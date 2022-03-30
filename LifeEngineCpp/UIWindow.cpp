@@ -8,7 +8,6 @@
 
 UIWindow::UIWindow(int window_width, int window_height, int simulation_width, int simulation_height, int window_fps,
                    int simulation_fps) : window_width(window_width), window_height(window_height),
-                                         simulation_width(simulation_width), simulation_height(simulation_height),
                                          max_window_fps(window_fps), max_simulation_fps(simulation_fps) {
     settings = sf::ContextSettings();
     settings.antialiasingLevel = 0;
@@ -20,12 +19,13 @@ UIWindow::UIWindow(int window_width, int window_height, int simulation_width, in
     set_window_interval();
     set_simulation_interval();
 
-    simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
+    dc.simulation_width = simulation_width;
+    dc.simulation_height = simulation_height;
+
+    dc.simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     //engine = new SimulationEngine(simulation_width, simulation_height, std::ref(simulation_grid), std::ref(engine_ticks), std::ref(engine_working), std::ref(engine_paused), std::ref(engine_mutex));
-    engine = new SimulationEngine(std::ref(simulation_width), std::ref(simulation_height),
-                                  std::ref(simulation_grid), std::ref(engine_ticks), std::ref(engine_working),
-                                  std::ref(engine_pause), std::ref(engine_paused), std::ref(engine_global_pause),
-                                  std::ref(engine_pass_tick), engine_mutex);
+    engine = new SimulationEngine(std::ref(dc), std::ref(cp), engine_mutex);
 
 //    std::random_device rd;
 //    std::mt19937 mt(rd());
@@ -64,20 +64,21 @@ void UIWindow::multi_thread_main_loop() {
 
     fps_timer = clock.now();
     while (window.isOpen()) {
-        std::this_thread::sleep_for(std::chrono::microseconds(int(window_interval*1000000 - std::abs(std::chrono::duration_cast<std::chrono::microseconds>(end-start).count()))));
+        std::this_thread::sleep_for(std::chrono::microseconds(int(window_interval*1000000 - delta_window_processing_time)));
         start = clock.now();
         window_tick();
         window_frames++;
         end = clock.now();
+        delta_window_processing_time = std::abs(std::chrono::duration_cast<std::chrono::microseconds>(end-start).count());
         // timer
         if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - fps_timer).count() / 1000. > 1) {
             //TODO make pausing logic better.
             //pauses engine, parses/loads data from/to engine, resumes engine. It looks stupid, but works
-            engine_pause = true;
+            cp.engine_pause = true;
             wait_for_engine_to_pause();
-            simulation_frames = engine_ticks;
-            engine_ticks = 0;
-            engine_pause = false;
+            simulation_frames = dc.engine_ticks;
+            dc.engine_ticks = 0;
+            cp.engine_pause = false;
 
             update_fps_labels(window_frames, simulation_frames);
 
@@ -87,35 +88,6 @@ void UIWindow::multi_thread_main_loop() {
         }
     }
 }
-
-//void UIWindow::multi_thread_main_loop() {
-//    engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
-//    engine_thread.detach();
-//
-//    if (!unlimited_window_fps) {last_window_update = clock.now();}
-//    fps_timer = clock.now();
-//    while (window.isOpen()) {
-//        std::this_thread::sleep_for(std::chrono::microseconds(int(window_interval*1000000.)));
-//        //if (unlimited_window_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_window_update).count() / 1000000. >= window_interval) {
-//        window_tick();
-//        window_frames++;
-//        //last_window_update = clock.now();
-//        //}
-//        // timer
-//        if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - fps_timer).count() / 1000. > 1) {
-//            engine_paused = true;
-//            simulation_frames = engine_ticks;
-//            engine_ticks = 0;
-//            engine_paused = false;
-//
-//            update_fps_labels(window_frames, simulation_frames);
-//
-//            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second\n";
-//            window_frames = 0;
-//            fps_timer = clock.now();
-//        }
-//    }
-//}
 
 void UIWindow::single_thread_main_loop() {
     if (!unlimited_window_fps) {last_window_update = clock.now();}
@@ -156,7 +128,7 @@ void UIWindow::window_tick() {
         gui.handleEvent(event);
 
         if (event.type == sf::Event::Closed) {
-            engine_working = false;
+            cp.engine_working = false;
             window.close();
             //TODO detached thread doesn't want to stop. oh well.
             exit(0);
@@ -202,10 +174,14 @@ void UIWindow::window_tick() {
                 configure_simulation_canvas();
                 configure_menu_canvas();
             } else if (event.key.code == sf::Keyboard::Space) {
-                engine_global_pause = !engine_global_pause;
+                cp.engine_global_pause = !cp.engine_global_pause;
             // the ">" key
             } else if (event.key.code == sf::Keyboard::Period) {
-                engine_pass_tick = true;
+                cp.engine_pass_tick = true;
+            } else if (event.key.code == sf::Keyboard::S) {
+                pause_image_construction = !pause_image_construction;
+                // calculating delta time is not needed when no image is being created.
+                cp.calculate_simulation_tick_delta_time = !cp.calculate_simulation_tick_delta_time;
             }
         } else if (event.type == sf::Event::Resized) {
             configure_simulation_canvas();
@@ -348,8 +324,8 @@ void UIWindow::move_center(int delta_x, int delta_y) {
 }
 
 void UIWindow::reset_image() {
-    center_x = (float)simulation_width/2;
-    center_y = (float)simulation_height/2;
+    center_x = (float)dc.simulation_width/2;
+    center_y = (float)dc.simulation_height/2;
     // finds exponent needed to scale the sprite
     auto exp = log((float)start_height/window_height) / log(1.05);
     scaling_zoom = pow(scaling_coefficient, exp);
@@ -392,21 +368,23 @@ void UIWindow::create_image() {
     auto lin_width = linspace(start_x, end_x, image_width);
     auto lin_height = linspace(start_y, end_y, image_height);
 
-    //it does not help
-    //#pragma omp parallel for
-    engine_pause = true;
-    // pausing engine to parse data from engine.
-    wait_for_engine_to_pause();
+    if (!pause_image_construction && !cp.engine_global_pause) {
+        //it does not help
+        //#pragma omp parallel for
+        cp.engine_pause = true;
+        // pausing engine to parse data from engine.
+        auto paused = wait_for_engine_to_pause();
+        // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
+        if (paused) { parse_simulation_grid(); cp.engine_pause = false;}
+    }
 
-    //TODO copying array could be faster for the engine.
     for (int x = 0; x < image_width; x++) {
-        if ((int) lin_width[x] < 0 || (int) lin_width[x] >= simulation_width) { continue; }
+        if ((int) lin_width[x] < 0 || (int) lin_width[x] >= dc.simulation_width) { continue; }
         for (int y = 0; y < image_height; y++) {
-            if ((int) lin_height[y] < 0 || (int) lin_height[y] >= simulation_height) { continue; }
-            image.setPixel(x, y, get_color(simulation_grid[(int) lin_width[x]][(int) lin_height[y]].type));
+            if ((int) lin_height[y] < 0 || (int) lin_height[y] >= dc.simulation_height) { continue; }
+            image.setPixel(x, y, get_color(dc.second_simulation_grid[(int) lin_width[x]][(int) lin_height[y]].type));
         }
     }
-    engine_pause = false;
 
     texture.loadFromImage(image);
     sprite.setTexture(texture);
@@ -444,10 +422,28 @@ void UIWindow::set_simulation_interval() {
     unlimited_simulation_fps = false;
 }
 
-// I guess O3 optimization will just put infinite loop here, huh.
-void __attribute__((optimize("O0"))) UIWindow::wait_for_engine_to_pause() {
-    if (engine_global_pause) {return;}
-    while (!engine_paused) {}
+// __attribute__((optimize("O0")))
+bool UIWindow::wait_for_engine_to_pause() {
+    // if engine is paused by user, then return if engine is really paused.
+    if (cp.engine_global_pause) {return cp.engine_paused;}
+    auto sleeping_time = std::chrono::microseconds (int(dc.delta_time*1.5));
+    // if sleeping time is larger than spare window processing time, then not wait and return result straight away.
+    //TODO not needed
+    if (!allow_waiting_overhead) {
+        if (sleeping_time.count() > int(window_interval * std::chrono::microseconds::period::den) - delta_window_processing_time) { return cp.engine_paused; }
+    } else {
+        if (sleeping_time.count() > int(window_interval * std::chrono::microseconds::period::den)) { return cp.engine_paused; }
+    }
+    std::this_thread::sleep_for(sleeping_time);
+    return cp.engine_paused;
+}
+
+void UIWindow::parse_simulation_grid() {
+    for (int x = 0; x < dc.simulation_width; x++) {
+        for (int y = 0; y < dc.simulation_height; y++) {
+            dc.second_simulation_grid[x][y].type = dc.simulation_grid[x][y].type;
+        }
+    }
 }
 
 std::vector<double> UIWindow::linspace(double start, double end, int num) {

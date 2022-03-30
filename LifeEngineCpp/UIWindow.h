@@ -6,18 +6,18 @@
 #define LANGUAGES_UIWINDOW_H
 
 #include <iostream>
-#include <atomic>
-//#include <SFML/Graphics.hpp>
-#include "TGUI/TGUI.hpp"
-#include "chrono"
-#include "cmath"
+#include <TGUI/TGUI.hpp>
+#include <chrono>
+#include <cmath>
+#include <thread>
+#include <omp.h>
+#include <random>
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
 #include "UIElemets/GridLayout2D.h"
-#include "random"
 #include "ParametersStruct.h"
-#include "thread"
-#include "omp.h"
+#include "EngineControlContainer.h"
+#include "EngineDataContainer.h"
 
 class UIWindow {
 private:
@@ -27,10 +27,6 @@ private:
     // by how much pixels is allowed to be after the end of simulation image.
     // (blank space after dragging image)
     int allow_num_padding = 50;
-
-    // dimensions of the simulation
-    int simulation_width = 600;
-    int simulation_height = 600;
 
     // x>1
     float scaling_coefficient = 1.05;
@@ -84,6 +80,8 @@ private:
 
     float window_interval = 0.;
     float simulation_interval = 0.;
+    long delta_window_processing_time = 0;
+    bool allow_waiting_overhead = false;
 
     //percentage for menu
     float menu_size = 0.33;
@@ -98,9 +96,6 @@ private:
 
     ColorContainer color_container;
 
-    // For multithreading purposes
-    std::vector<std::vector<BaseGridBlock>> simulation_grid;
-
     tgui::Label::Ptr window_fps_label;
     tgui::Label::Ptr simulation_fps_label;
 
@@ -108,21 +103,15 @@ private:
 
     ParametersStruct parameters{};
 
-    // if false then engine will stop
-    bool engine_working = true;
-    // a signal for engine to pause working when true to parse data
-    bool engine_pause = false;
-    // pauses the engine when true by user input
-    bool engine_global_pause = false;
-    // will do one tick and then return to being stopped.
-    bool engine_pass_tick = false;
-    // a signal for window process that engine is stopped, and window process can parse data from engine
-    bool engine_paused = false;
-    int engine_ticks = 0;
+    EngineControlParameters cp;
+    EngineDataContainer dc;
+
     std::thread engine_thread;
     std::mutex engine_mutex;
     //TODO delete in the future
     bool separate_process = true;
+
+    bool pause_image_construction = false;
 
     static std::vector<double> linspace(double start, double end, int num);
 
@@ -142,7 +131,8 @@ private:
     void single_thread_main_loop();
     void multi_thread_main_loop();
 
-    void wait_for_engine_to_pause();
+    bool wait_for_engine_to_pause();
+    void parse_simulation_grid();
 
 public:
     UIWindow(int window_width, int window_height,
