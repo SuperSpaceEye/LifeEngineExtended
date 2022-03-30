@@ -1,0 +1,15 @@
+//
+// Created by spaceeye on 29.03.2022.
+//
+
+#ifndef THELIFEENGINECPP_SIMULATIONMODES_H
+#define THELIFEENGINECPP_SIMULATIONMODES_H
+
+enum SimulationModes {
+    CPU_MODE,
+    CUDA_MODE,
+    OPENCL_MODE,
+    GPUFORT_MODE //?
+};
+
+#endif //THELIFEENGINECPP_SIMULATIONMODES_H
