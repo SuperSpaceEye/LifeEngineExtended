@@ -13,18 +13,21 @@
 #include "BlockTypes.h"
 #include "EngineControlContainer.h"
 #include "EngineDataContainer.h"
+#include "OrganismBlockParameters.h"
 
 class SimulationEngine {
 
     EngineControlParameters& cp;
     EngineDataContainer& dc;
+    OrganismBlockParameters& op;
 
     std::mutex& mutex;
 
     void process_user_action_pool();
 
 public:
-    SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters, std::mutex& mutex);
+    SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
+                     OrganismBlockParameters& organism_block_parameters, std::mutex& mutex);
     void simulation_tick();
     void threaded_mainloop();
 };

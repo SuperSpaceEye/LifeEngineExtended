@@ -31,9 +31,9 @@ UIWindow::UIWindow(int window_width, int window_height, int simulation_width, in
 //    std::mt19937 mt(rd());
 //    std::uniform_int_distribution<int> dist(0, 8);
 //
-//    for (int x = 0; x < simulation_width; x++) {
-//        for (int y = 0; y < simulation_height; y++) {
-//            simulation_grid[x][y].type = static_cast<BlockTypes>(dist(mt));
+//    for (int relative_x = 0; relative_x < simulation_width; relative_x++) {
+//        for (int relative_y = 0; relative_y < simulation_height; relative_y++) {
+//            simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(mt));
 //        }
 //    }
 
@@ -332,7 +332,7 @@ void UIWindow::reset_image() {
 }
 
 // TODO it is probably possible to do better.
-inline sf::Color& UIWindow::get_color(BlockTypes type) {
+sf::Color& UIWindow::get_color(BlockTypes type) {
     switch (type) {
         case EmptyBlock :   return color_container.empty_block;
         case MouthBlock:    return color_container.mouth;
@@ -348,7 +348,7 @@ inline sf::Color& UIWindow::get_color(BlockTypes type) {
 }
 
 // it works... surprisingly well. There are no difference between full and partial methods as far as i can see.
-//TODO bug. it has double pixel row and collumn at the left and up boundaries.
+//TODO bug. it has double pixel row and column at the left and up boundaries.
 void UIWindow::create_image() {
     // very important
     sprite = sf::Sprite{};

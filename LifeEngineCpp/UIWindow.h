@@ -18,6 +18,7 @@
 #include "ParametersStruct.h"
 #include "EngineControlContainer.h"
 #include "EngineDataContainer.h"
+#include "OrganismBlockParameters.h"
 
 class UIWindow {
 private:
@@ -28,7 +29,7 @@ private:
     // (blank space after dragging image)
     int allow_num_padding = 50;
 
-    // x>1
+    // relative_x>1
     float scaling_coefficient = 1.05;
     float scaling_zoom = 1;
 
@@ -105,6 +106,7 @@ private:
 
     EngineControlParameters cp;
     EngineDataContainer dc;
+    OrganismBlockParameters op;
 
     std::thread engine_thread;
     std::mutex engine_mutex;

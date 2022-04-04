@@ -4,8 +4,9 @@
 
 #include "SimulationEngine.h"
 
-SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters, std::mutex& mutex):
-    mutex(mutex), dc(engine_data_container), cp(engine_control_parameters){}
+SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
+                                   OrganismBlockParameters& organism_block_parameters, std::mutex& mutex):
+    mutex(mutex), dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters){}
 
 // TODO maybe not important. the majority of cpu time is spent on lock, but for now it's just an increment, so idk.
 void SimulationEngine::threaded_mainloop() {
@@ -31,11 +32,11 @@ void SimulationEngine::threaded_mainloop() {
 void SimulationEngine::simulation_tick() {
     dc.engine_ticks++;
 
-    for (int x = 0; x < dc.simulation_width; x++) {
-        for (int y = 0; y < dc.simulation_height; y++) {
-            dc.simulation_grid[x][y].type = static_cast<BlockTypes>(std::abs(dc.engine_ticks%9));
-        }
-    }
+//    for (int relative_x = 0; relative_x < dc.simulation_width; relative_x++) {
+//        for (int relative_y = 0; relative_y < dc.simulation_height; relative_y++) {
+//            dc.simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(std::abs(dc.engine_ticks%9));
+//        }
+//    }
 }
 
 
