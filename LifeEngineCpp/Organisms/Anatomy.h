@@ -18,7 +18,8 @@ struct OrganismBlockContainer {
     int relative_x;
     int relative_y;
 
-    OrganismBlockContainer(OrganismBlock organism_block,int relative_x,int relative_y):
+    OrganismBlockContainer()=default;
+    OrganismBlockContainer(OrganismBlock organism_block, int relative_x,int relative_y):
     organism_block(organism_block), relative_x(relative_x), relative_y(relative_y) {}
 };
 
@@ -26,6 +27,7 @@ struct AdjacentSpaceContainer {
     int relative_x;
     int relative_y;
 
+    AdjacentSpaceContainer()=default;
     AdjacentSpaceContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 };
@@ -35,6 +37,7 @@ struct OrganismStructureContainer {
     std::vector<AdjacentSpaceContainer> single_adjacent_space;
     std::vector<AdjacentSpaceContainer> double_adjacent_space;
 
+    OrganismStructureContainer()=default;
     OrganismStructureContainer(
             std::vector<OrganismBlockContainer> organism_blocks,
             std::vector<AdjacentSpaceContainer> single_adjacent_space,

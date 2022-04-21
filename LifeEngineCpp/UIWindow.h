@@ -22,8 +22,8 @@
 
 class UIWindow {
 private:
-    int window_width = 600;
-    int window_height = 600;
+    int window_width;
+    int window_height;
 
     // by how much pixels is allowed to be after the end of simulation image.
     // (blank space after dragging image)
@@ -40,8 +40,8 @@ private:
     float center_y = window_height/2;
 
     //TODO why do i need this again?
-    int image_width = 600;
-    int image_height = 600;
+    int image_width;
+    int image_height;
 
     int start_height = 100;
 
@@ -74,13 +74,11 @@ private:
 
     // separate from each other
     // if <=0 then unlimited
-    int max_window_fps = 0;
+    int max_window_fps;
     bool unlimited_window_fps = false;
-    int max_simulation_fps = 0;
-    bool unlimited_simulation_fps = true;
+    int max_simulation_fps;
 
     float window_interval = 0.;
-    float simulation_interval = 0.;
     long delta_window_processing_time = 0;
     bool allow_waiting_overhead = false;
 
@@ -114,6 +112,7 @@ private:
     bool separate_process = true;
 
     bool pause_image_construction = false;
+    bool full_simulation_grid_parsed = false;
 
     static std::vector<double> linspace(double start, double end, int num);
 
@@ -134,7 +133,8 @@ private:
     void multi_thread_main_loop();
 
     bool wait_for_engine_to_pause();
-    void parse_simulation_grid();
+    void parse_simulation_grid(std::vector<int> lin_width, std::vector<int> lin_height);
+    void parse_full_simulation_grid(bool parse);
 
 public:
     UIWindow(int window_width, int window_height,

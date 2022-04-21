@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <mutex>
+#include <thread>
 #include "GridBlocks/BaseGridBlock.h"
 #include "Organisms/Organism.h"
 #include "BlockTypes.h"
@@ -23,7 +24,15 @@ class SimulationEngine {
 
     std::mutex& mutex;
 
+    std::chrono::high_resolution_clock clock;
+    std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
+
     void process_user_action_pool();
+
+
+    std::random_device rd;
+    std::mt19937 mt;
+    std::uniform_int_distribution<int> dist;
 
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,

@@ -25,7 +25,7 @@ UIWindow::UIWindow(int window_width, int window_height, int simulation_width, in
     dc.simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     dc.second_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     //engine = new SimulationEngine(simulation_width, simulation_height, std::ref(simulation_grid), std::ref(engine_ticks), std::ref(engine_working), std::ref(engine_paused), std::ref(engine_mutex));
-    engine = new SimulationEngine(std::ref(dc), std::ref(cp), engine_mutex);
+    engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), engine_mutex);
 
 //    std::random_device rd;
 //    std::mt19937 mt(rd());
@@ -90,30 +90,30 @@ void UIWindow::multi_thread_main_loop() {
 }
 
 void UIWindow::single_thread_main_loop() {
-    if (!unlimited_window_fps) {last_window_update = clock.now();}
-    if (!unlimited_simulation_fps) {last_simulation_update = clock.now();}
-    fps_timer = clock.now();
-    while (window.isOpen()) {
-        if (unlimited_window_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_window_update).count() / 1000000. >= window_interval) {
-            window_tick();
-            window_frames++;
-            last_window_update = clock.now();
-        }
-        if (unlimited_simulation_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_simulation_update).count() / 1000000. >= simulation_interval) {
-            engine->simulation_tick();
-            simulation_frames++;
-            last_simulation_update = clock.now();
-        }
-        // timer
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - fps_timer).count() / 1000. > 1) {
-            update_fps_labels(window_frames, simulation_frames);
-
-            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second\n";
-            window_frames = 0;
-            simulation_frames = 0;
-            fps_timer = clock.now();
-        }
-    }
+//    if (!unlimited_window_fps) {last_window_update = clock.now();}
+//    if (!dc.unlimited_simulation_fps) {last_simulation_update = clock.now();}
+//    fps_timer = clock.now();
+//    while (window.isOpen()) {
+//        if (unlimited_window_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_window_update).count() / 1000000. >= window_interval) {
+//            window_tick();
+//            window_frames++;
+//            last_window_update = clock.now();
+//        }
+//        if (dc.unlimited_simulation_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_simulation_update).count() / 1000000. >= simulation_interval) {
+//            engine->simulation_tick();
+//            simulation_frames++;
+//            last_simulation_update = clock.now();
+//        }
+//        // timer
+//        if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - fps_timer).count() / 1000. > 1) {
+//            update_fps_labels(window_frames, simulation_frames);
+//
+//            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second\n";
+//            window_frames = 0;
+//            simulation_frames = 0;
+//            fps_timer = clock.now();
+//        }
+//    }
 }
 
 void UIWindow::update_fps_labels(int fps, int sps) {
@@ -139,6 +139,7 @@ void UIWindow::window_tick() {
                 scaling_zoom *= scaling_coefficient;
             }
         } else if (event.type == sf::Event::MouseButtonPressed) {
+            //TODO make middle click
             if (event.mouseButton.button == sf::Mouse::Right) {
                 auto position = sf::Mouse::getPosition(window);
 
@@ -180,6 +181,7 @@ void UIWindow::window_tick() {
                 cp.engine_pass_tick = true;
             } else if (event.key.code == sf::Keyboard::S) {
                 pause_image_construction = !pause_image_construction;
+                parse_full_simulation_grid(pause_image_construction);
                 // calculating delta time is not needed when no image is being created.
                 cp.calculate_simulation_tick_delta_time = !cp.calculate_simulation_tick_delta_time;
             }
@@ -347,7 +349,6 @@ sf::Color& UIWindow::get_color(BlockTypes type) {
     }
 }
 
-// it works... surprisingly well. There are no difference between full and partial methods as far as i can see.
 //TODO bug. it has double pixel row and column at the left and up boundaries.
 void UIWindow::create_image() {
     // very important
@@ -368,6 +369,15 @@ void UIWindow::create_image() {
     auto lin_width = linspace(start_x, end_x, image_width);
     auto lin_height = linspace(start_y, end_y, image_height);
 
+    std::vector<int> truncated_lin_width; truncated_lin_width.reserve(image_width);
+    std::vector<int> truncated_lin_height; truncated_lin_height.reserve(image_height);
+
+    int min_val = -1;
+    for (int x = 0; x < image_width; x++) {
+        if (int(lin_width[x]) > min_val) {min_val = int(lin_width[x]); truncated_lin_width.push_back(min_val);}}
+    min_val = -1;
+    for (int y = 0; y < image_height; y++) {if (int(lin_height[y]) > min_val) {min_val = int(lin_height[y]); truncated_lin_height.push_back(min_val);}}
+
     if (!pause_image_construction && !cp.engine_global_pause) {
         //it does not help
         //#pragma omp parallel for
@@ -375,7 +385,7 @@ void UIWindow::create_image() {
         // pausing engine to parse data from engine.
         auto paused = wait_for_engine_to_pause();
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
-        if (paused) { parse_simulation_grid(); cp.engine_pause = false;}
+        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); cp.engine_pause = false;}
     }
 
     for (int x = 0; x < image_width; x++) {
@@ -414,12 +424,12 @@ void UIWindow::set_window_interval() {
 
 void UIWindow::set_simulation_interval() {
     if (max_simulation_fps <= 0) {
-        simulation_interval = 0.;
-        unlimited_simulation_fps = true;
+        dc.simulation_interval = 0.;
+        dc.unlimited_simulation_fps = true;
         return;
     }
-    simulation_interval = 1./max_simulation_fps;
-    unlimited_simulation_fps = false;
+    dc.simulation_interval = 1./max_simulation_fps;
+    dc.unlimited_simulation_fps = false;
 }
 
 // __attribute__((optimize("O0")))
@@ -438,16 +448,34 @@ bool UIWindow::wait_for_engine_to_pause() {
     return cp.engine_paused;
 }
 
-void UIWindow::parse_simulation_grid() {
-    for (int x = 0; x < dc.simulation_width; x++) {
-        for (int y = 0; y < dc.simulation_height; y++) {
+void UIWindow::parse_simulation_grid(std::vector<int> lin_width, std::vector<int> lin_height) {
+    for (int x: lin_width) {
+        if (x < 0 || x >= dc.simulation_width) { continue; }
+        for (int y: lin_height) {
+            if (y < 0 || y >= dc.simulation_height) { continue; }
             dc.second_simulation_grid[x][y].type = dc.simulation_grid[x][y].type;
         }
     }
 }
 
+void UIWindow::parse_full_simulation_grid(bool parse) {
+    if (!parse) {return;}
+    full_simulation_grid_parsed = true;
+
+    cp.engine_pause = true;
+    while(!wait_for_engine_to_pause()) {}
+
+    for (int x = 0; x < dc.simulation_width; x++) {
+        for (int y = 0; y < dc.simulation_height; y++) {
+            dc.second_simulation_grid[x][y].type = dc.simulation_grid[x][y].type;
+        }
+    }
+    cp.engine_pause = false;
+}
+
 std::vector<double> UIWindow::linspace(double start, double end, int num) {
     std::vector<double> linspaced;
+    linspaced.reserve(num);
 
     if (num == 0) { return linspaced; }
     if (num == 1)
