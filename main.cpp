@@ -5,6 +5,7 @@
 #include "LifeEngineCpp/Organisms/Organism_parts/OrganismBlock.h"
 #include "LifeEngineCpp/BlockTypes.h"
 #include "thread"
+#include "LifeEngineCpp/Linspace.h"
 
 int WINDOW_WIDTH = 800;
 int WINDOW_HEIGHT = 800;
@@ -12,6 +13,8 @@ int SIMULATION_WIDTH = 600;
 int SIMULATION_HEIGHT = 600;
 int MAX_WINDOW_FPS = 60;
 int MAX_SIMULATION_FPS = 60;
+// should not be num_processes > cpu_cores, cpu_cores-2 works the best (for me)
+int START_SIMULATION_THREADS = 14;
 
 //TODO refractor types to be more concrete int->int32
 int main() {
@@ -20,7 +23,8 @@ int main() {
                            SIMULATION_WIDTH,
                            SIMULATION_HEIGHT,
                            MAX_WINDOW_FPS,
-                           MAX_SIMULATION_FPS};
+                           MAX_SIMULATION_FPS,
+                           START_SIMULATION_THREADS};
 
     window.main_loop();
 

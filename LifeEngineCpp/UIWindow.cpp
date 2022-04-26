@@ -7,7 +7,7 @@
 #include "UIWindow.h"
 
 UIWindow::UIWindow(int window_width, int window_height, int simulation_width, int simulation_height, int window_fps,
-                   int simulation_fps) : window_width(window_width), window_height(window_height),
+                   int simulation_fps, int simulation_num_threads) : window_width(window_width), window_height(window_height),
                                          max_window_fps(window_fps), max_simulation_fps(simulation_fps) {
     settings = sf::ContextSettings();
     settings.antialiasingLevel = 0;
@@ -21,6 +21,8 @@ UIWindow::UIWindow(int window_width, int window_height, int simulation_width, in
 
     dc.simulation_width = simulation_width;
     dc.simulation_height = simulation_height;
+
+    set_simulation_num_threads(simulation_num_threads);
 
     dc.simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     dc.second_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
@@ -47,14 +49,6 @@ UIWindow::UIWindow(int window_width, int window_height, int simulation_width, in
 }
 
 void UIWindow::main_loop() {
-    if (separate_process) {
-        multi_thread_main_loop();
-    } else {
-        single_thread_main_loop();
-    }
-}
-
-void UIWindow::multi_thread_main_loop() {
     engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
     engine_thread.detach();
 
@@ -64,7 +58,7 @@ void UIWindow::multi_thread_main_loop() {
 
     fps_timer = clock.now();
     while (window.isOpen()) {
-        std::this_thread::sleep_for(std::chrono::microseconds(int(window_interval*1000000 - delta_window_processing_time)));
+        std::this_thread::sleep_for(std::chrono::microseconds(int(window_interval * 1000000 - delta_window_processing_time)));
         start = clock.now();
         window_tick();
         window_frames++;
@@ -87,33 +81,6 @@ void UIWindow::multi_thread_main_loop() {
             fps_timer = clock.now();
         }
     }
-}
-
-void UIWindow::single_thread_main_loop() {
-//    if (!unlimited_window_fps) {last_window_update = clock.now();}
-//    if (!dc.unlimited_simulation_fps) {last_simulation_update = clock.now();}
-//    fps_timer = clock.now();
-//    while (window.isOpen()) {
-//        if (unlimited_window_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_window_update).count() / 1000000. >= window_interval) {
-//            window_tick();
-//            window_frames++;
-//            last_window_update = clock.now();
-//        }
-//        if (dc.unlimited_simulation_fps || std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_simulation_update).count() / 1000000. >= simulation_interval) {
-//            engine->simulation_tick();
-//            simulation_frames++;
-//            last_simulation_update = clock.now();
-//        }
-//        // timer
-//        if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - fps_timer).count() / 1000. > 1) {
-//            update_fps_labels(window_frames, simulation_frames);
-//
-//            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second\n";
-//            window_frames = 0;
-//            simulation_frames = 0;
-//            fps_timer = clock.now();
-//        }
-//    }
 }
 
 void UIWindow::update_fps_labels(int fps, int sps) {
@@ -415,11 +382,9 @@ void UIWindow::make_image() {
 void UIWindow::set_window_interval() {
     if (max_window_fps <= 0) {
         window_interval = 0.;
-        unlimited_window_fps = true;
         return;
     }
     window_interval = 1./max_window_fps;
-    unlimited_window_fps = false;
 }
 
 void UIWindow::set_simulation_interval() {
@@ -471,6 +436,11 @@ void UIWindow::parse_full_simulation_grid(bool parse) {
         }
     }
     cp.engine_pause = false;
+}
+
+void UIWindow::set_simulation_num_threads(uint8_t num_threads) {
+    cp.num_threads = num_threads;
+    cp.build_threads = true;
 }
 
 std::vector<double> UIWindow::linspace(double start, double end, int num) {

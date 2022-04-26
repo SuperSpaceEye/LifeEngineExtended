@@ -5,6 +5,12 @@
 #ifndef THELIFEENGINECPP_ENGINECONTROLCONTAINER_H
 #define THELIFEENGINECPP_ENGINECONTROLCONTAINER_H
 
+enum class SimulationModes {
+    CPU_Single_Threaded,
+    CPU_Multi_Threaded,
+    GPU_CUDA_mode,
+};
+
 struct EngineControlParameters {
     // if false then engine will stop
     bool engine_working = true;
@@ -18,6 +24,13 @@ struct EngineControlParameters {
     bool engine_paused = false;
     // for image creating purposes
     bool calculate_simulation_tick_delta_time = true;
+    // if true, will build the threads
+    bool build_threads = false;
+
+    SimulationModes simulation_mode = SimulationModes::CPU_Multi_Threaded;
+
+    uint8_t num_threads = 1;
+
 };
 
 #endif //THELIFEENGINECPP_ENGINECONTROLCONTAINER_H

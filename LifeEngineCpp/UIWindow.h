@@ -75,7 +75,6 @@ private:
     // separate from each other
     // if <=0 then unlimited
     int max_window_fps;
-    bool unlimited_window_fps = false;
     int max_simulation_fps;
 
     float window_interval = 0.;
@@ -108,8 +107,6 @@ private:
 
     std::thread engine_thread;
     std::mutex engine_mutex;
-    //TODO delete in the future
-    bool separate_process = true;
 
     bool pause_image_construction = false;
     bool full_simulation_grid_parsed = false;
@@ -129,17 +126,16 @@ private:
 
     inline sf::Color& get_color(BlockTypes type);
 
-    void single_thread_main_loop();
-    void multi_thread_main_loop();
-
     bool wait_for_engine_to_pause();
     void parse_simulation_grid(std::vector<int> lin_width, std::vector<int> lin_height);
     void parse_full_simulation_grid(bool parse);
 
+    void set_simulation_num_threads(uint8_t num_threads);
+
 public:
     UIWindow(int window_width, int window_height,
              int simulation_width, int simulation_height,
-             int window_fps, int simulation_fps);
+             int window_fps, int simulation_fps, int simulation_num_threads);
 
     // the main loop of the program
     void main_loop();
