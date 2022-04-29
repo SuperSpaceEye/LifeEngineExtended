@@ -52,7 +52,6 @@ void UIWindow::main_loop() {
     engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
     engine_thread.detach();
 
-    //TODO limits fps by sleep(window_interval-time_to_process_one_frame).
     auto start = clock.now();
     auto end = clock.now();
 
@@ -95,10 +94,8 @@ void UIWindow::window_tick() {
         gui.handleEvent(event);
 
         if (event.type == sf::Event::Closed) {
-            cp.engine_working = false;
+            cp.stop_engine = true;
             window.close();
-            //TODO detached thread doesn't want to stop. oh well.
-            exit(0);
         } else if (event.type == sf::Event::MouseWheelScrolled) {
             if (event.mouseWheelScroll.delta == 1) {
                 scaling_zoom /= scaling_coefficient;
@@ -143,9 +140,11 @@ void UIWindow::window_tick() {
                 configure_menu_canvas();
             } else if (event.key.code == sf::Keyboard::Space) {
                 cp.engine_global_pause = !cp.engine_global_pause;
+                parse_full_simulation_grid(cp.engine_global_pause);
             // the ">" key
             } else if (event.key.code == sf::Keyboard::Period) {
                 cp.engine_pass_tick = true;
+                parse_full_simulation_grid(true);
             } else if (event.key.code == sf::Keyboard::S) {
                 pause_image_construction = !pause_image_construction;
                 parse_full_simulation_grid(pause_image_construction);
@@ -161,7 +160,6 @@ void UIWindow::window_tick() {
         }
     }
     window.clear(sf::Color(0, 0, 0, 255));
-    //todo delete in the future?
     make_image();
     gui.draw();
     window.display();
@@ -372,10 +370,6 @@ void UIWindow::make_image() {
 
     canvas->clear(color_container.simulation_background_color);
     canvas->draw(sprite);
-    //TODO bug. rarely throws malloc for some reason.
-    // and now I can't catch it. great.
-
-    //TODO second bug. with canvas displaying, the fps is lower for some reason. And it can run faster, it just doesn't want to.
     canvas->display();
 }
 

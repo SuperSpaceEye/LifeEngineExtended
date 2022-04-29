@@ -12,13 +12,17 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
     dist = std::uniform_int_distribution<int>{0, 8};
 }
 
-// TODO maybe not important. the majority of cpu time is spent on lock, but for now it's just an increment, so idk.
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
     while (cp.engine_working) {
-        //TODO timer works very strange
 //        if (cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
         std::lock_guard<std::mutex> guard(mutex);
+        if (cp.stop_engine) {
+            kill_threads();
+            cp.engine_working = false;
+            cp.stop_engine = false;
+            return;
+        }
         if (cp.build_threads) {build_threads();}
         if (!cp.engine_global_pause || cp.engine_pass_tick) {
             if (!cp.engine_pause) {
@@ -41,7 +45,7 @@ void SimulationEngine::simulation_tick() {
 
     switch (cp.simulation_mode){
         case SimulationModes::CPU_Single_Threaded:
-            single_threaded_tick(&dc);
+            single_threaded_tick(&dc, &mt);
             break;
         case SimulationModes::CPU_Multi_Threaded:
             multi_threaded_tick();
@@ -52,7 +56,7 @@ void SimulationEngine::simulation_tick() {
     }
 }
 
-void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, int start_relative_x, int start_relative_y, int end_relative_x, int end_relative_y) {
+void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, std::mt19937 * mt, int start_relative_x, int start_relative_y, int end_relative_x, int end_relative_y) {
     if (end_relative_x == 0 && end_relative_y == 0) {
         end_relative_x = dc->simulation_width;
         end_relative_y = dc->simulation_height;
@@ -60,19 +64,23 @@ void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, int start_
 
     for (int relative_x = start_relative_x; relative_x < end_relative_x; relative_x++) {
         for (int relative_y = start_relative_y; relative_y < end_relative_y; relative_y++) {
-            dc->simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(std::abs(dc->engine_ticks%9));
+            dc->simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dc->engine_ticks%9);
         }
     }
 
-//    for (int relative_x = 0; relative_x < dc.simulation_width; relative_x++) {
-//        for (int relative_y = 0; relative_y < dc.simulation_height; relative_y++) {
-//            dc.simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(mt));
+
+//    auto dist = std::uniform_int_distribution<int>(0, 8);
+//
+//    for (int relative_x = start_relative_x; relative_x < end_relative_x; relative_x++) {
+//        for (int relative_y = start_relative_y; relative_y < end_relative_y; relative_y++) {
+//            dc->simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(*mt));
 //        }
 //    }
 }
+
 void SimulationEngine::multi_threaded_tick() {
     if (cp.num_threads <= 1) {
-        single_threaded_tick(&dc);
+        single_threaded_tick(&dc, &mt);
         return;
     }
 
@@ -89,13 +97,17 @@ void SimulationEngine::cuda_tick() {
 
 }
 
-void SimulationEngine::build_threads() {
+void SimulationEngine::kill_threads() {
     if (!threads.empty()) {
         for (auto & thread: threads) {
             thread.stop_work();
         }
         threads.clear();
     }
+}
+
+void SimulationEngine::build_threads() {
+    kill_threads();
     threads.reserve(cp.num_threads);
 
     thread_points.clear();

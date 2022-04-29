@@ -41,8 +41,7 @@ class SimulationEngine {
     void multi_threaded_tick();
     void cuda_tick();
     void build_threads();
-
-    void thread_wrapper();
+    void kill_threads();
 
     std::random_device rd;
     std::mt19937 mt;
@@ -54,6 +53,7 @@ public:
     void threaded_mainloop();
 
     static void single_threaded_tick(EngineDataContainer * dc,
+                                     std::mt19937 * mt,
                                      int start_relative_x = 0,
                                      int start_relative_y = 0,
                                      int end_relative_x = 0,
@@ -67,12 +67,19 @@ struct eager_worker {
     int end_relative_x = 0;
     int end_relative_y = 0;
 
+    std::random_device rd;
+    std::mt19937 mt;
+
     eager_worker() = default;
     eager_worker(EngineDataContainer * dc, int start_relative_x, int start_relative_y, int end_relative_x, int end_relative_y):
-            dc(dc), start_relative_x(start_relative_x), start_relative_y(start_relative_y), end_relative_x(end_relative_x), end_relative_y(end_relative_y){}
+            dc(dc), start_relative_x(start_relative_x), start_relative_y(start_relative_y), end_relative_x(end_relative_x), end_relative_y(end_relative_y){
+        mt = std::mt19937(rd());
+    }
     eager_worker(const eager_worker & worker):
             dc(worker.dc), start_relative_x(worker.start_relative_x), start_relative_y(worker.start_relative_y),
-            end_relative_x(worker.end_relative_x), end_relative_y(worker.end_relative_y){}
+            end_relative_x(worker.end_relative_x), end_relative_y(worker.end_relative_y){
+        mt = std::mt19937(rd());
+    }
 
     inline void work() {
         has_work.store(true);
@@ -109,7 +116,7 @@ private:
                     return;
                 }
             }
-            SimulationEngine::single_threaded_tick(dc, start_relative_x, start_relative_y, end_relative_x, end_relative_y);
+            SimulationEngine::single_threaded_tick(dc, &mt, start_relative_x, start_relative_y, end_relative_x, end_relative_y);
             has_work.store(false);
         }
     });

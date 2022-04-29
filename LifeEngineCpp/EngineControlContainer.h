@@ -14,6 +14,8 @@ enum class SimulationModes {
 struct EngineControlParameters {
     // if false then engine will stop
     bool engine_working = true;
+
+    bool stop_engine = false;
     // a signal for engine to pause working when true to parse data
     bool engine_pause = false;
     // pauses the engine when true by user input

@@ -5,13 +5,12 @@
 #ifndef THELIFEENGINECPP_ENGINEDATACONTAINER_H
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
-//TODO restructure elements in a struct
 struct EngineDataContainer {
+    uint64_t delta_time = 0;
+    uint32_t engine_ticks = 0;
     // dimensions of the simulation
-    int simulation_width = 600;
-    int simulation_height = 600;
-    int engine_ticks = 0;
-    long delta_time;
+    uint16_t simulation_width = 600;
+    uint16_t simulation_height = 600;
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
     std::vector<std::vector<BaseGridBlock>> simulation_grid;
