@@ -1,4 +1,5 @@
-#include "LifeEngineCpp/UIWindow.h"
+#include "LifeEngineCpp/WindowCore.h"
+#include <QApplication>
 
 int WINDOW_WIDTH = 800;
 int WINDOW_HEIGHT = 800;
@@ -9,17 +10,22 @@ int MAX_SIMULATION_FPS = 0;
 // should not be num_processes > cpu_cores, cpu_cores-2 works the best (for me)
 int START_SIMULATION_THREADS = 14;
 
-//TODO refactor types to be more concrete int->int32
-int main() {
-    auto window = UIWindow{WINDOW_WIDTH,
-                           WINDOW_HEIGHT,
-                           SIMULATION_WIDTH,
-                           SIMULATION_HEIGHT,
-                           MAX_WINDOW_FPS,
-                           MAX_SIMULATION_FPS,
-                           START_SIMULATION_THREADS};
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    QWidget widget;
 
-    window.main_loop();
+    auto window = WindowCore{WINDOW_WIDTH,
+                             WINDOW_HEIGHT,
+                             SIMULATION_WIDTH,
+                             SIMULATION_HEIGHT,
+                             MAX_WINDOW_FPS,
+                             MAX_SIMULATION_FPS,
+                             START_SIMULATION_THREADS,
+                             &widget};
+    widget.show();
+    return app.exec();
+
+
 
 //    boost::unordered_map<int, boost::unordered_map<int, int>> test_map;
 //    boost::unordered_map<int, boost::unordered_map<int, int>> second_map;

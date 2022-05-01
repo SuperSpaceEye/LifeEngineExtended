@@ -6,21 +6,28 @@
 #define LANGUAGES_UIWINDOW_H
 
 #include <iostream>
-#include <TGUI/TGUI.hpp>
 #include <chrono>
 #include <cmath>
 #include <thread>
 #include <omp.h>
 #include <random>
+
+#include <QApplication>
+#include <QWidget>
+#include <QTimer>
+#include <QGraphicsPixmapItem>
+#include <QMouseEvent>
+
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
-#include "UIElemets/GridLayout2D.h"
 #include "ParametersStruct.h"
 #include "EngineControlContainer.h"
 #include "EngineDataContainer.h"
 #include "OrganismBlockParameters.h"
+#include "WindowUI.h"
 
-class UIWindow {
+class WindowCore: public QWidget {
+        Q_OBJECT
 private:
     int window_width;
     int window_height;
@@ -40,8 +47,8 @@ private:
     float center_y = window_height/2;
 
     //TODO why do i need this again?
-    int image_width;
-    int image_height;
+//    int image_width = 600;
+//    int image_height = 600;
 
     int start_height = 100;
 
@@ -54,24 +61,6 @@ private:
 
     SimulationEngine* engine;
 
-    sf::Image image;
-    sf::Color base_simulation_color = sf::Color::White;
-
-    sf::Texture menu_texture;
-    sf::Image menu_image;
-    sf::Sprite menu_sprite;
-    tgui::CanvasSFML::Ptr menu_canvas;
-
-    sf::RenderWindow window;
-    sf::Font font;
-    sf::Texture texture;
-    sf::Sprite sprite;
-    sf::ContextSettings settings;
-
-    tgui::GuiSFML gui;
-    tgui::CanvasSFML::Ptr canvas;
-    std::vector<GridLayout2D*> layouts;
-
     // separate from each other
     // if <=0 then unlimited
     int max_window_fps;
@@ -80,6 +69,12 @@ private:
     float window_interval = 0.;
     long delta_window_processing_time = 0;
     bool allow_waiting_overhead = false;
+
+    Ui::MainWindow _ui;
+    QTimer * timer;
+    //void showEvent(QShowEvent *event);
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> end;
 
     //percentage for menu
     float menu_size = 0.33;
@@ -94,11 +89,6 @@ private:
 
     ColorContainer color_container;
 
-    tgui::Label::Ptr window_fps_label;
-    tgui::Label::Ptr simulation_fps_label;
-
-    std::vector<tgui::Widget::Ptr> menu_widgets;
-
     ParametersStruct parameters{};
 
     EngineControlParameters cp;
@@ -108,23 +98,26 @@ private:
     std::thread engine_thread;
     std::mutex engine_mutex;
 
+    QImage image;
+    std::vector<unsigned char> image_vector;
+    QGraphicsScene scene;
+    QGraphicsPixmapItem pixmap_item;
+
     bool pause_image_construction = false;
     bool full_simulation_grid_parsed = false;
 
-    static std::vector<double> linspace(double start, double end, int num);
-
+    void mainloop_tick();
     void window_tick();
     void set_simulation_interval();
     void set_window_interval();
-    void make_visuals();
     void update_fps_labels(int fps, int sps);
-
-    void configure_simulation_canvas();
-    void configure_menu_canvas();
+    void resize_image();
+    void set_image_pixel(int x, int y, QColor & color);
+    bool compare_pixel_color(int x, int y, QColor & color);
 
     void create_image();
 
-    inline sf::Color& get_color(BlockTypes type);
+    inline QColor& get_color(BlockTypes type);
 
     bool wait_for_engine_to_pause();
     void parse_simulation_grid(std::vector<int> lin_width, std::vector<int> lin_height);
@@ -132,14 +125,25 @@ private:
 
     void set_simulation_num_threads(uint8_t num_threads);
 
+
+    void closeEvent(QCloseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+    bool eventFilter(QObject *watched, QEvent *event);
+
+private slots:
+    void pause_slot(bool paused);
+    void stoprender_slot(bool stopped_render);
+    void clear_slot();
+    void reset_slot();
+    void pass_one_tick_slot();
+    void reset_view_slot();
+
 public:
-    UIWindow(int window_width, int window_height,
-             int simulation_width, int simulation_height,
-             int window_fps, int simulation_fps, int simulation_num_threads);
-
-    // the main loop of the program
-    void main_loop();
-
+    WindowCore(int window_width, int window_height,
+               int simulation_width, int simulation_height,
+               int window_fps, int simulation_fps, int simulation_num_threads,
+               QWidget *parent);
 };
 
 

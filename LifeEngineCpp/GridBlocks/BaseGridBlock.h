@@ -5,7 +5,6 @@
 #ifndef THELIFEENGINECPP_BASEGRIDBLOCK_H
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
-#include "SFML/Graphics.hpp"
 #include "../BlockTypes.h"
 
 class BaseGridBlock {
