@@ -11,12 +11,15 @@
 #include <thread>
 #include <omp.h>
 #include <random>
+#include <boost/lexical_cast.hpp>
+#include <boost/lexical_cast/try_lexical_convert.hpp>
 
 #include <QApplication>
 #include <QWidget>
 #include <QTimer>
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>
+#include <QMessageBox>
 
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
@@ -25,6 +28,12 @@
 #include "EngineDataContainer.h"
 #include "OrganismBlockParameters.h"
 #include "WindowUI.h"
+
+enum class CursorMode {
+    Food_mode,
+    Wall_mode,
+    Kill_mode,
+};
 
 class WindowCore: public QWidget {
         Q_OBJECT
@@ -46,13 +55,10 @@ private:
     float center_x = window_width/2;
     float center_y = window_height/2;
 
-    //TODO why do i need this again?
-//    int image_width = 600;
-//    int image_height = 600;
+    CursorMode cursor_mode = CursorMode::Food_mode;
 
     int start_height = 100;
 
-    void make_image();
     void move_center(int delta_x, int delta_y);
     void reset_image();
 
@@ -60,11 +66,6 @@ private:
     int last_mouse_y = 0;
 
     SimulationEngine* engine;
-
-    // separate from each other
-    // if <=0 then unlimited
-    int max_window_fps;
-    int max_simulation_fps;
 
     float window_interval = 0.;
     long delta_window_processing_time = 0;
@@ -75,10 +76,6 @@ private:
     //void showEvent(QShowEvent *event);
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
-
-    //percentage for menu
-    float menu_size = 0.33;
-    bool menu_shows = true;
 
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
@@ -106,10 +103,13 @@ private:
     bool pause_image_construction = false;
     bool full_simulation_grid_parsed = false;
 
+    bool stop_console_output = false;
+    bool synchronise_simulation_and_window = false;
+
     void mainloop_tick();
     void window_tick();
-    void set_simulation_interval();
-    void set_window_interval();
+    void set_simulation_interval(int max_simulation_fps);
+    void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);
     void resize_image();
     void set_image_pixel(int x, int y, QColor & color);
@@ -117,14 +117,27 @@ private:
 
     void create_image();
 
-    inline QColor& get_color(BlockTypes type);
+    QColor inline &get_color(BlockTypes type);
 
     bool wait_for_engine_to_pause();
-    void parse_simulation_grid(std::vector<int> lin_width, std::vector<int> lin_height);
+    void parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height);
     void parse_full_simulation_grid(bool parse);
 
     void set_simulation_num_threads(uint8_t num_threads);
 
+    void set_cursor_mode(CursorMode mode);
+    void set_simulation_mode(SimulationModes mode);
+
+    void inline calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
+                            int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
+    void inline calculate_truncated_linspace(int image_width, int image_height,
+                                      std::vector<int> & lin_width,
+                                      std::vector<int> & lin_height,
+                                      std::vector<int> & truncated_lin_width,
+                                      std::vector<int> & truncated_lin_height);
+    void inline image_for_loop(int image_width, int image_height,
+                               std::vector<int> & lin_width,
+                               std::vector<int> & lin_height);
 
     void closeEvent(QCloseEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -138,6 +151,21 @@ private slots:
     void reset_slot();
     void pass_one_tick_slot();
     void reset_view_slot();
+
+    void parse_max_sps_slot();
+    void parse_max_fps_slot();
+    void parse_num_threads_slot();
+
+    void food_rbutton_slot();
+    void wall_rbutton_slot();
+    void kill_rbutton_slot();
+
+    void single_thread_rbutton_slot();
+    void multi_thread_rbutton_slot();
+    void cuda_rbutton_slot();
+
+    void stop_console_output_slot(bool state);
+    void synchronise_simulation_and_window_slot(bool state);
 
 public:
     WindowCore(int window_width, int window_height,

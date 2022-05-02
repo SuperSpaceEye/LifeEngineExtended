@@ -9,7 +9,7 @@
 
 struct ColorContainer {
     QColor menu_color = QColor{200, 200, 255};
-    QColor simulation_background_color = QColor(70, 70, 150);
+    QColor simulation_background_color = QColor(50, 100, 150);
 
     QColor empty_block = QColor{0,  0,  0};
     QColor mouth =       QColor{255,188,0};

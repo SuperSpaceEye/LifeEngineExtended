@@ -16,13 +16,15 @@ void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
     while (cp.engine_working) {
 //        if (cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
-        std::lock_guard<std::mutex> guard(mutex);
+        //it works better without mutex... huh.
+        //std::lock_guard<std::mutex> guard(mutex);
         if (cp.stop_engine) {
             kill_threads();
             cp.engine_working = false;
             cp.stop_engine = false;
             return;
         }
+        if (cp.change_simulation_mode) {change_mode();}
         if (cp.build_threads) {build_threads();}
         if (!cp.engine_global_pause || cp.engine_pass_tick) {
             if (!cp.engine_pause) {
@@ -38,6 +40,35 @@ void SimulationEngine::threaded_mainloop() {
             cp.engine_paused = true;
         }
     }
+}
+
+void SimulationEngine::change_mode() {
+    if (cp.change_to_mode == cp.simulation_mode) {
+        return;
+    }
+
+    switch (cp.change_to_mode) {
+        case SimulationModes::CPU_Single_Threaded:
+            if (cp.simulation_mode == SimulationModes::CPU_Multi_Threaded) {
+                kill_threads();
+            }
+            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
+
+            }
+            break;
+        case SimulationModes::CPU_Multi_Threaded:
+            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
+
+            }
+            build_threads();
+            break;
+        case SimulationModes::GPU_CUDA_mode:
+            if (cp.simulation_mode == SimulationModes::CPU_Multi_Threaded) {
+                kill_threads();
+            }
+            break;
+    }
+    cp.simulation_mode = cp.change_to_mode;
 }
 
 void SimulationEngine::simulation_tick() {

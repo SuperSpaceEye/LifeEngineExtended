@@ -30,6 +30,8 @@ struct EngineControlParameters {
     bool build_threads = false;
 
     SimulationModes simulation_mode = SimulationModes::CPU_Multi_Threaded;
+    SimulationModes change_to_mode = SimulationModes::CPU_Multi_Threaded;
+    bool change_simulation_mode = false;
 
     uint8_t num_threads = 1;
 
