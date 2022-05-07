@@ -28,6 +28,7 @@ struct ParametersStruct {
         bool reset_on_total_extinction = true;
         bool pause_on_total_extinction = false;
         bool clear_walls_on_reset = false;
+        bool generate_random_walls_on_reset = false;
 };
 
 #endif //THELIFEENGINECPP_PARAMETERSSTRUCT_H

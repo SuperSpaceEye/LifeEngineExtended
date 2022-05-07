@@ -20,6 +20,7 @@
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>
 #include <QMessageBox>
+#include <QLineEdit>
 
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
@@ -35,15 +36,17 @@ enum class CursorMode {
     Kill_mode,
 };
 
+template<typename T>
+struct result_struct {
+    bool is_valid;
+    T result;
+};
+
 class WindowCore: public QWidget {
         Q_OBJECT
 private:
     int window_width;
     int window_height;
-
-    // by how much pixels is allowed to be after the end of simulation image.
-    // (blank space after dragging image)
-    int allow_num_padding = 50;
 
     // relative_x>1
     float scaling_coefficient = 1.05;
@@ -106,6 +109,14 @@ private:
     bool stop_console_output = false;
     bool synchronise_simulation_and_window = false;
 
+    //TODO if == 1, then prints one pixel for one simulation block. If > 1, then loads texture texture (if exists).
+    int cell_size = 1;
+    int new_simulation_width = 600;
+    int new_simulation_height = 600;
+    // if true, will create simulation grid == simulation_graphicsView.viewport().size()
+    bool fill_window = false;
+    bool override_evolution_controls_slot = false;
+
     void mainloop_tick();
     void window_tick();
     void set_simulation_interval(int max_simulation_fps);
@@ -128,6 +139,8 @@ private:
     void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
+    void resize_simulation_space();
+
     void inline calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                             int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
     void inline calculate_truncated_linspace(int image_width, int image_height,
@@ -140,32 +153,62 @@ private:
                                std::vector<int> & lin_height);
 
     void closeEvent(QCloseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
 
+    template<typename T>
+    result_struct<T> message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
+    static void display_message(const std::string& message);
 private slots:
-    void pause_slot(bool paused);
-    void stoprender_slot(bool stopped_render);
-    void clear_slot();
-    void reset_slot();
-    void pass_one_tick_slot();
-    void reset_view_slot();
+    void tb_pause_slot(bool paused);
+    void tb_stoprender_slot(bool stopped_render);
 
-    void parse_max_sps_slot();
-    void parse_max_fps_slot();
-    void parse_num_threads_slot();
+    void b_clear_slot();
+    void b_reset_slot();
+    void b_pass_one_tick_slot();
+    void b_reset_view_slot();
+    void b_resize_and_reset_slot();
+    void b_generate_random_walls_slot();
+    void b_clear_all_walls_slot();
+    void b_save_world_slot();
+    void b_load_world_slot();
 
-    void food_rbutton_slot();
-    void wall_rbutton_slot();
-    void kill_rbutton_slot();
+    void rb_food_slot();
+    void rb_wall_slot();
+    void rb_kill_slot();
+    void rb_single_thread_slot();
+    void rb_multi_thread_slot();
+    void rb_cuda_slot();
 
-    void single_thread_rbutton_slot();
-    void multi_thread_rbutton_slot();
-    void cuda_rbutton_slot();
+    void le_num_threads_slot();
+    void le_food_production_probability_slot();
+    void le_lifespan_multiplier_slot();
+    void le_look_range_slot();
+    void le_auto_food_drop_rate_slot();
+    void le_extra_reproduction_cost_slot();
+    void le_global_mutation_rate_slot();
+    void le_add_cell_slot();
+    void le_change_cell_slot();
+    void le_remove_cell_slot();
+    void le_max_sps_slot();
+    void le_max_fps_slot();
+    void le_cell_size_slot();
+    void le_simulation_width_slot();
+    void le_simulation_height_slot();
 
-    void stop_console_output_slot(bool state);
-    void synchronise_simulation_and_window_slot(bool state);
+    void cb_rotation_enabled_slot(bool state);
+    void cb_on_touch_kill_slot(bool state);
+    void cb_use_evolved_mutation_rate_slot(bool state);
+    void cb_movers_can_produce_food_slot(bool state);
+    void cb_food_blocks_reproduction_slot(bool state);
+    void cb_stop_console_output_slot(bool state);
+    void cb_synchronise_simulation_and_window_slot(bool state);
+    void cb_fill_window_slot(bool state);
+    void cb_reset_on_total_extinction_slot(bool state);
+    void cb_pause_on_total_extinction_slot(bool state);
+    void cb_clear_walls_on_reset_slot(bool state);
+    void cb_override_evolution_controls_slot(bool state);
+    void cb_generate_random_walls_on_reset_slot(bool state);
 
 public:
     WindowCore(int window_width, int window_height,

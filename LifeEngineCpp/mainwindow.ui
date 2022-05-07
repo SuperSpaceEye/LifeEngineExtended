@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -25,9 +25,12 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="3,1">
    <property name="spacing">
     <number>0</number>
+   </property>
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMaximumSize</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -42,430 +45,1168 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1">
-     <property name="spacing">
+    <widget class="QGraphicsView" name="simulation_graphicsView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
       <number>0</number>
      </property>
-     <item>
-      <widget class="QGraphicsView" name="graphicsView">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: 0px;
-border-radius: 0px;</string>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="lineWidth">
-        <number>0</number>
-       </property>
-       <property name="optimizationFlags">
-        <set>QGraphicsView::DontAdjustForAntialiasing</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QFrame" name="horizontalFrame">
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
-        <property name="spacing">
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <property name="interactive">
+      <bool>false</bool>
+     </property>
+     <property name="optimizationFlags">
+      <set>QGraphicsView::DontAdjustForAntialiasing</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="horizontalFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="lineWidth">
          <number>0</number>
         </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item alignment="Qt::AlignLeft">
-         <widget class="QFrame" name="frame_2">
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <property name="spacing">
-            <number>0</number>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lb_fps">
+           <property name="text">
+            <string>fps:</string>
            </property>
-           <property name="leftMargin">
-            <number>4</number>
+           <property name="buddy">
+            <cstring>le_fps</cstring>
            </property>
-           <property name="topMargin">
-            <number>4</number>
-           </property>
-           <property name="rightMargin">
-            <number>4</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QLabel" name="fps_label">
+            <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>fps:</string>
-             </property>
-             <property name="buddy">
-              <cstring>fps_lineedit</cstring>
+              <string>Set max fps:</string>
              </property>
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <item>
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>Set max fps:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="fps_lineedit">
-               <property name="text">
-                <string>60</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QLabel" name="sps_label">
+            <widget class="QLineEdit" name="le_fps">
              <property name="text">
-              <string>sps:</string>
+              <string>60</string>
              </property>
             </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>Set max sps:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="sps_lineedit">
-               <property name="text">
-                <string>-1</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="2">
-              <widget class="QPushButton" name="clear_button">
-               <property name="text">
-                <string>Clear</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QPushButton" name="reset_button">
-               <property name="text">
-                <string>Reset</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pause_button">
-               <property name="text">
-                <string>Pause</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="stoprender_button">
-               <property name="text">
-                <string>Stop render</string>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="reset_view_button">
-               <property name="text">
-                <string>Reset view</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="pass_one_tick_button">
-               <property name="text">
-                <string>Pass one tick</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QRadioButton" name="food_rbutton">
-               <property name="text">
-                <string>Food mode</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">cursor_modes</string>
-               </attribute>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="kill_rbutton">
-               <property name="text">
-                <string>Kill mode</string>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">cursor_modes</string>
-               </attribute>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="wall_rbutton">
-               <property name="text">
-                <string>Wall mode</string>
-               </property>
-               <attribute name="buttonGroup">
-                <string notr="true">cursor_modes</string>
-               </attribute>
-              </widget>
-             </item>
-            </layout>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QFrame" name="frame_3">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <property name="spacing">
-            <number>0</number>
+         </item>
+         <item>
+          <widget class="QLabel" name="lb_sps">
+           <property name="text">
+            <string>sps:</string>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QTabWidget" name="Tabs">
-             <property name="tabPosition">
-              <enum>QTabWidget::North</enum>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Set max sps:</string>
              </property>
-             <property name="tabShape">
-              <enum>QTabWidget::Rounded</enum>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="le_sps">
+             <property name="text">
+              <string>-1</string>
              </property>
-             <property name="currentIndex">
-              <number>4</number>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="2">
+            <widget class="QPushButton" name="b_clear">
+             <property name="text">
+              <string>Clear</string>
              </property>
-             <property name="iconSize">
-              <size>
-               <width>16</width>
-               <height>16</height>
-              </size>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QPushButton" name="b_reset">
+             <property name="text">
+              <string>Reset</string>
              </property>
-             <property name="elideMode">
-              <enum>Qt::ElideNone</enum>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="tb_pause">
+             <property name="text">
+              <string>Pause</string>
              </property>
-             <property name="documentMode">
+             <property name="checkable">
               <bool>true</bool>
              </property>
-             <property name="tabsClosable">
-              <bool>false</bool>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="tb_stoprender">
+             <property name="text">
+              <string>Stop render</string>
              </property>
-             <property name="movable">
-              <bool>false</bool>
-             </property>
-             <property name="tabBarAutoHide">
+             <property name="checkable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="editor_tab">
-              <attribute name="title">
-               <string>Editor</string>
-              </attribute>
-             </widget>
-             <widget class="QWidget" name="world_controls_tab">
-              <attribute name="title">
-               <string>World Controls</string>
-              </attribute>
-             </widget>
-             <widget class="QWidget" name="evolution_controls_tab">
-              <attribute name="title">
-               <string>Evolution Controls</string>
-              </attribute>
-             </widget>
-             <widget class="QWidget" name="statistics_tab">
-              <attribute name="title">
-               <string>Statistics</string>
-              </attribute>
-             </widget>
-             <widget class="QWidget" name="simulation_settings_tab">
-              <attribute name="title">
-               <string>Simulation Settings</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
-               <item>
-                <widget class="QScrollArea" name="scrollArea">
-                 <property name="widgetResizable">
-                  <bool>true</bool>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="b_reset_view">
+             <property name="text">
+              <string>Reset view</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QPushButton" name="b_pass_one_tick">
+             <property name="text">
+              <string>Pass one tick</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QRadioButton" name="rb_food">
+             <property name="text">
+              <string>Food mode</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">cursor_modes</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rb_kill">
+             <property name="text">
+              <string>Kill mode</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">cursor_modes</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="rb_wall">
+             <property name="text">
+              <string>Wall mode</string>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">cursor_modes</string>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTabWidget" name="Tabs">
+           <property name="tabPosition">
+            <enum>QTabWidget::North</enum>
+           </property>
+           <property name="tabShape">
+            <enum>QTabWidget::Rounded</enum>
+           </property>
+           <property name="currentIndex">
+            <number>2</number>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="elideMode">
+            <enum>Qt::ElideNone</enum>
+           </property>
+           <property name="documentMode">
+            <bool>true</bool>
+           </property>
+           <property name="tabsClosable">
+            <bool>false</bool>
+           </property>
+           <property name="movable">
+            <bool>false</bool>
+           </property>
+           <property name="tabBarAutoHide">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="about_tab">
+            <attribute name="title">
+             <string>About</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QTextEdit" name="textEdit">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+               <property name="html">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features (in the far future).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="editor_tab">
+            <attribute name="title">
+             <string>Editor</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="world_controls_tab">
+            <attribute name="title">
+             <string>World Controls</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QScrollArea" name="scrollArea_3">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_3">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>420</width>
+                  <height>192</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_12">
+                 <property name="spacing">
+                  <number>0</number>
                  </property>
-                 <widget class="QWidget" name="scrollAreaWidgetContents">
-                  <property name="geometry">
-                   <rect>
-                    <x>0</x>
-                    <y>0</y>
-                    <width>410</width>
-                    <height>248</height>
-                   </rect>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_5">
-                   <item>
-                    <widget class="QCheckBox" name="stop_console_output_check">
-                     <property name="text">
-                      <string>Stop console output</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QCheckBox" name="synchronise_sim_and_win_check">
-                     <property name="text">
-                      <string>Synchronise simulation and window</string>
-                     </property>
-                     <property name="checked">
-                      <bool>false</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_2">
-                     <property name="spacing">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QRadioButton" name="single_thread_mode_rbutton">
-                       <property name="text">
-                        <string>Single thread CPU</string>
-                       </property>
-                       <attribute name="buttonGroup">
-                        <string notr="true">simulation_modes</string>
-                       </attribute>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QRadioButton" name="multi_thread_mode_rbutton">
-                       <property name="text">
-                        <string>Multi-thread CPU</string>
-                       </property>
-                       <property name="checked">
-                        <bool>true</bool>
-                       </property>
-                       <attribute name="buttonGroup">
-                        <string notr="true">simulation_modes</string>
-                       </attribute>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QRadioButton" name="cuda_mode_rbutton">
-                       <property name="text">
-                        <string>CUDA</string>
-                       </property>
-                       <attribute name="buttonGroup">
-                        <string notr="true">simulation_modes</string>
-                       </attribute>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_4">
-                     <item>
-                      <widget class="QLabel" name="label">
-                       <property name="text">
-                        <string>Set number of CPU threads:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLineEdit" name="set_cpu_threads_linedit">
-                       <property name="text">
-                        <string>1</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
-                 </widget>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-       <zorder>frame_3</zorder>
-       <zorder>frame_2</zorder>
-      </widget>
-     </item>
-    </layout>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QWidget" name="widget_3" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_20" stretch="1,1">
+                    <property name="leftMargin">
+                     <number>6</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>6</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>6</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>6</number>
+                    </property>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_21">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_22">
+                        <item>
+                         <widget class="QLabel" name="label_8">
+                          <property name="text">
+                           <string>Cell size:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_cell_size">
+                          <property name="text">
+                           <string>1</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QCheckBox" name="cb_fill_window">
+                          <property name="text">
+                           <string>Fill window</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_23">
+                        <item>
+                         <widget class="QLabel" name="label_13">
+                          <property name="text">
+                           <string>Width:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_simulation_width">
+                          <property name="text">
+                           <string>600</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_14">
+                          <property name="text">
+                           <string>Height:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_simulation_height">
+                          <property name="text">
+                           <string>600</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="b_resize_and_reset">
+                        <property name="text">
+                         <string>Resize and Reset</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_reset_on_total_extinction">
+                        <property name="text">
+                         <string>Reset on total extinction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="lb_auto_reset_count">
+                        <property name="text">
+                         <string>Auto reset count: 0</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_pause_on_total_extinction">
+                        <property name="text">
+                         <string>Pause on total extinction</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_22">
+                      <item>
+                       <widget class="QPushButton" name="b_generate_random_walls">
+                        <property name="text">
+                         <string>Generate random walls</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_generate_random_walls_on_reset">
+                        <property name="text">
+                         <string>Generate random walls on reset</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="b_clear_all_walls">
+                        <property name="text">
+                         <string>Clear all walls</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_clear_walls_on_reset">
+                        <property name="text">
+                         <string>Clear walls on reset</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="b_save_world">
+                        <property name="text">
+                         <string>Save world</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_21">
+                        <item>
+                         <widget class="QPushButton" name="b_load_world">
+                          <property name="text">
+                           <string>Load world</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QCheckBox" name="cb_override_evolution_controls">
+                          <property name="text">
+                           <string>Override Evolution Controls</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="evolution_controls_tab">
+            <attribute name="title">
+             <string>Evolution Controls</string>
+            </attribute>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QScrollArea" name="scrollArea_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="lineWidth">
+                <number>-3</number>
+               </property>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAsNeeded</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>406</width>
+                  <height>416</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>9</number>
+                 </property>
+                 <item>
+                  <widget class="QWidget" name="widget" native="true">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                     <horstretch>10</horstretch>
+                     <verstretch>10</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_20">
+                    <property name="spacing">
+                     <number>6</number>
+                    </property>
+                    <property name="sizeConstraint">
+                     <enum>QLayout::SetDefaultConstraint</enum>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_8">
+                      <property name="spacing">
+                       <number>6</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label_4">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>1666666</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>food production probability:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_food_production_probability">
+                        <property name="text">
+                         <string>5</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_9">
+                      <item>
+                       <widget class="QLabel" name="label_5">
+                        <property name="text">
+                         <string>llifespan multiplier:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_lifespan_multiplier">
+                        <property name="text">
+                         <string>100</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_18">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_13">
+                        <item>
+                         <widget class="QLabel" name="label_7">
+                          <property name="text">
+                           <string>look range:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_look_range">
+                          <property name="text">
+                           <string>50</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_14">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_15">
+                        <item>
+                         <widget class="QLabel" name="label_9">
+                          <property name="text">
+                           <string>auto food drop rate:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_auto_food_drop_rate">
+                          <property name="text">
+                           <string>0</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_18">
+                      <item>
+                       <widget class="QLabel" name="label_6">
+                        <property name="text">
+                         <string>extra reproduction cost:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_extra_reproduction_cost">
+                        <property name="text">
+                         <string>0</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_16">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_19">
+                        <item>
+                         <widget class="QCheckBox" name="cb_use_evoved_mutation_rate">
+                          <property name="text">
+                           <string>Use evolved mutation rate</string>
+                          </property>
+                          <property name="checked">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="mutation_rate_layout">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_12">
+                        <item>
+                         <widget class="QLabel" name="lb_mutation_rate">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="text">
+                           <string>global mutation rate:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_global_mutation_rate">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
+                          <property name="text">
+                           <string>5</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_17">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_16">
+                        <item>
+                         <widget class="QLabel" name="label_10">
+                          <property name="text">
+                           <string>add cell:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_add">
+                          <property name="text">
+                           <string>33</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_11">
+                          <property name="text">
+                           <string>change cell:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_change">
+                          <property name="text">
+                           <string>33</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_12">
+                          <property name="text">
+                           <string>remove cell:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_remove">
+                          <property name="text">
+                           <string>33</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_11">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_11">
+                        <item>
+                         <widget class="QCheckBox" name="cb_rotation_enabled">
+                          <property name="text">
+                           <string>Rotation enabled</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_10">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_10">
+                        <item>
+                         <widget class="QCheckBox" name="cb_on_touch_kill">
+                          <property name="text">
+                           <string>On touch kill</string>
+                          </property>
+                          <property name="checked">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_15">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_17">
+                        <item>
+                         <widget class="QCheckBox" name="cb_movers_can_produce_food">
+                          <property name="text">
+                           <string>Movers can produce food</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_13">
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_14">
+                        <item>
+                         <widget class="QCheckBox" name="cb_food_blocks_reproduction">
+                          <property name="text">
+                           <string>Food blocks reproduction</string>
+                          </property>
+                          <property name="checked">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="statistics_tab">
+            <attribute name="title">
+             <string>Statistics</string>
+            </attribute>
+           </widget>
+           <widget class="QWidget" name="simulation_settings_tab">
+            <attribute name="title">
+             <string>Simulation Settings</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QScrollArea" name="scrollArea">
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>420</width>
+                  <height>192</height>
+                 </rect>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_5">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QWidget" name="widget_2" native="true">
+                   <layout class="QVBoxLayout" name="verticalLayout_19">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_2">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <widget class="QRadioButton" name="rb_single_thread_mode">
+                        <property name="text">
+                         <string>Single thread CPU</string>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">simulation_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QRadioButton" name="rb_multi_thread_mode">
+                        <property name="text">
+                         <string>Multi-thread CPU</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">simulation_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QRadioButton" name="rb_cuda_mode">
+                        <property name="text">
+                         <string>CUDA</string>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">simulation_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_stop_console_output">
+                      <property name="text">
+                       <string>Stop console output</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_4">
+                      <property name="spacing">
+                       <number>6</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label">
+                        <property name="text">
+                         <string>Set number of CPU threads:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_num_threads">
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_synchronise_sim_and_win">
+                      <property name="text">
+                       <string>Synchronise simulation and window</string>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+     <zorder>frame_3</zorder>
+     <zorder>frame_2</zorder>
+    </widget>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>reset_button</sender>
+   <sender>b_reset</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>reset_slot()</slot>
+   <slot>b_reset_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>295</x>
@@ -478,10 +1219,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>food_rbutton</sender>
+   <sender>rb_food</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>food_rbutton_slot()</slot>
+   <slot>rb_food_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>64</x>
@@ -494,10 +1235,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>stop_console_output_check</sender>
+   <sender>cb_stop_console_output</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>stop_console_output_slot(bool)</slot>
+   <slot>cb_stop_console_output_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>745</x>
@@ -510,10 +1251,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>synchronise_sim_and_win_check</sender>
+   <sender>cb_synchronise_sim_and_win</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>synchronise_simulation_and_window_slot(bool)</slot>
+   <slot>cb_synchronise_simulation_and_window_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>745</x>
@@ -526,10 +1267,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>stoprender_button</sender>
+   <sender>tb_stoprender</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>stoprender_slot(bool)</slot>
+   <slot>tb_stoprender_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>131</x>
@@ -542,10 +1283,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>multi_thread_mode_rbutton</sender>
+   <sender>rb_multi_thread_mode</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>multi_thread_rbutton_slot()</slot>
+   <slot>rb_multi_thread_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>749</x>
@@ -558,10 +1299,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>cuda_mode_rbutton</sender>
+   <sender>rb_cuda_mode</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>cuda_rbutton_slot()</slot>
+   <slot>rb_cuda_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>984</x>
@@ -574,10 +1315,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>wall_rbutton</sender>
+   <sender>rb_wall</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>wall_rbutton_slot()</slot>
+   <slot>rb_wall_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>305</x>
@@ -590,10 +1331,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>reset_view_button</sender>
+   <sender>b_reset_view</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>reset_view_slot()</slot>
+   <slot>b_reset_view_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>47</x>
@@ -606,10 +1347,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>kill_rbutton</sender>
+   <sender>rb_kill</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>kill_rbutton_slot()</slot>
+   <slot>rb_kill_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>184</x>
@@ -622,10 +1363,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>fps_lineedit</sender>
-   <signal>editingFinished()</signal>
+   <sender>le_fps</sender>
+   <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>parse_max_fps_slot()</slot>
+   <slot>le_max_fps_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>184</x>
@@ -638,10 +1379,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>clear_button</sender>
+   <sender>b_clear</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>clear_slot()</slot>
+   <slot>b_clear_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>215</x>
@@ -654,10 +1395,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>single_thread_mode_rbutton</sender>
+   <sender>rb_single_thread_mode</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>single_thread_rbutton_slot()</slot>
+   <slot>rb_single_thread_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>514</x>
@@ -670,10 +1411,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>pause_button</sender>
+   <sender>tb_pause</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>pause_slot(bool)</slot>
+   <slot>tb_pause_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>46</x>
@@ -686,10 +1427,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>set_cpu_threads_linedit</sender>
+   <sender>le_num_threads</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>parse_num_threads_slot()</slot>
+   <slot>le_num_threads_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>745</x>
@@ -702,10 +1443,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>sps_lineedit</sender>
-   <signal>editingFinished()</signal>
+   <sender>le_sps</sender>
+   <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>parse_max_sps_slot()</slot>
+   <slot>le_max_sps_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>184</x>
@@ -718,10 +1459,10 @@ border-radius: 0px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>pass_one_tick_button</sender>
+   <sender>b_pass_one_tick</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>pass_one_tick_slot()</slot>
+   <slot>b_pass_one_tick_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>142</x>
@@ -733,25 +1474,501 @@ border-radius: 0px;</string>
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_food_production_probability</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_food_production_probability_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>646</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_lifespan_multiplier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_lifespan_multiplier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>644</x>
+     <y>679</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_look_range</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_look_range_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>616</x>
+     <y>713</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_auto_food_drop_rate</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_auto_food_drop_rate_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>748</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_global_mutation_rate</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_global_mutation_rate_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>650</x>
+     <y>783</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_add</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_add_cell_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>463</x>
+     <y>818</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_change</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_change_cell_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>607</x>
+     <y>818</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_remove</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_remove_cell_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>751</x>
+     <y>818</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_rotation_enabled</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_rotation_enabled_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>749</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_on_touch_kill</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_on_touch_kill_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>782</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_evoved_mutation_rate</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_evolved_mutation_rate_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>815</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_movers_can_produce_food</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_movers_can_produce_food_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>848</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_food_blocks_reproduction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_food_blocks_reproduction_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>881</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_extra_reproduction_cost</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_extra_reproduction_cost_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>665</x>
+     <y>864</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_cell_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_cell_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>478</x>
+     <y>726</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_simulation_width</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_simulation_width_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>459</x>
+     <y>759</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_simulation_height</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_simulation_height_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>759</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_fill_window</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_fill_window_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>547</x>
+     <y>726</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_resize_and_reset</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_resize_and_reset_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>791</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_reset_on_total_extinction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_reset_on_total_extinction_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>821</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_pause_on_total_extinction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_pause_on_total_extinction_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>879</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_generate_random_walls</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_generate_random_walls_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>725</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_clear_all_walls</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_clear_all_walls_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>756</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_clear_walls_on_reset</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_clear_walls_on_reset_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>786</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_save_world</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_save_world_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>816</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_load_world</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_load_world_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>634</x>
+     <y>862</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_override_evolution_controls</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_override_evolution_controls_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>736</x>
+     <y>862</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_generate_random_walls_on_reset</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>755</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
-  <slot>pause_slot(bool)</slot>
-  <slot>stoprender_slot(bool)</slot>
-  <slot>clear_slot()</slot>
-  <slot>reset_slot()</slot>
-  <slot>pass_one_tick_slot()</slot>
-  <slot>reset_view_slot()</slot>
-  <slot>parse_max_fps_slot()</slot>
-  <slot>parse_max_sps_slot()</slot>
-  <slot>food_rbutton_slot()</slot>
-  <slot>kill_rbutton_slot()</slot>
-  <slot>wall_rbutton_slot()</slot>
-  <slot>single_thread_rbutton_slot()</slot>
-  <slot>multi_thread_rbutton_slot()</slot>
-  <slot>cuda_rbutton_slot()</slot>
-  <slot>stop_console_output_slot(bool)</slot>
-  <slot>synchronise_simulation_and_window_slot(bool)</slot>
-  <slot>parse_num_threads_slot()</slot>
+  <slot>tb_pause_slot(bool)</slot>
+  <slot>tb_stoprender_slot(bool)</slot>
+  <slot>b_clear_slot()</slot>
+  <slot>b_reset_slot()</slot>
+  <slot>b_pass_one_tick_slot()</slot>
+  <slot>b_reset_view_slot()</slot>
+  <slot>le_max_fps_slot()</slot>
+  <slot>le_max_sps_slot()</slot>
+  <slot>rb_food_slot()</slot>
+  <slot>rb_kill_slot()</slot>
+  <slot>rb_wall_slot()</slot>
+  <slot>rb_single_thread_slot()</slot>
+  <slot>rb_multi_thread_slot()</slot>
+  <slot>rb_cuda_slot()</slot>
+  <slot>cb_stop_console_output_slot(bool)</slot>
+  <slot>cb_synchronise_simulation_and_window_slot(bool)</slot>
+  <slot>le_num_threads_slot()</slot>
+  <slot>le_food_production_probability_slot()</slot>
+  <slot>le_lifespan_multiplier_slot()</slot>
+  <slot>le_look_range_slot()</slot>
+  <slot>le_auto_food_drop_rate_slot()</slot>
+  <slot>le_extra_reproduction_cost_slot()</slot>
+  <slot>le_global_mutation_rate_slot()</slot>
+  <slot>le_add_cell_slot()</slot>
+  <slot>le_change_cell_slot()</slot>
+  <slot>le_remove_cell_slot()</slot>
+  <slot>cb_rotation_enabled_slot(bool)</slot>
+  <slot>cb_on_touch_kill_slot(bool)</slot>
+  <slot>cb_use_evolved_mutation_rate_slot(bool)</slot>
+  <slot>cb_movers_can_produce_food_slot(bool)</slot>
+  <slot>cb_food_blocks_reproduction_slot(bool)</slot>
+  <slot>le_cell_size_slot()</slot>
+  <slot>cb_fill_window_slot(bool)</slot>
+  <slot>le_simulation_width_slot()</slot>
+  <slot>le_simulation_height_slot()</slot>
+  <slot>b_resize_and_reset_slot()</slot>
+  <slot>cb_reset_on_total_extinction_slot(bool)</slot>
+  <slot>cb_pause_on_total_extinction_slot(bool)</slot>
+  <slot>b_generate_random_walls_slot()</slot>
+  <slot>b_clear_all_walls_slot()</slot>
+  <slot>cb_clear_walls_on_reset_slot(bool)</slot>
+  <slot>b_save_world_slot()</slot>
+  <slot>b_load_world_slot()</slot>
+  <slot>cb_override_evolution_controls_slot(bool)</slot>
+  <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

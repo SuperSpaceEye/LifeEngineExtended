@@ -4,13 +4,15 @@
 
 #include "WindowCore.h"
 
+#include <utility>
+
 WindowCore::WindowCore(int window_width, int window_height, int simulation_width, int simulation_height, int window_fps,
                        int simulation_fps, int simulation_num_threads, QWidget *parent) :
         QWidget(parent), window_width(window_width), window_height(window_height){
     _ui.setupUi(this);
 
-    _ui.graphicsView->show();
-    _ui.graphicsView->move(0, 0);
+    _ui.simulation_graphicsView->show();
+    _ui.simulation_graphicsView->move(0, 0);
 
     //https://stackoverflow.com/questions/32714105/mousemoveevent-is-not-called
     QCoreApplication::instance()->installEventFilter(this);
@@ -43,7 +45,6 @@ WindowCore::WindowCore(int window_width, int window_height, int simulation_width
     resize_image();
     reset_image();
 
-
     QTimer::singleShot(0, [&]{
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
         engine_thread.detach();
@@ -54,8 +55,7 @@ WindowCore::WindowCore(int window_width, int window_height, int simulation_width
         fps_timer = clock.now();
 
         scene.addItem(&pixmap_item);
-        _ui.graphicsView->setScene(&scene);
-        std::cout << "here\n";
+        _ui.simulation_graphicsView->setScene(&scene);
     });
 
     timer = new QTimer(parent);
@@ -64,7 +64,7 @@ WindowCore::WindowCore(int window_width, int window_height, int simulation_width
 }
 
 void WindowCore::mainloop_tick() {
-    std::this_thread::sleep_for(std::chrono::microseconds(int(window_interval * 1000000 - delta_window_processing_time)));
+    std::this_thread::sleep_for(std::chrono::microseconds(long(window_interval) * 1000000 - delta_window_processing_time));
     start = clock.now();
     if (synchronise_simulation_and_window) {
         cp.engine_pass_tick = true;
@@ -95,8 +95,8 @@ void WindowCore::mainloop_tick() {
 }
 
 void WindowCore::update_fps_labels(int fps, int sps) {
-    _ui.fps_label->setText(QString::fromStdString("fps: " + std::to_string(fps)));
-    _ui.sps_label->setText(QString::fromStdString("sps: "+std::to_string(sps)));
+    _ui.lb_fps->setText(QString::fromStdString("fps: " + std::to_string(fps)));
+    _ui.lb_sps->setText(QString::fromStdString("sps: "+std::to_string(sps)));
 }
 
 //TODO kinda redundant right now
@@ -106,7 +106,7 @@ void WindowCore::window_tick() {
 
 void WindowCore::resize_image() {
     image_vector.clear();
-    image_vector.reserve(4 * _ui.graphicsView->viewport()->width() * _ui.graphicsView->viewport()->height());
+    image_vector.reserve(4 * _ui.simulation_graphicsView->viewport()->width() * _ui.simulation_graphicsView->viewport()->height());
 }
 
 void WindowCore::move_center(int delta_x, int delta_y) {
@@ -142,8 +142,8 @@ QColor inline &WindowCore::get_color(BlockTypes type) {
 //TODO bug. it has double pixel row and column at the left and up boundaries.
 void WindowCore::create_image() {
     resize_image();
-    auto image_width = _ui.graphicsView->viewport()->width();
-    auto image_height = _ui.graphicsView->viewport()->height();
+    auto image_width = _ui.simulation_graphicsView->viewport()->width();
+    auto image_height = _ui.simulation_graphicsView->viewport()->height();
 
     image = QImage(image_width, image_height, QImage::Format_RGB32);
 
@@ -182,7 +182,7 @@ void WindowCore::create_image() {
 }
 
 void inline WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                        int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height) {
+                                           int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width = Linspace<int>()(start_x, end_x, image_width);
     lin_height = Linspace<int>()(start_y, end_y, image_height);
 }
@@ -216,14 +216,14 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
 }
 
 void WindowCore::set_image_pixel(int x, int y, QColor &color) {
-    auto index = 4 * (y * _ui.graphicsView->viewport()->width() + x);
+    auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
     image_vector[index+2] = color.red();
     image_vector[index+1] = color.green();
     image_vector[index  ] = color.blue();
 }
 
 bool WindowCore::compare_pixel_color(int x, int y, QColor &color) {
-    auto index = 4 * (y * _ui.graphicsView->viewport()->width() + x);
+    auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
     return image_vector[index+2] == color.red()  &&
            image_vector[index+1] == color.green()&&
            image_vector[index  ] == color.blue();
@@ -301,171 +301,4 @@ void WindowCore::set_cursor_mode(CursorMode mode) {
 void WindowCore::set_simulation_mode(SimulationModes mode) {
     cp.change_to_mode = mode;
     cp.change_simulation_mode = true;
-}
-
-//====================Events====================
-
-void WindowCore::closeEvent(QCloseEvent *event) {
-    cp.stop_engine = true;
-    QWidget::closeEvent(event);
-}
-
-void WindowCore::mousePressEvent(QMouseEvent *event) {
-    //https://doc.qt.io/qt-5/qt.html#MouseButton-enum
-    if (event->button() == Qt::RightButton) {
-        auto position = event->pos();
-
-        if (_ui.graphicsView->underMouse()) {
-            right_mouse_button_pressed = true;
-        }
-
-        last_mouse_x = position.x();
-        last_mouse_y = position.y();
-    } else if (event->button() == Qt::LeftButton) {
-        left_mouse_button_pressed = true;
-    }
-}
-
-
-bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
-    if (event->type() == QEvent::MouseMove) {
-        auto mouse_event = dynamic_cast<QMouseEvent*>(event);
-        if (right_mouse_button_pressed) {
-            int delta_x = mouse_event->x() - last_mouse_x;
-            int delta_y = mouse_event->y() - last_mouse_y;
-
-            move_center(delta_x, delta_y);
-
-            last_mouse_x = mouse_event->x();
-            last_mouse_y = mouse_event->y();
-        }
-    } else if (event->type() == QEvent::MouseButtonRelease) {
-        auto mouse_event = dynamic_cast<QMouseEvent*>(event);
-        if (mouse_event->button() == Qt::RightButton) {
-            right_mouse_button_pressed = false;
-        } else if (mouse_event->button() == Qt::LeftButton) {
-            left_mouse_button_pressed = false;
-        }
-    }
-    return false;
-}
-
-void WindowCore::wheelEvent(QWheelEvent *event) {
-    if (_ui.graphicsView->underMouse()) {
-        if (event->delta() > 0) {
-            scaling_zoom /= scaling_coefficient;
-        } else {
-            scaling_zoom *= scaling_coefficient;
-        }
-    }
-}
-
-//====================SLOTS====================
-
-void WindowCore::pause_slot(bool paused) {
-    cp.engine_global_pause = paused;
-    parse_full_simulation_grid(cp.engine_global_pause);
-}
-
-void WindowCore::stoprender_slot(bool stopped_render) {
-    pause_image_construction = stopped_render;
-    parse_full_simulation_grid(pause_image_construction);
-    // calculating delta time is not needed when no image is being created.
-    cp.calculate_simulation_tick_delta_time = !cp.calculate_simulation_tick_delta_time;
-}
-
-void WindowCore::clear_slot() {
-
-}
-
-void WindowCore::reset_slot() {
-
-}
-
-void WindowCore::pass_one_tick_slot() {
-    cp.engine_pass_tick = true;
-    parse_full_simulation_grid(true);
-}
-void WindowCore::reset_view_slot() {
-    reset_image();
-}
-
-void WindowCore::parse_max_sps_slot() {
-    int result;
-    if (boost::conversion::try_lexical_convert<int>(_ui.fps_lineedit->text().toStdString(), result)) {
-        set_simulation_interval(result);
-    } else {
-        _ui.fps_lineedit->setText(QString("Inputted text is not an int"));
-    }
-}
-
-void WindowCore::parse_max_fps_slot() {
-    int result;
-    if (boost::conversion::try_lexical_convert<int>(_ui.fps_lineedit->text().toStdString(), result)) {
-        set_window_interval(result);
-    } else {
-        _ui.fps_lineedit->setText(QString("Inputted text is not an int"));
-    }
-}
-
-void WindowCore::parse_num_threads_slot() {
-    int result;
-    std::cout << "here\n";
-    if (boost::conversion::try_lexical_convert<int>(_ui.set_cpu_threads_linedit->text().toStdString(), result)) {
-        if (result < 1) {
-            _ui.set_cpu_threads_linedit->setText(QString::fromStdString("Number of threads cannot be less than 0."));
-            return;
-        }
-        if (result > std::thread::hardware_concurrency()-1) {
-            QMessageBox msg;
-            msg.setText(QString::fromStdString("Warning, setting number of processes (" + std::to_string(result)
-            + ") higher than the number of CPU cores (" + std::to_string(std::thread::hardware_concurrency()) +
-            ") is not recommended, and will hurt the performance. To get the best result, try using less CPU threads than available CPU cores."));
-            msg.exec();
-        }
-        set_simulation_num_threads(result);
-    } else {
-        _ui.set_cpu_threads_linedit->setText(QString::fromStdString("Inputted text in not an int."));
-    }
-}
-
-void WindowCore::food_rbutton_slot() {
-    set_cursor_mode(CursorMode::Food_mode);
-}
-
-void WindowCore::wall_rbutton_slot() {
-    set_cursor_mode(CursorMode::Wall_mode);
-}
-
-void WindowCore::kill_rbutton_slot() {
-    set_cursor_mode(CursorMode::Kill_mode);
-}
-
-
-void WindowCore::single_thread_rbutton_slot() {
-    set_simulation_mode(SimulationModes::CPU_Single_Threaded);
-}
-
-void WindowCore::multi_thread_rbutton_slot() {
-    set_simulation_mode(SimulationModes::CPU_Multi_Threaded);
-}
-
-//TODO CUDA mode not implemented
-void WindowCore::cuda_rbutton_slot() {
-    return;
-    set_simulation_mode(SimulationModes::GPU_CUDA_mode);
-}
-
-void WindowCore::stop_console_output_slot(bool state) {
-    stop_console_output = state;
-    if (state) {
-        std::cout << "Console output stopped\n";
-    } else {
-        std::cout << "Console output resumed\n";
-    }
-}
-
-void WindowCore::synchronise_simulation_and_window_slot(bool state) {
-    synchronise_simulation_and_window = state;
-    cp.engine_global_pause = state;
 }
