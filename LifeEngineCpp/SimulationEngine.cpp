@@ -21,23 +21,21 @@ void SimulationEngine::threaded_mainloop() {
         if (cp.stop_engine) {
             kill_threads();
             cp.engine_working = false;
+            cp.engine_paused = true;
             cp.stop_engine = false;
             return;
         }
-        if (cp.change_simulation_mode) {change_mode();}
-        if (cp.build_threads) {build_threads();}
-        if (!cp.engine_global_pause || cp.engine_pass_tick) {
+        if (cp.change_simulation_mode) { change_mode(); }
+        if (cp.build_threads) { build_threads(); }
+        if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else { cp.engine_paused = false; }
+        if (!cp.engine_paused || cp.engine_pass_tick) {
             if (!cp.engine_pause) {
                 cp.engine_paused = false;
                 cp.engine_pass_tick = false;
                 simulation_tick();
 //                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
 //                if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
-            } else {
-                cp.engine_paused = true;
             }
-        } else {
-            cp.engine_paused = true;
         }
     }
 }
@@ -110,11 +108,6 @@ void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, std::mt199
 }
 
 void SimulationEngine::multi_threaded_tick() {
-    if (cp.num_threads <= 1) {
-        single_threaded_tick(&dc, &mt);
-        return;
-    }
-
     for (auto & thread :threads) {
         thread.work();
     }

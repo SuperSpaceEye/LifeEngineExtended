@@ -5,6 +5,7 @@
 #ifndef THELIFEENGINECPP_BASEGRIDBLOCK_H
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
+#include <iostream>
 #include "../BlockTypes.h"
 
 class BaseGridBlock {

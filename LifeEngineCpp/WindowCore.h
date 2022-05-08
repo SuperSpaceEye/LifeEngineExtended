@@ -21,6 +21,7 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QDialog>
 
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
@@ -42,12 +43,43 @@ struct result_struct {
     T result;
 };
 
+class DescisionMessageBox : public QDialog {
+    Q_OBJECT
+
+private:
+    QVBoxLayout *vertical_layout;
+    QHBoxLayout *horizontal_layout;
+    QPushButton *accept_button;
+    QPushButton *decline_button;
+    QLabel *content_label;
+public:
+    DescisionMessageBox(const QString& title, const QString& content,
+                        const QString& accept_text, const QString& decline_text, QWidget* parent=0)
+                        : QDialog(parent) {
+    vertical_layout = new QVBoxLayout();
+    horizontal_layout = new QHBoxLayout();
+    accept_button = new QPushButton(accept_text, this);
+    decline_button = new QPushButton(decline_text, this);
+    content_label = new QLabel(content, this);
+
+    setLayout(vertical_layout);
+    vertical_layout->addWidget(content_label, 2);
+    vertical_layout->addLayout(horizontal_layout, 1);
+    horizontal_layout->addWidget(accept_button);
+    horizontal_layout->addWidget(decline_button);
+
+    connect(accept_button, &QPushButton::pressed, this, &QDialog::accept);
+    connect(decline_button, &QPushButton::pressed, this, &QDialog::reject);
+
+    this->setWindowTitle(title);
+    }
+};
+
+//TODO expand About page.
+
 class WindowCore: public QWidget {
         Q_OBJECT
 private:
-    int window_width;
-    int window_height;
-
     // relative_x>1
     float scaling_coefficient = 1.05;
     float scaling_zoom = 1;
@@ -55,15 +87,15 @@ private:
     bool right_mouse_button_pressed = false;
     bool left_mouse_button_pressed = false;
 
-    float center_x = window_width/2;
-    float center_y = window_height/2;
+    float center_x;
+    float center_y;
 
     CursorMode cursor_mode = CursorMode::Food_mode;
 
     int start_height = 100;
 
     void move_center(int delta_x, int delta_y);
-    void reset_image();
+    void reset_scale_view();
 
     int last_mouse_x = 0;
     int last_mouse_y = 0;
@@ -80,7 +112,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
 
-    std::chrono::high_resolution_clock clock;
+    static auto clock_now() {return std::chrono::high_resolution_clock::now();}
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
@@ -98,7 +130,6 @@ private:
     std::thread engine_thread;
     std::mutex engine_mutex;
 
-    QImage image;
     std::vector<unsigned char> image_vector;
     QGraphicsScene scene;
     QGraphicsPixmapItem pixmap_item;
@@ -116,6 +147,8 @@ private:
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
     bool override_evolution_controls_slot = false;
+
+    bool resize_simulation_grid_flag = false;
 
     void mainloop_tick();
     void window_tick();
@@ -139,6 +172,7 @@ private:
     void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
+    //TODO sometimes the program SEGFAULTS when resizing, and I have no idea why.
     void resize_simulation_space();
 
     void inline calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
@@ -152,12 +186,12 @@ private:
                                std::vector<int> & lin_width,
                                std::vector<int> & lin_height);
 
-    void closeEvent(QCloseEvent *event);
     void wheelEvent(QWheelEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
 
     template<typename T>
-    result_struct<T> message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
+    result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
+    int display_dialog_message(const std::string& message);
     static void display_message(const std::string& message);
 private slots:
     void tb_pause_slot(bool paused);
@@ -211,8 +245,7 @@ private slots:
     void cb_generate_random_walls_on_reset_slot(bool state);
 
 public:
-    WindowCore(int window_width, int window_height,
-               int simulation_width, int simulation_height,
+    WindowCore(int simulation_width, int simulation_height,
                int window_fps, int simulation_fps, int simulation_num_threads,
                QWidget *parent);
 };

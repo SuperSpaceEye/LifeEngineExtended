@@ -3,11 +3,13 @@
 //
 
 #include "WindowCore.h"
-
-void WindowCore::closeEvent(QCloseEvent *event) {
-    cp.stop_engine = true;
-    QWidget::closeEvent(event);
-}
+//
+//void WindowCore::closeEvent(QCloseEvent *event) {
+//    cp.stop_engine = true;
+//    while (!wait_for_engine_to_pause()) {}
+//    std::cout << "here\n";
+//    QWidget::closeEvent(event);
+//}
 
 bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
     //https://doc.qt.io/qt-5/qt.html#MouseButton-enum
@@ -33,6 +35,8 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
             last_mouse_y = position.y();
         } else if (mouse_event->button() == Qt::LeftButton) {
             left_mouse_button_pressed = true;
+
+            //if(_ui.simulation_graphicsView->underMouse()) {std::cout << "on widget\n";}
         }
     } else if (event->type() == QEvent::MouseButtonRelease) {
         auto mouse_event = dynamic_cast<QMouseEvent*>(event);
@@ -45,6 +49,12 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
         auto resize_event = dynamic_cast<QResizeEvent*>(event);
         QWidget::resizeEvent(resize_event);
         this->resize(this->parentWidget()->width(), this->parentWidget()->height());
+    } else if (event->type() == QEvent::Close) {
+        auto close_event = dynamic_cast<QCloseEvent*>(event);
+        //closeEvent(close_event);
+        cp.stop_engine = true;
+        while (!wait_for_engine_to_pause()) {}
+        close_event->accept();
     }
     return false;
 }

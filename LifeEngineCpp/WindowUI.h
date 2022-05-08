@@ -192,7 +192,7 @@ public:
         simulation_graphicsView->setLineWidth(0);
         simulation_graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         simulation_graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        simulation_graphicsView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        simulation_graphicsView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         simulation_graphicsView->setInteractive(false);
         simulation_graphicsView->setOptimizationFlags(QGraphicsView::DontAdjustForAntialiasing);
 
@@ -351,6 +351,7 @@ public:
         textEdit = new QTextEdit(about_tab);
         textEdit->setObjectName(QString::fromUtf8("textEdit"));
         textEdit->setReadOnly(true);
+        textEdit->setOverwriteMode(false);
 
         verticalLayout_8->addWidget(textEdit);
 
@@ -823,7 +824,7 @@ public:
         verticalLayout_19 = new QVBoxLayout(widget_2);
         verticalLayout_19->setSpacing(0);
         verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
-        verticalLayout_19->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_19->setContentsMargins(9, 9, 9, 9);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -952,7 +953,7 @@ public:
         QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
         QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
 
-        Tabs->setCurrentIndex(2);
+        Tabs->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -981,7 +982,14 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features (in the far future).</p></body></html>", nullptr));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features (in the far future).</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent"
+                        ":0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Important Information:</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">sps is the number of simulation ticks per second.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">setting max sps/sps to &lt;0 will enable unlimited mode.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Not implemented:</p></body></html>", nullptr));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
         Tabs->setTabText(Tabs->indexOf(editor_tab), QApplication::translate("MainWindow", "Editor", nullptr));
         label_8->setText(QApplication::translate("MainWindow", "Cell size:", nullptr));

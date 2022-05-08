@@ -92,7 +92,6 @@ struct eager_worker {
     }
 
     inline void stop_work() {
-        has_work.store(true);
         exiting.store(true);
     }
 

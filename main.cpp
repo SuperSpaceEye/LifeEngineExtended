@@ -1,8 +1,6 @@
 #include "LifeEngineCpp/WindowCore.h"
 #include <QApplication>
 
-int WINDOW_WIDTH = 800;
-int WINDOW_HEIGHT = 800;
 int SIMULATION_WIDTH = 600;
 int SIMULATION_HEIGHT = 600;
 int MAX_WINDOW_FPS = 60;
@@ -14,9 +12,7 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QWidget widget;
 
-    auto window = WindowCore{WINDOW_WIDTH,
-                             WINDOW_HEIGHT,
-                             SIMULATION_WIDTH,
+    auto window = WindowCore{SIMULATION_WIDTH,
                              SIMULATION_HEIGHT,
                              MAX_WINDOW_FPS,
                              MAX_SIMULATION_FPS,

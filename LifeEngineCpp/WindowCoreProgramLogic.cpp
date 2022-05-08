@@ -4,21 +4,18 @@
 
 #include "WindowCore.h"
 
-#include <utility>
-
-WindowCore::WindowCore(int window_width, int window_height, int simulation_width, int simulation_height, int window_fps,
+WindowCore::WindowCore(int simulation_width, int simulation_height, int window_fps,
                        int simulation_fps, int simulation_num_threads, QWidget *parent) :
-        QWidget(parent), window_width(window_width), window_height(window_height){
+        QWidget(parent){
     _ui.setupUi(this);
 
     _ui.simulation_graphicsView->show();
-    _ui.simulation_graphicsView->move(0, 0);
+    //If not false, the graphics view allows scrolling of an image after window resizing and only this helps.
+    //Disabling graphics view doesn't change anything anyway.
+    _ui.simulation_graphicsView->setEnabled(false);
 
     //https://stackoverflow.com/questions/32714105/mousemoveevent-is-not-called
     QCoreApplication::instance()->installEventFilter(this);
-
-    set_window_interval(window_fps);
-    set_simulation_interval(simulation_fps);
 
     dc.simulation_width = simulation_width;
     dc.simulation_height = simulation_height;
@@ -43,16 +40,16 @@ WindowCore::WindowCore(int window_width, int window_height, int simulation_width
     color_container = ColorContainer{};
 
     resize_image();
-    reset_image();
+    reset_scale_view();
 
     QTimer::singleShot(0, [&]{
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
         engine_thread.detach();
 
-        start = clock.now();
-        end = clock.now();
+        start = clock_now();
+        end = clock_now();
 
-        fps_timer = clock.now();
+        fps_timer = clock_now();
 
         scene.addItem(&pixmap_item);
         _ui.simulation_graphicsView->setScene(&scene);
@@ -60,21 +57,25 @@ WindowCore::WindowCore(int window_width, int window_height, int simulation_width
 
     timer = new QTimer(parent);
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
+
+    set_window_interval(window_fps);
+    set_simulation_interval(simulation_fps);
+
     timer->start();
+    reset_scale_view();
 }
 
 void WindowCore::mainloop_tick() {
-    std::this_thread::sleep_for(std::chrono::microseconds(long(window_interval) * 1000000 - delta_window_processing_time));
-    start = clock.now();
+    start = clock_now();
     if (synchronise_simulation_and_window) {
         cp.engine_pass_tick = true;
     }
     window_tick();
     window_frames++;
-    end = clock.now();
-    delta_window_processing_time = std::abs(std::chrono::duration_cast<std::chrono::microseconds>(end-start).count());
+    end = clock_now();
+    delta_window_processing_time = std::abs(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count());
     // timer
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(clock.now() - fps_timer).count() / 1000. > 1) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count() / 1000. > 1) {
         //TODO make pausing logic better.
         //pauses engine, parses/loads data from/to engine, resumes engine. It looks stupid, but works
         cp.engine_pause = true;
@@ -90,7 +91,7 @@ void WindowCore::mainloop_tick() {
         }
 
         window_frames = 0;
-        fps_timer = clock.now();
+        fps_timer = clock_now();
     }
 }
 
@@ -101,6 +102,7 @@ void WindowCore::update_fps_labels(int fps, int sps) {
 
 //TODO kinda redundant right now
 void WindowCore::window_tick() {
+    if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
     create_image();
 }
 
@@ -114,11 +116,12 @@ void WindowCore::move_center(int delta_x, int delta_y) {
     center_y -= delta_y * scaling_zoom;
 }
 
-void WindowCore::reset_image() {
+void WindowCore::reset_scale_view() {
     center_x = (float)dc.simulation_width/2;
     center_y = (float)dc.simulation_height/2;
     // finds exponent needed to scale the sprite
-    auto exp = log((float)start_height/window_height) / log(1.05);
+    auto exp = log((float)dc.simulation_height/(float)_ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
+//    auto exp = log(1) / log(1.05);
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
@@ -144,8 +147,6 @@ void WindowCore::create_image() {
     resize_image();
     auto image_width = _ui.simulation_graphicsView->viewport()->width();
     auto image_height = _ui.simulation_graphicsView->viewport()->height();
-
-    image = QImage(image_width, image_height, QImage::Format_RGB32);
 
     int scaled_width = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
@@ -215,6 +216,8 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
     }
 }
 
+// depth * ( y * width + x) + z
+// depth * width * y + depth * x + z
 void WindowCore::set_image_pixel(int x, int y, QColor &color) {
     auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
     image_vector[index+2] = color.red();
@@ -232,9 +235,11 @@ bool WindowCore::compare_pixel_color(int x, int y, QColor &color) {
 void WindowCore::set_window_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
         window_interval = 0.;
+        timer->setInterval(0);
         return;
     }
     window_interval = 1./max_window_fps;
+    timer->setInterval(1000/max_window_fps);
 }
 
 void WindowCore::set_simulation_interval(int max_simulation_fps) {
@@ -301,4 +306,35 @@ void WindowCore::set_cursor_mode(CursorMode mode) {
 void WindowCore::set_simulation_mode(SimulationModes mode) {
     cp.change_to_mode = mode;
     cp.change_simulation_mode = true;
+}
+
+//TODO there could be memory leaks in the feature.
+void WindowCore::resize_simulation_space() {
+    auto msg = DescisionMessageBox("Warning",
+                                   "Warning, resizing simulation grid is unstable and can crash the program.\n"
+                                   "I don't know why it crashes, but beware that it can.",
+                                   "OK", "Cancel", this);
+    auto result = msg.exec();
+    if (!result) {
+        return;
+    }
+
+    cp.engine_pause = true;
+    while (!cp.engine_paused) {std::cout << "here\n";}
+    dc.simulation_width = new_simulation_width;
+    dc.simulation_height = new_simulation_height;
+
+    dc.simulation_grid.clear();
+    dc.second_simulation_grid.clear();
+
+    dc.simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+
+    cp.build_threads = true;
+
+    cp.engine_pause = false;
+
+    reset_scale_view();
+
+    //std::cout << dc.simulation_grid.size() << " " << dc.simulation_grid[0].size() << " " << dc.simulation_height << " " << dc.simulation_width << "\n";
 }
