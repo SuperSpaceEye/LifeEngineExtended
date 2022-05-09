@@ -25,7 +25,7 @@
 
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
-#include "ParametersStruct.h"
+#include "SimulationParameters.h"
 #include "EngineControlContainer.h"
 #include "EngineDataContainer.h"
 #include "OrganismBlockParameters.h"
@@ -121,7 +121,7 @@ private:
 
     ColorContainer color_container;
 
-    ParametersStruct parameters{};
+    SimulationParameters parameters{};
 
     EngineControlParameters cp;
     EngineDataContainer dc;
@@ -149,6 +149,11 @@ private:
     bool override_evolution_controls_slot = false;
 
     bool resize_simulation_grid_flag = false;
+
+    Organism base_organism;
+    Organism chosen_organism;
+
+    std::mt19937 mt;
 
     void mainloop_tick();
     void window_tick();
@@ -224,6 +229,7 @@ private slots:
     void le_add_cell_slot();
     void le_change_cell_slot();
     void le_remove_cell_slot();
+    void le_do_nothing_slot();
     void le_max_sps_slot();
     void le_max_fps_slot();
     void le_cell_size_slot();

@@ -27,8 +27,8 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     //engine = new SimulationEngine(simulation_width, simulation_height, std::ref(simulation_grid), std::ref(engine_ticks), std::ref(engine_working), std::ref(engine_paused), std::ref(engine_mutex));
     engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), engine_mutex);
 
-//    std::random_device rd;
-//    std::mt19937 mt(rd());
+    std::random_device rd;
+    mt = std::mt19937(rd());
 //    std::uniform_int_distribution<int> dist(0, 8);
 //
 //    for (int relative_x = 0; relative_x < simulation_width; relative_x++) {
@@ -38,6 +38,19 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 //    }
 
     color_container = ColorContainer{};
+
+    auto anatomy = new Anatomy();
+    anatomy->set_block(BlockTypes::MouthBlock, 0, 0);
+    anatomy->set_block(BlockTypes::ProducerBlock, -1, -1);
+    anatomy->set_block(BlockTypes::ProducerBlock, 1, 1);
+
+    std::cout << anatomy->_organism_blocks.size();
+
+    //TODO very important. organism calls destructor for some reason, deallocating anatomy.
+    base_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &parameters.rotation_enabled, Rotation::UP, anatomy, &parameters, &op, &mt);
+    chosen_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &parameters.rotation_enabled, Rotation::UP, new Anatomy(anatomy), &parameters, &op, &mt);
+
+    dc.organisms.push_back(chosen_organism);
 
     resize_image();
     reset_scale_view();

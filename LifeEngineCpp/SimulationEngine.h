@@ -34,7 +34,7 @@ class SimulationEngine {
     std::vector<eager_worker> threads;
     std::vector<int> thread_points;
 
-    void process_user_action_pool();
+    void process_user_action_pool(){};
 
     void simulation_tick();
 
@@ -60,6 +60,8 @@ public:
                                      int start_relative_y = 0,
                                      int end_relative_x = 0,
                                      int end_relative_y = 0);
+
+    static void tick_of_single_thread() {};
 };
 
 struct eager_worker {
@@ -117,7 +119,8 @@ private:
                     return;
                 }
             }
-            SimulationEngine::single_threaded_tick(dc, &mt, start_relative_x, start_relative_y, end_relative_x, end_relative_y);
+            //SimulationEngine::single_threaded_tick(dc, &mt, start_relative_x, start_relative_y, end_relative_x, end_relative_y);
+            SimulationEngine::tick_of_single_thread();
             has_work.store(false);
         }
     });

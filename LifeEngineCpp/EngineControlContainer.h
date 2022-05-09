@@ -29,8 +29,9 @@ struct EngineControlParameters {
     // if true, will build the threads
     bool build_threads = false;
 
-    SimulationModes simulation_mode = SimulationModes::CPU_Multi_Threaded;
-    SimulationModes change_to_mode = SimulationModes::CPU_Multi_Threaded;
+    //TODO change this
+    SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
+    SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;
     bool change_simulation_mode = false;
 
     uint8_t num_threads = 1;

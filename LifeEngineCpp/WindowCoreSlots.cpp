@@ -58,19 +58,19 @@ void WindowCore::b_resize_and_reset_slot() {
 }
 
 void WindowCore::b_generate_random_walls_slot() {
-
+    display_message("Not implemented");
 }
 
 void WindowCore::b_clear_all_walls_slot() {
-
+    display_message("Not implemented");
 }
 
 void WindowCore::b_save_world_slot() {
-
+    display_message("Not implemented");
 }
 
 void WindowCore::b_load_world_slot() {
-
+    display_message("Not implemented");
 }
 
 void WindowCore::b_pass_one_tick_slot() {
@@ -112,9 +112,7 @@ void WindowCore::le_num_threads_slot() {
                 + ") higher than the number of CPU cores (" +
                 std::to_string(std::thread::hardware_concurrency()) +
                 ") is not recommended, and will hurt the performance. To get the best result, try using less CPU threads than available CPU cores.");
-        if (!accept) {
-            return;
-        }
+        if (!accept) {return;}
     }
     set_simulation_num_threads(result.result);
 }
@@ -124,7 +122,7 @@ void WindowCore::le_cell_size_slot() {
     int fallback = cell_size;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_cell_size, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Size of cell cannot be less than 1.");return;}
+    if (result.result < 1) {display_message("Size of cell cannot be less than 1."); return;}
     cell_size = result.result;
     display_message("Warning, changing cell size is not implemented");
 }
@@ -135,7 +133,7 @@ void WindowCore::le_simulation_width_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_width,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Simulation width cannot be less than 1.");return;}
+    if (result.result < 1) {display_message("Simulation width cannot be less than 1."); return;}
     new_simulation_width = result.result;
 }
 
@@ -144,7 +142,7 @@ void WindowCore::le_simulation_height_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_height,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Simulation height cannot be less than 1.");return;}
+    if (result.result < 1) {display_message("Simulation height cannot be less than 1."); return;}
     new_simulation_height = result.result;
 }
 
@@ -154,7 +152,7 @@ void WindowCore::le_food_production_probability_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float",
                                                           _ui.le_food_production_probability, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.food_production_probability = result.result;
 }
 
@@ -163,7 +161,7 @@ void WindowCore::le_lifespan_multiplier_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_lifespan_multiplier,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.lifespan_multiplier = result.result;
 }
 
@@ -172,7 +170,7 @@ void WindowCore::le_look_range_slot() {
     int fallback = parameters.look_range;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_look_range, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.look_range = result.result;
 }
 
@@ -181,7 +179,7 @@ void WindowCore::le_auto_food_drop_rate_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_food_drop_rate,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.auto_food_drop_rate = result.result;
 }
 
@@ -198,7 +196,7 @@ void WindowCore::le_global_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not an int", _ui.le_global_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.global_mutation_rate = result.result;
 }
 
@@ -206,7 +204,7 @@ void WindowCore::le_add_cell_slot() {
     int fallback = parameters.add_cell;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_add, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.add_cell = result.result;
 }
 
@@ -214,7 +212,7 @@ void WindowCore::le_change_cell_slot() {
     int fallback = parameters.change_cell;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_change, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.change_cell = result.result;
 }
 
@@ -222,8 +220,16 @@ void WindowCore::le_remove_cell_slot() {
     int fallback = parameters.remove_cell;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_remove, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0.");}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     parameters.remove_cell = result.result;
+}
+
+void WindowCore::le_do_nothing_slot() {
+    int fallback = parameters.do_nothing;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_do_nothing, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    parameters.do_nothing = result.result;
 }
 
 //==================== Radio buttond ====================

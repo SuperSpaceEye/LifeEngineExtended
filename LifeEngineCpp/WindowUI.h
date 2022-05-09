@@ -133,6 +133,8 @@ public:
     QLineEdit *le_change;
     QLabel *label_12;
     QLineEdit *le_remove;
+    QLabel *label_15;
+    QLineEdit *le_do_nothing;
     QVBoxLayout *verticalLayout_11;
     QHBoxLayout *horizontalLayout_11;
     QCheckBox *cb_rotation_enabled;
@@ -162,8 +164,8 @@ public:
     QLabel *label;
     QLineEdit *le_num_threads;
     QCheckBox *cb_synchronise_sim_and_win;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -532,7 +534,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 406, 416));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -221, 406, 416));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -716,6 +718,16 @@ public:
         le_remove->setObjectName(QString::fromUtf8("le_remove"));
 
         horizontalLayout_16->addWidget(le_remove);
+
+        label_15 = new QLabel(widget);
+        label_15->setObjectName(QString::fromUtf8("label_15"));
+
+        horizontalLayout_16->addWidget(label_15);
+
+        le_do_nothing = new QLineEdit(widget);
+        le_do_nothing->setObjectName(QString::fromUtf8("le_do_nothing"));
+
+        horizontalLayout_16->addWidget(le_do_nothing);
 
 
         verticalLayout_17->addLayout(horizontalLayout_16);
@@ -952,8 +964,9 @@ public:
         QObject::connect(b_load_world, SIGNAL(clicked()), MainWindow, SLOT(b_load_world_slot()));
         QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
         QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
+        QObject::connect(le_do_nothing, SIGNAL(returnPressed()), MainWindow, SLOT(le_do_nothing_slot()));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1025,11 +1038,13 @@ public:
         lb_mutation_rate->setText(QApplication::translate("MainWindow", "global mutation rate:", nullptr));
         le_global_mutation_rate->setText(QApplication::translate("MainWindow", "5", nullptr));
         label_10->setText(QApplication::translate("MainWindow", "add cell:", nullptr));
-        le_add->setText(QApplication::translate("MainWindow", "33", nullptr));
+        le_add->setText(QApplication::translate("MainWindow", "25", nullptr));
         label_11->setText(QApplication::translate("MainWindow", "change cell:", nullptr));
-        le_change->setText(QApplication::translate("MainWindow", "33", nullptr));
+        le_change->setText(QApplication::translate("MainWindow", "25", nullptr));
         label_12->setText(QApplication::translate("MainWindow", "remove cell:", nullptr));
-        le_remove->setText(QApplication::translate("MainWindow", "33", nullptr));
+        le_remove->setText(QApplication::translate("MainWindow", "25", nullptr));
+        label_15->setText(QApplication::translate("MainWindow", "do nothing", nullptr));
+        le_do_nothing->setText(QApplication::translate("MainWindow", "25", nullptr));
         cb_rotation_enabled->setText(QApplication::translate("MainWindow", "Rotation enabled", nullptr));
         cb_on_touch_kill->setText(QApplication::translate("MainWindow", "On touch kill", nullptr));
         cb_movers_can_produce_food->setText(QApplication::translate("MainWindow", "Movers can produce food", nullptr));

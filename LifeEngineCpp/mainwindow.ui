@@ -322,7 +322,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>3</number>
            </property>
            <property name="iconSize">
             <size>
@@ -675,7 +675,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-221</y>
                   <width>406</width>
                   <height>416</height>
                  </rect>
@@ -914,7 +914,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_add">
                           <property name="text">
-                           <string>33</string>
+                           <string>25</string>
                           </property>
                          </widget>
                         </item>
@@ -928,7 +928,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_change">
                           <property name="text">
-                           <string>33</string>
+                           <string>25</string>
                           </property>
                          </widget>
                         </item>
@@ -942,7 +942,21 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_remove">
                           <property name="text">
-                           <string>33</string>
+                           <string>25</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_15">
+                          <property name="text">
+                           <string>do nothing</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_do_nothing">
+                          <property name="text">
+                           <string>25</string>
                           </property>
                          </widget>
                         </item>
@@ -1931,6 +1945,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_do_nothing</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_do_nothing_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>751</x>
+     <y>745</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -1978,13 +2008,14 @@ p, li { white-space: pre-wrap; }
   <slot>b_load_world_slot()</slot>
   <slot>cb_override_evolution_controls_slot(bool)</slot>
   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
+  <slot>le_do_nothing_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

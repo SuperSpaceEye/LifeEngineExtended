@@ -2,11 +2,11 @@
 // Created by spaceeye on 27.03.2022.
 //
 
-#ifndef THELIFEENGINECPP_PARAMETERSSTRUCT_H
-#define THELIFEENGINECPP_PARAMETERSSTRUCT_H
+#ifndef THELIFEENGINECPP_SIMULATIONPARAMETERS_H
+#define THELIFEENGINECPP_SIMULATIONPARAMETERS_H
 
-struct ParametersStruct {
-    //simulation parameters
+struct SimulationParameters {
+    //simulation sim_parameters
     //evolution controls
         float food_production_probability = 5;
         int lifespan_multiplier = 100;
@@ -15,9 +15,10 @@ struct ParametersStruct {
         int extra_reproduction_cost = 0;
         float global_mutation_rate = 5;
         //Probabilities
-            int add_cell = 33;
-            int change_cell = 33;
-            int remove_cell = 33;
+            int add_cell = 25;
+            int change_cell = 25;
+            int remove_cell = 25;
+            int do_nothing = 25;
 
         bool rotation_enabled = false;
         bool one_touch_kill = true;
@@ -31,4 +32,4 @@ struct ParametersStruct {
         bool generate_random_walls_on_reset = false;
 };
 
-#endif //THELIFEENGINECPP_PARAMETERSSTRUCT_H
+#endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

@@ -28,6 +28,7 @@ void SimulationEngine::threaded_mainloop() {
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) { build_threads(); }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else { cp.engine_paused = false; }
+        process_user_action_pool();
         if (!cp.engine_paused || cp.engine_pass_tick) {
             if (!cp.engine_pause) {
                 cp.engine_paused = false;
@@ -86,25 +87,13 @@ void SimulationEngine::simulation_tick() {
 }
 
 void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, std::mt19937 * mt, int start_relative_x, int start_relative_y, int end_relative_x, int end_relative_y) {
-    if (end_relative_x == 0 && end_relative_y == 0) {
-        end_relative_x = dc->simulation_width;
-        end_relative_y = dc->simulation_height;
-    }
-
-    for (int relative_x = start_relative_x; relative_x < end_relative_x; relative_x++) {
-        for (int relative_y = start_relative_y; relative_y < end_relative_y; relative_y++) {
-            dc->simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dc->engine_ticks%9);
+    for (auto & organism: dc->organisms) {
+        //std::cout << organism.organism_anatomy->_organism_blocks.size() << "\n";
+        for (auto & block: organism.organism_anatomy->_organism_blocks) {
+            //std::cout << block.relative_x << " " << block.relative_y << "\n";
+            dc->simulation_grid[organism.x + block.relative_x][organism.y + block.relative_y].type = block.organism_block.type;
         }
     }
-
-
-//    auto dist = std::uniform_int_distribution<int>(0, 8);
-//
-//    for (int relative_x = start_relative_x; relative_x < end_relative_x; relative_x++) {
-//        for (int relative_y = start_relative_y; relative_y < end_relative_y; relative_y++) {
-//            dc->simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(*mt));
-//        }
-//    }
 }
 
 void SimulationEngine::multi_threaded_tick() {
