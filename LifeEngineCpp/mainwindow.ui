@@ -675,7 +675,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-221</y>
+                  <y>0</y>
                   <width>406</width>
                   <height>416</height>
                  </rect>
@@ -768,7 +768,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QLineEdit" name="le_food_production_probability">
                         <property name="text">
-                         <string>5</string>
+                         <string>0.5</string>
                         </property>
                        </widget>
                       </item>

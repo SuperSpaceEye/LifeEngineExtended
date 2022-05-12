@@ -45,11 +45,11 @@ void WindowCore::tb_stoprender_slot(bool stopped_render) {
 //==================== Buttons ====================
 
 void WindowCore::b_clear_slot() {
-
+    clear_world();
 }
 
 void WindowCore::b_reset_slot() {
-
+    reset_world();
 }
 
 void WindowCore::b_resize_and_reset_slot() {
@@ -148,88 +148,88 @@ void WindowCore::le_simulation_height_slot() {
 
 //I don't know how to do it better.
 void WindowCore::le_food_production_probability_slot() {
-    float fallback = parameters.food_production_probability;
+    float fallback = sp.food_production_probability;
     auto result = try_convert_message_box_template<float>("Inputted text is not a float",
                                                           _ui.le_food_production_probability, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.food_production_probability = result.result;
+    if (result.result < 0 || result.result > 1) {display_message("Input must be between 0 and 1."); return;}
+    sp.food_production_probability = result.result;
 }
 
 void WindowCore::le_lifespan_multiplier_slot() {
-    int fallback = parameters.lifespan_multiplier;
+    int fallback = sp.lifespan_multiplier;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_lifespan_multiplier,
                                                         fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.lifespan_multiplier = result.result;
+    sp.lifespan_multiplier = result.result;
 }
 
 //TODO set restraints
 void WindowCore::le_look_range_slot() {
-    int fallback = parameters.look_range;
+    int fallback = sp.look_range;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_look_range, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.look_range = result.result;
+    sp.look_range = result.result;
 }
 
 void WindowCore::le_auto_food_drop_rate_slot() {
-    int fallback = parameters.auto_food_drop_rate;
+    int fallback = sp.auto_food_drop_rate;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_food_drop_rate,
                                                         fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.auto_food_drop_rate = result.result;
+    sp.auto_food_drop_rate = result.result;
 }
 
 void WindowCore::le_extra_reproduction_cost_slot() {
-    int fallback = parameters.extra_reproduction_cost;
+    int fallback = sp.extra_reproduction_cost;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_extra_reproduction_cost,
                                                         fallback);
     if (!result.is_valid) {return;}
-    parameters.extra_reproduction_cost = result.result;
+    sp.extra_reproduction_cost = result.result;
 }
 
 void WindowCore::le_global_mutation_rate_slot() {
-    float fallback = parameters.global_mutation_rate;
+    float fallback = sp.global_mutation_rate;
     auto result = try_convert_message_box_template<float>("Inputted text is not an int", _ui.le_global_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.global_mutation_rate = result.result;
+    sp.global_mutation_rate = result.result;
 }
 
 void WindowCore::le_add_cell_slot() {
-    int fallback = parameters.add_cell;
+    int fallback = sp.add_cell;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_add, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.add_cell = result.result;
+    sp.add_cell = result.result;
 }
 
 void WindowCore::le_change_cell_slot() {
-    int fallback = parameters.change_cell;
+    int fallback = sp.change_cell;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_change, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.change_cell = result.result;
+    sp.change_cell = result.result;
 }
 
 void WindowCore::le_remove_cell_slot() {
-    int fallback = parameters.remove_cell;
+    int fallback = sp.remove_cell;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_remove, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    parameters.remove_cell = result.result;
+    sp.remove_cell = result.result;
 }
 
 void WindowCore::le_do_nothing_slot() {
-    int fallback = parameters.do_nothing;
+    int fallback = sp.do_nothing;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_do_nothing, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    parameters.do_nothing = result.result;
+    sp.do_nothing = result.result;
 }
 
 //==================== Radio buttond ====================
@@ -273,31 +273,31 @@ void WindowCore::cb_stop_console_output_slot(bool state) {
 
 void WindowCore::cb_synchronise_simulation_and_window_slot(bool state) {
     synchronise_simulation_and_window = state;
-    cp.engine_global_pause = state;
+    cp.engine_pause = state;
 }
 
 void WindowCore::cb_use_evolved_mutation_rate_slot(bool state) {
-    parameters.use_evolved_mutation_rate = state;
+    sp.use_evolved_mutation_rate = state;
     _ui.le_global_mutation_rate->setDisabled(state);
     _ui.lb_mutation_rate->setDisabled(state);
 }
 
-void WindowCore::cb_rotation_enabled_slot               (bool state) {parameters.rotation_enabled = state;}
+void WindowCore::cb_rotation_enabled_slot               (bool state) { sp.rotation_enabled = state;}
 
-void WindowCore::cb_on_touch_kill_slot                  (bool state) {parameters.one_touch_kill = state;}
+void WindowCore::cb_on_touch_kill_slot                  (bool state) { sp.one_touch_kill = state;}
 
-void WindowCore::cb_movers_can_produce_food_slot        (bool state) {parameters.movers_can_produce_food = state;}
+void WindowCore::cb_movers_can_produce_food_slot        (bool state) { sp.movers_can_produce_food = state;}
 
-void WindowCore::cb_food_blocks_reproduction_slot       (bool state) {parameters.food_blocks_reproduction = state;}
+void WindowCore::cb_food_blocks_reproduction_slot       (bool state) { sp.food_blocks_reproduction = state;}
 
-void WindowCore::cb_fill_window_slot                    (bool state) {fill_window = state;}
+void WindowCore::cb_fill_window_slot                    (bool state) { fill_window = state;}
 
-void WindowCore::cb_reset_on_total_extinction_slot      (bool state) {parameters.reset_on_total_extinction = state;}
+void WindowCore::cb_reset_on_total_extinction_slot      (bool state) { sp.reset_on_total_extinction = state;}
 
-void WindowCore::cb_pause_on_total_extinction_slot      (bool state) {parameters.pause_on_total_extinction = state;}
+void WindowCore::cb_pause_on_total_extinction_slot      (bool state) { sp.pause_on_total_extinction = state;}
 
-void WindowCore::cb_clear_walls_on_reset_slot           (bool state) {parameters.clear_walls_on_reset = state;}
+void WindowCore::cb_clear_walls_on_reset_slot           (bool state) { sp.clear_walls_on_reset = state;}
 
-void WindowCore::cb_override_evolution_controls_slot    (bool state) {override_evolution_controls_slot = state;}
+void WindowCore::cb_override_evolution_controls_slot    (bool state) { override_evolution_controls_slot = state;}
 
-void WindowCore::cb_generate_random_walls_on_reset_slot (bool state) {parameters.generate_random_walls_on_reset = state;}
+void WindowCore::cb_generate_random_walls_on_reset_slot (bool state) { sp.generate_random_walls_on_reset = state;}

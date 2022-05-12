@@ -22,6 +22,8 @@ struct EngineControlParameters {
     bool engine_global_pause = false;
     // will do one tick and then return to being stopped.
     bool engine_pass_tick = false;
+
+    bool synchronise_simulation_tick = false;
     // a signal for window process that engine is stopped, and window process can parse data from engine
     bool engine_paused = false;
     // for image creating purposes

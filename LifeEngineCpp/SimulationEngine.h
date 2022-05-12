@@ -21,10 +21,10 @@
 struct eager_worker;
 
 class SimulationEngine {
-
     EngineControlParameters& cp;
     EngineDataContainer& dc;
     OrganismBlockParameters& op;
+    SimulationParameters& sp;
 
     std::mutex& mutex;
 
@@ -39,11 +39,23 @@ class SimulationEngine {
     void simulation_tick();
 
     void multi_threaded_tick();
+
     void cuda_tick();
     void build_threads();
     void kill_threads();
 
     void change_mode();
+
+    //simulation stages for single-threaded simulation
+    static void produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism & organism, std::mt19937 & mt);
+    static void eat_food(EngineDataContainer * dc, SimulationParameters * sp, Organism & organism);
+    static void tick_lifetime(EngineDataContainer * dc, std::vector<int>& to_erase, Organism & organism, int organism_pos);
+    static void erase_organisms(EngineDataContainer * dc, std::vector<int>& to_erase, int i);
+
+    static void apply_damage();
+    static void get_observation();
+    static void make_decision();
+    static void move_organism();
 
     std::random_device rd;
     std::mt19937 mt;
@@ -51,17 +63,15 @@ class SimulationEngine {
 
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                     OrganismBlockParameters& organism_block_parameters, std::mutex& mutex);
+                     OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters,
+                     std::mutex& mutex);
     void threaded_mainloop();
 
     static void single_threaded_tick(EngineDataContainer * dc,
-                                     std::mt19937 * mt,
-                                     int start_relative_x = 0,
-                                     int start_relative_y = 0,
-                                     int end_relative_x = 0,
-                                     int end_relative_y = 0);
+                                     SimulationParameters * sp,
+                                     std::mt19937 * mt);
 
-    static void tick_of_single_thread() {};
+    static void tick_of_single_thread();
 };
 
 struct eager_worker {

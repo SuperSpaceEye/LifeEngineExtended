@@ -50,8 +50,8 @@ float Organism::calculate_max_life(Anatomy *anatomy) {
 
 //TODO for the future
 int Organism::calculate_organism_lifetime(Anatomy *anatomy) {
-    lifetime = anatomy->_organism_blocks.size();
-    return lifetime;
+    max_lifetime = anatomy->_organism_blocks.size() * sim_parameters->lifespan_multiplier;
+    return max_lifetime;
 }
 
 Organism * Organism::create_child() {

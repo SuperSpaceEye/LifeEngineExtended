@@ -25,7 +25,7 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     dc.simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     dc.second_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     //engine = new SimulationEngine(simulation_width, simulation_height, std::ref(simulation_grid), std::ref(engine_ticks), std::ref(engine_working), std::ref(engine_paused), std::ref(engine_mutex));
-    engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), engine_mutex);
+    engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), std::ref(sp), engine_mutex);
 
     std::random_device rd;
     mt = std::mt19937(rd());
@@ -47,8 +47,8 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     std::cout << anatomy->_organism_blocks.size();
 
     //TODO very important. organism calls destructor for some reason, deallocating anatomy.
-    base_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &parameters.rotation_enabled, Rotation::UP, anatomy, &parameters, &op, &mt);
-    chosen_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &parameters.rotation_enabled, Rotation::UP, new Anatomy(anatomy), &parameters, &op, &mt);
+    base_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
+    chosen_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, new Anatomy(anatomy), &sp, &op, &mt);
 
     dc.organisms.push_back(chosen_organism);
 
@@ -82,6 +82,7 @@ void WindowCore::mainloop_tick() {
     start = clock_now();
     if (synchronise_simulation_and_window) {
         cp.engine_pass_tick = true;
+        cp.synchronise_simulation_tick = true;
     }
     window_tick();
     window_frames++;
@@ -95,7 +96,7 @@ void WindowCore::mainloop_tick() {
         wait_for_engine_to_pause();
         simulation_frames = dc.engine_ticks;
         dc.engine_ticks = 0;
-        cp.engine_pause = false;
+        unpause_engine();
 
         update_fps_labels(window_frames, simulation_frames);
 
@@ -188,7 +189,7 @@ void WindowCore::create_image() {
         // pausing engine to parse data from engine.
         auto paused = wait_for_engine_to_pause();
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
-        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); cp.engine_pause = false;}
+        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); unpause_engine();}
     }
 
     image_for_loop(image_width, image_height, lin_width, lin_height);
@@ -304,7 +305,7 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
             dc.second_simulation_grid[x][y].type = dc.simulation_grid[x][y].type;
         }
     }
-    cp.engine_pause = false;
+    unpause_engine();
 }
 
 void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
@@ -333,7 +334,7 @@ void WindowCore::resize_simulation_space() {
     }
 
     cp.engine_pause = true;
-    while (!cp.engine_paused) {std::cout << "here\n";}
+    while (!cp.engine_paused) {}
     dc.simulation_width = new_simulation_width;
     dc.simulation_height = new_simulation_height;
 
@@ -345,9 +346,37 @@ void WindowCore::resize_simulation_space() {
 
     cp.build_threads = true;
 
-    cp.engine_pause = false;
+    unpause_engine();
 
     reset_scale_view();
+}
 
-    //std::cout << dc.simulation_grid.size() << " " << dc.simulation_grid[0].size() << " " << dc.simulation_height << " " << dc.simulation_width << "\n";
+void WindowCore::partial_clear_world() {
+    cp.engine_pause = true;
+    while (!cp.engine_paused) {}
+    dc.organisms.clear();
+    for (auto & column: dc.simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.second_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+}
+
+void WindowCore::reset_world() {
+    partial_clear_world();
+    if (reset_with_chosen) {dc.organisms.push_back(chosen_organism);}
+    else                    {dc.organisms.push_back(base_organism);}
+    reset_with_chosen = false;
+    //Just in case
+    cp.engine_pass_tick = true;
+    cp.synchronise_simulation_tick = true;
+    unpause_engine();
+}
+
+void WindowCore::clear_world() {
+    partial_clear_world();
+    unpause_engine();
+}
+
+void WindowCore::unpause_engine() {
+    if (!synchronise_simulation_and_window) {
+        cp.engine_pause = false;
+    }
 }

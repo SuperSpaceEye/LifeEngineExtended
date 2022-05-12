@@ -29,14 +29,15 @@ public:
     //coordinates of a central block of a cell
     int x = 0;
     int y = 0;
+    // how much organism can sustain.
     float life_points = 0;
     // how much damage organism sustained. If damage > life_points, organism dies
     float damage = 0;
 
     // an amount of ticks organism can live
-    int lifetime = 0;
+    int max_lifetime = 0;
     // for how much organism already lived.
-    int current_time = 0;
+    int lifetime = 0;
 
     float food_collected = 0;
     //TODO implement rotation

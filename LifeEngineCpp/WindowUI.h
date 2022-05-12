@@ -534,7 +534,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -221, 406, 416));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 406, 416));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -1025,7 +1025,7 @@ public:
         cb_override_evolution_controls->setText(QApplication::translate("MainWindow", "Override Evolution Controls", nullptr));
         Tabs->setTabText(Tabs->indexOf(world_controls_tab), QApplication::translate("MainWindow", "World Controls", nullptr));
         label_4->setText(QApplication::translate("MainWindow", "food production probability:", nullptr));
-        le_food_production_probability->setText(QApplication::translate("MainWindow", "5", nullptr));
+        le_food_production_probability->setText(QApplication::translate("MainWindow", "0.5", nullptr));
         label_5->setText(QApplication::translate("MainWindow", "llifespan multiplier:", nullptr));
         le_lifespan_multiplier->setText(QApplication::translate("MainWindow", "100", nullptr));
         label_7->setText(QApplication::translate("MainWindow", "look range:", nullptr));

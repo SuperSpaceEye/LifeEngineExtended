@@ -81,7 +81,7 @@ class WindowCore: public QWidget {
         Q_OBJECT
 private:
     // relative_x>1
-    float scaling_coefficient = 1.05;
+    float scaling_coefficient = 1.2;
     float scaling_zoom = 1;
 
     bool right_mouse_button_pressed = false;
@@ -121,7 +121,7 @@ private:
 
     ColorContainer color_container;
 
-    SimulationParameters parameters{};
+    SimulationParameters sp{};
 
     EngineControlParameters cp;
     EngineDataContainer dc;
@@ -147,6 +147,7 @@ private:
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
     bool override_evolution_controls_slot = false;
+    bool reset_with_chosen = false;
 
     bool resize_simulation_grid_flag = false;
 
@@ -163,6 +164,8 @@ private:
     void resize_image();
     void set_image_pixel(int x, int y, QColor & color);
     bool compare_pixel_color(int x, int y, QColor & color);
+
+    void unpause_engine();
 
     void create_image();
 
@@ -190,6 +193,10 @@ private:
     void inline image_for_loop(int image_width, int image_height,
                                std::vector<int> & lin_width,
                                std::vector<int> & lin_height);
+
+    void partial_clear_world();
+    void reset_world();
+    void clear_world();
 
     void wheelEvent(QWheelEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);

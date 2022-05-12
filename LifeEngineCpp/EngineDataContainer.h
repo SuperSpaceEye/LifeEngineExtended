@@ -5,6 +5,8 @@
 #ifndef THELIFEENGINECPP_ENGINEDATACONTAINER_H
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
+#include <atomic>
+
 struct EngineDataContainer {
     uint64_t delta_time = 0;
     uint32_t engine_ticks = 0;
@@ -16,6 +18,9 @@ struct EngineDataContainer {
     std::vector<std::vector<BaseGridBlock>> simulation_grid;
     std::vector<std::vector<BaseGridBlock>> second_simulation_grid;
     std::vector<Organism> organisms;
+
+    std::vector<std::vector<uint8_t>> food_grid;
+
     // adding/killing organisms, adding/deleting food/walls, etc.
     //std::vector<Action> user_actions_pool;;
 
