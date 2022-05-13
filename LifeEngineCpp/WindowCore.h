@@ -121,7 +121,7 @@ private:
 
     ColorContainer color_container;
 
-    SimulationParameters sp{};
+    SimulationParameters sp;
 
     EngineControlParameters cp;
     EngineDataContainer dc;
@@ -138,7 +138,7 @@ private:
     bool full_simulation_grid_parsed = false;
 
     bool stop_console_output = false;
-    bool synchronise_simulation_and_window = false;
+    bool synchronise_simulation_and_window = true;
 
     //TODO if == 1, then prints one pixel for one simulation block. If > 1, then loads texture texture (if exists).
     int cell_size = 1;
@@ -151,8 +151,8 @@ private:
 
     bool resize_simulation_grid_flag = false;
 
-    Organism base_organism;
-    Organism chosen_organism;
+    Organism * base_organism;
+    Organism * chosen_organism;
 
     std::mt19937 mt;
 

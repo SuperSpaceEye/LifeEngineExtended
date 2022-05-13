@@ -7,15 +7,10 @@
 
 #include <random>
 #include "Anatomy.h"
+#include "Brain.h"
 #include "../SimulationParameters.h"
 #include "../OrganismBlockParameters.h"
-
-enum class Rotation {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT
-};
+#include "Rotation.h"
 
 struct Coordinates {
     int x;
@@ -40,22 +35,28 @@ public:
     int lifetime = 0;
 
     float food_collected = 0;
+    float food_needed = 0;
     //TODO implement rotation
     bool * can_rotate = nullptr;
     Rotation rotation = Rotation::UP;
 
+    bool child_ready = false;
+
     Anatomy * organism_anatomy = nullptr;
+    Brain * brain;
     SimulationParameters* sim_parameters = nullptr;
     OrganismBlockParameters* block_parameters = nullptr;
+    Organism * child_pattern = nullptr;
 
-    std::mt19937* mt;
+    std::mt19937* mt = nullptr;
 
     float calculate_max_life(Anatomy *anatomy);
     int calculate_organism_lifetime(Anatomy *anatomy);
+    float calculate_food_needed(Anatomy *anatomy);
 //public:
     Organism(int x, int y, bool* can_rotate, Rotation rotation, Anatomy * anatomy,
              SimulationParameters* sim_parameters, OrganismBlockParameters* block_parameters, std::mt19937* mt);
-    Organism()=default;
+    Organism(const Organism & organism);
     ~Organism();
     Organism * create_child();
 };

@@ -17,7 +17,7 @@ struct EngineControlParameters {
 
     bool stop_engine = false;
     // a signal for engine to pause working when true to parse data
-    bool engine_pause = false;
+    bool engine_pause = true;
     // pauses the engine when true by user input
     bool engine_global_pause = false;
     // will do one tick and then return to being stopped.

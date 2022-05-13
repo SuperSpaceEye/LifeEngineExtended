@@ -17,7 +17,8 @@ struct EngineDataContainer {
     bool unlimited_simulation_fps = true;
     std::vector<std::vector<BaseGridBlock>> simulation_grid;
     std::vector<std::vector<BaseGridBlock>> second_simulation_grid;
-    std::vector<Organism> organisms;
+    std::vector<Organism*> organisms;
+    std::vector<Organism*> to_place_organisms;
 
     std::vector<std::vector<uint8_t>> food_grid;
 

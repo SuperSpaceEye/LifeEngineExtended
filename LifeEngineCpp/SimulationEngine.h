@@ -47,15 +47,24 @@ class SimulationEngine {
     void change_mode();
 
     //simulation stages for single-threaded simulation
-    static void produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism & organism, std::mt19937 & mt);
-    static void eat_food(EngineDataContainer * dc, SimulationParameters * sp, Organism & organism);
-    static void tick_lifetime(EngineDataContainer * dc, std::vector<int>& to_erase, Organism & organism, int organism_pos);
+    static void produce_food   (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, std::mt19937 & mt);
+    static void eat_food       (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
+    static void tick_lifetime  (EngineDataContainer * dc, std::vector<int>& to_erase, Organism *organism, int organism_pos);
+    static void apply_damage   (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
     static void erase_organisms(EngineDataContainer * dc, std::vector<int>& to_erase, int i);
+    static void get_observation(EngineDataContainer * dc, Organism *organism);
+    static void make_decision  (EngineDataContainer * dc, Organism *organism, std::vector<Observation> & organism_observations);
+    static void try_make_child (EngineDataContainer * dc, Organism *organism, std::vector<Organism*>& child_organisms, std::mt19937 * mt);
+    static void push_new_children (EngineDataContainer * dc, std::vector<Organism*>& child_organisms);
 
-    static void apply_damage();
-    static void get_observation();
-    static void make_decision();
-    static void move_organism();
+    static void make_child     (EngineDataContainer * dc, Organism *organism, std::mt19937 * mt);
+    static void place_child    (EngineDataContainer * dc, Organism *organism, std::vector<Organism*>& child_organisms, std::mt19937 * mt);
+
+    static void rotate_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision);
+    static void move_organism  (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
+
+    static void reserve_observations(std::vector<std::vector<Observation>> & observations, std::vector<Organism *> &organisms);
+
 
     std::random_device rd;
     std::mt19937 mt;

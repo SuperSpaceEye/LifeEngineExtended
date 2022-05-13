@@ -3,6 +3,7 @@
 //
 
 #include "WindowCore.h"
+#include "Organisms/Rotation.h"
 
 WindowCore::WindowCore(int simulation_width, int simulation_height, int window_fps,
                        int simulation_fps, int simulation_num_threads, QWidget *parent) :
@@ -38,19 +39,20 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 //    }
 
     color_container = ColorContainer{};
+    sp = SimulationParameters{};
 
     auto anatomy = new Anatomy();
     anatomy->set_block(BlockTypes::MouthBlock, 0, 0);
     anatomy->set_block(BlockTypes::ProducerBlock, -1, -1);
     anatomy->set_block(BlockTypes::ProducerBlock, 1, 1);
 
-    std::cout << anatomy->_organism_blocks.size();
+    std::cout << "organism blocks size " << anatomy->_organism_blocks.size() << "\n";
 
     //TODO very important. organism calls destructor for some reason, deallocating anatomy.
-    base_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
-    chosen_organism = Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, new Anatomy(anatomy), &sp, &op, &mt);
+    base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
+    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, new Anatomy(anatomy), &sp, &op, &mt);
 
-    dc.organisms.push_back(chosen_organism);
+    dc.to_place_organisms.push_back(chosen_organism);
 
     resize_image();
     reset_scale_view();
@@ -70,6 +72,7 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
     timer = new QTimer(parent);
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
+    //connect(timer, &QTimer::timeout, [&]{std::cout << "" << (chosen_organism == dc.organisms[0]) << "\n";;});
 
     set_window_interval(window_fps);
     set_simulation_interval(simulation_fps);
@@ -362,7 +365,7 @@ void WindowCore::partial_clear_world() {
 void WindowCore::reset_world() {
     partial_clear_world();
     if (reset_with_chosen) {dc.organisms.push_back(chosen_organism);}
-    else                    {dc.organisms.push_back(base_organism);}
+    else                   {dc.organisms.push_back(base_organism);}
     reset_with_chosen = false;
     //Just in case
     cp.engine_pass_tick = true;
