@@ -50,8 +50,8 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
 
     //TODO very important. organism calls destructor for some reason, deallocating anatomy.
-    base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
-    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.rotation_enabled, Rotation::UP, new Anatomy(anatomy), &sp, &op, &mt);
+    base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
+    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, new Anatomy(anatomy), &sp, &op, &mt);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
 
@@ -121,6 +121,8 @@ void WindowCore::update_fps_labels(int fps, int sps) {
 //TODO kinda redundant right now
 void WindowCore::window_tick() {
     if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
+    if (sp.pause_on_total_extinction && cp.organisms_extinct) {_ui.tb_pause->setChecked(true); cp.organisms_extinct = false;} else
+    if (sp.reset_on_total_extinction && cp.organisms_extinct) {reset_world();}
     create_image();
 }
 
@@ -417,7 +419,7 @@ void WindowCore::unpause_engine() {
 }
 
 void WindowCore::make_walls() {
-    auto wall_thickness = 5;
+    auto wall_thickness = 1;
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int i = 0; i < wall_thickness; i++) {

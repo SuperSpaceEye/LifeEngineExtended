@@ -31,6 +31,8 @@ struct EngineControlParameters {
     // if true, will build the threads
     bool build_threads = false;
 
+    bool organisms_extinct = false;
+
     //TODO change this
     SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;

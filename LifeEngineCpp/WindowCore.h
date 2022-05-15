@@ -245,8 +245,11 @@ private slots:
     void le_cell_size_slot();
     void le_simulation_width_slot();
     void le_simulation_height_slot();
+    void le_min_reproducing_distance_slot();
+    void le_max_reproducing_distance_slot();
+    void le_max_organisms_slot();
 
-    void cb_rotation_enabled_slot(bool state);
+    void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
     void cb_use_evolved_mutation_rate_slot(bool state);
     void cb_movers_can_produce_food_slot(bool state);
@@ -259,6 +262,8 @@ private slots:
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_override_evolution_controls_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
+    void cb_runtime_rotation_enabled_slot(bool state);
+    void cb_fix_reproduction_distance_slot(bool state);
 
 public:
     WindowCore(int simulation_width, int simulation_height,

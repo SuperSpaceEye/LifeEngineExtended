@@ -714,7 +714,6 @@ void Anatomy::reset_organism_center(std::vector<SerializedOrganismBlockContainer
     // new coordinates of a previous center, which will be deleted.
     x -= shift_x;
     y -= shift_y;
-\
 }
 
 void Anatomy::set_block(BlockTypes type, int x, int y) {

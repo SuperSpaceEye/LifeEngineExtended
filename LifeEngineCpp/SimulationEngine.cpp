@@ -77,6 +77,16 @@ void SimulationEngine::change_mode() {
 void SimulationEngine::simulation_tick() {
     dc.engine_ticks++;
 
+    if (dc.organisms.empty() && dc.to_place_organisms.empty()) {
+        cp.organisms_extinct = true;
+        if (sp.pause_on_total_extinction || sp.reset_on_total_extinction) {
+            cp.engine_paused = true;
+            return;
+            }
+    } else {
+        cp.organisms_extinct = false;
+    }
+
     switch (cp.simulation_mode){
         case SimulationModes::CPU_Single_Threaded:
             single_threaded_tick(&dc, &sp, &mt);
@@ -96,13 +106,7 @@ void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, Simulation
         for (auto &block: organism->organism_anatomy->_organism_blocks) {
             dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
                                [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
-
-//                    if (dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-//            [organism->y + block.get_pos(organism->rotation).y].type == BlockTypes::WallBlock) {
-//                throw std::exception();
-//                    }
         }
-
     }
     dc->to_place_organisms.clear();
 
@@ -121,7 +125,6 @@ void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, Simulation
     for (int i = 0; i < dc->organisms.size(); i++) {make_decision(dc, dc->organisms[i], organisms_observations[i]);}
     //TODO VERY IMPORTANT! invalid read here
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
-    //push_new_children(dc, dc->to_place_organisms);
     //for (auto & organism: dc->organisms) {move_organism();}
 }
 
@@ -201,13 +204,14 @@ void SimulationEngine::make_decision(EngineDataContainer *dc, Organism *organism
 void SimulationEngine::try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
                                       std::vector<Organism *> &child_organisms, std::mt19937 *mt) {
     if (!organism->child_ready) {organism->child_pattern = organism->create_child(); make_child(dc, organism, mt);}
+    // if max_organisms < 0, then unlimited.
+    if (dc->max_organisms >= 0 && dc->organisms.size() + dc->to_place_organisms.size() >= dc->max_organisms) {return;}
     if (organism->food_collected >= organism->child_pattern->food_needed) {
         place_child(dc, sp, organism, child_organisms, mt);}
 }
 
 //TODO probably not needed.
 void SimulationEngine::make_child(EngineDataContainer *dc, Organism *organism, std::mt19937 * mt) {
-    organism->rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
     organism->child_ready = true;
 }
 
@@ -215,21 +219,31 @@ void SimulationEngine::place_child(EngineDataContainer *dc, SimulationParameters
                                    std::vector<Organism *> &child_organisms, std::mt19937 *mt) {
     auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
     Rotation rotation;
-    if (sp->rotation_enabled) {
+    if (sp->reproduction_rotation_enabled) {
         rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
     } else {
         rotation = Rotation::UP;
     }
-    auto distance = std::uniform_int_distribution<int>(0, 3)(*mt);
+
+    int distance = sp->min_reproducing_distance;
+    if (!sp->reproduction_distance_fixed) {
+        distance = std::uniform_int_distribution<int>(sp->min_reproducing_distance, sp->max_reproducing_distance)(*mt);
+    }
     //UP - min_y,
     //LEFT - min_x
     //DOWN - max_y
     //RIGHT - max_x
 
+//    auto min_y = INT32_MAX;
+//    auto min_x = INT32_MAX;
+//    auto max_y = INT32_MIN;
+//    auto max_x = INT32_MIN;
+
     auto min_y = 0;
     auto min_x = 0;
     auto max_y = 0;
     auto max_x = 0;
+
 
     //a width and height of an organism can only change by one, so to be safe, the distance between organisms = size_of_base_organism + 1
     switch (to_place) {
@@ -238,23 +252,35 @@ void SimulationEngine::place_child(EngineDataContainer *dc, SimulationParameters
                 if (block.get_pos(organism->rotation).y < min_y) {min_y = block.get_pos(organism->rotation).y;}
             }
             min_y -= distance;
+            min_x = 0;
+            max_y = 0;
+            max_x = 0;
             break;
         case Rotation::LEFT:
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
                 if (block.get_pos(organism->rotation).x < min_x) {min_x = block.get_pos(organism->rotation).x;}
             }
+            min_y = 0;
             min_x -= distance;
+            max_y = 0;
+            max_x = 0;
             break;
         case Rotation::DOWN:
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
-                if (block.get_pos(organism->rotation).x > max_y) {max_y = block.get_pos(organism->rotation).y;}
+                if (block.get_pos(organism->rotation).y > max_y) {max_y = block.get_pos(organism->rotation).y;}
             }
+            min_y = 0;
+            min_x = 0;
             max_y += distance;
+            max_x = 0;
             break;
         case Rotation::RIGHT:
             for (auto & block: organism->organism_anatomy->_organism_blocks){
                 if (block.get_pos(organism->rotation).x > max_x) {max_x = block.get_pos(organism->rotation).x;}
             }
+            min_y = 0;
+            min_x = 0;
+            max_y = 0;
             max_x += distance;
             break;
     }
@@ -278,7 +304,6 @@ void SimulationEngine::place_child(EngineDataContainer *dc, SimulationParameters
 //        {continue;}
 //        return;
     }
-    //if (dc->simulation_grid[organism->x+pc.get_pos(organism->rotation).x][organism->y+pc.get_pos(organism->rotation).y].type == BlockTypes::EmptyBlock)
 
     child_organisms.emplace_back(organism->child_pattern);
     organism->food_collected -= organism->child_pattern->food_needed;

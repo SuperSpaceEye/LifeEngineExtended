@@ -53,7 +53,7 @@ public:
     QPushButton *tb_stoprender;
     QPushButton *b_reset_view;
     QPushButton *b_pass_one_tick;
-    QPushButton *b_kill_all_organisms;
+    QPushButton *b_kill_all_organisms_slot;
     QHBoxLayout *horizontalLayout_3;
     QRadioButton *rb_food;
     QRadioButton *rb_kill;
@@ -86,6 +86,9 @@ public:
     QCheckBox *cb_reset_on_total_extinction;
     QLabel *lb_auto_reset_count;
     QCheckBox *cb_pause_on_total_extinction;
+    QHBoxLayout *horizontalLayout_11;
+    QLabel *label_18;
+    QLineEdit *le_max_organisms;
     QVBoxLayout *verticalLayout_22;
     QPushButton *b_generate_random_walls;
     QCheckBox *cb_generate_random_walls_on_reset;
@@ -137,8 +140,9 @@ public:
     QLabel *label_15;
     QLineEdit *le_do_nothing;
     QVBoxLayout *verticalLayout_11;
-    QHBoxLayout *horizontalLayout_11;
-    QCheckBox *cb_rotation_enabled;
+    QCheckBox *cb_reproducing_rotation_enabled;
+    QVBoxLayout *verticalLayout_27;
+    QCheckBox *cb_runtime_rotation_enabled;
     QVBoxLayout *verticalLayout_10;
     QHBoxLayout *horizontalLayout_10;
     QCheckBox *cb_on_touch_kill;
@@ -148,6 +152,14 @@ public:
     QVBoxLayout *verticalLayout_13;
     QHBoxLayout *horizontalLayout_14;
     QCheckBox *cb_food_blocks_reproduction;
+    QVBoxLayout *verticalLayout_26;
+    QHBoxLayout *horizontalLayout_25;
+    QLabel *label_17;
+    QLineEdit *le_min_reproduction_distance;
+    QHBoxLayout *horizontalLayout_26;
+    QLabel *label_16;
+    QLineEdit *le_max_reproduction_distance;
+    QCheckBox *cb_fix_reproduction_distance;
     QWidget *statistics_tab;
     QWidget *simulation_settings_tab;
     QVBoxLayout *verticalLayout_7;
@@ -295,10 +307,10 @@ public:
 
         gridLayout->addWidget(b_pass_one_tick, 1, 1, 1, 1);
 
-        b_kill_all_organisms = new QPushButton(frame_2);
-        b_kill_all_organisms->setObjectName(QString::fromUtf8("b_kill_all_organisms_slot"));
+        b_kill_all_organisms_slot = new QPushButton(frame_2);
+        b_kill_all_organisms_slot->setObjectName(QString::fromUtf8("b_kill_all_organisms_slot"));
 
-        gridLayout->addWidget(b_kill_all_organisms, 1, 2, 1, 1);
+        gridLayout->addWidget(b_kill_all_organisms_slot, 1, 2, 1, 1);
 
 
         verticalLayout_6->addLayout(gridLayout);
@@ -378,7 +390,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 98, 192));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, -208, 406, 400));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -390,6 +402,7 @@ public:
         verticalLayout_12->setContentsMargins(0, 0, 0, 0);
         widget_3 = new QWidget(scrollAreaWidgetContents_3);
         widget_3->setObjectName(QString::fromUtf8("widget_3"));
+        widget_3->setMinimumSize(QSize(0, 400));
         horizontalLayout_20 = new QHBoxLayout(widget_3);
         horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
         horizontalLayout_20->setContentsMargins(6, 6, 6, 6);
@@ -459,6 +472,21 @@ public:
         cb_pause_on_total_extinction->setObjectName(QString::fromUtf8("cb_pause_on_total_extinction"));
 
         verticalLayout_21->addWidget(cb_pause_on_total_extinction);
+
+        horizontalLayout_11 = new QHBoxLayout();
+        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
+        label_18 = new QLabel(widget_3);
+        label_18->setObjectName(QString::fromUtf8("label_18"));
+
+        horizontalLayout_11->addWidget(label_18);
+
+        le_max_organisms = new QLineEdit(widget_3);
+        le_max_organisms->setObjectName(QString::fromUtf8("le_max_organisms"));
+
+        horizontalLayout_11->addWidget(le_max_organisms);
+
+
+        verticalLayout_21->addLayout(horizontalLayout_11);
 
 
         horizontalLayout_20->addLayout(verticalLayout_21);
@@ -540,7 +568,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 406, 416));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -826, 406, 1018));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -549,12 +577,12 @@ public:
         verticalLayout_9->setContentsMargins(9, 9, 9, 9);
         widget = new QWidget(scrollAreaWidgetContents_2);
         widget->setObjectName(QString::fromUtf8("widget"));
-        QSizePolicy sizePolicy2(QSizePolicy::Maximum, QSizePolicy::Preferred);
+        QSizePolicy sizePolicy2(QSizePolicy::Maximum, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(10);
-        sizePolicy2.setVerticalStretch(10);
+        sizePolicy2.setVerticalStretch(100);
         sizePolicy2.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
         widget->setSizePolicy(sizePolicy2);
-        widget->setMinimumSize(QSize(0, 0));
+        widget->setMinimumSize(QSize(0, 1000));
         verticalLayout_20 = new QVBoxLayout(widget);
         verticalLayout_20->setSpacing(6);
         verticalLayout_20->setObjectName(QString::fromUtf8("verticalLayout_20"));
@@ -743,18 +771,24 @@ public:
 
         verticalLayout_11 = new QVBoxLayout();
         verticalLayout_11->setObjectName(QString::fromUtf8("verticalLayout_11"));
-        horizontalLayout_11 = new QHBoxLayout();
-        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
-        cb_rotation_enabled = new QCheckBox(widget);
-        cb_rotation_enabled->setObjectName(QString::fromUtf8("cb_rotation_enabled"));
+        cb_reproducing_rotation_enabled = new QCheckBox(widget);
+        cb_reproducing_rotation_enabled->setObjectName(QString::fromUtf8("cb_reproducing_rotation_enabled"));
+        cb_reproducing_rotation_enabled->setChecked(true);
 
-        horizontalLayout_11->addWidget(cb_rotation_enabled);
-
-
-        verticalLayout_11->addLayout(horizontalLayout_11);
+        verticalLayout_11->addWidget(cb_reproducing_rotation_enabled);
 
 
         verticalLayout_20->addLayout(verticalLayout_11);
+
+        verticalLayout_27 = new QVBoxLayout();
+        verticalLayout_27->setObjectName(QString::fromUtf8("verticalLayout_27"));
+        cb_runtime_rotation_enabled = new QCheckBox(widget);
+        cb_runtime_rotation_enabled->setObjectName(QString::fromUtf8("cb_runtime_rotation_enabled"));
+
+        verticalLayout_27->addWidget(cb_runtime_rotation_enabled);
+
+
+        verticalLayout_20->addLayout(verticalLayout_27);
 
         verticalLayout_10 = new QVBoxLayout();
         verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
@@ -803,6 +837,46 @@ public:
 
         verticalLayout_20->addLayout(verticalLayout_13);
 
+        verticalLayout_26 = new QVBoxLayout();
+        verticalLayout_26->setObjectName(QString::fromUtf8("verticalLayout_26"));
+        horizontalLayout_25 = new QHBoxLayout();
+        horizontalLayout_25->setObjectName(QString::fromUtf8("horizontalLayout_25"));
+        label_17 = new QLabel(widget);
+        label_17->setObjectName(QString::fromUtf8("label_17"));
+
+        horizontalLayout_25->addWidget(label_17);
+
+        le_min_reproduction_distance = new QLineEdit(widget);
+        le_min_reproduction_distance->setObjectName(QString::fromUtf8("le_min_reproduction_distance"));
+
+        horizontalLayout_25->addWidget(le_min_reproduction_distance);
+
+
+        verticalLayout_26->addLayout(horizontalLayout_25);
+
+        horizontalLayout_26 = new QHBoxLayout();
+        horizontalLayout_26->setObjectName(QString::fromUtf8("horizontalLayout_26"));
+        label_16 = new QLabel(widget);
+        label_16->setObjectName(QString::fromUtf8("label_16"));
+
+        horizontalLayout_26->addWidget(label_16);
+
+        le_max_reproduction_distance = new QLineEdit(widget);
+        le_max_reproduction_distance->setObjectName(QString::fromUtf8("le_max_reproduction_distance"));
+
+        horizontalLayout_26->addWidget(le_max_reproduction_distance);
+
+
+        verticalLayout_26->addLayout(horizontalLayout_26);
+
+        cb_fix_reproduction_distance = new QCheckBox(widget);
+        cb_fix_reproduction_distance->setObjectName(QString::fromUtf8("cb_fix_reproduction_distance"));
+
+        verticalLayout_26->addWidget(cb_fix_reproduction_distance);
+
+
+        verticalLayout_20->addLayout(verticalLayout_26);
+
 
         verticalLayout_9->addWidget(widget);
 
@@ -827,7 +901,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 116));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 420, 192));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -950,7 +1024,7 @@ public:
         QObject::connect(le_add, SIGNAL(returnPressed()), MainWindow, SLOT(le_add_cell_slot()));
         QObject::connect(le_change, SIGNAL(returnPressed()), MainWindow, SLOT(le_change_cell_slot()));
         QObject::connect(le_remove, SIGNAL(returnPressed()), MainWindow, SLOT(le_remove_cell_slot()));
-        QObject::connect(cb_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_rotation_enabled_slot(bool)));
+        QObject::connect(cb_reproducing_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reproduction_rotation_enabled_slot(bool)));
         QObject::connect(cb_on_touch_kill, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_on_touch_kill_slot(bool)));
         QObject::connect(cb_use_evoved_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_mutation_rate_slot(bool)));
         QObject::connect(cb_movers_can_produce_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_movers_can_produce_food_slot(bool)));
@@ -971,9 +1045,14 @@ public:
         QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
         QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
         QObject::connect(le_do_nothing, SIGNAL(returnPressed()), MainWindow, SLOT(le_do_nothing_slot()));
-        QObject::connect(b_kill_all_organisms, SIGNAL(clicked()), MainWindow, SLOT(b_kill_all_organisms_slot()));
+        QObject::connect(b_kill_all_organisms_slot, SIGNAL(clicked()), MainWindow, SLOT(b_kill_all_organisms_slot()));
+        QObject::connect(cb_runtime_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_runtime_rotation_enabled_slot(bool)));
+        QObject::connect(cb_fix_reproduction_distance, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fix_reproduction_distance_slot(bool)));
+        QObject::connect(le_min_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_reproducing_distance_slot()));
+        QObject::connect(le_max_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_reproducing_distance_slot()));
+        QObject::connect(le_max_organisms, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_organisms_slot()));
 
-        Tabs->setCurrentIndex(3);
+        Tabs->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -994,7 +1073,7 @@ public:
         tb_stoprender->setText(QApplication::translate("MainWindow", "Stop render", nullptr));
         b_reset_view->setText(QApplication::translate("MainWindow", "Reset view", nullptr));
         b_pass_one_tick->setText(QApplication::translate("MainWindow", "Pass one tick", nullptr));
-        b_kill_all_organisms->setText(QApplication::translate("MainWindow", "Kill all", nullptr));
+        b_kill_all_organisms_slot->setText(QApplication::translate("MainWindow", "Kill all", nullptr));
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", nullptr));
         rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", nullptr));
         rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", nullptr));
@@ -1024,6 +1103,8 @@ public:
         cb_reset_on_total_extinction->setText(QApplication::translate("MainWindow", "Reset on total extinction", nullptr));
         lb_auto_reset_count->setText(QApplication::translate("MainWindow", "Auto reset count: 0", nullptr));
         cb_pause_on_total_extinction->setText(QApplication::translate("MainWindow", "Pause on total extinction", nullptr));
+        label_18->setText(QApplication::translate("MainWindow", "Max organisms:", nullptr));
+        le_max_organisms->setText(QApplication::translate("MainWindow", "-1", nullptr));
         b_generate_random_walls->setText(QApplication::translate("MainWindow", "Generate random walls", nullptr));
         cb_generate_random_walls_on_reset->setText(QApplication::translate("MainWindow", "Generate random walls on reset", nullptr));
         b_clear_all_walls->setText(QApplication::translate("MainWindow", "Clear all walls", nullptr));
@@ -1053,10 +1134,16 @@ public:
         le_remove->setText(QApplication::translate("MainWindow", "25", nullptr));
         label_15->setText(QApplication::translate("MainWindow", "do nothing", nullptr));
         le_do_nothing->setText(QApplication::translate("MainWindow", "25", nullptr));
-        cb_rotation_enabled->setText(QApplication::translate("MainWindow", "Rotation enabled", nullptr));
+        cb_reproducing_rotation_enabled->setText(QApplication::translate("MainWindow", "Reproducing rotation enabled", nullptr));
+        cb_runtime_rotation_enabled->setText(QApplication::translate("MainWindow", "Runtime rotation enabled", nullptr));
         cb_on_touch_kill->setText(QApplication::translate("MainWindow", "On touch kill", nullptr));
         cb_movers_can_produce_food->setText(QApplication::translate("MainWindow", "Movers can produce food", nullptr));
         cb_food_blocks_reproduction->setText(QApplication::translate("MainWindow", "Food blocks reproduction", nullptr));
+        label_17->setText(QApplication::translate("MainWindow", "Min reproducing distance: ", nullptr));
+        le_min_reproduction_distance->setText(QApplication::translate("MainWindow", "0", nullptr));
+        label_16->setText(QApplication::translate("MainWindow", "Max reproducing distance: ", nullptr));
+        le_max_reproduction_distance->setText(QApplication::translate("MainWindow", "3", nullptr));
+        cb_fix_reproduction_distance->setText(QApplication::translate("MainWindow", "Fix reproducing distance", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
         Tabs->setTabText(Tabs->indexOf(statistics_tab), QApplication::translate("MainWindow", "Statistics", nullptr));
         rb_single_thread_mode->setText(QApplication::translate("MainWindow", "Single thread CPU", nullptr));

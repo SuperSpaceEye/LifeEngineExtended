@@ -246,6 +246,31 @@ void WindowCore::le_do_nothing_slot() {
     sp.do_nothing = result.result;
 }
 
+void WindowCore::le_min_reproducing_distance_slot() {
+    int fallback = sp.min_reproducing_distance;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_reproduction_distance, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result > sp.max_reproducing_distance) { display_message("Input cannot be more than max reproducing distance."); return;}
+    sp.min_reproducing_distance = result.result;
+}
+
+void WindowCore::le_max_reproducing_distance_slot() {
+    int fallback = sp.max_reproducing_distance;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_reproduction_distance, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result < sp.min_reproducing_distance) { display_message("Input cannot be less than min reproducing distance."); return;}
+    sp.max_reproducing_distance = result.result;
+}
+
+void WindowCore::le_max_organisms_slot() {
+    int fallback = dc.max_organisms;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_organisms, fallback);
+    if (!result.is_valid) {return;}
+    dc.max_organisms = result.result;
+}
+
 //==================== Radio buttond ====================
 
 void WindowCore::rb_food_slot() {
@@ -296,7 +321,7 @@ void WindowCore::cb_use_evolved_mutation_rate_slot(bool state) {
     _ui.lb_mutation_rate->setDisabled(state);
 }
 
-void WindowCore::cb_rotation_enabled_slot               (bool state) { sp.rotation_enabled = state;}
+void WindowCore::cb_reproduction_rotation_enabled_slot  (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void WindowCore::cb_on_touch_kill_slot                  (bool state) { sp.one_touch_kill = state;}
 
@@ -315,3 +340,7 @@ void WindowCore::cb_clear_walls_on_reset_slot           (bool state) { sp.clear_
 void WindowCore::cb_override_evolution_controls_slot    (bool state) { override_evolution_controls_slot = state;}
 
 void WindowCore::cb_generate_random_walls_on_reset_slot (bool state) { sp.generate_random_walls_on_reset = state;}
+
+void WindowCore::cb_runtime_rotation_enabled_slot       (bool state) { sp.runtime_rotation_enabled = state;}
+
+void WindowCore::cb_fix_reproduction_distance_slot      (bool state) { sp.reproduction_distance_fixed = state;}
