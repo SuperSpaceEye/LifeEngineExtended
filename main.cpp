@@ -1,8 +1,8 @@
 #include "LifeEngineCpp/WindowCore.h"
 #include <QApplication>
 
-int SIMULATION_WIDTH = 600;
-int SIMULATION_HEIGHT = 600;
+int SIMULATION_WIDTH = 200;
+int SIMULATION_HEIGHT = 200;
 int MAX_WINDOW_FPS = 60;
 int MAX_SIMULATION_FPS = 0;
 // should not be num_processes > cpu_cores, cpu_cores-3 works the best (for me)

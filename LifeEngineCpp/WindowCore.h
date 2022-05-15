@@ -138,7 +138,7 @@ private:
     bool full_simulation_grid_parsed = false;
 
     bool stop_console_output = false;
-    bool synchronise_simulation_and_window = true;
+    bool synchronise_simulation_and_window = false;
 
     //TODO if == 1, then prints one pixel for one simulation block. If > 1, then loads texture texture (if exists).
     int cell_size = 1;
@@ -174,6 +174,8 @@ private:
     bool wait_for_engine_to_pause();
     void parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height);
     void parse_full_simulation_grid(bool parse);
+    void clear_organisms();
+    void make_walls();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -218,6 +220,7 @@ private slots:
     void b_clear_all_walls_slot();
     void b_save_world_slot();
     void b_load_world_slot();
+    void b_kill_all_organisms_slot();
 
     void rb_food_slot();
     void rb_wall_slot();

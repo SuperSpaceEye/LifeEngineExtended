@@ -53,6 +53,7 @@ public:
     QPushButton *tb_stoprender;
     QPushButton *b_reset_view;
     QPushButton *b_pass_one_tick;
+    QPushButton *b_kill_all_organisms;
     QHBoxLayout *horizontalLayout_3;
     QRadioButton *rb_food;
     QRadioButton *rb_kill;
@@ -164,8 +165,8 @@ public:
     QLabel *label;
     QLineEdit *le_num_threads;
     QCheckBox *cb_synchronise_sim_and_win;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -294,6 +295,11 @@ public:
 
         gridLayout->addWidget(b_pass_one_tick, 1, 1, 1, 1);
 
+        b_kill_all_organisms = new QPushButton(frame_2);
+        b_kill_all_organisms->setObjectName(QString::fromUtf8("b_kill_all_organisms_slot"));
+
+        gridLayout->addWidget(b_kill_all_organisms, 1, 2, 1, 1);
+
 
         verticalLayout_6->addLayout(gridLayout);
 
@@ -372,7 +378,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 420, 192));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 98, 192));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -821,7 +827,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 420, 192));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 116));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -965,6 +971,7 @@ public:
         QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
         QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
         QObject::connect(le_do_nothing, SIGNAL(returnPressed()), MainWindow, SLOT(le_do_nothing_slot()));
+        QObject::connect(b_kill_all_organisms, SIGNAL(clicked()), MainWindow, SLOT(b_kill_all_organisms_slot()));
 
         Tabs->setCurrentIndex(3);
 
@@ -987,6 +994,7 @@ public:
         tb_stoprender->setText(QApplication::translate("MainWindow", "Stop render", nullptr));
         b_reset_view->setText(QApplication::translate("MainWindow", "Reset view", nullptr));
         b_pass_one_tick->setText(QApplication::translate("MainWindow", "Pass one tick", nullptr));
+        b_kill_all_organisms->setText(QApplication::translate("MainWindow", "Kill all", nullptr));
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", nullptr));
         rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", nullptr));
         rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", nullptr));

@@ -56,7 +56,7 @@ public:
 //public:
     Organism(int x, int y, bool* can_rotate, Rotation rotation, Anatomy * anatomy,
              SimulationParameters* sim_parameters, OrganismBlockParameters* block_parameters, std::mt19937* mt);
-    Organism(const Organism & organism);
+    Organism(const Organism * organism);
     ~Organism();
     Organism * create_child();
 };

@@ -247,6 +247,13 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="b_kill_all_organisms_slot">
+             <property name="text">
+              <string>Kill all</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>
@@ -1961,6 +1968,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_kill_all_organisms_slot</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_kill_all_organisms_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>239</x>
+     <y>847</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -2009,13 +2032,14 @@ p, li { white-space: pre-wrap; }
   <slot>cb_override_evolution_controls_slot(bool)</slot>
   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
   <slot>le_do_nothing_slot()</slot>
+  <slot>b_kill_all_organisms_slot()</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

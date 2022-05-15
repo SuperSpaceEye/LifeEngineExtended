@@ -32,13 +32,14 @@ public:
     relative_x(relative_x), relative_y(relative_y) {}
 
     pos get_pos(Rotation rotation) {
+        return pos{relative_x, relative_y};
         switch (rotation) {
             case Rotation::UP:    return pos{ relative_x,  relative_y};
             case Rotation::LEFT:  return pos{-relative_y,  relative_x};
-            case Rotation::DOWN:  return pos{ relative_y, -relative_x};
-            case Rotation::RIGHT: return pos{-relative_x, -relative_y};
+            case Rotation::DOWN:  return pos{ -relative_x, -relative_y};
+            case Rotation::RIGHT: return pos{relative_y, -relative_x};
+            default: return pos{relative_x, relative_y};
         }
-        return pos{relative_x, relative_y};
     }
 };
 
@@ -50,13 +51,13 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     organism_block(organism_block), BaseSerializedContainer(relative_x, relative_y) {}
 };
 
-struct SerializedAdjacentSpaceContainer:BaseSerializedContainer {
+struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
     SerializedAdjacentSpaceContainer()=default;
     SerializedAdjacentSpaceContainer(int relative_x, int relative_y):
     BaseSerializedContainer(relative_x, relative_y) {}
 };
 
-struct SerializedArmorSpaceContainer:BaseSerializedContainer {
+struct SerializedArmorSpaceContainer: BaseSerializedContainer {
     bool is_armored;
     SerializedArmorSpaceContainer()=default;
     SerializedArmorSpaceContainer(int relative_x, int relative_y, bool is_armored):
@@ -153,6 +154,10 @@ private:
                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
                                    int32_t armor_blocks);
 
+    static void reset_organism_center(std::vector<SerializedOrganismBlockContainer> & _organism_blocks,
+                                      boost::unordered_map<int, boost::unordered_map<int, OrganismBlock>> & organism_blocks,
+                                      int & x, int & y);
+
     static SerializedOrganismStructureContainer * serialize(const boost::unordered_map<int, boost::unordered_map<int, OrganismBlock>>& organism_blocks,
                                                             const boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
                                                             const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
@@ -194,8 +199,6 @@ public:
     int32_t _killer_blocks = 0;
     int32_t _armor_blocks = 0;
     int32_t _eye_blocks = 0;
-
-    SerializedOrganismStructureContainer * structure = nullptr;
 
     Anatomy(SerializedOrganismStructureContainer *structure);
     Anatomy(const Anatomy *anatomy);

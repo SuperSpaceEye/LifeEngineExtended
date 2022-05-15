@@ -15,9 +15,9 @@ Organism::Organism(int x, int y, bool * can_rotate, Rotation rotation, Anatomy* 
     brain = new Brain{mt, BrainTypes::RandomActions};
 }
 
-Organism::Organism(const Organism &organism): x(organism.x), y(organism.y), can_rotate(organism.can_rotate),
-        rotation(organism.rotation), organism_anatomy(organism.organism_anatomy), sim_parameters(organism.sim_parameters),
-        block_parameters(organism.block_parameters), mt(organism.mt), brain(organism.brain) {
+Organism::Organism(const Organism *organism): x(organism->x), y(organism->y), can_rotate(organism->can_rotate),
+        rotation(organism->rotation), organism_anatomy(organism->organism_anatomy), sim_parameters(organism->sim_parameters),
+        block_parameters(organism->block_parameters), mt(organism->mt), brain(organism->brain) {
     calculate_max_life(organism_anatomy);
     calculate_organism_lifetime(organism_anatomy);
     calculate_food_needed(organism_anatomy);
@@ -87,8 +87,6 @@ float Organism::calculate_food_needed(Anatomy *anatomy) {
 
 Organism * Organism::create_child() {
     int total_chance = 0;
-    std::cout << "sim parameter address " << sim_parameters << "\n";
-    //if (sim_parameters == nullptr) {std::cout << "why the fuck\n"; return nullptr;}
     total_chance += sim_parameters->add_cell;
     total_chance += sim_parameters->change_cell;
     total_chance += sim_parameters->remove_cell;
@@ -105,7 +103,6 @@ Organism * Organism::create_child() {
                                               {new_anatomy = new Anatomy(organism_anatomy->remove_random_block(*mt));}
     else                                      {new_anatomy = new Anatomy(organism_anatomy);
     }}}
-    std::cout << new_anatomy->_organism_blocks[0].relative_x << "\n";
     //TODO VERY IMPORTANT! leak here? when try_make_child
     return new Organism(0, 0, can_rotate, rotation, new_anatomy, sim_parameters, block_parameters, mt);
 }

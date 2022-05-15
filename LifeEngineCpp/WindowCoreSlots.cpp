@@ -81,6 +81,20 @@ void WindowCore::b_reset_view_slot() {
     reset_scale_view();
 }
 
+void WindowCore::b_kill_all_organisms_slot() {
+    cp.engine_pause = true;
+    wait_for_engine_to_pause();
+
+    for (auto & organism: dc.organisms) {
+        organism->lifetime = organism->max_lifetime*2;
+    }
+    for (auto & organism: dc.to_place_organisms) {
+        organism->lifetime = organism->max_lifetime*2;
+    }
+
+    unpause_engine();
+}
+
 //==================== Line edits ====================
 
 //There should be a better way of doing this, but I don't see one
