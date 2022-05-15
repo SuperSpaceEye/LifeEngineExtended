@@ -32,7 +32,6 @@ public:
     relative_x(relative_x), relative_y(relative_y) {}
 
     pos get_pos(Rotation rotation) {
-        return pos{relative_x, relative_y};
         switch (rotation) {
             case Rotation::UP:    return pos{ relative_x,  relative_y};
             case Rotation::LEFT:  return pos{-relative_y,  relative_x};

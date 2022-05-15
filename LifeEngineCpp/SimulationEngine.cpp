@@ -268,7 +268,15 @@ void SimulationEngine::place_child(EngineDataContainer *dc, SimulationParameters
         if (check_if_out_of_boundaries(dc, organism->child_pattern, block)) {return;}
 
         if (dc->simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
-                               [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type != BlockTypes::EmptyBlock) {return;}
+                               [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type != BlockTypes::EmptyBlock)
+        {return;}
+
+//        if (dc->simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
+//                [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type == BlockTypes::EmptyBlock ||
+//            (!sp->food_blocks_reproduction && dc->simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
+//                [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type == BlockTypes::FoodBlock))
+//        {continue;}
+//        return;
     }
     //if (dc->simulation_grid[organism->x+pc.get_pos(organism->rotation).x][organism->y+pc.get_pos(organism->rotation).y].type == BlockTypes::EmptyBlock)
 
