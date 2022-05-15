@@ -12,11 +12,6 @@
 #include "../OrganismBlockParameters.h"
 #include "Rotation.h"
 
-struct Coordinates {
-    int x;
-    int y;
-};
-
 //TODO It's stupid, but it is prototype
 class Organism {
 //private:
@@ -34,6 +29,8 @@ public:
     // for how much organism already lived.
     int lifetime = 0;
 
+    float mutaion_rate = 0.05;
+
     float food_collected = 0;
     float food_needed = 0;
     //TODO implement rotation
@@ -42,21 +39,22 @@ public:
 
     bool child_ready = false;
 
-    Anatomy * organism_anatomy = nullptr;
+    std::shared_ptr<Anatomy> organism_anatomy = nullptr;
     Brain * brain;
-    SimulationParameters* sim_parameters = nullptr;
-    OrganismBlockParameters* block_parameters = nullptr;
+    SimulationParameters* sp = nullptr;
+    OrganismBlockParameters* bp = nullptr;
     Organism * child_pattern = nullptr;
 
     std::mt19937* mt = nullptr;
 
-    float calculate_max_life(Anatomy *anatomy);
-    int calculate_organism_lifetime(Anatomy *anatomy);
-    float calculate_food_needed(Anatomy *anatomy);
+    float calculate_max_life(const std::shared_ptr<Anatomy>& anatomy);
+    int calculate_organism_lifetime(const std::shared_ptr<Anatomy>& anatomy);
+    float calculate_food_needed(const std::shared_ptr<Anatomy>& anatomy);
 //public:
-    Organism(int x, int y, bool* can_rotate, Rotation rotation, Anatomy * anatomy,
-             SimulationParameters* sim_parameters, OrganismBlockParameters* block_parameters, std::mt19937* mt);
-    Organism(const Organism * organism);
+    Organism(int x, int y, bool* can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
+             SimulationParameters* sp, OrganismBlockParameters* block_parameters, std::mt19937* mt);
+    Organism(Organism *organism);
+    Organism()=default;
     ~Organism();
     Organism * create_child();
 };

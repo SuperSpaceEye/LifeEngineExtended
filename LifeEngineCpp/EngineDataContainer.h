@@ -6,10 +6,14 @@
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
 #include <atomic>
+#include "Organism/Organism.h"
 
 struct EngineDataContainer {
     uint64_t delta_time = 0;
+    // for calculating ticks/second
     uint32_t engine_ticks = 0;
+    // for tracking total ticks since start/reset of simulation.
+    uint32_t total_engine_ticks = 0;
     // if -1, then unlimited
     int32_t max_organisms = -1;
     // dimensions of the simulation

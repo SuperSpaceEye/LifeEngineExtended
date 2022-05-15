@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>805</width>
     <height>900</height>
    </rect>
   </property>
@@ -95,7 +95,7 @@
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -199,37 +199,10 @@
          </item>
          <item>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="2">
-            <widget class="QPushButton" name="b_clear">
-             <property name="text">
-              <string>Clear</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="3">
             <widget class="QPushButton" name="b_reset">
              <property name="text">
               <string>Reset</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QPushButton" name="tb_pause">
-             <property name="text">
-              <string>Pause</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="tb_stoprender">
-             <property name="text">
-              <string>Stop render</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -247,10 +220,37 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="tb_stoprender">
+             <property name="text">
+              <string>Stop render</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="2">
             <widget class="QPushButton" name="b_kill_all_organisms_slot">
              <property name="text">
               <string>Kill all</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="tb_pause">
+             <property name="text">
+              <string>Pause</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="b_clear">
+             <property name="text">
+              <string>Clear</string>
              </property>
             </widget>
            </item>
@@ -293,6 +293,16 @@
            </item>
           </layout>
          </item>
+         <item>
+          <widget class="QCheckBox" name="cb_synchronise_sim_and_win">
+           <property name="text">
+            <string>Synchronise simulation and window</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -329,7 +339,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>3</number>
            </property>
            <property name="iconSize">
             <size>
@@ -374,8 +384,9 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features (in the far future).&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Important Information:&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;sps is the number of simulation ticks per second.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;setting max sps/sps to &amp;lt;0 will enable unlimited mode.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*sps is the number of simulation ticks per second.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*setting max fps/sps/organisms to &amp;lt;0 will enable unlimited mode.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*checking &amp;quot;Fix reproducing distance&amp;quot; will set reproducing distance to min value.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Not implemented:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -420,9 +431,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-208</y>
-                  <width>406</width>
-                  <height>400</height>
+                  <y>0</y>
+                  <width>411</width>
+                  <height>219</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -452,7 +463,7 @@ p, li { white-space: pre-wrap; }
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>400</height>
+                     <height>0</height>
                     </size>
                    </property>
                    <layout class="QHBoxLayout" name="horizontalLayout_20" stretch="1,1">
@@ -706,9 +717,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-826</y>
-                  <width>406</width>
-                  <height>1018</height>
+                  <y>-165</y>
+                  <width>411</width>
+                  <height>542</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -744,7 +755,7 @@ p, li { white-space: pre-wrap; }
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>1000</height>
+                     <height>0</height>
                     </size>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0">
@@ -895,7 +906,7 @@ p, li { white-space: pre-wrap; }
                            <string>Use evolved mutation rate</string>
                           </property>
                           <property name="checked">
-                           <bool>true</bool>
+                           <bool>false</bool>
                           </property>
                          </widget>
                         </item>
@@ -910,7 +921,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLabel" name="lb_mutation_rate">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>global mutation rate:</string>
@@ -920,10 +931,10 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_global_mutation_rate">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
-                           <string>5</string>
+                           <string>0.05</string>
                           </property>
                          </widget>
                         </item>
@@ -945,7 +956,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_add">
                           <property name="text">
-                           <string>25</string>
+                           <string>33</string>
                           </property>
                          </widget>
                         </item>
@@ -959,7 +970,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_change">
                           <property name="text">
-                           <string>25</string>
+                           <string>33</string>
                           </property>
                          </widget>
                         </item>
@@ -973,21 +984,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_remove">
                           <property name="text">
-                           <string>25</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_15">
-                          <property name="text">
-                           <string>do nothing</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLineEdit" name="le_do_nothing">
-                          <property name="text">
-                           <string>25</string>
+                           <string>33</string>
                           </property>
                          </widget>
                         </item>
@@ -1131,6 +1128,105 @@ p, li { white-space: pre-wrap; }
             <attribute name="title">
              <string>Statistics</string>
             </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QScrollArea" name="scrollArea_4">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_4">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>411</width>
+                  <height>219</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_24">
+                 <item>
+                  <widget class="QLabel" name="lb_total_engine_ticks">
+                   <property name="text">
+                    <string>Total engine ticks: </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_organisms_alive">
+                   <property name="text">
+                    <string>Organisms alive:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_organism_size">
+                   <property name="text">
+                    <string>Average organism size:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_mouth_num">
+                   <property name="text">
+                    <string>Average mouth num: </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_producer_num">
+                   <property name="text">
+                    <string>Average producer num: </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_mover_num">
+                   <property name="text">
+                    <string>Average mover num:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_killer_num">
+                   <property name="text">
+                    <string>Average killer num:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_armor_num">
+                   <property name="text">
+                    <string>Average armor num: </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_eye_num">
+                   <property name="text">
+                    <string>Average eye num: </string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
            </widget>
            <widget class="QWidget" name="simulation_settings_tab">
             <attribute name="title">
@@ -1167,9 +1263,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>420</width>
-                  <height>192</height>
+                  <y>-21</y>
+                  <width>411</width>
+                  <height>213</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1198,7 +1294,7 @@ p, li { white-space: pre-wrap; }
                   <widget class="QWidget" name="widget_2" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_19">
                     <property name="spacing">
-                     <number>0</number>
+                     <number>2</number>
                     </property>
                     <property name="leftMargin">
                      <number>9</number>
@@ -1213,14 +1309,24 @@ p, li { white-space: pre-wrap; }
                      <number>9</number>
                     </property>
                     <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_2">
-                      <property name="spacing">
-                       <number>0</number>
-                      </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_23">
                       <item>
                        <widget class="QRadioButton" name="rb_single_thread_mode">
                         <property name="text">
                          <string>Single thread CPU</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">simulation_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QRadioButton" name="rb_partial_multi_thread_mode">
+                        <property name="text">
+                         <string>Partial multi-thread CPU</string>
                         </property>
                         <attribute name="buttonGroup">
                          <string notr="true">simulation_modes</string>
@@ -1233,7 +1339,7 @@ p, li { white-space: pre-wrap; }
                          <string>Multi-thread CPU</string>
                         </property>
                         <property name="checked">
-                         <bool>true</bool>
+                         <bool>false</bool>
                         </property>
                         <attribute name="buttonGroup">
                          <string notr="true">simulation_modes</string>
@@ -1281,14 +1387,22 @@ p, li { white-space: pre-wrap; }
                      </layout>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_synchronise_sim_and_win">
-                      <property name="text">
-                       <string>Synchronise simulation and window</string>
-                      </property>
-                      <property name="checked">
-                       <bool>false</bool>
-                      </property>
-                     </widget>
+                     <layout class="QHBoxLayout" name="horizontalLayout_2">
+                      <item>
+                       <widget class="QLabel" name="label_19">
+                        <property name="text">
+                         <string>Float number precision: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_float_number_precision">
+                        <property name="text">
+                         <string>2</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
                     </item>
                    </layout>
                   </widget>
@@ -2034,22 +2148,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>le_do_nothing</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_do_nothing_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>751</x>
-     <y>745</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>b_kill_all_organisms_slot</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
@@ -2145,6 +2243,38 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>rb_partial_multi_thread_mode</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>rb_partial_multi_thread_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>587</x>
+     <y>756</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_float_number_precision</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_float_number_precision_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>665</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -2192,13 +2322,14 @@ p, li { white-space: pre-wrap; }
   <slot>b_load_world_slot()</slot>
   <slot>cb_override_evolution_controls_slot(bool)</slot>
   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
-  <slot>le_do_nothing_slot()</slot>
   <slot>b_kill_all_organisms_slot()</slot>
   <slot>cb_runtime_rotation_enabled_slot(bool)</slot>
   <slot>cb_fix_reproduction_distance_slot(bool)</slot>
   <slot>le_min_reproducing_distance_slot()</slot>
   <slot>le_max_reproducing_distance_slot()</slot>
   <slot>le_max_organisms_slot()</slot>
+  <slot>rb_partial_multi_thread_slot()</slot>
+  <slot>le_float_number_precision_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

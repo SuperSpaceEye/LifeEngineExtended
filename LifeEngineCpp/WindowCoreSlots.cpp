@@ -238,14 +238,6 @@ void WindowCore::le_remove_cell_slot() {
     sp.remove_cell = result.result;
 }
 
-void WindowCore::le_do_nothing_slot() {
-    int fallback = sp.do_nothing;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_do_nothing, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    sp.do_nothing = result.result;
-}
-
 void WindowCore::le_min_reproducing_distance_slot() {
     int fallback = sp.min_reproducing_distance;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_reproduction_distance, fallback);
@@ -271,6 +263,14 @@ void WindowCore::le_max_organisms_slot() {
     dc.max_organisms = result.result;
 }
 
+void WindowCore::le_float_number_precision_slot() {
+    int fallback = float_precision;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_float_number_precision, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    float_precision = result.result;
+}
+
 //==================== Radio buttond ====================
 
 void WindowCore::rb_food_slot() {
@@ -291,6 +291,10 @@ void WindowCore::rb_single_thread_slot() {
 
 void WindowCore::rb_multi_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Multi_Threaded);
+}
+
+void WindowCore::rb_partial_multi_thread_slot() {
+    set_simulation_mode(SimulationModes::CPU_Partial_Multi_threaded);
 }
 
 //TODO CUDA mode not implemented

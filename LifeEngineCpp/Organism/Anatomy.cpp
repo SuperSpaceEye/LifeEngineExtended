@@ -6,15 +6,15 @@
 //TODO program will do some redundant work, but i don't know if optimization i can think of will make it much faster
 //TODO std::move structure
 Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
-    _organism_blocks = std::vector(structure->organism_blocks);
+    _organism_blocks = std::move(structure->organism_blocks);
 
-    _producing_space = std::vector(structure->producing_space);
-    _eating_space    = std::vector(structure->eating_space);
-    _armor_space     = std::vector(structure->armor_space);
+    _producing_space = std::move(structure->producing_space);
+    _eating_space    = std::move(structure->eating_space);
+    _armor_space     = std::move(structure->armor_space);
 
-    _single_adjacent_space          = std::vector(structure->single_adjacent_space);
-    _single_diagonal_adjacent_space = std::vector(structure->single_diagonal_adjacent_space);
-    _double_adjacent_space          = std::vector(structure->double_adjacent_space);
+    _single_adjacent_space          = std::move(structure->single_adjacent_space);
+    _single_diagonal_adjacent_space = std::move(structure->single_diagonal_adjacent_space);
+    _double_adjacent_space          = std::move(structure->double_adjacent_space);
 
     _mouth_blocks    = structure->mouth_blocks;
     _producer_blocks = structure->producer_blocks;
@@ -25,7 +25,7 @@ Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
     delete structure;
 }
 
-Anatomy::Anatomy(const Anatomy *anatomy) {
+Anatomy::Anatomy(const std::shared_ptr<Anatomy>& anatomy) {
     _organism_blocks = std::vector(anatomy->_organism_blocks);
 
     _producing_space = std::vector(anatomy->_producing_space);
@@ -44,9 +44,7 @@ Anatomy::Anatomy(const Anatomy *anatomy) {
     _eye_blocks      = anatomy->_armor_blocks;
 }
 
-Anatomy::~Anatomy() {
-    //delete structure;
-}
+Anatomy::~Anatomy()=default;
 
 void Anatomy::set_single_adjacent(int x, int y, int x_offset, int y_offset,
                                   boost::unordered_map<int, boost::unordered_map<int, OrganismBlock>>& organism_blocks,
@@ -750,15 +748,15 @@ void Anatomy::set_block(BlockTypes type, int x, int y) {
     }
     auto new_structure = add_block(type, -1, x, y);
 
-    _organism_blocks = std::vector(new_structure->organism_blocks);
+    _organism_blocks = std::move(new_structure->organism_blocks);
 
-    _producing_space = std::vector(new_structure->producing_space);
-    _eating_space    = std::vector(new_structure->eating_space);
-    _armor_space     = std::vector(new_structure->armor_space);
+    _producing_space = std::move(new_structure->producing_space);
+    _eating_space    = std::move(new_structure->eating_space);
+    _armor_space     = std::move(new_structure->armor_space);
 
-    _single_adjacent_space          = std::vector(new_structure->single_adjacent_space);
-    _single_diagonal_adjacent_space = std::vector(new_structure->single_diagonal_adjacent_space);
-    _double_adjacent_space          = std::vector(new_structure->double_adjacent_space);
+    _single_adjacent_space          = std::move(new_structure->single_adjacent_space);
+    _single_diagonal_adjacent_space = std::move(new_structure->single_diagonal_adjacent_space);
+    _double_adjacent_space          = std::move(new_structure->double_adjacent_space);
 
     _mouth_blocks    = new_structure->mouth_blocks;
     _producer_blocks = new_structure->producer_blocks;

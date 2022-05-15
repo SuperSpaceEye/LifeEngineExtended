@@ -192,16 +192,17 @@ public:
     std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _double_adjacent_space;
 
-    int32_t _mouth_blocks = 0;
+    int32_t _mouth_blocks    = 0;
     int32_t _producer_blocks = 0;
-    int32_t _mover_blocks = 0;
-    int32_t _killer_blocks = 0;
-    int32_t _armor_blocks = 0;
-    int32_t _eye_blocks = 0;
+    int32_t _mover_blocks    = 0;
+    int32_t _killer_blocks   = 0;
+    int32_t _armor_blocks    = 0;
+    int32_t _eye_blocks      = 0;
 
-    Anatomy(SerializedOrganismStructureContainer *structure);
-    Anatomy(const Anatomy *anatomy);
+    explicit Anatomy(SerializedOrganismStructureContainer *structure);
+    explicit Anatomy(const std::shared_ptr<Anatomy>& anatomy);
     Anatomy()=default;
+
     ~Anatomy();
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, std::mt19937& mt);

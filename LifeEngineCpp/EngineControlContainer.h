@@ -7,8 +7,12 @@
 
 enum class SimulationModes {
     CPU_Single_Threaded,
+    CPU_Partial_Multi_threaded,
     CPU_Multi_Threaded,
     GPU_CUDA_mode,
+    OPENCL_MODE,
+    GPUFORT_MODE //?
+
 };
 
 struct EngineControlParameters {

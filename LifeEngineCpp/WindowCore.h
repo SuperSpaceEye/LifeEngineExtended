@@ -8,6 +8,9 @@
 #include <iostream>
 #include <chrono>
 #include <cmath>
+#include <cfloat>
+#include <sstream>
+#include <iomanip>
 #include <thread>
 #include <omp.h>
 #include <random>
@@ -43,6 +46,12 @@ struct result_struct {
     T result;
 };
 
+template <typename T> std::string to_str(const T& t, int float_precision = 2) {
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(float_precision) << t;
+    return stream.str();
+}
+
 class DescisionMessageBox : public QDialog {
     Q_OBJECT
 
@@ -73,6 +82,16 @@ public:
 
     this->setWindowTitle(title);
     }
+};
+
+struct OrganismAvgBlockInformation {
+    float size = 0;
+    float _mouth_blocks    = 0;
+    float _producer_blocks = 0;
+    float _mover_blocks    = 0;
+    float _killer_blocks   = 0;
+    float _armor_blocks    = 0;
+    float _eye_blocks      = 0;
 };
 
 //TODO expand About page.
@@ -149,6 +168,9 @@ private:
     bool override_evolution_controls_slot = false;
     bool reset_with_chosen = false;
 
+    int float_precision = 2;
+    int auto_reset_num = 0;
+
     bool resize_simulation_grid_flag = false;
 
     Organism * base_organism;
@@ -182,6 +204,8 @@ private:
     void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
+    void update_statistics_info(OrganismAvgBlockInformation info);
+
     //TODO sometimes the program SEGFAULTS when resizing, and I have no idea why.
     void resize_simulation_space();
 
@@ -199,6 +223,9 @@ private:
     void partial_clear_world();
     void reset_world();
     void clear_world();
+
+    OrganismAvgBlockInformation calculate_organisms_info();
+
 
     void wheelEvent(QWheelEvent *event);
     bool eventFilter(QObject *watched, QEvent *event);
@@ -228,6 +255,7 @@ private slots:
     void rb_single_thread_slot();
     void rb_multi_thread_slot();
     void rb_cuda_slot();
+    void rb_partial_multi_thread_slot();
 
     void le_num_threads_slot();
     void le_food_production_probability_slot();
@@ -239,7 +267,6 @@ private slots:
     void le_add_cell_slot();
     void le_change_cell_slot();
     void le_remove_cell_slot();
-    void le_do_nothing_slot();
     void le_max_sps_slot();
     void le_max_fps_slot();
     void le_cell_size_slot();
@@ -248,6 +275,7 @@ private slots:
     void le_min_reproducing_distance_slot();
     void le_max_reproducing_distance_slot();
     void le_max_organisms_slot();
+    void le_float_number_precision_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);

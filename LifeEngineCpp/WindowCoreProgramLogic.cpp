@@ -2,8 +2,9 @@
 // Created by spaceeye on 16.03.2022.
 //
 
+#include <memory>
+
 #include "WindowCore.h"
-#include "Organisms/Rotation.h"
 
 WindowCore::WindowCore(int simulation_width, int simulation_height, int window_fps,
                        int simulation_fps, int simulation_num_threads, QWidget *parent) :
@@ -43,7 +44,7 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     color_container = ColorContainer{};
     sp = SimulationParameters{};
 
-    auto anatomy = new Anatomy();
+    auto anatomy = std::make_shared<Anatomy>();
     anatomy->set_block(BlockTypes::MouthBlock, 0, 0);
     anatomy->set_block(BlockTypes::ProducerBlock, -1, -1);
     anatomy->set_block(BlockTypes::ProducerBlock, 1, 1);
@@ -51,7 +52,7 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
     //TODO very important. organism calls destructor for some reason, deallocating anatomy.
     base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
-    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, new Anatomy(anatomy), &sp, &op, &mt);
+    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, std::make_shared<Anatomy>(anatomy), &sp, &op, &mt);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
 
@@ -101,11 +102,22 @@ void WindowCore::mainloop_tick() {
         dc.engine_ticks = 0;
         unpause_engine();
 
+        auto info = calculate_organisms_info();
+
         update_fps_labels(window_frames, simulation_frames);
+        update_statistics_info(info);
 
         if (!stop_console_output) {
             std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second | "
-            << dc.organisms.size() << " organisms alive" << "\n";
+            << dc.organisms.size() << " organisms alive | " << info.size << " average organism_size | "
+            << to_str(dc.total_engine_ticks, float_precision) << " total engine ticks\n"
+            << to_str(info._eye_blocks,      float_precision) << " average mouth num | "
+            << to_str(info._producer_blocks, float_precision) << " average producer num | "
+            << to_str(info._mover_blocks,    float_precision) << " average mover num | "
+            << to_str(info._killer_blocks,   float_precision) << " average killer num | "
+            << to_str(info._armor_blocks,    float_precision) << " average armor num | "
+            << to_str(info._eye_blocks,      float_precision) << " average eye num\n"
+            <<"\n";
         }
 
         window_frames = 0;
@@ -122,7 +134,11 @@ void WindowCore::update_fps_labels(int fps, int sps) {
 void WindowCore::window_tick() {
     if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
     if (sp.pause_on_total_extinction && cp.organisms_extinct) {_ui.tb_pause->setChecked(true); cp.organisms_extinct = false;} else
-    if (sp.reset_on_total_extinction && cp.organisms_extinct) {reset_world();}
+    if (sp.reset_on_total_extinction && cp.organisms_extinct) {
+        reset_world();
+        auto_reset_num++;
+        _ui.lb_auto_reset_count->setText(QString::fromStdString("Auto reset count: "+ std::to_string(auto_reset_num)));
+    }
     create_image();
 }
 
@@ -336,7 +352,7 @@ void WindowCore::set_simulation_mode(SimulationModes mode) {
 
 void WindowCore::clear_organisms() {
     if (!cp.engine_paused) {
-        if (!stop_console_output) {std::cout << "Engine is not paused! Organisms not cleared.\n";}
+        if (!stop_console_output) {std::cout << "Engine is not paused! Organism not cleared.\n";}
         return;
     }
     for (auto & organism: dc.organisms) {delete organism;}
@@ -390,6 +406,8 @@ void WindowCore::partial_clear_world() {
 
     for (auto & column: dc.simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
     for (auto & column: dc.second_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+
+    dc.total_engine_ticks = 0;
 }
 
 void WindowCore::reset_world() {
@@ -433,4 +451,49 @@ void WindowCore::make_walls() {
             dc.simulation_grid[dc.simulation_width - 1 - i][y].type = BlockTypes::WallBlock;
         }
     }
+}
+
+OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
+    OrganismAvgBlockInformation info;
+    for (auto & organism: dc.organisms) {
+        info.size += organism->organism_anatomy->_organism_blocks.size();
+
+        info._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
+        info._producer_blocks += organism->organism_anatomy->_producer_blocks;
+        info._mover_blocks    += organism->organism_anatomy->_mover_blocks;
+        info._killer_blocks   += organism->organism_anatomy->_killer_blocks;
+        info._armor_blocks    += organism->organism_anatomy->_armor_blocks;
+        info._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+    }
+
+    info.size /= dc.organisms.size();
+
+
+    info._mouth_blocks    /= dc.organisms.size();
+    info._producer_blocks /= dc.organisms.size();
+    info._mover_blocks    /= dc.organisms.size();
+    info._killer_blocks   /= dc.organisms.size();
+    info._armor_blocks    /= dc.organisms.size();
+    info._eye_blocks      /= dc.organisms.size();
+
+    if (std::isnan(info.size))             {info.size             = 0;}
+    if (std::isnan(info._mouth_blocks))    {info._mouth_blocks    = 0;}
+    if (std::isnan(info._producer_blocks)) {info._producer_blocks = 0;}
+    if (std::isnan(info._mover_blocks))    {info._mover_blocks    = 0;}
+    if (std::isnan(info._killer_blocks))   {info._killer_blocks   = 0;}
+    if (std::isnan(info._armor_blocks))    {info._armor_blocks    = 0;}
+    if (std::isnan(info._eye_blocks))      {info._eye_blocks      = 0;}
+    return info;
+}
+
+void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
+    _ui.lb_total_engine_ticks->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
+    _ui.lb_organisms_alive->   setText(QString::fromStdString("Organism alive: "       + std::to_string(dc.organisms.size())));
+    _ui.lb_organism_size->     setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
+    _ui.lb_mouth_num->         setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
+    _ui.lb_producer_num->      setText(QString::fromStdString("Average producer num: "  + to_str(info._producer_blocks, float_precision)));
+    _ui.lb_mover_num->         setText(QString::fromStdString("Average mover num: "     + to_str(info._mover_blocks,    float_precision)));
+    _ui.lb_killer_num->        setText(QString::fromStdString("Average killer num: "    + to_str(info._killer_blocks,   float_precision)));
+    _ui.lb_armor_num->         setText(QString::fromStdString("Average armor num: "     + to_str(info._armor_blocks,    float_precision)));
+    _ui.lb_eye_num->           setText(QString::fromStdString("Average eye num: "       + to_str(info._eye_blocks,      float_precision)));
 }

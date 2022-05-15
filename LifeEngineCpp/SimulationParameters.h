@@ -6,14 +6,14 @@
 #define THELIFEENGINECPP_SIMULATIONPARAMETERS_H
 
 struct SimulationParameters {
-    //simulation sim_parameters
+    //simulation sp
     //evolution controls
         float food_production_probability = 0.05;
         int   lifespan_multiplier = 100;
         int   look_range = 50;
         int   auto_food_drop_rate = 0;
         int   extra_reproduction_cost = 0;
-        float global_mutation_rate = 5;
+        float global_mutation_rate = 0.05;
         float killer_damage_amount = 1;
 
         int min_reproducing_distance = 0;
@@ -22,7 +22,6 @@ struct SimulationParameters {
             int add_cell = 25;
             int change_cell = 25;
             int remove_cell = 25;
-            int do_nothing = 25;
 
         bool reproduction_rotation_enabled = true;
         bool one_touch_kill = false;

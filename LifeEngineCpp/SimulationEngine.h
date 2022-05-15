@@ -12,7 +12,7 @@
 #include <atomic>
 
 #include "GridBlocks/BaseGridBlock.h"
-#include "Organisms/Organism.h"
+#include "Organism/Organism.h"
 #include "BlockTypes.h"
 #include "EngineControlContainer.h"
 #include "EngineDataContainer.h"
@@ -38,10 +38,10 @@ class SimulationEngine {
     void process_user_action_pool(){};
 
     void simulation_tick();
-
+    void partial_multi_threaded_tick();
     void multi_threaded_tick();
-
     void cuda_tick();
+
     void build_threads();
     void kill_threads();
 

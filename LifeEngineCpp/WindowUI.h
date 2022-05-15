@@ -47,17 +47,18 @@ public:
     QLabel *label_3;
     QLineEdit *le_sps;
     QGridLayout *gridLayout;
-    QPushButton *b_clear;
     QPushButton *b_reset;
-    QPushButton *tb_pause;
-    QPushButton *tb_stoprender;
     QPushButton *b_reset_view;
     QPushButton *b_pass_one_tick;
+    QPushButton *tb_stoprender;
     QPushButton *b_kill_all_organisms_slot;
+    QPushButton *tb_pause;
+    QPushButton *b_clear;
     QHBoxLayout *horizontalLayout_3;
     QRadioButton *rb_food;
     QRadioButton *rb_kill;
     QRadioButton *rb_wall;
+    QCheckBox *cb_synchronise_sim_and_win;
     QFrame *frame_3;
     QVBoxLayout *verticalLayout_4;
     QTabWidget *Tabs;
@@ -137,8 +138,6 @@ public:
     QLineEdit *le_change;
     QLabel *label_12;
     QLineEdit *le_remove;
-    QLabel *label_15;
-    QLineEdit *le_do_nothing;
     QVBoxLayout *verticalLayout_11;
     QCheckBox *cb_reproducing_rotation_enabled;
     QVBoxLayout *verticalLayout_27;
@@ -161,6 +160,19 @@ public:
     QLineEdit *le_max_reproduction_distance;
     QCheckBox *cb_fix_reproduction_distance;
     QWidget *statistics_tab;
+    QVBoxLayout *verticalLayout_3;
+    QScrollArea *scrollArea_4;
+    QWidget *scrollAreaWidgetContents_4;
+    QVBoxLayout *verticalLayout_24;
+    QLabel *lb_total_engine_ticks;
+    QLabel *lb_organisms_alive;
+    QLabel *lb_organism_size;
+    QLabel *lb_mouth_num;
+    QLabel *lb_producer_num;
+    QLabel *lb_mover_num;
+    QLabel *lb_killer_num;
+    QLabel *lb_armor_num;
+    QLabel *lb_eye_num;
     QWidget *simulation_settings_tab;
     QVBoxLayout *verticalLayout_7;
     QScrollArea *scrollArea;
@@ -168,15 +180,18 @@ public:
     QVBoxLayout *verticalLayout_5;
     QWidget *widget_2;
     QVBoxLayout *verticalLayout_19;
-    QHBoxLayout *horizontalLayout_2;
+    QVBoxLayout *verticalLayout_23;
     QRadioButton *rb_single_thread_mode;
+    QRadioButton *rb_partial_multi_thread_mode;
     QRadioButton *rb_multi_thread_mode;
     QRadioButton *rb_cuda_mode;
     QCheckBox *cb_stop_console_output;
     QHBoxLayout *horizontalLayout_4;
     QLabel *label;
     QLineEdit *le_num_threads;
-    QCheckBox *cb_synchronise_sim_and_win;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_19;
+    QLineEdit *le_float_number_precision;
     QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
 
@@ -184,7 +199,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(800, 900);
+        MainWindow->resize(805, 900);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -275,27 +290,10 @@ public:
 
         gridLayout = new QGridLayout();
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        b_clear = new QPushButton(frame_2);
-        b_clear->setObjectName(QString::fromUtf8("b_clear"));
-
-        gridLayout->addWidget(b_clear, 0, 2, 1, 1);
-
         b_reset = new QPushButton(frame_2);
         b_reset->setObjectName(QString::fromUtf8("b_reset"));
 
         gridLayout->addWidget(b_reset, 0, 3, 1, 1);
-
-        tb_pause = new QPushButton(frame_2);
-        tb_pause->setObjectName(QString::fromUtf8("tb_pause"));
-        tb_pause->setCheckable(true);
-
-        gridLayout->addWidget(tb_pause, 0, 0, 1, 1);
-
-        tb_stoprender = new QPushButton(frame_2);
-        tb_stoprender->setObjectName(QString::fromUtf8("tb_stoprender"));
-        tb_stoprender->setCheckable(true);
-
-        gridLayout->addWidget(tb_stoprender, 0, 1, 1, 1);
 
         b_reset_view = new QPushButton(frame_2);
         b_reset_view->setObjectName(QString::fromUtf8("b_reset_view"));
@@ -307,10 +305,27 @@ public:
 
         gridLayout->addWidget(b_pass_one_tick, 1, 1, 1, 1);
 
+        tb_stoprender = new QPushButton(frame_2);
+        tb_stoprender->setObjectName(QString::fromUtf8("tb_stoprender"));
+        tb_stoprender->setCheckable(true);
+
+        gridLayout->addWidget(tb_stoprender, 0, 1, 1, 1);
+
         b_kill_all_organisms_slot = new QPushButton(frame_2);
         b_kill_all_organisms_slot->setObjectName(QString::fromUtf8("b_kill_all_organisms_slot"));
 
         gridLayout->addWidget(b_kill_all_organisms_slot, 1, 2, 1, 1);
+
+        tb_pause = new QPushButton(frame_2);
+        tb_pause->setObjectName(QString::fromUtf8("tb_pause"));
+        tb_pause->setCheckable(true);
+
+        gridLayout->addWidget(tb_pause, 0, 0, 1, 1);
+
+        b_clear = new QPushButton(frame_2);
+        b_clear->setObjectName(QString::fromUtf8("b_clear"));
+
+        gridLayout->addWidget(b_clear, 0, 2, 1, 1);
 
 
         verticalLayout_6->addLayout(gridLayout);
@@ -341,6 +356,12 @@ public:
 
 
         verticalLayout_6->addLayout(horizontalLayout_3);
+
+        cb_synchronise_sim_and_win = new QCheckBox(frame_2);
+        cb_synchronise_sim_and_win->setObjectName(QString::fromUtf8("cb_synchronise_sim_and_win"));
+        cb_synchronise_sim_and_win->setChecked(false);
+
+        verticalLayout_6->addWidget(cb_synchronise_sim_and_win);
 
 
         horizontalLayout->addWidget(frame_2);
@@ -390,7 +411,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, -208, 406, 400));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 411, 219));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -402,7 +423,7 @@ public:
         verticalLayout_12->setContentsMargins(0, 0, 0, 0);
         widget_3 = new QWidget(scrollAreaWidgetContents_3);
         widget_3->setObjectName(QString::fromUtf8("widget_3"));
-        widget_3->setMinimumSize(QSize(0, 400));
+        widget_3->setMinimumSize(QSize(0, 0));
         horizontalLayout_20 = new QHBoxLayout(widget_3);
         horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
         horizontalLayout_20->setContentsMargins(6, 6, 6, 6);
@@ -568,7 +589,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -826, 406, 1018));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -165, 411, 542));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -582,7 +603,7 @@ public:
         sizePolicy2.setVerticalStretch(100);
         sizePolicy2.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
         widget->setSizePolicy(sizePolicy2);
-        widget->setMinimumSize(QSize(0, 1000));
+        widget->setMinimumSize(QSize(0, 0));
         verticalLayout_20 = new QVBoxLayout(widget);
         verticalLayout_20->setSpacing(6);
         verticalLayout_20->setObjectName(QString::fromUtf8("verticalLayout_20"));
@@ -687,7 +708,7 @@ public:
         horizontalLayout_19->setObjectName(QString::fromUtf8("horizontalLayout_19"));
         cb_use_evoved_mutation_rate = new QCheckBox(widget);
         cb_use_evoved_mutation_rate->setObjectName(QString::fromUtf8("cb_use_evoved_mutation_rate"));
-        cb_use_evoved_mutation_rate->setChecked(true);
+        cb_use_evoved_mutation_rate->setChecked(false);
 
         horizontalLayout_19->addWidget(cb_use_evoved_mutation_rate);
 
@@ -703,13 +724,13 @@ public:
         horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
         lb_mutation_rate = new QLabel(widget);
         lb_mutation_rate->setObjectName(QString::fromUtf8("lb_mutation_rate"));
-        lb_mutation_rate->setEnabled(false);
+        lb_mutation_rate->setEnabled(true);
 
         horizontalLayout_12->addWidget(lb_mutation_rate);
 
         le_global_mutation_rate = new QLineEdit(widget);
         le_global_mutation_rate->setObjectName(QString::fromUtf8("le_global_mutation_rate"));
-        le_global_mutation_rate->setEnabled(false);
+        le_global_mutation_rate->setEnabled(true);
 
         horizontalLayout_12->addWidget(le_global_mutation_rate);
 
@@ -752,16 +773,6 @@ public:
         le_remove->setObjectName(QString::fromUtf8("le_remove"));
 
         horizontalLayout_16->addWidget(le_remove);
-
-        label_15 = new QLabel(widget);
-        label_15->setObjectName(QString::fromUtf8("label_15"));
-
-        horizontalLayout_16->addWidget(label_15);
-
-        le_do_nothing = new QLineEdit(widget);
-        le_do_nothing->setObjectName(QString::fromUtf8("le_do_nothing"));
-
-        horizontalLayout_16->addWidget(le_do_nothing);
 
 
         verticalLayout_17->addLayout(horizontalLayout_16);
@@ -887,6 +898,67 @@ public:
         Tabs->addTab(evolution_controls_tab, QString());
         statistics_tab = new QWidget();
         statistics_tab->setObjectName(QString::fromUtf8("statistics_tab"));
+        verticalLayout_3 = new QVBoxLayout(statistics_tab);
+        verticalLayout_3->setSpacing(0);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+        scrollArea_4 = new QScrollArea(statistics_tab);
+        scrollArea_4->setObjectName(QString::fromUtf8("scrollArea_4"));
+        scrollArea_4->setWidgetResizable(true);
+        scrollAreaWidgetContents_4 = new QWidget();
+        scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 411, 219));
+        verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
+        verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
+        lb_total_engine_ticks = new QLabel(scrollAreaWidgetContents_4);
+        lb_total_engine_ticks->setObjectName(QString::fromUtf8("lb_total_engine_ticks"));
+
+        verticalLayout_24->addWidget(lb_total_engine_ticks);
+
+        lb_organisms_alive = new QLabel(scrollAreaWidgetContents_4);
+        lb_organisms_alive->setObjectName(QString::fromUtf8("lb_organisms_alive"));
+
+        verticalLayout_24->addWidget(lb_organisms_alive);
+
+        lb_organism_size = new QLabel(scrollAreaWidgetContents_4);
+        lb_organism_size->setObjectName(QString::fromUtf8("lb_organism_size"));
+
+        verticalLayout_24->addWidget(lb_organism_size);
+
+        lb_mouth_num = new QLabel(scrollAreaWidgetContents_4);
+        lb_mouth_num->setObjectName(QString::fromUtf8("lb_mouth_num"));
+
+        verticalLayout_24->addWidget(lb_mouth_num);
+
+        lb_producer_num = new QLabel(scrollAreaWidgetContents_4);
+        lb_producer_num->setObjectName(QString::fromUtf8("lb_producer_num"));
+
+        verticalLayout_24->addWidget(lb_producer_num);
+
+        lb_mover_num = new QLabel(scrollAreaWidgetContents_4);
+        lb_mover_num->setObjectName(QString::fromUtf8("lb_mover_num"));
+
+        verticalLayout_24->addWidget(lb_mover_num);
+
+        lb_killer_num = new QLabel(scrollAreaWidgetContents_4);
+        lb_killer_num->setObjectName(QString::fromUtf8("lb_killer_num"));
+
+        verticalLayout_24->addWidget(lb_killer_num);
+
+        lb_armor_num = new QLabel(scrollAreaWidgetContents_4);
+        lb_armor_num->setObjectName(QString::fromUtf8("lb_armor_num"));
+
+        verticalLayout_24->addWidget(lb_armor_num);
+
+        lb_eye_num = new QLabel(scrollAreaWidgetContents_4);
+        lb_eye_num->setObjectName(QString::fromUtf8("lb_eye_num"));
+
+        verticalLayout_24->addWidget(lb_eye_num);
+
+        scrollArea_4->setWidget(scrollAreaWidgetContents_4);
+
+        verticalLayout_3->addWidget(scrollArea_4);
+
         Tabs->addTab(statistics_tab, QString());
         simulation_settings_tab = new QWidget();
         simulation_settings_tab->setObjectName(QString::fromUtf8("simulation_settings_tab"));
@@ -901,7 +973,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 420, 192));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -21, 411, 213));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -914,35 +986,41 @@ public:
         widget_2 = new QWidget(scrollAreaWidgetContents);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
         verticalLayout_19 = new QVBoxLayout(widget_2);
-        verticalLayout_19->setSpacing(0);
+        verticalLayout_19->setSpacing(2);
         verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
         verticalLayout_19->setContentsMargins(9, 9, 9, 9);
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setSpacing(0);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        verticalLayout_23 = new QVBoxLayout();
+        verticalLayout_23->setObjectName(QString::fromUtf8("verticalLayout_23"));
         rb_single_thread_mode = new QRadioButton(widget_2);
         simulation_modes = new QButtonGroup(MainWindow);
         simulation_modes->setObjectName(QString::fromUtf8("simulation_modes"));
         simulation_modes->addButton(rb_single_thread_mode);
         rb_single_thread_mode->setObjectName(QString::fromUtf8("rb_single_thread_mode"));
+        rb_single_thread_mode->setChecked(true);
 
-        horizontalLayout_2->addWidget(rb_single_thread_mode);
+        verticalLayout_23->addWidget(rb_single_thread_mode);
+
+        rb_partial_multi_thread_mode = new QRadioButton(widget_2);
+        simulation_modes->addButton(rb_partial_multi_thread_mode);
+        rb_partial_multi_thread_mode->setObjectName(QString::fromUtf8("rb_partial_multi_thread_mode"));
+
+        verticalLayout_23->addWidget(rb_partial_multi_thread_mode);
 
         rb_multi_thread_mode = new QRadioButton(widget_2);
         simulation_modes->addButton(rb_multi_thread_mode);
         rb_multi_thread_mode->setObjectName(QString::fromUtf8("rb_multi_thread_mode"));
-        rb_multi_thread_mode->setChecked(true);
+        rb_multi_thread_mode->setChecked(false);
 
-        horizontalLayout_2->addWidget(rb_multi_thread_mode);
+        verticalLayout_23->addWidget(rb_multi_thread_mode);
 
         rb_cuda_mode = new QRadioButton(widget_2);
         simulation_modes->addButton(rb_cuda_mode);
         rb_cuda_mode->setObjectName(QString::fromUtf8("rb_cuda_mode"));
 
-        horizontalLayout_2->addWidget(rb_cuda_mode);
+        verticalLayout_23->addWidget(rb_cuda_mode);
 
 
-        verticalLayout_19->addLayout(horizontalLayout_2);
+        verticalLayout_19->addLayout(verticalLayout_23);
 
         cb_stop_console_output = new QCheckBox(widget_2);
         cb_stop_console_output->setObjectName(QString::fromUtf8("cb_stop_console_output"));
@@ -965,11 +1043,20 @@ public:
 
         verticalLayout_19->addLayout(horizontalLayout_4);
 
-        cb_synchronise_sim_and_win = new QCheckBox(widget_2);
-        cb_synchronise_sim_and_win->setObjectName(QString::fromUtf8("cb_synchronise_sim_and_win"));
-        cb_synchronise_sim_and_win->setChecked(false);
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        label_19 = new QLabel(widget_2);
+        label_19->setObjectName(QString::fromUtf8("label_19"));
 
-        verticalLayout_19->addWidget(cb_synchronise_sim_and_win);
+        horizontalLayout_2->addWidget(label_19);
+
+        le_float_number_precision = new QLineEdit(widget_2);
+        le_float_number_precision->setObjectName(QString::fromUtf8("le_float_number_precision"));
+
+        horizontalLayout_2->addWidget(le_float_number_precision);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_2);
 
 
         verticalLayout_5->addWidget(widget_2);
@@ -986,7 +1073,7 @@ public:
         horizontalLayout->addWidget(frame_3);
 
         horizontalLayout->setStretch(0, 1);
-        horizontalLayout->setStretch(1, 3);
+        horizontalLayout->setStretch(1, 2);
         frame_3->raise();
         frame_2->raise();
 
@@ -1044,15 +1131,16 @@ public:
         QObject::connect(b_load_world, SIGNAL(clicked()), MainWindow, SLOT(b_load_world_slot()));
         QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
         QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
-        QObject::connect(le_do_nothing, SIGNAL(returnPressed()), MainWindow, SLOT(le_do_nothing_slot()));
         QObject::connect(b_kill_all_organisms_slot, SIGNAL(clicked()), MainWindow, SLOT(b_kill_all_organisms_slot()));
         QObject::connect(cb_runtime_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_runtime_rotation_enabled_slot(bool)));
         QObject::connect(cb_fix_reproduction_distance, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fix_reproduction_distance_slot(bool)));
         QObject::connect(le_min_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_reproducing_distance_slot()));
         QObject::connect(le_max_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_reproducing_distance_slot()));
         QObject::connect(le_max_organisms, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_organisms_slot()));
+        QObject::connect(rb_partial_multi_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_partial_multi_thread_slot()));
+        QObject::connect(le_float_number_precision, SIGNAL(returnPressed()), MainWindow, SLOT(le_float_number_precision_slot()));
 
-        Tabs->setCurrentIndex(2);
+        Tabs->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1067,16 +1155,17 @@ public:
         lb_sps->setText(QApplication::translate("MainWindow", "sps:", nullptr));
         label_3->setText(QApplication::translate("MainWindow", "Set max sps:", nullptr));
         le_sps->setText(QApplication::translate("MainWindow", "-1", nullptr));
-        b_clear->setText(QApplication::translate("MainWindow", "Clear", nullptr));
         b_reset->setText(QApplication::translate("MainWindow", "Reset", nullptr));
-        tb_pause->setText(QApplication::translate("MainWindow", "Pause", nullptr));
-        tb_stoprender->setText(QApplication::translate("MainWindow", "Stop render", nullptr));
         b_reset_view->setText(QApplication::translate("MainWindow", "Reset view", nullptr));
         b_pass_one_tick->setText(QApplication::translate("MainWindow", "Pass one tick", nullptr));
+        tb_stoprender->setText(QApplication::translate("MainWindow", "Stop render", nullptr));
         b_kill_all_organisms_slot->setText(QApplication::translate("MainWindow", "Kill all", nullptr));
+        tb_pause->setText(QApplication::translate("MainWindow", "Pause", nullptr));
+        b_clear->setText(QApplication::translate("MainWindow", "Clear", nullptr));
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", nullptr));
         rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", nullptr));
         rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", nullptr));
+        cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
         textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -1086,10 +1175,12 @@ public:
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent"
                         ":0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Important Information:</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">sps is the number of simulation ticks per second.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">setting max sps/sps to &lt;0 will enable unlimited mode.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*sps is the number of simulation ticks per second.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*setting max fps/sps/organisms to &lt;0 will enable unlimited mode.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*checking &quot;Fix reproducing distance&quot; will set reproducing distance to min value.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Not implemented:</p></body></html>", nullptr));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:"
+                        "0px; -qt-block-indent:0; text-indent:0px;\">Not implemented:</p></body></html>", nullptr));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
         Tabs->setTabText(Tabs->indexOf(editor_tab), QApplication::translate("MainWindow", "Editor", nullptr));
         label_8->setText(QApplication::translate("MainWindow", "Cell size:", nullptr));
@@ -1125,15 +1216,13 @@ public:
         le_extra_reproduction_cost->setText(QApplication::translate("MainWindow", "0", nullptr));
         cb_use_evoved_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved mutation rate", nullptr));
         lb_mutation_rate->setText(QApplication::translate("MainWindow", "global mutation rate:", nullptr));
-        le_global_mutation_rate->setText(QApplication::translate("MainWindow", "5", nullptr));
+        le_global_mutation_rate->setText(QApplication::translate("MainWindow", "0.05", nullptr));
         label_10->setText(QApplication::translate("MainWindow", "add cell:", nullptr));
-        le_add->setText(QApplication::translate("MainWindow", "25", nullptr));
+        le_add->setText(QApplication::translate("MainWindow", "33", nullptr));
         label_11->setText(QApplication::translate("MainWindow", "change cell:", nullptr));
-        le_change->setText(QApplication::translate("MainWindow", "25", nullptr));
+        le_change->setText(QApplication::translate("MainWindow", "33", nullptr));
         label_12->setText(QApplication::translate("MainWindow", "remove cell:", nullptr));
-        le_remove->setText(QApplication::translate("MainWindow", "25", nullptr));
-        label_15->setText(QApplication::translate("MainWindow", "do nothing", nullptr));
-        le_do_nothing->setText(QApplication::translate("MainWindow", "25", nullptr));
+        le_remove->setText(QApplication::translate("MainWindow", "33", nullptr));
         cb_reproducing_rotation_enabled->setText(QApplication::translate("MainWindow", "Reproducing rotation enabled", nullptr));
         cb_runtime_rotation_enabled->setText(QApplication::translate("MainWindow", "Runtime rotation enabled", nullptr));
         cb_on_touch_kill->setText(QApplication::translate("MainWindow", "On touch kill", nullptr));
@@ -1145,14 +1234,25 @@ public:
         le_max_reproduction_distance->setText(QApplication::translate("MainWindow", "3", nullptr));
         cb_fix_reproduction_distance->setText(QApplication::translate("MainWindow", "Fix reproducing distance", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
+        lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", nullptr));
+        lb_organisms_alive->setText(QApplication::translate("MainWindow", "Organisms alive:", nullptr));
+        lb_organism_size->setText(QApplication::translate("MainWindow", "Average organism size:", nullptr));
+        lb_mouth_num->setText(QApplication::translate("MainWindow", "Average mouth num: ", nullptr));
+        lb_producer_num->setText(QApplication::translate("MainWindow", "Average producer num: ", nullptr));
+        lb_mover_num->setText(QApplication::translate("MainWindow", "Average mover num:", nullptr));
+        lb_killer_num->setText(QApplication::translate("MainWindow", "Average killer num:", nullptr));
+        lb_armor_num->setText(QApplication::translate("MainWindow", "Average armor num: ", nullptr));
+        lb_eye_num->setText(QApplication::translate("MainWindow", "Average eye num: ", nullptr));
         Tabs->setTabText(Tabs->indexOf(statistics_tab), QApplication::translate("MainWindow", "Statistics", nullptr));
         rb_single_thread_mode->setText(QApplication::translate("MainWindow", "Single thread CPU", nullptr));
+        rb_partial_multi_thread_mode->setText(QApplication::translate("MainWindow", "Partial multi-thread CPU", nullptr));
         rb_multi_thread_mode->setText(QApplication::translate("MainWindow", "Multi-thread CPU", nullptr));
         rb_cuda_mode->setText(QApplication::translate("MainWindow", "CUDA", nullptr));
         cb_stop_console_output->setText(QApplication::translate("MainWindow", "Stop console output", nullptr));
         label->setText(QApplication::translate("MainWindow", "Set number of CPU threads:", nullptr));
         le_num_threads->setText(QApplication::translate("MainWindow", "1", nullptr));
-        cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
+        label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
+        le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
         Tabs->setTabText(Tabs->indexOf(simulation_settings_tab), QApplication::translate("MainWindow", "Simulation Settings", nullptr));
     } // retranslateUi
 
