@@ -211,8 +211,8 @@ public:
     QLabel *label_19;
     QLineEdit *le_float_number_precision;
     QCheckBox *cb_disable_warnings;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -624,7 +624,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 98, 761));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 761));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -943,6 +943,7 @@ public:
         horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
         cb_food_blocks_reproduction = new QCheckBox(widget);
         cb_food_blocks_reproduction->setObjectName(QString::fromUtf8("cb_food_blocks_reproduction"));
+        cb_food_blocks_reproduction->setEnabled(false);
         cb_food_blocks_reproduction->setChecked(true);
 
         horizontalLayout_14->addWidget(cb_food_blocks_reproduction);
@@ -1017,7 +1018,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 238, 265));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 265));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         lb_total_engine_ticks = new QLabel(scrollAreaWidgetContents_4);
@@ -1093,7 +1094,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 238));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 238));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);

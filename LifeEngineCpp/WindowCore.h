@@ -167,10 +167,11 @@ private:
     bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
 
-    //TODO if == 1, then prints one pixel for one simulation block. If > 1, then loads texture texture (if exists).
+    //TODO implement it
     int cell_size = 1;
-    int new_simulation_width = 600;
-    int new_simulation_height = 600;
+
+    int new_simulation_width = 200;
+    int new_simulation_height = 200;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
     bool override_evolution_controls_slot = false;
@@ -199,6 +200,8 @@ private:
     void resize_image();
     void set_image_pixel(int x, int y, QColor & color);
     bool compare_pixel_color(int x, int y, QColor & color);
+
+    void calculate_new_simulation_size();
 
     void unpause_engine();
 

@@ -59,6 +59,7 @@ void WindowCore::b_reset_slot() {
 
 void WindowCore::b_resize_and_reset_slot() {
     resize_simulation_grid_flag = true;
+    //Ok, it breaks
     //resize_simulation_space();
 }
 

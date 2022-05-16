@@ -24,7 +24,8 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_num_threads(1);
 
     dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+
     engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), std::ref(sp), engine_mutex);
 
     make_walls();
@@ -441,6 +442,13 @@ void WindowCore::clear_organisms() {
     dc.to_place_organisms.clear();
 }
 
+void WindowCore::calculate_new_simulation_size() {
+    auto window_size = _ui.simulation_graphicsView->viewport()->size();
+
+    new_simulation_width  = window_size.width() / cell_size;
+    new_simulation_height = window_size.height() / cell_size;
+}
+
 void WindowCore::resize_simulation_space() {
     if (!disable_warnings) {
         auto msg = DescisionMessageBox("Warning",
@@ -454,6 +462,7 @@ void WindowCore::resize_simulation_space() {
 
     cp.engine_pause = true;
     wait_for_engine_to_pause();
+    if (fill_window) {calculate_new_simulation_size();}
 
     dc.simulation_width = new_simulation_width;
     dc.simulation_height = new_simulation_height;
@@ -461,20 +470,11 @@ void WindowCore::resize_simulation_space() {
     dc.single_thread_simulation_grid.clear();
     dc.second_simulation_grid.clear();
 
-    auto block = BaseGridBlock{};
-    block.type = BlockTypes::EmptyBlock;
-
-    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
-    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
-
-    clear_organisms();
-
-    make_walls();
+    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
 
     cp.build_threads = true;
     reset_world();
-
-    unpause_engine();
 
     reset_scale_view();
 }
@@ -485,15 +485,14 @@ void WindowCore::partial_clear_world() {
 
     clear_organisms();
 
-    for (auto & column: dc.single_thread_simulation_grid)        {for (auto & block: column) { block.type = BlockTypes::EmptyBlock;}}
-    for (auto & column: dc.second_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.single_thread_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.second_simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
 
     dc.total_engine_ticks = 0;
 }
 
 void WindowCore::reset_world() {
     partial_clear_world();
-    clear_organisms();
     make_walls();
 
     base_organism->x = dc.simulation_width / 2;
@@ -527,16 +526,13 @@ void WindowCore::make_walls() {
     auto wall_thickness = 1;
 
     for (int x = 0; x < dc.simulation_width; x++) {
-        for (int i = 0; i < wall_thickness; i++) {
-            dc.single_thread_simulation_grid[x][i].type = BlockTypes::WallBlock;
-            dc.single_thread_simulation_grid[x][dc.simulation_height - 1 - i].type = BlockTypes::WallBlock;
-        }
+        dc.single_thread_simulation_grid[x][0].type = BlockTypes::WallBlock;
+        dc.single_thread_simulation_grid[x][dc.simulation_height-1].type = BlockTypes::WallBlock;
     }
-    for (int y = 0; y < dc.simulation_width; y++) {
-        for (int i = 0; i < wall_thickness; i++) {
-            dc.single_thread_simulation_grid[i][y].type = BlockTypes::WallBlock;
-            dc.single_thread_simulation_grid[dc.simulation_width - 1 - i][y].type = BlockTypes::WallBlock;
-        }
+
+    for (int y = 0; y < dc.simulation_height; y++) {
+        dc.single_thread_simulation_grid[0][y].type = BlockTypes::WallBlock;
+        dc.single_thread_simulation_grid[dc.simulation_width -1][y].type = BlockTypes::WallBlock;
     }
 }
 

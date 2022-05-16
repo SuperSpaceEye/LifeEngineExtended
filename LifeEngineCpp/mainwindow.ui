@@ -772,7 +772,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>506</width>
                   <height>761</height>
                  </rect>
                 </property>
@@ -1195,6 +1195,9 @@ p, li { white-space: pre-wrap; }
                        <layout class="QHBoxLayout" name="horizontalLayout_14">
                         <item>
                          <widget class="QCheckBox" name="cb_food_blocks_reproduction">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
                           <property name="text">
                            <string>Food blocks reproduction</string>
                           </property>
@@ -1300,7 +1303,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>238</width>
+                  <width>506</width>
                   <height>265</height>
                  </rect>
                 </property>
@@ -1424,7 +1427,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>506</width>
                   <height>238</height>
                  </rect>
                 </property>
@@ -2647,11 +2650,11 @@ p, li { white-space: pre-wrap; }
   <slot>le_global_brain_mutation_rate_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>
