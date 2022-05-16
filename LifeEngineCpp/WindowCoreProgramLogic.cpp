@@ -46,15 +46,17 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
     auto anatomy = std::make_shared<Anatomy>();
     anatomy->set_block(BlockTypes::MouthBlock, 0, 0);
-    anatomy->set_block(BlockTypes::ProducerBlock, -1, -1);
+    anatomy->set_block(BlockTypes::MoverBlock, -1, -1);
     anatomy->set_block(BlockTypes::ProducerBlock, 1, 1);
 
+    auto brain = std::make_shared<Brain>(&mt, BrainTypes::RandomActions);
 
     //TODO very important. organism calls destructor for some reason, deallocating anatomy.
-    base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, anatomy, &sp, &op, &mt);
-    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, std::make_shared<Anatomy>(anatomy), &sp, &op, &mt);
+    base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, anatomy, brain, &sp, &op, &mt);
+    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain), &sp, &op, &mt);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
+    
 
     resize_image();
     reset_scale_view();

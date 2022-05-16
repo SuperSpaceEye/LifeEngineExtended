@@ -29,7 +29,8 @@ public:
     // for how much organism already lived.
     int lifetime = 0;
 
-    float mutaion_rate = 0.05;
+    float anatomy_mutation_rate = 0.05;
+    float brain_mutation_rate = 0.1;
 
     float food_collected = 0;
     float food_needed = 0;
@@ -40,19 +41,23 @@ public:
     bool child_ready = false;
 
     std::shared_ptr<Anatomy> organism_anatomy = nullptr;
-    Brain * brain;
+    std::shared_ptr<Brain> brain = nullptr;
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
     Organism * child_pattern = nullptr;
 
     std::mt19937* mt = nullptr;
 
-    float calculate_max_life(const std::shared_ptr<Anatomy>& anatomy);
-    int calculate_organism_lifetime(const std::shared_ptr<Anatomy>& anatomy);
-    float calculate_food_needed(const std::shared_ptr<Anatomy>& anatomy);
+    float calculate_max_life();
+    int calculate_organism_lifetime();
+    float calculate_food_needed();
+
+    void mutate_anatomy(std::shared_ptr<Anatomy> & new_anatomy);
+    void mutate_brain(std::shared_ptr<Anatomy> & new_anatomy, std::shared_ptr<Brain> & new_brain);
 //public:
-    Organism(int x, int y, bool* can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
-             SimulationParameters* sp, OrganismBlockParameters* block_parameters, std::mt19937* mt);
+    Organism(int x, int y, bool * can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
+             std::shared_ptr<Brain> brain, SimulationParameters* sp, OrganismBlockParameters* block_parameters,
+             std::mt19937* mt);
     Organism(Organism *organism);
     Organism()=default;
     ~Organism();

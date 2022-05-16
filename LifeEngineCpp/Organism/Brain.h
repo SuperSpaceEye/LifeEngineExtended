@@ -8,13 +8,15 @@
 #include <cstdint>
 #include <vector>
 #include <random>
+#include <memory>
+
 #include "../BlockTypes.h"
 
 enum class BrainDecision {
     //Movement
     MoveUp,
-    MoveDown,
     MoveLeft,
+    MoveDown,
     MoveRight,
 
     RotateLeft,
@@ -49,13 +51,15 @@ private:
     BrainDecision get_simple_action(std::vector<Observation> & observations_vector);
 public:
     Brain()=default;
-    Brain(Brain& brain);
+    explicit Brain(std::shared_ptr<Brain> & brain);
     Brain(std::mt19937 * mt, BrainTypes brain_type);
 
     std::mt19937 * mt;
     BrainTypes brain_type;
 
     BrainDecision get_decision(std::vector<Observation> & observation_vector);
+
+    Brain * mutate();
 
 };
 

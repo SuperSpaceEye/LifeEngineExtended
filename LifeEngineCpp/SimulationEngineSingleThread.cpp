@@ -25,8 +25,9 @@ void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, Simulation
     for (int i = 0; i < dc->organisms.size(); i++) {tick_lifetime(dc, to_erase, dc->organisms[i], i);}
     for (int i = 0; i < to_erase.size(); ++i)      {erase_organisms(dc, to_erase, i);}
 
-    for (auto & organism: dc->organisms) {get_observation(dc, organism);}
-    for (int i = 0; i < dc->organisms.size(); i++) {make_decision(dc, dc->organisms[i], organisms_observations[i]);}
+    get_observations(dc, dc->organisms, organisms_observations);
+    for (int i = 0; i < dc->organisms.size(); i++) {
+        make_decision(dc, sp, dc->organisms[i],organisms_observations[i]);}
     //TODO VERY IMPORTANT! invalid read here
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
     //for (auto & organism: dc->organisms) {move_organism();}
@@ -34,6 +35,10 @@ void SimulationEngine::single_threaded_tick(EngineDataContainer * dc, Simulation
 
 //Each producer will add one run of producing a food
 void SimulationEngine::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, std::mt19937 & mt) {
+    if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
+    if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
+    if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
+
     for (int i = 0; i < organism->organism_anatomy->_producer_blocks; i++) {
         for (auto & pc: organism->organism_anatomy->_producing_space) {
             //if (check_if_out_of_boundaries(dc, organism, pc)) {continue;}
@@ -96,13 +101,136 @@ void SimulationEngine::reserve_observations(std::vector<std::vector<Observation>
     //for (auto & item: observations_count) {observations.emplace_back(std::vector<Observation>(item));}
 }
 
-void SimulationEngine::get_observation(EngineDataContainer *dc, Organism *organism) {
+void SimulationEngine::get_observations(EngineDataContainer *dc, std::vector<Organism *> &organisms,
+                                        std::vector<std::vector<Observation>> &organism_observations) {
+    for (int i = 0; i < organisms.size(); i++) {
+        if (organisms[0]->organism_anatomy->_eye_blocks <= 0) {continue;}
+    }
+}
+
+void SimulationEngine::rotate_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision) {
+    auto new_int_rotation = static_cast<int>(organism->rotation);
+    switch (decision) {
+        case BrainDecision::RotateLeft:
+            new_int_rotation += 1;
+            break;
+        case BrainDecision::RotateRight:
+            new_int_rotation -= 1;
+            break;
+        case BrainDecision::Flip:
+            new_int_rotation += 2;
+            break;
+        default: break;
+    }
+    if (new_int_rotation < 0) {new_int_rotation+=4;}
+    if (new_int_rotation > 3) {new_int_rotation-=4;}
+
+    auto new_rotation = static_cast<Rotation>(new_int_rotation);
+
+
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                           [organism->y + block.get_pos(organism->rotation).y].type = EmptyBlock;
+    }
+
+    //TODO this is stupid and needs reworking.
+    //Every block of an organism on a grid is empty, so if in place of a rotated is not empty, then it is block of other
+    //organism, and rotation is impossible, so return organism blocks on their place, and exit function.
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        if (dc->simulation_grid[organism->x + block.get_pos(new_rotation).x]
+                               [organism->y + block.get_pos(new_rotation).y].type != EmptyBlock) {
+
+            for (auto & block: organism->organism_anatomy->_organism_blocks) {
+                dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                                   [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+            }
+            return;
+        }
+    }
+
+    //If there is a place for rotated organism, then rotation can happen
+    organism->rotation = new_rotation;
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                           [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+    }
+
+}
+void SimulationEngine::move_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision) {
+    auto new_int_decision = static_cast<int>(decision) + static_cast<int>(organism->rotation);
+    if (new_int_decision > 3) {new_int_decision -= 4;}
+    auto new_decision = static_cast<BrainDecision>(new_int_decision);
+
+    int new_x = organism->x;
+    int new_y = organism->y;
+
+    switch (new_decision) {
+        case BrainDecision::MoveUp:
+            new_y -= 1;
+            break;
+        case BrainDecision::MoveLeft:
+            new_x -= 1;
+            break;
+        case BrainDecision::MoveDown:
+            new_y += 1;
+            break;
+        case BrainDecision::MoveRight:
+            new_x += 1;
+            break;
+        default: break;
+    }
+
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                           [organism->y + block.get_pos(organism->rotation).y].type = EmptyBlock;
+    }
+
+    //TODO this is also stupid and needs reworking.
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        if (dc->simulation_grid[new_x + block.get_pos(organism->rotation).x]
+                               [new_y + block.get_pos(organism->rotation).y].type != EmptyBlock) {
+            for (auto & block: organism->organism_anatomy->_organism_blocks) {
+                dc->simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                                   [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+            }
+            return;
+        }
+    }
+
+    //If there is a place for rotated organism, then rotation can happen
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        dc->simulation_grid[new_x + block.get_pos(organism->rotation).x]
+                           [new_y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+    }
+
+    organism->x = new_x;
+    organism->y = new_y;
 
 }
 
-void SimulationEngine::make_decision(EngineDataContainer *dc, Organism *organism,
-                                     std::vector<Observation> & organism_observations) {
+void SimulationEngine::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
+                                     std::vector<Observation> &organism_observations) {
     auto decision = organism->brain->get_decision(organism_observations);
+
+    switch (decision) {
+        case BrainDecision::MoveUp:
+        case BrainDecision::MoveDown:
+        case BrainDecision::MoveLeft:
+        case BrainDecision::MoveRight:
+            if (organism->organism_anatomy->_mover_blocks > 0) {
+                move_organism(dc, organism, decision);
+            }
+            break;
+        case BrainDecision::RotateLeft:
+        case BrainDecision::RotateRight:
+        case BrainDecision::Flip:
+            if (organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
+                rotate_organism(dc, organism, decision);
+            }
+            break;
+
+        default: break;
+    }
 }
 
 void SimulationEngine::try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,

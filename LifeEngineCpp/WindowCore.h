@@ -276,10 +276,12 @@ private slots:
     void le_max_reproducing_distance_slot();
     void le_max_organisms_slot();
     void le_float_number_precision_slot();
+    void le_killer_damage_amount_slot();
+    void le_produce_food_every_n_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
-    void cb_use_evolved_mutation_rate_slot(bool state);
+    void cb_use_evolved_anatomy_mutation_rate_slot(bool state);
     void cb_movers_can_produce_food_slot(bool state);
     void cb_food_blocks_reproduction_slot(bool state);
     void cb_stop_console_output_slot(bool state);
@@ -292,6 +294,7 @@ private slots:
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_runtime_rotation_enabled_slot(bool state);
     void cb_fix_reproduction_distance_slot(bool state);
+    void cb_use_evolved_brain_mutation_rate_slot(bool state);
 
 public:
     WindowCore(int simulation_width, int simulation_height,

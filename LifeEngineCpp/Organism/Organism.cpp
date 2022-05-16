@@ -8,21 +8,23 @@
 #include "Rotation.h"
 
 Organism::Organism(int x, int y, bool * can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
-                   SimulationParameters* sp, OrganismBlockParameters* block_parameters, std::mt19937* mt):
-        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(std::move(anatomy)), sp(sp),
-        bp(block_parameters), mt(mt) {
-    calculate_max_life(organism_anatomy);
-    calculate_organism_lifetime(organism_anatomy);
-    calculate_food_needed(organism_anatomy);
-    brain = new Brain{mt, BrainTypes::RandomActions};
+                   std::shared_ptr<Brain> brain, SimulationParameters* sp, OrganismBlockParameters* block_parameters,
+                   std::mt19937* mt):
+//        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(std::move(anatomy)), sp(sp),
+//        bp(block_parameters), mt(mt), brain(std::move(brain)) {
+        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(anatomy), sp(sp),
+        bp(block_parameters), mt(mt), brain(brain) {
+    calculate_max_life();
+    calculate_organism_lifetime();
+    calculate_food_needed();
 }
 
 Organism::Organism(Organism *organism): x(organism->x), y(organism->y), can_rotate(organism->can_rotate),
                                         rotation(organism->rotation), organism_anatomy(organism->organism_anatomy), sp(organism->sp),
                                         bp(organism->bp), mt(organism->mt), brain(organism->brain) {
-    calculate_max_life(organism_anatomy);
-    calculate_organism_lifetime(organism_anatomy);
-    calculate_food_needed(organism_anatomy);
+    calculate_max_life();
+    calculate_organism_lifetime();
+    calculate_food_needed();
 }
 
 Organism::~Organism() {
@@ -30,9 +32,9 @@ Organism::~Organism() {
     delete child_pattern;
 }
 
-float Organism::calculate_max_life(const std::shared_ptr<Anatomy>& anatomy) {
+float Organism::calculate_max_life() {
     life_points = 0;
-    for (auto& item: anatomy->_organism_blocks) {
+    for (auto& item: organism_anatomy->_organism_blocks) {
         switch (item.organism_block.type) {
             case MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
             case ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
@@ -51,14 +53,14 @@ float Organism::calculate_max_life(const std::shared_ptr<Anatomy>& anatomy) {
 }
 
 //TODO for the future
-int Organism::calculate_organism_lifetime(const std::shared_ptr<Anatomy>& anatomy) {
-    max_lifetime = anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
+int Organism::calculate_organism_lifetime() {
+    max_lifetime = organism_anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
     return max_lifetime;
 }
 
-float Organism::calculate_food_needed(const std::shared_ptr<Anatomy>& anatomy) {
+float Organism::calculate_food_needed() {
     food_needed = 0;
-    for (auto & block: anatomy->_organism_blocks) {
+    for (auto & block: organism_anatomy->_organism_blocks) {
         switch (block.organism_block.type) {
             case MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
             case ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
@@ -75,17 +77,25 @@ float Organism::calculate_food_needed(const std::shared_ptr<Anatomy>& anatomy) {
     return food_needed;
 }
 
-Organism * Organism::create_child() {
-    bool mutate;
-    std::shared_ptr<Anatomy> new_anatomy;
+void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy) {
+    bool mutate_anatomy;
+    bool mutated = false;
 
-    if (sp->use_evolved_mutation_rate) {
-
+    if (sp->use_anatomy_evolved_mutation_rate) {
+        if (std::uniform_real_distribution<float>(0,1)(*mt) <= 0.5) {
+            anatomy_mutation_rate += sp->anatomy_mutations_rate_mutation_modifier;
+        } else {
+            anatomy_mutation_rate -= sp->anatomy_mutations_rate_mutation_modifier;
+            if (anatomy_mutation_rate < sp->anatomy_min_possible_mutation_rate) {
+                anatomy_mutation_rate = sp->anatomy_min_possible_mutation_rate;
+            }
+        }
+        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*mt) <= anatomy_mutation_rate;
     } else {
-        mutate = std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->global_mutation_rate;
+        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->global_anatomy_mutation_rate;
     }
 
-    if (mutate) {
+    if (mutate_anatomy) {
         int total_chance = 0;
         total_chance += sp->add_cell;
         total_chance += sp->change_cell;
@@ -96,21 +106,58 @@ Organism * Organism::create_child() {
         //TODO i don't like this stairs of if's end else's.
         if (choice < sp->add_cell) {
             new_anatomy.reset(new Anatomy(organism_anatomy->add_random_block(*bp, *mt)));
+            mutated = true;
         } else {
             choice -= sp->add_cell;
             if (choice < sp->change_cell) {
                 new_anatomy.reset(new Anatomy(organism_anatomy->change_random_block(*bp, *mt)));
+                mutated = true;
             } else {
                 choice -= sp->change_cell;
                 if (choice < sp->remove_cell && organism_anatomy->_organism_blocks.size() > 1) {
                     new_anatomy.reset(new Anatomy(organism_anatomy->remove_random_block(*mt)));
+                    mutated = true;
                 }
             }
         }
-    } else {
+    }
+    if (!mutated) {
         new_anatomy.reset(new Anatomy(organism_anatomy));
     }
+}
 
-    //TODO VERY IMPORTANT! leak here? when try_make_child
-    return new Organism(0, 0, can_rotate, rotation, new_anatomy, sp, bp, mt);
+void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> & new_brain) {
+    bool mutate_brain;
+
+    if (sp->use_brain_evolved_mutation_rate) {
+        if (std::uniform_real_distribution<float>(0,1)(*mt) <= 0.5) {
+            brain_mutation_rate += sp->brain_mutation_rate_mutation_modifier;
+        } else {
+            brain_mutation_rate -= sp->brain_mutation_rate_mutation_modifier;
+            if (brain_mutation_rate < sp->brain_min_possible_mutation_rate) {
+                brain_mutation_rate = sp->brain_min_possible_mutation_rate;
+            }
+        }
+        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*mt) <= brain_mutation_rate;
+    } else {
+        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->global_brain_mutation_rate;
+    }
+
+    // if mutate brain
+    if (mutate_brain && new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {
+        new_brain.reset(brain->mutate());
+    } else {
+        // just copy brain from parent
+        new_brain.reset(new Brain(brain));
+    }
+}
+
+Organism * Organism::create_child() {
+    std::shared_ptr<Anatomy> new_anatomy;
+    std::shared_ptr<Brain>   new_brain;
+
+    mutate_anatomy(new_anatomy);
+    mutate_brain(new_anatomy, new_brain);
+
+    return new Organism(0, 0, can_rotate, rotation, new_anatomy, new_brain, sp, bp, mt);
 }

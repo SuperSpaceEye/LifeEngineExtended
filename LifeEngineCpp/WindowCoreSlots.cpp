@@ -206,12 +206,12 @@ void WindowCore::le_extra_reproduction_cost_slot() {
 }
 
 void WindowCore::le_global_mutation_rate_slot() {
-    float fallback = sp.global_mutation_rate;
-    auto result = try_convert_message_box_template<float>("Inputted text is not an int", _ui.le_global_mutation_rate,
+    float fallback = sp.global_anatomy_mutation_rate;
+    auto result = try_convert_message_box_template<float>("Inputted text is not an int", _ui.le_global_anatomy_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.global_mutation_rate = result.result;
+    sp.global_anatomy_mutation_rate = result.result;
 }
 
 void WindowCore::le_add_cell_slot() {
@@ -271,6 +271,21 @@ void WindowCore::le_float_number_precision_slot() {
     float_precision = result.result;
 }
 
+void WindowCore::le_killer_damage_amount_slot() {
+    float fallback = sp.killer_damage_amount;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_killer_damage_amount, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    sp.killer_damage_amount = result.result;
+}
+void WindowCore::le_produce_food_every_n_slot() {
+    int fallback = sp.produce_food_every_n_life_ticks;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_produce_food_every_n_tick, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    sp.produce_food_every_n_life_ticks = result.result;
+}
+
 //==================== Radio buttond ====================
 
 void WindowCore::rb_food_slot() {
@@ -319,10 +334,14 @@ void WindowCore::cb_synchronise_simulation_and_window_slot(bool state) {
     cp.engine_pause = state;
 }
 
-void WindowCore::cb_use_evolved_mutation_rate_slot(bool state) {
-    sp.use_evolved_mutation_rate = state;
-    _ui.le_global_mutation_rate->setDisabled(state);
-    _ui.lb_mutation_rate->setDisabled(state);
+void WindowCore::cb_use_evolved_anatomy_mutation_rate_slot(bool state) {
+    sp.use_anatomy_evolved_mutation_rate = state;
+    _ui.le_global_anatomy_mutation_rate->setDisabled(state);
+}
+
+void WindowCore::cb_use_evolved_brain_mutation_rate_slot(bool state) {
+    sp.use_brain_evolved_mutation_rate = state;
+    _ui.le_global_brain_mutation_rate->setDisabled(state);
 }
 
 void WindowCore::cb_reproduction_rotation_enabled_slot  (bool state) { sp.reproduction_rotation_enabled = state;}
