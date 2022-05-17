@@ -45,11 +45,15 @@ void WindowCore::tb_stoprender_slot(bool stopped_render) {
 //==================== Buttons ====================
 
 void WindowCore::b_clear_slot() {
-    clear_world();
+    if (display_dialog_message("All organisms and simulation grid will be cleared.")) {
+        clear_world();
+    }
 }
 
 void WindowCore::b_reset_slot() {
-    reset_world();
+    if (display_dialog_message("All organisms and simulation grid will be reset.")) {
+        reset_world();
+    }
 }
 
 void WindowCore::b_resize_and_reset_slot() {
@@ -82,6 +86,7 @@ void WindowCore::b_reset_view_slot() {
 }
 
 void WindowCore::b_kill_all_organisms_slot() {
+    if (!display_dialog_message("All organisms will be killed.")) {return;}
     cp.engine_pause = true;
     wait_for_engine_to_pause();
 
@@ -346,7 +351,7 @@ void WindowCore::cb_use_evolved_brain_mutation_rate_slot(bool state) {
 
 void WindowCore::cb_reproduction_rotation_enabled_slot  (bool state) { sp.reproduction_rotation_enabled = state;}
 
-void WindowCore::cb_on_touch_kill_slot                  (bool state) { sp.one_touch_kill = state;}
+void WindowCore::cb_on_touch_kill_slot                  (bool state) { sp.on_touch_kill = state;}
 
 void WindowCore::cb_movers_can_produce_food_slot        (bool state) { sp.movers_can_produce_food = state;}
 

@@ -85,7 +85,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="horizontalFrame">
+    <widget class="QFrame" name="menu_frame">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -190,6 +190,9 @@
            </item>
            <item>
             <widget class="QLineEdit" name="le_sps">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>-1</string>
              </property>
@@ -260,6 +263,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QRadioButton" name="rb_food">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Food mode</string>
              </property>
@@ -273,6 +279,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="rb_kill">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Kill mode</string>
              </property>
@@ -283,6 +292,9 @@
            </item>
            <item>
             <widget class="QRadioButton" name="rb_wall">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Wall mode</string>
              </property>
@@ -339,7 +351,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>3</number>
+            <number>0</number>
            </property>
            <property name="iconSize">
             <size>
@@ -382,13 +394,13 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features (in the far future).&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version is basically an alpha, so many things are not implemeted and will probably change.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Important Information:&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*sps is the number of simulation ticks per second.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*setting max fps/sps/organisms to &amp;lt;0 will enable unlimited mode.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*setting max fps/sps/num organisms to &amp;lt;0 will enable unlimited mode.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*checking &amp;quot;Fix reproducing distance&amp;quot; will set reproducing distance to min value.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Not implemented:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &amp;quot;M&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="overwriteMode">
                 <bool>false</bool>
@@ -401,6 +413,19 @@ p, li { white-space: pre-wrap; }
             <attribute name="title">
              <string>Editor</string>
             </attribute>
+            <widget class="QLabel" name="label_22">
+             <property name="geometry">
+              <rect>
+               <x>60</x>
+               <y>40</y>
+               <width>311</width>
+               <height>91</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Not implemented yet.</string>
+             </property>
+            </widget>
            </widget>
            <widget class="QWidget" name="world_controls_tab">
             <attribute name="title">
@@ -590,6 +615,9 @@ p, li { white-space: pre-wrap; }
                      <layout class="QVBoxLayout" name="verticalLayout_22">
                       <item>
                        <widget class="QPushButton" name="b_generate_random_walls">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Generate random walls</string>
                         </property>
@@ -597,6 +625,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QCheckBox" name="cb_generate_random_walls_on_reset">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Generate random walls on reset</string>
                         </property>
@@ -604,6 +635,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QPushButton" name="b_clear_all_walls">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Clear all walls</string>
                         </property>
@@ -611,6 +645,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QCheckBox" name="cb_clear_walls_on_reset">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Clear walls on reset</string>
                         </property>
@@ -618,6 +655,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QPushButton" name="b_save_world">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Save world</string>
                         </property>
@@ -627,6 +667,9 @@ p, li { white-space: pre-wrap; }
                        <layout class="QHBoxLayout" name="horizontalLayout_21">
                         <item>
                          <widget class="QPushButton" name="b_load_world">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
                           <property name="text">
                            <string>Load world</string>
                           </property>
@@ -634,6 +677,9 @@ p, li { white-space: pre-wrap; }
                         </item>
                         <item>
                          <widget class="QCheckBox" name="cb_override_evolution_controls">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
                           <property name="text">
                            <string>Override Evolution Controls</string>
                           </property>
@@ -717,9 +763,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-456</y>
+                  <y>0</y>
                   <width>412</width>
-                  <height>1018</height>
+                  <height>666</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -755,7 +801,7 @@ p, li { white-space: pre-wrap; }
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
-                     <height>1000</height>
+                     <height>0</height>
                     </size>
                    </property>
                    <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
@@ -1208,7 +1254,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>412</width>
-                  <height>219</height>
+                  <height>265</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -1223,6 +1269,20 @@ p, li { white-space: pre-wrap; }
                   <widget class="QLabel" name="lb_organisms_alive">
                    <property name="text">
                     <string>Organisms alive:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_anatomy_mutation_rate">
+                   <property name="text">
+                    <string>Average anatomy mutation rate:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_brain_mutation_rate">
+                   <property name="text">
+                    <string>Average brain mutation rate:</string>
                    </property>
                   </widget>
                  </item>
@@ -1378,6 +1438,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QRadioButton" name="rb_partial_multi_thread_mode">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Partial multi-thread CPU</string>
                         </property>
@@ -1388,6 +1451,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QRadioButton" name="rb_multi_thread_mode">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>Multi-thread CPU</string>
                         </property>
@@ -1401,6 +1467,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QRadioButton" name="rb_cuda_mode">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>CUDA</string>
                         </property>
@@ -1432,6 +1501,9 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QLineEdit" name="le_num_threads">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
                         <property name="text">
                          <string>1</string>
                         </property>
@@ -2436,11 +2508,11 @@ p, li { white-space: pre-wrap; }
   <slot>cb_use_evolved_brain_mutation_rate_slot(bool)</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

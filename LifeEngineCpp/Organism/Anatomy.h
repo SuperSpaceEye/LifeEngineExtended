@@ -12,7 +12,7 @@
 #include "Organism_parts/OrganismBlock.h"
 #include "Rotation.h"
 #include "../OrganismBlockParameters.h"
-#include "../BlockTypes.h"
+#include "../BlockTypes.hpp"
 
 //TODO refactor this
 //TODO this code is a mess and i became confused, so i don't really know if it will even work.

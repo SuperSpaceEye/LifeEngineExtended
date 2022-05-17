@@ -10,7 +10,7 @@
 #include <random>
 #include <memory>
 
-#include "../BlockTypes.h"
+#include "../BlockTypes.hpp"
 
 enum class BrainDecision {
     //Movement

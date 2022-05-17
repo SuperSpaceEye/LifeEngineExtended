@@ -6,7 +6,7 @@
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
 #include <iostream>
-#include "../BlockTypes.h"
+#include "../BlockTypes.hpp"
 
 class BaseGridBlock {
 public:

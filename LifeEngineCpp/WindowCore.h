@@ -92,6 +92,8 @@ struct OrganismAvgBlockInformation {
     float _killer_blocks   = 0;
     float _armor_blocks    = 0;
     float _eye_blocks      = 0;
+    float brain_mutation_rate = 0;
+    float anatomy_mutation_rate = 0;
 };
 
 //TODO expand About page.
@@ -156,7 +158,7 @@ private:
     bool pause_image_construction = false;
     bool full_simulation_grid_parsed = false;
 
-    bool stop_console_output = false;
+    bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
 
     //TODO if == 1, then prints one pixel for one simulation block. If > 1, then loads texture texture (if exists).
@@ -168,7 +170,7 @@ private:
     bool override_evolution_controls_slot = false;
     bool reset_with_chosen = false;
 
-    int float_precision = 2;
+    int float_precision = 4;
     int auto_reset_num = 0;
 
     bool resize_simulation_grid_flag = false;
@@ -177,6 +179,9 @@ private:
     Organism * chosen_organism;
 
     std::mt19937 mt;
+
+    bool menu_hidden = false;
+    bool allow_menu_hidden_change = true;
 
     void mainloop_tick();
     void window_tick();
@@ -224,11 +229,14 @@ private:
     void reset_world();
     void clear_world();
 
+    void initialize_gui_settings();
+
     OrganismAvgBlockInformation calculate_organisms_info();
 
-
-    void wheelEvent(QWheelEvent *event);
-    bool eventFilter(QObject *watched, QEvent *event);
+    void wheelEvent(QWheelEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
+    void keyPressEvent(QKeyEvent * event) override;
+    void keyReleaseEvent(QKeyEvent * event) override;
 
     template<typename T>
     result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);

@@ -24,9 +24,8 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
     set_simulation_num_threads(simulation_num_threads);
 
-    dc.simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
+    dc.single_thread_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
     dc.second_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
-    //engine = new SimulationEngine(simulation_width, simulation_height, std::ref(simulation_grid), std::ref(engine_ticks), std::ref(engine_working), std::ref(engine_paused), std::ref(engine_mutex));
     engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), std::ref(sp), engine_mutex);
 
     make_walls();
@@ -37,7 +36,7 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 //
 //    for (int relative_x = 0; relative_x < simulation_width; relative_x++) {
 //        for (int relative_y = 0; relative_y < simulation_height; relative_y++) {
-//            simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(mt));
+//            single_thread_simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(mt));
 //        }
 //    }
 
@@ -46,14 +45,17 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
     auto anatomy = std::make_shared<Anatomy>();
     anatomy->set_block(BlockTypes::MouthBlock, 0, 0);
-    anatomy->set_block(BlockTypes::MoverBlock, -1, -1);
+    anatomy->set_block(BlockTypes::ProducerBlock, -1, -1);
     anatomy->set_block(BlockTypes::ProducerBlock, 1, 1);
 
     auto brain = std::make_shared<Brain>(&mt, BrainTypes::RandomActions);
 
     //TODO very important. organism calls destructor for some reason, deallocating anatomy.
-    base_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, anatomy, brain, &sp, &op, &mt);
-    chosen_organism = new Organism(dc.simulation_width/2, dc.simulation_height/2, &sp.reproduction_rotation_enabled, Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain), &sp, &op, &mt);
+    base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
+                                 Rotation::UP, anatomy, brain, &sp, &op, &mt);
+    chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
+                                   Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
+                                   &sp, &op, &mt);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
     
@@ -72,6 +74,9 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
         scene.addItem(&pixmap_item);
         _ui.simulation_graphicsView->setScene(&scene);
+
+        reset_scale_view();
+        initialize_gui_settings();
     });
 
     timer = new QTimer(parent);
@@ -81,7 +86,7 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     set_simulation_interval(simulation_fps);
 
     timer->start();
-    reset_scale_view();
+    //reset_scale_view();
 }
 
 void WindowCore::mainloop_tick() {
@@ -111,8 +116,10 @@ void WindowCore::mainloop_tick() {
 
         if (!stop_console_output) {
             std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second | "
-            << dc.organisms.size() << " organisms alive | " << info.size << " average organism_size | "
+            << dc.organisms.size() << " organisms alive | " << to_str(info.size, float_precision) << " average organism_size | "
             << to_str(dc.total_engine_ticks, float_precision) << " total engine ticks\n"
+            << to_str(info.anatomy_mutation_rate, float_precision) << " average anatomy mutation rate | "
+            << to_str(info.brain_mutation_rate, float_precision) << " average brain mutation rate | "
             << to_str(info._eye_blocks,      float_precision) << " average mouth num | "
             << to_str(info._producer_blocks, float_precision) << " average producer num | "
             << to_str(info._mover_blocks,    float_precision) << " average mover num | "
@@ -318,7 +325,7 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
         if (x < 0 || x >= dc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= dc.simulation_height) { continue; }
-            dc.second_simulation_grid[x][y].type = dc.simulation_grid[x][y].type;
+            dc.second_simulation_grid[x][y].type = dc.single_thread_simulation_grid[x][y].type;
         }
     }
 }
@@ -332,7 +339,7 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
-            dc.second_simulation_grid[x][y].type = dc.simulation_grid[x][y].type;
+            dc.second_simulation_grid[x][y].type = dc.single_thread_simulation_grid[x][y].type;
         }
     }
     unpause_engine();
@@ -380,13 +387,13 @@ void WindowCore::resize_simulation_space() {
     dc.simulation_width = new_simulation_width;
     dc.simulation_height = new_simulation_height;
 
-    dc.simulation_grid.clear();
+    dc.single_thread_simulation_grid.clear();
     dc.second_simulation_grid.clear();
 
     auto block = BaseGridBlock{};
     block.type = BlockTypes::EmptyBlock;
 
-    dc.simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
+    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
     dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
 
     clear_organisms();
@@ -394,6 +401,7 @@ void WindowCore::resize_simulation_space() {
     make_walls();
 
     cp.build_threads = true;
+    reset_world();
 
     unpause_engine();
 
@@ -406,7 +414,7 @@ void WindowCore::partial_clear_world() {
 
     clear_organisms();
 
-    for (auto & column: dc.simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.single_thread_simulation_grid)        {for (auto & block: column) { block.type = BlockTypes::EmptyBlock;}}
     for (auto & column: dc.second_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
 
     dc.total_engine_ticks = 0;
@@ -416,6 +424,12 @@ void WindowCore::reset_world() {
     partial_clear_world();
     clear_organisms();
     make_walls();
+
+    base_organism->x = dc.simulation_width / 2;
+    base_organism->y = dc.simulation_height / 2;
+
+    chosen_organism->x = dc.simulation_width / 2;
+    chosen_organism->y = dc.simulation_height / 2;
 
     if (reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(chosen_organism));}
     else                   {dc.to_place_organisms.push_back(new Organism(base_organism));}
@@ -443,14 +457,14 @@ void WindowCore::make_walls() {
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int i = 0; i < wall_thickness; i++) {
-            dc.simulation_grid[x][i].type = BlockTypes::WallBlock;
-            dc.simulation_grid[x][dc.simulation_height - 1 - i].type = BlockTypes::WallBlock;
+            dc.single_thread_simulation_grid[x][i].type = BlockTypes::WallBlock;
+            dc.single_thread_simulation_grid[x][dc.simulation_height - 1 - i].type = BlockTypes::WallBlock;
         }
     }
     for (int y = 0; y < dc.simulation_width; y++) {
         for (int i = 0; i < wall_thickness; i++) {
-            dc.simulation_grid[i][y].type = BlockTypes::WallBlock;
-            dc.simulation_grid[dc.simulation_width - 1 - i][y].type = BlockTypes::WallBlock;
+            dc.single_thread_simulation_grid[i][y].type = BlockTypes::WallBlock;
+            dc.single_thread_simulation_grid[dc.simulation_width - 1 - i][y].type = BlockTypes::WallBlock;
         }
     }
 }
@@ -466,10 +480,12 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         info._killer_blocks   += organism->organism_anatomy->_killer_blocks;
         info._armor_blocks    += organism->organism_anatomy->_armor_blocks;
         info._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+
+        info.brain_mutation_rate   += organism->brain_mutation_rate;
+        info.anatomy_mutation_rate += organism->anatomy_mutation_rate;
     }
 
     info.size /= dc.organisms.size();
-
 
     info._mouth_blocks    /= dc.organisms.size();
     info._producer_blocks /= dc.organisms.size();
@@ -478,19 +494,26 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info._armor_blocks    /= dc.organisms.size();
     info._eye_blocks      /= dc.organisms.size();
 
+    info.brain_mutation_rate   /= dc.organisms.size();
+    info.anatomy_mutation_rate /= dc.organisms.size();
+
     if (std::isnan(info.size))             {info.size             = 0;}
+
     if (std::isnan(info._mouth_blocks))    {info._mouth_blocks    = 0;}
     if (std::isnan(info._producer_blocks)) {info._producer_blocks = 0;}
     if (std::isnan(info._mover_blocks))    {info._mover_blocks    = 0;}
     if (std::isnan(info._killer_blocks))   {info._killer_blocks   = 0;}
     if (std::isnan(info._armor_blocks))    {info._armor_blocks    = 0;}
     if (std::isnan(info._eye_blocks))      {info._eye_blocks      = 0;}
+
+    if (std::isnan(info.brain_mutation_rate)) {info.brain_mutation_rate    = 0;}
+    if (std::isnan(info.anatomy_mutation_rate)) {info.anatomy_mutation_rate      = 0;}
     return info;
 }
 
 void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_total_engine_ticks->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
-    _ui.lb_organisms_alive->   setText(QString::fromStdString("Organism alive: "       + std::to_string(dc.organisms.size())));
+    _ui.lb_organisms_alive->   setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
     _ui.lb_organism_size->     setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
     _ui.lb_mouth_num->         setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
     _ui.lb_producer_num->      setText(QString::fromStdString("Average producer num: "  + to_str(info._producer_blocks, float_precision)));
@@ -498,4 +521,45 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_killer_num->        setText(QString::fromStdString("Average killer num: "    + to_str(info._killer_blocks,   float_precision)));
     _ui.lb_armor_num->         setText(QString::fromStdString("Average armor num: "     + to_str(info._armor_blocks,    float_precision)));
     _ui.lb_eye_num->           setText(QString::fromStdString("Average eye num: "       + to_str(info._eye_blocks,      float_precision)));
+
+    _ui.lb_anatomy_mutation_rate->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.anatomy_mutation_rate, float_precision)));
+    _ui.lb_brain_mutation_rate->  setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.brain_mutation_rate,   float_precision)));
+}
+
+// So that changes in code values would be set by default in gui.
+void WindowCore::initialize_gui_settings() {
+    //World settings
+    _ui.le_cell_size->setText(QString::fromStdString(std::to_string(cell_size)));
+    _ui.le_simulation_width->setText(QString::fromStdString(std::to_string(dc.simulation_width)));
+    _ui.le_simulation_height->setText(QString::fromStdString(std::to_string(dc.simulation_height)));
+    _ui.cb_reset_on_total_extinction->setChecked(sp.reset_on_total_extinction);
+    _ui.cb_pause_on_total_extinction->setChecked(sp.pause_on_total_extinction);
+    _ui.le_max_organisms->setText(QString::fromStdString(std::to_string(dc.max_organisms)));
+    _ui.cb_fill_window->setChecked(fill_window);
+    //Evolution settings
+    _ui.le_food_production_probability->setText(QString::fromStdString(to_str(sp.food_production_probability, float_precision)));
+    _ui.le_produce_food_every_n_tick->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
+    _ui.le_lifespan_multiplier->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
+    _ui.le_look_range->setText(QString::fromStdString(std::to_string(sp.look_range)));
+    _ui.le_auto_food_drop_rate->setText(QString::fromStdString(std::to_string(sp.auto_food_drop_rate)));
+    _ui.le_extra_reproduction_cost->setText(QString::fromStdString(std::to_string(sp.extra_reproduction_cost)));
+    _ui.cb_use_evolved_anatomy_mutation_rate->setChecked(sp.use_anatomy_evolved_mutation_rate);
+    _ui.le_global_anatomy_mutation_rate->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate, float_precision)));
+    _ui.cb_use_evolved_brain_mutation_rate->setChecked(sp.use_brain_evolved_mutation_rate);
+    _ui.le_global_brain_mutation_rate->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate, float_precision)));
+    _ui.le_add->setText(QString::fromStdString(std::to_string(sp.add_cell)));
+    _ui.le_change->setText(QString::fromStdString(std::to_string(sp.change_cell)));
+    _ui.le_remove->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
+    _ui.cb_reproducing_rotation_enabled->setChecked(sp.reproduction_rotation_enabled);
+    _ui.cb_runtime_rotation_enabled->setChecked(sp.runtime_rotation_enabled);
+    _ui.cb_on_touch_kill->setChecked(sp.on_touch_kill);
+    _ui.cb_movers_can_produce_food->setChecked(sp.movers_can_produce_food);
+    _ui.cb_food_blocks_reproduction->setChecked(sp.food_blocks_reproduction);
+    _ui.le_min_reproduction_distance->setText(QString::fromStdString(std::to_string(sp.min_reproducing_distance)));
+    _ui.le_max_reproduction_distance->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
+    _ui.cb_fix_reproduction_distance->setChecked(sp.reproduction_distance_fixed);
+    //Simulation settings
+    _ui.cb_stop_console_output->setChecked(stop_console_output);
+    _ui.le_num_threads->setText(QString::fromStdString(std::to_string(cp.num_threads)));
+    _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
 }

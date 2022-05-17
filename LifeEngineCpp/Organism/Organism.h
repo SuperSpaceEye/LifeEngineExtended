@@ -52,12 +52,13 @@ public:
     int calculate_organism_lifetime();
     float calculate_food_needed();
 
-    void mutate_anatomy(std::shared_ptr<Anatomy> & new_anatomy);
-    void mutate_brain(std::shared_ptr<Anatomy> & new_anatomy, std::shared_ptr<Brain> & new_brain);
+    void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate);
+    void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate);
 //public:
-    Organism(int x, int y, bool * can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
-             std::shared_ptr<Brain> brain, SimulationParameters* sp, OrganismBlockParameters* block_parameters,
-             std::mt19937* mt);
+    Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
+             std::shared_ptr<Brain> brain, SimulationParameters *sp,
+             OrganismBlockParameters *block_parameters, std::mt19937 *mt, float anatomy_mutation_rate=0.5,
+             float brain_mutation_rate=0.5);
     Organism(Organism *organism);
     Organism()=default;
     ~Organism();

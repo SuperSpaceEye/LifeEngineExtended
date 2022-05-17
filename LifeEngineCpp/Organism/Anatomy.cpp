@@ -112,7 +112,7 @@ void Anatomy::create_producing_space(
         boost::unordered_map<int, boost::unordered_map<int, bool>> &producing_space,
         boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
         const int32_t producer_blocks) {
-    if (producer_blocks > 0) {
+    //if (producer_blocks > 0) {
         for (auto &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
                 if (yxmap.second.type == BlockTypes::ProducerBlock) {
@@ -125,14 +125,14 @@ void Anatomy::create_producing_space(
                 }
             }
         }
-    }
+    //}
 }
 
 void Anatomy::create_eating_space(boost::unordered_map<int, boost::unordered_map<int, OrganismBlock>> &organism_blocks,
                                   boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
                                   boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
                                   int32_t mouth_blocks) {
-    if (mouth_blocks > 0) {
+    //if (mouth_blocks > 0) {
         for (auto &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
                 if (yxmap.second.type == BlockTypes::MouthBlock) {
@@ -145,14 +145,14 @@ void Anatomy::create_eating_space(boost::unordered_map<int, boost::unordered_map
                 }
             }
         }
-    }
+    //}
 }
 
 void Anatomy::create_armor_space(boost::unordered_map<int, boost::unordered_map<int, OrganismBlock>> &organism_blocks,
                                  boost::unordered_map<int, boost::unordered_map<int, bool>> &armor_space,
                                  boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
                                  int32_t armor_blocks) {
-    if (armor_blocks > 0) {
+    //if (armor_blocks > 0) {
         for (auto &xmap: organism_blocks) {
             for (auto &yxmap: xmap.second) {
                 auto x = xmap.first;
@@ -187,7 +187,7 @@ void Anatomy::create_armor_space(boost::unordered_map<int, boost::unordered_map<
                 }
             }
         }
-    }
+    //}
 }
 
 SerializedOrganismStructureContainer * Anatomy::serialize(
