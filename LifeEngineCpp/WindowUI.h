@@ -1262,7 +1262,9 @@ public:
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*setting max fps/sps/num organisms to &lt;0 will enable unlimited mode.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*checking &quot;Fix reproducing distance&quot; will set reproducing distance to min value.</p>\n"
 "<p style="
-                        "\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p></body></html>", nullptr));
+                        "\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Github https://github.com/SuperSpaceEye/TheLifeEngineCpp</p></body></html>", nullptr));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Not implemented yet.", nullptr));
         Tabs->setTabText(Tabs->indexOf(editor_tab), QApplication::translate("MainWindow", "Editor", nullptr));
