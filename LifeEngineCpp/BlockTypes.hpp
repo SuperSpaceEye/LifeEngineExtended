@@ -2,8 +2,8 @@
 // Created by spaceeye on 23.03.2022.
 //
 
-#ifndef THELIFEENGINECPP_BLOCKTYPES_H
-#define THELIFEENGINECPP_BLOCKTYPES_H
+#ifndef THELIFEENGINECPP_BLOCKTYPES_HPP
+#define THELIFEENGINECPP_BLOCKTYPES_HPP
 
 enum BlockTypes {
     EmptyBlock,
@@ -17,4 +17,4 @@ enum BlockTypes {
     WallBlock,
 };
 
-#endif //THELIFEENGINECPP_BLOCKTYPES_H
+#endif //THELIFEENGINECPP_BLOCKTYPES_HPP
