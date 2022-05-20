@@ -28,11 +28,12 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i < dc->organisms.size(); i++)  {tick_lifetime(dc, to_erase, dc->organisms[i], i);}
     for (int i = 0; i < to_erase.size(); ++i)       {erase_organisms(dc, to_erase, i);}
 
-    auto organisms_observations = std::vector<std::vector<Observation>>{};
+    auto organisms_observations = std::vector<std::vector<Observation>>();
     reserve_observations(organisms_observations, dc->organisms);
+    get_observations(dc, sp, dc->organisms, organisms_observations);
 
-    get_observations(dc, dc->organisms, organisms_observations);
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i],organisms_observations[i]);}
+
     //TODO VERY IMPORTANT! invalid read here
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
     //for (auto & organism: dc->organisms) {move_organism();}
@@ -99,17 +100,60 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
                                                         std::vector<Organism *> &organisms) {
     auto observations_count = std::vector<int>{};
-    for (auto & organism: organisms) {
-        //std::cout << "eye blocks "<< organism->organism_anatomy->_eye_blocks << "\n";
-        observations_count.push_back(organism->organism_anatomy->_eye_blocks);}
-    observations.reserve(observations_count.size());
-    //for (auto & item: observations_count) {observations.emplace_back(std::vector<Observation>(item));}
+    observations_count.reserve(organisms.size());
+    for (auto & organism: organisms) {observations_count.emplace_back(organism->organism_anatomy->_eye_blocks);}
+    observations.reserve(organisms.size());
+    for (auto & item: observations_count) {observations.emplace_back(std::vector<Observation>(item));}
 }
 
-void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, std::vector<Organism *> &organisms,
+void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, SimulationParameters *sp,
+                                                    std::vector<Organism *> &organisms,
                                                     std::vector<std::vector<Observation>> &organism_observations) {
-    for (int i = 0; i < organisms.size(); i++) {
-        if (organisms[0]->organism_anatomy->_eye_blocks <= 0) {continue;}
+    auto organism_i = -1;
+    for (auto & organism : organisms) {
+        organism_i++;
+        if (organism->organism_anatomy->_eye_blocks <= 0) {continue;}
+        auto eye_i = -1;
+        for (auto & block: organism->organism_anatomy->_organism_blocks) {
+            if (block.type != BlockTypes::EyeBlock) {continue;}
+            eye_i++;
+            auto pos_x = organism->x + block.get_pos(organism->rotation).x;
+            auto pos_y = organism->y + block.get_pos(organism->rotation).y;
+            auto block_rotation = block.rotation;
+
+            auto offset_x = 0;
+            auto offset_y = 0;
+
+            switch (block_rotation) {
+                case Rotation::UP:
+                    offset_y = -1;
+                    break;
+                case Rotation::LEFT:
+                    offset_x = -1;
+                    break;
+                case Rotation::DOWN:
+                    offset_y = 1;
+                    break;
+                case Rotation::RIGHT:
+                    offset_x = 1;
+                    break;
+            }
+
+            auto last_observation = Observation{EmptyBlock, 0};
+
+            for (int i = 0; i < sp->look_range; i++) {
+                pos_x += offset_x;
+                pos_y += offset_y;
+
+                if (check_if_out_of_boundaries(dc, pos_x, pos_y)) {break;}
+
+                last_observation.type = dc->single_thread_simulation_grid[pos_x][pos_y].type;
+                last_observation.distance = i;
+
+                if (last_observation.type != BlockTypes::EmptyBlock) {break;}
+            }
+            organism_observations[organism_i][eye_i] = last_observation;
+        }
     }
 }
 
@@ -142,7 +186,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     //Every block of an organism on a grid is empty, so if in place of a rotated is not empty, then it is block of other
     //organism, and rotation is impossible, so return organism blocks on their place, and exit function.
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        if (check_if_out_of_boundaries(dc, organism, block, new_rotation) ||
+        if (check_if_block_out_of_boundaries(dc, organism, block, new_rotation) ||
             dc->single_thread_simulation_grid[organism->x + block.get_pos(new_rotation).x]
                                [organism->y + block.get_pos(new_rotation).y].type != EmptyBlock) {
 
@@ -345,7 +389,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
 
     //checking, if there is space for a child
     for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
-        if (check_if_out_of_boundaries(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
+        if (check_if_block_out_of_boundaries(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
 
         if (dc->single_thread_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
                                [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type != EmptyBlock)
@@ -365,12 +409,17 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     organism->child_ready = false;
 }
 
+bool SimulationEngineSingleThread::check_if_out_of_boundaries(EngineDataContainer *dc, int x, int y) {
+    return (x < 0 ||
+            x > dc->simulation_width -1 ||
+            y < 0 ||
+            y > dc->simulation_height-1);
+}
+
 // if any is true, then check fails, else check succeeds
-//template<typename T>
-bool SimulationEngineSingleThread::check_if_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
+bool SimulationEngineSingleThread::check_if_block_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
                                                               BaseSerializedContainer &block, Rotation rotation) {
-    return (organism->x + block.get_pos(rotation).x < 0 ||
-            organism->x + block.get_pos(rotation).x > dc->simulation_width -1 ||
-            organism->y + block.get_pos(rotation).y < 0 ||
-            organism->y + block.get_pos(rotation).y > dc->simulation_height-1);
+    return check_if_out_of_boundaries(dc,
+                                      organism->x + block.get_pos(rotation).x,
+                                      organism->y + block.get_pos(rotation).y);
 }

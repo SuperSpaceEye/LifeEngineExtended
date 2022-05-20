@@ -22,7 +22,7 @@ Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
     _mover_blocks    = structure->mover_blocks;
     _killer_blocks   = structure->killer_blocks;
     _armor_blocks    = structure->armor_blocks;
-    _eye_blocks      = structure->armor_blocks;
+    _eye_blocks      = structure->eye_blocks;
     delete structure;
 }
 
@@ -42,7 +42,7 @@ Anatomy::Anatomy(const std::shared_ptr<Anatomy>& anatomy) {
     _mover_blocks    = anatomy->_mover_blocks;
     _killer_blocks   = anatomy->_killer_blocks;
     _armor_blocks    = anatomy->_armor_blocks;
-    _eye_blocks      = anatomy->_armor_blocks;
+    _eye_blocks      = anatomy->_eye_blocks;
 }
 
 Anatomy::~Anatomy()=default;
@@ -273,8 +273,6 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
         }
     }
 
-//    std::cout << producer_blocks << " " << _producing_space.size() << "\n";
-    //TODO VERY IMPORTANT! memory leak here. maybe not
     return new SerializedOrganismStructureContainer{_organism_blocks,
 
                                                     _producing_space,

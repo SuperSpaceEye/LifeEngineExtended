@@ -33,7 +33,9 @@ class SimulationEngineSingleThread {
 
     static void reserve_observations(std::vector<std::vector<Observation>> & observations, std::vector<Organism *> &organisms);
 
-    static void get_observations(EngineDataContainer *dc, std::vector<Organism *> &organisms, std::vector<std::vector<Observation>> &organism_observations);
+    static void get_observations(EngineDataContainer *dc, SimulationParameters *sp,
+                                 std::vector<Organism *> &organisms,
+                                 std::vector<std::vector<Observation>> &organism_observations);
 
     static void rotate_organism (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
 
@@ -47,8 +49,9 @@ class SimulationEngineSingleThread {
 
     static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, std::mt19937 *mt);
 
-    static bool check_if_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
-                                           BaseSerializedContainer &block, Rotation rotation);
+    static bool check_if_out_of_boundaries(EngineDataContainer *dc, int x, int y);
+    static bool check_if_block_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
+                                                 BaseSerializedContainer &block, Rotation rotation);
 
 public:
     static void single_threaded_tick(EngineDataContainer * dc,

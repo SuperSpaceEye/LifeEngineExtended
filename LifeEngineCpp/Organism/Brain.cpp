@@ -9,6 +9,7 @@ Brain::Brain(std::shared_ptr<Brain> & brain): mt(brain->mt), brain_type(brain->b
 Brain::Brain(std::mt19937 *mt, BrainTypes brain_type): mt(mt), brain_type(brain_type) {}
 
 BrainDecision Brain::get_random_action() {
+
     return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(*mt));
 }
 
