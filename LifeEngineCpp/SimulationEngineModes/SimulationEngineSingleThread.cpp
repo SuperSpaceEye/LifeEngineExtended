@@ -119,7 +119,8 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
             eye_i++;
             auto pos_x = organism->x + block.get_pos(organism->rotation).x;
             auto pos_y = organism->y + block.get_pos(organism->rotation).y;
-            auto block_rotation = block.rotation;
+            // getting global rotation on a simulation grid
+            auto block_rotation = block.get_block_rotation_on_grid(organism->rotation);
 
             auto offset_x = 0;
             auto offset_y = 0;
@@ -139,7 +140,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                     break;
             }
 
-            auto last_observation = Observation{EmptyBlock, 0};
+            auto last_observation = Observation{EmptyBlock, 0, block.rotation};
 
             for (int i = 0; i < sp->look_range; i++) {
                 pos_x += offset_x;
@@ -216,6 +217,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
 }
 
 void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision) {
+    // rotates movement relative to simulation grid
     auto new_int_decision = static_cast<int>(decision) + static_cast<int>(organism->rotation);
     if (new_int_decision > 3) {new_int_decision -= 4;}
     auto new_decision = static_cast<BrainDecision>(new_int_decision);

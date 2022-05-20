@@ -11,9 +11,10 @@
 #include <memory>
 
 #include "../BlockTypes.hpp"
+#include "Rotation.h"
 
 enum class BrainDecision {
-    //Movement
+    //Movement and rotation from organism viewpoint.
     MoveUp,
     MoveLeft,
     MoveDown,
@@ -30,6 +31,8 @@ enum class BrainDecision {
 //Maybe for later
 enum class BrainTypes {
     RandomActions,
+    // chooses the closest observation to an organism, and acts upon it. If do nothing, then returns random action.
+    // If no meaningful action, then returns random action.
     SimpleBrain,
     //TODO will try to implement in the future
     //https://gamedev.stackexchange.com/questions/51693/difference-between-decision-trees-behavior-trees-for-game-ai
@@ -43,12 +46,37 @@ enum class BrainTypes {
 struct Observation {
     BlockTypes type;
     int32_t distance;
+    //local rotation
+    Rotation eye_rotation;
+};
+
+enum class SimpleDecision {
+    DoNothing,
+    GoAway,
+    GoTowards
+};
+
+struct SimpleActionTable {
+    SimpleDecision MouthBlock;
+    SimpleDecision ProducerBlock;
+    SimpleDecision MoverBlock;
+    SimpleDecision KillerBlock;
+    SimpleDecision ArmorBlock;
+    SimpleDecision EyeBlock;
+    SimpleDecision FoodBlock;
+    SimpleDecision WallBlock;
 };
 
 class Brain {
 private:
     BrainDecision get_random_action();
+
+    SimpleActionTable simple_action_table;
+    static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
+    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, std::mt19937 &mt);
+    static SimpleActionTable get_random_action_table(std::mt19937 &mt);
     BrainDecision get_simple_action(std::vector<Observation> & observations_vector);
+    BrainDecision calculate_simple_action(Observation & observation);
 public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
@@ -57,7 +85,8 @@ public:
     std::mt19937 * mt;
     BrainTypes brain_type;
 
-    BrainDecision get_decision(std::vector<Observation> & observation_vector);
+
+    BrainDecision get_decision(std::vector<Observation> &observation_vector);
 
     Brain * mutate();
 
