@@ -23,7 +23,7 @@ result_struct<T> WindowCore::try_convert_message_box_template(const std::string&
         return result_struct<T>{true, result};
     } else {
         display_message(message);
-        line_edit->setText(QString::fromStdString(std::to_string(fallback_value)));
+        line_edit->setText(QString::fromStdString(to_str(fallback_value, 5)));
         return result_struct<T>{false, result};
     }
 }
@@ -291,7 +291,24 @@ void WindowCore::le_produce_food_every_n_slot() {
     sp.produce_food_every_n_life_ticks = result.result;
 }
 
-//==================== Radio buttond ====================
+void WindowCore::le_anatomy_mutation_rate_delimiter_slot() {
+    float fallback = sp.anatomy_mutation_rate_delimiter;
+    auto result = try_convert_message_box_template<float>("Inputted text is not float", _ui.le_anatomy_mutation_rate_delimiter, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) { display_message("Input cannot be more than 1."); return;}
+    sp.anatomy_mutation_rate_delimiter = result.result;
+}
+void WindowCore::le_brain_mutation_rate_delimiter_slot() {
+    float fallback = sp.brain_mutation_rate_delimiter;
+    auto result = try_convert_message_box_template<float>("Inputted text is not float", _ui.le_brain_mutation_rate_delimiter, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) { display_message("Input cannot be more than 1."); return;}
+    sp.brain_mutation_rate_delimiter = result.result;
+}
+
+//==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
     set_cursor_mode(CursorMode::Food_mode);

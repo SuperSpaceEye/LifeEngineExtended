@@ -44,9 +44,9 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     sp = SimulationParameters{};
 
     auto anatomy = std::make_shared<Anatomy>();
-    anatomy->set_block(BlockTypes::MouthBlock, 0, 0);
-    anatomy->set_block(BlockTypes::ProducerBlock, -1, -1);
-    anatomy->set_block(BlockTypes::ProducerBlock, 1, 1);
+    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
+    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
     auto brain = std::make_shared<Brain>(&mt, BrainTypes::RandomActions);
 
@@ -223,7 +223,7 @@ void WindowCore::create_image() {
         if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); unpause_engine();}
     }
 
-    image_for_loop(image_width, image_height, lin_width, lin_height);
+    image_for_loop(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
 }
 
@@ -231,6 +231,17 @@ void inline WindowCore::calculate_linspace(std::vector<int> & lin_width, std::ve
                                            int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width = Linspace<int>()(start_x, end_x, image_width);
     lin_height = Linspace<int>()(start_y, end_y, image_height);
+    //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
+    // n pixels
+    int max_x = lin_width[lin_width.size()-1];
+    int max_y = lin_height[lin_height.size()-1];
+    int del_x = 0;
+    int del_y = 0;
+    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
+    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
+
+    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
+    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
 }
 
 void inline WindowCore::calculate_truncated_linspace(
@@ -240,16 +251,90 @@ void inline WindowCore::calculate_truncated_linspace(
         std::vector<int> & truncated_lin_width,
         std::vector<int> & truncated_lin_height) {
 
-    int min_val = -1;
+    int min_val = INT32_MIN;
     for (int x = 0; x < image_width; x++) {if (lin_width[x] > min_val) {min_val = lin_width[x]; truncated_lin_width.push_back(min_val);}}
-    min_val = -1;
+    truncated_lin_width.pop_back();
+    min_val = INT32_MIN;
     for (int y = 0; y < image_height; y++) {if (lin_height[y] > min_val) {min_val = lin_height[y]; truncated_lin_height.push_back(min_val);}}
+    truncated_lin_height.pop_back();
 }
 
 //__attribute__((noinline))
 void inline WindowCore::image_for_loop(int image_width, int image_height,
-                                       std::vector<int> & lin_width,
-                                       std::vector<int> & lin_height) {
+                                       std::vector<int> &lin_width,
+                                       std::vector<int> &lin_height,
+                                       std::vector<int> &truncated_lin_width,
+                                       std::vector<int> &truncated_lin_height) {
+    //TODO ok, it works, but it is MASSIVE and SLOW
+//    std::vector<pix_pos> width_img_boundaries;
+//    std::vector<pix_pos> height_img_boundaries;
+//
+//    auto last = INT32_MIN;
+//    auto count = 0;
+//    for (int x = 0; x < lin_width.size(); x++) {
+//        if (last < lin_width[x]) {
+//            width_img_boundaries.emplace_back(count, x);
+//            last = lin_width[x];
+//            count = x;
+//        }
+//    }
+//    width_img_boundaries.emplace_back(count, lin_width.size());
+//
+//    last = INT32_MIN;
+//    count = 0;
+//    for (int x = 0; x < lin_height.size(); x++) {
+//        if (last < lin_height[x]) {
+//            height_img_boundaries.emplace_back(count, x);
+//            last = lin_height[x];
+//            count = x;
+//        }
+//    }
+//    height_img_boundaries.emplace_back(count, lin_height.size());
+//
+//    QColor pixel_color;
+//    //width of boundaries of an organisms
+//
+//    //width bound, height bound
+//    for (auto & w_b : width_img_boundaries) {
+//        for (auto & h_b : height_img_boundaries) {
+//
+//            auto y_boundary_width = 0;
+//            auto x_boundary_width = 0;
+//
+//            if (w_b.stop - w_b.start > 15) {x_boundary_width = 5;}
+//            if (h_b.stop - h_b.start > 15) {y_boundary_width = 5;}
+//            std::cout << w_b.stop - w_b.start << "\n";
+//
+//            for (int x = w_b.start; x < w_b.stop; x++) {
+//                for (int y = h_b.start; y < h_b.stop; y++) {
+//                    auto & block = dc.second_simulation_grid[lin_width[x]][lin_height[y]];
+//                    auto continue_flag = false;
+//
+//                    if (lin_width[x] < 0 ||
+//                        lin_width[x] >= dc.simulation_width ||
+//                        lin_height[y] < 0 ||
+//                        lin_height[y] >= dc.simulation_height) {pixel_color = color_container.simulation_background_color;set_image_pixel(x, y, pixel_color);continue;}
+//                    if (block.type == BlockTypes::EmptyBlock) {pixel_color = get_color(BlockTypes::EmptyBlock);set_image_pixel(x, y, pixel_color);continue;}
+//                    if (block.type == BlockTypes::WallBlock)  {pixel_color = get_color(BlockTypes::WallBlock);set_image_pixel(x, y, pixel_color);continue;}
+//                    if (block.type == BlockTypes::FoodBlock)  {pixel_color = get_color(BlockTypes::FoodBlock);set_image_pixel(x, y, pixel_color);continue;}
+//
+//                    if (y_boundary_width > 0) {
+//                        if (!block.neighbors.up   && (y == h_b.start || y < h_b.start + y_boundary_width-1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
+//                        if (!block.neighbors.down && (y == h_b.stop  || y > h_b.stop  - y_boundary_width+1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
+//                    }
+//
+//                    if (x_boundary_width > 0) {
+//                        if (!block.neighbors.left  && (x == w_b.start || x < w_b.start + x_boundary_width-1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
+//                        if (!block.neighbors.right && (x == w_b.stop  || x > w_b.stop  - x_boundary_width+1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
+//                    }
+//
+//                    pixel_color = get_color(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type);
+//                    set_image_pixel(x, y, pixel_color);
+//                }
+//            }
+//        }
+//    }
+
     QColor pixel_color;
     for (int x = 0; x < image_width; x++) {
         for (int y = 0; y < image_height; y++) {
@@ -325,7 +410,7 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
         if (x < 0 || x >= dc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= dc.simulation_height) { continue; }
-            dc.second_simulation_grid[x][y].type = dc.single_thread_simulation_grid[x][y].type;
+            dc.second_simulation_grid[x][y] = dc.single_thread_simulation_grid[x][y];
         }
     }
 }
@@ -339,7 +424,7 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
-            dc.second_simulation_grid[x][y].type = dc.single_thread_simulation_grid[x][y].type;
+            dc.second_simulation_grid[x][y] = dc.single_thread_simulation_grid[x][y];
         }
     }
     unpause_engine();
@@ -512,54 +597,61 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
 }
 
 void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
-    _ui.lb_total_engine_ticks->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
-    _ui.lb_organisms_alive->   setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
-    _ui.lb_organism_size->     setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
-    _ui.lb_mouth_num->         setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
-    _ui.lb_producer_num->      setText(QString::fromStdString("Average producer num: "  + to_str(info._producer_blocks, float_precision)));
-    _ui.lb_mover_num->         setText(QString::fromStdString("Average mover num: "     + to_str(info._mover_blocks,    float_precision)));
-    _ui.lb_killer_num->        setText(QString::fromStdString("Average killer num: "    + to_str(info._killer_blocks,   float_precision)));
-    _ui.lb_armor_num->         setText(QString::fromStdString("Average armor num: "     + to_str(info._armor_blocks,    float_precision)));
-    _ui.lb_eye_num->           setText(QString::fromStdString("Average eye num: "       + to_str(info._eye_blocks,      float_precision)));
+    _ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
+    _ui.lb_organisms_alive    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
+    _ui.lb_organism_size      ->setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
+    _ui.lb_mouth_num          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
+    _ui.lb_producer_num       ->setText(QString::fromStdString("Average producer num: "  + to_str(info._producer_blocks, float_precision)));
+    _ui.lb_mover_num          ->setText(QString::fromStdString("Average mover num: "     + to_str(info._mover_blocks,    float_precision)));
+    _ui.lb_killer_num         ->setText(QString::fromStdString("Average killer num: "    + to_str(info._killer_blocks,   float_precision)));
+    _ui.lb_armor_num          ->setText(QString::fromStdString("Average armor num: "     + to_str(info._armor_blocks,    float_precision)));
+    _ui.lb_eye_num            ->setText(QString::fromStdString("Average eye num: "       + to_str(info._eye_blocks,      float_precision)));
 
-    _ui.lb_anatomy_mutation_rate->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.anatomy_mutation_rate, float_precision)));
-    _ui.lb_brain_mutation_rate->  setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.brain_mutation_rate,   float_precision)));
+    _ui.lb_anatomy_mutation_rate ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.anatomy_mutation_rate, float_precision)));
+    _ui.lb_brain_mutation_rate   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.brain_mutation_rate,   float_precision)));
 }
 
 // So that changes in code values would be set by default in gui.
 void WindowCore::initialize_gui_settings() {
     //World settings
-    _ui.le_cell_size->setText(QString::fromStdString(std::to_string(cell_size)));
-    _ui.le_simulation_width->setText(QString::fromStdString(std::to_string(dc.simulation_width)));
-    _ui.le_simulation_height->setText(QString::fromStdString(std::to_string(dc.simulation_height)));
-    _ui.cb_reset_on_total_extinction->setChecked(sp.reset_on_total_extinction);
-    _ui.cb_pause_on_total_extinction->setChecked(sp.pause_on_total_extinction);
-    _ui.le_max_organisms->setText(QString::fromStdString(std::to_string(dc.max_organisms)));
-    _ui.cb_fill_window->setChecked(fill_window);
+    _ui.le_cell_size         ->setText(QString::fromStdString(std::to_string(cell_size)));
+    _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(dc.simulation_width)));
+    _ui.le_simulation_height ->setText(QString::fromStdString(std::to_string(dc.simulation_height)));
+    _ui.le_max_organisms     ->setText(QString::fromStdString(std::to_string(dc.max_organisms)));
+    _ui.cb_reset_on_total_extinction ->setChecked(sp.reset_on_total_extinction);
+    _ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
+    _ui.cb_fill_window               ->setChecked(fill_window);
     //Evolution settings
-    _ui.le_food_production_probability->setText(QString::fromStdString(to_str(sp.food_production_probability, float_precision)));
-    _ui.le_produce_food_every_n_tick->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
-    _ui.le_lifespan_multiplier->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
-    _ui.le_look_range->setText(QString::fromStdString(std::to_string(sp.look_range)));
-    _ui.le_auto_food_drop_rate->setText(QString::fromStdString(std::to_string(sp.auto_food_drop_rate)));
-    _ui.le_extra_reproduction_cost->setText(QString::fromStdString(std::to_string(sp.extra_reproduction_cost)));
-    _ui.cb_use_evolved_anatomy_mutation_rate->setChecked(sp.use_anatomy_evolved_mutation_rate);
-    _ui.le_global_anatomy_mutation_rate->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate, float_precision)));
-    _ui.cb_use_evolved_brain_mutation_rate->setChecked(sp.use_brain_evolved_mutation_rate);
-    _ui.le_global_brain_mutation_rate->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate, float_precision)));
-    _ui.le_add->setText(QString::fromStdString(std::to_string(sp.add_cell)));
-    _ui.le_change->setText(QString::fromStdString(std::to_string(sp.change_cell)));
-    _ui.le_remove->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
-    _ui.cb_reproducing_rotation_enabled->setChecked(sp.reproduction_rotation_enabled);
-    _ui.cb_runtime_rotation_enabled->setChecked(sp.runtime_rotation_enabled);
-    _ui.cb_on_touch_kill->setChecked(sp.on_touch_kill);
-    _ui.cb_movers_can_produce_food->setChecked(sp.movers_can_produce_food);
-    _ui.cb_food_blocks_reproduction->setChecked(sp.food_blocks_reproduction);
-    _ui.le_min_reproduction_distance->setText(QString::fromStdString(std::to_string(sp.min_reproducing_distance)));
-    _ui.le_max_reproduction_distance->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
-    _ui.cb_fix_reproduction_distance->setChecked(sp.reproduction_distance_fixed);
+    _ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability,     4)));
+    _ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate,    2)));
+    _ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate,      2)));
+    _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
+    _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
+    _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
+    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
+    _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
+    _ui.le_auto_food_drop_rate               ->setText(QString::fromStdString(std::to_string(sp.auto_food_drop_rate)));
+    _ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(std::to_string(sp.extra_reproduction_cost)));
+    _ui.le_add                               ->setText(QString::fromStdString(std::to_string(sp.add_cell)));
+    _ui.le_change                            ->setText(QString::fromStdString(std::to_string(sp.change_cell)));
+    _ui.le_remove                            ->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
+    _ui.le_min_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.min_reproducing_distance)));
+    _ui.le_max_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
+
+    _ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
+    _ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);
+    _ui.cb_on_touch_kill                     ->setChecked(sp.on_touch_kill);
+    _ui.cb_movers_can_produce_food           ->setChecked(sp.movers_can_produce_food);
+    _ui.cb_food_blocks_reproduction          ->setChecked(sp.food_blocks_reproduction);
+    _ui.cb_fix_reproduction_distance         ->setChecked(sp.reproduction_distance_fixed);
+    _ui.cb_use_evolved_brain_mutation_rate   ->setChecked(sp.use_brain_evolved_mutation_rate);
+    _ui.cb_use_evolved_anatomy_mutation_rate ->setChecked(sp.use_anatomy_evolved_mutation_rate);
     //Simulation settings
     _ui.cb_stop_console_output->setChecked(stop_console_output);
-    _ui.le_num_threads->setText(QString::fromStdString(std::to_string(cp.num_threads)));
-    _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
+    _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
+    _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
+
+    _ui.rb_partial_multi_thread_mode->hide();
+    _ui.rb_multi_thread_mode->hide();
+    _ui.rb_cuda_mode->hide();
 }

@@ -7,12 +7,23 @@
 
 #include <iostream>
 #include "../BlockTypes.hpp"
+#include "../Organism/Rotation.h"
+
+struct Neighbors {
+    //has neighbor
+    bool up    = false;
+    bool left  = false;
+    bool down  = false;
+    bool right = false;
+};
 
 class BaseGridBlock {
 public:
     BlockTypes type = BlockTypes::EmptyBlock;
+    Rotation rotation = Rotation::UP;
+    Neighbors neighbors{};
     BaseGridBlock()=default;
+    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{}):
+                            type(type), rotation(rotation), neighbors(neighbors) {}
 };
-
-
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

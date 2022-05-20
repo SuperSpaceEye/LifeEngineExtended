@@ -39,7 +39,7 @@ Organism::~Organism() {
 float Organism::calculate_max_life() {
     life_points = 0;
     for (auto& item: organism_anatomy->_organism_blocks) {
-        switch (item.organism_block.type) {
+        switch (item.type) {
             case MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
             case ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
             case MoverBlock:    life_points += bp->MoverBlock.   life_point_amount; break;
@@ -65,7 +65,7 @@ int Organism::calculate_organism_lifetime() {
 float Organism::calculate_food_needed() {
     food_needed = 0;
     for (auto & block: organism_anatomy->_organism_blocks) {
-        switch (block.organism_block.type) {
+        switch (block.type) {
             case MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
             case ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
             case MoverBlock:    food_needed += bp->MoverBlock.   food_cost_modifier; break;
