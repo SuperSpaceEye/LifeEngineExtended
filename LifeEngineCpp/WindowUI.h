@@ -174,6 +174,7 @@ public:
     QLabel *label_16;
     QLineEdit *le_max_reproduction_distance;
     QCheckBox *cb_fix_reproduction_distance;
+    QCheckBox *cb_self_organism_blocks_block_sight;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -190,7 +191,7 @@ public:
     QLabel *lb_killer_num;
     QLabel *lb_armor_num;
     QLabel *lb_eye_num;
-    QWidget *simulation_settings_tab;
+    QWidget *settings_tab;
     QVBoxLayout *verticalLayout_7;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
@@ -209,8 +210,9 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_19;
     QLineEdit *le_float_number_precision;
-    QButtonGroup *simulation_modes;
+    QCheckBox *cb_disable_warnings;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -620,7 +622,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 732));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -569, 506, 761));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -986,6 +988,11 @@ public:
 
         verticalLayout_26->addWidget(cb_fix_reproduction_distance);
 
+        cb_self_organism_blocks_block_sight = new QCheckBox(widget);
+        cb_self_organism_blocks_block_sight->setObjectName(QString::fromUtf8("cb_self_organism_blocks_block_sight"));
+
+        verticalLayout_26->addWidget(cb_self_organism_blocks_block_sight);
+
 
         verticalLayout_20->addLayout(verticalLayout_26);
 
@@ -1071,20 +1078,20 @@ public:
         verticalLayout_3->addWidget(scrollArea_4);
 
         Tabs->addTab(statistics_tab, QString());
-        simulation_settings_tab = new QWidget();
-        simulation_settings_tab->setObjectName(QString::fromUtf8("simulation_settings_tab"));
-        verticalLayout_7 = new QVBoxLayout(simulation_settings_tab);
+        settings_tab = new QWidget();
+        settings_tab->setObjectName(QString::fromUtf8("settings_tab"));
+        verticalLayout_7 = new QVBoxLayout(settings_tab);
         verticalLayout_7->setSpacing(0);
         verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
         verticalLayout_7->setContentsMargins(0, 0, 0, 0);
-        scrollArea = new QScrollArea(simulation_settings_tab);
+        scrollArea = new QScrollArea(settings_tab);
         scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
         scrollArea->setLineWidth(0);
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 213));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -38, 506, 238));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1173,6 +1180,11 @@ public:
 
         verticalLayout_19->addLayout(horizontalLayout_2);
 
+        cb_disable_warnings = new QCheckBox(widget_2);
+        cb_disable_warnings->setObjectName(QString::fromUtf8("cb_disable_warnings"));
+
+        verticalLayout_19->addWidget(cb_disable_warnings);
+
 
         verticalLayout_5->addWidget(widget_2);
 
@@ -1180,7 +1192,7 @@ public:
 
         verticalLayout_7->addWidget(scrollArea);
 
-        Tabs->addTab(simulation_settings_tab, QString());
+        Tabs->addTab(settings_tab, QString());
 
         verticalLayout_4->addWidget(Tabs);
 
@@ -1259,6 +1271,8 @@ public:
         QObject::connect(cb_use_evolved_brain_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_brain_mutation_rate_slot(bool)));
         QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
         QObject::connect(le_brain_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_delimiter_slot()));
+        QObject::connect(cb_disable_warnings, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_disable_warnings_slot(bool)));
+        QObject::connect(cb_self_organism_blocks_block_sight, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_self_organism_blocks_block_sight_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -1366,6 +1380,7 @@ public:
         label_16->setText(QApplication::translate("MainWindow", "Max reproducing distance: ", nullptr));
         le_max_reproduction_distance->setText(QApplication::translate("MainWindow", "3", nullptr));
         cb_fix_reproduction_distance->setText(QApplication::translate("MainWindow", "Fix reproducing distance", nullptr));
+        cb_self_organism_blocks_block_sight->setText(QApplication::translate("MainWindow", "Organism's self blocks block sight", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
         lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", nullptr));
         lb_organisms_alive->setText(QApplication::translate("MainWindow", "Organisms alive:", nullptr));
@@ -1388,7 +1403,8 @@ public:
         le_num_threads->setText(QApplication::translate("MainWindow", "1", nullptr));
         label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
-        Tabs->setTabText(Tabs->indexOf(simulation_settings_tab), QApplication::translate("MainWindow", "Simulation Settings", nullptr));
+        cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", nullptr));
+        Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", nullptr));
     } // retranslateUi
 
 };

@@ -47,7 +47,7 @@ struct SimulationParameters {
         bool generate_random_walls_on_reset = false;
         bool reproduction_distance_fixed = false;
         bool runtime_rotation_enabled = true;
-        bool self_organism_blocks_block_sight = true;
+        bool organism_self_blocks_block_sight = false;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

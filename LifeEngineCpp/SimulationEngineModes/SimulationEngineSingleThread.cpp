@@ -142,7 +142,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
 
             auto last_observation = Observation{EmptyBlock, 0, block.rotation};
 
-            for (int i = 0; i < sp->look_range; i++) {
+            for (int i = 1; i < sp->look_range; i++) {
                 pos_x += offset_x;
                 pos_y += offset_y;
 
@@ -151,7 +151,26 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                 last_observation.type = dc->single_thread_simulation_grid[pos_x][pos_y].type;
                 last_observation.distance = i;
 
-                if (last_observation.type != BlockTypes::EmptyBlock) {break;}
+                if (last_observation.type == BlockTypes::WallBlock) {break;}
+                if (last_observation.type == BlockTypes::FoodBlock) {break;}
+                if (last_observation.type != BlockTypes::EmptyBlock) {
+                    //if observation_type is not empty block and wall, and not organism_self_blocks_block_sight, then
+                    //check global positions of all organism blocks, and if any equals to observation pos, then continue
+                    //observing, else stop.
+                    //TODO not very efficient
+                    if (!sp->organism_self_blocks_block_sight) {
+                        auto continue_flag = false;
+                        for (auto & org_block: organism->organism_anatomy->_organism_blocks) {
+                            if (organism->x + org_block.get_pos(organism->rotation).x == pos_x &&
+                                organism->y + org_block.get_pos(organism->rotation).y == pos_y) {
+                                continue_flag = true;
+                                break;
+                            }
+                        }
+                        if (continue_flag) {continue;}
+                    }
+                    break;
+                }
             }
             organism_observations[organism_i][eye_i] = last_observation;
         }
