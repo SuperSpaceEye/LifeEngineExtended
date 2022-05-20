@@ -23,7 +23,10 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *mt);}
     for (auto & organism: dc->organisms) {eat_food(dc, sp, organism);}
-    for (auto & organism: dc->organisms) {apply_damage(dc, sp, organism);}
+
+    if (sp->killer_damage_amount > 0) {
+        for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
+    }
 
     for (int i = 0; i < dc->organisms.size(); i++)  {tick_lifetime(dc, to_erase, dc->organisms[i], i);}
     for (int i = 0; i < to_erase.size(); ++i)       {erase_organisms(dc, to_erase, i);}

@@ -279,7 +279,8 @@ private slots:
     void le_look_range_slot();
     void le_auto_food_drop_rate_slot();
     void le_extra_reproduction_cost_slot();
-    void le_global_mutation_rate_slot();
+    void le_global_anatomy_mutation_rate_slot();
+    void le_global_brain_mutation_rate_slot();
     void le_add_cell_slot();
     void le_change_cell_slot();
     void le_remove_cell_slot();
@@ -317,9 +318,7 @@ private slots:
     void cb_self_organism_blocks_block_sight_slot(bool state);
 
 public:
-    WindowCore(int simulation_width, int simulation_height,
-               int window_fps, int simulation_fps, int simulation_num_threads,
-               QWidget *parent);
+    WindowCore(QWidget *parent);
 };
 
 

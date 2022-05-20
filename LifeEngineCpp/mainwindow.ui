@@ -519,6 +519,9 @@ p, li { white-space: pre-wrap; }
                         </item>
                         <item>
                          <widget class="QLineEdit" name="le_cell_size">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
                           <property name="text">
                            <string>1</string>
                           </property>
@@ -526,6 +529,9 @@ p, li { white-space: pre-wrap; }
                         </item>
                         <item>
                          <widget class="QCheckBox" name="cb_fill_window">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
                           <property name="text">
                            <string>Fill window</string>
                           </property>
@@ -765,8 +771,8 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-569</y>
-                  <width>506</width>
+                  <y>0</y>
+                  <width>98</width>
                   <height>761</height>
                  </rect>
                 </property>
@@ -1249,7 +1255,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QCheckBox" name="cb_self_organism_blocks_block_sight">
                         <property name="text">
-                         <string>Organism's self blocks block sight</string>
+                         <string>Organism's self cells block sight</string>
                         </property>
                        </widget>
                       </item>
@@ -1294,7 +1300,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>506</width>
+                  <width>238</width>
                   <height>265</height>
                  </rect>
                 </property>
@@ -1417,8 +1423,8 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-38</y>
-                  <width>506</width>
+                  <y>0</y>
+                  <width>98</width>
                   <height>238</height>
                  </rect>
                 </property>
@@ -1617,22 +1623,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_stop_console_output</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_stop_console_output_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>745</x>
-     <y>670</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>559</x>
-     <y>406</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cb_synchronise_sim_and_win</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -1661,38 +1651,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>399</x>
      <y>399</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rb_multi_thread_mode</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>rb_multi_thread_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>749</x>
-     <y>754</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>562</x>
-     <y>406</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rb_cuda_mode</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>rb_cuda_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>984</x>
-     <y>754</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>562</x>
-     <y>406</y>
     </hint>
    </hints>
   </connection>
@@ -1777,22 +1735,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>rb_single_thread_mode</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>rb_single_thread_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>514</x>
-     <y>754</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>562</x>
-     <y>406</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>tb_pause</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -1805,22 +1747,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>399</x>
      <y>399</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_num_threads</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_num_threads_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>745</x>
-     <y>779</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>559</x>
-     <y>406</y>
     </hint>
    </hints>
   </connection>
@@ -1857,14 +1783,14 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>le_food_production_probability</sender>
-   <signal>returnPressed()</signal>
+   <sender>b_kill_all_organisms_slot</sender>
+   <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_food_production_probability_slot()</slot>
+   <slot>b_kill_all_organisms_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>675</x>
-     <y>646</y>
+     <x>239</x>
+     <y>847</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -1873,162 +1799,18 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>le_lifespan_multiplier</sender>
-   <signal>returnPressed()</signal>
+   <sender>rb_food</sender>
+   <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_lifespan_multiplier_slot()</slot>
+   <slot>rb_food_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>644</x>
-     <y>679</y>
+     <x>64</x>
+     <y>796</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_look_range</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_look_range_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>616</x>
-     <y>713</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_auto_food_drop_rate</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_auto_food_drop_rate_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>647</x>
-     <y>748</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_global_anatomy_mutation_rate</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_global_mutation_rate_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>650</x>
-     <y>783</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_add</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_add_cell_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>463</x>
-     <y>818</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_change</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_change_cell_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>607</x>
-     <y>818</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_remove</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_remove_cell_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>751</x>
-     <y>818</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_reproducing_rotation_enabled</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_reproduction_rotation_enabled_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>575</x>
-     <y>749</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_on_touch_kill</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_on_touch_kill_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>575</x>
-     <y>782</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_use_evolved_anatomy_mutation_rate</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_use_evolved_anatomy_mutation_rate_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>575</x>
-     <y>815</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
+     <x>562</x>
+     <y>406</y>
     </hint>
    </hints>
   </connection>
@@ -2041,54 +1823,6 @@ p, li { white-space: pre-wrap; }
     <hint type="sourcelabel">
      <x>575</x>
      <y>848</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_food_blocks_reproduction</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_food_blocks_reproduction_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>575</x>
-     <y>881</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_extra_reproduction_cost</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_extra_reproduction_cost_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>665</x>
-     <y>864</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_cell_size</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_cell_size_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>478</x>
-     <y>726</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2113,14 +1847,30 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>le_simulation_height</sender>
-   <signal>returnPressed()</signal>
+   <sender>b_load_world</sender>
+   <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_simulation_height_slot()</slot>
+   <slot>b_load_world_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>560</x>
-     <y>759</y>
+     <x>634</x>
+     <y>862</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_reset_on_total_extinction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_reset_on_total_extinction_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>821</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2145,14 +1895,14 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>b_resize_and_reset</sender>
+   <sender>rb_partial_multi_thread_mode</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>b_resize_and_reset_slot()</slot>
+   <slot>rb_partial_multi_thread_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>484</x>
-     <y>791</y>
+     <x>587</x>
+     <y>756</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2161,18 +1911,34 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_reset_on_total_extinction</sender>
-   <signal>toggled(bool)</signal>
+   <sender>b_save_world</sender>
+   <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>cb_reset_on_total_extinction_slot(bool)</slot>
+   <slot>b_save_world_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>484</x>
-     <y>821</y>
+     <x>691</x>
+     <y>816</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
      <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_single_thread_mode</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>rb_single_thread_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>514</x>
+     <y>754</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>562</x>
+     <y>406</y>
     </hint>
    </hints>
   </connection>
@@ -2209,30 +1975,30 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>b_clear_all_walls</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>b_clear_all_walls_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>691</x>
-     <y>756</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_clear_walls_on_reset</sender>
+   <sender>cb_disable_warnings</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>cb_clear_walls_on_reset_slot(bool)</slot>
+   <slot>cb_disable_warnings_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>691</x>
-     <y>786</y>
+     <x>630</x>
+     <y>885</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_auto_food_drop_rate</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_auto_food_drop_rate_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2241,110 +2007,30 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>b_save_world</sender>
-   <signal>clicked()</signal>
+   <sender>le_num_threads</sender>
+   <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>b_save_world_slot()</slot>
+   <slot>le_num_threads_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>691</x>
-     <y>816</y>
+     <x>745</x>
+     <y>779</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
+     <x>559</x>
+     <y>406</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>b_load_world</sender>
-   <signal>clicked()</signal>
+   <sender>le_remove</sender>
+   <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>b_load_world_slot()</slot>
+   <slot>le_remove_cell_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>634</x>
-     <y>862</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_override_evolution_controls</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_override_evolution_controls_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>736</x>
-     <y>862</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_generate_random_walls_on_reset</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>691</x>
-     <y>755</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>b_kill_all_organisms_slot</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>b_kill_all_organisms_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>239</x>
-     <y>847</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_runtime_rotation_enabled</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_runtime_rotation_enabled_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>580</x>
-     <y>1375</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_fix_reproduction_distance</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_fix_reproduction_distance_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>580</x>
-     <y>876</y>
+     <x>751</x>
+     <y>818</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2369,30 +2055,46 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>le_max_reproduction_distance</sender>
+   <sender>le_change</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_max_reproducing_distance_slot()</slot>
+   <slot>le_change_cell_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>607</x>
+     <y>818</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_produce_food_every_n_tick</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_produce_food_every_n_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>675</x>
-     <y>845</y>
+     <y>796</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
+     <x>402</x>
      <y>449</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>le_max_organisms</sender>
+   <sender>le_look_range</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_max_organisms_slot()</slot>
+   <slot>le_look_range_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>536</x>
-     <y>855</y>
+     <x>616</x>
+     <y>713</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2401,14 +2103,30 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>rb_partial_multi_thread_mode</sender>
-   <signal>clicked()</signal>
+   <sender>cb_runtime_rotation_enabled</sender>
+   <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>rb_partial_multi_thread_slot()</slot>
+   <slot>cb_runtime_rotation_enabled_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>587</x>
-     <y>756</y>
+     <x>580</x>
+     <y>1375</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_generate_random_walls_on_reset</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2433,18 +2151,130 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>rb_food</sender>
-   <signal>clicked()</signal>
+   <sender>le_anatomy_mutation_rate_delimiter</sender>
+   <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>rb_food_slot()</slot>
+   <slot>le_anatomy_mutation_rate_delimiter_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>64</x>
-     <y>796</y>
+     <x>700</x>
+     <y>794</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>402</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_cuda_mode</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>rb_cuda_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>984</x>
+     <y>754</y>
     </hint>
     <hint type="destinationlabel">
      <x>562</x>
      <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_override_evolution_controls</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_override_evolution_controls_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>736</x>
+     <y>862</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_global_anatomy_mutation_rate</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_anatomy_mutation_rate_delimiter_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>650</x>
+     <y>783</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_max_reproduction_distance</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_max_reproducing_distance_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>845</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_fix_reproduction_distance</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_fix_reproduction_distance_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>580</x>
+     <y>876</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_stop_console_output</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_stop_console_output_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>745</x>
+     <y>670</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>559</x>
+     <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_evolved_anatomy_mutation_rate</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_evolved_anatomy_mutation_rate_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>815</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
     </hint>
    </hints>
   </connection>
@@ -2465,49 +2295,81 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>le_produce_food_every_n_tick</sender>
+   <sender>cb_on_touch_kill</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_on_touch_kill_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>782</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_resize_and_reset</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_resize_and_reset_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>791</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_food_production_probability</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_produce_food_every_n_slot()</slot>
+   <slot>le_food_production_probability_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>675</x>
-     <y>796</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>402</x>
+     <x>399</x>
      <y>449</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>cb_use_evolved_brain_mutation_rate</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_use_evolved_brain_mutation_rate_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>583</x>
-     <y>862</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>402</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>le_anatomy_mutation_rate_delimiter</sender>
+   <sender>le_extra_reproduction_cost</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_anatomy_mutation_rate_delimiter_slot()</slot>
+   <slot>le_extra_reproduction_cost_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>700</x>
-     <y>794</y>
+     <x>665</x>
+     <y>864</y>
     </hint>
     <hint type="destinationlabel">
-     <x>402</x>
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_lifespan_multiplier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_lifespan_multiplier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>644</x>
+     <y>679</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
      <y>449</y>
     </hint>
    </hints>
@@ -2529,17 +2391,49 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_disable_warnings</sender>
-   <signal>toggled(bool)</signal>
+   <sender>le_global_brain_mutation_rate</sender>
+   <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>cb_disable_warnings_slot(bool)</slot>
+   <slot>le_global_brain_mutation_rate_slot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>630</x>
-     <y>885</y>
+     <x>725</x>
+     <y>857</y>
     </hint>
     <hint type="destinationlabel">
      <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_cell_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_cell_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>478</x>
+     <y>726</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_evolved_brain_mutation_rate</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_evolved_brain_mutation_rate_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>583</x>
+     <y>862</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>402</x>
      <y>449</y>
     </hint>
    </hints>
@@ -2556,6 +2450,134 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_add</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_add_cell_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>463</x>
+     <y>818</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_simulation_height</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_simulation_height_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>759</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_max_organisms</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_max_organisms_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>536</x>
+     <y>855</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_multi_thread_mode</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>rb_multi_thread_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>749</x>
+     <y>754</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>562</x>
+     <y>406</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_clear_walls_on_reset</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_clear_walls_on_reset_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>786</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_food_blocks_reproduction</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_food_blocks_reproduction_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>881</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_reproducing_rotation_enabled</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_reproduction_rotation_enabled_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>575</x>
+     <y>749</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_clear_all_walls</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>b_clear_all_walls_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>756</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
      <y>449</y>
     </hint>
    </hints>
@@ -2584,7 +2606,7 @@ p, li { white-space: pre-wrap; }
   <slot>le_look_range_slot()</slot>
   <slot>le_auto_food_drop_rate_slot()</slot>
   <slot>le_extra_reproduction_cost_slot()</slot>
-  <slot>le_global_mutation_rate_slot()</slot>
+  <slot>le_global_anatomy_mutation_rate_slot()</slot>
   <slot>le_add_cell_slot()</slot>
   <slot>le_change_cell_slot()</slot>
   <slot>le_remove_cell_slot()</slot>
@@ -2622,13 +2644,14 @@ p, li { white-space: pre-wrap; }
   <slot>le_brain_mutation_rate_delimiter_slot()</slot>
   <slot>cb_disable_warnings_slot(bool)</slot>
   <slot>cb_self_organism_blocks_block_sight_slot(bool)</slot>
+  <slot>le_global_brain_mutation_rate_slot()</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>
