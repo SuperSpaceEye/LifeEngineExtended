@@ -189,6 +189,8 @@ private:
     bool menu_hidden = false;
     bool allow_menu_hidden_change = true;
 
+    bool disable_warnings = false;
+
     void mainloop_tick();
     void window_tick();
     void set_simulation_interval(int max_simulation_fps);
@@ -311,6 +313,8 @@ private slots:
     void cb_runtime_rotation_enabled_slot(bool state);
     void cb_fix_reproduction_distance_slot(bool state);
     void cb_use_evolved_brain_mutation_rate_slot(bool state);
+    void cb_disable_warnings_slot(bool state);
+    void cb_self_organism_blocks_block_sight_slot(bool state);
 
 public:
     WindowCore(int simulation_width, int simulation_height,

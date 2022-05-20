@@ -169,5 +169,8 @@ Organism * Organism::create_child() {
     mutate_anatomy(new_anatomy, _anatomy_mutation_rate);
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate);
 
+    if (new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {new_brain->brain_type = BrainTypes::SimpleBrain;}
+    else {new_brain->brain_type = BrainTypes::RandomActions;}
+
     return new Organism(0, 0, can_rotate, rotation, new_anatomy, new_brain, sp, bp, mt, _anatomy_mutation_rate, _brain_mutation_rate);
 }

@@ -50,7 +50,6 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
 
     auto brain = std::make_shared<Brain>(&mt, BrainTypes::RandomActions);
 
-    //TODO very important. organism calls destructor for some reason, deallocating anatomy.
     base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                  Rotation::UP, anatomy, brain, &sp, &op, &mt);
     chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
@@ -139,7 +138,6 @@ void WindowCore::update_fps_labels(int fps, int sps) {
     _ui.lb_sps->setText(QString::fromStdString("sps: "+std::to_string(sps)));
 }
 
-//TODO kinda redundant right now
 void WindowCore::window_tick() {
     if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
     if (sp.pause_on_total_extinction && cp.organisms_extinct) {_ui.tb_pause->setChecked(true); cp.organisms_extinct = false;} else
@@ -170,7 +168,6 @@ void WindowCore::reset_scale_view() {
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
-// TODO it is probably possible to do better.
 //__attribute__((noinline))
 QColor inline &WindowCore::get_color(BlockTypes type) {
     switch (type) {
@@ -388,7 +385,6 @@ bool WindowCore::wait_for_engine_to_pause() {
 //    if (cp.engine_global_pause && !synchronise_simulation_and_window) {return cp.engine_paused;}
 //    auto sleeping_time = std::chrono::microseconds (int(dc.delta_time*1.5));
 //    // if sleeping time is larger than spare window processing time, then not wait and return result straight away.
-//    //TODO not needed
 //    if (!allow_waiting_overhead) {
 //        if (sleeping_time.count() > int(window_interval * std::chrono::microseconds::period::den) - delta_window_processing_time) { return cp.engine_paused; }
 //    } else {
@@ -455,15 +451,15 @@ void WindowCore::clear_organisms() {
     dc.to_place_organisms.clear();
 }
 
-//TODO there could be memory leaks in the feature.
 void WindowCore::resize_simulation_space() {
-    auto msg = DescisionMessageBox("Warning",
-                                   "Warning, resizing simulation grid is unstable and can crash the program.\n"
-                                   "I don't know why it crashes, but beware that it can.",
-                                   "OK", "Cancel", this);
-    auto result = msg.exec();
-    if (!result) {
-        return;
+    if (!disable_warnings) {
+        auto msg = DescisionMessageBox("Warning",
+                                       "All organisms and simulation grid will be cleared.",
+                                       "OK", "Cancel", this);
+        auto result = msg.exec();
+        if (!result) {
+            return;
+        }
     }
 
     cp.engine_pause = true;

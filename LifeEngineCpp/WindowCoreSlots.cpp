@@ -5,6 +5,7 @@
 #include "WindowCore.h"
 
 int WindowCore::display_dialog_message(const std::string& message) {
+    if (disable_warnings) {return true;}
     DescisionMessageBox msg{"Warning", QString::fromStdString(message), "OK", "Cancel", this};
     return msg.exec();
 }
@@ -62,19 +63,19 @@ void WindowCore::b_resize_and_reset_slot() {
 }
 
 void WindowCore::b_generate_random_walls_slot() {
-    display_message("Not implemented");
+    if (!disable_warnings) {display_message("Not implemented");}
 }
 
 void WindowCore::b_clear_all_walls_slot() {
-    display_message("Not implemented");
+    if (!disable_warnings) {display_message("Not implemented");}
 }
 
 void WindowCore::b_save_world_slot() {
-    display_message("Not implemented");
+    if (!disable_warnings) {display_message("Not implemented");}
 }
 
 void WindowCore::b_load_world_slot() {
-    display_message("Not implemented");
+    if (!disable_warnings) {display_message("Not implemented");}
 }
 
 void WindowCore::b_pass_one_tick_slot() {
@@ -125,7 +126,7 @@ void WindowCore::le_num_threads_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_num_threads, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 1) { display_dialog_message("Number of threads cannot be less than 1."); return;}
-    if (result.result > std::thread::hardware_concurrency()-1) {
+    if (result.result > std::thread::hardware_concurrency()-1 && !disable_warnings) {
         auto accept = display_dialog_message(
                 "Warning, setting number of processes (" + std::to_string(result.result)
                 + ") higher than the number of CPU cores (" +
@@ -143,10 +144,11 @@ void WindowCore::le_cell_size_slot() {
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Size of cell cannot be less than 1."); return;}
     cell_size = result.result;
-    display_message("Warning, changing cell size is not implemented");
+    if (!disable_warnings) {
+        display_message("Warning, changing cell size is not implemented");
+    }
 }
 
-//TODO not implemented
 void WindowCore::le_simulation_width_slot() {
     int fallback = dc.simulation_width;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_width,
@@ -184,7 +186,6 @@ void WindowCore::le_lifespan_multiplier_slot() {
     sp.lifespan_multiplier = result.result;
 }
 
-//TODO set restraints
 void WindowCore::le_look_range_slot() {
     int fallback = sp.look_range;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_look_range, fallback);
@@ -326,17 +327,18 @@ void WindowCore::rb_single_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Single_Threaded);
 }
 
+//TODO not implemented
 void WindowCore::rb_multi_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Multi_Threaded);
 }
 
+//TODO not implemented
 void WindowCore::rb_partial_multi_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Partial_Multi_threaded);
 }
 
-//TODO CUDA mode not implemented
+//TODO not implemented
 void WindowCore::rb_cuda_slot() {
-    return;
     set_simulation_mode(SimulationModes::GPU_CUDA_mode);
 }
 
@@ -389,3 +391,7 @@ void WindowCore::cb_generate_random_walls_on_reset_slot (bool state) { sp.genera
 void WindowCore::cb_runtime_rotation_enabled_slot       (bool state) { sp.runtime_rotation_enabled = state;}
 
 void WindowCore::cb_fix_reproduction_distance_slot      (bool state) { sp.reproduction_distance_fixed = state;}
+
+void WindowCore::cb_disable_warnings_slot               (bool state) { disable_warnings = state;}
+
+void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){sp.organism_self_blocks_block_sight = state;}
