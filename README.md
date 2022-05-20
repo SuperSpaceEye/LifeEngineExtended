@@ -14,9 +14,9 @@ option | type | constraints | desciption
 #### Evolution Controls
 - Food production probability | float | 0<x<=1 | This option controls probablity of each producing cell to produce a food cell around it.
 - Produce food every n life ticks | int | x>0 | On every n tick of organism's lifetime it will try to produce food.
-- Lifespan multiplier | int | x>1 |
-- Look range | int | x>1 |
-- Auto food drop rate | int | 0<=x | Function is not yet implemented
+- Lifespan multiplier | int | x>0 |
+- Look range | int | x>0 |
+- Auto food drop rate | int | x>=0 | Function is not yet implemented
 - Extra reproduction cost | int | any | Function is not yet implemented
 - Global anatomy mutation rate | float | 0<=x<=1 | If "Use evolved anatomy mutation rate" is not checked, will use this mutation rate instead.
 - Anatomy mutation rate delimiter | float | 0<=x<=1 | A delimiter between increasing evolved mutation rate, or decreasing. If x>0.5 , then it will bias organisms to increase mutation rate, if x<0.5, then it will bias organisms to decrease it. If x==0.5, then there will be no bias.
