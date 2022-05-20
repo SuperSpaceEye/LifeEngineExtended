@@ -8,18 +8,19 @@
 #include <QColor>
 
 struct ColorContainer {
-    QColor menu_color = QColor{200, 200, 255};
-    QColor simulation_background_color = QColor(50, 100, 150);
+    //QColor menu_color = QColor{200, 200, 255};
+    QColor simulation_background_color = QColor(58, 75, 104);
+    QColor organism_boundary = QColor{255, 0, 0};
 
-    QColor empty_block = QColor{0,  0,  0};
-    QColor mouth =       QColor{255,188,0};
-    QColor producer =    QColor{0,  200,0};
-    QColor mover =       QColor{0,  235,211};
-    QColor killer =      QColor{255,60, 112};
-    QColor armor =       QColor{125,38, 255};
-    QColor eye =         QColor{210,180,255};
-    QColor food =        QColor{125,186,255};
-    QColor wall =        QColor{70, 70, 70};
+    QColor empty_block = QColor{14, 19, 24};
+    QColor mouth =       QColor{222,177,77};
+    QColor producer =    QColor{21, 222,89};
+    QColor mover =       QColor{96, 212,255};
+    QColor killer =      QColor{248,35, 128};
+    QColor armor =       QColor{114,48, 219};
+    QColor eye =         QColor{182,193,234};
+    QColor food =        QColor{47, 122,183};
+    QColor wall =        QColor{128, 128, 128};
 };
 
 

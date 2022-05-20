@@ -132,10 +132,16 @@ public:
     QHBoxLayout *horizontalLayout_12;
     QLabel *lb_mutation_rate;
     QLineEdit *le_global_anatomy_mutation_rate;
+    QHBoxLayout *horizontalLayout_28;
+    QLabel *label_23;
+    QLineEdit *le_anatomy_mutation_rate_delimiter;
     QCheckBox *cb_use_evolved_brain_mutation_rate;
     QHBoxLayout *horizontalLayout_27;
     QLabel *label_20;
     QLineEdit *le_global_brain_mutation_rate;
+    QHBoxLayout *horizontalLayout_29;
+    QLabel *label_24;
+    QLineEdit *le_brain_mutation_rate_delimiter;
     QHBoxLayout *horizontalLayout_19;
     QLabel *label_21;
     QLineEdit *le_killer_damage_amount;
@@ -210,7 +216,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(806, 900);
+        MainWindow->resize(900, 900);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -429,7 +435,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 412, 219));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 506, 219));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -614,7 +620,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 412, 666));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 732));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -770,6 +776,21 @@ public:
 
         verticalLayout_20->addLayout(mutation_rate_layout);
 
+        horizontalLayout_28 = new QHBoxLayout();
+        horizontalLayout_28->setObjectName(QString::fromUtf8("horizontalLayout_28"));
+        label_23 = new QLabel(widget);
+        label_23->setObjectName(QString::fromUtf8("label_23"));
+
+        horizontalLayout_28->addWidget(label_23);
+
+        le_anatomy_mutation_rate_delimiter = new QLineEdit(widget);
+        le_anatomy_mutation_rate_delimiter->setObjectName(QString::fromUtf8("le_anatomy_mutation_rate_delimiter"));
+
+        horizontalLayout_28->addWidget(le_anatomy_mutation_rate_delimiter);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_28);
+
         cb_use_evolved_brain_mutation_rate = new QCheckBox(widget);
         cb_use_evolved_brain_mutation_rate->setObjectName(QString::fromUtf8("cb_use_evolved_brain_mutation_rate"));
 
@@ -789,6 +810,21 @@ public:
 
 
         verticalLayout_20->addLayout(horizontalLayout_27);
+
+        horizontalLayout_29 = new QHBoxLayout();
+        horizontalLayout_29->setObjectName(QString::fromUtf8("horizontalLayout_29"));
+        label_24 = new QLabel(widget);
+        label_24->setObjectName(QString::fromUtf8("label_24"));
+
+        horizontalLayout_29->addWidget(label_24);
+
+        le_brain_mutation_rate_delimiter = new QLineEdit(widget);
+        le_brain_mutation_rate_delimiter->setObjectName(QString::fromUtf8("le_brain_mutation_rate_delimiter"));
+
+        horizontalLayout_29->addWidget(le_brain_mutation_rate_delimiter);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_29);
 
         horizontalLayout_19 = new QHBoxLayout();
         horizontalLayout_19->setObjectName(QString::fromUtf8("horizontalLayout_19"));
@@ -972,7 +1008,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 412, 265));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 265));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         lb_total_engine_ticks = new QLabel(scrollAreaWidgetContents_4);
@@ -1048,7 +1084,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 412, 213));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 213));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1221,6 +1257,8 @@ public:
         QObject::connect(le_killer_damage_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_killer_damage_amount_slot()));
         QObject::connect(le_produce_food_every_n_tick, SIGNAL(returnPressed()), MainWindow, SLOT(le_produce_food_every_n_slot()));
         QObject::connect(cb_use_evolved_brain_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_brain_mutation_rate_slot(bool)));
+        QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
+        QObject::connect(le_brain_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_delimiter_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -1304,9 +1342,12 @@ public:
         cb_use_evolved_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved anatomy mutation rate", nullptr));
         lb_mutation_rate->setText(QApplication::translate("MainWindow", "Global anatomy mutation rate:", nullptr));
         le_global_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "0.05", nullptr));
+        label_23->setText(QApplication::translate("MainWindow", "Anatomy mutation rate delimiter:", nullptr));
+        le_anatomy_mutation_rate_delimiter->setText(QApplication::translate("MainWindow", "0.5", nullptr));
         cb_use_evolved_brain_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved brain mutation rate", nullptr));
         label_20->setText(QApplication::translate("MainWindow", "Global brain mutation rate:", nullptr));
         le_global_brain_mutation_rate->setText(QApplication::translate("MainWindow", "0.1", nullptr));
+        label_24->setText(QApplication::translate("MainWindow", "Brain mutation rate delimiter:", nullptr));
         label_21->setText(QApplication::translate("MainWindow", "Killer damage amount:", nullptr));
         le_killer_damage_amount->setText(QApplication::translate("MainWindow", "1", nullptr));
         label_10->setText(QApplication::translate("MainWindow", "add cell:", nullptr));

@@ -40,6 +40,12 @@ enum class CursorMode {
     Kill_mode,
 };
 
+struct pix_pos {
+    int start = 0;
+    int stop = 0;
+    pix_pos(int start, int stop): start(start), stop(stop) {}
+};
+
 template<typename T>
 struct result_struct {
     bool is_valid;
@@ -221,9 +227,9 @@ private:
                                       std::vector<int> & lin_height,
                                       std::vector<int> & truncated_lin_width,
                                       std::vector<int> & truncated_lin_height);
-    void inline image_for_loop(int image_width, int image_height,
-                               std::vector<int> & lin_width,
-                               std::vector<int> & lin_height);
+    void inline
+    image_for_loop(int image_width, int image_height, std::vector<int> &lin_width, std::vector<int> &lin_height,
+                   std::vector<int> &truncated_lin_width, std::vector<int> &truncated_lin_height);
 
     void partial_clear_world();
     void reset_world();
@@ -286,6 +292,8 @@ private slots:
     void le_float_number_precision_slot();
     void le_killer_damage_amount_slot();
     void le_produce_food_every_n_slot();
+    void le_anatomy_mutation_rate_delimiter_slot();
+    void le_brain_mutation_rate_delimiter_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);

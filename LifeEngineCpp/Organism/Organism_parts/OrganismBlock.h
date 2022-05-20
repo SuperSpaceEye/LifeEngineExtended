@@ -10,6 +10,7 @@
 class OrganismBlock: public BaseGridBlock {
 public:
     OrganismBlock();
+    explicit OrganismBlock(BlockTypes type) : BaseGridBlock(type) {}
 };
 
 

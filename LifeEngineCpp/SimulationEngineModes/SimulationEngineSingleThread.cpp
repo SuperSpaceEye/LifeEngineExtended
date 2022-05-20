@@ -10,7 +10,11 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
         dc->organisms.emplace_back(organism);
         for (auto &block: organism->organism_anatomy->_organism_blocks) {
             dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                               [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+                               [organism->y + block.get_pos(organism->rotation).y].type = block.type;
+            dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                               [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
+            dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                               [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
         }
     }
     dc->to_place_organisms.clear();
@@ -144,7 +148,11 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
 
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
                 dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                                   [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+                                   [organism->y + block.get_pos(organism->rotation).y].type = block.type;
+                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                                   [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                                   [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
             }
             return;
         }
@@ -154,7 +162,11 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     organism->rotation = new_rotation;
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                           [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+        [organism->y + block.get_pos(organism->rotation).y].type = block.type;
+        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+        [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+        [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
     }
 
 }
@@ -194,7 +206,11 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
                                [new_y + block.get_pos(organism->rotation).y].type != EmptyBlock) {
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
                 dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                                   [organism->y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+                [organism->y + block.get_pos(organism->rotation).y].type = block.type;
+                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
             }
             return;
         }
@@ -202,7 +218,11 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-                           [new_y + block.get_pos(organism->rotation).y].type = block.organism_block.type;
+        [new_y + block.get_pos(organism->rotation).y].type = block.type;
+        dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
+        [new_y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+        dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
+        [new_y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
     }
 
     organism->x = new_x;
