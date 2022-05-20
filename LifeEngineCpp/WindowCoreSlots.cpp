@@ -154,7 +154,7 @@ void WindowCore::le_simulation_width_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_width,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Simulation width cannot be less than 1."); return;}
+    if (result.result < 10) {display_message("Simulation width cannot be less than 10."); return;}
     new_simulation_width = result.result;
 }
 
@@ -163,7 +163,7 @@ void WindowCore::le_simulation_height_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_height,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Simulation height cannot be less than 1."); return;}
+    if (result.result < 10) {display_message("Simulation height cannot be less than 10."); return;}
     new_simulation_height = result.result;
 }
 
@@ -173,7 +173,7 @@ void WindowCore::le_food_production_probability_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float",
                                                           _ui.le_food_production_probability, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0 || result.result > 1) {display_message("Input must be between 0 and 1."); return;}
+    if (result.result <= 0 || result.result > 1) {display_message("Input must be between 0 and 1."); return;}
     sp.food_production_probability = result.result;
 }
 
@@ -182,7 +182,7 @@ void WindowCore::le_lifespan_multiplier_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_lifespan_multiplier,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
     sp.lifespan_multiplier = result.result;
 }
 
@@ -190,7 +190,7 @@ void WindowCore::le_look_range_slot() {
     int fallback = sp.look_range;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_look_range, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
     sp.look_range = result.result;
 }
 
@@ -211,13 +211,24 @@ void WindowCore::le_extra_reproduction_cost_slot() {
     sp.extra_reproduction_cost = result.result;
 }
 
-void WindowCore::le_global_mutation_rate_slot() {
+void WindowCore::le_global_anatomy_mutation_rate_slot() {
     float fallback = sp.global_anatomy_mutation_rate;
-    auto result = try_convert_message_box_template<float>("Inputted text is not an int", _ui.le_global_anatomy_mutation_rate,
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_anatomy_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_anatomy_mutation_rate = result.result;
+}
+
+void WindowCore::le_global_brain_mutation_rate_slot() {
+    float fallback = sp.global_brain_mutation_rate;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_brain_mutation_rate,
+                                                          fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
+    sp.global_brain_mutation_rate = result.result;
 }
 
 void WindowCore::le_add_cell_slot() {
@@ -248,7 +259,7 @@ void WindowCore::le_min_reproducing_distance_slot() {
     int fallback = sp.min_reproducing_distance;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_reproduction_distance, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result < 1) { display_message("Input cannot be less than 1."); return;}
     if (result.result > sp.max_reproducing_distance) { display_message("Input cannot be more than max reproducing distance."); return;}
     sp.min_reproducing_distance = result.result;
 }
@@ -257,7 +268,7 @@ void WindowCore::le_max_reproducing_distance_slot() {
     int fallback = sp.max_reproducing_distance;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_reproduction_distance, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result < 1) { display_message("Input cannot be less than 1."); return;}
     if (result.result < sp.min_reproducing_distance) { display_message("Input cannot be less than min reproducing distance."); return;}
     sp.max_reproducing_distance = result.result;
 }

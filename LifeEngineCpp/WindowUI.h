@@ -211,8 +211,8 @@ public:
     QLabel *label_19;
     QLineEdit *le_float_number_precision;
     QCheckBox *cb_disable_warnings;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -464,11 +464,13 @@ public:
 
         le_cell_size = new QLineEdit(widget_3);
         le_cell_size->setObjectName(QString::fromUtf8("le_cell_size"));
+        le_cell_size->setEnabled(false);
 
         horizontalLayout_22->addWidget(le_cell_size);
 
         cb_fill_window = new QCheckBox(widget_3);
         cb_fill_window->setObjectName(QString::fromUtf8("cb_fill_window"));
+        cb_fill_window->setEnabled(false);
 
         horizontalLayout_22->addWidget(cb_fill_window);
 
@@ -622,7 +624,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -569, 506, 761));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 98, 761));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -1015,7 +1017,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 265));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 238, 265));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         lb_total_engine_ticks = new QLabel(scrollAreaWidgetContents_4);
@@ -1091,7 +1093,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -38, 506, 238));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 238));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1214,65 +1216,66 @@ public:
 
         retranslateUi(MainWindow);
         QObject::connect(b_reset, SIGNAL(clicked()), MainWindow, SLOT(b_reset_slot()));
-        QObject::connect(cb_stop_console_output, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_stop_console_output_slot(bool)));
         QObject::connect(cb_synchronise_sim_and_win, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_synchronise_simulation_and_window_slot(bool)));
         QObject::connect(tb_stoprender, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_stoprender_slot(bool)));
-        QObject::connect(rb_multi_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_multi_thread_slot()));
-        QObject::connect(rb_cuda_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_cuda_slot()));
         QObject::connect(rb_wall, SIGNAL(clicked()), MainWindow, SLOT(rb_wall_slot()));
         QObject::connect(b_reset_view, SIGNAL(clicked()), MainWindow, SLOT(b_reset_view_slot()));
         QObject::connect(rb_kill, SIGNAL(clicked()), MainWindow, SLOT(rb_kill_slot()));
         QObject::connect(le_fps, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_fps_slot()));
         QObject::connect(b_clear, SIGNAL(clicked()), MainWindow, SLOT(b_clear_slot()));
-        QObject::connect(rb_single_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_single_thread_slot()));
         QObject::connect(tb_pause, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_pause_slot(bool)));
-        QObject::connect(le_num_threads, SIGNAL(returnPressed()), MainWindow, SLOT(le_num_threads_slot()));
         QObject::connect(le_sps, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_sps_slot()));
         QObject::connect(b_pass_one_tick, SIGNAL(clicked()), MainWindow, SLOT(b_pass_one_tick_slot()));
-        QObject::connect(le_food_production_probability, SIGNAL(returnPressed()), MainWindow, SLOT(le_food_production_probability_slot()));
-        QObject::connect(le_lifespan_multiplier, SIGNAL(returnPressed()), MainWindow, SLOT(le_lifespan_multiplier_slot()));
-        QObject::connect(le_look_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_look_range_slot()));
-        QObject::connect(le_auto_food_drop_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_auto_food_drop_rate_slot()));
-        QObject::connect(le_global_anatomy_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_global_mutation_rate_slot()));
-        QObject::connect(le_add, SIGNAL(returnPressed()), MainWindow, SLOT(le_add_cell_slot()));
-        QObject::connect(le_change, SIGNAL(returnPressed()), MainWindow, SLOT(le_change_cell_slot()));
-        QObject::connect(le_remove, SIGNAL(returnPressed()), MainWindow, SLOT(le_remove_cell_slot()));
-        QObject::connect(cb_reproducing_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reproduction_rotation_enabled_slot(bool)));
-        QObject::connect(cb_on_touch_kill, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_on_touch_kill_slot(bool)));
-        QObject::connect(cb_use_evolved_anatomy_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_anatomy_mutation_rate_slot(bool)));
+        QObject::connect(b_kill_all_organisms_slot, SIGNAL(clicked()), MainWindow, SLOT(b_kill_all_organisms_slot()));
+        QObject::connect(rb_food, SIGNAL(clicked()), MainWindow, SLOT(rb_food_slot()));
         QObject::connect(cb_movers_can_produce_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_movers_can_produce_food_slot(bool)));
-        QObject::connect(cb_food_blocks_reproduction, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_food_blocks_reproduction_slot(bool)));
-        QObject::connect(le_extra_reproduction_cost, SIGNAL(returnPressed()), MainWindow, SLOT(le_extra_reproduction_cost_slot()));
-        QObject::connect(le_cell_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_cell_size_slot()));
         QObject::connect(le_simulation_width, SIGNAL(returnPressed()), MainWindow, SLOT(le_simulation_width_slot()));
-        QObject::connect(le_simulation_height, SIGNAL(returnPressed()), MainWindow, SLOT(le_simulation_height_slot()));
-        QObject::connect(cb_fill_window, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fill_window_slot(bool)));
-        QObject::connect(b_resize_and_reset, SIGNAL(clicked()), MainWindow, SLOT(b_resize_and_reset_slot()));
+        QObject::connect(b_load_world, SIGNAL(clicked()), MainWindow, SLOT(b_load_world_slot()));
         QObject::connect(cb_reset_on_total_extinction, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reset_on_total_extinction_slot(bool)));
+        QObject::connect(cb_fill_window, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fill_window_slot(bool)));
+        QObject::connect(rb_partial_multi_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_partial_multi_thread_slot()));
+        QObject::connect(b_save_world, SIGNAL(clicked()), MainWindow, SLOT(b_save_world_slot()));
+        QObject::connect(rb_single_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_single_thread_slot()));
         QObject::connect(cb_pause_on_total_extinction, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_pause_on_total_extinction_slot(bool)));
         QObject::connect(b_generate_random_walls, SIGNAL(clicked()), MainWindow, SLOT(b_generate_random_walls_slot()));
-        QObject::connect(b_clear_all_walls, SIGNAL(clicked()), MainWindow, SLOT(b_clear_all_walls_slot()));
-        QObject::connect(cb_clear_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_clear_walls_on_reset_slot(bool)));
-        QObject::connect(b_save_world, SIGNAL(clicked()), MainWindow, SLOT(b_save_world_slot()));
-        QObject::connect(b_load_world, SIGNAL(clicked()), MainWindow, SLOT(b_load_world_slot()));
-        QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
-        QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
-        QObject::connect(b_kill_all_organisms_slot, SIGNAL(clicked()), MainWindow, SLOT(b_kill_all_organisms_slot()));
-        QObject::connect(cb_runtime_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_runtime_rotation_enabled_slot(bool)));
-        QObject::connect(cb_fix_reproduction_distance, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fix_reproduction_distance_slot(bool)));
-        QObject::connect(le_min_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_reproducing_distance_slot()));
-        QObject::connect(le_max_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_reproducing_distance_slot()));
-        QObject::connect(le_max_organisms, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_organisms_slot()));
-        QObject::connect(rb_partial_multi_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_partial_multi_thread_slot()));
-        QObject::connect(le_float_number_precision, SIGNAL(returnPressed()), MainWindow, SLOT(le_float_number_precision_slot()));
-        QObject::connect(rb_food, SIGNAL(clicked()), MainWindow, SLOT(rb_food_slot()));
-        QObject::connect(le_killer_damage_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_killer_damage_amount_slot()));
-        QObject::connect(le_produce_food_every_n_tick, SIGNAL(returnPressed()), MainWindow, SLOT(le_produce_food_every_n_slot()));
-        QObject::connect(cb_use_evolved_brain_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_brain_mutation_rate_slot(bool)));
-        QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
-        QObject::connect(le_brain_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_delimiter_slot()));
         QObject::connect(cb_disable_warnings, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_disable_warnings_slot(bool)));
+        QObject::connect(le_auto_food_drop_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_auto_food_drop_rate_slot()));
+        QObject::connect(le_num_threads, SIGNAL(returnPressed()), MainWindow, SLOT(le_num_threads_slot()));
+        QObject::connect(le_remove, SIGNAL(returnPressed()), MainWindow, SLOT(le_remove_cell_slot()));
+        QObject::connect(le_min_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_reproducing_distance_slot()));
+        QObject::connect(le_change, SIGNAL(returnPressed()), MainWindow, SLOT(le_change_cell_slot()));
+        QObject::connect(le_produce_food_every_n_tick, SIGNAL(returnPressed()), MainWindow, SLOT(le_produce_food_every_n_slot()));
+        QObject::connect(le_look_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_look_range_slot()));
+        QObject::connect(cb_runtime_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_runtime_rotation_enabled_slot(bool)));
+        QObject::connect(cb_generate_random_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_generate_random_walls_on_reset_slot(bool)));
+        QObject::connect(le_float_number_precision, SIGNAL(returnPressed()), MainWindow, SLOT(le_float_number_precision_slot()));
+        QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
+        QObject::connect(rb_cuda_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_cuda_slot()));
+        QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
+        QObject::connect(le_global_anatomy_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
+        QObject::connect(le_max_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_reproducing_distance_slot()));
+        QObject::connect(cb_fix_reproduction_distance, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fix_reproduction_distance_slot(bool)));
+        QObject::connect(cb_stop_console_output, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_stop_console_output_slot(bool)));
+        QObject::connect(cb_use_evolved_anatomy_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_anatomy_mutation_rate_slot(bool)));
+        QObject::connect(le_killer_damage_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_killer_damage_amount_slot()));
+        QObject::connect(cb_on_touch_kill, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_on_touch_kill_slot(bool)));
+        QObject::connect(b_resize_and_reset, SIGNAL(clicked()), MainWindow, SLOT(b_resize_and_reset_slot()));
+        QObject::connect(le_food_production_probability, SIGNAL(returnPressed()), MainWindow, SLOT(le_food_production_probability_slot()));
+        QObject::connect(le_extra_reproduction_cost, SIGNAL(returnPressed()), MainWindow, SLOT(le_extra_reproduction_cost_slot()));
+        QObject::connect(le_lifespan_multiplier, SIGNAL(returnPressed()), MainWindow, SLOT(le_lifespan_multiplier_slot()));
+        QObject::connect(le_brain_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_delimiter_slot()));
+        QObject::connect(le_global_brain_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_global_brain_mutation_rate_slot()));
+        QObject::connect(le_cell_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_cell_size_slot()));
+        QObject::connect(cb_use_evolved_brain_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_brain_mutation_rate_slot(bool)));
         QObject::connect(cb_self_organism_blocks_block_sight, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_self_organism_blocks_block_sight_slot(bool)));
+        QObject::connect(le_add, SIGNAL(returnPressed()), MainWindow, SLOT(le_add_cell_slot()));
+        QObject::connect(le_simulation_height, SIGNAL(returnPressed()), MainWindow, SLOT(le_simulation_height_slot()));
+        QObject::connect(le_max_organisms, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_organisms_slot()));
+        QObject::connect(rb_multi_thread_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_multi_thread_slot()));
+        QObject::connect(cb_clear_walls_on_reset, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_clear_walls_on_reset_slot(bool)));
+        QObject::connect(cb_food_blocks_reproduction, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_food_blocks_reproduction_slot(bool)));
+        QObject::connect(cb_reproducing_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reproduction_rotation_enabled_slot(bool)));
+        QObject::connect(b_clear_all_walls, SIGNAL(clicked()), MainWindow, SLOT(b_clear_all_walls_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -1380,7 +1383,7 @@ public:
         label_16->setText(QApplication::translate("MainWindow", "Max reproducing distance: ", nullptr));
         le_max_reproduction_distance->setText(QApplication::translate("MainWindow", "3", nullptr));
         cb_fix_reproduction_distance->setText(QApplication::translate("MainWindow", "Fix reproducing distance", nullptr));
-        cb_self_organism_blocks_block_sight->setText(QApplication::translate("MainWindow", "Organism's self blocks block sight", nullptr));
+        cb_self_organism_blocks_block_sight->setText(QApplication::translate("MainWindow", "Organism's self cells block sight", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
         lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", nullptr));
         lb_organisms_alive->setText(QApplication::translate("MainWindow", "Organisms alive:", nullptr));

@@ -6,8 +6,7 @@
 
 #include "WindowCore.h"
 
-WindowCore::WindowCore(int simulation_width, int simulation_height, int window_fps,
-                       int simulation_fps, int simulation_num_threads, QWidget *parent) :
+WindowCore::WindowCore(QWidget *parent) :
         QWidget(parent){
     _ui.setupUi(this);
 
@@ -19,26 +18,19 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     //https://stackoverflow.com/questions/32714105/mousemoveevent-is-not-called
     QCoreApplication::instance()->installEventFilter(this);
 
-    dc.simulation_width = simulation_width;
-    dc.simulation_height = simulation_height;
+    dc.simulation_width = 200;
+    dc.simulation_height = 200;
 
-    set_simulation_num_threads(simulation_num_threads);
+    set_simulation_num_threads(1);
 
-    dc.single_thread_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
-    dc.second_simulation_grid.resize(simulation_width, std::vector<BaseGridBlock>(simulation_height, BaseGridBlock{}));
+    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
     engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), std::ref(sp), engine_mutex);
 
     make_walls();
 
     std::random_device rd;
     mt = std::mt19937(rd());
-//    std::uniform_int_distribution<int> dist(0, 8);
-//
-//    for (int relative_x = 0; relative_x < simulation_width; relative_x++) {
-//        for (int relative_y = 0; relative_y < simulation_height; relative_y++) {
-//            single_thread_simulation_grid[relative_x][relative_y].type = static_cast<BlockTypes>(dist(mt));
-//        }
-//    }
 
     color_container = ColorContainer{};
     sp = SimulationParameters{};
@@ -81,11 +73,10 @@ WindowCore::WindowCore(int simulation_width, int simulation_height, int window_f
     timer = new QTimer(parent);
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
 
-    set_window_interval(window_fps);
-    set_simulation_interval(simulation_fps);
+    set_window_interval(60);
+    set_simulation_interval(-1);
 
     timer->start();
-    //reset_scale_view();
 }
 
 void WindowCore::mainloop_tick() {
@@ -101,7 +92,6 @@ void WindowCore::mainloop_tick() {
     // timer
     if (std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count() / 1000. > 1) {
         //TODO make pausing logic better.
-        //pauses engine, parses/loads data from/to engine, resumes engine. It looks stupid, but works
         cp.engine_pause = true;
         wait_for_engine_to_pause();
         simulation_frames = dc.engine_ticks;
@@ -442,7 +432,7 @@ void WindowCore::set_simulation_mode(SimulationModes mode) {
 
 void WindowCore::clear_organisms() {
     if (!cp.engine_paused) {
-        if (!stop_console_output) {std::cout << "Engine is not paused! Organism not cleared.\n";}
+        if (!stop_console_output) {std::cout << "Engine is not paused! Organisms not cleared.\n";}
         return;
     }
     for (auto & organism: dc.organisms) {delete organism;}
@@ -454,7 +444,7 @@ void WindowCore::clear_organisms() {
 void WindowCore::resize_simulation_space() {
     if (!disable_warnings) {
         auto msg = DescisionMessageBox("Warning",
-                                       "All organisms and simulation grid will be cleared.",
+                                       "Simulation space will be rebuilt and all organisms cleared.",
                                        "OK", "Cancel", this);
         auto result = msg.exec();
         if (!result) {
@@ -642,6 +632,8 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_fix_reproduction_distance         ->setChecked(sp.reproduction_distance_fixed);
     _ui.cb_use_evolved_brain_mutation_rate   ->setChecked(sp.use_brain_evolved_mutation_rate);
     _ui.cb_use_evolved_anatomy_mutation_rate ->setChecked(sp.use_anatomy_evolved_mutation_rate);
+    _ui.cb_disable_warnings                  ->setChecked(disable_warnings);
+    _ui.cb_self_organism_blocks_block_sight  ->setChecked(sp.organism_self_blocks_block_sight);
     //Simulation settings
     _ui.cb_stop_console_output->setChecked(stop_console_output);
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
