@@ -91,6 +91,15 @@ public:
 };
 
 struct OrganismAvgBlockInformation {
+    uint64_t total_size_organism_blocks = 0;
+    uint64_t total_size_producing_space = 0;
+    uint64_t total_size_eating_space    = 0;
+    uint64_t total_size_armor_space     = 0;
+    uint64_t total_size_single_adjacent_space = 0;
+    uint64_t total_size_single_diagonal_adjacent_space = 0;
+    uint64_t total_size_double_adjacent_space = 0;
+    uint64_t total_size = 0;
+
     float size = 0;
     float _mouth_blocks    = 0;
     float _producer_blocks = 0;
@@ -240,7 +249,11 @@ private:
     void reset_world();
     void clear_world();
 
+    void update_simulation_size_label();
+
     void initialize_gui_settings();
+
+    std::string convert_num_bytes(uint64_t num_bytes);
 
     OrganismAvgBlockInformation calculate_organisms_info();
 

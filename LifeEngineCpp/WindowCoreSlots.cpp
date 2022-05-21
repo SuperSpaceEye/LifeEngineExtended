@@ -58,9 +58,8 @@ void WindowCore::b_reset_slot() {
 }
 
 void WindowCore::b_resize_and_reset_slot() {
+    //it breaks, if I do it inplace
     resize_simulation_grid_flag = true;
-    //Ok, it breaks
-    //resize_simulation_space();
 }
 
 void WindowCore::b_generate_random_walls_slot() {
@@ -138,16 +137,12 @@ void WindowCore::le_num_threads_slot() {
     set_simulation_num_threads(result.result);
 }
 
-//TODO cell size is not implemented
 void WindowCore::le_cell_size_slot() {
     int fallback = cell_size;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_cell_size, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Size of cell cannot be less than 1."); return;}
     cell_size = result.result;
-    if (!disable_warnings) {
-        display_message("Warning, changing cell size is not implemented");
-    }
 }
 
 void WindowCore::le_simulation_width_slot() {

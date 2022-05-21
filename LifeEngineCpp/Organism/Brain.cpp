@@ -114,6 +114,7 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) {
                 case Rotation::RIGHT: return BrainDecision::MoveRight;
             }
     }
+    return get_random_action();
 }
 
 //TODO

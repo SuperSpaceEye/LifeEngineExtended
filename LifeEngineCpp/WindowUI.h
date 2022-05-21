@@ -180,6 +180,8 @@ public:
     QScrollArea *scrollArea_4;
     QWidget *scrollAreaWidgetContents_4;
     QVBoxLayout *verticalLayout_24;
+    QLabel *lb_simulation_size;
+    QLabel *lb_organisms_memory_consumption;
     QLabel *lb_total_engine_ticks;
     QLabel *lb_organisms_alive;
     QLabel *lb_anatomy_mutation_rate;
@@ -437,7 +439,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 506, 219));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 98, 219));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -464,13 +466,13 @@ public:
 
         le_cell_size = new QLineEdit(widget_3);
         le_cell_size->setObjectName(QString::fromUtf8("le_cell_size"));
-        le_cell_size->setEnabled(false);
+        le_cell_size->setEnabled(true);
 
         horizontalLayout_22->addWidget(le_cell_size);
 
         cb_fill_window = new QCheckBox(widget_3);
         cb_fill_window->setObjectName(QString::fromUtf8("cb_fill_window"));
-        cb_fill_window->setEnabled(false);
+        cb_fill_window->setEnabled(true);
 
         horizontalLayout_22->addWidget(cb_fill_window);
 
@@ -624,7 +626,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 761));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 98, 761));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -1018,9 +1020,19 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 265));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 311));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
+        lb_simulation_size = new QLabel(scrollAreaWidgetContents_4);
+        lb_simulation_size->setObjectName(QString::fromUtf8("lb_simulation_size"));
+
+        verticalLayout_24->addWidget(lb_simulation_size);
+
+        lb_organisms_memory_consumption = new QLabel(scrollAreaWidgetContents_4);
+        lb_organisms_memory_consumption->setObjectName(QString::fromUtf8("lb_organisms_memory_consumption"));
+
+        verticalLayout_24->addWidget(lb_organisms_memory_consumption);
+
         lb_total_engine_ticks = new QLabel(scrollAreaWidgetContents_4);
         lb_total_engine_ticks->setObjectName(QString::fromUtf8("lb_total_engine_ticks"));
 
@@ -1094,7 +1106,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 238));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 238));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1106,6 +1118,7 @@ public:
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(scrollAreaWidgetContents);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
+        widget_2->setMinimumSize(QSize(0, 0));
         verticalLayout_19 = new QVBoxLayout(widget_2);
         verticalLayout_19->setSpacing(2);
         verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
@@ -1320,7 +1333,7 @@ public:
 "<p style="
                         "\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Github https://github.com/SuperSpaceEye/TheLifeEngineCpp</p></body></html>", nullptr));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This project's Github: https://github.com/SuperSpaceEye/TheLifeEngineCpp</p></body></html>", nullptr));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Not implemented yet.", nullptr));
         Tabs->setTabText(Tabs->indexOf(editor_tab), QApplication::translate("MainWindow", "Editor", nullptr));
@@ -1386,6 +1399,8 @@ public:
         cb_fix_reproduction_distance->setText(QApplication::translate("MainWindow", "Fix reproducing distance", nullptr));
         cb_self_organism_blocks_block_sight->setText(QApplication::translate("MainWindow", "Organism's self cells block sight", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
+        lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", nullptr));
+        lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", nullptr));
         lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", nullptr));
         lb_organisms_alive->setText(QApplication::translate("MainWindow", "Organisms alive:", nullptr));
         lb_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", nullptr));
