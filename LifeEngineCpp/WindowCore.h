@@ -34,6 +34,7 @@
 #include "EngineDataContainer.h"
 #include "OrganismBlockParameters.h"
 #include "WindowUI.h"
+#include "OrganismEditor.h"
 
 enum class CursorMode {
     Food_mode,
@@ -101,6 +102,9 @@ struct OrganismAvgBlockInformation {
     uint64_t total_size_double_adjacent_space = 0;
     uint64_t total_size = 0;
 
+    float move_range = 0;
+    int moving_organisms = 0;
+
     float size = 0;
     float _mouth_blocks    = 0;
     float _producer_blocks = 0;
@@ -124,6 +128,9 @@ private:
     bool right_mouse_button_pressed = false;
     bool left_mouse_button_pressed = false;
 
+    bool change_main_simulation_grid = false;
+    bool change_editing_grid = false;
+
     float center_x;
     float center_y;
 
@@ -138,6 +145,7 @@ private:
     int last_mouse_y = 0;
 
     SimulationEngine* engine;
+    OrganismEditor edit_engine;
 
     float window_interval = 0.;
     long delta_window_processing_time = 0;
@@ -315,6 +323,9 @@ private slots:
     void le_anatomy_mutation_rate_delimiter_slot();
     void le_brain_mutation_rate_delimiter_slot();
     void le_font_size_slot();
+    void le_max_move_range_slot();
+    void le_min_move_range_slot();
+    void le_move_range_delimiter_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
@@ -334,6 +345,7 @@ private slots:
     void cb_use_evolved_brain_mutation_rate_slot(bool state);
     void cb_disable_warnings_slot(bool state);
     void cb_self_organism_blocks_block_sight_slot(bool state);
+    void cb_set_fixed_move_range_slot(bool state);
 
 public:
     WindowCore(QWidget *parent);

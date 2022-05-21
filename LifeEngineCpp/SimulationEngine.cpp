@@ -32,10 +32,11 @@ void SimulationEngine::threaded_mainloop() {
         //if (cp.build_threads) { build_threads(); }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
         process_user_action_pool();
-        if (!cp.engine_paused || cp.engine_pass_tick) {
+        if ((!cp.engine_paused || cp.engine_pass_tick) && (!cp.pause_button_pause || cp.pass_tick)) {
             //if ((!cp.engine_pause || cp.synchronise_simulation_tick) && !cp.engine_global_pause) {
                 cp.engine_paused = false;
                 cp.engine_pass_tick = false;
+                cp.pass_tick = false;
                 cp.synchronise_simulation_tick = false;
                 simulation_tick();
 //                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}

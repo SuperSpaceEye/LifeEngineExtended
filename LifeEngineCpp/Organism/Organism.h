@@ -34,11 +34,17 @@ public:
 
     float food_collected = 0;
     float food_needed = 0;
+
+    int move_range = 1;
     //TODO implement rotation
     bool * can_rotate = nullptr;
     Rotation rotation = Rotation::UP;
 
     bool child_ready = false;
+
+    int move_counter = 0;
+
+    BrainDecision last_decision = BrainDecision::MoveUp;
 
     std::shared_ptr<Anatomy> organism_anatomy = nullptr;
     std::shared_ptr<Brain> brain = nullptr;
@@ -54,11 +60,12 @@ public:
 
     void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate);
     void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate);
-//public:
+    static int mutate_move_range(SimulationParameters *sp, std::mt19937 * mt, int parent_move_range);
+    //public:
     Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
              std::shared_ptr<Brain> brain, SimulationParameters *sp,
-             OrganismBlockParameters *block_parameters, std::mt19937 *mt, float anatomy_mutation_rate=0.5,
-             float brain_mutation_rate=0.5);
+             OrganismBlockParameters *block_parameters, std::mt19937 *mt, int move_range,
+             float anatomy_mutation_rate=0.5, float brain_mutation_rate=0.5);
     Organism(Organism *organism);
     Organism()=default;
     ~Organism();

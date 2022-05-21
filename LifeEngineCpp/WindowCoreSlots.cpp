@@ -32,8 +32,8 @@ result_struct<T> WindowCore::try_convert_message_box_template(const std::string&
 //==================== Toggle buttons ====================
 
 void WindowCore::tb_pause_slot(bool paused) {
-    cp.engine_global_pause = paused;
-    parse_full_simulation_grid(cp.engine_global_pause);
+    cp.pause_button_pause = paused;
+    parse_full_simulation_grid(cp.pause_button_pause);
 }
 
 void WindowCore::tb_stoprender_slot(bool stopped_render) {
@@ -79,7 +79,7 @@ void WindowCore::b_load_world_slot() {
 }
 
 void WindowCore::b_pass_one_tick_slot() {
-    cp.engine_pass_tick = true;
+    cp.pass_tick = true;
     parse_full_simulation_grid(true);
 }
 void WindowCore::b_reset_view_slot() {
@@ -344,6 +344,28 @@ void WindowCore::le_font_size_slot() {
     setFont(_font);
 }
 
+void WindowCore::le_max_move_range_slot() {
+    int fallback = sp.max_move_range;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_move_range, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    if (result.result < sp.min_move_range) { display_message("Input cannot be less than min move distance."); return;}
+    sp.max_move_range = result.result;
+}
+
+void WindowCore::le_min_move_range_slot() {
+    int fallback = sp.min_move_range;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_move_range, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    if (result.result > sp.max_move_range) { display_message("Input cannot be more than max move distance"); result;}
+    sp.min_move_range = result.result;
+}
+
+void WindowCore::le_move_range_delimiter_slot() {
+
+}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
@@ -428,5 +450,7 @@ void WindowCore::cb_runtime_rotation_enabled_slot       (bool state) { sp.runtim
 void WindowCore::cb_fix_reproduction_distance_slot      (bool state) { sp.reproduction_distance_fixed = state;}
 
 void WindowCore::cb_disable_warnings_slot               (bool state) { disable_warnings = state;}
+
+void WindowCore::cb_set_fixed_move_range_slot           (bool state) {sp.set_fixed_move_range = state;}
 
 void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){sp.organism_self_blocks_block_sight = state;}

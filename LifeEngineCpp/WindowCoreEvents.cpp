@@ -31,7 +31,14 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
             if (mouse_event->button() == Qt::RightButton) {
                 auto position = mouse_event->pos();
 
-                if (_ui.simulation_graphicsView->underMouse()) {right_mouse_button_pressed = true;}
+                if (_ui.simulation_graphicsView->underMouse()) {
+                    right_mouse_button_pressed = true;
+                    change_main_simulation_grid = true;
+                }
+                if (_ui.editor_graphicsView->underMouse()) {
+                    right_mouse_button_pressed = true;
+                    change_editing_grid = true;
+                }
 
                 last_mouse_x = position.x();
                 last_mouse_y = position.y();
@@ -46,6 +53,9 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
             } else if (mouse_event->button() == Qt::LeftButton) {
                 left_mouse_button_pressed = false;
             }
+
+            change_editing_grid = false;
+            change_main_simulation_grid = false;
         } break;
         case QEvent::Resize: {
             auto resize_event = dynamic_cast<QResizeEvent*>(event);

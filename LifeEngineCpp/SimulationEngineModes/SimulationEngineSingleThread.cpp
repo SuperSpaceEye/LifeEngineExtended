@@ -32,7 +32,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i < to_erase.size(); ++i)       {erase_organisms(dc, to_erase, i);}
 
     auto organisms_observations = std::vector<std::vector<Observation>>();
-    reserve_observations(organisms_observations, dc->organisms);
+    reserve_observations(organisms_observations, dc->organisms, nullptr);
     get_observations(dc, sp, dc->organisms, organisms_observations);
 
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i],organisms_observations[i]);}
@@ -101,10 +101,18 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
 }
 
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
-                                                        std::vector<Organism *> &organisms) {
+                                                        std::vector<Organism *> &organisms,
+                                                        SimulationParameters *sp) {
     auto observations_count = std::vector<int>{};
     observations_count.reserve(organisms.size());
-    for (auto & organism: organisms) {observations_count.emplace_back(organism->organism_anatomy->_eye_blocks);}
+    for (auto & organism: organisms) {
+        // if organism is moving, then do not observe.
+        if (organism->move_counter == 0 && organism->organism_anatomy->_mover_blocks > 0 && organism->organism_anatomy->_eye_blocks > 0) {
+            observations_count.emplace_back(organism->organism_anatomy->_eye_blocks);
+        } else {
+            observations_count.emplace_back(0);
+        }
+    }
     observations.reserve(organisms.size());
     for (auto & item: observations_count) {observations.emplace_back(std::vector<Observation>(item));}
 }
@@ -115,7 +123,8 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
     auto organism_i = -1;
     for (auto & organism : organisms) {
         organism_i++;
-        if (organism->organism_anatomy->_eye_blocks <= 0) {continue;}
+        if (organism->organism_anatomy->_eye_blocks <= 0 || organism->organism_anatomy->_mover_blocks <=0) {continue;}
+        if (organism->move_counter != 0) {continue;}
         auto eye_i = -1;
         for (auto & block: organism->organism_anatomy->_organism_blocks) {
             if (block.type != BlockTypes::EyeBlock) {continue;}
@@ -300,26 +309,32 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
 
 void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
                                                  std::vector<Observation> &organism_observations) {
-    auto decision = organism->brain->get_decision(organism_observations);
+    if (organism->move_counter != 0) {
+        organism->last_decision = organism->brain->get_decision(organism_observations);
+    }
 
-    switch (decision) {
+    switch (organism->last_decision) {
         case BrainDecision::MoveUp:
         case BrainDecision::MoveDown:
         case BrainDecision::MoveLeft:
         case BrainDecision::MoveRight:
             if (organism->organism_anatomy->_mover_blocks > 0) {
-                move_organism(dc, organism, decision);
+                move_organism(dc, organism, organism->last_decision);
+                organism->move_counter++;
             }
             break;
         case BrainDecision::RotateLeft:
         case BrainDecision::RotateRight:
         case BrainDecision::Flip:
             if (organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-                rotate_organism(dc, organism, decision);
+                rotate_organism(dc, organism, organism->last_decision);
             }
             break;
 
         default: break;
+    }
+    if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_reproducing_distance == organism->move_counter)) {
+        organism->move_counter = 0;
     }
 }
 

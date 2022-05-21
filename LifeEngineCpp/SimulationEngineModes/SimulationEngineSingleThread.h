@@ -31,7 +31,9 @@ class SimulationEngineSingleThread {
 
     static void apply_damage    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
-    static void reserve_observations(std::vector<std::vector<Observation>> & observations, std::vector<Organism *> &organisms);
+    static void reserve_observations(std::vector<std::vector<Observation>> &observations,
+                                     std::vector<Organism *> &organisms,
+                                     SimulationParameters *sp);
 
     static void get_observations(EngineDataContainer *dc, SimulationParameters *sp,
                                  std::vector<Organism *> &organisms,

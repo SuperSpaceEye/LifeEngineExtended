@@ -35,6 +35,10 @@ struct EngineControlParameters {
     // if true, will build the threads
     bool build_threads = false;
 
+    bool pause_button_pause = false;
+
+    bool pass_tick = false;
+
     bool organisms_extinct = false;
 
     //TODO change this

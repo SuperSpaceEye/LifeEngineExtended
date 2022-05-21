@@ -29,6 +29,11 @@ struct SimulationParameters {
         float brain_min_possible_mutation_rate = 0.1;
         float brain_mutation_rate_delimiter = 0.5;
 
+        int max_move_range = 5;
+        int min_move_range = 1;
+        float move_range_delimiter = 0.5;
+        bool set_fixed_move_range = false;
+
         //Probabilities of creating child with doing:
             int add_cell = 33;
             int change_cell = 33;

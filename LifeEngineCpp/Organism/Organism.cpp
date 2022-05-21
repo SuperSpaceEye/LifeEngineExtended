@@ -9,13 +9,13 @@
 
 Organism::Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
-                   OrganismBlockParameters *block_parameters, std::mt19937 *mt, float anatomy_mutation_rate,
+                   OrganismBlockParameters *block_parameters, std::mt19937 *mt, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
 //        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(std::move(anatomy)), sp(sp),
 //        bp(block_parameters), mt(mt), brain(std::move(brain)) {
         x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(anatomy), sp(sp),
         bp(block_parameters), mt(mt), brain(brain), anatomy_mutation_rate(anatomy_mutation_rate),
-        brain_mutation_rate(brain_mutation_rate) {
+        brain_mutation_rate(brain_mutation_rate), move_range(move_range) {
     calculate_max_life();
     calculate_organism_lifetime();
     calculate_food_needed();
@@ -25,7 +25,8 @@ Organism::Organism(Organism *organism): x(organism->x), y(organism->y), can_rota
                                         rotation(organism->rotation), organism_anatomy(organism->organism_anatomy), sp(organism->sp),
                                         bp(organism->bp), mt(organism->mt), brain(organism->brain),
                                         anatomy_mutation_rate(organism->anatomy_mutation_rate),
-                                        brain_mutation_rate(organism->brain_mutation_rate){
+                                        brain_mutation_rate(organism->brain_mutation_rate),
+                                        move_range(organism->move_range){
     calculate_max_life();
     calculate_organism_lifetime();
     calculate_food_needed();
@@ -159,6 +160,21 @@ void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_p
     }
 }
 
+int Organism::mutate_move_range(SimulationParameters *sp, std::mt19937 * mt, int parent_move_range) {
+    if (sp->set_fixed_move_range) {return parent_move_range;}
+
+    auto child_move_range = parent_move_range;
+    if (std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->move_range_delimiter) {
+        child_move_range += 1;
+        if (child_move_range > sp->max_move_range) {return sp->max_move_range;}
+        return child_move_range;
+    } else {
+        child_move_range -= 1;
+        if (child_move_range < sp->min_move_range) {return sp->min_move_range;}
+        return child_move_range;
+    }
+}
+
 Organism * Organism::create_child() {
     std::shared_ptr<Anatomy> new_anatomy;
     std::shared_ptr<Brain>   new_brain;
@@ -168,9 +184,21 @@ Organism * Organism::create_child() {
 
     mutate_anatomy(new_anatomy, _anatomy_mutation_rate);
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate);
+    auto child_move_range = mutate_move_range(sp, mt, move_range);
 
     if (new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {new_brain->brain_type = BrainTypes::SimpleBrain;}
     else {new_brain->brain_type = BrainTypes::RandomActions;}
 
-    return new Organism(0, 0, can_rotate, rotation, new_anatomy, new_brain, sp, bp, mt, _anatomy_mutation_rate, _brain_mutation_rate);
+    return new Organism(0,
+                        0,
+                        can_rotate,
+                        rotation,
+                        new_anatomy,
+                        new_brain,
+                        sp,
+                        bp,
+                        mt,
+                        child_move_range,
+                        _anatomy_mutation_rate,
+                        _brain_mutation_rate);
 }
