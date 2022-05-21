@@ -316,6 +316,34 @@ void WindowCore::le_brain_mutation_rate_delimiter_slot() {
     sp.brain_mutation_rate_delimiter = result.result;
 }
 
+void WindowCore::le_font_size_slot() {
+    auto _font = font();
+
+    //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1.
+    //so the program needs to understand which mode it is
+    int font_size = 0;
+    bool point_size_m;
+    if (font().pixelSize() < 0) {
+        font_size = font().pointSize();
+        point_size_m = true;
+    } else {
+        font_size = font().pixelSize();
+        point_size_m = false;
+    }
+
+    int fallback = font_size;
+    auto result = try_convert_message_box_template<int>("Inputted text is not int", _ui.le_font_size, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+
+    if (point_size_m) {
+        _font.setPointSize(result.result);
+    } else {
+        _font.setPixelSize(result.result);
+    }
+    setFont(_font);
+}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {

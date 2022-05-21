@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QLineEdit>
 #include <QDialog>
+#include <QFont>
 
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
@@ -313,6 +314,7 @@ private slots:
     void le_produce_food_every_n_slot();
     void le_anatomy_mutation_rate_delimiter_slot();
     void le_brain_mutation_rate_delimiter_slot();
+    void le_font_size_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);

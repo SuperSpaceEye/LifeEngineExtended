@@ -351,7 +351,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>5</number>
            </property>
            <property name="iconSize">
             <size>
@@ -459,7 +459,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>84</width>
                   <height>219</height>
                  </rect>
                 </property>
@@ -772,7 +772,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>84</width>
                   <height>761</height>
                  </rect>
                 </property>
@@ -1440,9 +1440,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>98</width>
-                  <height>238</height>
+                  <y>-75</y>
+                  <width>506</width>
+                  <height>267</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1470,6 +1470,12 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <widget class="QWidget" name="widget_2" native="true">
                    <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="baseSize">
                     <size>
                      <width>0</width>
                      <height>0</height>
@@ -1605,6 +1611,20 @@ p, li { white-space: pre-wrap; }
                        <string>Disable warnings</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_30">
+                      <item>
+                       <widget class="QLabel" name="label_25">
+                        <property name="text">
+                         <string>Font size:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_font_size"/>
+                      </item>
+                     </layout>
                     </item>
                    </layout>
                   </widget>
@@ -2605,6 +2625,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_font_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_font_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>666</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -2668,6 +2704,7 @@ p, li { white-space: pre-wrap; }
   <slot>cb_disable_warnings_slot(bool)</slot>
   <slot>cb_self_organism_blocks_block_sight_slot(bool)</slot>
   <slot>le_global_brain_mutation_rate_slot()</slot>
+  <slot>le_font_size_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="cursor_modes">

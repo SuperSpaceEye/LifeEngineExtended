@@ -213,6 +213,9 @@ public:
     QLabel *label_19;
     QLineEdit *le_float_number_precision;
     QCheckBox *cb_disable_warnings;
+    QHBoxLayout *horizontalLayout_30;
+    QLabel *label_25;
+    QLineEdit *le_font_size;
     QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
 
@@ -439,7 +442,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 98, 219));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 84, 219));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -626,7 +629,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 98, 761));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 84, 761));
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -1106,7 +1109,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 238));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -75, 506, 267));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1119,6 +1122,7 @@ public:
         widget_2 = new QWidget(scrollAreaWidgetContents);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setMinimumSize(QSize(0, 0));
+        widget_2->setBaseSize(QSize(0, 0));
         verticalLayout_19 = new QVBoxLayout(widget_2);
         verticalLayout_19->setSpacing(2);
         verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
@@ -1200,6 +1204,21 @@ public:
         cb_disable_warnings->setObjectName(QString::fromUtf8("cb_disable_warnings"));
 
         verticalLayout_19->addWidget(cb_disable_warnings);
+
+        horizontalLayout_30 = new QHBoxLayout();
+        horizontalLayout_30->setObjectName(QString::fromUtf8("horizontalLayout_30"));
+        label_25 = new QLabel(widget_2);
+        label_25->setObjectName(QString::fromUtf8("label_25"));
+
+        horizontalLayout_30->addWidget(label_25);
+
+        le_font_size = new QLineEdit(widget_2);
+        le_font_size->setObjectName(QString::fromUtf8("le_font_size"));
+
+        horizontalLayout_30->addWidget(le_font_size);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_30);
 
 
         verticalLayout_5->addWidget(widget_2);
@@ -1290,8 +1309,9 @@ public:
         QObject::connect(cb_food_blocks_reproduction, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_food_blocks_reproduction_slot(bool)));
         QObject::connect(cb_reproducing_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reproduction_rotation_enabled_slot(bool)));
         QObject::connect(b_clear_all_walls, SIGNAL(clicked()), MainWindow, SLOT(b_clear_all_walls_slot()));
+        QObject::connect(le_font_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_font_size_slot()));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(5);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1423,6 +1443,7 @@ public:
         label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
         cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", nullptr));
+        label_25->setText(QApplication::translate("MainWindow", "Font size:", nullptr));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", nullptr));
     } // retranslateUi
 

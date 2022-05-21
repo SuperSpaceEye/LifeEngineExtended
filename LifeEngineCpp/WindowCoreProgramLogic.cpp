@@ -79,6 +79,10 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_interval(-1);
 
     timer->start();
+
+//    auto _font = font();
+//    _font.setPixelSize(20);
+//    setFont(_font);
 }
 
 void WindowCore::mainloop_tick() {
@@ -663,10 +667,18 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_use_evolved_anatomy_mutation_rate ->setChecked(sp.use_anatomy_evolved_mutation_rate);
     _ui.cb_disable_warnings                  ->setChecked(disable_warnings);
     _ui.cb_self_organism_blocks_block_sight  ->setChecked(sp.organism_self_blocks_block_sight);
-    //Simulation settings
+    //Settings
     _ui.cb_stop_console_output->setChecked(stop_console_output);
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
+    //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
+    int font_size = 0;
+    if (font().pixelSize() < 0) {
+        font_size = font().pointSize();
+    } else {
+        font_size = font().pixelSize();
+    }
+    _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font().pointSize())));
 
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
