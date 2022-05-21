@@ -402,7 +402,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*checking &amp;quot;Fix reproducing distance&amp;quot; will set reproducing distance to min value.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &amp;quot;M&amp;quot;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Github https://github.com/SuperSpaceEye/TheLifeEngineCpp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This project's Github: https://github.com/SuperSpaceEye/TheLifeEngineCpp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="overwriteMode">
                 <bool>false</bool>
@@ -459,7 +459,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>506</width>
+                  <width>98</width>
                   <height>219</height>
                  </rect>
                 </property>
@@ -520,7 +520,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLineEdit" name="le_cell_size">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>1</string>
@@ -530,7 +530,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QCheckBox" name="cb_fill_window">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Fill window</string>
@@ -1195,6 +1195,9 @@ p, li { white-space: pre-wrap; }
                        <layout class="QHBoxLayout" name="horizontalLayout_14">
                         <item>
                          <widget class="QCheckBox" name="cb_food_blocks_reproduction">
+                          <property name="enabled">
+                           <bool>false</bool>
+                          </property>
                           <property name="text">
                            <string>Food blocks reproduction</string>
                           </property>
@@ -1300,11 +1303,25 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>238</width>
-                  <height>265</height>
+                  <width>506</width>
+                  <height>311</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_24">
+                 <item>
+                  <widget class="QLabel" name="lb_simulation_size">
+                   <property name="text">
+                    <string>Simulation size:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_organisms_memory_consumption">
+                   <property name="text">
+                    <string>Organism's memory consumption:</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item>
                   <widget class="QLabel" name="lb_total_engine_ticks">
                    <property name="text">
@@ -1452,6 +1469,12 @@ p, li { white-space: pre-wrap; }
                  </property>
                  <item>
                   <widget class="QWidget" name="widget_2" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <layout class="QVBoxLayout" name="verticalLayout_19">
                     <property name="spacing">
                      <number>2</number>
@@ -2647,11 +2670,11 @@ p, li { white-space: pre-wrap; }
   <slot>le_global_brain_mutation_rate_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

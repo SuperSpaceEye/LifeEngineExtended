@@ -24,7 +24,10 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_num_threads(1);
 
     dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+
+    update_simulation_size_label();
+
     engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), std::ref(sp), engine_mutex);
 
     make_walls();
@@ -49,7 +52,6 @@ WindowCore::WindowCore(QWidget *parent) :
                                    &sp, &op, &mt);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
-    
 
     resize_image();
     reset_scale_view();
@@ -441,16 +443,28 @@ void WindowCore::clear_organisms() {
     dc.to_place_organisms.clear();
 }
 
+void WindowCore::calculate_new_simulation_size() {
+    auto window_size = _ui.simulation_graphicsView->viewport()->size();
+
+    new_simulation_width  = window_size.width() / cell_size;
+    new_simulation_height = window_size.height() / cell_size;
+}
+
 void WindowCore::resize_simulation_space() {
+    if (fill_window) {calculate_new_simulation_size();}
+
     if (!disable_warnings) {
         auto msg = DescisionMessageBox("Warning",
-                                       "Simulation space will be rebuilt and all organisms cleared.",
+                                       QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
+                                       "New grid will need " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width*2)),
                                        "OK", "Cancel", this);
         auto result = msg.exec();
         if (!result) {
             return;
         }
     }
+
+    std::cout << sizeof(BaseGridBlock) << "\n";
 
     cp.engine_pause = true;
     wait_for_engine_to_pause();
@@ -461,20 +475,13 @@ void WindowCore::resize_simulation_space() {
     dc.single_thread_simulation_grid.clear();
     dc.second_simulation_grid.clear();
 
-    auto block = BaseGridBlock{};
-    block.type = BlockTypes::EmptyBlock;
+    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
 
-    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
-    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, block));
-
-    clear_organisms();
-
-    make_walls();
+    update_simulation_size_label();
 
     cp.build_threads = true;
     reset_world();
-
-    unpause_engine();
 
     reset_scale_view();
 }
@@ -485,15 +492,14 @@ void WindowCore::partial_clear_world() {
 
     clear_organisms();
 
-    for (auto & column: dc.single_thread_simulation_grid)        {for (auto & block: column) { block.type = BlockTypes::EmptyBlock;}}
-    for (auto & column: dc.second_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.single_thread_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.second_simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
 
     dc.total_engine_ticks = 0;
 }
 
 void WindowCore::reset_world() {
     partial_clear_world();
-    clear_organisms();
     make_walls();
 
     base_organism->x = dc.simulation_width / 2;
@@ -527,22 +533,27 @@ void WindowCore::make_walls() {
     auto wall_thickness = 1;
 
     for (int x = 0; x < dc.simulation_width; x++) {
-        for (int i = 0; i < wall_thickness; i++) {
-            dc.single_thread_simulation_grid[x][i].type = BlockTypes::WallBlock;
-            dc.single_thread_simulation_grid[x][dc.simulation_height - 1 - i].type = BlockTypes::WallBlock;
-        }
+        dc.single_thread_simulation_grid[x][0].type = BlockTypes::WallBlock;
+        dc.single_thread_simulation_grid[x][dc.simulation_height-1].type = BlockTypes::WallBlock;
     }
-    for (int y = 0; y < dc.simulation_width; y++) {
-        for (int i = 0; i < wall_thickness; i++) {
-            dc.single_thread_simulation_grid[i][y].type = BlockTypes::WallBlock;
-            dc.single_thread_simulation_grid[dc.simulation_width - 1 - i][y].type = BlockTypes::WallBlock;
-        }
+
+    for (int y = 0; y < dc.simulation_height; y++) {
+        dc.single_thread_simulation_grid[0][y].type = BlockTypes::WallBlock;
+        dc.single_thread_simulation_grid[dc.simulation_width -1][y].type = BlockTypes::WallBlock;
     }
 }
 
 OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     OrganismAvgBlockInformation info;
     for (auto & organism: dc.organisms) {
+        info.total_size_organism_blocks += organism->organism_anatomy->_organism_blocks.size();
+        info.total_size_producing_space += organism->organism_anatomy->_producing_space.size();
+        info.total_size_eating_space    += organism->organism_anatomy->_eating_space.size();
+        info.total_size_armor_space     += organism->organism_anatomy->_armor_space.size();
+        info.total_size_single_adjacent_space += organism->organism_anatomy->_single_adjacent_space.size();
+        info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
+        info.total_size_double_adjacent_space += organism->organism_anatomy->_double_adjacent_space.size();
+
         info.size += organism->organism_anatomy->_organism_blocks.size();
 
         info._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
@@ -555,6 +566,22 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         info.brain_mutation_rate   += organism->brain_mutation_rate;
         info.anatomy_mutation_rate += organism->anatomy_mutation_rate;
     }
+
+    info.total_size_organism_blocks *= sizeof(SerializedOrganismBlockContainer);
+    info.total_size_producing_space *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_eating_space    *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_armor_space     *= sizeof(SerializedArmorSpaceContainer);
+    info.total_size_single_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_single_diagonal_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_double_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
+
+    info.total_size = info.total_size_organism_blocks +
+                      info.total_size_producing_space +
+                      info.total_size_eating_space +
+                      info.total_size_armor_space +
+                      info.total_size_single_adjacent_space +
+                      info.total_size_single_diagonal_adjacent_space +
+                      info.total_size_double_adjacent_space;
 
     info.size /= dc.organisms.size();
 
@@ -584,6 +611,8 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
 
 void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
+    _ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
+                                                                                convert_num_bytes(info.total_size)));
     _ui.lb_organisms_alive    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
     _ui.lb_organism_size      ->setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
     _ui.lb_mouth_num          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
@@ -642,4 +671,25 @@ void WindowCore::initialize_gui_settings() {
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
+}
+
+void WindowCore::update_simulation_size_label() {
+    _ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(dc.simulation_width) + "x" + std::to_string(dc.simulation_height)));
+}
+
+std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
+    int previous = num_bytes;
+    num_bytes /= 1024;
+    if (!num_bytes) {return std::to_string(previous) + " B";}
+    previous = num_bytes;
+    num_bytes /= 1024;
+    if (!num_bytes) {return std::to_string(previous) + "KiB";}
+    previous = num_bytes;
+    num_bytes /= 1024;
+    if (!num_bytes) {return std::to_string(previous) + "MiB";}
+    previous = num_bytes;
+    num_bytes /= 1024;
+    if (!num_bytes) {return std::to_string(previous) + "GiB";}
+
+    return std::to_string(num_bytes) + " TiB";
 }
