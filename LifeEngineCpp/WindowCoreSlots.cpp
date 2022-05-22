@@ -67,7 +67,19 @@ void WindowCore::b_generate_random_walls_slot() {
 }
 
 void WindowCore::b_clear_all_walls_slot() {
-    if (!disable_warnings) {display_message("Not implemented");}
+
+    cp.engine_pause = true;
+    wait_for_engine_to_pause();
+
+    for (int x = 1; x < dc.simulation_width-1; x++) {
+        for (int y = 1; y < dc.simulation_height-1; y++) {
+            if (dc.single_thread_simulation_grid[x][y].type == BlockTypes::WallBlock) {
+                dc.single_thread_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
+            }
+        }
+    }
+
+    unpause_engine();
 }
 
 void WindowCore::b_save_world_slot() {

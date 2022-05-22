@@ -250,6 +250,8 @@ private:
     void change_main_grid_left_click();
     void change_main_grid_right_click();
 
+    bool wait_for_engine_to_pause_processing_user_actions();
+
     void set_simulation_num_threads(uint8_t num_threads);
 
     void set_cursor_mode(CursorMode mode);

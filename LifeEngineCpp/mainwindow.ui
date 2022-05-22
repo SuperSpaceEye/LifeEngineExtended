@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1111</width>
+    <width>900</width>
     <height>900</height>
    </rect>
   </property>
@@ -87,10 +87,16 @@
    <item>
     <widget class="QFrame" name="menu_frame">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>250</height>
+      </size>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -371,7 +377,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>3</number>
+            <number>0</number>
            </property>
            <property name="iconSize">
             <size>
@@ -813,7 +819,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>717</width>
+                  <width>506</width>
                   <height>219</height>
                  </rect>
                 </property>
@@ -998,7 +1004,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QPushButton" name="b_clear_all_walls">
                         <property name="enabled">
-                         <bool>false</bool>
+                         <bool>true</bool>
                         </property>
                         <property name="text">
                          <string>Clear all walls</string>
@@ -1126,7 +1132,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>717</width>
+                  <width>506</width>
                   <height>909</height>
                  </rect>
                 </property>
@@ -1713,7 +1719,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>717</width>
+                  <width>506</width>
                   <height>357</height>
                  </rect>
                 </property>
@@ -1865,7 +1871,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>717</width>
+                  <width>506</width>
                   <height>267</height>
                  </rect>
                 </property>

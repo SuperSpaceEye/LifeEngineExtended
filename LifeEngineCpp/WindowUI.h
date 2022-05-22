@@ -290,7 +290,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1111, 900);
+        MainWindow->resize(900, 900);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -321,8 +321,12 @@ public:
 
         menu_frame = new QFrame(MainWindow);
         menu_frame->setObjectName(QString::fromUtf8("menu_frame"));
-        sizePolicy.setHeightForWidth(menu_frame->sizePolicy().hasHeightForWidth());
-        menu_frame->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(menu_frame->sizePolicy().hasHeightForWidth());
+        menu_frame->setSizePolicy(sizePolicy1);
+        menu_frame->setMinimumSize(QSize(0, 250));
         menu_frame->setFrameShape(QFrame::NoFrame);
         horizontalLayout = new QHBoxLayout(menu_frame);
         horizontalLayout->setSpacing(0);
@@ -330,11 +334,11 @@ public:
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         frame_2 = new QFrame(menu_frame);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
-        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(frame_2->sizePolicy().hasHeightForWidth());
-        frame_2->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(frame_2->sizePolicy().hasHeightForWidth());
+        frame_2->setSizePolicy(sizePolicy2);
         frame_2->setMinimumSize(QSize(0, 0));
         frame_2->setFrameShape(QFrame::NoFrame);
         frame_2->setFrameShadow(QFrame::Sunken);
@@ -518,11 +522,11 @@ public:
         horizontalLayout_31->setObjectName(QString::fromUtf8("horizontalLayout_31"));
         editor_graphicsView = new QGraphicsView(editor_tab);
         editor_graphicsView->setObjectName(QString::fromUtf8("editor_graphicsView"));
-        QSizePolicy sizePolicy2(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(100);
-        sizePolicy2.setVerticalStretch(100);
-        sizePolicy2.setHeightForWidth(editor_graphicsView->sizePolicy().hasHeightForWidth());
-        editor_graphicsView->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy3.setHorizontalStretch(100);
+        sizePolicy3.setVerticalStretch(100);
+        sizePolicy3.setHeightForWidth(editor_graphicsView->sizePolicy().hasHeightForWidth());
+        editor_graphicsView->setSizePolicy(sizePolicy3);
         editor_graphicsView->setLayoutDirection(Qt::LeftToRight);
         editor_graphicsView->setFrameShape(QFrame::Box);
         editor_graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -611,8 +615,8 @@ public:
         stackedWidget->addWidget(page_organism_details);
         page_edit_organism = new QWidget();
         page_edit_organism->setObjectName(QString::fromUtf8("page_edit_organism"));
-        sizePolicy1.setHeightForWidth(page_edit_organism->sizePolicy().hasHeightForWidth());
-        page_edit_organism->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(page_edit_organism->sizePolicy().hasHeightForWidth());
+        page_edit_organism->setSizePolicy(sizePolicy2);
         page_edit_organism->setMinimumSize(QSize(0, 0));
         verticalLayout_28 = new QVBoxLayout(page_edit_organism);
         verticalLayout_28->setObjectName(QString::fromUtf8("verticalLayout_28"));
@@ -770,12 +774,12 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 717, 219));
-        QSizePolicy sizePolicy3(QSizePolicy::Ignored, QSizePolicy::Expanding);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(scrollAreaWidgetContents_3->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents_3->setSizePolicy(sizePolicy3);
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 506, 219));
+        QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Expanding);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(scrollAreaWidgetContents_3->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents_3->setSizePolicy(sizePolicy4);
         verticalLayout_12 = new QVBoxLayout(scrollAreaWidgetContents_3);
         verticalLayout_12->setSpacing(0);
         verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
@@ -889,7 +893,7 @@ public:
 
         b_clear_all_walls = new QPushButton(widget_3);
         b_clear_all_walls->setObjectName(QString::fromUtf8("b_clear_all_walls"));
-        b_clear_all_walls->setEnabled(false);
+        b_clear_all_walls->setEnabled(true);
 
         verticalLayout_22->addWidget(b_clear_all_walls);
 
@@ -957,20 +961,20 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 717, 909));
-        sizePolicy3.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents_2->setSizePolicy(sizePolicy3);
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 909));
+        sizePolicy4.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents_2->setSizePolicy(sizePolicy4);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
         verticalLayout_9->setSpacing(0);
         verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_9->setContentsMargins(9, 9, 9, 9);
         widget = new QWidget(scrollAreaWidgetContents_2);
         widget->setObjectName(QString::fromUtf8("widget"));
-        QSizePolicy sizePolicy4(QSizePolicy::Maximum, QSizePolicy::Expanding);
-        sizePolicy4.setHorizontalStretch(10);
-        sizePolicy4.setVerticalStretch(100);
-        sizePolicy4.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
-        widget->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Expanding);
+        sizePolicy5.setHorizontalStretch(10);
+        sizePolicy5.setVerticalStretch(100);
+        sizePolicy5.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
+        widget->setSizePolicy(sizePolicy5);
         widget->setMinimumSize(QSize(0, 0));
         verticalLayout_20 = new QVBoxLayout(widget);
         verticalLayout_20->setSpacing(6);
@@ -982,11 +986,11 @@ public:
         horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         label_4 = new QLabel(widget);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        QSizePolicy sizePolicy5(QSizePolicy::Preferred, QSizePolicy::Minimum);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
-        label_4->setSizePolicy(sizePolicy5);
+        QSizePolicy sizePolicy6(QSizePolicy::Preferred, QSizePolicy::Minimum);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
+        label_4->setSizePolicy(sizePolicy6);
         label_4->setMinimumSize(QSize(0, 0));
         label_4->setMaximumSize(QSize(16777215, 1666666));
 
@@ -1411,7 +1415,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 717, 357));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 357));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         lb_simulation_size = new QLabel(scrollAreaWidgetContents_4);
@@ -1507,12 +1511,12 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 717, 267));
-        QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Preferred);
-        sizePolicy6.setHorizontalStretch(0);
-        sizePolicy6.setVerticalStretch(0);
-        sizePolicy6.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents->setSizePolicy(sizePolicy6);
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 267));
+        QSizePolicy sizePolicy7(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        sizePolicy7.setHorizontalStretch(0);
+        sizePolicy7.setVerticalStretch(0);
+        sizePolicy7.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents->setSizePolicy(sizePolicy7);
         verticalLayout_5 = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_5->setSpacing(0);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
@@ -1714,7 +1718,7 @@ public:
         QObject::connect(le_move_range_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_move_range_delimiter_slot()));
         QObject::connect(le_brush_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_brush_size_slot()));
 
-        Tabs->setCurrentIndex(3);
+        Tabs->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(2);
 
 

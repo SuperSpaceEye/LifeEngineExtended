@@ -405,6 +405,18 @@ bool WindowCore::wait_for_engine_to_pause() {
     return cp.engine_paused;
 }
 
+__attribute__((optimize("O0")))
+bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
+    auto now = clock_now();
+    while (cp.processing_user_actions) {
+        if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
+            std::cout << "Waiting for engine to pause processing user actions\n";
+            now = clock_now();
+        }
+    }
+    return cp.engine_paused;
+}
+
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= dc.simulation_width) { continue; }
@@ -741,7 +753,7 @@ void WindowCore::change_main_grid_left_click() {
     //cursor pos on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
     cp.pause_processing_user_action = true;
-    while (cp.processing_user_actions) {}
+    wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
@@ -770,7 +782,7 @@ void WindowCore::change_main_grid_left_click() {
 void WindowCore::change_main_grid_right_click() {
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
     cp.pause_processing_user_action = true;
-    while(cp.processing_user_actions){}
+    wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {

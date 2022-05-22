@@ -151,6 +151,7 @@ void SimulationEngine::cuda_tick() {
 
 }
 
+//TODO refactor
 void SimulationEngine::process_user_action_pool() {
     auto temp = std::vector<Organism*>{};
     for (auto & action: dc.user_actions_pool) {
