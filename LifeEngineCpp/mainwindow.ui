@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1115</width>
+    <width>1111</width>
     <height>900</height>
    </rect>
   </property>
@@ -118,6 +118,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -264,7 +270,7 @@
            <item>
             <widget class="QRadioButton" name="rb_food">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Food mode</string>
@@ -280,7 +286,7 @@
            <item>
             <widget class="QRadioButton" name="rb_kill">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Kill mode</string>
@@ -293,7 +299,7 @@
            <item>
             <widget class="QRadioButton" name="rb_wall">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Wall mode</string>
@@ -302,6 +308,20 @@
               <string notr="true">cursor_modes</string>
              </attribute>
             </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_41">
+           <item>
+            <widget class="QLabel" name="label_43">
+             <property name="text">
+              <string>Brush size:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="le_brush_size"/>
            </item>
           </layout>
          </item>
@@ -452,8 +472,8 @@ p, li { white-space: pre-wrap; }
                <widget class="QWidget" name="scrollAreaWidgetContents_5">
                 <property name="geometry">
                  <rect>
-                  <x>-75</x>
-                  <y>-80</y>
+                  <x>0</x>
+                  <y>0</y>
                   <width>516</width>
                   <height>240</height>
                  </rect>
@@ -793,7 +813,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>721</width>
+                  <width>717</width>
                   <height>219</height>
                  </rect>
                 </property>
@@ -1105,8 +1125,8 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-709</y>
-                  <width>721</width>
+                  <y>0</y>
+                  <width>717</width>
                   <height>909</height>
                  </rect>
                 </property>
@@ -1693,7 +1713,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>721</width>
+                  <width>717</width>
                   <height>357</height>
                  </rect>
                 </property>
@@ -1844,8 +1864,8 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-75</y>
-                  <width>721</width>
+                  <y>0</y>
+                  <width>717</width>
                   <height>267</height>
                  </rect>
                 </property>
@@ -3109,6 +3129,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_brush_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_brush_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>854</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>555</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3177,14 +3213,15 @@ p, li { white-space: pre-wrap; }
   <slot>le_max_move_range_slot()</slot>
   <slot>le_min_move_range_slot()</slot>
   <slot>le_move_range_delimiter_slot()</slot>
+  <slot>le_brush_size_slot()</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
+  <buttongroup name="editor_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
-  <buttongroup name="editor_modes"/>
  </buttongroups>
 </ui>

@@ -8,6 +8,7 @@
 #include <iostream>
 #include "../BlockTypes.hpp"
 #include "../Organism/Rotation.h"
+//#include "../Organism/Organism.h"
 
 struct Neighbors {
     //has neighbor
@@ -17,17 +18,18 @@ struct Neighbors {
     bool right = false;
 };
 
+class Organism;
+
 class BaseGridBlock {
 public:
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
     Neighbors neighbors{};
-    //Circular includes break my IDE code analysis...
-    //Basically an identifier, that should never be used to access anything
-    void * organism = nullptr;
+
+    Organism * organism = nullptr;
     BaseGridBlock()=default;
     explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{},
-                           void * organism = nullptr):
+                           Organism * organism = nullptr):
                             type(type), rotation(rotation), neighbors(neighbors), organism(organism) {}
 };
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

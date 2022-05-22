@@ -16,15 +16,15 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
             dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
                                [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
             dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                               [organism->y + block.get_pos(organism->rotation).y].organism = &organism;
+                               [organism->y + block.get_pos(organism->rotation).y].organism = organism;
         }
     }
     dc->to_place_organisms.clear();
 
     auto to_erase = std::vector<int>{};
 
-    for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *mt);}
     for (auto & organism: dc->organisms) {eat_food(dc, sp, organism);}
+    for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *mt);}
 
     if (sp->killer_damage_amount > 0) {
         for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
@@ -39,9 +39,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i],organisms_observations[i]);}
 
-    //TODO VERY IMPORTANT! invalid read here
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
-    //for (auto & organism: dc->organisms) {move_organism();}
 }
 
 //Each producer will add one run of producing a food
@@ -65,7 +63,6 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, Simula
 
 void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
     for (auto & pc: organism->organism_anatomy->_eating_space) {
-        //TODO research why the fuck organisms reach out of bounds when they shouldn't be able to.
         if (dc->single_thread_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == FoodBlock) {
             dc->single_thread_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = EmptyBlock;
             organism->food_collected++;
@@ -77,8 +74,8 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, std::v
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
         for (auto & block: organism->organism_anatomy->_organism_blocks) {
-            //if (check_if_out_of_bounds(dc, organism, block)) {continue;}
             dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type = FoodBlock;
+            dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
         }
         to_erase.push_back(organism_pos);
     }
@@ -93,8 +90,6 @@ void SimulationEngineSingleThread::erase_organisms(EngineDataContainer *dc, std:
 void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
     for (auto & block: organism->organism_anatomy->_armor_space) {
         if (block.is_armored) {continue;}
-        // It shoudln't reach as walls would stop organism
-        //if (check_if_out_of_bounds(dc, organism, block)) {continue;}
         if (dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type == KillerBlock) {
             if (sp->on_touch_kill) { organism->damage = organism->life_points + 1; break;}
             organism->damage += sp->killer_damage_amount;
@@ -170,7 +165,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                 if (last_observation.type != BlockTypes::EmptyBlock) {
                     //TODO not very efficient
                     if (!sp->organism_self_blocks_block_sight) {
-                        if(dc->single_thread_simulation_grid[pos_x][pos_y].organism == &organism) {
+                        if(dc->single_thread_simulation_grid[pos_x][pos_y].organism == organism) {
                             continue;
                         }
                     }
@@ -207,7 +202,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
                 (dc->single_thread_simulation_grid[organism->x + block.get_pos(new_rotation).x]
                                [organism->y + block.get_pos(new_rotation).y].type != EmptyBlock &&
                 dc->single_thread_simulation_grid[organism->x + block.get_pos(new_rotation).x]
-                               [organism->y + block.get_pos(new_rotation).y].organism != &organism)) {
+                               [organism->y + block.get_pos(new_rotation).y].organism != organism)) {
             return;
         }
     }
@@ -215,6 +210,8 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].type = BlockTypes::EmptyBlock;
+        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+        [organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
     }
 
     //If there is a place for rotated organism, then rotation can happen
@@ -227,7 +224,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].organism = &organism;
+        [organism->y + block.get_pos(organism->rotation).y].organism = organism;
     }
 
 }
@@ -262,7 +259,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
         if (dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
                                [new_y + block.get_pos(organism->rotation).y].type != EmptyBlock &&
                 dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-                [new_y + block.get_pos(organism->rotation).y].organism != &organism) {
+                [new_y + block.get_pos(organism->rotation).y].organism != organism) {
             return;
         }
     }
@@ -270,6 +267,8 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].type = BlockTypes::EmptyBlock;
+        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+        [organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
@@ -280,7 +279,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
         dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
         [new_y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
         dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-        [new_y + block.get_pos(organism->rotation).y].organism = &organism;
+        [new_y + block.get_pos(organism->rotation).y].organism = organism;
     }
 
     organism->x = new_x;
@@ -352,15 +351,15 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     //DOWN - max_y
     //RIGHT - max_x
 
-//    auto min_y = INT32_MAX;
-//    auto min_x = INT32_MAX;
-//    auto max_y = INT32_MIN;
-//    auto max_x = INT32_MIN;
+    auto min_y = INT32_MAX;
+    auto min_x = INT32_MAX;
+    auto max_y = INT32_MIN;
+    auto max_x = INT32_MIN;
 
-    auto min_y = 0;
-    auto min_x = 0;
-    auto max_y = 0;
-    auto max_x = 0;
+//    auto min_y = 0;
+//    auto min_x = 0;
+//    auto max_y = 0;
+//    auto max_x = 0;
 
 
     //a width and height of an organism can only change by one, so to be safe, the distance between organisms = size_of_base_organism + 1

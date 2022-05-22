@@ -59,6 +59,9 @@ public:
     QRadioButton *rb_food;
     QRadioButton *rb_kill;
     QRadioButton *rb_wall;
+    QHBoxLayout *horizontalLayout_41;
+    QLabel *label_43;
+    QLineEdit *le_brush_size;
     QCheckBox *cb_synchronise_sim_and_win;
     QFrame *frame_3;
     QVBoxLayout *verticalLayout_4;
@@ -279,15 +282,15 @@ public:
     QHBoxLayout *horizontalLayout_30;
     QLabel *label_25;
     QLineEdit *le_font_size;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
     QButtonGroup *editor_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1115, 900);
+        MainWindow->resize(1111, 900);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -332,6 +335,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(frame_2->sizePolicy().hasHeightForWidth());
         frame_2->setSizePolicy(sizePolicy1);
+        frame_2->setMinimumSize(QSize(0, 0));
         frame_2->setFrameShape(QFrame::NoFrame);
         frame_2->setFrameShadow(QFrame::Sunken);
         frame_2->setLineWidth(0);
@@ -430,7 +434,7 @@ public:
         cursor_modes->setExclusive(true);
         cursor_modes->addButton(rb_food);
         rb_food->setObjectName(QString::fromUtf8("rb_food"));
-        rb_food->setEnabled(false);
+        rb_food->setEnabled(true);
         rb_food->setChecked(true);
 
         horizontalLayout_3->addWidget(rb_food);
@@ -438,19 +442,34 @@ public:
         rb_kill = new QRadioButton(frame_2);
         cursor_modes->addButton(rb_kill);
         rb_kill->setObjectName(QString::fromUtf8("rb_kill"));
-        rb_kill->setEnabled(false);
+        rb_kill->setEnabled(true);
 
         horizontalLayout_3->addWidget(rb_kill);
 
         rb_wall = new QRadioButton(frame_2);
         cursor_modes->addButton(rb_wall);
         rb_wall->setObjectName(QString::fromUtf8("rb_wall"));
-        rb_wall->setEnabled(false);
+        rb_wall->setEnabled(true);
 
         horizontalLayout_3->addWidget(rb_wall);
 
 
         verticalLayout_6->addLayout(horizontalLayout_3);
+
+        horizontalLayout_41 = new QHBoxLayout();
+        horizontalLayout_41->setObjectName(QString::fromUtf8("horizontalLayout_41"));
+        label_43 = new QLabel(frame_2);
+        label_43->setObjectName(QString::fromUtf8("label_43"));
+
+        horizontalLayout_41->addWidget(label_43);
+
+        le_brush_size = new QLineEdit(frame_2);
+        le_brush_size->setObjectName(QString::fromUtf8("le_brush_size"));
+
+        horizontalLayout_41->addWidget(le_brush_size);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_41);
 
         cb_synchronise_sim_and_win = new QCheckBox(frame_2);
         cb_synchronise_sim_and_win->setObjectName(QString::fromUtf8("cb_synchronise_sim_and_win"));
@@ -517,7 +536,7 @@ public:
         scrollArea_5->setWidgetResizable(true);
         scrollAreaWidgetContents_5 = new QWidget();
         scrollAreaWidgetContents_5->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_5"));
-        scrollAreaWidgetContents_5->setGeometry(QRect(-75, -80, 516, 240));
+        scrollAreaWidgetContents_5->setGeometry(QRect(0, 0, 516, 240));
         horizontalLayout_32 = new QHBoxLayout(scrollAreaWidgetContents_5);
         horizontalLayout_32->setObjectName(QString::fromUtf8("horizontalLayout_32"));
         horizontalLayout_32->setContentsMargins(0, 0, 0, 0);
@@ -751,7 +770,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 721, 219));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 717, 219));
         QSizePolicy sizePolicy3(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -938,7 +957,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -709, 721, 909));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 717, 909));
         sizePolicy3.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy3);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -1392,7 +1411,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 721, 357));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 717, 357));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         lb_simulation_size = new QLabel(scrollAreaWidgetContents_4);
@@ -1488,7 +1507,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -75, 721, 267));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 717, 267));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1693,6 +1712,7 @@ public:
         QObject::connect(le_max_move_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_move_range_slot()));
         QObject::connect(le_min_move_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_move_range_slot()));
         QObject::connect(le_move_range_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_move_range_delimiter_slot()));
+        QObject::connect(le_brush_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_brush_size_slot()));
 
         Tabs->setCurrentIndex(3);
         stackedWidget->setCurrentIndex(2);
@@ -1714,12 +1734,13 @@ public:
         b_reset_view->setText(QApplication::translate("MainWindow", "Reset view", nullptr));
         b_pass_one_tick->setText(QApplication::translate("MainWindow", "Pass one tick", nullptr));
         tb_stoprender->setText(QApplication::translate("MainWindow", "Stop render", nullptr));
-        b_kill_all_organisms_slot->setText(QApplication::translate("MainWindow", "KillOrganism all", nullptr));
+        b_kill_all_organisms_slot->setText(QApplication::translate("MainWindow", "Kill all", nullptr));
         tb_pause->setText(QApplication::translate("MainWindow", "Pause", nullptr));
         b_clear->setText(QApplication::translate("MainWindow", "Clear", nullptr));
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", nullptr));
-        rb_kill->setText(QApplication::translate("MainWindow", "KillOrganism mode", nullptr));
-        rb_wall->setText(QApplication::translate("MainWindow", "ModifyWall mode", nullptr));
+        rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", nullptr));
+        rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", nullptr));
+        label_43->setText(QApplication::translate("MainWindow", "Brush size:", nullptr));
         cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
         textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

@@ -143,6 +143,9 @@ void WindowCore::window_tick() {
         auto_reset_num++;
         _ui.lb_auto_reset_count->setText(QString::fromStdString("Auto reset count: "+ std::to_string(auto_reset_num)));
     }
+
+    if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
+    if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
     create_image();
 }
 
@@ -651,6 +654,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(dc.simulation_width)));
     _ui.le_simulation_height ->setText(QString::fromStdString(std::to_string(dc.simulation_height)));
     _ui.le_max_organisms     ->setText(QString::fromStdString(std::to_string(dc.max_organisms)));
+    _ui.le_brush_size        ->setText(QString::fromStdString(std::to_string(brush_size)));
     _ui.cb_reset_on_total_extinction ->setChecked(sp.reset_on_total_extinction);
     _ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
     _ui.cb_fill_window               ->setChecked(fill_window);
@@ -697,7 +701,7 @@ void WindowCore::initialize_gui_settings() {
     } else {
         font_size = font().pixelSize();
     }
-    _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font().pointSize())));
+    _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
@@ -724,4 +728,67 @@ std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
     if (!num_bytes) {return std::to_string(previous) + "GiB";}
 
     return std::to_string(num_bytes) + " TiB";
+}
+
+pos_on_grid WindowCore::calculate_cursor_pos_on_grid(int x, int y) {
+    auto c_pos = pos_on_grid{};
+    c_pos.x = static_cast<int>((x - float(_ui.simulation_graphicsView->viewport()->width() )/2)*scaling_zoom + center_x);
+    c_pos.y = static_cast<int>((y - float(_ui.simulation_graphicsView->viewport()->height())/2)*scaling_zoom + center_y);
+    return c_pos;
+}
+
+void WindowCore::change_main_grid_left_click() {
+    //cursor pos on grid
+    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
+    cp.pause_processing_user_action = true;
+    while (cp.processing_user_actions) {}
+    for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
+        for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
+            switch (cursor_mode) {
+                case CursorMode::ModifyFood:
+                    dc.user_actions_pool.push_back(
+                            Action{ActionType::TryAddFood, cpg.x + x, cpg.y + y});
+                    break;
+                case CursorMode::ModifyWall:
+                    dc.user_actions_pool.push_back(
+                            Action{ActionType::TryAddWall, cpg.x + x, cpg.y + y});
+                    break;
+                case CursorMode::KillOrganism:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::ChooseOrganism:
+                    dc.user_actions_pool.push_back(Action{ActionType::TrySelectOrganism, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::PlaceOrganism:
+                    break;
+            }
+        }
+    }
+    cp.pause_processing_user_action = false;
+}
+
+void WindowCore::change_main_grid_right_click() {
+    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
+    cp.pause_processing_user_action = true;
+    while(cp.processing_user_actions){}
+    for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
+        for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
+            switch (cursor_mode) {
+                case CursorMode::ModifyFood:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryRemoveFood, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::ModifyWall:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryRemoveWall, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::KillOrganism:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::ChooseOrganism:
+                    break;
+                case CursorMode::PlaceOrganism:
+                    break;
+            }
+        }
+    }
+    cp.pause_processing_user_action = false;
 }

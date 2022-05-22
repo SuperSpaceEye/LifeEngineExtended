@@ -32,7 +32,8 @@ void SimulationEngine::threaded_mainloop() {
         if (cp.change_simulation_mode) { change_mode(); }
         //if (cp.build_threads) { build_threads(); }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
-        process_user_action_pool();
+        if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
+        if (cp.processing_user_actions) {process_user_action_pool();}
         if ((!cp.engine_paused || cp.engine_pass_tick) && (!cp.pause_button_pause || cp.pass_tick)) {
             //if ((!cp.engine_pause || cp.synchronise_simulation_tick) && !cp.engine_global_pause) {
                 cp.engine_paused = false;
@@ -148,4 +149,77 @@ void SimulationEngine::multi_threaded_tick() {
 
 void SimulationEngine::cuda_tick() {
 
+}
+
+void SimulationEngine::process_user_action_pool() {
+    auto temp = std::vector<Organism*>{};
+    for (auto & action: dc.user_actions_pool) {
+        switch (action.type) {
+            case ActionType::TryAddFood:
+                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                if (dc.single_thread_simulation_grid[action.x][action.y].type != BlockTypes::EmptyBlock) {continue;}
+                dc.single_thread_simulation_grid[action.x][action.y].type = BlockTypes::FoodBlock;
+                break;
+            case ActionType::TryRemoveFood:
+                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                if (dc.single_thread_simulation_grid[action.x][action.y].type != BlockTypes::FoodBlock) {continue;}
+                dc.single_thread_simulation_grid[action.x][action.y].type = EmptyBlock;
+                break;
+            case ActionType::TryAddWall:
+                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                if (dc.single_thread_simulation_grid[action.x][action.y].type != BlockTypes::EmptyBlock) {continue;}
+                dc.single_thread_simulation_grid[action.x][action.y].type = BlockTypes::WallBlock;
+                break;
+            case ActionType::TryRemoveWall:
+                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                if (action.x == 0 || action.y == 0 || action.x == dc.simulation_width-1 || action.y == dc.simulation_height-1) {continue;}
+                if (dc.single_thread_simulation_grid[action.x][action.y].type != BlockTypes::WallBlock) {continue;}
+                dc.single_thread_simulation_grid[action.x][action.y].type = BlockTypes::EmptyBlock;
+                break;
+            case ActionType::TryAddOrganism:
+                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                break;
+            case ActionType::TryKillOrganism: {
+                    if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                    if (dc.single_thread_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
+                        dc.single_thread_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
+                        dc.single_thread_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
+                    Organism * organism_ptr = (dc.single_thread_simulation_grid[action.x][action.y].organism);
+                    //if (organism_ptr == nullptr) {continue;}
+                    bool continue_flag = false;
+                    for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
+                    if (continue_flag) {continue;}
+                    temp.push_back(organism_ptr);
+                    for (auto & block: organism_ptr->organism_anatomy->_organism_blocks) {
+                        dc.single_thread_simulation_grid
+                        [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
+                        [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
+                    }
+                    for (int i = 0; i < dc.organisms.size(); i++) {
+                        if (dc.organisms[i] == organism_ptr) {
+                            dc.organisms.erase(dc.organisms.begin() + i);
+                            break;
+                        }
+                    }
+                    delete organism_ptr;
+                }
+                break;
+            case ActionType::TrySelectOrganism: {
+                    if (check_if_out_of_bounds(&dc, action.x, action.y)) { continue; }
+                    if (dc.single_thread_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
+                        dc.single_thread_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
+                        dc.single_thread_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
+                    dc.selected_organims = dc.single_thread_simulation_grid[action.x][action.y].organism;
+                }
+                break;
+        }
+    }
+    dc.user_actions_pool.clear();
+}
+
+bool SimulationEngine::check_if_out_of_bounds(EngineDataContainer *dc, int x, int y) {
+    return (x < 0 ||
+            x > dc->simulation_width -1 ||
+            y < 0 ||
+            y > dc->simulation_height-1);
 }

@@ -47,11 +47,7 @@ float Organism::calculate_max_life() {
             case KillerBlock:   life_points += bp->KillerBlock.  life_point_amount; break;
             case ArmorBlock:    life_points += bp->ArmorBlock.   life_point_amount; break;
             case EyeBlock:      life_points += bp->EyeBlock.     life_point_amount; break;
-            //These cases can't happen
-            case EmptyBlock:
-            case FoodBlock:
-            case WallBlock:
-                break;
+            default: throw std::runtime_error("Unknown block");
         }
     }
     return life_points;
@@ -64,7 +60,7 @@ int Organism::calculate_organism_lifetime() {
 }
 
 float Organism::calculate_food_needed() {
-    food_needed = 0;
+    food_needed = sp->extra_reproduction_cost;
     for (auto & block: organism_anatomy->_organism_blocks) {
         switch (block.type) {
             case MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
@@ -73,10 +69,7 @@ float Organism::calculate_food_needed() {
             case KillerBlock:   food_needed += bp->KillerBlock.  food_cost_modifier; break;
             case ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost_modifier; break;
             case EyeBlock:      food_needed += bp->EyeBlock.     food_cost_modifier; break;
-            case EmptyBlock:
-            case FoodBlock:
-            case WallBlock:
-                break;
+            default: throw std::runtime_error("Unknown block");
         }
     }
     return food_needed;

@@ -59,6 +59,11 @@ struct result_struct {
     T result;
 };
 
+struct pos_on_grid {
+    int x;
+    int y;
+};
+
 template <typename T> std::string to_str(const T& t, int float_precision = 2) {
     std::stringstream stream;
     stream << std::fixed << std::setprecision(float_precision) << t;
@@ -130,6 +135,7 @@ private:
     float scaling_coefficient = 1.2;
     float scaling_zoom = 1;
 
+    bool wheel_mouse_button_pressed = false;
     bool right_mouse_button_pressed = false;
     bool left_mouse_button_pressed = false;
 
@@ -215,6 +221,8 @@ private:
 
     bool disable_warnings = false;
 
+    int brush_size = 1;
+
     void mainloop_tick();
     void window_tick();
     void set_simulation_interval(int max_simulation_fps);
@@ -225,6 +233,7 @@ private:
     bool compare_pixel_color(int x, int y, QColor & color);
 
     void calculate_new_simulation_size();
+    pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
 
     void unpause_engine();
 
@@ -237,6 +246,9 @@ private:
     void parse_full_simulation_grid(bool parse);
     void clear_organisms();
     void make_walls();
+
+    void change_main_grid_left_click();
+    void change_main_grid_right_click();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -331,6 +343,7 @@ private slots:
     void le_max_move_range_slot();
     void le_min_move_range_slot();
     void le_move_range_delimiter_slot();
+    void le_brush_size_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);

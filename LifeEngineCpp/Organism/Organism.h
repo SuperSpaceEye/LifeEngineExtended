@@ -7,14 +7,15 @@
 
 #include <random>
 #include <boost/random.hpp>
+#include <exception>
+
 #include "Anatomy.h"
 #include "Brain.h"
 #include "../SimulationParameters.h"
 #include "../OrganismBlockParameters.h"
 #include "Rotation.h"
 
-//TODO It's stupid, but it is prototype
-class Organism {
+class Organism{
 //private:
 public:
     //coordinates of a central block of a cell

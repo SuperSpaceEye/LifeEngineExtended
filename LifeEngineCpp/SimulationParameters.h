@@ -8,7 +8,7 @@
 struct SimulationParameters {
     //simulation sp
     //evolution controls
-        float food_production_probability = 0.008;
+        float food_production_probability = 0.003;
         int   produce_food_every_n_life_ticks = 1;
         int   lifespan_multiplier = 100;
         int   look_range = 50;
@@ -18,8 +18,8 @@ struct SimulationParameters {
         float global_brain_mutation_rate = 0.1;
         float killer_damage_amount = 1;
 
-        int   min_reproducing_distance = 2;
-        int   max_reproducing_distance = 3;
+        int   min_reproducing_distance = 4;
+        int   max_reproducing_distance = 5;
 
         float anatomy_mutations_rate_mutation_modifier = 0.01;
         float anatomy_min_possible_mutation_rate = 0.01;

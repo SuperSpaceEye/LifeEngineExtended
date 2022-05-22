@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include "Organism/Organism.h"
+#include "Actions.h"
 
 struct eager_worker_partial;
 
@@ -35,7 +36,9 @@ struct EngineDataContainer {
     std::vector<std::vector<std::atomic<BaseGridBlock>>> partial_multi_thread_simulation_grid;
 
     // adding/killing organisms, adding/deleting food/walls, etc.
-    //std::vector<Action> user_actions_pool;
+    std::vector<Action> user_actions_pool;
+
+    Organism * selected_organims = nullptr;
 
 };
 

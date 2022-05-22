@@ -36,7 +36,7 @@ class SimulationEngine {
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
 
-    void process_user_action_pool(){};
+    void process_user_action_pool();
 
     void simulation_tick();
     void partial_multi_threaded_tick();
@@ -44,6 +44,7 @@ class SimulationEngine {
     void cuda_tick();
 
     void change_mode();
+    static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
 
     boost::mt19937 mt;
 

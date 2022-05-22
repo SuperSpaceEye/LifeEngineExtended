@@ -363,7 +363,20 @@ void WindowCore::le_min_move_range_slot() {
 }
 
 void WindowCore::le_move_range_delimiter_slot() {
+    float fallback = sp.move_range_delimiter;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_move_range_delimiter, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    if (result.result > 0) { display_message("Input cannot be more than 0"); result;}
+    sp.move_range_delimiter = result.result;
+}
 
+void WindowCore::le_brush_size_slot() {
+    int fallback = brush_size;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_brush_size, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    brush_size = result.result;
 }
 
 //==================== Radio button ====================
