@@ -8,7 +8,7 @@ Brain::Brain(std::shared_ptr<Brain> & brain): mt(brain->mt), brain_type(brain->b
     copy_parents_table(brain->simple_action_table);
 }
 
-Brain::Brain(std::mt19937 *mt, BrainTypes brain_type): mt(mt), brain_type(brain_type) {}
+Brain::Brain(boost::mt19937 *mt, BrainTypes brain_type): mt(mt), brain_type(brain_type) {}
 
 BrainDecision Brain::get_random_action() {
     return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(*mt));
@@ -28,7 +28,7 @@ SimpleActionTable Brain::copy_parents_table(SimpleActionTable &parents_simple_ac
     return simple_action_table;
 }
 
-SimpleActionTable Brain::mutate_action_table(SimpleActionTable &parents_simple_action_table, std::mt19937 &mt) {
+SimpleActionTable Brain::mutate_action_table(SimpleActionTable &parents_simple_action_table, boost::mt19937 &mt) {
     auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
     auto new_simple_action_table = copy_parents_table(parents_simple_action_table);
 
@@ -48,7 +48,7 @@ SimpleActionTable Brain::mutate_action_table(SimpleActionTable &parents_simple_a
     return new_simple_action_table;
 }
 
-SimpleActionTable Brain::get_random_action_table(std::mt19937 &mt) {
+SimpleActionTable Brain::get_random_action_table(boost::mt19937 &mt) {
     auto new_simple_action_table = SimpleActionTable{};
     new_simple_action_table.MouthBlock    = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
     new_simple_action_table.ProducerBlock = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));

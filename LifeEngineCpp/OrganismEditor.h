@@ -34,6 +34,7 @@ class OrganismEditor {
     int image_height = 0;
 public:
     OrganismEditor(int width, int height, int image_width, int image_height);
+    OrganismEditor()=default;
 
     void set_block(int x, int y, OrganismBlock block);
     OrganismBlock get_block(int x, int y);
@@ -44,7 +45,7 @@ public:
     void resize_image_editing_grid(int width, int height);
     std::vector<unsigned char> create_image();
 
-    void move_center(int delta_x, int delta_y);
+    void move_center(int delta_x, int delta_y){};
     void reset_scale_view();
 };
 

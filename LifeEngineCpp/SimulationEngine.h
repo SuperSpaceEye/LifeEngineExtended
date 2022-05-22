@@ -11,6 +11,9 @@
 #include <thread>
 #include <atomic>
 
+#include <boost/nondet_random.hpp>
+#include <boost/random.hpp>
+
 #include "GridBlocks/BaseGridBlock.h"
 #include "Organism/Organism.h"
 #include "BlockTypes.hpp"
@@ -42,18 +45,13 @@ class SimulationEngine {
 
     void change_mode();
 
-
-    std::random_device rd;
-    std::mt19937 mt;
-    std::uniform_int_distribution<int> dist;
+    boost::mt19937 mt;
 
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
                      OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters,
                      std::mutex& mutex);
     void threaded_mainloop();
-
-    static void tick_of_single_thread();
 
 };
 

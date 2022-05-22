@@ -10,8 +10,9 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
                                    std::mutex& mutex):
     mutex(mutex), dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
 
-    mt = std::mt19937{rd()};
-    dist = std::uniform_int_distribution<int>{0, 8};
+    boost::random_device rd;
+    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    mt = boost::mt19937(sd);
 }
 
 //TODO refactor pausing/pass_tick/synchronise_tick
@@ -132,10 +133,6 @@ void SimulationEngine::simulation_tick() {
 }
 
 void SimulationEngine::partial_multi_threaded_tick() {
-
-}
-
-void SimulationEngine::tick_of_single_thread() {
 
 }
 

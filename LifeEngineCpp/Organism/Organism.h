@@ -6,6 +6,7 @@
 #define THELIFEENGINECPP_ORGANISM_H
 
 #include <random>
+#include <boost/random.hpp>
 #include "Anatomy.h"
 #include "Brain.h"
 #include "../SimulationParameters.h"
@@ -52,7 +53,7 @@ public:
     OrganismBlockParameters* bp = nullptr;
     Organism * child_pattern = nullptr;
 
-    std::mt19937* mt = nullptr;
+    boost::mt19937* mt = nullptr;
 
     float calculate_max_life();
     int calculate_organism_lifetime();
@@ -60,12 +61,12 @@ public:
 
     void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate);
     void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate);
-    static int mutate_move_range(SimulationParameters *sp, std::mt19937 * mt, int parent_move_range);
+    static int mutate_move_range(SimulationParameters *sp, boost::mt19937 *mt, int parent_move_range);
     //public:
     Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
              std::shared_ptr<Brain> brain, SimulationParameters *sp,
-             OrganismBlockParameters *block_parameters, std::mt19937 *mt, int move_range,
-             float anatomy_mutation_rate=0.5, float brain_mutation_rate=0.5);
+             OrganismBlockParameters *block_parameters, boost::mt19937 *mt, int move_range,
+             float anatomy_mutation_rate= 0.5, float brain_mutation_rate= 0.5);
     Organism(Organism *organism);
     Organism()=default;
     ~Organism();

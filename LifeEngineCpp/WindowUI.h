@@ -1714,12 +1714,12 @@ public:
         b_reset_view->setText(QApplication::translate("MainWindow", "Reset view", nullptr));
         b_pass_one_tick->setText(QApplication::translate("MainWindow", "Pass one tick", nullptr));
         tb_stoprender->setText(QApplication::translate("MainWindow", "Stop render", nullptr));
-        b_kill_all_organisms_slot->setText(QApplication::translate("MainWindow", "Kill all", nullptr));
+        b_kill_all_organisms_slot->setText(QApplication::translate("MainWindow", "KillOrganism all", nullptr));
         tb_pause->setText(QApplication::translate("MainWindow", "Pause", nullptr));
         b_clear->setText(QApplication::translate("MainWindow", "Clear", nullptr));
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", nullptr));
-        rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", nullptr));
-        rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", nullptr));
+        rb_kill->setText(QApplication::translate("MainWindow", "KillOrganism mode", nullptr));
+        rb_wall->setText(QApplication::translate("MainWindow", "ModifyWall mode", nullptr));
         cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
         textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

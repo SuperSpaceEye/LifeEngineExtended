@@ -1,0 +1,88 @@
+    #include <boost/nondet_random.hpp>
+    #include <boost/random.hpp>
+    #include <random>
+    #include <chrono>
+
+
+    int num_iter = 1000000;
+
+    boost::random_device rd;
+
+    std::mt19937 mt(rd());
+    boost::mt19937 bmt(rd());
+
+    auto point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = std::uniform_int_distribution<int>(0, 9)(mt);
+    }
+    auto end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+    " std int uniform, std engine" << std::endl;
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = boost::uniform_int<int>(0, 9)(mt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+    " boost int uniform, std engine" << std::endl;
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = std::uniform_int_distribution<int>(0, 9)(bmt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+    " std int uniform, boost engine" << std::endl;
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = boost::uniform_int<int>(0, 9)(bmt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+    " boost int uniform, boost engine" << std::endl;
+
+    std::cout << "----------\n";
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = std::uniform_real_distribution<float>(0, 1)(mt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+              " std float uniform, std engine" << std::endl;
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = boost::uniform_real<float>(0, 1)(mt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+              " boost float uniform, std engine" << std::endl;
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = std::uniform_real_distribution<float>(0, 1)(bmt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+              " std float uniform, boost engine" << std::endl;
+
+    point = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < num_iter; i++) {
+        volatile auto num = boost::uniform_real<float>(0, 1)(bmt);
+    }
+    end_point = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
+             " boost float uniform, boost engine" << std::endl;
+
+    //13721617 std int uniform, std engine
+    //5994750 boost int uniform, std engine
+    //2019512 std int uniform, boost engine
+    //2006268 boost int uniform, boost engine
+    //----------
+    //5856522 std float uniform, std engine
+    //5906104 boost float uniform, std engine
+    //1948050 std float uniform, boost engine
+    //2139857 boost float uniform, boost engine

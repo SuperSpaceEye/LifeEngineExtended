@@ -2,8 +2,6 @@
 // Created by spaceeye on 16.03.2022.
 //
 
-#include <memory>
-
 #include "WindowCore.h"
 
 WindowCore::WindowCore(QWidget *parent) :
@@ -32,8 +30,11 @@ WindowCore::WindowCore(QWidget *parent) :
 
     make_walls();
 
-    std::random_device rd;
-    mt = std::mt19937(rd());
+    //In mingw compiler std::random_device is deterministic?
+    //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
+    boost::random_device rd;
+    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    mt = boost::mt19937(sd);
 
     color_container = ColorContainer{};
     sp = SimulationParameters{};
@@ -155,7 +156,7 @@ void WindowCore::move_center(int delta_x, int delta_y) {
         center_x -= delta_x * scaling_zoom;
         center_y -= delta_y * scaling_zoom;
     } else {
-        edit_engine.move_center(delta_x, delta_y)
+        edit_engine.move_center(delta_x, delta_y);
     }
 }
 

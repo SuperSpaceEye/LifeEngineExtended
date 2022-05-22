@@ -22,8 +22,12 @@ public:
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
     Neighbors neighbors{};
+    //Circular includes break my IDE code analysis...
+    //Basically an identifier, that should never be used to access anything
+    void * organism = nullptr;
     BaseGridBlock()=default;
-    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{}):
-                            type(type), rotation(rotation), neighbors(neighbors) {}
+    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{},
+                           void * organism = nullptr):
+                            type(type), rotation(rotation), neighbors(neighbors), organism(organism) {}
 };
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

@@ -369,15 +369,15 @@ void WindowCore::le_move_range_delimiter_slot() {
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
-    set_cursor_mode(CursorMode::Food_mode);
+    set_cursor_mode(CursorMode::ModifyFood);
 }
 
 void WindowCore::rb_wall_slot() {
-    set_cursor_mode(CursorMode::Wall_mode);
+    set_cursor_mode(CursorMode::ModifyWall);
 }
 
 void WindowCore::rb_kill_slot() {
-    set_cursor_mode(CursorMode::Kill_mode);
+    set_cursor_mode(CursorMode::KillOrganism);
 }
 
 void WindowCore::rb_single_thread_slot() {

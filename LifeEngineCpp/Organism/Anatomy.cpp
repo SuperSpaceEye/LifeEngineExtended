@@ -375,7 +375,7 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
                      eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& block_parameters, std::mt19937& mt) {
+SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt) {
     float total_chance = 0;
     total_chance += block_parameters.MouthBlock   .chance_weight;
     total_chance += block_parameters.ProducerBlock.chance_weight;
@@ -409,7 +409,7 @@ SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockPa
     return add_block(BlockTypes::EyeBlock, block_choice, rotation, 0, 0);
 }
 
-SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, int block_choice, std::mt19937 *mt) {
+SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, int block_choice, boost::mt19937 *mt) {
     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
     boost::unordered_map<int, boost::unordered_map<int, bool>> producing_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
@@ -488,7 +488,7 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
                      eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& block_parameters, std::mt19937& mt) {
+SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt) {
     float total_chance = 0;
     total_chance += block_parameters.MouthBlock   .chance_weight;
     total_chance += block_parameters.ProducerBlock.chance_weight;
@@ -591,7 +591,7 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
                      eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::remove_random_block(std::mt19937 &mt) {
+SerializedOrganismStructureContainer * Anatomy::remove_random_block(boost::mt19937 &mt) {
     int block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(mt);
     return remove_block(block_choice);
 }

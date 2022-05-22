@@ -25,6 +25,8 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
+find_package(Boost COMPONENTS random REQUIRED)
+
 # either i am doing something wrong (more likely), or OpenMP only does worse.
 #find_package(OpenMP)
 
@@ -41,6 +43,11 @@ if (Qt5_FOUND)
             Qt5::Gui
             Qt5::Widgets
             )
+endif()
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 endif()
 
 

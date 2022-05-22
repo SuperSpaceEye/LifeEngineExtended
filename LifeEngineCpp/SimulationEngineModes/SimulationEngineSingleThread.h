@@ -11,6 +11,8 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
+#include <boost/random.hpp>
+
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/Organism.h"
 #include "../BlockTypes.hpp"
@@ -21,7 +23,7 @@
 
 class SimulationEngineSingleThread {
 
-    static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, std::mt19937 & mt);
+    static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 &mt);
 
     static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
@@ -45,20 +47,20 @@ class SimulationEngineSingleThread {
 
     static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Observation> &organism_observations);
 
-    static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, std::mt19937 *mt);
+    static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
 
-    static void make_child      (EngineDataContainer * dc, Organism *organism, std::mt19937 * mt);
+    static void make_child      (EngineDataContainer * dc, Organism *organism, boost::mt19937 *mt);
 
-    static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, std::mt19937 *mt);
+    static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
 
-    static bool check_if_out_of_boundaries(EngineDataContainer *dc, int x, int y);
-    static bool check_if_block_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
-                                                 BaseSerializedContainer &block, Rotation rotation);
+    static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
+    static bool check_if_block_out_of_bounds(EngineDataContainer *dc, Organism *organism,
+                                             BaseSerializedContainer &block, Rotation rotation);
 
 public:
     static void single_threaded_tick(EngineDataContainer * dc,
                                      SimulationParameters * sp,
-                                     std::mt19937 * mt);
+                                     boost::mt19937 *mt);
 };
 
 

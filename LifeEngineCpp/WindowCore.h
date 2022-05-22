@@ -14,8 +14,11 @@
 #include <thread>
 #include <omp.h>
 #include <random>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
+#include <boost/nondet_random.hpp>
+#include <boost/random.hpp>
 
 #include <QApplication>
 #include <QWidget>
@@ -37,9 +40,11 @@
 #include "OrganismEditor.h"
 
 enum class CursorMode {
-    Food_mode,
-    Wall_mode,
-    Kill_mode,
+    ModifyFood,
+    ModifyWall,
+    KillOrganism,
+    ChooseOrganism,
+    PlaceOrganism
 };
 
 struct pix_pos {
@@ -134,7 +139,7 @@ private:
     float center_x;
     float center_y;
 
-    CursorMode cursor_mode = CursorMode::Food_mode;
+    CursorMode cursor_mode = CursorMode::ModifyFood;
 
     int start_height = 100;
 
@@ -203,7 +208,7 @@ private:
     Organism * base_organism;
     Organism * chosen_organism;
 
-    std::mt19937 mt;
+    boost::mt19937 mt;
 
     bool menu_hidden = false;
     bool allow_menu_hidden_change = true;

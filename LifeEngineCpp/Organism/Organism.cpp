@@ -9,7 +9,7 @@
 
 Organism::Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
-                   OrganismBlockParameters *block_parameters, std::mt19937 *mt, int move_range, float anatomy_mutation_rate,
+                   OrganismBlockParameters *block_parameters, boost::mt19937 *mt, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
 //        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(std::move(anatomy)), sp(sp),
 //        bp(block_parameters), mt(mt), brain(std::move(brain)) {
@@ -160,7 +160,7 @@ void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_p
     }
 }
 
-int Organism::mutate_move_range(SimulationParameters *sp, std::mt19937 * mt, int parent_move_range) {
+int Organism::mutate_move_range(SimulationParameters *sp, boost::mt19937 *mt, int parent_move_range) {
     if (sp->set_fixed_move_range) {return parent_move_range;}
 
     auto child_move_range = parent_move_range;

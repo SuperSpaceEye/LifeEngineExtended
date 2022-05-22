@@ -5,7 +5,7 @@
 #include "../SimulationEngine.h"
 #include "SimulationEngineSingleThread.h"
 
-void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, std::mt19937 * mt) {
+void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, boost::mt19937 *mt) {
     for (auto organism: dc->to_place_organisms) {
         dc->organisms.emplace_back(organism);
         for (auto &block: organism->organism_anatomy->_organism_blocks) {
@@ -15,6 +15,8 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
                                [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
             dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
                                [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+            dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+                               [organism->y + block.get_pos(organism->rotation).y].organism = &organism;
         }
     }
     dc->to_place_organisms.clear();
@@ -43,14 +45,14 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 }
 
 //Each producer will add one run of producing a food
-void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, std::mt19937 & mt) {
+void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 &mt) {
     if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
     if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 
     for (int i = 0; i < organism->organism_anatomy->_producer_blocks; i++) {
         for (auto & pc: organism->organism_anatomy->_producing_space) {
-            //if (check_if_out_of_boundaries(dc, organism, pc)) {continue;}
+            //if (check_if_out_of_bounds(dc, organism, pc)) {continue;}
             if (dc->single_thread_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
                 if (std::uniform_real_distribution<float>(0, 1)(mt) < sp->food_production_probability) {
                     dc->single_thread_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
@@ -75,7 +77,7 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, std::v
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
         for (auto & block: organism->organism_anatomy->_organism_blocks) {
-            //if (check_if_out_of_boundaries(dc, organism, block)) {continue;}
+            //if (check_if_out_of_bounds(dc, organism, block)) {continue;}
             dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type = FoodBlock;
         }
         to_erase.push_back(organism_pos);
@@ -92,7 +94,7 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
     for (auto & block: organism->organism_anatomy->_armor_space) {
         if (block.is_armored) {continue;}
         // It shoudln't reach as walls would stop organism
-        //if (check_if_out_of_boundaries(dc, organism, block)) {continue;}
+        //if (check_if_out_of_bounds(dc, organism, block)) {continue;}
         if (dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type == KillerBlock) {
             if (sp->on_touch_kill) { organism->damage = organism->life_points + 1; break;}
             organism->damage += sp->killer_damage_amount;
@@ -158,7 +160,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                 pos_x += offset_x;
                 pos_y += offset_y;
 
-                if (check_if_out_of_boundaries(dc, pos_x, pos_y)) {break;}
+                if (check_if_out_of_bounds(dc, pos_x, pos_y)) {break;}
 
                 last_observation.type = dc->single_thread_simulation_grid[pos_x][pos_y].type;
                 last_observation.distance = i;
@@ -166,20 +168,11 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                 if (last_observation.type == BlockTypes::WallBlock) {break;}
                 if (last_observation.type == BlockTypes::FoodBlock) {break;}
                 if (last_observation.type != BlockTypes::EmptyBlock) {
-                    //if observation_type is not empty block and wall, and not organism_self_blocks_block_sight, then
-                    //check global positions of all organism blocks, and if any equals to observation pos, then continue
-                    //observing, else stop.
                     //TODO not very efficient
                     if (!sp->organism_self_blocks_block_sight) {
-                        auto continue_flag = false;
-                        for (auto & org_block: organism->organism_anatomy->_organism_blocks) {
-                            if (organism->x + org_block.get_pos(organism->rotation).x == pos_x &&
-                                organism->y + org_block.get_pos(organism->rotation).y == pos_y) {
-                                continue_flag = true;
-                                break;
-                            }
+                        if(dc->single_thread_simulation_grid[pos_x][pos_y].organism == &organism) {
+                            continue;
                         }
-                        if (continue_flag) {continue;}
                     }
                     break;
                 }
@@ -208,30 +201,20 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
 
     auto new_rotation = static_cast<Rotation>(new_int_rotation);
 
+    //checks if space for organism is empty, or contains itself
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        if (check_if_block_out_of_bounds(dc, organism, block, new_rotation) ||
+                (dc->single_thread_simulation_grid[organism->x + block.get_pos(new_rotation).x]
+                               [organism->y + block.get_pos(new_rotation).y].type != EmptyBlock &&
+                dc->single_thread_simulation_grid[organism->x + block.get_pos(new_rotation).x]
+                               [organism->y + block.get_pos(new_rotation).y].organism != &organism)) {
+            return;
+        }
+    }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                           [organism->y + block.get_pos(organism->rotation).y].type = EmptyBlock;
-    }
-
-    //TODO this is stupid and needs reworking.
-    //Every block of an organism on a grid is empty, so if in place of a rotated is not empty, then it is block of other
-    //organism, and rotation is impossible, so return organism blocks on their place, and exit function.
-    for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        if (check_if_block_out_of_boundaries(dc, organism, block, new_rotation) ||
-            dc->single_thread_simulation_grid[organism->x + block.get_pos(new_rotation).x]
-                               [organism->y + block.get_pos(new_rotation).y].type != EmptyBlock) {
-
-            for (auto & block: organism->organism_anatomy->_organism_blocks) {
-                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                                   [organism->y + block.get_pos(organism->rotation).y].type = block.type;
-                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                                   [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
-                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                                   [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
-            }
-            return;
-        }
+        [organism->y + block.get_pos(organism->rotation).y].type = BlockTypes::EmptyBlock;
     }
 
     //If there is a place for rotated organism, then rotation can happen
@@ -243,6 +226,8 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
         [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
         dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
+        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+        [organism->y + block.get_pos(organism->rotation).y].organism = &organism;
     }
 
 }
@@ -272,25 +257,19 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
         default: break;
     }
 
-    for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                           [organism->y + block.get_pos(organism->rotation).y].type = EmptyBlock;
-    }
-
-    //TODO this is also stupid and needs reworking.
+    //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         if (dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-                               [new_y + block.get_pos(organism->rotation).y].type != EmptyBlock) {
-            for (auto & block: organism->organism_anatomy->_organism_blocks) {
-                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                [organism->y + block.get_pos(organism->rotation).y].type = block.type;
-                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
-                dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-                [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
-            }
+                               [new_y + block.get_pos(organism->rotation).y].type != EmptyBlock &&
+                dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
+                [new_y + block.get_pos(organism->rotation).y].organism != &organism) {
             return;
         }
+    }
+
+    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        dc->single_thread_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+        [organism->y + block.get_pos(organism->rotation).y].type = BlockTypes::EmptyBlock;
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
@@ -300,6 +279,8 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
         [new_y + block.get_pos(organism->rotation).y].rotation = block.rotation;
         dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
         [new_y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
+        dc->single_thread_simulation_grid[new_x + block.get_pos(organism->rotation).x]
+        [new_y + block.get_pos(organism->rotation).y].organism = &organism;
     }
 
     organism->x = new_x;
@@ -309,7 +290,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
 
 void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
                                                  std::vector<Observation> &organism_observations) {
-    if (organism->move_counter != 0) {
+    if (organism->move_counter == 0) {
         organism->last_decision = organism->brain->get_decision(organism_observations);
     }
 
@@ -339,7 +320,7 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
 }
 
 void SimulationEngineSingleThread::try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                                                  std::vector<Organism *> &child_organisms, std::mt19937 *mt) {
+                                                  std::vector<Organism *> &child_organisms, boost::mt19937 *mt) {
     if (!organism->child_ready) {organism->child_pattern = organism->create_child(); make_child(dc, organism, mt);}
     // if max_organisms < 0, then unlimited.
     if (dc->max_organisms >= 0 && dc->organisms.size() + dc->to_place_organisms.size() >= dc->max_organisms) {return;}
@@ -348,12 +329,12 @@ void SimulationEngineSingleThread::try_make_child(EngineDataContainer *dc, Simul
 }
 
 //TODO probably not needed.
-void SimulationEngineSingleThread::make_child(EngineDataContainer *dc, Organism *organism, std::mt19937 * mt) {
+void SimulationEngineSingleThread::make_child(EngineDataContainer *dc, Organism *organism, boost::mt19937 *mt) {
     organism->child_ready = true;
 }
 
 void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                                               std::vector<Organism *> &child_organisms, std::mt19937 *mt) {
+                                               std::vector<Organism *> &child_organisms, boost::mt19937 *mt) {
     auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
     Rotation rotation;
     if (sp->reproduction_rotation_enabled) {
@@ -428,7 +409,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
 
     //checking, if there is space for a child
     for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
-        if (check_if_block_out_of_boundaries(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
+        if (check_if_block_out_of_bounds(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
 
         if (dc->single_thread_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
                                [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type != EmptyBlock)
@@ -448,7 +429,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     organism->child_ready = false;
 }
 
-bool SimulationEngineSingleThread::check_if_out_of_boundaries(EngineDataContainer *dc, int x, int y) {
+bool SimulationEngineSingleThread::check_if_out_of_bounds(EngineDataContainer *dc, int x, int y) {
     return (x < 0 ||
             x > dc->simulation_width -1 ||
             y < 0 ||
@@ -456,9 +437,9 @@ bool SimulationEngineSingleThread::check_if_out_of_boundaries(EngineDataContaine
 }
 
 // if any is true, then check fails, else check succeeds
-bool SimulationEngineSingleThread::check_if_block_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
-                                                              BaseSerializedContainer &block, Rotation rotation) {
-    return check_if_out_of_boundaries(dc,
-                                      organism->x + block.get_pos(rotation).x,
-                                      organism->y + block.get_pos(rotation).y);
+bool SimulationEngineSingleThread::check_if_block_out_of_bounds(EngineDataContainer *dc, Organism *organism,
+                                                                BaseSerializedContainer &block, Rotation rotation) {
+    return check_if_out_of_bounds(dc,
+                                  organism->x + block.get_pos(rotation).x,
+                                  organism->y + block.get_pos(rotation).y);
 }
