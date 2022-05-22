@@ -7,6 +7,7 @@
 
 #include <utility>
 #include <boost/unordered_map.hpp>
+#include <boost/random.hpp>
 #include <random>
 
 #include "Organism_parts/OrganismBlock.h"
@@ -233,8 +234,8 @@ private:
     static int get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map);
 
     SerializedOrganismStructureContainer *add_block(BlockTypes type, int block_choice, Rotation rotation, int x_, int y_);
-    SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, std::mt19937 *mt);
-    SerializedOrganismStructureContainer * remove_block(int block_choice);
+    SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, boost::mt19937 *mt);
+    SerializedOrganismStructureContainer *remove_block(int block_choice);
 
 public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
@@ -258,9 +259,9 @@ public:
 
     ~Anatomy();
 
-    SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, std::mt19937& mt);
-    SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, std::mt19937& mt);
-    SerializedOrganismStructureContainer * remove_random_block(std::mt19937& mt);
+    SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt);
+    SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt);
+    SerializedOrganismStructureContainer * remove_random_block(boost::mt19937 &mt);
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);
 };

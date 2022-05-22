@@ -8,6 +8,7 @@
 #include <iostream>
 #include "../BlockTypes.hpp"
 #include "../Organism/Rotation.h"
+//#include "../Organism/Organism.h"
 
 struct Neighbors {
     //has neighbor
@@ -17,13 +18,18 @@ struct Neighbors {
     bool right = false;
 };
 
+class Organism;
+
 class BaseGridBlock {
 public:
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
     Neighbors neighbors{};
+
+    Organism * organism = nullptr;
     BaseGridBlock()=default;
-    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{}):
-                            type(type), rotation(rotation), neighbors(neighbors) {}
+    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{},
+                           Organism * organism = nullptr):
+                            type(type), rotation(rotation), neighbors(neighbors), organism(organism) {}
 };
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

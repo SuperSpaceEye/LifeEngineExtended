@@ -14,8 +14,11 @@
 #include <thread>
 #include <omp.h>
 #include <random>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
+#include <boost/nondet_random.hpp>
+#include <boost/random.hpp>
 
 #include <QApplication>
 #include <QWidget>
@@ -25,6 +28,7 @@
 #include <QMessageBox>
 #include <QLineEdit>
 #include <QDialog>
+#include <QFont>
 
 #include "SimulationEngine.h"
 #include "ColorContainer.h"
@@ -33,11 +37,14 @@
 #include "EngineDataContainer.h"
 #include "OrganismBlockParameters.h"
 #include "WindowUI.h"
+#include "OrganismEditor.h"
 
 enum class CursorMode {
-    Food_mode,
-    Wall_mode,
-    Kill_mode,
+    ModifyFood,
+    ModifyWall,
+    KillOrganism,
+    ChooseOrganism,
+    PlaceOrganism
 };
 
 struct pix_pos {
@@ -50,6 +57,11 @@ template<typename T>
 struct result_struct {
     bool is_valid;
     T result;
+};
+
+struct pos_on_grid {
+    int x;
+    int y;
 };
 
 template <typename T> std::string to_str(const T& t, int float_precision = 2) {
@@ -100,6 +112,9 @@ struct OrganismAvgBlockInformation {
     uint64_t total_size_double_adjacent_space = 0;
     uint64_t total_size = 0;
 
+    float move_range = 0;
+    int moving_organisms = 0;
+
     float size = 0;
     float _mouth_blocks    = 0;
     float _producer_blocks = 0;
@@ -120,13 +135,17 @@ private:
     float scaling_coefficient = 1.2;
     float scaling_zoom = 1;
 
+    bool wheel_mouse_button_pressed = false;
     bool right_mouse_button_pressed = false;
     bool left_mouse_button_pressed = false;
+
+    bool change_main_simulation_grid = false;
+    bool change_editing_grid = false;
 
     float center_x;
     float center_y;
 
-    CursorMode cursor_mode = CursorMode::Food_mode;
+    CursorMode cursor_mode = CursorMode::ModifyFood;
 
     int start_height = 100;
 
@@ -137,6 +156,7 @@ private:
     int last_mouse_y = 0;
 
     SimulationEngine* engine;
+    OrganismEditor edit_engine;
 
     float window_interval = 0.;
     long delta_window_processing_time = 0;
@@ -194,12 +214,14 @@ private:
     Organism * base_organism;
     Organism * chosen_organism;
 
-    std::mt19937 mt;
+    boost::mt19937 mt;
 
     bool menu_hidden = false;
     bool allow_menu_hidden_change = true;
 
     bool disable_warnings = false;
+
+    int brush_size = 1;
 
     void mainloop_tick();
     void window_tick();
@@ -211,6 +233,7 @@ private:
     bool compare_pixel_color(int x, int y, QColor & color);
 
     void calculate_new_simulation_size();
+    pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
 
     void unpause_engine();
 
@@ -223,6 +246,11 @@ private:
     void parse_full_simulation_grid(bool parse);
     void clear_organisms();
     void make_walls();
+
+    void change_main_grid_left_click();
+    void change_main_grid_right_click();
+
+    bool wait_for_engine_to_pause_processing_user_actions();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -313,6 +341,11 @@ private slots:
     void le_produce_food_every_n_slot();
     void le_anatomy_mutation_rate_delimiter_slot();
     void le_brain_mutation_rate_delimiter_slot();
+    void le_font_size_slot();
+    void le_max_move_range_slot();
+    void le_min_move_range_slot();
+    void le_move_range_delimiter_slot();
+    void le_brush_size_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
@@ -332,6 +365,7 @@ private slots:
     void cb_use_evolved_brain_mutation_rate_slot(bool state);
     void cb_disable_warnings_slot(bool state);
     void cb_self_organism_blocks_block_sight_slot(bool state);
+    void cb_set_fixed_move_range_slot(bool state);
 
 public:
     WindowCore(QWidget *parent);

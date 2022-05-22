@@ -9,6 +9,7 @@
 #include <vector>
 #include <random>
 #include <memory>
+#include <boost/random.hpp>
 
 #include "../BlockTypes.hpp"
 #include "Rotation.h"
@@ -73,16 +74,16 @@ private:
 
     SimpleActionTable simple_action_table;
     static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
-    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, std::mt19937 &mt);
-    static SimpleActionTable get_random_action_table(std::mt19937 &mt);
+    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, boost::mt19937 &mt);
+    static SimpleActionTable get_random_action_table(boost::mt19937 &mt);
     BrainDecision get_simple_action(std::vector<Observation> & observations_vector);
     BrainDecision calculate_simple_action(Observation & observation);
 public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
-    Brain(std::mt19937 * mt, BrainTypes brain_type);
+    Brain(boost::mt19937 *mt, BrainTypes brain_type);
 
-    std::mt19937 * mt;
+    boost::mt19937 * mt;
     BrainTypes brain_type;
 
 

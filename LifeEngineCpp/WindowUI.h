@@ -22,6 +22,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
@@ -58,6 +59,9 @@ public:
     QRadioButton *rb_food;
     QRadioButton *rb_kill;
     QRadioButton *rb_wall;
+    QHBoxLayout *horizontalLayout_41;
+    QLabel *label_43;
+    QLineEdit *le_brush_size;
     QCheckBox *cb_synchronise_sim_and_win;
     QFrame *frame_3;
     QVBoxLayout *verticalLayout_4;
@@ -66,7 +70,55 @@ public:
     QVBoxLayout *verticalLayout_8;
     QTextEdit *textEdit;
     QWidget *editor_tab;
+    QHBoxLayout *horizontalLayout_31;
+    QGraphicsView *editor_graphicsView;
+    QScrollArea *scrollArea_5;
+    QWidget *scrollAreaWidgetContents_5;
+    QHBoxLayout *horizontalLayout_32;
+    QWidget *widget_4;
+    QHBoxLayout *horizontalLayout_34;
+    QVBoxLayout *verticalLayout_16;
+    QRadioButton *rb_select;
+    QRadioButton *rb_edit;
+    QRadioButton *rb_drop;
+    QPushButton *b_save_organism;
+    QPushButton *b_load_organism;
+    QPushButton *pushButton;
+    QStackedWidget *stackedWidget;
+    QWidget *page_organism_details;
+    QVBoxLayout *verticalLayout_25;
     QLabel *label_22;
+    QLabel *label_26;
+    QLabel *label_27;
+    QWidget *page_edit_organism;
+    QVBoxLayout *verticalLayout_28;
+    QLabel *label_28;
+    QHBoxLayout *horizontalLayout_36;
+    QRadioButton *radioButton_2;
+    QRadioButton *radioButton_5;
+    QRadioButton *radioButton;
+    QHBoxLayout *horizontalLayout_37;
+    QRadioButton *radioButton_6;
+    QRadioButton *radioButton_4;
+    QRadioButton *radioButton_3;
+    QLabel *label_29;
+    QHBoxLayout *horizontalLayout_33;
+    QLabel *label_30;
+    QLineEdit *lineEdit;
+    QHBoxLayout *horizontalLayout_35;
+    QLabel *label_31;
+    QLineEdit *lineEdit_2;
+    QLabel *label_32;
+    QPushButton *pushButton_2;
+    QWidget *page_place;
+    QVBoxLayout *verticalLayout_29;
+    QLabel *label_34;
+    QLabel *label_36;
+    QLabel *label_35;
+    QLabel *label_33;
+    QLabel *label_39;
+    QLabel *label_38;
+    QLabel *label_37;
     QWidget *world_controls_tab;
     QVBoxLayout *verticalLayout;
     QScrollArea *scrollArea_3;
@@ -166,6 +218,7 @@ public:
     QVBoxLayout *verticalLayout_13;
     QHBoxLayout *horizontalLayout_14;
     QCheckBox *cb_food_blocks_reproduction;
+    QVBoxLayout *verticalLayout_33;
     QVBoxLayout *verticalLayout_26;
     QHBoxLayout *horizontalLayout_25;
     QLabel *label_17;
@@ -175,6 +228,17 @@ public:
     QLineEdit *le_max_reproduction_distance;
     QCheckBox *cb_fix_reproduction_distance;
     QCheckBox *cb_self_organism_blocks_block_sight;
+    QVBoxLayout *verticalLayout_34;
+    QCheckBox *cb_set_fixed_move_range;
+    QHBoxLayout *horizontalLayout_39;
+    QLabel *label_41;
+    QLineEdit *le_min_move_range;
+    QHBoxLayout *horizontalLayout_40;
+    QLabel *label_40;
+    QLineEdit *le_max_move_range;
+    QHBoxLayout *horizontalLayout_38;
+    QLabel *label_42;
+    QLineEdit *le_move_range_delimiter;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -184,6 +248,8 @@ public:
     QLabel *lb_organisms_memory_consumption;
     QLabel *lb_total_engine_ticks;
     QLabel *lb_organisms_alive;
+    QLabel *lb_moving_organisms;
+    QLabel *lb_average_move_range;
     QLabel *lb_anatomy_mutation_rate;
     QLabel *lb_brain_mutation_rate;
     QLabel *lb_organism_size;
@@ -213,8 +279,12 @@ public:
     QLabel *label_19;
     QLineEdit *le_float_number_precision;
     QCheckBox *cb_disable_warnings;
-    QButtonGroup *cursor_modes;
+    QHBoxLayout *horizontalLayout_30;
+    QLabel *label_25;
+    QLineEdit *le_font_size;
     QButtonGroup *simulation_modes;
+    QButtonGroup *editor_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -251,8 +321,12 @@ public:
 
         menu_frame = new QFrame(MainWindow);
         menu_frame->setObjectName(QString::fromUtf8("menu_frame"));
-        sizePolicy.setHeightForWidth(menu_frame->sizePolicy().hasHeightForWidth());
-        menu_frame->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(menu_frame->sizePolicy().hasHeightForWidth());
+        menu_frame->setSizePolicy(sizePolicy1);
+        menu_frame->setMinimumSize(QSize(0, 250));
         menu_frame->setFrameShape(QFrame::NoFrame);
         horizontalLayout = new QHBoxLayout(menu_frame);
         horizontalLayout->setSpacing(0);
@@ -260,8 +334,12 @@ public:
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         frame_2 = new QFrame(menu_frame);
         frame_2->setObjectName(QString::fromUtf8("frame_2"));
-        sizePolicy.setHeightForWidth(frame_2->sizePolicy().hasHeightForWidth());
-        frame_2->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(frame_2->sizePolicy().hasHeightForWidth());
+        frame_2->setSizePolicy(sizePolicy2);
+        frame_2->setMinimumSize(QSize(0, 0));
         frame_2->setFrameShape(QFrame::NoFrame);
         frame_2->setFrameShadow(QFrame::Sunken);
         frame_2->setLineWidth(0);
@@ -360,7 +438,7 @@ public:
         cursor_modes->setExclusive(true);
         cursor_modes->addButton(rb_food);
         rb_food->setObjectName(QString::fromUtf8("rb_food"));
-        rb_food->setEnabled(false);
+        rb_food->setEnabled(true);
         rb_food->setChecked(true);
 
         horizontalLayout_3->addWidget(rb_food);
@@ -368,19 +446,34 @@ public:
         rb_kill = new QRadioButton(frame_2);
         cursor_modes->addButton(rb_kill);
         rb_kill->setObjectName(QString::fromUtf8("rb_kill"));
-        rb_kill->setEnabled(false);
+        rb_kill->setEnabled(true);
 
         horizontalLayout_3->addWidget(rb_kill);
 
         rb_wall = new QRadioButton(frame_2);
         cursor_modes->addButton(rb_wall);
         rb_wall->setObjectName(QString::fromUtf8("rb_wall"));
-        rb_wall->setEnabled(false);
+        rb_wall->setEnabled(true);
 
         horizontalLayout_3->addWidget(rb_wall);
 
 
         verticalLayout_6->addLayout(horizontalLayout_3);
+
+        horizontalLayout_41 = new QHBoxLayout();
+        horizontalLayout_41->setObjectName(QString::fromUtf8("horizontalLayout_41"));
+        label_43 = new QLabel(frame_2);
+        label_43->setObjectName(QString::fromUtf8("label_43"));
+
+        horizontalLayout_41->addWidget(label_43);
+
+        le_brush_size = new QLineEdit(frame_2);
+        le_brush_size->setObjectName(QString::fromUtf8("le_brush_size"));
+
+        horizontalLayout_41->addWidget(le_brush_size);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_41);
 
         cb_synchronise_sim_and_win = new QCheckBox(frame_2);
         cb_synchronise_sim_and_win->setObjectName(QString::fromUtf8("cb_synchronise_sim_and_win"));
@@ -424,9 +517,251 @@ public:
         Tabs->addTab(about_tab, QString());
         editor_tab = new QWidget();
         editor_tab->setObjectName(QString::fromUtf8("editor_tab"));
-        label_22 = new QLabel(editor_tab);
+        editor_tab->setLayoutDirection(Qt::LeftToRight);
+        horizontalLayout_31 = new QHBoxLayout(editor_tab);
+        horizontalLayout_31->setObjectName(QString::fromUtf8("horizontalLayout_31"));
+        editor_graphicsView = new QGraphicsView(editor_tab);
+        editor_graphicsView->setObjectName(QString::fromUtf8("editor_graphicsView"));
+        QSizePolicy sizePolicy3(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy3.setHorizontalStretch(100);
+        sizePolicy3.setVerticalStretch(100);
+        sizePolicy3.setHeightForWidth(editor_graphicsView->sizePolicy().hasHeightForWidth());
+        editor_graphicsView->setSizePolicy(sizePolicy3);
+        editor_graphicsView->setLayoutDirection(Qt::LeftToRight);
+        editor_graphicsView->setFrameShape(QFrame::Box);
+        editor_graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        editor_graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        editor_graphicsView->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_31->addWidget(editor_graphicsView);
+
+        scrollArea_5 = new QScrollArea(editor_tab);
+        scrollArea_5->setObjectName(QString::fromUtf8("scrollArea_5"));
+        scrollArea_5->setWidgetResizable(true);
+        scrollAreaWidgetContents_5 = new QWidget();
+        scrollAreaWidgetContents_5->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_5"));
+        scrollAreaWidgetContents_5->setGeometry(QRect(0, 0, 516, 240));
+        horizontalLayout_32 = new QHBoxLayout(scrollAreaWidgetContents_5);
+        horizontalLayout_32->setObjectName(QString::fromUtf8("horizontalLayout_32"));
+        horizontalLayout_32->setContentsMargins(0, 0, 0, 0);
+        widget_4 = new QWidget(scrollAreaWidgetContents_5);
+        widget_4->setObjectName(QString::fromUtf8("widget_4"));
+        horizontalLayout_34 = new QHBoxLayout(widget_4);
+        horizontalLayout_34->setSpacing(0);
+        horizontalLayout_34->setObjectName(QString::fromUtf8("horizontalLayout_34"));
+        horizontalLayout_34->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_16 = new QVBoxLayout();
+        verticalLayout_16->setObjectName(QString::fromUtf8("verticalLayout_16"));
+        rb_select = new QRadioButton(widget_4);
+        editor_modes = new QButtonGroup(MainWindow);
+        editor_modes->setObjectName(QString::fromUtf8("editor_modes"));
+        editor_modes->addButton(rb_select);
+        rb_select->setObjectName(QString::fromUtf8("rb_select"));
+        rb_select->setChecked(true);
+
+        verticalLayout_16->addWidget(rb_select);
+
+        rb_edit = new QRadioButton(widget_4);
+        editor_modes->addButton(rb_edit);
+        rb_edit->setObjectName(QString::fromUtf8("rb_edit"));
+
+        verticalLayout_16->addWidget(rb_edit);
+
+        rb_drop = new QRadioButton(widget_4);
+        editor_modes->addButton(rb_drop);
+        rb_drop->setObjectName(QString::fromUtf8("rb_drop"));
+
+        verticalLayout_16->addWidget(rb_drop);
+
+        b_save_organism = new QPushButton(widget_4);
+        b_save_organism->setObjectName(QString::fromUtf8("b_save_organism"));
+
+        verticalLayout_16->addWidget(b_save_organism);
+
+        b_load_organism = new QPushButton(widget_4);
+        b_load_organism->setObjectName(QString::fromUtf8("b_load_organism"));
+
+        verticalLayout_16->addWidget(b_load_organism);
+
+        pushButton = new QPushButton(widget_4);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+
+        verticalLayout_16->addWidget(pushButton);
+
+
+        horizontalLayout_34->addLayout(verticalLayout_16);
+
+        stackedWidget = new QStackedWidget(widget_4);
+        stackedWidget->setObjectName(QString::fromUtf8("stackedWidget"));
+        page_organism_details = new QWidget();
+        page_organism_details->setObjectName(QString::fromUtf8("page_organism_details"));
+        verticalLayout_25 = new QVBoxLayout(page_organism_details);
+        verticalLayout_25->setObjectName(QString::fromUtf8("verticalLayout_25"));
+        label_22 = new QLabel(page_organism_details);
         label_22->setObjectName(QString::fromUtf8("label_22"));
-        label_22->setGeometry(QRect(60, 40, 311, 91));
+
+        verticalLayout_25->addWidget(label_22);
+
+        label_26 = new QLabel(page_organism_details);
+        label_26->setObjectName(QString::fromUtf8("label_26"));
+
+        verticalLayout_25->addWidget(label_26);
+
+        label_27 = new QLabel(page_organism_details);
+        label_27->setObjectName(QString::fromUtf8("label_27"));
+
+        verticalLayout_25->addWidget(label_27);
+
+        stackedWidget->addWidget(page_organism_details);
+        page_edit_organism = new QWidget();
+        page_edit_organism->setObjectName(QString::fromUtf8("page_edit_organism"));
+        sizePolicy2.setHeightForWidth(page_edit_organism->sizePolicy().hasHeightForWidth());
+        page_edit_organism->setSizePolicy(sizePolicy2);
+        page_edit_organism->setMinimumSize(QSize(0, 0));
+        verticalLayout_28 = new QVBoxLayout(page_edit_organism);
+        verticalLayout_28->setObjectName(QString::fromUtf8("verticalLayout_28"));
+        label_28 = new QLabel(page_edit_organism);
+        label_28->setObjectName(QString::fromUtf8("label_28"));
+
+        verticalLayout_28->addWidget(label_28);
+
+        horizontalLayout_36 = new QHBoxLayout();
+        horizontalLayout_36->setObjectName(QString::fromUtf8("horizontalLayout_36"));
+        radioButton_2 = new QRadioButton(page_edit_organism);
+        radioButton_2->setObjectName(QString::fromUtf8("radioButton_2"));
+
+        horizontalLayout_36->addWidget(radioButton_2);
+
+        radioButton_5 = new QRadioButton(page_edit_organism);
+        radioButton_5->setObjectName(QString::fromUtf8("radioButton_5"));
+
+        horizontalLayout_36->addWidget(radioButton_5);
+
+        radioButton = new QRadioButton(page_edit_organism);
+        radioButton->setObjectName(QString::fromUtf8("radioButton"));
+
+        horizontalLayout_36->addWidget(radioButton);
+
+
+        verticalLayout_28->addLayout(horizontalLayout_36);
+
+        horizontalLayout_37 = new QHBoxLayout();
+        horizontalLayout_37->setObjectName(QString::fromUtf8("horizontalLayout_37"));
+        radioButton_6 = new QRadioButton(page_edit_organism);
+        radioButton_6->setObjectName(QString::fromUtf8("radioButton_6"));
+
+        horizontalLayout_37->addWidget(radioButton_6);
+
+        radioButton_4 = new QRadioButton(page_edit_organism);
+        radioButton_4->setObjectName(QString::fromUtf8("radioButton_4"));
+
+        horizontalLayout_37->addWidget(radioButton_4);
+
+        radioButton_3 = new QRadioButton(page_edit_organism);
+        radioButton_3->setObjectName(QString::fromUtf8("radioButton_3"));
+
+        horizontalLayout_37->addWidget(radioButton_3);
+
+
+        verticalLayout_28->addLayout(horizontalLayout_37);
+
+        label_29 = new QLabel(page_edit_organism);
+        label_29->setObjectName(QString::fromUtf8("label_29"));
+
+        verticalLayout_28->addWidget(label_29);
+
+        horizontalLayout_33 = new QHBoxLayout();
+        horizontalLayout_33->setObjectName(QString::fromUtf8("horizontalLayout_33"));
+        label_30 = new QLabel(page_edit_organism);
+        label_30->setObjectName(QString::fromUtf8("label_30"));
+
+        horizontalLayout_33->addWidget(label_30);
+
+        lineEdit = new QLineEdit(page_edit_organism);
+        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+
+        horizontalLayout_33->addWidget(lineEdit);
+
+
+        verticalLayout_28->addLayout(horizontalLayout_33);
+
+        horizontalLayout_35 = new QHBoxLayout();
+        horizontalLayout_35->setObjectName(QString::fromUtf8("horizontalLayout_35"));
+        label_31 = new QLabel(page_edit_organism);
+        label_31->setObjectName(QString::fromUtf8("label_31"));
+
+        horizontalLayout_35->addWidget(label_31);
+
+        lineEdit_2 = new QLineEdit(page_edit_organism);
+        lineEdit_2->setObjectName(QString::fromUtf8("lineEdit_2"));
+
+        horizontalLayout_35->addWidget(lineEdit_2);
+
+
+        verticalLayout_28->addLayout(horizontalLayout_35);
+
+        label_32 = new QLabel(page_edit_organism);
+        label_32->setObjectName(QString::fromUtf8("label_32"));
+
+        verticalLayout_28->addWidget(label_32);
+
+        pushButton_2 = new QPushButton(page_edit_organism);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+
+        verticalLayout_28->addWidget(pushButton_2);
+
+        stackedWidget->addWidget(page_edit_organism);
+        page_place = new QWidget();
+        page_place->setObjectName(QString::fromUtf8("page_place"));
+        verticalLayout_29 = new QVBoxLayout(page_place);
+        verticalLayout_29->setObjectName(QString::fromUtf8("verticalLayout_29"));
+        label_34 = new QLabel(page_place);
+        label_34->setObjectName(QString::fromUtf8("label_34"));
+
+        verticalLayout_29->addWidget(label_34);
+
+        label_36 = new QLabel(page_place);
+        label_36->setObjectName(QString::fromUtf8("label_36"));
+
+        verticalLayout_29->addWidget(label_36);
+
+        label_35 = new QLabel(page_place);
+        label_35->setObjectName(QString::fromUtf8("label_35"));
+
+        verticalLayout_29->addWidget(label_35);
+
+        label_33 = new QLabel(page_place);
+        label_33->setObjectName(QString::fromUtf8("label_33"));
+
+        verticalLayout_29->addWidget(label_33);
+
+        label_39 = new QLabel(page_place);
+        label_39->setObjectName(QString::fromUtf8("label_39"));
+
+        verticalLayout_29->addWidget(label_39);
+
+        label_38 = new QLabel(page_place);
+        label_38->setObjectName(QString::fromUtf8("label_38"));
+
+        verticalLayout_29->addWidget(label_38);
+
+        label_37 = new QLabel(page_place);
+        label_37->setObjectName(QString::fromUtf8("label_37"));
+
+        verticalLayout_29->addWidget(label_37);
+
+        stackedWidget->addWidget(page_place);
+
+        horizontalLayout_34->addWidget(stackedWidget);
+
+        horizontalLayout_34->setStretch(0, 1);
+
+        horizontalLayout_32->addWidget(widget_4);
+
+        scrollArea_5->setWidget(scrollAreaWidgetContents_5);
+
+        horizontalLayout_31->addWidget(scrollArea_5);
+
         Tabs->addTab(editor_tab, QString());
         world_controls_tab = new QWidget();
         world_controls_tab->setObjectName(QString::fromUtf8("world_controls_tab"));
@@ -439,12 +774,12 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 98, 219));
-        QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Expanding);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_3->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents_3->setSizePolicy(sizePolicy1);
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 506, 219));
+        QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Expanding);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(scrollAreaWidgetContents_3->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents_3->setSizePolicy(sizePolicy4);
         verticalLayout_12 = new QVBoxLayout(scrollAreaWidgetContents_3);
         verticalLayout_12->setSpacing(0);
         verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
@@ -558,7 +893,7 @@ public:
 
         b_clear_all_walls = new QPushButton(widget_3);
         b_clear_all_walls->setObjectName(QString::fromUtf8("b_clear_all_walls"));
-        b_clear_all_walls->setEnabled(false);
+        b_clear_all_walls->setEnabled(true);
 
         verticalLayout_22->addWidget(b_clear_all_walls);
 
@@ -626,36 +961,36 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 98, 761));
-        sizePolicy1.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 909));
+        sizePolicy4.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents_2->setSizePolicy(sizePolicy4);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
         verticalLayout_9->setSpacing(0);
         verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_9->setContentsMargins(9, 9, 9, 9);
         widget = new QWidget(scrollAreaWidgetContents_2);
         widget->setObjectName(QString::fromUtf8("widget"));
-        QSizePolicy sizePolicy2(QSizePolicy::Maximum, QSizePolicy::Expanding);
-        sizePolicy2.setHorizontalStretch(10);
-        sizePolicy2.setVerticalStretch(100);
-        sizePolicy2.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
-        widget->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Expanding);
+        sizePolicy5.setHorizontalStretch(10);
+        sizePolicy5.setVerticalStretch(100);
+        sizePolicy5.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
+        widget->setSizePolicy(sizePolicy5);
         widget->setMinimumSize(QSize(0, 0));
         verticalLayout_20 = new QVBoxLayout(widget);
         verticalLayout_20->setSpacing(6);
         verticalLayout_20->setObjectName(QString::fromUtf8("verticalLayout_20"));
         verticalLayout_20->setSizeConstraint(QLayout::SetDefaultConstraint);
-        verticalLayout_20->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_20->setContentsMargins(0, 0, 0, 10);
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setSpacing(6);
         horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         label_4 = new QLabel(widget);
         label_4->setObjectName(QString::fromUtf8("label_4"));
-        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Minimum);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
-        label_4->setSizePolicy(sizePolicy3);
+        QSizePolicy sizePolicy6(QSizePolicy::Preferred, QSizePolicy::Minimum);
+        sizePolicy6.setHorizontalStretch(0);
+        sizePolicy6.setVerticalStretch(0);
+        sizePolicy6.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
+        label_4->setSizePolicy(sizePolicy6);
         label_4->setMinimumSize(QSize(0, 0));
         label_4->setMaximumSize(QSize(16777215, 1666666));
 
@@ -956,6 +1291,11 @@ public:
 
         verticalLayout_20->addLayout(verticalLayout_13);
 
+        verticalLayout_33 = new QVBoxLayout();
+        verticalLayout_33->setObjectName(QString::fromUtf8("verticalLayout_33"));
+
+        verticalLayout_20->addLayout(verticalLayout_33);
+
         verticalLayout_26 = new QVBoxLayout();
         verticalLayout_26->setObjectName(QString::fromUtf8("verticalLayout_26"));
         horizontalLayout_25 = new QHBoxLayout();
@@ -1001,6 +1341,61 @@ public:
 
         verticalLayout_20->addLayout(verticalLayout_26);
 
+        verticalLayout_34 = new QVBoxLayout();
+        verticalLayout_34->setObjectName(QString::fromUtf8("verticalLayout_34"));
+        cb_set_fixed_move_range = new QCheckBox(widget);
+        cb_set_fixed_move_range->setObjectName(QString::fromUtf8("cb_set_fixed_move_range"));
+
+        verticalLayout_34->addWidget(cb_set_fixed_move_range);
+
+        horizontalLayout_39 = new QHBoxLayout();
+        horizontalLayout_39->setObjectName(QString::fromUtf8("horizontalLayout_39"));
+        label_41 = new QLabel(widget);
+        label_41->setObjectName(QString::fromUtf8("label_41"));
+
+        horizontalLayout_39->addWidget(label_41);
+
+        le_min_move_range = new QLineEdit(widget);
+        le_min_move_range->setObjectName(QString::fromUtf8("le_min_move_range"));
+
+        horizontalLayout_39->addWidget(le_min_move_range);
+
+
+        verticalLayout_34->addLayout(horizontalLayout_39);
+
+        horizontalLayout_40 = new QHBoxLayout();
+        horizontalLayout_40->setObjectName(QString::fromUtf8("horizontalLayout_40"));
+        label_40 = new QLabel(widget);
+        label_40->setObjectName(QString::fromUtf8("label_40"));
+
+        horizontalLayout_40->addWidget(label_40);
+
+        le_max_move_range = new QLineEdit(widget);
+        le_max_move_range->setObjectName(QString::fromUtf8("le_max_move_range"));
+
+        horizontalLayout_40->addWidget(le_max_move_range);
+
+
+        verticalLayout_34->addLayout(horizontalLayout_40);
+
+        horizontalLayout_38 = new QHBoxLayout();
+        horizontalLayout_38->setObjectName(QString::fromUtf8("horizontalLayout_38"));
+        label_42 = new QLabel(widget);
+        label_42->setObjectName(QString::fromUtf8("label_42"));
+
+        horizontalLayout_38->addWidget(label_42);
+
+        le_move_range_delimiter = new QLineEdit(widget);
+        le_move_range_delimiter->setObjectName(QString::fromUtf8("le_move_range_delimiter"));
+
+        horizontalLayout_38->addWidget(le_move_range_delimiter);
+
+
+        verticalLayout_34->addLayout(horizontalLayout_38);
+
+
+        verticalLayout_20->addLayout(verticalLayout_34);
+
 
         verticalLayout_9->addWidget(widget);
 
@@ -1020,7 +1415,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 311));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 506, 357));
         verticalLayout_24 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         lb_simulation_size = new QLabel(scrollAreaWidgetContents_4);
@@ -1042,6 +1437,16 @@ public:
         lb_organisms_alive->setObjectName(QString::fromUtf8("lb_organisms_alive"));
 
         verticalLayout_24->addWidget(lb_organisms_alive);
+
+        lb_moving_organisms = new QLabel(scrollAreaWidgetContents_4);
+        lb_moving_organisms->setObjectName(QString::fromUtf8("lb_moving_organisms"));
+
+        verticalLayout_24->addWidget(lb_moving_organisms);
+
+        lb_average_move_range = new QLabel(scrollAreaWidgetContents_4);
+        lb_average_move_range->setObjectName(QString::fromUtf8("lb_average_move_range"));
+
+        verticalLayout_24->addWidget(lb_average_move_range);
 
         lb_anatomy_mutation_rate = new QLabel(scrollAreaWidgetContents_4);
         lb_anatomy_mutation_rate->setObjectName(QString::fromUtf8("lb_anatomy_mutation_rate"));
@@ -1106,12 +1511,12 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 98, 238));
-        QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Preferred);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents->setSizePolicy(sizePolicy4);
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 267));
+        QSizePolicy sizePolicy7(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        sizePolicy7.setHorizontalStretch(0);
+        sizePolicy7.setVerticalStretch(0);
+        sizePolicy7.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents->setSizePolicy(sizePolicy7);
         verticalLayout_5 = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_5->setSpacing(0);
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
@@ -1119,6 +1524,7 @@ public:
         widget_2 = new QWidget(scrollAreaWidgetContents);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setMinimumSize(QSize(0, 0));
+        widget_2->setBaseSize(QSize(0, 0));
         verticalLayout_19 = new QVBoxLayout(widget_2);
         verticalLayout_19->setSpacing(2);
         verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
@@ -1200,6 +1606,21 @@ public:
         cb_disable_warnings->setObjectName(QString::fromUtf8("cb_disable_warnings"));
 
         verticalLayout_19->addWidget(cb_disable_warnings);
+
+        horizontalLayout_30 = new QHBoxLayout();
+        horizontalLayout_30->setObjectName(QString::fromUtf8("horizontalLayout_30"));
+        label_25 = new QLabel(widget_2);
+        label_25->setObjectName(QString::fromUtf8("label_25"));
+
+        horizontalLayout_30->addWidget(label_25);
+
+        le_font_size = new QLineEdit(widget_2);
+        le_font_size->setObjectName(QString::fromUtf8("le_font_size"));
+
+        horizontalLayout_30->addWidget(le_font_size);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_30);
 
 
         verticalLayout_5->addWidget(widget_2);
@@ -1290,8 +1711,15 @@ public:
         QObject::connect(cb_food_blocks_reproduction, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_food_blocks_reproduction_slot(bool)));
         QObject::connect(cb_reproducing_rotation_enabled, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reproduction_rotation_enabled_slot(bool)));
         QObject::connect(b_clear_all_walls, SIGNAL(clicked()), MainWindow, SLOT(b_clear_all_walls_slot()));
+        QObject::connect(le_font_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_font_size_slot()));
+        QObject::connect(cb_set_fixed_move_range, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_set_fixed_move_range_slot(bool)));
+        QObject::connect(le_max_move_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_move_range_slot()));
+        QObject::connect(le_min_move_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_move_range_slot()));
+        QObject::connect(le_move_range_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_move_range_delimiter_slot()));
+        QObject::connect(le_brush_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_brush_size_slot()));
 
         Tabs->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1316,6 +1744,7 @@ public:
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", nullptr));
         rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", nullptr));
         rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", nullptr));
+        label_43->setText(QApplication::translate("MainWindow", "Brush size:", nullptr));
         cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
         textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -1335,7 +1764,34 @@ public:
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This project's Github: https://github.com/SuperSpaceEye/TheLifeEngineCpp</p></body></html>", nullptr));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
-        label_22->setText(QApplication::translate("MainWindow", "Not implemented yet.", nullptr));
+        rb_select->setText(QApplication::translate("MainWindow", "Select organism from world", nullptr));
+        rb_edit->setText(QApplication::translate("MainWindow", "Edit organim", nullptr));
+        rb_drop->setText(QApplication::translate("MainWindow", "Drop organism", nullptr));
+        b_save_organism->setText(QApplication::translate("MainWindow", "Save Organism", nullptr));
+        b_load_organism->setText(QApplication::translate("MainWindow", "Load Organism", nullptr));
+        pushButton->setText(QApplication::translate("MainWindow", "Reset with Editor Organism", nullptr));
+        label_22->setText(QApplication::translate("MainWindow", "Organims Details", nullptr));
+        label_26->setText(QApplication::translate("MainWindow", "Cell count:", nullptr));
+        label_27->setText(QApplication::translate("MainWindow", "Mutation Rate:", nullptr));
+        label_28->setText(QApplication::translate("MainWindow", "Edit Organism", nullptr));
+        radioButton_2->setText(QApplication::translate("MainWindow", "Mouth", nullptr));
+        radioButton_5->setText(QApplication::translate("MainWindow", "KIller", nullptr));
+        radioButton->setText(QApplication::translate("MainWindow", "Killer", nullptr));
+        radioButton_6->setText(QApplication::translate("MainWindow", "Producer", nullptr));
+        radioButton_4->setText(QApplication::translate("MainWindow", "Mover", nullptr));
+        radioButton_3->setText(QApplication::translate("MainWindow", "RadioButton", nullptr));
+        label_29->setText(QApplication::translate("MainWindow", "Cell count:", nullptr));
+        label_30->setText(QApplication::translate("MainWindow", "Move Range:", nullptr));
+        label_31->setText(QApplication::translate("MainWindow", "Mutation Rate:", nullptr));
+        label_32->setText(QApplication::translate("MainWindow", "Brain", nullptr));
+        pushButton_2->setText(QApplication::translate("MainWindow", "Edit Brain Table", nullptr));
+        label_34->setText(QApplication::translate("MainWindow", "Organism Details", nullptr));
+        label_36->setText(QApplication::translate("MainWindow", "Cell count:", nullptr));
+        label_35->setText(QApplication::translate("MainWindow", "Move Range:", nullptr));
+        label_33->setText(QApplication::translate("MainWindow", "Mutation Rate:", nullptr));
+        label_39->setText(QApplication::translate("MainWindow", "Brain", nullptr));
+        label_38->setText(QApplication::translate("MainWindow", "Mobe Towards:", nullptr));
+        label_37->setText(QApplication::translate("MainWindow", "Move Away From:", nullptr));
         Tabs->setTabText(Tabs->indexOf(editor_tab), QApplication::translate("MainWindow", "Editor", nullptr));
         label_8->setText(QApplication::translate("MainWindow", "Cell size:", nullptr));
         le_cell_size->setText(QApplication::translate("MainWindow", "1", nullptr));
@@ -1398,11 +1854,17 @@ public:
         le_max_reproduction_distance->setText(QApplication::translate("MainWindow", "3", nullptr));
         cb_fix_reproduction_distance->setText(QApplication::translate("MainWindow", "Fix reproducing distance", nullptr));
         cb_self_organism_blocks_block_sight->setText(QApplication::translate("MainWindow", "Organism's self cells block sight", nullptr));
+        cb_set_fixed_move_range->setText(QApplication::translate("MainWindow", "Set fixed move range", nullptr));
+        label_41->setText(QApplication::translate("MainWindow", "Min move range:", nullptr));
+        label_40->setText(QApplication::translate("MainWindow", "Max move range:", nullptr));
+        label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", nullptr));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", nullptr));
         lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", nullptr));
         lb_organisms_alive->setText(QApplication::translate("MainWindow", "Organisms alive:", nullptr));
+        lb_moving_organisms->setText(QApplication::translate("MainWindow", "Moving organisms:", nullptr));
+        lb_average_move_range->setText(QApplication::translate("MainWindow", "Average move range:", nullptr));
         lb_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", nullptr));
         lb_brain_mutation_rate->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", nullptr));
         lb_organism_size->setText(QApplication::translate("MainWindow", "Average organism size:", nullptr));
@@ -1423,6 +1885,7 @@ public:
         label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
         cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", nullptr));
+        label_25->setText(QApplication::translate("MainWindow", "Font size:", nullptr));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", nullptr));
     } // retranslateUi
 

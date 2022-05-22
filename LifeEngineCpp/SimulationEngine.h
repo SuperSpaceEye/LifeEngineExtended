@@ -11,6 +11,9 @@
 #include <thread>
 #include <atomic>
 
+#include <boost/nondet_random.hpp>
+#include <boost/random.hpp>
+
 #include "GridBlocks/BaseGridBlock.h"
 #include "Organism/Organism.h"
 #include "BlockTypes.hpp"
@@ -33,7 +36,7 @@ class SimulationEngine {
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
 
-    void process_user_action_pool(){};
+    void process_user_action_pool();
 
     void simulation_tick();
     void partial_multi_threaded_tick();
@@ -41,19 +44,15 @@ class SimulationEngine {
     void cuda_tick();
 
     void change_mode();
+    static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
 
-
-    std::random_device rd;
-    std::mt19937 mt;
-    std::uniform_int_distribution<int> dist;
+    boost::mt19937 mt;
 
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
                      OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters,
                      std::mutex& mutex);
     void threaded_mainloop();
-
-    static void tick_of_single_thread();
 
 };
 

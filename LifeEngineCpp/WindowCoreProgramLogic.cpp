@@ -2,8 +2,6 @@
 // Created by spaceeye on 16.03.2022.
 //
 
-#include <memory>
-
 #include "WindowCore.h"
 
 WindowCore::WindowCore(QWidget *parent) :
@@ -32,8 +30,11 @@ WindowCore::WindowCore(QWidget *parent) :
 
     make_walls();
 
-    std::random_device rd;
-    mt = std::mt19937(rd());
+    //In mingw compiler std::random_device is deterministic?
+    //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
+    boost::random_device rd;
+    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    mt = boost::mt19937(sd);
 
     color_container = ColorContainer{};
     sp = SimulationParameters{};
@@ -46,10 +47,10 @@ WindowCore::WindowCore(QWidget *parent) :
     auto brain = std::make_shared<Brain>(&mt, BrainTypes::RandomActions);
 
     base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
-                                 Rotation::UP, anatomy, brain, &sp, &op, &mt);
+                                 Rotation::UP, anatomy, brain, &sp, &op, &mt, 1);
     chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                    Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
-                                   &sp, &op, &mt);
+                                   &sp, &op, &mt, 1);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
 
@@ -79,6 +80,10 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_interval(-1);
 
     timer->start();
+
+//    auto _font = font();
+//    _font.setPixelSize(20);
+//    setFont(_font);
 }
 
 void WindowCore::mainloop_tick() {
@@ -138,6 +143,9 @@ void WindowCore::window_tick() {
         auto_reset_num++;
         _ui.lb_auto_reset_count->setText(QString::fromStdString("Auto reset count: "+ std::to_string(auto_reset_num)));
     }
+
+    if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
+    if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
     create_image();
 }
 
@@ -147,8 +155,12 @@ void WindowCore::resize_image() {
 }
 
 void WindowCore::move_center(int delta_x, int delta_y) {
-    center_x -= delta_x * scaling_zoom;
-    center_y -= delta_y * scaling_zoom;
+    if (change_main_simulation_grid) {
+        center_x -= delta_x * scaling_zoom;
+        center_y -= delta_y * scaling_zoom;
+    } else {
+        edit_engine.move_center(delta_x, delta_y);
+    }
 }
 
 void WindowCore::reset_scale_view() {
@@ -393,6 +405,18 @@ bool WindowCore::wait_for_engine_to_pause() {
     return cp.engine_paused;
 }
 
+__attribute__((optimize("O0")))
+bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
+    auto now = clock_now();
+    while (cp.processing_user_actions) {
+        if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
+            std::cout << "Waiting for engine to pause processing user actions\n";
+            now = clock_now();
+        }
+    }
+    return cp.engine_paused;
+}
+
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= dc.simulation_width) { continue; }
@@ -554,6 +578,11 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
         info.total_size_double_adjacent_space += organism->organism_anatomy->_double_adjacent_space.size();
 
+        if (organism->organism_anatomy->_mover_blocks > 0) {
+            info.move_range += organism->move_range;
+            info.moving_organisms++;
+        }
+
         info.size += organism->organism_anatomy->_organism_blocks.size();
 
         info._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
@@ -574,6 +603,8 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.total_size_single_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
     info.total_size_single_diagonal_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
     info.total_size_double_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
+
+    info.move_range /= info.moving_organisms;
 
     info.total_size = info.total_size_organism_blocks +
                       info.total_size_producing_space +
@@ -614,6 +645,8 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
     _ui.lb_organisms_alive    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
+    _ui.lb_moving_organisms   ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_organisms)));
+    _ui.lb_average_move_range ->setText(QString::fromStdString("Average move range: "    + to_str(info.move_range,       float_precision)));
     _ui.lb_organism_size      ->setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
     _ui.lb_mouth_num          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
     _ui.lb_producer_num       ->setText(QString::fromStdString("Average producer num: "  + to_str(info._producer_blocks, float_precision)));
@@ -633,6 +666,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(dc.simulation_width)));
     _ui.le_simulation_height ->setText(QString::fromStdString(std::to_string(dc.simulation_height)));
     _ui.le_max_organisms     ->setText(QString::fromStdString(std::to_string(dc.max_organisms)));
+    _ui.le_brush_size        ->setText(QString::fromStdString(std::to_string(brush_size)));
     _ui.cb_reset_on_total_extinction ->setChecked(sp.reset_on_total_extinction);
     _ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
     _ui.cb_fill_window               ->setChecked(fill_window);
@@ -642,6 +676,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate,      2)));
     _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
     _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
+    _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
@@ -652,6 +687,9 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_remove                            ->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
     _ui.le_min_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.min_reproducing_distance)));
     _ui.le_max_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
+    _ui.le_min_move_range                    ->setText(QString::fromStdString(std::to_string(sp.min_move_range)));
+    _ui.le_max_move_range                    ->setText(QString::fromStdString(std::to_string(sp.max_move_range)));
+
 
     _ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
     _ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);
@@ -663,14 +701,24 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_use_evolved_anatomy_mutation_rate ->setChecked(sp.use_anatomy_evolved_mutation_rate);
     _ui.cb_disable_warnings                  ->setChecked(disable_warnings);
     _ui.cb_self_organism_blocks_block_sight  ->setChecked(sp.organism_self_blocks_block_sight);
-    //Simulation settings
+    _ui.cb_set_fixed_move_range              ->setChecked(sp.set_fixed_move_range);
+    //Settings
     _ui.cb_stop_console_output->setChecked(stop_console_output);
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
+    //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
+    int font_size = 0;
+    if (font().pixelSize() < 0) {
+        font_size = font().pointSize();
+    } else {
+        font_size = font().pixelSize();
+    }
+    _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
+
 }
 
 void WindowCore::update_simulation_size_label() {
@@ -692,4 +740,67 @@ std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
     if (!num_bytes) {return std::to_string(previous) + "GiB";}
 
     return std::to_string(num_bytes) + " TiB";
+}
+
+pos_on_grid WindowCore::calculate_cursor_pos_on_grid(int x, int y) {
+    auto c_pos = pos_on_grid{};
+    c_pos.x = static_cast<int>((x - float(_ui.simulation_graphicsView->viewport()->width() )/2)*scaling_zoom + center_x);
+    c_pos.y = static_cast<int>((y - float(_ui.simulation_graphicsView->viewport()->height())/2)*scaling_zoom + center_y);
+    return c_pos;
+}
+
+void WindowCore::change_main_grid_left_click() {
+    //cursor pos on grid
+    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
+    cp.pause_processing_user_action = true;
+    wait_for_engine_to_pause_processing_user_actions();
+    for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
+        for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
+            switch (cursor_mode) {
+                case CursorMode::ModifyFood:
+                    dc.user_actions_pool.push_back(
+                            Action{ActionType::TryAddFood, cpg.x + x, cpg.y + y});
+                    break;
+                case CursorMode::ModifyWall:
+                    dc.user_actions_pool.push_back(
+                            Action{ActionType::TryAddWall, cpg.x + x, cpg.y + y});
+                    break;
+                case CursorMode::KillOrganism:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::ChooseOrganism:
+                    dc.user_actions_pool.push_back(Action{ActionType::TrySelectOrganism, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::PlaceOrganism:
+                    break;
+            }
+        }
+    }
+    cp.pause_processing_user_action = false;
+}
+
+void WindowCore::change_main_grid_right_click() {
+    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
+    cp.pause_processing_user_action = true;
+    wait_for_engine_to_pause_processing_user_actions();
+    for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
+        for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
+            switch (cursor_mode) {
+                case CursorMode::ModifyFood:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryRemoveFood, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::ModifyWall:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryRemoveWall, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::KillOrganism:
+                    dc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x+x, cpg.y+y});
+                    break;
+                case CursorMode::ChooseOrganism:
+                    break;
+                case CursorMode::PlaceOrganism:
+                    break;
+            }
+        }
+    }
+    cp.pause_processing_user_action = false;
 }

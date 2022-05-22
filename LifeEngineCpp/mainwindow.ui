@@ -87,10 +87,16 @@
    <item>
     <widget class="QFrame" name="menu_frame">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>250</height>
+      </size>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -114,10 +120,16 @@
       <item>
        <widget class="QFrame" name="frame_2">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -264,7 +276,7 @@
            <item>
             <widget class="QRadioButton" name="rb_food">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Food mode</string>
@@ -280,7 +292,7 @@
            <item>
             <widget class="QRadioButton" name="rb_kill">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Kill mode</string>
@@ -293,7 +305,7 @@
            <item>
             <widget class="QRadioButton" name="rb_wall">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>Wall mode</string>
@@ -302,6 +314,20 @@
               <string notr="true">cursor_modes</string>
              </attribute>
             </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_41">
+           <item>
+            <widget class="QLabel" name="label_43">
+             <property name="text">
+              <string>Brush size:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="le_brush_size"/>
            </item>
           </layout>
          </item>
@@ -412,22 +438,356 @@ p, li { white-space: pre-wrap; }
             </layout>
            </widget>
            <widget class="QWidget" name="editor_tab">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
             <attribute name="title">
              <string>Editor</string>
             </attribute>
-            <widget class="QLabel" name="label_22">
-             <property name="geometry">
-              <rect>
-               <x>60</x>
-               <y>40</y>
-               <width>311</width>
-               <height>91</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Not implemented yet.</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_31">
+             <item>
+              <widget class="QGraphicsView" name="editor_graphicsView">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>100</horstretch>
+                 <verstretch>100</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAsNeeded</enum>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QScrollArea" name="scrollArea_5">
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_5">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>516</width>
+                  <height>240</height>
+                 </rect>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_32">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QWidget" name="widget_4" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="1,0">
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                     <number>0</number>
+                    </property>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_16">
+                      <item>
+                       <widget class="QRadioButton" name="rb_select">
+                        <property name="text">
+                         <string>Select organism from world</string>
+                        </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">editor_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QRadioButton" name="rb_edit">
+                        <property name="text">
+                         <string>Edit organim</string>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">editor_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QRadioButton" name="rb_drop">
+                        <property name="text">
+                         <string>Drop organism</string>
+                        </property>
+                        <attribute name="buttonGroup">
+                         <string notr="true">editor_modes</string>
+                        </attribute>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="b_save_organism">
+                        <property name="text">
+                         <string>Save Organism</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="b_load_organism">
+                        <property name="text">
+                         <string>Load Organism</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton">
+                        <property name="text">
+                         <string>Reset with Editor Organism</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QStackedWidget" name="stackedWidget">
+                      <property name="currentIndex">
+                       <number>2</number>
+                      </property>
+                      <widget class="QWidget" name="page_organism_details">
+                       <layout class="QVBoxLayout" name="verticalLayout_25">
+                        <item>
+                         <widget class="QLabel" name="label_22">
+                          <property name="text">
+                           <string>Organims Details</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_26">
+                          <property name="text">
+                           <string>Cell count:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_27">
+                          <property name="text">
+                           <string>Mutation Rate:</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="page_edit_organism">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_28">
+                        <item>
+                         <widget class="QLabel" name="label_28">
+                          <property name="text">
+                           <string>Edit Organism</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_36">
+                          <item>
+                           <widget class="QRadioButton" name="radioButton_2">
+                            <property name="text">
+                             <string>Mouth</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QRadioButton" name="radioButton_5">
+                            <property name="text">
+                             <string>KIller</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QRadioButton" name="radioButton">
+                            <property name="text">
+                             <string>Killer</string>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_37">
+                          <item>
+                           <widget class="QRadioButton" name="radioButton_6">
+                            <property name="text">
+                             <string>Producer</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QRadioButton" name="radioButton_4">
+                            <property name="text">
+                             <string>Mover</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QRadioButton" name="radioButton_3">
+                            <property name="text">
+                             <string>RadioButton</string>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_29">
+                          <property name="text">
+                           <string>Cell count:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_33">
+                          <item>
+                           <widget class="QLabel" name="label_30">
+                            <property name="text">
+                             <string>Move Range:</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="lineEdit"/>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <layout class="QHBoxLayout" name="horizontalLayout_35">
+                          <item>
+                           <widget class="QLabel" name="label_31">
+                            <property name="text">
+                             <string>Mutation Rate:</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="lineEdit_2"/>
+                          </item>
+                         </layout>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_32">
+                          <property name="text">
+                           <string>Brain</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="pushButton_2">
+                          <property name="text">
+                           <string>Edit Brain Table</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                      <widget class="QWidget" name="page_place">
+                       <layout class="QVBoxLayout" name="verticalLayout_29">
+                        <item>
+                         <widget class="QLabel" name="label_34">
+                          <property name="text">
+                           <string>Organism Details</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_36">
+                          <property name="text">
+                           <string>Cell count:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_35">
+                          <property name="text">
+                           <string>Move Range:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_33">
+                          <property name="text">
+                           <string>Mutation Rate:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_39">
+                          <property name="text">
+                           <string>Brain</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_38">
+                          <property name="text">
+                           <string>Mobe Towards:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_37">
+                          <property name="text">
+                           <string>Move Away From:</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
            </widget>
            <widget class="QWidget" name="world_controls_tab">
             <attribute name="title">
@@ -459,7 +819,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
+                  <width>506</width>
                   <height>219</height>
                  </rect>
                 </property>
@@ -644,7 +1004,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QPushButton" name="b_clear_all_walls">
                         <property name="enabled">
-                         <bool>false</bool>
+                         <bool>true</bool>
                         </property>
                         <property name="text">
                          <string>Clear all walls</string>
@@ -772,8 +1132,8 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>761</height>
+                  <width>506</width>
+                  <height>909</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -812,7 +1172,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -829,7 +1189,7 @@ p, li { white-space: pre-wrap; }
                      <number>0</number>
                     </property>
                     <property name="bottomMargin">
-                     <number>0</number>
+                     <number>10</number>
                     </property>
                     <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -1211,6 +1571,9 @@ p, li { white-space: pre-wrap; }
                      </layout>
                     </item>
                     <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_33"/>
+                    </item>
+                    <item>
                      <layout class="QVBoxLayout" name="verticalLayout_26">
                       <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_25">
@@ -1264,6 +1627,59 @@ p, li { white-space: pre-wrap; }
                       </item>
                      </layout>
                     </item>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_34">
+                      <item>
+                       <widget class="QCheckBox" name="cb_set_fixed_move_range">
+                        <property name="text">
+                         <string>Set fixed move range</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_39">
+                        <item>
+                         <widget class="QLabel" name="label_41">
+                          <property name="text">
+                           <string>Min move range:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_min_move_range"/>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_40">
+                        <item>
+                         <widget class="QLabel" name="label_40">
+                          <property name="text">
+                           <string>Max move range:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_max_move_range"/>
+                        </item>
+                       </layout>
+                      </item>
+                      <item>
+                       <layout class="QHBoxLayout" name="horizontalLayout_38">
+                        <item>
+                         <widget class="QLabel" name="label_42">
+                          <property name="text">
+                           <string>Move range delimiter</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLineEdit" name="le_move_range_delimiter"/>
+                        </item>
+                       </layout>
+                      </item>
+                     </layout>
+                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -1304,7 +1720,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>506</width>
-                  <height>311</height>
+                  <height>357</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -1333,6 +1749,20 @@ p, li { white-space: pre-wrap; }
                   <widget class="QLabel" name="lb_organisms_alive">
                    <property name="text">
                     <string>Organisms alive:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_moving_organisms">
+                   <property name="text">
+                    <string>Moving organisms:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="lb_average_move_range">
+                   <property name="text">
+                    <string>Average move range:</string>
                    </property>
                   </widget>
                  </item>
@@ -1441,8 +1871,8 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>238</height>
+                  <width>506</width>
+                  <height>267</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1470,6 +1900,12 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <widget class="QWidget" name="widget_2" native="true">
                    <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="baseSize">
                     <size>
                      <width>0</width>
                      <height>0</height>
@@ -1605,6 +2041,20 @@ p, li { white-space: pre-wrap; }
                        <string>Disable warnings</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_30">
+                      <item>
+                       <widget class="QLabel" name="label_25">
+                        <property name="text">
+                         <string>Font size:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_font_size"/>
+                      </item>
+                     </layout>
                     </item>
                    </layout>
                   </widget>
@@ -2605,6 +3055,102 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_font_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_font_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>666</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_set_fixed_move_range</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_set_fixed_move_range_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>726</x>
+     <y>767</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_max_move_range</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_max_move_range_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>787</x>
+     <y>798</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_min_move_range</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_min_move_range_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>786</x>
+     <y>831</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_move_range_delimiter</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_move_range_delimiter_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>802</x>
+     <y>864</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_brush_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_brush_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>854</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>555</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -2668,13 +3214,20 @@ p, li { white-space: pre-wrap; }
   <slot>cb_disable_warnings_slot(bool)</slot>
   <slot>cb_self_organism_blocks_block_sight_slot(bool)</slot>
   <slot>le_global_brain_mutation_rate_slot()</slot>
+  <slot>le_font_size_slot()</slot>
+  <slot>cb_set_fixed_move_range_slot(bool)</slot>
+  <slot>le_max_move_range_slot()</slot>
+  <slot>le_min_move_range_slot()</slot>
+  <slot>le_move_range_delimiter_slot()</slot>
+  <slot>le_brush_size_slot()</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
+  <buttongroup name="editor_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>
