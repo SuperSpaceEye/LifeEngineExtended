@@ -6,7 +6,7 @@
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
 #include <iostream>
-#include <mutex>
+#include <atomic>
 #include "../BlockTypes.hpp"
 #include "../Organism/Rotation.h"
 //#include "../Organism/Organism.h"
@@ -21,13 +21,15 @@ struct Neighbors {
 
 class Organism;
 
-struct BaseGridBlock : public std::mutex{
+struct BaseGridBlock{
 public:
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
     Neighbors neighbors{};
 
     Organism * organism = nullptr;
+
+    std::atomic<bool> locked = false;
     BaseGridBlock()=default;
     BaseGridBlock(const BaseGridBlock & block): type(block.type),
                                                 rotation(block.rotation),

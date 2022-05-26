@@ -31,8 +31,9 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) {
-            SimulationEnginePartialMultiThread::kill_threads(dc);
-            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+//            SimulationEnginePartialMultiThread::kill_threads(dc);
+//            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+            cp.build_threads = false;
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
