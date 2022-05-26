@@ -5,7 +5,7 @@
 #ifndef THELIFEENGINECPP_ROTATION_H
 #define THELIFEENGINECPP_ROTATION_H
 
-//TODO do not change the order of the rotation, rotate_organism is
+//do not change the order of the rotation.
 enum class Rotation {
     UP,
     LEFT,

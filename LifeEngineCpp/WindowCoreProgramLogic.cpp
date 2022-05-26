@@ -19,9 +19,7 @@ WindowCore::WindowCore(QWidget *parent) :
     dc.simulation_width = 200;
     dc.simulation_height = 200;
 
-    set_simulation_num_threads(1);
-
-    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
     dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
 
     update_simulation_size_label();
@@ -44,13 +42,13 @@ WindowCore::WindowCore(QWidget *parent) :
     anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
     anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
-    auto brain = std::make_shared<Brain>(&mt, BrainTypes::RandomActions);
+    auto brain = std::make_shared<Brain>(BrainTypes::RandomActions);
 
     base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
-                                 Rotation::UP, anatomy, brain, &sp, &op, &mt, 1);
+                                 Rotation::UP, anatomy, brain, &sp, &op, 1);
     chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                    Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
-                                   &sp, &op, &mt, 1);
+                                   &sp, &op, 1);
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
 
@@ -80,6 +78,7 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_interval(-1);
 
     timer->start();
+//    set_simulation_num_threads(1);
 
 //    auto _font = font();
 //    _font.setPixelSize(20);
@@ -110,20 +109,20 @@ void WindowCore::mainloop_tick() {
         update_fps_labels(window_frames, simulation_frames);
         update_statistics_info(info);
 
-        if (!stop_console_output) {
-            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second | "
-            << dc.organisms.size() << " organisms alive | " << to_str(info.size, float_precision) << " average organism_size | "
-            << to_str(dc.total_engine_ticks, float_precision) << " total engine ticks\n"
-            << to_str(info.anatomy_mutation_rate, float_precision) << " average anatomy mutation rate | "
-            << to_str(info.brain_mutation_rate, float_precision) << " average brain mutation rate | "
-            << to_str(info._eye_blocks,      float_precision) << " average mouth num | "
-            << to_str(info._producer_blocks, float_precision) << " average producer num | "
-            << to_str(info._mover_blocks,    float_precision) << " average mover num | "
-            << to_str(info._killer_blocks,   float_precision) << " average killer num | "
-            << to_str(info._armor_blocks,    float_precision) << " average armor num | "
-            << to_str(info._eye_blocks,      float_precision) << " average eye num\n"
-            <<"\n";
-        }
+//        if (!stop_console_output) {
+//            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second | "
+//            << dc.organisms.size() << " organisms alive | " << to_str(info.size, float_precision) << " average organism_size | "
+//            << to_str(dc.total_engine_ticks, float_precision) << " total engine ticks\n"
+//            << to_str(info.anatomy_mutation_rate, float_precision) << " average anatomy mutation rate | "
+//            << to_str(info.brain_mutation_rate, float_precision) << " average brain mutation rate | "
+//            << to_str(info._eye_blocks,      float_precision) << " average mouth num | "
+//            << to_str(info._producer_blocks, float_precision) << " average producer num | "
+//            << to_str(info._mover_blocks,    float_precision) << " average mover num | "
+//            << to_str(info._killer_blocks,   float_precision) << " average killer num | "
+//            << to_str(info._armor_blocks,    float_precision) << " average armor num | "
+//            << to_str(info._eye_blocks,      float_precision) << " average eye num\n"
+//            <<"\n";
+//        }
 
         window_frames = 0;
         fps_timer = clock_now();
@@ -356,13 +355,6 @@ void WindowCore::set_image_pixel(int x, int y, QColor &color) {
     image_vector[index  ] = color.blue();
 }
 
-bool WindowCore::compare_pixel_color(int x, int y, QColor &color) {
-    auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
-    return image_vector[index+2] == color.red()  &&
-           image_vector[index+1] == color.green()&&
-           image_vector[index  ] == color.blue();
-}
-
 void WindowCore::set_window_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
         window_interval = 0.;
@@ -422,7 +414,7 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
         if (x < 0 || x >= dc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= dc.simulation_height) { continue; }
-            dc.second_simulation_grid[x][y] = dc.single_thread_simulation_grid[x][y];
+            dc.second_simulation_grid[x][y] = dc.CPU_simulation_grid[x][y];
         }
     }
 }
@@ -436,15 +428,20 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
-            dc.second_simulation_grid[x][y] = dc.single_thread_simulation_grid[x][y];
+            dc.second_simulation_grid[x][y] = dc.CPU_simulation_grid[x][y];
         }
     }
     unpause_engine();
 }
 
 void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
+    cp.engine_pause = true;
+    wait_for_engine_to_pause();
+
     cp.num_threads = num_threads;
     cp.build_threads = true;
+
+    unpause_engine();
 }
 
 void WindowCore::set_cursor_mode(CursorMode mode) {
@@ -488,18 +485,16 @@ void WindowCore::resize_simulation_space() {
         }
     }
 
-    std::cout << sizeof(BaseGridBlock) << "\n";
-
     cp.engine_pause = true;
     wait_for_engine_to_pause();
 
     dc.simulation_width = new_simulation_width;
     dc.simulation_height = new_simulation_height;
 
-    dc.single_thread_simulation_grid.clear();
+    dc.CPU_simulation_grid.clear();
     dc.second_simulation_grid.clear();
 
-    dc.single_thread_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
     dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
 
     update_simulation_size_label();
@@ -516,7 +511,7 @@ void WindowCore::partial_clear_world() {
 
     clear_organisms();
 
-    for (auto & column: dc.single_thread_simulation_grid) {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
+    for (auto & column: dc.CPU_simulation_grid) {for (auto & block: column) { block.type = BlockTypes::EmptyBlock;}}
     for (auto & column: dc.second_simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
 
     dc.total_engine_ticks = 0;
@@ -557,13 +552,13 @@ void WindowCore::make_walls() {
     auto wall_thickness = 1;
 
     for (int x = 0; x < dc.simulation_width; x++) {
-        dc.single_thread_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        dc.single_thread_simulation_grid[x][dc.simulation_height-1].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
     }
 
     for (int y = 0; y < dc.simulation_height; y++) {
-        dc.single_thread_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        dc.single_thread_simulation_grid[dc.simulation_width -1][y].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
     }
 }
 
@@ -573,7 +568,6 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         info.total_size_organism_blocks += organism->organism_anatomy->_organism_blocks.size();
         info.total_size_producing_space += organism->organism_anatomy->_producing_space.size();
         info.total_size_eating_space    += organism->organism_anatomy->_eating_space.size();
-        info.total_size_armor_space     += organism->organism_anatomy->_armor_space.size();
         info.total_size_single_adjacent_space += organism->organism_anatomy->_single_adjacent_space.size();
         info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
         info.total_size_double_adjacent_space += organism->organism_anatomy->_double_adjacent_space.size();
@@ -598,9 +592,8 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
 
     info.total_size_organism_blocks *= sizeof(SerializedOrganismBlockContainer);
     info.total_size_producing_space *= sizeof(SerializedAdjacentSpaceContainer);
-    info.total_size_eating_space    *= sizeof(SerializedAdjacentSpaceContainer);
-    info.total_size_armor_space     *= sizeof(SerializedArmorSpaceContainer);
-    info.total_size_single_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_eating_space *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_single_adjacent_space *= sizeof(SerializedArmorSpaceContainer);
     info.total_size_single_diagonal_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
     info.total_size_double_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
 
@@ -609,7 +602,6 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.total_size = info.total_size_organism_blocks +
                       info.total_size_producing_space +
                       info.total_size_eating_space +
-                      info.total_size_armor_space +
                       info.total_size_single_adjacent_space +
                       info.total_size_single_diagonal_adjacent_space +
                       info.total_size_double_adjacent_space;
@@ -635,8 +627,8 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     if (std::isnan(info._armor_blocks))    {info._armor_blocks    = 0;}
     if (std::isnan(info._eye_blocks))      {info._eye_blocks      = 0;}
 
-    if (std::isnan(info.brain_mutation_rate)) {info.brain_mutation_rate    = 0;}
-    if (std::isnan(info.anatomy_mutation_rate)) {info.anatomy_mutation_rate      = 0;}
+    if (std::isnan(info.brain_mutation_rate))   {info.brain_mutation_rate   = 0;}
+    if (std::isnan(info.anatomy_mutation_rate)) {info.anatomy_mutation_rate = 0;}
     return info;
 }
 
@@ -702,6 +694,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_disable_warnings                  ->setChecked(disable_warnings);
     _ui.cb_self_organism_blocks_block_sight  ->setChecked(sp.organism_self_blocks_block_sight);
     _ui.cb_set_fixed_move_range              ->setChecked(sp.set_fixed_move_range);
+    _ui.cb_failed_reproduction_eats_food     ->setChecked(sp.failed_reproduction_eats_food);
     //Settings
     _ui.cb_stop_console_output->setChecked(stop_console_output);
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
@@ -715,7 +708,7 @@ void WindowCore::initialize_gui_settings() {
     }
     _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
-    _ui.rb_partial_multi_thread_mode->hide();
+    //_ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
 

@@ -4,14 +4,14 @@
 
 #include "Brain.h"
 
-Brain::Brain(std::shared_ptr<Brain> & brain): mt(brain->mt), brain_type(brain->brain_type){
-    copy_parents_table(brain->simple_action_table);
+Brain::Brain(std::shared_ptr<Brain> & brain): brain_type(brain->brain_type){
+    brain->simple_action_table = copy_parents_table(brain->simple_action_table);
 }
 
-Brain::Brain(boost::mt19937 *mt, BrainTypes brain_type): mt(mt), brain_type(brain_type) {}
+Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
-BrainDecision Brain::get_random_action() {
-    return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(*mt));
+BrainDecision Brain::get_random_action(boost::mt19937 &mt) {
+    return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(mt));
 }
 
 
@@ -61,8 +61,7 @@ SimpleActionTable Brain::get_random_action_table(boost::mt19937 &mt) {
     return new_simple_action_table;
 }
 
-BrainDecision Brain::get_simple_action(std::vector<Observation> &observations_vector) {
-    Observation * closest_observation;
+BrainDecision Brain::get_simple_action(std::vector<Observation> &observations_vector, boost::mt19937 &mt) {
     auto min_distance = INT32_MAX;
     auto observation_i = -1;
 
@@ -77,12 +76,12 @@ BrainDecision Brain::get_simple_action(std::vector<Observation> &observations_ve
         }
     }
     //if there is no meaningful observations, then return random action;
-    if (observation_i < 0) {return get_random_action();}
+    if (observation_i < 0) {return get_random_action(mt);}
 
-    return calculate_simple_action(observations_vector[observation_i]);
+    return calculate_simple_action(observations_vector[observation_i], mt);
 }
 
-BrainDecision Brain::calculate_simple_action(Observation &observation) {
+BrainDecision Brain::calculate_simple_action(Observation &observation, boost::mt19937 &mt) {
     auto action = SimpleDecision{};
     switch (observation.type) {
         case MouthBlock:    action = simple_action_table.MouthBlock;    break;
@@ -97,7 +96,7 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) {
 
     switch (action) {
         case SimpleDecision::DoNothing:
-            return get_random_action();
+            return get_random_action(mt);
         case SimpleDecision::GoAway:
             switch (observation.eye_rotation)
             {   //local movement
@@ -114,26 +113,25 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) {
                 case Rotation::RIGHT: return BrainDecision::MoveRight;
             }
     }
-    return get_random_action();
+    return get_random_action(mt);
 }
 
-//TODO
-BrainDecision Brain::get_decision(std::vector<Observation> &observation_vector) {
+BrainDecision Brain::get_decision(std::vector<Observation> &observation_vector, boost::mt19937 &mt) {
     switch (brain_type) {
         case BrainTypes::RandomActions:
-            return get_random_action();
+            return get_random_action(mt);
         case BrainTypes::SimpleBrain:
-            return get_simple_action(observation_vector);
+            return get_simple_action(observation_vector, mt);
         case BrainTypes::BehaviourTreeBrain:
             break;
         case BrainTypes::NeuralNetworkBrain:
             break;
     }
-    return get_random_action();
+    return get_random_action(mt);
 }
 
-Brain * Brain::mutate() {
-    auto new_brain = new Brain(mt, brain_type);
-    new_brain->simple_action_table = mutate_action_table(simple_action_table, *mt);
+Brain * Brain::mutate(boost::mt19937 &mt) {
+    auto new_brain = new Brain(brain_type);
+    new_brain->simple_action_table = mutate_action_table(simple_action_table, mt);
     return new_brain;
 }

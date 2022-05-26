@@ -46,6 +46,8 @@ class SimulationEngine {
     void change_mode();
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
 
+    void random_food_drop();
+
     boost::mt19937 mt;
 
 public:

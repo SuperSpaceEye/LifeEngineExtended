@@ -70,26 +70,25 @@ struct SimpleActionTable {
 
 class Brain {
 private:
-    BrainDecision get_random_action();
+    BrainDecision get_random_action(boost::mt19937 &mt);
 
     SimpleActionTable simple_action_table;
     static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
     static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, boost::mt19937 &mt);
     static SimpleActionTable get_random_action_table(boost::mt19937 &mt);
-    BrainDecision get_simple_action(std::vector<Observation> & observations_vector);
-    BrainDecision calculate_simple_action(Observation & observation);
+    BrainDecision get_simple_action(std::vector<Observation> & observations_vector, boost::mt19937 &mt);
+    BrainDecision calculate_simple_action(Observation & observation, boost::mt19937 &mt);
 public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
-    Brain(boost::mt19937 *mt, BrainTypes brain_type);
+    Brain(BrainTypes brain_type);
 
-    boost::mt19937 * mt;
     BrainTypes brain_type;
 
 
-    BrainDecision get_decision(std::vector<Observation> &observation_vector);
+    BrainDecision get_decision(std::vector<Observation> &observation_vector, boost::mt19937 &mt);
 
-    Brain * mutate();
+    Brain * mutate(boost::mt19937 &mt);
 
 };
 

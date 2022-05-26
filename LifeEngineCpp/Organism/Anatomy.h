@@ -16,12 +16,13 @@
 #include "../BlockTypes.hpp"
 #include "../GridBlocks/BaseGridBlock.h"
 
-//TODO refactor this
-//TODO this code is a mess and i became confused, so i don't really know if it will even work.
-
 struct pos {
     int x;
     int y;
+};
+
+struct MapAjacent {
+    bool is_armored = false;
 };
 
 struct BaseSerializedContainer {
@@ -115,9 +116,9 @@ struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
     std::vector<SerializedAdjacentSpaceContainer> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
-    std::vector<SerializedArmorSpaceContainer>    armor_space;
+//    std::vector<SerializedArmorSpaceContainer   > armor_space;
 
-    std::vector<SerializedAdjacentSpaceContainer> single_adjacent_space;
+    std::vector<SerializedArmorSpaceContainer   > single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> double_adjacent_space;
 
@@ -133,8 +134,8 @@ struct SerializedOrganismStructureContainer {
             std::vector<SerializedOrganismBlockContainer> organism_blocks,
             std::vector<SerializedAdjacentSpaceContainer> producing_space,
             std::vector<SerializedAdjacentSpaceContainer> eating_space,
-            std::vector<SerializedArmorSpaceContainer>    armor_space,
-            std::vector<SerializedAdjacentSpaceContainer> single_adjacent_space,
+//            std::vector<SerializedArmorSpaceContainer>    armor_space,
+            std::vector<SerializedArmorSpaceContainer   > single_adjacent_space,
             std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space,
             std::vector<SerializedAdjacentSpaceContainer> double_adjacent_space,
             int32_t mouth_blocks,
@@ -146,7 +147,7 @@ struct SerializedOrganismStructureContainer {
             organism_blocks                (std::move(organism_blocks)),
             producing_space                (std::move(producing_space)),
             eating_space                   (std::move(eating_space)),
-            armor_space                    (std::move(armor_space)),
+//            armor_space                    (std::move(armor_space)),
 
             single_adjacent_space          (std::move(single_adjacent_space)),
             single_diagonal_adjacent_space (std::move(single_diagonal_adjacent_space)),
@@ -164,45 +165,44 @@ class Anatomy {
 private:
     static void set_single_adjacent(int x, int y, int x_offset, int y_offset,
                                     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
+                                    boost::unordered_map<int, boost::unordered_map<int, MapAjacent>> &single_adjacent_space,
+                                    const BaseGridBlock &block);
 
     static void set_double_adjacent(int x, int y, int x_offset, int y_offset,
                                     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+                                    boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space);
 
+    static void set_single_diagonal_adjacent(int x, int y, int x_offset, int y_offset,
+                                             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                             boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
+                                             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
+
     static void create_single_adjacent_space(
             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
-            boost::unordered_map<int, boost::unordered_map<int, bool>> &single_diagonal_adjacent_space);
+            boost::unordered_map<int, boost::unordered_map<int, MapAjacent>> &single_adjacent_space);
 
     static void create_single_diagonal_adjacent_space(
             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+            boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
 
     static void create_double_adjacent_space(
             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+            boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
             boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space);
 
     static void create_producing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                        boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
-                                       boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+                                       boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
                                        int32_t producer_blocks);
 
     static void create_eating_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+                                    boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
                                     int32_t mouth_blocks);
-
-    static void create_armor_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                   boost::unordered_map<int, boost::unordered_map<int, bool>>& armor_space,
-                                   boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                   int32_t armor_blocks);
 
     static void reset_organism_center(std::vector<SerializedOrganismBlockContainer> & _organism_blocks,
                                       boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
@@ -214,8 +214,7 @@ private:
             const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-            const boost::unordered_map<int, boost::unordered_map<int, bool>>& armor_space,
-            const boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+            const boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space,
             int32_t mouth_blocks,
@@ -224,11 +223,6 @@ private:
             int32_t killer_blocks,
             int32_t armor_blocks,
             int32_t eye_blocks);
-
-//    DeserializedOrganismStructureContainer deserialize(std::vector<SerializedOrganismBlockContainer>& organism_blocks,
-//                                                       std::vector<SerializedAdjacentSpaceContainer>& single_adjacent_space,
-//                                                       std::vector<SerializedAdjacentSpaceContainer>& single_diagonal_adjacent_space,
-//                                                       std::vector<SerializedAdjacentSpaceContainer>& double_adjacent_space);
 
     template<typename T>
     static int get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map);
@@ -241,8 +235,8 @@ public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
     std::vector<SerializedAdjacentSpaceContainer> _producing_space;
     std::vector<SerializedAdjacentSpaceContainer> _eating_space;
-    std::vector<SerializedArmorSpaceContainer>    _armor_space;
-    std::vector<SerializedAdjacentSpaceContainer> _single_adjacent_space;
+//    std::vector<SerializedArmorSpaceContainer   > _armor_space;
+    std::vector<SerializedArmorSpaceContainer   > _single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _double_adjacent_space;
 
@@ -256,8 +250,6 @@ public:
     explicit Anatomy(SerializedOrganismStructureContainer *structure);
     explicit Anatomy(const std::shared_ptr<Anatomy>& anatomy);
     Anatomy()=default;
-
-    ~Anatomy();
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt);
     SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt);

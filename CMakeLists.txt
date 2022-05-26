@@ -14,8 +14,8 @@ set(CMAKE_AUTOUIC ON)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 #for perf
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
 #set(${CMAKE_CXX_FLAGS} -static)
 

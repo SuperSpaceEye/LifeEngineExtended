@@ -4,10 +4,7 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    app.setStyle(QStyleFactory::create("windowsvista"));
-//    for (auto & key :QStyleFactory::keys().toVector()) {
-//        std::cout << key.toStdString() << "\n";
-//    }
+    app.setStyle(QStyleFactory::create("WindowsVista"));
     QWidget widget;
 
     auto window = WindowCore{&widget};

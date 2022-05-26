@@ -29,10 +29,11 @@ struct SimulationParameters {
         float brain_min_possible_mutation_rate = 0.1;
         float brain_mutation_rate_delimiter = 0.5;
 
-        int max_move_range = 5;
-        int min_move_range = 1;
+        int   max_move_range = 5;
+        int   min_move_range = 1;
         float move_range_delimiter = 0.5;
-        bool set_fixed_move_range = false;
+        bool  set_fixed_move_range = false;
+        int   min_organism_size = 1;
 
         //Probabilities of creating child with doing:
             int add_cell = 33;
@@ -42,7 +43,7 @@ struct SimulationParameters {
         bool reproduction_rotation_enabled = true;
         bool on_touch_kill = false;
         bool use_anatomy_evolved_mutation_rate = true;
-        bool use_brain_evolved_mutation_rate = false;
+        bool use_brain_evolved_mutation_rate = true;
         bool movers_can_produce_food = false;
         bool food_blocks_reproduction = true;
     //world controls
@@ -53,6 +54,7 @@ struct SimulationParameters {
         bool reproduction_distance_fixed = false;
         bool runtime_rotation_enabled = true;
         bool organism_self_blocks_block_sight = false;
+        bool failed_reproduction_eats_food = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

@@ -73,8 +73,8 @@ void WindowCore::b_clear_all_walls_slot() {
 
     for (int x = 1; x < dc.simulation_width-1; x++) {
         for (int y = 1; y < dc.simulation_height-1; y++) {
-            if (dc.single_thread_simulation_grid[x][y].type == BlockTypes::WallBlock) {
-                dc.single_thread_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
+            if (dc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock) {
+                dc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
             }
         }
     }
@@ -479,3 +479,5 @@ void WindowCore::cb_disable_warnings_slot               (bool state) { disable_w
 void WindowCore::cb_set_fixed_move_range_slot           (bool state) {sp.set_fixed_move_range = state;}
 
 void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){sp.organism_self_blocks_block_sight = state;}
+
+void WindowCore::cb_failed_reproduction_eats_food_slot  (bool state) {sp.failed_reproduction_eats_food = state;}
