@@ -22,6 +22,9 @@
 #include "../Linspace.h"
 
 class SimulationEngineSingleThread {
+public:
+
+    static void place_organism  (EngineDataContainer * dc, Organism * organism);
 
     static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 &mt);
 
@@ -45,11 +48,13 @@ class SimulationEngineSingleThread {
 
     static void move_organism   (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
 
-    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Observation> &organism_observations);
+    static void think_decision  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Observation> &organism_observations, boost::mt19937 *mt);
+
+    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism);
 
     static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
 
-    static void make_child      (EngineDataContainer * dc, Organism *organism, boost::mt19937 *mt);
+//    static void make_child      (EngineDataContainer * dc, Organism *organism, boost::mt19937 *mt);
 
     static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
 
@@ -57,7 +62,6 @@ class SimulationEngineSingleThread {
     static bool check_if_block_out_of_bounds(EngineDataContainer *dc, Organism *organism,
                                              BaseSerializedContainer &block, Rotation rotation);
 
-public:
     static void single_threaded_tick(EngineDataContainer * dc,
                                      SimulationParameters * sp,
                                      boost::mt19937 *mt);

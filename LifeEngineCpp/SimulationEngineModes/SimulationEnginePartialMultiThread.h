@@ -18,6 +18,7 @@
 #include "../EngineDataContainer.h"
 #include "../OrganismBlockParameters.h"
 #include "../Linspace.h"
+#include "SimulationEngineSingleThread.h"
 
 struct EngineDataContainer;
 struct eager_worker_partial;
@@ -31,99 +32,89 @@ enum class PartialSimulationStage {
     //EraseOrganisms,
     //ReserveObservations,
     GetObservations,
-    MakeDecision,
+    ThinkDecision,
     //DoDecision,
     //TryMakeChild
 };
 
 class SimulationEnginePartialMultiThread {
 private:
-    static void place_organisms (EngineDataContainer * dc);
-
-    static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, std::mt19937 & mt);
+    static void place_organism (EngineDataContainer * dc, Organism * organism);
 
     static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
-    static void tick_lifetime   (EngineDataContainer * dc, std::vector<int>& to_erase, Organism *organism, int organism_pos);
+    static void tick_lifetime(EngineDataContainer *dc, std::vector<std::vector<int>> &to_erase,
+                              Organism *organism, int thread_num, int organism_pos);
 
-    static void erase_organisms (EngineDataContainer * dc, std::vector<int>& to_erase, int i);
+    static void erase_organisms (EngineDataContainer * dc, std::vector<std::vector<int>>& to_erase);
 
-    static void apply_damage    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
+    static void get_observations(EngineDataContainer *dc, Organism *&organism,
+                                 std::vector<std::vector<Observation>> &organism_observations,
+                                 SimulationParameters *sp, int organism_num);
+    static void calculate_threads_points(int num_points, int num_threads, std::vector<std::vector<int>> & thread_points);
 
-    static void reserve_observations(std::vector<std::vector<Observation>> & observations, std::vector<Organism *> &organisms);
-
-    static void get_observations(EngineDataContainer *dc, std::vector<Organism *> &organisms, std::vector<std::vector<Observation>> &organism_observations);
-
-    static void rotate_organism (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
-
-    static void move_organism   (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
-
-    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Observation> &organism_observations);
-
-    static void do_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Observation> &organism_observations);
-
-    static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, std::mt19937 *mt);
-
-    static void make_child      (EngineDataContainer * dc, Organism *organism, std::mt19937 * mt);
-
-    static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, std::mt19937 *mt);
-
-    static bool check_if_out_of_boundaries(EngineDataContainer *dc, Organism *organism,
-                                           BaseSerializedContainer &block, Rotation rotation);
-
-    static void calculate_threads_points(int num_organisms, int num_threads, std::vector<int> & thread_points);
-
+    static void start_stage(EngineDataContainer *dc, PartialSimulationStage stage,
+                            std::vector<std::vector<int>> &thread_points);
 public:
     static void
-    partial_multi_thread_tick(EngineDataContainer *dc, EngineControlParameters *cp, OrganismBlockParameters *bp,
-                              SimulationParameters *sp);
+    partial_multi_thread_tick(EngineDataContainer *dc, EngineControlParameters *cp,
+                              OrganismBlockParameters *bp, SimulationParameters *sp,
+                              boost::mt19937 *mt);
 
-    static void build_threads(EngineDataContainer &dc, EngineControlParameters &cp);
+    static void build_threads(EngineDataContainer &dc, EngineControlParameters &cp,
+                              SimulationParameters &sp);
 
     static void kill_threads(EngineDataContainer &dc);
 
-    static void thread_tick(PartialSimulationStage stage, int start_pos, int end_pos);
+    static void thread_tick(PartialSimulationStage stage, EngineDataContainer *dc,
+                            SimulationParameters *sp, boost::mt19937 *mt, int start_pos,
+                            int end_pos, int thread_num);
 
-    static void start_stage(PartialSimulationStage stage, std::vector<int> & thread_points);
 };
 
 struct eager_worker_partial {
     EngineDataContainer * dc = nullptr;
-    int start_organism_pos = 0;
-    int end_organism_pos = 0;
+    SimulationParameters * sp = nullptr;
+    int start_pos = 0;
+    int end_pos = 0;
+    int thread_num;
 
     std::random_device r;
-    std::mt19937 mt;
+    boost::mt19937 mt;
 
     eager_worker_partial() = default;
-    eager_worker_partial(EngineDataContainer * dc):
-            dc(dc){
+    eager_worker_partial(EngineDataContainer * dc, SimulationParameters * sp, int thread_num):
+            dc(dc), sp(sp), thread_num(thread_num){
         auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
-        mt = std::mt19937(seed);
+        mt = boost::mt19937(seed);
+        thread = std::thread{&eager_worker_partial::main_loop, this};
     }
     eager_worker_partial(const eager_worker_partial & worker):
-            dc(worker.dc){
+            dc(worker.dc), sp(worker.sp), thread_num(worker.thread_num){
         auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
-        mt = std::mt19937(seed);
+        mt = boost::mt19937(seed);
+        thread = std::thread{&eager_worker_partial::main_loop, this};
     }
 
-    inline void work(PartialSimulationStage stage) {
-        has_work.store(true);
-        thread_stage.store(stage);
+    inline void work(PartialSimulationStage stage, int start, int stop) {
+        start_pos = start;
+        end_pos = stop;
+        thread_stage = stage;
+        has_work = true;
     }
 
     inline void finish() {
-        while (has_work.load()) {}
+        while (has_work) {}
     }
 
     inline void stop_work() {
-        exiting.store(true);
+        exiting = true;
     }
 
-    inline ~eager_worker_partial() { stop_thread(); }
+    inline ~eager_worker_partial() {stop_thread();}
     inline void stop_thread() {
-        exiting.store(true);
-        has_work.store(true);
+        exiting = true;
+        has_work = true;
         if (thread.joinable()) {
             thread.join();
         }
@@ -132,22 +123,34 @@ private:
     std::atomic<bool> has_work{false};
 
     std::atomic<bool> exiting{false};
-    std::atomic<bool> thread_started{false};
 
-    std::atomic<PartialSimulationStage> thread_stage;
+    PartialSimulationStage thread_stage;
 
-    std::thread thread = std::thread([this] {
-        thread_started.store(true);
+//    __attribute__((optimize("O0")))
+//    bool wait_for_work() {
+//        while (!has_work) {
+//            if (exiting) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+//    __attribute__((optimize("O0")))
+    void main_loop() {
         while (true) {
+//            if (wait_for_work()) { return;}
             while (!has_work.load()) {
                 if (exiting.load()) {
                     return;
                 }
             }
-            SimulationEnginePartialMultiThread::thread_tick(thread_stage, 0, 0);
-            has_work.store(false);
+            SimulationEnginePartialMultiThread::thread_tick(thread_stage, dc, sp, &mt, start_pos, end_pos, thread_num);
+            has_work = false;
         }
-    });
+    }
+
+    std::thread thread;
 };
 
 

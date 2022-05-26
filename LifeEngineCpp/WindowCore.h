@@ -106,7 +106,6 @@ struct OrganismAvgBlockInformation {
     uint64_t total_size_organism_blocks = 0;
     uint64_t total_size_producing_space = 0;
     uint64_t total_size_eating_space    = 0;
-    uint64_t total_size_armor_space     = 0;
     uint64_t total_size_single_adjacent_space = 0;
     uint64_t total_size_single_diagonal_adjacent_space = 0;
     uint64_t total_size_double_adjacent_space = 0;
@@ -196,7 +195,6 @@ private:
     bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
 
-    //TODO implement it
     int cell_size = 1;
 
     int new_simulation_width = 200;
@@ -230,7 +228,6 @@ private:
     void update_fps_labels(int fps, int sps);
     void resize_image();
     void set_image_pixel(int x, int y, QColor & color);
-    bool compare_pixel_color(int x, int y, QColor & color);
 
     void calculate_new_simulation_size();
     pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
@@ -259,7 +256,6 @@ private:
 
     void update_statistics_info(OrganismAvgBlockInformation info);
 
-    //TODO sometimes the program SEGFAULTS when resizing, and I have no idea why.
     void resize_simulation_space();
 
     void inline calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
@@ -294,6 +290,7 @@ private:
     result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
     int display_dialog_message(const std::string& message);
     static void display_message(const std::string& message);
+
 private slots:
     void tb_pause_slot(bool paused);
     void tb_stoprender_slot(bool stopped_render);
@@ -366,6 +363,7 @@ private slots:
     void cb_disable_warnings_slot(bool state);
     void cb_self_organism_blocks_block_sight_slot(bool state);
     void cb_set_fixed_move_range_slot(bool state);
+    void cb_failed_reproduction_eats_food_slot(bool state);
 
 public:
     WindowCore(QWidget *parent);

@@ -239,6 +239,7 @@ public:
     QHBoxLayout *horizontalLayout_38;
     QLabel *label_42;
     QLineEdit *le_move_range_delimiter;
+    QCheckBox *cb_failed_reproduction_eats_food;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -282,8 +283,8 @@ public:
     QHBoxLayout *horizontalLayout_30;
     QLabel *label_25;
     QLineEdit *le_font_size;
-    QButtonGroup *simulation_modes;
     QButtonGroup *editor_modes;
+    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
@@ -961,7 +962,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 909));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 938));
         sizePolicy4.setHeightForWidth(scrollAreaWidgetContents_2->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy4);
         verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
@@ -1396,6 +1397,11 @@ public:
 
         verticalLayout_20->addLayout(verticalLayout_34);
 
+        cb_failed_reproduction_eats_food = new QCheckBox(widget);
+        cb_failed_reproduction_eats_food->setObjectName(QString::fromUtf8("cb_failed_reproduction_eats_food"));
+
+        verticalLayout_20->addWidget(cb_failed_reproduction_eats_food);
+
 
         verticalLayout_9->addWidget(widget);
 
@@ -1543,7 +1549,7 @@ public:
         rb_partial_multi_thread_mode = new QRadioButton(widget_2);
         simulation_modes->addButton(rb_partial_multi_thread_mode);
         rb_partial_multi_thread_mode->setObjectName(QString::fromUtf8("rb_partial_multi_thread_mode"));
-        rb_partial_multi_thread_mode->setEnabled(false);
+        rb_partial_multi_thread_mode->setEnabled(true);
 
         verticalLayout_23->addWidget(rb_partial_multi_thread_mode);
 
@@ -1580,7 +1586,7 @@ public:
 
         le_num_threads = new QLineEdit(widget_2);
         le_num_threads->setObjectName(QString::fromUtf8("le_num_threads"));
-        le_num_threads->setEnabled(false);
+        le_num_threads->setEnabled(true);
 
         horizontalLayout_4->addWidget(le_num_threads);
 
@@ -1717,8 +1723,9 @@ public:
         QObject::connect(le_min_move_range, SIGNAL(returnPressed()), MainWindow, SLOT(le_min_move_range_slot()));
         QObject::connect(le_move_range_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_move_range_delimiter_slot()));
         QObject::connect(le_brush_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_brush_size_slot()));
+        QObject::connect(cb_failed_reproduction_eats_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_failed_reproduction_eats_food_slot(bool)));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(5);
         stackedWidget->setCurrentIndex(2);
 
 
@@ -1858,6 +1865,7 @@ public:
         label_41->setText(QApplication::translate("MainWindow", "Min move range:", nullptr));
         label_40->setText(QApplication::translate("MainWindow", "Max move range:", nullptr));
         label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", nullptr));
+        cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", nullptr));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", nullptr));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", nullptr));

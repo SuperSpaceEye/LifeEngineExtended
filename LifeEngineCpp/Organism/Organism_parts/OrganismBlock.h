@@ -7,7 +7,7 @@
 
 #include "../../GridBlocks/BaseGridBlock.h"
 
-class OrganismBlock: public BaseGridBlock {
+struct OrganismBlock: public BaseGridBlock {
 public:
     OrganismBlock();
     explicit OrganismBlock(BlockTypes type) : BaseGridBlock(type) {}
