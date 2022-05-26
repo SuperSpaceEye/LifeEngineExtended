@@ -60,9 +60,9 @@ void SimulationEngine::change_mode() {
 
     switch (cp.change_to_mode) {
         case SimulationModes::CPU_Single_Threaded:
-//            if (cp.simulation_mode == SimulationModes::CPU_Multi_Threaded) {
-//                kill_threads();
-//            }
+            if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+                SimulationEnginePartialMultiThread::kill_threads(dc);
+            }
 //            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
 //
 //            }
