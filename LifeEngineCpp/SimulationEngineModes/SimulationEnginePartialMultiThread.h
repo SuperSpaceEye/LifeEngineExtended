@@ -12,11 +12,11 @@
 #include <atomic>
 //#include "EagerWorkerPartial.h"
 #include "../GridBlocks/BaseGridBlock.h"
-#include "../Organism/Organism.h"
+#include "../Organism/CPU/Organism.h"
 #include "../BlockTypes.hpp"
-#include "../EngineControlContainer.h"
-#include "../EngineDataContainer.h"
-#include "../OrganismBlockParameters.h"
+#include "../Containers/CPU/EngineControlContainer.h"
+#include "../Containers/CPU/EngineDataContainer.h"
+#include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Linspace.h"
 #include "SimulationEngineSingleThread.h"
 

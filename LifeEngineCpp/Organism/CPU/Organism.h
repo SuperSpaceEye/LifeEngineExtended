@@ -11,8 +11,8 @@
 
 #include "Anatomy.h"
 #include "Brain.h"
-#include "../SimulationParameters.h"
-#include "../OrganismBlockParameters.h"
+#include "../../Containers/CPU/SimulationParameters.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
 
 class Organism{

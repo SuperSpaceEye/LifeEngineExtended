@@ -31,11 +31,11 @@
 #include <QFont>
 
 #include "SimulationEngine.h"
-#include "ColorContainer.h"
-#include "SimulationParameters.h"
-#include "EngineControlContainer.h"
-#include "EngineDataContainer.h"
-#include "OrganismBlockParameters.h"
+#include "Containers/CPU/ColorContainer.h"
+#include "Containers/CPU/SimulationParameters.h"
+#include "Containers/CPU/EngineControlContainer.h"
+#include "Containers/CPU/EngineDataContainer.h"
+#include "Containers/CPU/OrganismBlockParameters.h"
 #include "WindowUI.h"
 #include "OrganismEditor.h"
 

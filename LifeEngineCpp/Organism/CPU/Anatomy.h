@@ -10,11 +10,11 @@
 #include <boost/random.hpp>
 #include <random>
 
-#include "Organism_parts/OrganismBlock.h"
+//#include "../Organism_parts/OrganismBlock.h"
 #include "Rotation.h"
-#include "../OrganismBlockParameters.h"
-#include "../BlockTypes.hpp"
-#include "../GridBlocks/BaseGridBlock.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../BlockTypes.hpp"
+#include "../../GridBlocks/BaseGridBlock.h"
 
 struct pos {
     int x;

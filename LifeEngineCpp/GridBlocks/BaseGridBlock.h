@@ -6,10 +6,8 @@
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
 #include <iostream>
-#include <atomic>
 #include "../BlockTypes.hpp"
-#include "../Organism/Rotation.h"
-//#include "../Organism/Organism.h"
+#include "../Organism/CPU/Rotation.h"
 
 struct Neighbors {
     //has neighbor
@@ -28,8 +26,6 @@ public:
     Neighbors neighbors{};
 
     Organism * organism = nullptr;
-
-    std::atomic<bool> locked = false;
     BaseGridBlock()=default;
     BaseGridBlock(const BaseGridBlock & block): type(block.type),
                                                 rotation(block.rotation),
@@ -38,12 +34,6 @@ public:
     explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{},
                            Organism * organism = nullptr):
                             type(type), rotation(rotation), neighbors(neighbors), organism(organism) {}
-    BaseGridBlock& operator=(const BaseGridBlock & block) {
-        type = block.type;
-        rotation = block.rotation;
-        neighbors = block.neighbors;
-        organism = block.organism;
-        return *this;
-    }
+    BaseGridBlock& operator=(const BaseGridBlock & block) = default;
 };
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

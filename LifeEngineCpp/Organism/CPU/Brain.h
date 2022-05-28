@@ -11,7 +11,7 @@
 #include <memory>
 #include <boost/random.hpp>
 
-#include "../BlockTypes.hpp"
+#include "../../BlockTypes.hpp"
 #include "Rotation.h"
 
 enum class BrainDecision {

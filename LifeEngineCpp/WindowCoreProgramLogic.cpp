@@ -19,8 +19,8 @@ WindowCore::WindowCore(QWidget *parent) :
     dc.simulation_width = 200;
     dc.simulation_height = 200;
 
-    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
-    dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
+    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>  (dc.simulation_height, BaseGridBlock{}));
 
     update_simulation_size_label();
 
@@ -414,7 +414,10 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
         if (x < 0 || x >= dc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= dc.simulation_height) { continue; }
-            dc.second_simulation_grid[x][y] = dc.CPU_simulation_grid[x][y];
+            dc.second_simulation_grid[x][y].type = dc.CPU_simulation_grid[x][y].type;
+            dc.second_simulation_grid[x][y].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
+            dc.second_simulation_grid[x][y].organism = dc.CPU_simulation_grid[x][y].organism;
+            dc.second_simulation_grid[x][y].rotation = dc.CPU_simulation_grid[x][y].rotation;
         }
     }
 }
@@ -428,7 +431,10 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
-            dc.second_simulation_grid[x][y] = dc.CPU_simulation_grid[x][y];
+            dc.second_simulation_grid[x][y].type = dc.CPU_simulation_grid[x][y].type;
+            dc.second_simulation_grid[x][y].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
+            dc.second_simulation_grid[x][y].organism = dc.CPU_simulation_grid[x][y].organism;
+            dc.second_simulation_grid[x][y].rotation = dc.CPU_simulation_grid[x][y].rotation;
         }
     }
     unpause_engine();
@@ -494,8 +500,8 @@ void WindowCore::resize_simulation_space() {
     dc.CPU_simulation_grid.clear();
     dc.second_simulation_grid.clear();
 
-    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
-    dc.second_simulation_grid       .resize(dc.simulation_width, std::vector<BaseGridBlock>(dc.simulation_height, BaseGridBlock{}));
+    dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
+    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>  (dc.simulation_height, BaseGridBlock{}));
 
     update_simulation_size_label();
 
