@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
-enable_language(CUDA)
+#enable_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
@@ -20,13 +20,28 @@ set(CMAKE_CUDA_ARCHITECTURES 62)
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mwindows")
 
 #for perf
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
-find_package(CUDA)
+set(WIN_COMPILATION 1)
+
+if (WIN_COMPILATION)
+    set(BOOST_ROOT "C:\\libs\\boost\\boost_1_79_0")
+    set(BOOST_LIBRARYDIR "C:\\libs\\boost\\boost_1_79_0\\stage\\libs")
+    set(Boost_DEBUG 0)
+    set(Boost_ARCHITECTURE -x64)
+    set(Boost_LIB_PREFIX lib)
+
+    set(Boost_USE_STATIC_LIBS ON)
+    set(Boost_USE_DYNAMIC_LIBS ON)
+    set(Boost_USE_RELEASE_LIBS ON)
+    set(Boost_USE_MULTITHREADED ON)
+    set(Boost_USE_STATIC_RUNTIME ON)
+endif()
+
+#find_package(CUDA)
 find_package(Qt5 COMPONENTS
         Core
         Gui
@@ -46,12 +61,14 @@ endif()
 add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.cpp LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_SOURCES})
 
 if (Qt5_FOUND)
-    #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
-    get_property( core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
-    string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
-    set_property( TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
-    set_property( TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
-    set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
+    if(!WIN_COMPILATION)
+        #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
+        get_property( core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
+        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+        set_property( TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+        set_property( TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
+    endif()
 
     target_link_libraries(${PROJECT_NAME}
             Qt5::Core

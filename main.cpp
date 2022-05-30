@@ -6,16 +6,18 @@
 #define __CUDA_USED__=0
 #endif
 
+#if defined(__WIN32)
+#include <windows.h>
+#endif
+
 //#if __CUDA_USED__
 //#include "LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh"
 //#endif
 
 int main(int argc, char *argv[]) {
-//#if __CUDA_USED__
-//    auto engine = SimulationEngineCuda();
-//    engine.cuda_tick();
-//    std::cout << "here\n";
-//#endif
+#if defined(__WIN32)
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
 
     QApplication app(argc, argv);
     app.setStyle(QStyleFactory::create("WindowsVista"));
