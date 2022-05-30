@@ -5,9 +5,10 @@
 #ifndef THELIFEENGINECPP_ENGINEDATACONTAINER_H
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
-#include <atomic>
-#include "Organism/Organism.h"
-#include "Actions.h"
+#include "../../Organism/CPU/Organism.h"
+#include "../../Actions.h"
+#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridBlocks/AtomicGridBlock.h"
 
 struct eager_worker_partial;
 
@@ -25,21 +26,23 @@ struct EngineDataContainer {
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
 
-    std::vector<std::vector<BaseGridBlock>> single_thread_simulation_grid;
+    std::vector<std::vector<AtomicGridBlock>> CPU_simulation_grid;
     std::vector<Organism*> organisms;
     std::vector<Organism*> to_place_organisms;
 
     std::vector<std::vector<BaseGridBlock>> second_simulation_grid;
 
     std::vector<eager_worker_partial> threads;
-    std::vector<int> thread_points;
-    std::vector<std::vector<std::atomic<BaseGridBlock>>> partial_multi_thread_simulation_grid;
+    //std::vector<int> thread_points;
+    //std::vector<std::vector<BaseMutexGridBlock>> partial_multi_thread_simulation_grid;
+    std::vector<std::vector<int>> threaded_to_erase;
+    std::vector<std::vector<Observation>> threaded_organisms_observations;
+
 
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> user_actions_pool;
 
     Organism * selected_organims = nullptr;
-
 };
 
 

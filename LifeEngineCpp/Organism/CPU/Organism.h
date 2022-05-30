@@ -11,24 +11,24 @@
 
 #include "Anatomy.h"
 #include "Brain.h"
-#include "../SimulationParameters.h"
-#include "../OrganismBlockParameters.h"
+#include "../../Containers/CPU/SimulationParameters.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
 
 class Organism{
 //private:
 public:
-    //coordinates of a central block of a cell
+    //coordinates of a central block of an organism
     int x = 0;
     int y = 0;
-    // how much organism can sustain.
+    //how much damage organism can sustain.
     float life_points = 0;
-    // how much damage organism sustained. If damage > life_points, organism dies
+    //how much damage organism sustained. If damage > life_points, organism dies
     float damage = 0;
 
-    // an amount of ticks organism can live
+    //an amount of simulation ticks organism can live
     int max_lifetime = 0;
-    // for how much organism already lived.
+    //how much organism already lived.
     int lifetime = 0;
 
     float anatomy_mutation_rate = 0.05;
@@ -38,7 +38,6 @@ public:
     float food_needed = 0;
 
     int move_range = 1;
-    //TODO implement rotation
     bool * can_rotate = nullptr;
     Rotation rotation = Rotation::UP;
 
@@ -46,7 +45,10 @@ public:
 
     int move_counter = 0;
 
-    BrainDecision last_decision = BrainDecision::MoveUp;
+    int max_decision_lifetime = 2;
+    int max_do_nothing_lifetime = 4;
+
+    DecisionObservation last_decision = DecisionObservation{};
 
     std::shared_ptr<Anatomy> organism_anatomy = nullptr;
     std::shared_ptr<Brain> brain = nullptr;
@@ -54,24 +56,26 @@ public:
     OrganismBlockParameters* bp = nullptr;
     Organism * child_pattern = nullptr;
 
-    boost::mt19937* mt = nullptr;
+    //boost::mt19937* mt = nullptr;
 
     float calculate_max_life();
     int calculate_organism_lifetime();
     float calculate_food_needed();
 
-    void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate);
-    void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate);
+    void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate, boost::mt19937 *mt);
+    void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate, boost::mt19937 *mt);
     static int mutate_move_range(SimulationParameters *sp, boost::mt19937 *mt, int parent_move_range);
+
+    void think_decision(std::vector<Observation> &organism_observations, boost::mt19937 *mt);
     //public:
     Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
              std::shared_ptr<Brain> brain, SimulationParameters *sp,
-             OrganismBlockParameters *block_parameters, boost::mt19937 *mt, int move_range,
-             float anatomy_mutation_rate= 0.5, float brain_mutation_rate= 0.5);
+             OrganismBlockParameters *block_parameters, int move_range,
+             float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
     Organism(Organism *organism);
     Organism()=default;
     ~Organism();
-    Organism * create_child();
+    Organism * create_child(boost::mt19937 *mt);
 };
 
 

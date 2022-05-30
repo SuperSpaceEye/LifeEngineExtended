@@ -1,0 +1,174 @@
+//Do not use map in any circumstances, boost umap is most balanced, while std::umap is faster in parsing, but terrible
+//at item access speed. (maybe a bug, idk)
+
+auto std_umap = std::unordered_map<int, double>{};
+    auto std_map = std::map<int, double>{};
+    auto boost_umap = boost::unordered_map<int, double>{};
+    auto values = std::vector<int>{};
+    auto clock = std::chrono::high_resolution_clock{};
+
+    int num_values = 1'000;
+    int num_tries = 1'000;
+
+    //std::chrono::duration_cast<std::chrono::microseconds>(clock.now() - last_window_update).count()
+
+    values.resize(num_values, 0);
+
+    double average_time = 0;
+
+    std::cout << "Start std_map testing\n";
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+                std_map.insert_or_assign(i, -i);
+            }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Assigning map: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            std_map[i] = i;
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Assigning map values: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            auto value = std_map[i];
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Accessing map items: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (auto const &imap: std_map) {
+            values.push_back(imap.first);
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+        values.clear();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Parsing values " << average_time << std::endl;
+    average_time = 0;
+    std_map.clear();
+
+
+    std::cout << "\nStart std umap testing\n";
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            std_umap.insert_or_assign(i, -i);
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Assigning map: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            std_umap[i] = i;
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Assigning map values: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            auto value = std_map[i];
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Accessing map items: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (auto const &imap: std_umap) {
+            values.push_back(imap.first);
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+        values.clear();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Parsing values " << average_time << std::endl;
+    average_time = 0;
+    std_umap.clear();
+
+
+    std::cout << "\nStart boost umap testing\n";
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            boost_umap.insert_or_assign(i, -i);
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Assigning map: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            boost_umap[i] = i;
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Assigning map values: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (int i = 0; i < num_values; i++) {
+            auto value = boost_umap[i];
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Accessing map items: " << average_time << std::endl;
+    average_time = 0;
+
+    for (int tries = 0; tries < num_tries; tries++) {
+        auto delta = clock.now();
+        for (auto const &imap: boost_umap) {
+            values.push_back(imap.first);
+        }
+        average_time += std::chrono::duration_cast<std::chrono::nanoseconds>(clock.now() - delta).count();
+        values.clear();
+    }
+    average_time /= num_tries;
+
+    std::cout << "Parsing values " << average_time << std::endl;
+    boost_umap.clear();

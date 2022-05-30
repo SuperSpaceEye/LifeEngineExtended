@@ -7,8 +7,7 @@
 
 #include <iostream>
 #include "../BlockTypes.hpp"
-#include "../Organism/Rotation.h"
-//#include "../Organism/Organism.h"
+#include "../Organism/CPU/Rotation.h"
 
 struct Neighbors {
     //has neighbor
@@ -20,7 +19,7 @@ struct Neighbors {
 
 class Organism;
 
-class BaseGridBlock {
+struct BaseGridBlock{
 public:
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
@@ -28,8 +27,13 @@ public:
 
     Organism * organism = nullptr;
     BaseGridBlock()=default;
+    BaseGridBlock(const BaseGridBlock & block): type(block.type),
+                                                rotation(block.rotation),
+                                                neighbors(block.neighbors),
+                                                organism(block.organism) {}
     explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{},
                            Organism * organism = nullptr):
                             type(type), rotation(rotation), neighbors(neighbors), organism(organism) {}
+    BaseGridBlock& operator=(const BaseGridBlock & block) = default;
 };
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

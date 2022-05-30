@@ -65,7 +65,7 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
         case QEvent::Close: {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
             cp.stop_engine = true;
-            while (!wait_for_engine_to_pause()) {}
+            while (!wait_for_engine_to_pause_force()) {}
             close_event->accept();
         } break;
         default: break;

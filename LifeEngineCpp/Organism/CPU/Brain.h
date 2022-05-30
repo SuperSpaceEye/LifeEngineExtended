@@ -11,7 +11,7 @@
 #include <memory>
 #include <boost/random.hpp>
 
-#include "../BlockTypes.hpp"
+#include "../../BlockTypes.hpp"
 #include "Rotation.h"
 
 enum class BrainDecision {
@@ -24,6 +24,8 @@ enum class BrainDecision {
     RotateLeft,
     RotateRight,
     Flip,
+
+    DoNothing,
 
     //TODO will not be used right now, but for more complex brains it will be.
     TryProduceChild,
@@ -45,10 +47,10 @@ enum class BrainTypes {
 };
 
 struct Observation {
-    BlockTypes type;
-    int32_t distance;
+    BlockTypes type = BlockTypes::EmptyBlock;
+    int32_t distance = 0;
     //local rotation
-    Rotation eye_rotation;
+    Rotation eye_rotation = Rotation::UP;
 };
 
 enum class SimpleDecision {
@@ -57,39 +59,44 @@ enum class SimpleDecision {
     GoTowards
 };
 
+struct DecisionObservation {
+    BrainDecision decision = BrainDecision::MoveUp;
+    Observation observation = Observation{};
+    int time = 0;
+};
+
 struct SimpleActionTable {
-    SimpleDecision MouthBlock;
-    SimpleDecision ProducerBlock;
-    SimpleDecision MoverBlock;
-    SimpleDecision KillerBlock;
-    SimpleDecision ArmorBlock;
-    SimpleDecision EyeBlock;
-    SimpleDecision FoodBlock;
-    SimpleDecision WallBlock;
+    SimpleDecision MouthBlock    = SimpleDecision::DoNothing;
+    SimpleDecision ProducerBlock = SimpleDecision::DoNothing;
+    SimpleDecision MoverBlock    = SimpleDecision::DoNothing;
+    SimpleDecision KillerBlock   = SimpleDecision::GoAway;
+    SimpleDecision ArmorBlock    = SimpleDecision::DoNothing;
+    SimpleDecision EyeBlock      = SimpleDecision::DoNothing;
+    SimpleDecision FoodBlock     = SimpleDecision::GoTowards;
+    SimpleDecision WallBlock     = SimpleDecision::DoNothing;
 };
 
 class Brain {
 private:
-    BrainDecision get_random_action();
+    DecisionObservation get_random_action(boost::mt19937 &mt);
 
     SimpleActionTable simple_action_table;
     static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
     static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, boost::mt19937 &mt);
     static SimpleActionTable get_random_action_table(boost::mt19937 &mt);
-    BrainDecision get_simple_action(std::vector<Observation> & observations_vector);
-    BrainDecision calculate_simple_action(Observation & observation);
+    DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, boost::mt19937 &mt);
+    BrainDecision calculate_simple_action(Observation & observation, boost::mt19937 &mt);
 public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
-    Brain(boost::mt19937 *mt, BrainTypes brain_type);
+    Brain(BrainTypes brain_type);
 
-    boost::mt19937 * mt;
     BrainTypes brain_type;
 
 
-    BrainDecision get_decision(std::vector<Observation> &observation_vector);
+    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, boost::mt19937 &mt);
 
-    Brain * mutate();
+    Brain * mutate(boost::mt19937 &mt);
 
 };
 
