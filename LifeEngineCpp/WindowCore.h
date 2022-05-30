@@ -102,18 +102,7 @@ public:
     }
 };
 
-struct OrganismAvgBlockInformation {
-    uint64_t total_size_organism_blocks = 0;
-    uint64_t total_size_producing_space = 0;
-    uint64_t total_size_eating_space    = 0;
-    uint64_t total_size_single_adjacent_space = 0;
-    uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size_double_adjacent_space = 0;
-    uint64_t total_size = 0;
-
-    float move_range = 0;
-    int moving_organisms = 0;
-
+struct OrganismInfoHolder {
     float size = 0;
     float _mouth_blocks    = 0;
     float _producer_blocks = 0;
@@ -123,6 +112,25 @@ struct OrganismAvgBlockInformation {
     float _eye_blocks      = 0;
     float brain_mutation_rate = 0;
     float anatomy_mutation_rate = 0;
+    int total = 0;
+};
+
+struct OrganismAvgBlockInformation {
+    uint64_t total_size_organism_blocks = 0;
+    uint64_t total_size_producing_space = 0;
+    uint64_t total_size_eating_space    = 0;
+    uint64_t total_size_single_adjacent_space = 0;
+    uint64_t total_size_single_diagonal_adjacent_space = 0;
+    uint64_t total_size_double_adjacent_space = 0;
+    uint64_t total_size = 0;
+
+    OrganismInfoHolder total_avg{};
+    OrganismInfoHolder station_avg{};
+    OrganismInfoHolder moving_avg{};
+
+    float move_range = 0;
+    int moving_organisms = 0;
+    int organisms_with_eyes = 0;
 };
 
 //TODO expand About page.
@@ -159,7 +167,6 @@ private:
 
     float window_interval = 0.;
     long delta_window_processing_time = 0;
-    bool allow_waiting_overhead = false;
 
     Ui::MainWindow _ui;
     QTimer * timer;
@@ -180,7 +187,7 @@ private:
 
     EngineControlParameters cp;
     EngineDataContainer dc;
-    OrganismBlockParameters op;
+    OrganismBlockParameters bp;
 
     std::thread engine_thread;
     std::mutex engine_mutex;
@@ -190,7 +197,6 @@ private:
     QGraphicsPixmapItem pixmap_item;
 
     bool pause_image_construction = false;
-    bool full_simulation_grid_parsed = false;
 
     bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
@@ -219,7 +225,9 @@ private:
 
     bool disable_warnings = false;
 
-    int brush_size = 1;
+    int brush_size = 2;
+
+    bool wait_for_engine_to_stop = false;
 
     void mainloop_tick();
     void window_tick();
@@ -248,6 +256,7 @@ private:
     void change_main_grid_right_click();
 
     bool wait_for_engine_to_pause_processing_user_actions();
+    bool wait_for_engine_to_pause_force();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -343,13 +352,13 @@ private slots:
     void le_min_move_range_slot();
     void le_move_range_delimiter_slot();
     void le_brush_size_slot();
+    void le_auto_produce_food_every_n_tick_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
     void cb_use_evolved_anatomy_mutation_rate_slot(bool state);
     void cb_movers_can_produce_food_slot(bool state);
     void cb_food_blocks_reproduction_slot(bool state);
-    void cb_stop_console_output_slot(bool state);
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);
     void cb_reset_on_total_extinction_slot(bool state);
@@ -364,6 +373,9 @@ private slots:
     void cb_self_organism_blocks_block_sight_slot(bool state);
     void cb_set_fixed_move_range_slot(bool state);
     void cb_failed_reproduction_eats_food_slot(bool state);
+    void cb_wait_for_engine_to_stop(bool state);
+
+    void table_cell_changed_slot(int row, int col);
 
 public:
     WindowCore(QWidget *parent);

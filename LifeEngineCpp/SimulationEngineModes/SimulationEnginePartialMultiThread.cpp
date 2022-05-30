@@ -262,8 +262,7 @@ void SimulationEnginePartialMultiThread::thread_tick(PartialSimulationStage stag
             break;
         case PartialSimulationStage::ThinkDecision:
             for (int i = start_pos; i < end_pos; i++) {
-                SimulationEngineSingleThread::think_decision(dc, sp, dc->organisms[i],
-                                                                   dc->threaded_organisms_observations[i], mt);
+                dc->organisms[i]->think_decision(dc->threaded_organisms_observations[i], mt);
             }
             break;
     }

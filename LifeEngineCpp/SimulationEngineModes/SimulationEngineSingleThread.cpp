@@ -25,7 +25,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     reserve_observations(organisms_observations, dc->organisms, sp);
     get_observations(dc, sp, dc->organisms, organisms_observations);
 
-    for (int i = 0; i < dc->organisms.size(); i++)  {think_decision(dc, sp, dc->organisms[i], organisms_observations[i], mt);}
+    for (int i = 0; i < dc->organisms.size(); i++)  {dc->organisms[i]->think_decision(organisms_observations[i], mt);}
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], mt);}
 
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
@@ -294,35 +294,35 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
     organism->y = new_y;
 }
 
-void SimulationEngineSingleThread::think_decision(EngineDataContainer *dc,
-                                                  SimulationParameters *sp,
-                                                  Organism *organism,
-                                                  std::vector<Observation> &organism_observations,
-                                                  boost::mt19937 *mt) {
-    if (organism->move_counter == 0) { //if organism can make new move
-        auto new_decision = organism->brain->get_decision(organism_observations, organism->rotation, *mt);
-        if (new_decision.decision != BrainDecision::DoNothing
-            && new_decision.observation.distance > organism->last_decision.observation.distance) {
-            organism->last_decision = new_decision;
-            return;
-        }
-
-        if (new_decision.decision != BrainDecision::DoNothing
-            && organism->last_decision.time > organism->max_decision_lifetime) {
-            organism->last_decision = new_decision;
-            return;
-        }
-
-        if (organism->last_decision.time > organism->max_do_nothing_lifetime) {
-            organism->last_decision = DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(*mt)),
-                                                          Observation{},
-                                                          0};
-            return;
-        }
-
-        organism->last_decision.time++;
-    }
-}
+//void SimulationEngineSingleThread::think_decision(EngineDataContainer *dc,
+//                                                  SimulationParameters *sp,
+//                                                  Organism *organism,
+//                                                  std::vector<Observation> &organism_observations,
+//                                                  boost::mt19937 *mt) {
+//    if (organism->move_counter == 0) { //if organism can make new move
+//        auto new_decision = organism->brain->get_decision(organism_observations, organism->rotation, *mt);
+//        if (new_decision.decision != BrainDecision::DoNothing
+//            && new_decision.observation.distance > organism->last_decision.observation.distance) {
+//            organism->last_decision = new_decision;
+//            return;
+//        }
+//
+//        if (new_decision.decision != BrainDecision::DoNothing
+//            && organism->last_decision.time > organism->max_decision_lifetime) {
+//            organism->last_decision = new_decision;
+//            return;
+//        }
+//
+//        if (organism->last_decision.time > organism->max_do_nothing_lifetime) {
+//            organism->last_decision = DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(*mt)),
+//                                                          Observation{},
+//                                                          0};
+//            return;
+//        }
+//
+//        organism->last_decision.time++;
+//    }
+//}
 
 void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, boost::mt19937 * mt) {
     switch (organism->last_decision.decision) {
@@ -388,7 +388,6 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     auto min_x = 0;
     auto max_y = 0;
     auto max_x = 0;
-
 
     //a width and height of an organism can only change by one, so to be safe, the distance between organisms = size_of_base_organism + 1
     switch (to_place) {

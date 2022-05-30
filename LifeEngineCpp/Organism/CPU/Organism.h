@@ -65,6 +65,8 @@ public:
     void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate, boost::mt19937 *mt);
     void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate, boost::mt19937 *mt);
     static int mutate_move_range(SimulationParameters *sp, boost::mt19937 *mt, int parent_move_range);
+
+    void think_decision(std::vector<Observation> &organism_observations, boost::mt19937 *mt);
     //public:
     Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
              std::shared_ptr<Brain> brain, SimulationParameters *sp,

@@ -180,3 +180,29 @@ Organism * Organism::create_child(boost::mt19937 *mt) {
                         _anatomy_mutation_rate,
                         _brain_mutation_rate);
 }
+
+void Organism::think_decision(std::vector<Observation> &organism_observations, boost::mt19937 *mt) {
+    if (move_counter == 0) { //if organism can make new move
+        auto new_decision = brain->get_decision(organism_observations, rotation, *mt);
+        if (new_decision.decision != BrainDecision::DoNothing
+            && new_decision.observation.distance > last_decision.observation.distance) {
+            last_decision = new_decision;
+            return;
+        }
+
+        if (new_decision.decision != BrainDecision::DoNothing
+            && last_decision.time > max_decision_lifetime) {
+            last_decision = new_decision;
+            return;
+        }
+
+        if (last_decision.time > max_do_nothing_lifetime) {
+            last_decision = DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(*mt)),
+                                                          Observation{},
+                                                          0};
+            return;
+        }
+
+        last_decision.time++;
+    }
+}

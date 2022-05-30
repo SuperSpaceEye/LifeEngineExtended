@@ -24,7 +24,7 @@ WindowCore::WindowCore(QWidget *parent) :
 
     update_simulation_size_label();
 
-    engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(op), std::ref(sp), engine_mutex);
+    engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(bp), std::ref(sp), engine_mutex);
 
     make_walls();
 
@@ -38,21 +38,21 @@ WindowCore::WindowCore(QWidget *parent) :
     sp = SimulationParameters{};
 
     auto anatomy = std::make_shared<Anatomy>();
-//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-//    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
-//    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
+    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
+    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
-    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
-    anatomy->set_block(BlockTypes::EyeBlock, Rotation::RIGHT, -1, -1);
-    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 1);
+//    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
+//    anatomy->set_block(BlockTypes::EyeBlock, Rotation::RIGHT, -1, -1);
+//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 1);
 
     auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
 
     base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
-                                 Rotation::UP, anatomy, brain, &sp, &op, 1);
+                                 Rotation::UP, anatomy, brain, &sp, &bp, 1);
     chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                    Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
-                                   &sp, &op, 1);
+                                   &sp, &bp, 1);
 
     base_organism->last_decision = DecisionObservation{};
     chosen_organism->last_decision = DecisionObservation{};
@@ -85,6 +85,9 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_interval(-1);
 
     timer->start();
+
+    cb_synchronise_simulation_and_window_slot(true);
+    _ui.cb_synchronise_sim_and_win->setChecked(true);
 }
 
 void WindowCore::mainloop_tick() {
@@ -110,21 +113,6 @@ void WindowCore::mainloop_tick() {
 
         update_fps_labels(window_frames, simulation_frames);
         update_statistics_info(info);
-
-//        if (!stop_console_output) {
-//            std::cout << window_frames << " frames in a second | " << simulation_frames << " simulation ticks in second | "
-//            << dc.organisms.size() << " organisms alive | " << to_str(info.size, float_precision) << " average organism_size | "
-//            << to_str(dc.total_engine_ticks, float_precision) << " total engine ticks\n"
-//            << to_str(info.anatomy_mutation_rate, float_precision) << " average anatomy mutation rate | "
-//            << to_str(info.brain_mutation_rate, float_precision) << " average brain mutation rate | "
-//            << to_str(info._eye_blocks,      float_precision) << " average mouth num | "
-//            << to_str(info._producer_blocks, float_precision) << " average producer num | "
-//            << to_str(info._mover_blocks,    float_precision) << " average mover num | "
-//            << to_str(info._killer_blocks,   float_precision) << " average killer num | "
-//            << to_str(info._armor_blocks,    float_precision) << " average armor num | "
-//            << to_str(info._eye_blocks,      float_precision) << " average eye num\n"
-//            <<"\n";
-//        }
 
         window_frames = 0;
         fps_timer = clock_now();
@@ -377,18 +365,19 @@ void WindowCore::set_simulation_interval(int max_simulation_fps) {
     dc.unlimited_simulation_fps = false;
 }
 
-__attribute__((optimize("O0")))
+#pragma optimize("", off)
+
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+
+//Can wait, or it can not.
 bool WindowCore::wait_for_engine_to_pause() {
-//    // if engine is paused by user, then return if engine is really paused.
-//    if (cp.engine_global_pause && !synchronise_simulation_and_window) {return cp.engine_paused;}
-//    auto sleeping_time = std::chrono::microseconds (int(dc.delta_time*1.5));
-//    // if sleeping time is larger than spare window processing time, then not wait and return result straight away.
-//    if (!allow_waiting_overhead) {
-//        if (sleeping_time.count() > int(window_interval * std::chrono::microseconds::period::den) - delta_window_processing_time) { return cp.engine_paused; }
-//    } else {
-//        if (sleeping_time.count() > int(window_interval * std::chrono::microseconds::period::den)) { return cp.engine_paused; }
-//    }
-//    std::this_thread::sleep_for(sleeping_time);
+    if (!wait_for_engine_to_stop || cp.engine_global_pause) {return true;}
+    return wait_for_engine_to_pause_force();
+}
+
+//Will always wait for engine to pause
+bool WindowCore::wait_for_engine_to_pause_force() {
     auto now = clock_now();
     while (!cp.engine_paused) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -399,7 +388,6 @@ bool WindowCore::wait_for_engine_to_pause() {
     return cp.engine_paused;
 }
 
-__attribute__((optimize("O0")))
 bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
     auto now = clock_now();
     while (cp.processing_user_actions) {
@@ -410,6 +398,10 @@ bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
     }
     return cp.engine_paused;
 }
+
+#pragma GCC pop_options
+
+#pragma optimize("", on)
 
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
@@ -426,10 +418,8 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
 
 void WindowCore::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
-    full_simulation_grid_parsed = true;
-
     cp.engine_pause = true;
-    while(!wait_for_engine_to_pause()) {}
+    while(!wait_for_engine_to_pause_force()) {}
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
@@ -444,7 +434,7 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
 
 void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
     cp.engine_pause = true;
-    wait_for_engine_to_pause();
+    wait_for_engine_to_pause_force();
 
     cp.num_threads = num_threads;
     cp.build_threads = true;
@@ -494,7 +484,7 @@ void WindowCore::resize_simulation_space() {
     }
 
     cp.engine_pause = true;
-    wait_for_engine_to_pause();
+    wait_for_engine_to_pause_force();
 
     dc.simulation_width = new_simulation_width;
     dc.simulation_height = new_simulation_height;
@@ -515,7 +505,7 @@ void WindowCore::resize_simulation_space() {
 
 void WindowCore::partial_clear_world() {
     cp.engine_pause = true;
-    wait_for_engine_to_pause();
+    wait_for_engine_to_pause_force();
 
     clear_organisms();
 
@@ -583,19 +573,51 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         if (organism->organism_anatomy->_mover_blocks > 0) {
             info.move_range += organism->move_range;
             info.moving_organisms++;
+
+            if(organism->organism_anatomy->_eye_blocks > 0) {
+                info.organisms_with_eyes++;
+            }
         }
 
-        info.size += organism->organism_anatomy->_organism_blocks.size();
+        info.total_avg.size += organism->organism_anatomy->_organism_blocks.size();
 
-        info._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
-        info._producer_blocks += organism->organism_anatomy->_producer_blocks;
-        info._mover_blocks    += organism->organism_anatomy->_mover_blocks;
-        info._killer_blocks   += organism->organism_anatomy->_killer_blocks;
-        info._armor_blocks    += organism->organism_anatomy->_armor_blocks;
-        info._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+        info.total_avg._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
+        info.total_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
+        info.total_avg._mover_blocks    += organism->organism_anatomy->_mover_blocks;
+        info.total_avg._killer_blocks   += organism->organism_anatomy->_killer_blocks;
+        info.total_avg._armor_blocks    += organism->organism_anatomy->_armor_blocks;
+        info.total_avg._eye_blocks      += organism->organism_anatomy->_eye_blocks;
 
-        info.brain_mutation_rate   += organism->brain_mutation_rate;
-        info.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+        info.total_avg.brain_mutation_rate   += organism->brain_mutation_rate;
+        info.total_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+
+        if (organism->organism_anatomy->_mover_blocks > 0) {
+            info.moving_avg.size += organism->organism_anatomy->_organism_blocks.size();
+
+            info.moving_avg._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
+            info.moving_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
+            info.moving_avg._mover_blocks    += organism->organism_anatomy->_mover_blocks;
+            info.moving_avg._killer_blocks   += organism->organism_anatomy->_killer_blocks;
+            info.moving_avg._armor_blocks    += organism->organism_anatomy->_armor_blocks;
+            info.moving_avg._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+
+            info.moving_avg.brain_mutation_rate   += organism->brain_mutation_rate;
+            info.moving_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+            info.moving_avg.total++;
+        } else {
+            info.station_avg.size += organism->organism_anatomy->_organism_blocks.size();
+
+            info.station_avg._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
+            info.station_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
+            info.station_avg._mover_blocks    += organism->organism_anatomy->_mover_blocks;
+            info.station_avg._killer_blocks   += organism->organism_anatomy->_killer_blocks;
+            info.station_avg._armor_blocks    += organism->organism_anatomy->_armor_blocks;
+            info.station_avg._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+
+            info.station_avg.brain_mutation_rate   += organism->brain_mutation_rate;
+            info.station_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+            info.station_avg.total++;
+        }
     }
 
     info.total_size_organism_blocks *= sizeof(SerializedOrganismBlockContainer);
@@ -612,31 +634,85 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
                       info.total_size_eating_space +
                       info.total_size_single_adjacent_space +
                       info.total_size_single_diagonal_adjacent_space +
-                      info.total_size_double_adjacent_space;
+                      info.total_size_double_adjacent_space +
+                      (sizeof(Brain) * dc.organisms.size()) +
+                      (sizeof(Anatomy) * dc.organisms.size()) +
+                      (sizeof(Organism) * dc.organisms.size())
+                      ;
 
-    info.size /= dc.organisms.size();
+    info.total_avg.size /= dc.organisms.size();
 
-    info._mouth_blocks    /= dc.organisms.size();
-    info._producer_blocks /= dc.organisms.size();
-    info._mover_blocks    /= dc.organisms.size();
-    info._killer_blocks   /= dc.organisms.size();
-    info._armor_blocks    /= dc.organisms.size();
-    info._eye_blocks      /= dc.organisms.size();
+    info.total_avg._mouth_blocks    /= dc.organisms.size();
+    info.total_avg._producer_blocks /= dc.organisms.size();
+    info.total_avg._mover_blocks    /= dc.organisms.size();
+    info.total_avg._killer_blocks   /= dc.organisms.size();
+    info.total_avg._armor_blocks    /= dc.organisms.size();
+    info.total_avg._eye_blocks      /= dc.organisms.size();
 
-    info.brain_mutation_rate   /= dc.organisms.size();
-    info.anatomy_mutation_rate /= dc.organisms.size();
+    info.total_avg.brain_mutation_rate   /= dc.organisms.size();
+    info.total_avg.anatomy_mutation_rate /= dc.organisms.size();
 
-    if (std::isnan(info.size))             {info.size             = 0;}
+    if (std::isnan(info.total_avg.size))             {info.total_avg.size             = 0;}
 
-    if (std::isnan(info._mouth_blocks))    {info._mouth_blocks    = 0;}
-    if (std::isnan(info._producer_blocks)) {info._producer_blocks = 0;}
-    if (std::isnan(info._mover_blocks))    {info._mover_blocks    = 0;}
-    if (std::isnan(info._killer_blocks))   {info._killer_blocks   = 0;}
-    if (std::isnan(info._armor_blocks))    {info._armor_blocks    = 0;}
-    if (std::isnan(info._eye_blocks))      {info._eye_blocks      = 0;}
+    if (std::isnan(info.total_avg._mouth_blocks))    {info.total_avg._mouth_blocks    = 0;}
+    if (std::isnan(info.total_avg._producer_blocks)) {info.total_avg._producer_blocks = 0;}
+    if (std::isnan(info.total_avg._mover_blocks))    {info.total_avg._mover_blocks    = 0;}
+    if (std::isnan(info.total_avg._killer_blocks))   {info.total_avg._killer_blocks   = 0;}
+    if (std::isnan(info.total_avg._armor_blocks))    {info.total_avg._armor_blocks    = 0;}
+    if (std::isnan(info.total_avg._eye_blocks))      {info.total_avg._eye_blocks      = 0;}
 
-    if (std::isnan(info.brain_mutation_rate))   {info.brain_mutation_rate   = 0;}
-    if (std::isnan(info.anatomy_mutation_rate)) {info.anatomy_mutation_rate = 0;}
+    if (std::isnan(info.total_avg.brain_mutation_rate))   {info.total_avg.brain_mutation_rate   = 0;}
+    if (std::isnan(info.total_avg.anatomy_mutation_rate)) {info.total_avg.anatomy_mutation_rate = 0;}
+
+
+    info.moving_avg.size /= info.moving_avg.total;
+
+    info.moving_avg._mouth_blocks    /= info.moving_avg.total;
+    info.moving_avg._producer_blocks /= info.moving_avg.total;
+    info.moving_avg._mover_blocks    /= info.moving_avg.total;
+    info.moving_avg._killer_blocks   /= info.moving_avg.total;
+    info.moving_avg._armor_blocks    /= info.moving_avg.total;
+    info.moving_avg._eye_blocks      /= info.moving_avg.total;
+
+    info.moving_avg.brain_mutation_rate   /= info.moving_avg.total;
+    info.moving_avg.anatomy_mutation_rate /= info.moving_avg.total;
+
+    if (std::isnan(info.moving_avg.size))             {info.moving_avg.size             = 0;}
+
+    if (std::isnan(info.moving_avg._mouth_blocks))    {info.moving_avg._mouth_blocks    = 0;}
+    if (std::isnan(info.moving_avg._producer_blocks)) {info.moving_avg._producer_blocks = 0;}
+    if (std::isnan(info.moving_avg._mover_blocks))    {info.moving_avg._mover_blocks    = 0;}
+    if (std::isnan(info.moving_avg._killer_blocks))   {info.moving_avg._killer_blocks   = 0;}
+    if (std::isnan(info.moving_avg._armor_blocks))    {info.moving_avg._armor_blocks    = 0;}
+    if (std::isnan(info.moving_avg._eye_blocks))      {info.moving_avg._eye_blocks      = 0;}
+
+    if (std::isnan(info.moving_avg.brain_mutation_rate))   {info.moving_avg.brain_mutation_rate   = 0;}
+    if (std::isnan(info.moving_avg.anatomy_mutation_rate)) {info.moving_avg.anatomy_mutation_rate = 0;}
+
+
+    info.station_avg.size /= info.station_avg.total;
+
+    info.station_avg._mouth_blocks    /= info.station_avg.total;
+    info.station_avg._producer_blocks /= info.station_avg.total;
+    info.station_avg._mover_blocks    /= info.station_avg.total;
+    info.station_avg._killer_blocks   /= info.station_avg.total;
+    info.station_avg._armor_blocks    /= info.station_avg.total;
+    info.station_avg._eye_blocks      /= info.station_avg.total;
+
+    info.station_avg.brain_mutation_rate   /= info.station_avg.total;
+    info.station_avg.anatomy_mutation_rate /= info.station_avg.total;
+
+    if (std::isnan(info.station_avg.size))             {info.station_avg.size             = 0;}
+
+    if (std::isnan(info.station_avg._mouth_blocks))    {info.station_avg._mouth_blocks    = 0;}
+    if (std::isnan(info.station_avg._producer_blocks)) {info.station_avg._producer_blocks = 0;}
+    if (std::isnan(info.station_avg._mover_blocks))    {info.station_avg._mover_blocks    = 0;}
+    if (std::isnan(info.station_avg._killer_blocks))   {info.station_avg._killer_blocks   = 0;}
+    if (std::isnan(info.station_avg._armor_blocks))    {info.station_avg._armor_blocks    = 0;}
+    if (std::isnan(info.station_avg._eye_blocks))      {info.station_avg._eye_blocks      = 0;}
+
+    if (std::isnan(info.station_avg.brain_mutation_rate))   {info.station_avg.brain_mutation_rate   = 0;}
+    if (std::isnan(info.station_avg.anatomy_mutation_rate)) {info.station_avg.anatomy_mutation_rate = 0;}
     return info;
 }
 
@@ -645,18 +721,41 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
     _ui.lb_organisms_alive    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
-    _ui.lb_moving_organisms   ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_organisms)));
     _ui.lb_average_move_range ->setText(QString::fromStdString("Average move range: "    + to_str(info.move_range,       float_precision)));
-    _ui.lb_organism_size      ->setText(QString::fromStdString("Average organism size: " + to_str(info.size,             float_precision)));
-    _ui.lb_mouth_num          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info._mouth_blocks,    float_precision)));
-    _ui.lb_producer_num       ->setText(QString::fromStdString("Average producer num: "  + to_str(info._producer_blocks, float_precision)));
-    _ui.lb_mover_num          ->setText(QString::fromStdString("Average mover num: "     + to_str(info._mover_blocks,    float_precision)));
-    _ui.lb_killer_num         ->setText(QString::fromStdString("Average killer num: "    + to_str(info._killer_blocks,   float_precision)));
-    _ui.lb_armor_num          ->setText(QString::fromStdString("Average armor num: "     + to_str(info._armor_blocks,    float_precision)));
-    _ui.lb_eye_num            ->setText(QString::fromStdString("Average eye num: "       + to_str(info._eye_blocks,      float_precision)));
+    _ui.lb_organism_size      ->setText(QString::fromStdString("Average organism size: " + to_str(info.total_avg.size,             float_precision)));
+    _ui.lb_mouth_num          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
+    _ui.lb_producer_num       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.total_avg._producer_blocks, float_precision)));
+    _ui.lb_mover_num          ->setText(QString::fromStdString("Average mover num: "     + to_str(info.total_avg._mover_blocks,    float_precision)));
+    _ui.lb_killer_num         ->setText(QString::fromStdString("Average killer num: "    + to_str(info.total_avg._killer_blocks,   float_precision)));
+    _ui.lb_armor_num          ->setText(QString::fromStdString("Average armor num: "     + to_str(info.total_avg._armor_blocks,    float_precision)));
+    _ui.lb_eye_num            ->setText(QString::fromStdString("Average eye num: "       + to_str(info.total_avg._eye_blocks,      float_precision)));
+    _ui.lb_anatomy_mutation_rate ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
+    _ui.lb_brain_mutation_rate   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
 
-    _ui.lb_anatomy_mutation_rate ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.anatomy_mutation_rate, float_precision)));
-    _ui.lb_brain_mutation_rate   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.brain_mutation_rate,   float_precision)));
+
+    _ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
+    _ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
+    _ui.lb_organism_size_2      ->setText(QString::fromStdString("Average organism size: " + to_str(info.moving_avg.size,             float_precision)));
+    _ui.lb_mouth_num_2          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.moving_avg._mouth_blocks,    float_precision)));
+    _ui.lb_producer_num_2       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.moving_avg._producer_blocks, float_precision)));
+    _ui.lb_mover_num_2          ->setText(QString::fromStdString("Average mover num: "     + to_str(info.moving_avg._mover_blocks,    float_precision)));
+    _ui.lb_killer_num_2         ->setText(QString::fromStdString("Average killer num: "    + to_str(info.moving_avg._killer_blocks,   float_precision)));
+    _ui.lb_armor_num_2          ->setText(QString::fromStdString("Average armor num: "     + to_str(info.moving_avg._armor_blocks,    float_precision)));
+    _ui.lb_eye_num_2            ->setText(QString::fromStdString("Average eye num: "       + to_str(info.moving_avg._eye_blocks,      float_precision)));
+    _ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
+    _ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.moving_avg.brain_mutation_rate,   float_precision)));
+
+
+    _ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: "  + std::to_string(info.station_avg.total)));
+    _ui.lb_organism_size_3      ->setText(QString::fromStdString("Average organism size: " + to_str(info.station_avg.size,             float_precision)));
+    _ui.lb_mouth_num_3          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.station_avg._mouth_blocks,    float_precision)));
+    _ui.lb_producer_num_3       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.station_avg._producer_blocks, float_precision)));
+    _ui.lb_mover_num_3          ->setText(QString::fromStdString("Average mover num: "     + to_str(info.station_avg._mover_blocks,    float_precision)));
+    _ui.lb_killer_num_3         ->setText(QString::fromStdString("Average killer num: "    + to_str(info.station_avg._killer_blocks,   float_precision)));
+    _ui.lb_armor_num_3          ->setText(QString::fromStdString("Average armor num: "     + to_str(info.station_avg._armor_blocks,    float_precision)));
+    _ui.lb_eye_num_3            ->setText(QString::fromStdString("Average eye num: "       + to_str(info.station_avg._eye_blocks,      float_precision)));
+    _ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
+    _ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.station_avg.brain_mutation_rate,   float_precision)));
 }
 
 // So that changes in code values would be set by default in gui.
@@ -680,7 +779,8 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
-    _ui.le_auto_food_drop_rate               ->setText(QString::fromStdString(std::to_string(sp.auto_food_drop_rate)));
+    _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
+    _ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));
     _ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(std::to_string(sp.extra_reproduction_cost)));
     _ui.le_add                               ->setText(QString::fromStdString(std::to_string(sp.add_cell)));
     _ui.le_change                            ->setText(QString::fromStdString(std::to_string(sp.change_cell)));
@@ -704,7 +804,6 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_set_fixed_move_range              ->setChecked(sp.set_fixed_move_range);
     _ui.cb_failed_reproduction_eats_food     ->setChecked(sp.failed_reproduction_eats_food);
     //Settings
-    _ui.cb_stop_console_output->setChecked(stop_console_output);
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
@@ -720,6 +819,10 @@ void WindowCore::initialize_gui_settings() {
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
 
+
+    _ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
+    _ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
+    _ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop);
 }
 
 void WindowCore::update_simulation_size_label() {

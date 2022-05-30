@@ -45,7 +45,7 @@ void SimulationEngine::threaded_mainloop() {
                 cp.pass_tick = false;
                 cp.synchronise_simulation_tick = false;
                 simulation_tick();
-                if (sp.auto_food_drop_rate > 0) {random_food_drop();}
+                if (sp.auto_produce_n_food > 0) {random_food_drop();}
 //                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
 //                if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
             //}
@@ -232,10 +232,13 @@ void SimulationEngine::process_user_action_pool() {
 }
 
 void SimulationEngine::random_food_drop() {
-    for (int i = 0; i < sp.auto_food_drop_rate; i++) {
-        int x = std::uniform_int_distribution<int>(1, dc.simulation_width-2)(mt);
-        int y = std::uniform_int_distribution<int>(1, dc.simulation_height-2)(mt);
-        dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
+    if (sp.auto_produce_food_every_n_ticks <= 0) {return;}
+    if (dc.engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
+        for (int i = 0; i < sp.auto_produce_n_food; i++) {
+            int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(mt);
+            int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(mt);
+            dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
+        }
     }
 }
 

@@ -20,5 +20,19 @@ struct OrganismBlockParameters {
     BlockParameters EyeBlock      = {1, 1, 1};
 };
 
+enum class BlocksNames {
+    MouthBlock,
+    ProducerBlock,
+    MoverBlock,
+    KillerBlock,
+    ArmorBlock,
+    EyeBlock
+};
+
+enum class ParametersNames {
+    FoodCostModifier,
+    LifePointAmount,
+    ChanceWeight,
+};
 
 #endif //THELIFEENGINECPP_ORGANISMBLOCKPARAMETERS_H
