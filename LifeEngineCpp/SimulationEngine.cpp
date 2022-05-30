@@ -31,8 +31,9 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) {
-            SimulationEnginePartialMultiThread::kill_threads(dc);
-            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+//            SimulationEnginePartialMultiThread::kill_threads(dc);
+//            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+            cp.build_threads = false;
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
@@ -44,7 +45,7 @@ void SimulationEngine::threaded_mainloop() {
                 cp.pass_tick = false;
                 cp.synchronise_simulation_tick = false;
                 simulation_tick();
-                if (sp.auto_food_drop_rate > 0) {random_food_drop();}
+                if (sp.auto_produce_n_food > 0) {random_food_drop();}
 //                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
 //                if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
             //}
@@ -59,9 +60,9 @@ void SimulationEngine::change_mode() {
 
     switch (cp.change_to_mode) {
         case SimulationModes::CPU_Single_Threaded:
-//            if (cp.simulation_mode == SimulationModes::CPU_Multi_Threaded) {
-//                kill_threads();
-//            }
+            if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+                SimulationEnginePartialMultiThread::kill_threads(dc);
+            }
 //            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
 //
 //            }
@@ -231,10 +232,13 @@ void SimulationEngine::process_user_action_pool() {
 }
 
 void SimulationEngine::random_food_drop() {
-    for (int i = 0; i < sp.auto_food_drop_rate; i++) {
-        int x = std::uniform_int_distribution<int>(1, dc.simulation_width-2)(mt);
-        int y = std::uniform_int_distribution<int>(1, dc.simulation_height-2)(mt);
-        dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
+    if (sp.auto_produce_food_every_n_ticks <= 0) {return;}
+    if (dc.engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
+        for (int i = 0; i < sp.auto_produce_n_food; i++) {
+            int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(mt);
+            int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(mt);
+            dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
+        }
     }
 }
 

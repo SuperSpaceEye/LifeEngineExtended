@@ -101,7 +101,7 @@ void WindowCore::b_reset_view_slot() {
 void WindowCore::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.")) {return;}
     cp.engine_pause = true;
-    wait_for_engine_to_pause();
+    wait_for_engine_to_pause_force();
 
     for (auto & organism: dc.organisms) {
         organism->lifetime = organism->max_lifetime*2;
@@ -203,12 +203,21 @@ void WindowCore::le_look_range_slot() {
 }
 
 void WindowCore::le_auto_food_drop_rate_slot() {
-    int fallback = sp.auto_food_drop_rate;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_food_drop_rate,
+    int fallback = sp.auto_produce_n_food;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_produce_n_food,
                                                         fallback);
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.auto_food_drop_rate = result.result;
+    sp.auto_produce_n_food = result.result;
+}
+
+void WindowCore::le_auto_produce_food_every_n_tick_slot() {
+    int fallback = sp.auto_produce_food_every_n_ticks;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_produce_food_every_n_tick,
+                                                        fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.auto_produce_food_every_n_ticks = result.result;
 }
 
 void WindowCore::le_extra_reproduction_cost_slot() {
@@ -426,15 +435,6 @@ void WindowCore::rb_cuda_slot() {
 
 //==================== Check buttons ====================
 
-void WindowCore::cb_stop_console_output_slot(bool state) {
-    stop_console_output = state;
-    if (state) {
-        std::cout << "Console output stopped\n";
-    } else {
-        std::cout << "Console output resumed\n";
-    }
-}
-
 void WindowCore::cb_synchronise_simulation_and_window_slot(bool state) {
     synchronise_simulation_and_window = state;
     cp.engine_pause = state;
@@ -481,3 +481,42 @@ void WindowCore::cb_set_fixed_move_range_slot           (bool state) {sp.set_fix
 void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){sp.organism_self_blocks_block_sight = state;}
 
 void WindowCore::cb_failed_reproduction_eats_food_slot  (bool state) {sp.failed_reproduction_eats_food = state;}
+
+void WindowCore::cb_wait_for_engine_to_stop             (bool state) {wait_for_engine_to_stop = state;}
+
+//==================== Table ====================
+
+void WindowCore::table_cell_changed_slot(int row, int col) {
+    _ui.table_organism_block_parameters->update();
+    auto item = _ui.table_organism_block_parameters->itemAt(row, col);
+    float result;
+    bool set_result = false;
+    if (boost::conversion::try_lexical_convert<float>(item->text().toStdString(), result)) {
+        set_result = true;
+    } else {
+        if (!disable_warnings) {display_message("Value should be float.");}
+    }
+    BlockParameters * type;
+    switch (static_cast<BlocksNames>(row)) {
+        case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
+        case BlocksNames::ProducerBlock: type = &bp.ProducerBlock; break;
+        case BlocksNames::MoverBlock:    type = &bp.MoverBlock;    break;
+        case BlocksNames::KillerBlock:   type = &bp.KillerBlock;   break;
+        case BlocksNames::ArmorBlock:    type = &bp.ArmorBlock;    break;
+        case BlocksNames::EyeBlock:      type = &bp.EyeBlock;      break;
+    }
+
+    float * value;
+    switch (static_cast<ParametersNames>(col)) {
+        case ParametersNames::FoodCostModifier: value = &type->food_cost_modifier; break;
+        case ParametersNames::LifePointAmount:  value = &type->life_point_amount;  break;
+        case ParametersNames::ChanceWeight:     value = &type->chance_weight;      break;
+    }
+
+    if(set_result) {*value = result; return;}
+
+    auto new_item = new QTableWidgetItem(*item);
+    new_item->setText(QString::fromStdString(to_str(*value)));
+
+    _ui.table_organism_block_parameters->setItem(row, col, new_item);
+}

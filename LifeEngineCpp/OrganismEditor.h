@@ -8,10 +8,11 @@
 #include <vector>
 
 #include "Linspace.h"
-#include "Organism/Organism.h"
-#include "Organism/Anatomy.h"
-#include "Organism/Brain.h"
-#include "Organism/Rotation.h"
+#include "Organism/CPU/Organism.h"
+#include "Organism/CPU/Anatomy.h"
+#include "Organism/CPU/Brain.h"
+#include "Organism/CPU/Rotation.h"
+#include "GridBlocks/BaseGridBlock.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -36,8 +37,8 @@ public:
     OrganismEditor(int width, int height, int image_width, int image_height);
     OrganismEditor()=default;
 
-    void set_block(int x, int y, OrganismBlock block);
-    OrganismBlock get_block(int x, int y);
+    void set_block(int x, int y, BaseGridBlock block);
+    BaseGridBlock get_block(int x, int y);
     void set_organism(Organism organism);
     Organism get_organism();
 
