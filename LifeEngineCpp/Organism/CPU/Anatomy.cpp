@@ -659,7 +659,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     _mover_blocks    = new_structure->mover_blocks;
     _killer_blocks   = new_structure->killer_blocks;
     _armor_blocks    = new_structure->armor_blocks;
-    _eye_blocks      = new_structure->armor_blocks;
+    _eye_blocks      = new_structure->eye_blocks;
 
     delete new_structure;
 }

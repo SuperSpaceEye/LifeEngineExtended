@@ -30,7 +30,7 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     start_stage(dc, PartialSimulationStage::GetObservations, simulation_organism_thread_points);
 
     start_stage(dc, PartialSimulationStage::ThinkDecision, simulation_organism_thread_points);
-    for (int i = 0; i < dc->organisms.size(); i++)  {SimulationEngineSingleThread::make_decision(dc, sp, dc->organisms[i]);}
+    for (int i = 0; i < dc->organisms.size(); i++)  {SimulationEngineSingleThread::make_decision(dc, sp, dc->organisms[i], mt);}
 
     for (auto & organism: dc->organisms) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
 }

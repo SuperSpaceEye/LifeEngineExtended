@@ -26,7 +26,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     get_observations(dc, sp, dc->organisms, organisms_observations);
 
     for (int i = 0; i < dc->organisms.size(); i++)  {think_decision(dc, sp, dc->organisms[i], organisms_observations[i], mt);}
-    for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i]);}
+    for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], mt);}
 
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
 }
@@ -229,11 +229,19 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     }
 }
 
-void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision) {
+void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision, boost::mt19937 * mt) {
     // rotates movement relative to simulation grid
-    auto new_int_decision = static_cast<int>(decision) + static_cast<int>(organism->rotation);
-    if (new_int_decision > 3) {new_int_decision -= 4;}
-    auto new_decision = static_cast<BrainDecision>(new_int_decision);
+    BrainDecision new_decision;
+//    if (decision != BrainDecision::DoNothing) {
+////        auto new_int_decision = static_cast<int>(decision) + static_cast<int>(organism->rotation);
+//        //auto new_int_decision = static_cast<int>(decision);
+//        //if (new_int_decision > 3) { new_int_decision -= 4; }
+//        //new_decision = static_cast<BrainDecision>(new_int_decision);
+//    } else {
+//        //new_decision = organism->last_decision;
+//        //rotate_organism(dc, organism, BrainDecision::RotateLeft);
+//    }
+    new_decision = decision;
 
     int new_x = organism->x;
     int new_y = organism->y;
@@ -291,30 +299,55 @@ void SimulationEngineSingleThread::think_decision(EngineDataContainer *dc,
                                                   Organism *organism,
                                                   std::vector<Observation> &organism_observations,
                                                   boost::mt19937 *mt) {
-    if (organism->move_counter == 0) {
-        organism->last_decision = organism->brain->get_decision(organism_observations, *mt);
+    if (organism->move_counter == 0) { //if organism can make new move
+        auto new_decision = organism->brain->get_decision(organism_observations, organism->rotation, *mt);
+        if (new_decision.decision != BrainDecision::DoNothing
+            && new_decision.observation.distance > organism->last_decision.observation.distance) {
+            organism->last_decision = new_decision;
+            return;
+        }
+
+        if (new_decision.decision != BrainDecision::DoNothing
+            && organism->last_decision.time > organism->max_decision_lifetime) {
+            organism->last_decision = new_decision;
+            return;
+        }
+
+        if (organism->last_decision.time > organism->max_do_nothing_lifetime) {
+            organism->last_decision = DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(*mt)),
+                                                          Observation{},
+                                                          0};
+            return;
+        }
+
+        organism->last_decision.time++;
     }
 }
 
-void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism) {
-    switch (organism->last_decision) {
+void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, boost::mt19937 * mt) {
+    switch (organism->last_decision.decision) {
         case BrainDecision::MoveUp:
         case BrainDecision::MoveDown:
         case BrainDecision::MoveLeft:
         case BrainDecision::MoveRight:
             if (organism->organism_anatomy->_mover_blocks > 0) {
-                move_organism(dc, organism, organism->last_decision);
+                move_organism(dc, organism, organism->last_decision.decision, mt);
+                if (organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
+                    rotate_organism(dc, organism,
+                                    static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*mt)));
+                }
                 organism->move_counter++;
             }
             break;
-        case BrainDecision::RotateLeft:
-        case BrainDecision::RotateRight:
-        case BrainDecision::Flip:
-            if (organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-                rotate_organism(dc, organism, organism->last_decision);
-            }
-            break;
-
+//        case BrainDecision::RotateLeft:
+//        case BrainDecision::RotateRight:
+//        case BrainDecision::Flip:
+//            if (organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
+//                //rotate_organism(dc, organism, organism->last_decision);
+//            }
+//            break;
+//        case BrainDecision::DoNothing:
+//            break;
         default: break;
     }
     if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_move_range == organism->move_counter)) {

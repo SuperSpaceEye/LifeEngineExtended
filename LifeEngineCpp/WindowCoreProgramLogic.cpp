@@ -38,17 +38,24 @@ WindowCore::WindowCore(QWidget *parent) :
     sp = SimulationParameters{};
 
     auto anatomy = std::make_shared<Anatomy>();
-    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
-    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
+//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+//    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
+//    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
-    auto brain = std::make_shared<Brain>(BrainTypes::RandomActions);
+    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
+    anatomy->set_block(BlockTypes::EyeBlock, Rotation::RIGHT, -1, -1);
+    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 1);
+
+    auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
 
     base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                  Rotation::UP, anatomy, brain, &sp, &op, 1);
     chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                    Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
                                    &sp, &op, 1);
+
+    base_organism->last_decision = DecisionObservation{};
+    chosen_organism->last_decision = DecisionObservation{};
 
     dc.to_place_organisms.push_back(new Organism(chosen_organism));
 
@@ -78,11 +85,6 @@ WindowCore::WindowCore(QWidget *parent) :
     set_simulation_interval(-1);
 
     timer->start();
-//    set_simulation_num_threads(1);
-
-//    auto _font = font();
-//    _font.setPixelSize(20);
-//    setFont(_font);
 }
 
 void WindowCore::mainloop_tick() {
@@ -714,7 +716,7 @@ void WindowCore::initialize_gui_settings() {
     }
     _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
-    //_ui.rb_partial_multi_thread_mode->hide();
+    _ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
 

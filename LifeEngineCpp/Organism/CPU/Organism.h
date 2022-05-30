@@ -45,7 +45,10 @@ public:
 
     int move_counter = 0;
 
-    BrainDecision last_decision = BrainDecision::MoveUp;
+    int max_decision_lifetime = 2;
+    int max_do_nothing_lifetime = 4;
+
+    DecisionObservation last_decision = DecisionObservation{};
 
     std::shared_ptr<Anatomy> organism_anatomy = nullptr;
     std::shared_ptr<Brain> brain = nullptr;

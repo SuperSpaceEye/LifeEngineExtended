@@ -35,6 +35,8 @@ struct SimulationParameters {
         bool  set_fixed_move_range = false;
         int   min_organism_size = 1;
 
+        //int   max_decision_lifetime = 2;
+
         //Probabilities of creating child with doing:
             int add_cell = 33;
             int change_cell = 33;

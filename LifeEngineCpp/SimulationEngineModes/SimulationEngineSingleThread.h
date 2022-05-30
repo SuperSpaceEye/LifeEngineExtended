@@ -46,11 +46,11 @@ public:
 
     static void rotate_organism (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
 
-    static void move_organism   (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
+    static void move_organism   (EngineDataContainer * dc, Organism *organism, BrainDecision decision, boost::mt19937 * mt);
 
     static void think_decision  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Observation> &organism_observations, boost::mt19937 *mt);
 
-    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism);
+    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, boost::mt19937 * mt);
 
     static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
 
