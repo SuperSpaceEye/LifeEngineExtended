@@ -12,7 +12,7 @@ Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
 DecisionObservation Brain::get_random_action(boost::mt19937 &mt) {
 //    return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(mt));
-    return DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(mt)), Observation()};
+    return DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(mt)), Observation(), 0};
 }
 
 
@@ -115,7 +115,7 @@ BrainDecision Brain::calculate_simple_action(Observation &observation, boost::mt
                 case Rotation::RIGHT: return BrainDecision::MoveRight;
             }
     }
-    throw "fuck";
+    throw "bad";
     //return get_random_action(mt).decision;
 }
 
