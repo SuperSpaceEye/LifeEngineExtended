@@ -116,7 +116,6 @@ struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
     std::vector<SerializedAdjacentSpaceContainer> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
-//    std::vector<SerializedArmorSpaceContainer   > armor_space;
 
     std::vector<SerializedArmorSpaceContainer   > single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space;

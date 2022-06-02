@@ -379,7 +379,7 @@ void WindowCore::le_min_move_range_slot() {
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_move_range, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    if (result.result > sp.max_move_range) { display_message("Input cannot be more than max move distance"); result;}
+    if (result.result > sp.max_move_range) { display_message("Input cannot be more than max move distance"); return;}
     sp.min_move_range = result.result;
 }
 
@@ -388,7 +388,7 @@ void WindowCore::le_move_range_delimiter_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_move_range_delimiter, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    if (result.result > 0) { display_message("Input cannot be more than 0"); result;}
+    if (result.result > 0) { display_message("Input cannot be more than 0"); return;}
     sp.move_range_delimiter = result.result;
 }
 
@@ -418,17 +418,14 @@ void WindowCore::rb_single_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Single_Threaded);
 }
 
-//TODO not implemented
 void WindowCore::rb_multi_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Multi_Threaded);
 }
 
-//TODO not implemented
 void WindowCore::rb_partial_multi_thread_slot() {
     set_simulation_mode(SimulationModes::CPU_Partial_Multi_threaded);
 }
 
-//TODO not implemented
 void WindowCore::rb_cuda_slot() {
     set_simulation_mode(SimulationModes::GPU_CUDA_mode);
 }
@@ -450,45 +447,48 @@ void WindowCore::cb_use_evolved_brain_mutation_rate_slot(bool state) {
     _ui.le_global_brain_mutation_rate->setDisabled(state);
 }
 
-void WindowCore::cb_reproduction_rotation_enabled_slot  (bool state) { sp.reproduction_rotation_enabled = state;}
+void WindowCore::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
-void WindowCore::cb_on_touch_kill_slot                  (bool state) { sp.on_touch_kill = state;}
+void WindowCore::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
 
-void WindowCore::cb_movers_can_produce_food_slot        (bool state) { sp.movers_can_produce_food = state;}
+void WindowCore::cb_movers_can_produce_food_slot         (bool state) { sp.movers_can_produce_food = state;}
 
-void WindowCore::cb_food_blocks_reproduction_slot       (bool state) { sp.food_blocks_reproduction = state;}
+void WindowCore::cb_food_blocks_reproduction_slot        (bool state) { sp.food_blocks_reproduction = state;}
 
-void WindowCore::cb_fill_window_slot                    (bool state) { fill_window = state;}
+void WindowCore::cb_fill_window_slot                     (bool state) { fill_window = state;}
 
-void WindowCore::cb_reset_on_total_extinction_slot      (bool state) { sp.reset_on_total_extinction = state;}
+void WindowCore::cb_reset_on_total_extinction_slot       (bool state) { sp.reset_on_total_extinction = state;}
 
-void WindowCore::cb_pause_on_total_extinction_slot      (bool state) { sp.pause_on_total_extinction = state;}
+void WindowCore::cb_pause_on_total_extinction_slot       (bool state) { sp.pause_on_total_extinction = state;}
 
-void WindowCore::cb_clear_walls_on_reset_slot           (bool state) { sp.clear_walls_on_reset = state;}
+void WindowCore::cb_clear_walls_on_reset_slot            (bool state) { sp.clear_walls_on_reset = state;}
 
-void WindowCore::cb_override_evolution_controls_slot    (bool state) { override_evolution_controls_slot = state;}
+void WindowCore::cb_override_evolution_controls_slot     (bool state) { override_evolution_controls_slot = state;}
 
-void WindowCore::cb_generate_random_walls_on_reset_slot (bool state) { sp.generate_random_walls_on_reset = state;}
+void WindowCore::cb_generate_random_walls_on_reset_slot  (bool state) { sp.generate_random_walls_on_reset = state;}
 
-void WindowCore::cb_runtime_rotation_enabled_slot       (bool state) { sp.runtime_rotation_enabled = state;}
+void WindowCore::cb_runtime_rotation_enabled_slot        (bool state) { sp.runtime_rotation_enabled = state;}
 
-void WindowCore::cb_fix_reproduction_distance_slot      (bool state) { sp.reproduction_distance_fixed = state;}
+void WindowCore::cb_fix_reproduction_distance_slot       (bool state) { sp.reproduction_distance_fixed = state;}
 
-void WindowCore::cb_disable_warnings_slot               (bool state) { disable_warnings = state;}
+void WindowCore::cb_disable_warnings_slot                (bool state) { disable_warnings = state;}
 
-void WindowCore::cb_set_fixed_move_range_slot           (bool state) {sp.set_fixed_move_range = state;}
+void WindowCore::cb_set_fixed_move_range_slot            (bool state) { sp.set_fixed_move_range = state;}
 
-void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){sp.organism_self_blocks_block_sight = state;}
+void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){ sp.organism_self_blocks_block_sight = state;}
 
-void WindowCore::cb_failed_reproduction_eats_food_slot  (bool state) {sp.failed_reproduction_eats_food = state;}
+void WindowCore::cb_failed_reproduction_eats_food_slot   (bool state) { sp.failed_reproduction_eats_food = state;}
 
-void WindowCore::cb_wait_for_engine_to_stop             (bool state) {wait_for_engine_to_stop = state;}
+void WindowCore::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop = state;}
+
+void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
+
+void WindowCore::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
 
 //==================== Table ====================
 
 void WindowCore::table_cell_changed_slot(int row, int col) {
-    _ui.table_organism_block_parameters->update();
-    auto item = _ui.table_organism_block_parameters->itemAt(row, col);
+    auto item = _ui.table_organism_block_parameters->item(row, col);
     float result;
     bool set_result = false;
     if (boost::conversion::try_lexical_convert<float>(item->text().toStdString(), result)) {
@@ -515,8 +515,6 @@ void WindowCore::table_cell_changed_slot(int row, int col) {
 
     if(set_result) {*value = result; return;}
 
-    auto new_item = new QTableWidgetItem(*item);
-    new_item->setText(QString::fromStdString(to_str(*value)));
-
-    _ui.table_organism_block_parameters->setItem(row, col, new_item);
+    _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
+    _ui.table_organism_block_parameters->update();
 }

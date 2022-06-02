@@ -82,6 +82,7 @@ void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_ana
     if (sp->use_anatomy_evolved_mutation_rate) {
         if (std::uniform_real_distribution<float>(0,1)(*mt) <= sp->anatomy_mutation_rate_delimiter) {
             _anatomy_mutation_rate += sp->anatomy_mutations_rate_mutation_modifier;
+            if (_anatomy_mutation_rate > 1) {_anatomy_mutation_rate = 1;}
         } else {
             _anatomy_mutation_rate -= sp->anatomy_mutations_rate_mutation_modifier;
             if (_anatomy_mutation_rate < sp->anatomy_min_possible_mutation_rate) {
@@ -119,6 +120,7 @@ void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_p
     if (sp->use_brain_evolved_mutation_rate) {
         if (std::uniform_real_distribution<float>(0,1)(*mt) <= sp->brain_mutation_rate_delimiter) {
             _brain_mutation_rate += sp->brain_mutation_rate_mutation_modifier;
+            if (_brain_mutation_rate > 1) {_brain_mutation_rate = 1;}
         } else {
             _brain_mutation_rate -= sp->brain_mutation_rate_mutation_modifier;
             if (_brain_mutation_rate < sp->brain_min_possible_mutation_rate) {
@@ -197,9 +199,7 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, b
         }
 
         if (last_decision.time > max_do_nothing_lifetime) {
-            last_decision = DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(*mt)),
-                                                          Observation{},
-                                                          0};
+            last_decision = brain->get_random_action(*mt);
             return;
         }
 

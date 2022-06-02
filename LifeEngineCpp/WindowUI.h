@@ -216,20 +216,11 @@ public:
     QLineEdit *le_change;
     QLabel *label_12;
     QLineEdit *le_remove;
-    QVBoxLayout *verticalLayout_11;
-    QCheckBox *cb_reproducing_rotation_enabled;
-    QVBoxLayout *verticalLayout_27;
     QCheckBox *cb_runtime_rotation_enabled;
-    QVBoxLayout *verticalLayout_10;
-    QHBoxLayout *horizontalLayout_10;
+    QCheckBox *cb_reproducing_rotation_enabled;
     QCheckBox *cb_on_touch_kill;
-    QVBoxLayout *verticalLayout_15;
-    QHBoxLayout *horizontalLayout_17;
     QCheckBox *cb_movers_can_produce_food;
-    QVBoxLayout *verticalLayout_13;
-    QHBoxLayout *horizontalLayout_14;
     QCheckBox *cb_food_blocks_reproduction;
-    QVBoxLayout *verticalLayout_33;
     QVBoxLayout *verticalLayout_26;
     QHBoxLayout *horizontalLayout_25;
     QLabel *label_17;
@@ -251,6 +242,7 @@ public:
     QLabel *label_42;
     QLineEdit *le_move_range_delimiter;
     QCheckBox *cb_failed_reproduction_eats_food;
+    QCheckBox *cb_rotate_every_move_tick;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -281,22 +273,21 @@ public:
     QLabel *lb_anatomy_mutation_rate_3;
     QLabel *lb_brain_mutation_rate_3;
     QLabel *lb_producer_num_3;
-    QLabel *lb_mover_num_3;
     QLabel *lb_mouth_num_3;
     QLabel *lb_killer_num_3;
     QLabel *lb_armor_num_3;
     QLabel *lb_eye_num_3;
-    QSpacerItem *verticalSpacer_2;
-    QLabel *lb_average_move_range;
-    QLabel *lb_anatomy_mutation_rate;
-    QLabel *lb_brain_mutation_rate;
-    QLabel *lb_organism_size;
-    QLabel *lb_mouth_num;
-    QLabel *lb_producer_num;
-    QLabel *lb_mover_num;
-    QLabel *lb_killer_num;
-    QLabel *lb_armor_num;
-    QLabel *lb_eye_num;
+    QVBoxLayout *verticalLayout_10;
+    QLabel *lb_organisms_alive_2;
+    QLabel *lb_organism_size_4;
+    QLabel *lb_anatomy_mutation_rate_4;
+    QLabel *lb_brain_mutation_rate_4;
+    QLabel *lb_producer_num_4;
+    QLabel *lb_mover_num_4;
+    QLabel *lb_mouth_num_4;
+    QLabel *lb_killer_num_4;
+    QLabel *lb_armor_num_4;
+    QLabel *lb_eye_num_4;
     QWidget *settings_tab;
     QVBoxLayout *verticalLayout_7;
     QScrollArea *scrollArea;
@@ -320,6 +311,7 @@ public:
     QHBoxLayout *horizontalLayout_30;
     QLabel *label_25;
     QLineEdit *le_font_size;
+    QCheckBox *cb_simplified_rendering;
     QButtonGroup *simulation_modes;
     QButtonGroup *editor_modes;
     QButtonGroup *cursor_modes;
@@ -1020,6 +1012,7 @@ public:
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
         table_organism_block_parameters->setVerticalHeaderItem(5, __qtablewidgetitem8);
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
+        __qtablewidgetitem9->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsTristate);
         table_organism_block_parameters->setItem(0, 0, __qtablewidgetitem9);
         QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
         table_organism_block_parameters->setItem(0, 1, __qtablewidgetitem10);
@@ -1056,7 +1049,12 @@ public:
         QTableWidgetItem *__qtablewidgetitem26 = new QTableWidgetItem();
         table_organism_block_parameters->setItem(5, 2, __qtablewidgetitem26);
         table_organism_block_parameters->setObjectName(QStringLiteral("table_organism_block_parameters"));
-        table_organism_block_parameters->setEditTriggers(QAbstractItemView::AllEditTriggers);
+        table_organism_block_parameters->setAutoScroll(false);
+        table_organism_block_parameters->setEditTriggers(QAbstractItemView::CurrentChanged);
+        table_organism_block_parameters->setSelectionMode(QAbstractItemView::SingleSelection);
+        table_organism_block_parameters->setShowGrid(true);
+        table_organism_block_parameters->setGridStyle(Qt::SolidLine);
+        table_organism_block_parameters->setWordWrap(false);
         table_organism_block_parameters->horizontalHeader()->setVisible(false);
         table_organism_block_parameters->horizontalHeader()->setCascadingSectionResizes(false);
         table_organism_block_parameters->horizontalHeader()->setDefaultSectionSize(120);
@@ -1104,7 +1102,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 971));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 976));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1383,79 +1381,34 @@ public:
 
         verticalLayout_20->addLayout(verticalLayout_17);
 
-        verticalLayout_11 = new QVBoxLayout();
-        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
+        cb_runtime_rotation_enabled = new QCheckBox(widget);
+        cb_runtime_rotation_enabled->setObjectName(QStringLiteral("cb_runtime_rotation_enabled"));
+
+        verticalLayout_20->addWidget(cb_runtime_rotation_enabled);
+
         cb_reproducing_rotation_enabled = new QCheckBox(widget);
         cb_reproducing_rotation_enabled->setObjectName(QStringLiteral("cb_reproducing_rotation_enabled"));
         cb_reproducing_rotation_enabled->setChecked(true);
 
-        verticalLayout_11->addWidget(cb_reproducing_rotation_enabled);
+        verticalLayout_20->addWidget(cb_reproducing_rotation_enabled);
 
-
-        verticalLayout_20->addLayout(verticalLayout_11);
-
-        verticalLayout_27 = new QVBoxLayout();
-        verticalLayout_27->setObjectName(QStringLiteral("verticalLayout_27"));
-        cb_runtime_rotation_enabled = new QCheckBox(widget);
-        cb_runtime_rotation_enabled->setObjectName(QStringLiteral("cb_runtime_rotation_enabled"));
-
-        verticalLayout_27->addWidget(cb_runtime_rotation_enabled);
-
-
-        verticalLayout_20->addLayout(verticalLayout_27);
-
-        verticalLayout_10 = new QVBoxLayout();
-        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
-        horizontalLayout_10 = new QHBoxLayout();
-        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
         cb_on_touch_kill = new QCheckBox(widget);
         cb_on_touch_kill->setObjectName(QStringLiteral("cb_on_touch_kill"));
         cb_on_touch_kill->setChecked(false);
 
-        horizontalLayout_10->addWidget(cb_on_touch_kill);
+        verticalLayout_20->addWidget(cb_on_touch_kill);
 
-
-        verticalLayout_10->addLayout(horizontalLayout_10);
-
-
-        verticalLayout_20->addLayout(verticalLayout_10);
-
-        verticalLayout_15 = new QVBoxLayout();
-        verticalLayout_15->setObjectName(QStringLiteral("verticalLayout_15"));
-        horizontalLayout_17 = new QHBoxLayout();
-        horizontalLayout_17->setObjectName(QStringLiteral("horizontalLayout_17"));
         cb_movers_can_produce_food = new QCheckBox(widget);
         cb_movers_can_produce_food->setObjectName(QStringLiteral("cb_movers_can_produce_food"));
 
-        horizontalLayout_17->addWidget(cb_movers_can_produce_food);
+        verticalLayout_20->addWidget(cb_movers_can_produce_food);
 
-
-        verticalLayout_15->addLayout(horizontalLayout_17);
-
-
-        verticalLayout_20->addLayout(verticalLayout_15);
-
-        verticalLayout_13 = new QVBoxLayout();
-        verticalLayout_13->setObjectName(QStringLiteral("verticalLayout_13"));
-        horizontalLayout_14 = new QHBoxLayout();
-        horizontalLayout_14->setObjectName(QStringLiteral("horizontalLayout_14"));
         cb_food_blocks_reproduction = new QCheckBox(widget);
         cb_food_blocks_reproduction->setObjectName(QStringLiteral("cb_food_blocks_reproduction"));
-        cb_food_blocks_reproduction->setEnabled(false);
+        cb_food_blocks_reproduction->setEnabled(true);
         cb_food_blocks_reproduction->setChecked(true);
 
-        horizontalLayout_14->addWidget(cb_food_blocks_reproduction);
-
-
-        verticalLayout_13->addLayout(horizontalLayout_14);
-
-
-        verticalLayout_20->addLayout(verticalLayout_13);
-
-        verticalLayout_33 = new QVBoxLayout();
-        verticalLayout_33->setObjectName(QStringLiteral("verticalLayout_33"));
-
-        verticalLayout_20->addLayout(verticalLayout_33);
+        verticalLayout_20->addWidget(cb_food_blocks_reproduction);
 
         verticalLayout_26 = new QVBoxLayout();
         verticalLayout_26->setObjectName(QStringLiteral("verticalLayout_26"));
@@ -1562,6 +1515,11 @@ public:
 
         verticalLayout_20->addWidget(cb_failed_reproduction_eats_food);
 
+        cb_rotate_every_move_tick = new QCheckBox(widget);
+        cb_rotate_every_move_tick->setObjectName(QStringLiteral("cb_rotate_every_move_tick"));
+
+        verticalLayout_20->addWidget(cb_rotate_every_move_tick);
+
 
         verticalLayout_9->addWidget(widget);
 
@@ -1582,7 +1540,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, -10, 540, 617));
+        scrollAreaWidgetContents_4->setGeometry(QRect(-158, -92, 698, 361));
         QSizePolicy sizePolicy9(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1707,11 +1665,6 @@ public:
 
         verticalLayout_40->addWidget(lb_producer_num_3);
 
-        lb_mover_num_3 = new QLabel(widget_5);
-        lb_mover_num_3->setObjectName(QStringLiteral("lb_mover_num_3"));
-
-        verticalLayout_40->addWidget(lb_mover_num_3);
-
         lb_mouth_num_3 = new QLabel(widget_5);
         lb_mouth_num_3->setObjectName(QStringLiteral("lb_mouth_num_3"));
 
@@ -1735,62 +1688,63 @@ public:
 
         horizontalLayout_47->addLayout(verticalLayout_40);
 
+        verticalLayout_10 = new QVBoxLayout();
+        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
+        lb_organisms_alive_2 = new QLabel(widget_5);
+        lb_organisms_alive_2->setObjectName(QStringLiteral("lb_organisms_alive_2"));
+
+        verticalLayout_10->addWidget(lb_organisms_alive_2);
+
+        lb_organism_size_4 = new QLabel(widget_5);
+        lb_organism_size_4->setObjectName(QStringLiteral("lb_organism_size_4"));
+
+        verticalLayout_10->addWidget(lb_organism_size_4);
+
+        lb_anatomy_mutation_rate_4 = new QLabel(widget_5);
+        lb_anatomy_mutation_rate_4->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_4"));
+
+        verticalLayout_10->addWidget(lb_anatomy_mutation_rate_4);
+
+        lb_brain_mutation_rate_4 = new QLabel(widget_5);
+        lb_brain_mutation_rate_4->setObjectName(QStringLiteral("lb_brain_mutation_rate_4"));
+
+        verticalLayout_10->addWidget(lb_brain_mutation_rate_4);
+
+        lb_producer_num_4 = new QLabel(widget_5);
+        lb_producer_num_4->setObjectName(QStringLiteral("lb_producer_num_4"));
+
+        verticalLayout_10->addWidget(lb_producer_num_4);
+
+        lb_mover_num_4 = new QLabel(widget_5);
+        lb_mover_num_4->setObjectName(QStringLiteral("lb_mover_num_4"));
+
+        verticalLayout_10->addWidget(lb_mover_num_4);
+
+        lb_mouth_num_4 = new QLabel(widget_5);
+        lb_mouth_num_4->setObjectName(QStringLiteral("lb_mouth_num_4"));
+
+        verticalLayout_10->addWidget(lb_mouth_num_4);
+
+        lb_killer_num_4 = new QLabel(widget_5);
+        lb_killer_num_4->setObjectName(QStringLiteral("lb_killer_num_4"));
+
+        verticalLayout_10->addWidget(lb_killer_num_4);
+
+        lb_armor_num_4 = new QLabel(widget_5);
+        lb_armor_num_4->setObjectName(QStringLiteral("lb_armor_num_4"));
+
+        verticalLayout_10->addWidget(lb_armor_num_4);
+
+        lb_eye_num_4 = new QLabel(widget_5);
+        lb_eye_num_4->setObjectName(QStringLiteral("lb_eye_num_4"));
+
+        verticalLayout_10->addWidget(lb_eye_num_4);
+
+
+        horizontalLayout_47->addLayout(verticalLayout_10);
+
 
         verticalLayout_37->addLayout(horizontalLayout_47);
-
-        verticalSpacer_2 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_37->addItem(verticalSpacer_2);
-
-        lb_average_move_range = new QLabel(widget_5);
-        lb_average_move_range->setObjectName(QStringLiteral("lb_average_move_range"));
-
-        verticalLayout_37->addWidget(lb_average_move_range);
-
-        lb_anatomy_mutation_rate = new QLabel(widget_5);
-        lb_anatomy_mutation_rate->setObjectName(QStringLiteral("lb_anatomy_mutation_rate"));
-
-        verticalLayout_37->addWidget(lb_anatomy_mutation_rate);
-
-        lb_brain_mutation_rate = new QLabel(widget_5);
-        lb_brain_mutation_rate->setObjectName(QStringLiteral("lb_brain_mutation_rate"));
-
-        verticalLayout_37->addWidget(lb_brain_mutation_rate);
-
-        lb_organism_size = new QLabel(widget_5);
-        lb_organism_size->setObjectName(QStringLiteral("lb_organism_size"));
-
-        verticalLayout_37->addWidget(lb_organism_size);
-
-        lb_mouth_num = new QLabel(widget_5);
-        lb_mouth_num->setObjectName(QStringLiteral("lb_mouth_num"));
-
-        verticalLayout_37->addWidget(lb_mouth_num);
-
-        lb_producer_num = new QLabel(widget_5);
-        lb_producer_num->setObjectName(QStringLiteral("lb_producer_num"));
-
-        verticalLayout_37->addWidget(lb_producer_num);
-
-        lb_mover_num = new QLabel(widget_5);
-        lb_mover_num->setObjectName(QStringLiteral("lb_mover_num"));
-
-        verticalLayout_37->addWidget(lb_mover_num);
-
-        lb_killer_num = new QLabel(widget_5);
-        lb_killer_num->setObjectName(QStringLiteral("lb_killer_num"));
-
-        verticalLayout_37->addWidget(lb_killer_num);
-
-        lb_armor_num = new QLabel(widget_5);
-        lb_armor_num->setObjectName(QStringLiteral("lb_armor_num"));
-
-        verticalLayout_37->addWidget(lb_armor_num);
-
-        lb_eye_num = new QLabel(widget_5);
-        lb_eye_num->setObjectName(QStringLiteral("lb_eye_num"));
-
-        verticalLayout_37->addWidget(lb_eye_num);
 
 
         verticalLayout_24->addWidget(widget_5);
@@ -1813,7 +1767,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 267));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -78, 540, 292));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -1924,6 +1878,11 @@ public:
 
         verticalLayout_19->addLayout(horizontalLayout_30);
 
+        cb_simplified_rendering = new QCheckBox(widget_2);
+        cb_simplified_rendering->setObjectName(QStringLiteral("cb_simplified_rendering"));
+
+        verticalLayout_19->addWidget(cb_simplified_rendering);
+
 
         verticalLayout_5->addWidget(widget_2);
 
@@ -2021,9 +1980,11 @@ public:
         QObject::connect(cb_failed_reproduction_eats_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_failed_reproduction_eats_food_slot(bool)));
         QObject::connect(le_auto_produce_food_every_n_tick, SIGNAL(returnPressed()), MainWindow, SLOT(le_auto_produce_food_every_n_tick_slot()));
         QObject::connect(table_organism_block_parameters, SIGNAL(cellChanged(int,int)), MainWindow, SLOT(table_cell_changed_slot(int,int)));
-        QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop(bool)));
+        QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop_slot(bool)));
+        QObject::connect(cb_rotate_every_move_tick, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_rotate_every_move_tick_slot(bool)));
+        QObject::connect(cb_simplified_rendering, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_rendering_slot(bool)));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(4);
         stackedWidget->setCurrentIndex(0);
 
 
@@ -2209,8 +2170,8 @@ public:
         le_change->setText(QApplication::translate("MainWindow", "33", Q_NULLPTR));
         label_12->setText(QApplication::translate("MainWindow", "remove cell:", Q_NULLPTR));
         le_remove->setText(QApplication::translate("MainWindow", "33", Q_NULLPTR));
-        cb_reproducing_rotation_enabled->setText(QApplication::translate("MainWindow", "Reproducing rotation enabled", Q_NULLPTR));
         cb_runtime_rotation_enabled->setText(QApplication::translate("MainWindow", "Runtime rotation enabled", Q_NULLPTR));
+        cb_reproducing_rotation_enabled->setText(QApplication::translate("MainWindow", "Reproducing rotation enabled", Q_NULLPTR));
         cb_on_touch_kill->setText(QApplication::translate("MainWindow", "On touch kill", Q_NULLPTR));
         cb_movers_can_produce_food->setText(QApplication::translate("MainWindow", "Movers can produce food", Q_NULLPTR));
         cb_food_blocks_reproduction->setText(QApplication::translate("MainWindow", "Food blocks reproduction", Q_NULLPTR));
@@ -2225,6 +2186,7 @@ public:
         label_40->setText(QApplication::translate("MainWindow", "Max move range:", Q_NULLPTR));
         label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", Q_NULLPTR));
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", Q_NULLPTR));
+        cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", Q_NULLPTR));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", Q_NULLPTR));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", Q_NULLPTR));
@@ -2246,21 +2208,20 @@ public:
         lb_anatomy_mutation_rate_3->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", Q_NULLPTR));
         lb_brain_mutation_rate_3->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", Q_NULLPTR));
         lb_producer_num_3->setText(QApplication::translate("MainWindow", "Average producer num: ", Q_NULLPTR));
-        lb_mover_num_3->setText(QApplication::translate("MainWindow", "Average mover num:", Q_NULLPTR));
         lb_mouth_num_3->setText(QApplication::translate("MainWindow", "Average mouth num: ", Q_NULLPTR));
         lb_killer_num_3->setText(QApplication::translate("MainWindow", "Average killer num:", Q_NULLPTR));
         lb_armor_num_3->setText(QApplication::translate("MainWindow", "Average armor num: ", Q_NULLPTR));
         lb_eye_num_3->setText(QApplication::translate("MainWindow", "Average eye num: ", Q_NULLPTR));
-        lb_average_move_range->setText(QApplication::translate("MainWindow", "Average move range:", Q_NULLPTR));
-        lb_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", Q_NULLPTR));
-        lb_organism_size->setText(QApplication::translate("MainWindow", "Average organism size:", Q_NULLPTR));
-        lb_mouth_num->setText(QApplication::translate("MainWindow", "Average mouth num: ", Q_NULLPTR));
-        lb_producer_num->setText(QApplication::translate("MainWindow", "Average producer num: ", Q_NULLPTR));
-        lb_mover_num->setText(QApplication::translate("MainWindow", "Average mover num:", Q_NULLPTR));
-        lb_killer_num->setText(QApplication::translate("MainWindow", "Average killer num:", Q_NULLPTR));
-        lb_armor_num->setText(QApplication::translate("MainWindow", "Average armor num: ", Q_NULLPTR));
-        lb_eye_num->setText(QApplication::translate("MainWindow", "Average eye num: ", Q_NULLPTR));
+        lb_organisms_alive_2->setText(QApplication::translate("MainWindow", "Organisms alive:", Q_NULLPTR));
+        lb_organism_size_4->setText(QApplication::translate("MainWindow", "Average organism size:", Q_NULLPTR));
+        lb_anatomy_mutation_rate_4->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", Q_NULLPTR));
+        lb_brain_mutation_rate_4->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", Q_NULLPTR));
+        lb_producer_num_4->setText(QApplication::translate("MainWindow", "Average producer num: ", Q_NULLPTR));
+        lb_mover_num_4->setText(QApplication::translate("MainWindow", "Average mover num:", Q_NULLPTR));
+        lb_mouth_num_4->setText(QApplication::translate("MainWindow", "Average mouth num: ", Q_NULLPTR));
+        lb_killer_num_4->setText(QApplication::translate("MainWindow", "Average killer num:", Q_NULLPTR));
+        lb_armor_num_4->setText(QApplication::translate("MainWindow", "Average armor num: ", Q_NULLPTR));
+        lb_eye_num_4->setText(QApplication::translate("MainWindow", "Average eye num: ", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(statistics_tab), QApplication::translate("MainWindow", "Statistics", Q_NULLPTR));
         rb_single_thread_mode->setText(QApplication::translate("MainWindow", "Single thread CPU", Q_NULLPTR));
         rb_partial_multi_thread_mode->setText(QApplication::translate("MainWindow", "Partial multi-thread CPU", Q_NULLPTR));
@@ -2273,6 +2234,7 @@ public:
         cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", Q_NULLPTR));
         cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to stop", Q_NULLPTR));
         label_25->setText(QApplication::translate("MainWindow", "Font size:", Q_NULLPTR));
+        cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", Q_NULLPTR));
     } // retranslateUi
 

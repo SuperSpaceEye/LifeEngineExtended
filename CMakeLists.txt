@@ -20,7 +20,6 @@ set(CMAKE_CUDA_ARCHITECTURES 62)
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mwindows")
 
 #for perf
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
@@ -43,7 +42,16 @@ else()
     add_compile_definitions(__CUDA_USED__=0)
 endif()
 
+add_custom_target(
+        run ALL
+        COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/LifeEngineCpp/mainwindow.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/WindowUI.h"
+        BYPRODUCTS WindowUI.h
+        COMMENT "Generating UI header file."
+)
+
 add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.cpp LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_SOURCES})
+
+add_dependencies(${PROJECT_NAME} run)
 
 if (Qt5_FOUND)
     #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
