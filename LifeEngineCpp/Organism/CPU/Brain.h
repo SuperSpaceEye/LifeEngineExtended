@@ -9,7 +9,7 @@
 #include <vector>
 #include <random>
 #include <memory>
-#include <boost/random.hpp>
+#include "../../PRNGS/lehmer64.h"
 
 #include "../../BlockTypes.hpp"
 #include "Rotation.h"
@@ -78,14 +78,12 @@ struct SimpleActionTable {
 
 class Brain {
 private:
-    DecisionObservation get_random_action(boost::mt19937 &mt);
-
     SimpleActionTable simple_action_table;
     static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
-    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, boost::mt19937 &mt);
-    static SimpleActionTable get_random_action_table(boost::mt19937 &mt);
-    DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, boost::mt19937 &mt);
-    BrainDecision calculate_simple_action(Observation & observation, boost::mt19937 &mt);
+    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
+    static SimpleActionTable get_random_action_table(lehmer64 &mt);
+    DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, lehmer64 &mt);
+    BrainDecision calculate_simple_action(Observation & observation, lehmer64 &mt);
 public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
@@ -93,10 +91,10 @@ public:
 
     BrainTypes brain_type;
 
+    DecisionObservation get_random_action(lehmer64 &mt);
+    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt);
 
-    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, boost::mt19937 &mt);
-
-    Brain * mutate(boost::mt19937 &mt);
+    Brain * mutate(lehmer64 &mt);
 
 };
 

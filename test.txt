@@ -8,12 +8,12 @@
 
     boost::random_device rd;
 
-    std::mt19937 mt(rd());
+    std::mt19937 gen(rd());
     boost::mt19937 bmt(rd());
 
     auto point = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < num_iter; i++) {
-        volatile auto num = std::uniform_int_distribution<int>(0, 9)(mt);
+        volatile auto num = std::uniform_int_distribution<int>(0, 9)(gen);
     }
     auto end_point = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
@@ -21,7 +21,7 @@
 
     point = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < num_iter; i++) {
-        volatile auto num = boost::uniform_int<int>(0, 9)(mt);
+        volatile auto num = boost::uniform_int<int>(0, 9)(gen);
     }
     end_point = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
@@ -47,7 +47,7 @@
 
     point = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < num_iter; i++) {
-        volatile auto num = std::uniform_real_distribution<float>(0, 1)(mt);
+        volatile auto num = std::uniform_real_distribution<float>(0, 1)(gen);
     }
     end_point = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<
@@ -55,7 +55,7 @@
 
     point = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < num_iter; i++) {
-        volatile auto num = boost::uniform_real<float>(0, 1)(mt);
+        volatile auto num = boost::uniform_real<float>(0, 1)(gen);
     }
     end_point = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end_point - point).count() <<

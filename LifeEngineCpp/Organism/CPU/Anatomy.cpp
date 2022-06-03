@@ -10,6 +10,7 @@ Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
 
     _producing_space = std::move(structure->producing_space);
     _eating_space    = std::move(structure->eating_space);
+    _killing_space   = std::move(structure->killing_space);
 //    _armor_space     = std::move(structure->armor_space);
 
     _single_adjacent_space          = std::move(structure->single_adjacent_space);
@@ -30,6 +31,7 @@ Anatomy::Anatomy(const std::shared_ptr<Anatomy>& anatomy) {
 
     _producing_space = std::vector(anatomy->_producing_space);
     _eating_space    = std::vector(anatomy->_eating_space);
+    _killing_space   = std::vector(anatomy->_killing_space);
 //    _armor_space     = std::vector(anatomy->_armor_space);
 
     _single_adjacent_space          = std::vector(anatomy->_single_adjacent_space);
@@ -127,7 +129,7 @@ void Anatomy::create_producing_space(
         boost::unordered_map<int, boost::unordered_map<int, bool>> &producing_space,
         boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
         int32_t producer_blocks) {
-    //if (producer_blocks > 0) {
+    if (producer_blocks > 0) {
         for (auto &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
                 if (yxmap.second.type == BlockTypes::ProducerBlock) {
@@ -140,14 +142,14 @@ void Anatomy::create_producing_space(
                 }
             }
         }
-    //}
+    }
 }
 
 void Anatomy::create_eating_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                   boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
                                   boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>&single_adjacent_space,
                                   int32_t mouth_blocks) {
-    //if (mouth_blocks > 0) {
+    if (mouth_blocks > 0) {
         for (auto &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
                 if (yxmap.second.type == BlockTypes::MouthBlock) {
@@ -160,7 +162,27 @@ void Anatomy::create_eating_space(boost::unordered_map<int, boost::unordered_map
                 }
             }
         }
-    //}
+    }
+}
+
+void Anatomy::create_killing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                 boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
+                                 boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
+                                 int32_t killer_blocks) {
+    if (killer_blocks > 0) {
+        for (auto &xmap: organism_blocks) {
+            for (auto const &yxmap: xmap.second) {
+                if (yxmap.second.type == BlockTypes::KillerBlock) {
+                    auto x = xmap.first;
+                    auto y = yxmap.first;
+                    if (single_adjacent_space[x + 1].count(y)) { killing_space[x + 1][y] = true; }
+                    if (single_adjacent_space[x - 1].count(y)) { killing_space[x - 1][y] = true; }
+                    if (single_adjacent_space[x].count(y + 1)) { killing_space[x][y + 1] = true; }
+                    if (single_adjacent_space[x].count(y - 1)) { killing_space[x][y - 1] = true; }
+                }
+            }
+        }
+    }
 }
 
 ////TODO it has bug, because if an adjacent cell has an armor cell, and a normal cell, it still will be armored, because
@@ -211,6 +233,7 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
         const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
         const boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
         const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
+        const boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
 
         const boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
         const boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
@@ -225,6 +248,7 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
 
     std::vector<SerializedAdjacentSpaceContainer> _producing_space;
     std::vector<SerializedAdjacentSpaceContainer> _eating_space;
+    std::vector<SerializedAdjacentSpaceContainer> _killing_space;
 
     std::vector<SerializedArmorSpaceContainer   > _single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
@@ -234,6 +258,7 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
 
     _producing_space.reserve(get_map_size(producing_space));
     _eating_space.reserve(   get_map_size(eating_space));
+    _killing_space.reserve(get_map_size(killing_space));
 
     _single_adjacent_space.reserve(         get_map_size(single_adjacent_space));
     _single_diagonal_adjacent_space.reserve(get_map_size(single_diagonal_adjacent_space));
@@ -259,6 +284,12 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
         }
     }
 
+    for (auto const &xmap: killing_space) {
+        for (auto const &yxmap: xmap.second) {
+            _killing_space.emplace_back(xmap.first, yxmap.first);
+        }
+    }
+
     for (auto const &xmap: single_adjacent_space) {
         for (auto const &yxmap: xmap.second) {
             _single_adjacent_space.emplace_back(xmap.first, yxmap.first, yxmap.second.is_armored);
@@ -281,6 +312,7 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
 
                                                     _producing_space,
                                                     _eating_space,
+                                                    _killing_space,
 
                                                     _single_adjacent_space,
                                                     _single_diagonal_adjacent_space,
@@ -299,6 +331,7 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
     boost::unordered_map<int, boost::unordered_map<int, bool>> producing_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
+    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
 
     boost::unordered_map<int, boost::unordered_map<int, MapAjacent>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
@@ -357,10 +390,12 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
 
     create_producing_space(organism_blocks, producing_space, single_adjacent_space, producer_blocks);
     create_eating_space(   organism_blocks, eating_space,    single_adjacent_space, mouth_blocks);
+    create_killing_space(  organism_blocks, killing_space,   single_adjacent_space, killer_blocks);
 
     return serialize(organism_blocks,
                      producing_space,
                      eating_space,
+                     killing_space,
                      single_adjacent_space,
                      single_diagonal_adjacent_space,
                      double_adjacent_space,
@@ -373,7 +408,7 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
                      eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt) {
+SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt) {
     float total_chance = 0;
     total_chance += block_parameters.MouthBlock   .chance_weight;
     total_chance += block_parameters.ProducerBlock.chance_weight;
@@ -403,10 +438,11 @@ SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockPa
     return add_block(BlockTypes::EyeBlock, block_choice, rotation, 0, 0);
 }
 
-SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, int block_choice, boost::mt19937 *mt) {
+SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, int block_choice, lehmer64 *mt) {
     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
     boost::unordered_map<int, boost::unordered_map<int, bool>> producing_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
+    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
 
     boost::unordered_map<int, boost::unordered_map<int, MapAjacent>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
@@ -463,10 +499,12 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
 
     create_producing_space(organism_blocks, producing_space, single_adjacent_space, producer_blocks);
     create_eating_space(   organism_blocks, eating_space,    single_adjacent_space, mouth_blocks);
+    create_killing_space(  organism_blocks, killing_space,   single_adjacent_space, killer_blocks);
 
     return serialize(organism_blocks,
                      producing_space,
                      eating_space,
+                     killing_space,
                      single_adjacent_space,
                      single_diagonal_adjacent_space,
                      double_adjacent_space,
@@ -479,7 +517,7 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
                      eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt) {
+SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen) {
     float total_chance = 0;
     total_chance += block_parameters.MouthBlock   .chance_weight;
     total_chance += block_parameters.ProducerBlock.chance_weight;
@@ -488,31 +526,32 @@ SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBloc
     total_chance += block_parameters.ArmorBlock   .chance_weight;
     total_chance += block_parameters.EyeBlock     .chance_weight;
 
-    float type_choice  = std::uniform_real_distribution<float>{0, total_chance}(mt);
-    int   block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(mt);
+    float type_choice  = std::uniform_real_distribution<float>{0, total_chance}(gen);
+    int   block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(gen);
 
     if (type_choice < block_parameters.MouthBlock.chance_weight)    {return change_block(BlockTypes::MouthBlock,
-                                                                                         block_choice, &mt);}
+                                                                                         block_choice, &gen);}
     type_choice -= block_parameters.MouthBlock.chance_weight;
     if (type_choice < block_parameters.ProducerBlock.chance_weight) {return change_block(BlockTypes::ProducerBlock,
-                                                                                         block_choice, &mt);}
+                                                                                         block_choice, &gen);}
     type_choice -= block_parameters.ProducerBlock.chance_weight;
     if (type_choice < block_parameters.MoverBlock.chance_weight)    {return change_block(BlockTypes::MoverBlock,
-                                                                                         block_choice, &mt);}
+                                                                                         block_choice, &gen);}
     type_choice -= block_parameters.MoverBlock.chance_weight;
     if (type_choice < block_parameters.KillerBlock.chance_weight)   {return change_block(BlockTypes::KillerBlock,
-                                                                                         block_choice, &mt);}
+                                                                                         block_choice, &gen);}
     type_choice -= block_parameters.KillerBlock.chance_weight;
     if (type_choice < block_parameters.ArmorBlock.chance_weight)    {return change_block(BlockTypes::ArmorBlock,
-                                                                                         block_choice, &mt);}
+                                                                                         block_choice, &gen);}
 
-    return change_block(BlockTypes::EyeBlock, block_choice, &mt);
+    return change_block(BlockTypes::EyeBlock, block_choice, &gen);
 }
 
 SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
     boost::unordered_map<int, boost::unordered_map<int, bool>> producing_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
+    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
 
     boost::unordered_map<int, boost::unordered_map<int, MapAjacent>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
@@ -562,10 +601,12 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
 
     create_producing_space(organism_blocks, producing_space, single_adjacent_space, producer_blocks);
     create_eating_space(   organism_blocks, eating_space,    single_adjacent_space, mouth_blocks);
+    create_killing_space(  organism_blocks, killing_space,   single_adjacent_space, killer_blocks);
 
     return serialize(organism_blocks,
                      producing_space,
                      eating_space,
+                     killing_space,
                      single_adjacent_space,
                      single_diagonal_adjacent_space,
                      double_adjacent_space,
@@ -578,8 +619,8 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
                      eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::remove_random_block(boost::mt19937 &mt) {
-    int block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(mt);
+SerializedOrganismStructureContainer * Anatomy::remove_random_block(lehmer64 &gen) {
+    int block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(gen);
     return remove_block(block_choice);
 }
 

@@ -11,8 +11,6 @@ Organism::Organism(int x, int y, bool *can_rotate, Rotation rotation, std::share
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-//        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(std::move(anatomy)), sp(sp),
-//        bp(block_parameters), mt(mt), brain(std::move(brain)) {
         x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(anatomy), sp(sp),
         bp(block_parameters), brain(brain), anatomy_mutation_rate(anatomy_mutation_rate),
         brain_mutation_rate(brain_mutation_rate), move_range(move_range) {
@@ -75,22 +73,23 @@ float Organism::calculate_food_needed() {
     return food_needed;
 }
 
-void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate, boost::mt19937 *mt) {
+void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen) {
     bool mutate_anatomy;
     _anatomy_mutation_rate = anatomy_mutation_rate;
 
     if (sp->use_anatomy_evolved_mutation_rate) {
-        if (std::uniform_real_distribution<float>(0,1)(*mt) <= sp->anatomy_mutation_rate_delimiter) {
+        if (std::uniform_real_distribution<float>(0,1)(*gen) <= sp->anatomy_mutation_rate_delimiter) {
             _anatomy_mutation_rate += sp->anatomy_mutations_rate_mutation_modifier;
+            if (_anatomy_mutation_rate > 1) {_anatomy_mutation_rate = 1;}
         } else {
             _anatomy_mutation_rate -= sp->anatomy_mutations_rate_mutation_modifier;
             if (_anatomy_mutation_rate < sp->anatomy_min_possible_mutation_rate) {
                 _anatomy_mutation_rate = sp->anatomy_min_possible_mutation_rate;
             }
         }
-        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*mt) <= _anatomy_mutation_rate;
+        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*gen) <= _anatomy_mutation_rate;
     } else {
-        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->global_anatomy_mutation_rate;
+        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*gen) <= sp->global_anatomy_mutation_rate;
     }
 
     if (mutate_anatomy) {
@@ -99,51 +98,52 @@ void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_ana
         total_chance += sp->change_cell;
         total_chance += sp->remove_cell;
 
-        int choice = std::uniform_int_distribution<int>(0, total_chance)(*mt);
+        int choice = std::uniform_int_distribution<int>(0, total_chance)(*gen);
 
-        if (choice < sp->add_cell) {new_anatomy.reset(new Anatomy(organism_anatomy->add_random_block(*bp, *mt)));return;}
+        if (choice < sp->add_cell) {new_anatomy.reset(new Anatomy(organism_anatomy->add_random_block(*bp, *gen)));return;}
         choice -= sp->add_cell;
-        if (choice < sp->change_cell) {new_anatomy.reset(new Anatomy(organism_anatomy->change_random_block(*bp, *mt)));return;}
+        if (choice < sp->change_cell) {new_anatomy.reset(new Anatomy(organism_anatomy->change_random_block(*bp, *gen)));return;}
         choice -= sp->change_cell;
-        if (choice < sp->remove_cell && organism_anatomy->_organism_blocks.size() > sp->min_organism_size) {new_anatomy.reset(new Anatomy(organism_anatomy->remove_random_block(*mt)));return;}
+        if (choice < sp->remove_cell && organism_anatomy->_organism_blocks.size() > sp->min_organism_size) {new_anatomy.reset(new Anatomy(organism_anatomy->remove_random_block(*gen)));return;}
     }
     //if not mutated.
     new_anatomy.reset(new Anatomy(organism_anatomy));
 }
 
 void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain,
-                            float &_brain_mutation_rate, boost::mt19937 *mt) {
+                            float &_brain_mutation_rate, lehmer64 *gen) {
     bool mutate_brain;
     _brain_mutation_rate = brain_mutation_rate;
 
     if (sp->use_brain_evolved_mutation_rate) {
-        if (std::uniform_real_distribution<float>(0,1)(*mt) <= sp->brain_mutation_rate_delimiter) {
+        if (std::uniform_real_distribution<float>(0,1)(*gen) <= sp->brain_mutation_rate_delimiter) {
             _brain_mutation_rate += sp->brain_mutation_rate_mutation_modifier;
+            if (_brain_mutation_rate > 1) {_brain_mutation_rate = 1;}
         } else {
             _brain_mutation_rate -= sp->brain_mutation_rate_mutation_modifier;
             if (_brain_mutation_rate < sp->brain_min_possible_mutation_rate) {
                 _brain_mutation_rate = sp->brain_min_possible_mutation_rate;
             }
         }
-        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*mt) <= _brain_mutation_rate;
+        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*gen) <= _brain_mutation_rate;
     } else {
-        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->global_brain_mutation_rate;
+        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*gen) <= sp->global_brain_mutation_rate;
     }
 
     // if mutate brain
     if (mutate_brain && new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {
-        new_brain.reset(brain->mutate(*mt));
+        new_brain.reset(brain->mutate(*gen));
     } else {
         // just copy brain from parent
         new_brain.reset(new Brain(brain));
     }
 }
 
-int Organism::mutate_move_range(SimulationParameters *sp, boost::mt19937 *mt, int parent_move_range) {
+int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range) {
     if (sp->set_fixed_move_range) {return parent_move_range;}
 
     auto child_move_range = parent_move_range;
-    if (std::uniform_real_distribution<float>(0, 1)(*mt) <= sp->move_range_delimiter) {
+    if (std::uniform_real_distribution<float>(0, 1)(*gen) <= sp->move_range_delimiter) {
         child_move_range += 1;
         if (child_move_range > sp->max_move_range) {return sp->max_move_range;}
         return child_move_range;
@@ -154,16 +154,16 @@ int Organism::mutate_move_range(SimulationParameters *sp, boost::mt19937 *mt, in
     }
 }
 
-Organism * Organism::create_child(boost::mt19937 *mt) {
+Organism * Organism::create_child(lehmer64 *gen) {
     std::shared_ptr<Anatomy> new_anatomy;
     std::shared_ptr<Brain>   new_brain;
 
     float _anatomy_mutation_rate = 0;
     float _brain_mutation_rate = 0;
 
-    mutate_anatomy(new_anatomy, _anatomy_mutation_rate, mt);
-    mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, mt);
-    auto child_move_range = mutate_move_range(sp, mt, move_range);
+    mutate_anatomy(new_anatomy, _anatomy_mutation_rate, gen);
+    mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
+    auto child_move_range = mutate_move_range(sp, gen, move_range);
 
     if (new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {new_brain->brain_type = BrainTypes::SimpleBrain;}
     else {new_brain->brain_type = BrainTypes::RandomActions;}
@@ -181,7 +181,7 @@ Organism * Organism::create_child(boost::mt19937 *mt) {
                         _brain_mutation_rate);
 }
 
-void Organism::think_decision(std::vector<Observation> &organism_observations, boost::mt19937 *mt) {
+void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
     if (move_counter == 0) { //if organism can make new move
         auto new_decision = brain->get_decision(organism_observations, rotation, *mt);
         if (new_decision.decision != BrainDecision::DoNothing
@@ -197,9 +197,7 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, b
         }
 
         if (last_decision.time > max_do_nothing_lifetime) {
-            last_decision = DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(*mt)),
-                                                          Observation{},
-                                                          0};
+            last_decision = brain->get_random_action(*mt);
             return;
         }
 

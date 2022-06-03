@@ -8,10 +8,6 @@
 
 #include <iostream>
 #include <vector>
-#include <mutex>
-#include <thread>
-#include <atomic>
-#include <boost/random.hpp>
 
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
@@ -26,7 +22,7 @@ public:
 
     static void place_organism  (EngineDataContainer * dc, Organism * organism);
 
-    static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 &mt);
+    static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen);
 
     static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
@@ -46,15 +42,13 @@ public:
 
     static void rotate_organism (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
 
-    static void move_organism   (EngineDataContainer * dc, Organism *organism, BrainDecision decision, boost::mt19937 * mt);
+    static void move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision);
 
-    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, boost::mt19937 * mt);
+    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen);
 
-    static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
+    static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, lehmer64 *gen);
 
-//    static void make_child      (EngineDataContainer * dc, Organism *organism, boost::mt19937 *mt);
-
-    static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, boost::mt19937 *mt);
+    static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, lehmer64 *gen);
 
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
     static bool check_if_block_out_of_bounds(EngineDataContainer *dc, Organism *organism,
@@ -62,7 +56,7 @@ public:
 
     static void single_threaded_tick(EngineDataContainer * dc,
                                      SimulationParameters * sp,
-                                     boost::mt19937 *mt);
+                                     lehmer64 *gen);
 };
 
 

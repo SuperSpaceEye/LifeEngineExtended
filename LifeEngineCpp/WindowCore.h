@@ -29,6 +29,7 @@
 #include <QLineEdit>
 #include <QDialog>
 #include <QFont>
+#include <QVBoxLayout>
 
 #include "SimulationEngine.h"
 #include "Containers/CPU/ColorContainer.h"
@@ -38,6 +39,7 @@
 #include "Containers/CPU/OrganismBlockParameters.h"
 #include "WindowUI.h"
 #include "OrganismEditor.h"
+#include "PRNGS/lehmer64.h"
 
 enum class CursorMode {
     ModifyFood,
@@ -45,6 +47,20 @@ enum class CursorMode {
     KillOrganism,
     ChooseOrganism,
     PlaceOrganism
+};
+
+#define BLACK1 QColor{14, 19, 24}
+#define BLACK2 QColor{56, 62, 77}
+#define GRAY1 QColor{182, 193, 234}
+#define GRAY2 QColor{161, 172, 209}
+#define GRAY3 QColor{167, 177, 215}
+
+struct Textures {
+    std::vector<std::vector<QColor>> EyeTexture{std::vector<QColor>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1},
+                                                std::vector<QColor>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1},
+                                                std::vector<QColor>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1},
+                                                std::vector<QColor>{GRAY1, GRAY3, BLACK2, GRAY3, GRAY1},
+                                                std::vector<QColor>{GRAY1, GRAY1, GRAY1,  GRAY1, GRAY1}};
 };
 
 struct pix_pos {
@@ -192,6 +208,8 @@ private:
     std::thread engine_thread;
     std::mutex engine_mutex;
 
+    Textures textures{};
+
     std::vector<unsigned char> image_vector;
     QGraphicsScene scene;
     QGraphicsPixmapItem pixmap_item;
@@ -218,7 +236,7 @@ private:
     Organism * base_organism;
     Organism * chosen_organism;
 
-    boost::mt19937 mt;
+    lehmer64 gen;
 
     bool menu_hidden = false;
     bool allow_menu_hidden_change = true;
@@ -228,6 +246,8 @@ private:
     int brush_size = 2;
 
     bool wait_for_engine_to_stop = false;
+
+    bool simplified_rendering = false;
 
     void mainloop_tick();
     void window_tick();
@@ -244,7 +264,9 @@ private:
 
     void create_image();
 
-    QColor inline &get_color(BlockTypes type);
+    QColor &get_color_simplified(BlockTypes type);
+    QColor &get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
+//    QColor &get_color_simplified(BlockTypes type);
 
     bool wait_for_engine_to_pause();
     void parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height);
@@ -373,7 +395,10 @@ private slots:
     void cb_self_organism_blocks_block_sight_slot(bool state);
     void cb_set_fixed_move_range_slot(bool state);
     void cb_failed_reproduction_eats_food_slot(bool state);
-    void cb_wait_for_engine_to_stop(bool state);
+    void cb_wait_for_engine_to_stop_slot(bool state);
+    void cb_rotate_every_move_tick_slot(bool state);
+    void cb_simplified_rendering_slot(bool state);
+    void cb_apply_damage_directly_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

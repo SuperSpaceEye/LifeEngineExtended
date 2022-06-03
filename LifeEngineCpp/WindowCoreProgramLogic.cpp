@@ -31,8 +31,8 @@ WindowCore::WindowCore(QWidget *parent) :
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
     boost::random_device rd;
-    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
-    mt = boost::mt19937(sd);
+//    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    gen = lehmer64(rd());
 
     color_container = ColorContainer{};
     sp = SimulationParameters{};
@@ -162,7 +162,7 @@ void WindowCore::reset_scale_view() {
 }
 
 //__attribute__((noinline))
-QColor inline &WindowCore::get_color(BlockTypes type) {
+QColor &WindowCore::get_color_simplified(BlockTypes type) {
     switch (type) {
         case EmptyBlock :   return color_container.empty_block;
         case MouthBlock:    return color_container.mouth;
@@ -171,6 +171,58 @@ QColor inline &WindowCore::get_color(BlockTypes type) {
         case KillerBlock:   return color_container.killer;
         case ArmorBlock:    return color_container.armor;
         case EyeBlock:      return color_container.eye;
+        case FoodBlock:     return color_container.food;
+        case WallBlock:     return color_container.wall;
+        default: return color_container.empty_block;
+    }
+}
+
+QColor &WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
+    int x;
+    int y;
+
+    switch (type) {
+        case EmptyBlock :   return color_container.empty_block;
+        case MouthBlock:    return color_container.mouth;
+        case ProducerBlock: return color_container.producer;
+        case MoverBlock:    return color_container.mover;
+        case KillerBlock:   return color_container.killer;
+        case ArmorBlock:    return color_container.armor;
+        case EyeBlock:
+            x = relative_x_scale * 5;
+            y = relative_y_scale * 5;
+            {
+                switch (rotation) {
+                    case Rotation::UP:
+                        break;
+                    case Rotation::LEFT:
+                        x -= 2;
+                        y -= 2;
+                        std::swap(x, y);
+                        y = -y;
+                        x += 2;
+                        y += 2;
+                        break;
+                    case Rotation::DOWN:
+                        x -= 2;
+                        y -= 2;
+                        x = -x;
+                        y = -y;
+                        x += 2;
+                        y += 2;
+                        break;
+                    case Rotation::RIGHT:
+                        x -= 2;
+                        y -= 2;
+                        std::swap(x, y);
+                        x = -x;
+                        x += 2;
+                        y += 2;
+                        break;
+                }
+            }
+
+            return textures.EyeTexture[y][x];
         case FoodBlock:     return color_container.food;
         case WallBlock:     return color_container.wall;
         default: return color_container.empty_block;
@@ -249,90 +301,76 @@ void inline WindowCore::calculate_truncated_linspace(
     truncated_lin_height.pop_back();
 }
 
-//__attribute__((noinline))
 void inline WindowCore::image_for_loop(int image_width, int image_height,
                                        std::vector<int> &lin_width,
                                        std::vector<int> &lin_height,
                                        std::vector<int> &truncated_lin_width,
                                        std::vector<int> &truncated_lin_height) {
-    //TODO ok, it works, but it is MASSIVE and SLOW
-//    std::vector<pix_pos> width_img_boundaries;
-//    std::vector<pix_pos> height_img_boundaries;
-//
-//    auto last = INT32_MIN;
-//    auto count = 0;
-//    for (int x = 0; x < lin_width.size(); x++) {
-//        if (last < lin_width[x]) {
-//            width_img_boundaries.emplace_back(count, x);
-//            last = lin_width[x];
-//            count = x;
-//        }
-//    }
-//    width_img_boundaries.emplace_back(count, lin_width.size());
-//
-//    last = INT32_MIN;
-//    count = 0;
-//    for (int x = 0; x < lin_height.size(); x++) {
-//        if (last < lin_height[x]) {
-//            height_img_boundaries.emplace_back(count, x);
-//            last = lin_height[x];
-//            count = x;
-//        }
-//    }
-//    height_img_boundaries.emplace_back(count, lin_height.size());
-//
-//    QColor pixel_color;
-//    //width of boundaries of an organisms
-//
-//    //width bound, height bound
-//    for (auto & w_b : width_img_boundaries) {
-//        for (auto & h_b : height_img_boundaries) {
-//
-//            auto y_boundary_width = 0;
-//            auto x_boundary_width = 0;
-//
-//            if (w_b.stop - w_b.start > 15) {x_boundary_width = 5;}
-//            if (h_b.stop - h_b.start > 15) {y_boundary_width = 5;}
-//            std::cout << w_b.stop - w_b.start << "\n";
-//
-//            for (int x = w_b.start; x < w_b.stop; x++) {
-//                for (int y = h_b.start; y < h_b.stop; y++) {
-//                    auto & block = dc.second_simulation_grid[lin_width[x]][lin_height[y]];
-//                    auto continue_flag = false;
-//
-//                    if (lin_width[x] < 0 ||
-//                        lin_width[x] >= dc.simulation_width ||
-//                        lin_height[y] < 0 ||
-//                        lin_height[y] >= dc.simulation_height) {pixel_color = color_container.simulation_background_color;set_image_pixel(x, y, pixel_color);continue;}
-//                    if (block.type == BlockTypes::EmptyBlock) {pixel_color = get_color(BlockTypes::EmptyBlock);set_image_pixel(x, y, pixel_color);continue;}
-//                    if (block.type == BlockTypes::WallBlock)  {pixel_color = get_color(BlockTypes::WallBlock);set_image_pixel(x, y, pixel_color);continue;}
-//                    if (block.type == BlockTypes::FoodBlock)  {pixel_color = get_color(BlockTypes::FoodBlock);set_image_pixel(x, y, pixel_color);continue;}
-//
-//                    if (y_boundary_width > 0) {
-//                        if (!block.neighbors.up   && (y == h_b.start || y < h_b.start + y_boundary_width-1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
-//                        if (!block.neighbors.down && (y == h_b.stop  || y > h_b.stop  - y_boundary_width+1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
-//                    }
-//
-//                    if (x_boundary_width > 0) {
-//                        if (!block.neighbors.left  && (x == w_b.start || x < w_b.start + x_boundary_width-1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
-//                        if (!block.neighbors.right && (x == w_b.stop  || x > w_b.stop  - x_boundary_width+1)) {pixel_color = color_container.organism_boundary;set_image_pixel(x, y, pixel_color);continue;}
-//                    }
-//
-//                    pixel_color = get_color(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type);
-//                    set_image_pixel(x, y, pixel_color);
-//                }
-//            }
-//        }
-//    }
+    //TODO refactor and optimize
+    if (!simplified_rendering) {
+        std::vector<pix_pos> width_img_boundaries;
+        std::vector<pix_pos> height_img_boundaries;
 
+        auto last = INT32_MIN;
+        auto count = 0;
+        for (int x = 0; x < lin_width.size(); x++) {
+            if (last < lin_width[x]) {
+                width_img_boundaries.emplace_back(count, x);
+                last = lin_width[x];
+                count = x;
+            }
+        }
+        width_img_boundaries.emplace_back(count, lin_width.size());
+
+        last = INT32_MIN;
+        count = 0;
+        for (int x = 0; x < lin_height.size(); x++) {
+            if (last < lin_height[x]) {
+                height_img_boundaries.emplace_back(count, x);
+                last = lin_height[x];
+                count = x;
+            }
+        }
+        height_img_boundaries.emplace_back(count, lin_height.size());
+
+        QColor pixel_color;
+        //width of boundaries of an organisms
+
+        //width bound, height bound
+        for (auto &w_b: width_img_boundaries) {
+            for (auto &h_b: height_img_boundaries) {
+                for (int x = w_b.start; x < w_b.stop; x++) {
+                    for (int y = h_b.start; y < h_b.stop; y++) {
+                        auto &block = dc.second_simulation_grid[lin_width[x]][lin_height[y]];
+
+                        if (lin_width[x] < 0 ||
+                            lin_width[x] >= dc.simulation_width ||
+                            lin_height[y] < 0 ||
+                            lin_height[y] >= dc.simulation_height) {
+                            pixel_color = color_container.simulation_background_color;
+                            set_image_pixel(x, y, pixel_color);
+                            continue;
+                        }
+
+                        pixel_color = get_texture_color(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type,
+                                                        dc.second_simulation_grid[lin_width[x]][lin_height[y]].rotation,
+                                                        float(x - w_b.start) / (w_b.stop - w_b.start),
+                                                        float(y - h_b.start) / (h_b.stop - h_b.start));
+                        set_image_pixel(x, y, pixel_color);
+                    }
+                }
+            }
+        }
+    } else {
     QColor pixel_color;
     for (int x = 0; x < image_width; x++) {
         for (int y = 0; y < image_height; y++) {
             //TODO maybe rewrite in OpenGL?
             if (lin_width[x] < 0 || lin_width[x] >= dc.simulation_width || lin_height[y] < 0 || lin_height[y] >= dc.simulation_height) {pixel_color = color_container.simulation_background_color;}
-            else {pixel_color = get_color(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type);}
+            else {pixel_color = get_color_simplified(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type);}
             set_image_pixel(x, y, pixel_color);
         }
+    }
     }
 }
 
@@ -365,6 +403,7 @@ void WindowCore::set_simulation_interval(int max_simulation_fps) {
     dc.unlimited_simulation_fps = false;
 }
 
+//Optimization break waiting functions
 #pragma optimize("", off)
 
 #pragma GCC push_options
@@ -509,9 +548,21 @@ void WindowCore::partial_clear_world() {
 
     clear_organisms();
 
-    for (auto & column: dc.CPU_simulation_grid) {for (auto & block: column) { block.type = BlockTypes::EmptyBlock;}}
-    for (auto & column: dc.second_simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
-
+    for (auto & column: dc.CPU_simulation_grid) {
+        for (auto &block: column) {
+            if (!sp.clear_walls_on_reset) {
+                if (block.type == BlockTypes::WallBlock) { continue; }
+            }
+            block.type = BlockTypes::EmptyBlock;
+        }
+    }
+    for (auto & column: dc.second_simulation_grid) {for (auto &block: column) {
+            if (!sp.clear_walls_on_reset) {
+                if (block.type == BlockTypes::WallBlock) { continue; }
+            }
+            block.type = BlockTypes::EmptyBlock;
+        }
+    }
     dc.total_engine_ticks = 0;
 }
 
@@ -547,8 +598,6 @@ void WindowCore::unpause_engine() {
 }
 
 void WindowCore::make_walls() {
-    auto wall_thickness = 1;
-
     for (int x = 0; x < dc.simulation_width; x++) {
         dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
         dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
@@ -720,17 +769,16 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
     _ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
-    _ui.lb_organisms_alive    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
-    _ui.lb_average_move_range ->setText(QString::fromStdString("Average move range: "    + to_str(info.move_range,       float_precision)));
-    _ui.lb_organism_size      ->setText(QString::fromStdString("Average organism size: " + to_str(info.total_avg.size,             float_precision)));
-    _ui.lb_mouth_num          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
-    _ui.lb_producer_num       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.total_avg._producer_blocks, float_precision)));
-    _ui.lb_mover_num          ->setText(QString::fromStdString("Average mover num: "     + to_str(info.total_avg._mover_blocks,    float_precision)));
-    _ui.lb_killer_num         ->setText(QString::fromStdString("Average killer num: "    + to_str(info.total_avg._killer_blocks,   float_precision)));
-    _ui.lb_armor_num          ->setText(QString::fromStdString("Average armor num: "     + to_str(info.total_avg._armor_blocks,    float_precision)));
-    _ui.lb_eye_num            ->setText(QString::fromStdString("Average eye num: "       + to_str(info.total_avg._eye_blocks,      float_precision)));
-    _ui.lb_anatomy_mutation_rate ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
-    _ui.lb_brain_mutation_rate   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
+    _ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
+    _ui.lb_organism_size_4      ->setText(QString::fromStdString("Average organism size: " + to_str(info.total_avg.size,             float_precision)));
+    _ui.lb_mouth_num_4          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
+    _ui.lb_producer_num_4       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.total_avg._producer_blocks, float_precision)));
+    _ui.lb_mover_num_4          ->setText(QString::fromStdString("Average mover num: "     + to_str(info.total_avg._mover_blocks,    float_precision)));
+    _ui.lb_killer_num_4         ->setText(QString::fromStdString("Average killer num: "    + to_str(info.total_avg._killer_blocks,   float_precision)));
+    _ui.lb_armor_num_4          ->setText(QString::fromStdString("Average armor num: "     + to_str(info.total_avg._armor_blocks,    float_precision)));
+    _ui.lb_eye_num_4            ->setText(QString::fromStdString("Average eye num: "       + to_str(info.total_avg._eye_blocks,      float_precision)));
+    _ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Average anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
+    _ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Average brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
 
 
     _ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
@@ -750,7 +798,6 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_organism_size_3      ->setText(QString::fromStdString("Average organism size: " + to_str(info.station_avg.size,             float_precision)));
     _ui.lb_mouth_num_3          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.station_avg._mouth_blocks,    float_precision)));
     _ui.lb_producer_num_3       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.station_avg._producer_blocks, float_precision)));
-    _ui.lb_mover_num_3          ->setText(QString::fromStdString("Average mover num: "     + to_str(info.station_avg._mover_blocks,    float_precision)));
     _ui.lb_killer_num_3         ->setText(QString::fromStdString("Average killer num: "    + to_str(info.station_avg._killer_blocks,   float_precision)));
     _ui.lb_armor_num_3          ->setText(QString::fromStdString("Average armor num: "     + to_str(info.station_avg._armor_blocks,    float_precision)));
     _ui.lb_eye_num_3            ->setText(QString::fromStdString("Average eye num: "       + to_str(info.station_avg._eye_blocks,      float_precision)));
@@ -790,7 +837,6 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_min_move_range                    ->setText(QString::fromStdString(std::to_string(sp.min_move_range)));
     _ui.le_max_move_range                    ->setText(QString::fromStdString(std::to_string(sp.max_move_range)));
 
-
     _ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
     _ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);
     _ui.cb_on_touch_kill                     ->setChecked(sp.on_touch_kill);
@@ -803,6 +849,8 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_self_organism_blocks_block_sight  ->setChecked(sp.organism_self_blocks_block_sight);
     _ui.cb_set_fixed_move_range              ->setChecked(sp.set_fixed_move_range);
     _ui.cb_failed_reproduction_eats_food     ->setChecked(sp.failed_reproduction_eats_food);
+    _ui.cb_rotate_every_move_tick            ->setChecked(sp.rotate_every_move_tick);
+    _ui.cb_apply_damage_directly             ->setChecked(sp.apply_damage_directly);
     //Settings
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
@@ -823,6 +871,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
     _ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
     _ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop);
+    _ui.cb_simplified_rendering->setChecked(simplified_rendering);
 }
 
 void WindowCore::update_simulation_size_label() {

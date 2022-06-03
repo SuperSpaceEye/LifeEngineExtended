@@ -7,7 +7,6 @@
 
 #include <utility>
 #include <boost/unordered_map.hpp>
-#include <boost/random.hpp>
 #include <random>
 
 //#include "../Organism_parts/OrganismBlock.h"
@@ -15,6 +14,7 @@
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "../../BlockTypes.hpp"
 #include "../../GridBlocks/BaseGridBlock.h"
+#include "../../PRNGS/lehmer64.h"
 
 struct pos {
     int x;
@@ -116,7 +116,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
     std::vector<SerializedAdjacentSpaceContainer> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
-//    std::vector<SerializedArmorSpaceContainer   > armor_space;
+    std::vector<SerializedAdjacentSpaceContainer> killing_space;
 
     std::vector<SerializedArmorSpaceContainer   > single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space;
@@ -134,6 +134,7 @@ struct SerializedOrganismStructureContainer {
             std::vector<SerializedOrganismBlockContainer> organism_blocks,
             std::vector<SerializedAdjacentSpaceContainer> producing_space,
             std::vector<SerializedAdjacentSpaceContainer> eating_space,
+            std::vector<SerializedAdjacentSpaceContainer> killing_space,
 //            std::vector<SerializedArmorSpaceContainer>    armor_space,
             std::vector<SerializedArmorSpaceContainer   > single_adjacent_space,
             std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space,
@@ -147,6 +148,7 @@ struct SerializedOrganismStructureContainer {
             organism_blocks                (std::move(organism_blocks)),
             producing_space                (std::move(producing_space)),
             eating_space                   (std::move(eating_space)),
+            killing_space                  (std::move(killing_space)),
 //            armor_space                    (std::move(armor_space)),
 
             single_adjacent_space          (std::move(single_adjacent_space)),
@@ -204,6 +206,11 @@ private:
                                     boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
                                     int32_t mouth_blocks);
 
+    static void create_killing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
+                                     boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
+                                     int32_t killer_blocks);
+
     static void reset_organism_center(std::vector<SerializedOrganismBlockContainer> & _organism_blocks,
                                       boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                       int & x, int & y);
@@ -214,6 +221,8 @@ private:
             const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
+            const boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
+
             const boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space,
@@ -228,13 +237,15 @@ private:
     static int get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map);
 
     SerializedOrganismStructureContainer *add_block(BlockTypes type, int block_choice, Rotation rotation, int x_, int y_);
-    SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, boost::mt19937 *mt);
+    SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, lehmer64 *gen);
     SerializedOrganismStructureContainer *remove_block(int block_choice);
 
 public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
     std::vector<SerializedAdjacentSpaceContainer> _producing_space;
     std::vector<SerializedAdjacentSpaceContainer> _eating_space;
+    std::vector<SerializedAdjacentSpaceContainer> _killing_space;
+
 //    std::vector<SerializedArmorSpaceContainer   > _armor_space;
     std::vector<SerializedArmorSpaceContainer   > _single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
@@ -251,9 +262,9 @@ public:
     explicit Anatomy(const std::shared_ptr<Anatomy>& anatomy);
     Anatomy()=default;
 
-    SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt);
-    SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, boost::mt19937 &mt);
-    SerializedOrganismStructureContainer * remove_random_block(boost::mt19937 &mt);
+    SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt);
+    SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen);
+    SerializedOrganismStructureContainer * remove_random_block(lehmer64 &gen);
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);
 };

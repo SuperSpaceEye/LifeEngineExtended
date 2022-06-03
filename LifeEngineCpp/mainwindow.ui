@@ -1028,7 +1028,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QCheckBox" name="cb_clear_walls_on_reset">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Clear walls on reset</string>
@@ -1116,8 +1116,23 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item>
                      <widget class="QTableWidget" name="table_organism_block_parameters">
+                      <property name="autoScroll">
+                       <bool>false</bool>
+                      </property>
                       <property name="editTriggers">
-                       <set>QAbstractItemView::AllEditTriggers</set>
+                       <set>QAbstractItemView::CurrentChanged</set>
+                      </property>
+                      <property name="selectionMode">
+                       <enum>QAbstractItemView::SingleSelection</enum>
+                      </property>
+                      <property name="showGrid">
+                       <bool>true</bool>
+                      </property>
+                      <property name="gridStyle">
+                       <enum>Qt::SolidLine</enum>
+                      </property>
+                      <property name="wordWrap">
+                       <bool>false</bool>
                       </property>
                       <attribute name="horizontalHeaderVisible">
                        <bool>false</bool>
@@ -1206,6 +1221,9 @@ p, li { white-space: pre-wrap; }
                       <item row="0" column="0">
                        <property name="text">
                         <string>1</string>
+                       </property>
+                       <property name="flags">
+                        <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsDropEnabled|ItemIsUserCheckable|ItemIsEnabled|ItemIsTristate</set>
                        </property>
                       </item>
                       <item row="0" column="1">
@@ -1369,9 +1387,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-799</y>
                   <width>540</width>
-                  <height>971</height>
+                  <height>1005</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1410,7 +1428,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1744,86 +1762,51 @@ p, li { white-space: pre-wrap; }
                      </layout>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_11">
-                      <item>
-                       <widget class="QCheckBox" name="cb_reproducing_rotation_enabled">
-                        <property name="text">
-                         <string>Reproducing rotation enabled</string>
-                        </property>
-                        <property name="checked">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
+                     <widget class="QCheckBox" name="cb_runtime_rotation_enabled">
+                      <property name="text">
+                       <string>Runtime rotation enabled</string>
+                      </property>
+                     </widget>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_27">
-                      <item>
-                       <widget class="QCheckBox" name="cb_runtime_rotation_enabled">
-                        <property name="text">
-                         <string>Runtime rotation enabled</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
+                     <widget class="QCheckBox" name="cb_reproducing_rotation_enabled">
+                      <property name="text">
+                       <string>Reproducing rotation enabled</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_10">
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_10">
-                        <item>
-                         <widget class="QCheckBox" name="cb_on_touch_kill">
-                          <property name="text">
-                           <string>On touch kill</string>
-                          </property>
-                          <property name="checked">
-                           <bool>false</bool>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
+                     <widget class="QCheckBox" name="cb_on_touch_kill">
+                      <property name="text">
+                       <string>On touch kill</string>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_15">
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_17">
-                        <item>
-                         <widget class="QCheckBox" name="cb_movers_can_produce_food">
-                          <property name="text">
-                           <string>Movers can produce food</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
+                     <widget class="QCheckBox" name="cb_movers_can_produce_food">
+                      <property name="text">
+                       <string>Movers can produce food</string>
+                      </property>
+                     </widget>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_13">
-                      <item>
-                       <layout class="QHBoxLayout" name="horizontalLayout_14">
-                        <item>
-                         <widget class="QCheckBox" name="cb_food_blocks_reproduction">
-                          <property name="enabled">
-                           <bool>false</bool>
-                          </property>
-                          <property name="text">
-                           <string>Food blocks reproduction</string>
-                          </property>
-                          <property name="checked">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
-                    </item>
-                    <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_33"/>
+                     <widget class="QCheckBox" name="cb_food_blocks_reproduction">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="text">
+                       <string>Food blocks reproduction</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
                     </item>
                     <item>
                      <layout class="QVBoxLayout" name="verticalLayout_26">
@@ -1939,6 +1922,20 @@ p, li { white-space: pre-wrap; }
                       </property>
                      </widget>
                     </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_rotate_every_move_tick">
+                      <property name="text">
+                       <string>Rotate every move tick</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_apply_damage_directly">
+                      <property name="text">
+                       <string>Apply damage directly</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -1983,9 +1980,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-10</y>
-                  <width>540</width>
-                  <height>617</height>
+                  <y>0</y>
+                  <width>698</width>
+                  <height>338</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2040,13 +2037,6 @@ p, li { white-space: pre-wrap; }
                      <widget class="QLabel" name="lb_total_engine_ticks">
                       <property name="text">
                        <string>Total engine ticks: </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_organisms_alive">
-                      <property name="text">
-                       <string>Organisms alive:</string>
                       </property>
                      </widget>
                     </item>
@@ -2171,13 +2161,6 @@ p, li { white-space: pre-wrap; }
                          </widget>
                         </item>
                         <item>
-                         <widget class="QLabel" name="lb_mover_num_3">
-                          <property name="text">
-                           <string>Average mover num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
                          <widget class="QLabel" name="lb_mouth_num_3">
                           <property name="text">
                            <string>Average mouth num: </string>
@@ -2207,90 +2190,81 @@ p, li { white-space: pre-wrap; }
                         </item>
                        </layout>
                       </item>
+                      <item>
+                       <layout class="QVBoxLayout" name="verticalLayout_10">
+                        <item>
+                         <widget class="QLabel" name="lb_organisms_alive_2">
+                          <property name="text">
+                           <string>Organisms alive:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_organism_size_4">
+                          <property name="text">
+                           <string>Average organism size:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_anatomy_mutation_rate_4">
+                          <property name="text">
+                           <string>Average anatomy mutation rate:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_brain_mutation_rate_4">
+                          <property name="text">
+                           <string>Average brain mutation rate:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_producer_num_4">
+                          <property name="text">
+                           <string>Average producer num: </string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_mover_num_4">
+                          <property name="text">
+                           <string>Average mover num:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_mouth_num_4">
+                          <property name="text">
+                           <string>Average mouth num: </string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_killer_num_4">
+                          <property name="text">
+                           <string>Average killer num:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_armor_num_4">
+                          <property name="text">
+                           <string>Average armor num: </string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_eye_num_4">
+                          <property name="text">
+                           <string>Average eye num: </string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </item>
                      </layout>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_average_move_range">
-                      <property name="text">
-                       <string>Average move range:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_anatomy_mutation_rate">
-                      <property name="text">
-                       <string>Average anatomy mutation rate:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_brain_mutation_rate">
-                      <property name="text">
-                       <string>Average brain mutation rate:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_organism_size">
-                      <property name="text">
-                       <string>Average organism size:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_mouth_num">
-                      <property name="text">
-                       <string>Average mouth num: </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_producer_num">
-                      <property name="text">
-                       <string>Average producer num: </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_mover_num">
-                      <property name="text">
-                       <string>Average mover num:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_killer_num">
-                      <property name="text">
-                       <string>Average killer num:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_armor_num">
-                      <property name="text">
-                       <string>Average armor num: </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_eye_num">
-                      <property name="text">
-                       <string>Average eye num: </string>
-                      </property>
-                     </widget>
                     </item>
                    </layout>
                   </widget>
@@ -2338,7 +2312,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>540</width>
-                  <height>267</height>
+                  <height>292</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2521,6 +2495,13 @@ p, li { white-space: pre-wrap; }
                        <widget class="QLineEdit" name="le_font_size"/>
                       </item>
                      </layout>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_simplified_rendering">
+                      <property name="text">
+                       <string>Simplified rendering</string>
+                      </property>
+                     </widget>
                     </item>
                    </layout>
                   </widget>
@@ -3653,11 +3634,59 @@ p, li { white-space: pre-wrap; }
    <sender>cb_wait_for_engine_to_stop</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>cb_wait_for_engine_to_stop(bool)</slot>
+   <slot>cb_wait_for_engine_to_stop_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>647</x>
      <y>871</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_rotate_every_move_tick</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_rotate_every_move_tick_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>865</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_simplified_rendering</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_simplified_rendering_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>883</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_apply_damage_directly</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_apply_damage_directly_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>865</y>
     </hint>
     <hint type="destinationlabel">
      <x>466</x>
@@ -3737,11 +3766,14 @@ p, li { white-space: pre-wrap; }
   <slot>cb_failed_reproduction_eats_food_slot(bool)</slot>
   <slot>le_auto_produce_food_every_n_tick_slot()</slot>
   <slot>table_cell_changed_slot(int,int)</slot>
-  <slot>cb_wait_for_engine_to_stop(bool)</slot>
+  <slot>cb_wait_for_engine_to_stop_slot(bool)</slot>
+  <slot>cb_rotate_every_move_tick_slot(bool)</slot>
+  <slot>cb_simplified_rendering_slot(bool)</slot>
+  <slot>cb_apply_damage_directly_slot(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="editor_modes"/>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
