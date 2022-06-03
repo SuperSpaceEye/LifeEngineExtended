@@ -8,7 +8,7 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
                                                                    EngineControlParameters *cp,
                                                                    OrganismBlockParameters *bp,
                                                                    SimulationParameters *sp,
-                                                                   boost::mt19937 *mt) {
+                                                                   lehmer64 *gen) {
     for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
     dc->to_place_organisms.clear();
 
@@ -30,9 +30,9 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     start_stage(dc, PartialSimulationStage::GetObservations, simulation_organism_thread_points);
 
     start_stage(dc, PartialSimulationStage::ThinkDecision, simulation_organism_thread_points);
-    for (int i = 0; i < dc->organisms.size(); i++)  {SimulationEngineSingleThread::make_decision(dc, sp, dc->organisms[i], mt);}
+    for (int i = 0; i < dc->organisms.size(); i++)  {SimulationEngineSingleThread::make_decision(dc, sp, dc->organisms[i], gen);}
 
-    for (auto & organism: dc->organisms) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
+    for (auto & organism: dc->organisms) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
 }
 
 void SimulationEnginePartialMultiThread::build_threads(EngineDataContainer &dc, EngineControlParameters &cp,
@@ -111,7 +111,7 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
     }
 }
 
-//void SimulationEnginePartialMultiThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 & mt) {
+//void SimulationEnginePartialMultiThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 & gen) {
 //    if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
 //    if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
 //    if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
@@ -120,7 +120,7 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
 //        for (auto & pc: organism->organism_anatomy->_producing_space) {
 //            //TODO locking here?
 //            if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
-//                if (std::uniform_real_distribution<float>(0, 1)(mt) < sp->food_production_probability) {
+//                if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability) {
 //                    dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
 //                    break;
 //                }
@@ -225,8 +225,8 @@ void SimulationEnginePartialMultiThread::get_observations(EngineDataContainer *d
 }
 
 void SimulationEnginePartialMultiThread::thread_tick(PartialSimulationStage stage, EngineDataContainer *dc,
-                                                SimulationParameters *sp, boost::mt19937 *mt, int start_pos,
-                                                int end_pos, int thread_num) {
+                                                     SimulationParameters *sp, lehmer64 *gen, int start_pos,
+                                                     int end_pos, int thread_num) {
     switch (stage) {
         case PartialSimulationStage::PlaceOrganisms:
             for (int i = start_pos; i < end_pos; i++) {
@@ -235,7 +235,7 @@ void SimulationEnginePartialMultiThread::thread_tick(PartialSimulationStage stag
             break;
         case PartialSimulationStage::ProduceFood:
             for (int i = start_pos; i < end_pos; i++) {
-                SimulationEngineSingleThread::produce_food(dc, sp, dc->organisms[i], *mt);
+                SimulationEngineSingleThread::produce_food(dc, sp, dc->organisms[i], *gen);
             }
             break;
         case PartialSimulationStage::EatFood:
@@ -262,7 +262,7 @@ void SimulationEnginePartialMultiThread::thread_tick(PartialSimulationStage stag
             break;
         case PartialSimulationStage::ThinkDecision:
             for (int i = start_pos; i < end_pos; i++) {
-                dc->organisms[i]->think_decision(dc->threaded_organisms_observations[i], mt);
+                dc->organisms[i]->think_decision(dc->threaded_organisms_observations[i], gen);
             }
             break;
     }

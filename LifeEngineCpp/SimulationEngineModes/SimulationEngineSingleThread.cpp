@@ -5,14 +5,14 @@
 #include "../SimulationEngine.h"
 #include "SimulationEngineSingleThread.h"
 
-void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, boost::mt19937 *mt) {
+void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, lehmer64 *gen) {
     for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
     dc->to_place_organisms.clear();
 
     auto to_erase = std::vector<int>{};
 
     for (auto & organism: dc->organisms) {eat_food(dc, sp, organism);}
-    for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *mt);}
+    for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *gen);}
 
     if (sp->killer_damage_amount > 0) {
         for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
@@ -25,10 +25,18 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     reserve_observations(organisms_observations, dc->organisms, sp);
     get_observations(dc, sp, dc->organisms, organisms_observations);
 
-    for (int i = 0; i < dc->organisms.size(); i++)  {dc->organisms[i]->think_decision(organisms_observations[i], mt);}
-    for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], mt);}
+    for (int i = 0; i < dc->organisms.size(); i++)  {dc->organisms[i]->think_decision(organisms_observations[i], gen);}
+    for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], gen);}
 
-    for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, mt);}
+    for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
+}
+
+constexpr
+Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
+    int new_int_rotation = static_cast<int>(rotation1)+static_cast<int>(rotation2);
+    if (new_int_rotation < 0) {new_int_rotation+=4;}
+    if (new_int_rotation > 3) {new_int_rotation-=4;}
+    return static_cast<Rotation>(new_int_rotation);
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
@@ -38,14 +46,16 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+        [organism->y + block.get_pos(organism->rotation).y].rotation = get_global_rotation(block.rotation,
+                                                                                           organism->rotation);
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].organism = organism;
     }
 }
 
 //Each producer will add one run of producing a food
-void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 &mt) {
+//TODO produce_food is the most resource intensive stage of simulation (according to perf).
+void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
     if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
     if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
@@ -54,7 +64,7 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, Simula
         for (auto & pc: organism->organism_anatomy->_producing_space) {
             //if (check_if_out_of_bounds(dc, organism, pc)) {continue;}
             if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
-                if (std::uniform_real_distribution<float>(0, 1)(mt) < sp->food_production_probability) {
+                if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability) {
                     dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
                     break;
                 }
@@ -90,11 +100,39 @@ void SimulationEngineSingleThread::erase_organisms(EngineDataContainer *dc, std:
 }
 
 void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
-    for (auto & block: organism->organism_anatomy->_single_adjacent_space) {
-        if (block.is_armored) {continue;}
-        if (dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type == KillerBlock) {
-            if (sp->on_touch_kill) { organism->damage = organism->life_points + 1; break;}
-            organism->damage += sp->killer_damage_amount;
+    if (sp->apply_damage_directly) {
+        for (auto &block: organism->organism_anatomy->_killing_space) {
+            auto world_block = dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][
+                    organism->y + block.get_pos(organism->rotation).y];
+            switch (world_block.type) {
+                case BlockTypes::EmptyBlock:
+                case BlockTypes::FoodBlock:
+                case BlockTypes::WallBlock:
+                case BlockTypes::ArmorBlock:
+                    continue;
+                default:
+                    break;
+            }
+//            if (world_block.type == BlockTypes::EmptyBlock ||
+//                world_block.type == BlockTypes::FoodBlock  ||
+//                world_block.type == BlockTypes::WallBlock  ||
+//                world_block.type == BlockTypes::ArmorBlock
+//                ) {continue;}
+            if (world_block.organism != nullptr) {
+                if (sp->on_touch_kill) {
+                    world_block.organism->damage = world_block.organism->life_points + 1;
+                    break;
+                }
+                world_block.organism->damage += sp->killer_damage_amount;
+            }
+        }
+    } else {
+        for (auto & block: organism->organism_anatomy->_single_adjacent_space) {
+            if (block.is_armored) {continue;}
+            if (dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type == KillerBlock) {
+                if (sp->on_touch_kill) { organism->damage = organism->life_points + 1; break;}
+                organism->damage += sp->killer_damage_amount;
+            }
         }
     }
 }
@@ -221,7 +259,8 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].type = block.type;
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+        [organism->y + block.get_pos(organism->rotation).y].rotation = get_global_rotation(block.rotation,
+                                                                                           organism->rotation);
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
@@ -229,7 +268,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     }
 }
 
-void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision, boost::mt19937 * mt) {
+void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision) {
     // rotates movement relative to simulation grid
 
     int new_x = organism->x;
@@ -272,7 +311,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
         dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
         [new_y + block.get_pos(organism->rotation).y].type = block.type;
         dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-        [new_y + block.get_pos(organism->rotation).y].rotation = block.rotation;
+        [new_y + block.get_pos(organism->rotation).y].rotation = get_global_rotation(block.rotation, organism->rotation);
         dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
         [new_y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
         dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
@@ -283,17 +322,17 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer * dc, Organ
     organism->y = new_y;
 }
 
-void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, boost::mt19937 * mt) {
+void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen) {
     switch (organism->last_decision.decision) {
         case BrainDecision::MoveUp:
         case BrainDecision::MoveDown:
         case BrainDecision::MoveLeft:
         case BrainDecision::MoveRight:
             if (organism->organism_anatomy->_mover_blocks > 0) {
-                move_organism(dc, organism, organism->last_decision.decision, mt);
+                move_organism(dc, organism, organism->last_decision.decision);
                 if (sp->rotate_every_move_tick && organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
                     rotate_organism(dc, organism,
-                                    static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*mt)));
+                                    static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)));
                 }
                 organism->move_counter++;
             }
@@ -312,34 +351,34 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
     if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_move_range == organism->move_counter)) {
         organism->move_counter = 0;
         if (!sp->rotate_every_move_tick && organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-            rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*mt)));
+            rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)));
         }
     }
 }
 
 void SimulationEngineSingleThread::try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                                                  std::vector<Organism *> &child_organisms, boost::mt19937 *mt) {
-    if (!organism->child_ready) {organism->child_pattern = organism->create_child(mt); organism->child_ready=true;}
+                                                  std::vector<Organism *> &child_organisms, lehmer64 *gen) {
+    if (!organism->child_ready) {organism->child_pattern = organism->create_child(gen); organism->child_ready=true;}
     // if max_organisms < 0, then unlimited.
     if (dc->max_organisms >= 0 && dc->organisms.size() + dc->to_place_organisms.size() >= dc->max_organisms) {return;}
     if (organism->food_collected >= organism->child_pattern->food_needed) {
         if (sp->failed_reproduction_eats_food) {organism->food_collected -= organism->child_pattern->food_needed;}
-        place_child(dc, sp, organism, child_organisms, mt);}
+        place_child(dc, sp, organism, child_organisms, gen);}
 }
 
 void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                                               std::vector<Organism *> &child_organisms, boost::mt19937 *mt) {
-    auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
+                                               std::vector<Organism *> &child_organisms, lehmer64 *gen) {
+    auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*gen));
     Rotation rotation;
     if (sp->reproduction_rotation_enabled) {
-        rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
+        rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*gen));
     } else {
         rotation = Rotation::UP;
     }
 
     int distance = sp->min_reproducing_distance;
     if (!sp->reproduction_distance_fixed) {
-        distance = std::uniform_int_distribution<int>(sp->min_reproducing_distance, sp->max_reproducing_distance)(*mt);
+        distance = std::uniform_int_distribution<int>(sp->min_reproducing_distance, sp->max_reproducing_distance)(*gen);
     }
     //UP - min_y,
     //LEFT - min_x

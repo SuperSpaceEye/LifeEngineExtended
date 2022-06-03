@@ -243,6 +243,7 @@ public:
     QLineEdit *le_move_range_delimiter;
     QCheckBox *cb_failed_reproduction_eats_food;
     QCheckBox *cb_rotate_every_move_tick;
+    QCheckBox *cb_apply_damage_directly;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -253,7 +254,6 @@ public:
     QLabel *lb_simulation_size;
     QLabel *lb_organisms_memory_consumption;
     QLabel *lb_total_engine_ticks;
-    QLabel *lb_organisms_alive;
     QHBoxLayout *horizontalLayout_47;
     QVBoxLayout *verticalLayout_38;
     QLabel *lb_moving_organisms;
@@ -312,8 +312,8 @@ public:
     QLabel *label_25;
     QLineEdit *le_font_size;
     QCheckBox *cb_simplified_rendering;
-    QButtonGroup *simulation_modes;
     QButtonGroup *editor_modes;
+    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
@@ -938,7 +938,7 @@ public:
 
         cb_clear_walls_on_reset = new QCheckBox(widget_3);
         cb_clear_walls_on_reset->setObjectName(QStringLiteral("cb_clear_walls_on_reset"));
-        cb_clear_walls_on_reset->setEnabled(false);
+        cb_clear_walls_on_reset->setEnabled(true);
 
         verticalLayout_22->addWidget(cb_clear_walls_on_reset);
 
@@ -1102,7 +1102,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 976));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -799, 540, 1005));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1520,6 +1520,11 @@ public:
 
         verticalLayout_20->addWidget(cb_rotate_every_move_tick);
 
+        cb_apply_damage_directly = new QCheckBox(widget);
+        cb_apply_damage_directly->setObjectName(QStringLiteral("cb_apply_damage_directly"));
+
+        verticalLayout_20->addWidget(cb_apply_damage_directly);
+
 
         verticalLayout_9->addWidget(widget);
 
@@ -1540,7 +1545,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(-158, -92, 698, 361));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 698, 338));
         QSizePolicy sizePolicy9(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1570,11 +1575,6 @@ public:
         lb_total_engine_ticks->setObjectName(QStringLiteral("lb_total_engine_ticks"));
 
         verticalLayout_37->addWidget(lb_total_engine_ticks);
-
-        lb_organisms_alive = new QLabel(widget_5);
-        lb_organisms_alive->setObjectName(QStringLiteral("lb_organisms_alive"));
-
-        verticalLayout_37->addWidget(lb_organisms_alive);
 
         horizontalLayout_47 = new QHBoxLayout();
         horizontalLayout_47->setObjectName(QStringLiteral("horizontalLayout_47"));
@@ -1767,7 +1767,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -78, 540, 292));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 292));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -1983,8 +1983,9 @@ public:
         QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop_slot(bool)));
         QObject::connect(cb_rotate_every_move_tick, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_rotate_every_move_tick_slot(bool)));
         QObject::connect(cb_simplified_rendering, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_rendering_slot(bool)));
+        QObject::connect(cb_apply_damage_directly, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_apply_damage_directly_slot(bool)));
 
-        Tabs->setCurrentIndex(4);
+        Tabs->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
 
 
@@ -2187,11 +2188,11 @@ public:
         label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", Q_NULLPTR));
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", Q_NULLPTR));
         cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", Q_NULLPTR));
+        cb_apply_damage_directly->setText(QApplication::translate("MainWindow", "Apply damage directly", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", Q_NULLPTR));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", Q_NULLPTR));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", Q_NULLPTR));
         lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", Q_NULLPTR));
-        lb_organisms_alive->setText(QApplication::translate("MainWindow", "Organisms alive:", Q_NULLPTR));
         lb_moving_organisms->setText(QApplication::translate("MainWindow", "Moving organisms:", Q_NULLPTR));
         lb_organisms_with_eyes->setText(QApplication::translate("MainWindow", "Organisms with eyes:", Q_NULLPTR));
         lb_organism_size_2->setText(QApplication::translate("MainWindow", "Average organism size:", Q_NULLPTR));

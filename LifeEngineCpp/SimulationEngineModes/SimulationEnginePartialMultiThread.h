@@ -19,6 +19,7 @@
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Linspace.h"
 #include "SimulationEngineSingleThread.h"
+#include "../PRNGS/lehmer64.h"
 
 struct EngineDataContainer;
 struct eager_worker_partial;
@@ -59,7 +60,7 @@ public:
     static void
     partial_multi_thread_tick(EngineDataContainer *dc, EngineControlParameters *cp,
                               OrganismBlockParameters *bp, SimulationParameters *sp,
-                              boost::mt19937 *mt);
+                              lehmer64 *gen);
 
     static void build_threads(EngineDataContainer &dc, EngineControlParameters &cp,
                               SimulationParameters &sp);
@@ -67,9 +68,8 @@ public:
     static void kill_threads(EngineDataContainer &dc);
 
     static void thread_tick(PartialSimulationStage stage, EngineDataContainer *dc,
-                            SimulationParameters *sp, boost::mt19937 *mt, int start_pos,
+                            SimulationParameters *sp, lehmer64 *gen, int start_pos,
                             int end_pos, int thread_num);
-
 };
 
 struct eager_worker_partial {
@@ -80,19 +80,19 @@ struct eager_worker_partial {
     int thread_num;
 
     std::random_device r;
-    boost::mt19937 mt;
+    lehmer64 gen;
 
     eager_worker_partial() = default;
     eager_worker_partial(EngineDataContainer * dc, SimulationParameters * sp, int thread_num):
             dc(dc), sp(sp), thread_num(thread_num){
-        auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
-        mt = boost::mt19937(seed);
+//        auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
+        gen = lehmer64(r());
         thread = std::thread{&eager_worker_partial::main_loop, this};
     }
     eager_worker_partial(const eager_worker_partial & worker):
             dc(worker.dc), sp(worker.sp), thread_num(worker.thread_num){
-        auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
-        mt = boost::mt19937(seed);
+//        auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
+        gen = lehmer64(r());
         thread = std::thread{&eager_worker_partial::main_loop, this};
     }
 
@@ -145,7 +145,7 @@ private:
                     return;
                 }
             }
-            SimulationEnginePartialMultiThread::thread_tick(thread_stage, dc, sp, &mt, start_pos, end_pos, thread_num);
+            SimulationEnginePartialMultiThread::thread_tick(thread_stage, dc, sp, &gen, start_pos, end_pos, thread_num);
             has_work = false;
         }
     }

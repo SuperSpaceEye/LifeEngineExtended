@@ -31,8 +31,8 @@ WindowCore::WindowCore(QWidget *parent) :
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
     boost::random_device rd;
-    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
-    mt = boost::mt19937(sd);
+//    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    gen = lehmer64(rd());
 
     color_container = ColorContainer{};
     sp = SimulationParameters{};
@@ -301,14 +301,6 @@ void inline WindowCore::calculate_truncated_linspace(
     truncated_lin_height.pop_back();
 }
 
-constexpr
-Rotation get_rotation(Rotation rotation1, Rotation rotation2) {
-    int new_int_rotation = static_cast<int>(rotation1)+static_cast<int>(rotation2);
-    if (new_int_rotation < 0) {new_int_rotation+=4;}
-    if (new_int_rotation > 3) {new_int_rotation-=4;}
-    return static_cast<Rotation>(new_int_rotation);
-}
-
 void inline WindowCore::image_for_loop(int image_width, int image_height,
                                        std::vector<int> &lin_width,
                                        std::vector<int> &lin_height,
@@ -360,14 +352,8 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
                             continue;
                         }
 
-                        auto rotation = dc.second_simulation_grid[lin_width[x]][lin_height[y]].rotation;
-                        if (dc.second_simulation_grid[lin_width[x]][lin_height[y]].type == BlockTypes::EyeBlock) {
-                            rotation = get_rotation(rotation,
-                                                    dc.second_simulation_grid[lin_width[x]][lin_height[y]].organism->rotation);
-                        }
-
                         pixel_color = get_texture_color(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type,
-                                                        rotation,
+                                                        dc.second_simulation_grid[lin_width[x]][lin_height[y]].rotation,
                                                         float(x - w_b.start) / (w_b.stop - w_b.start),
                                                         float(y - h_b.start) / (h_b.stop - h_b.start));
                         set_image_pixel(x, y, pixel_color);
@@ -562,9 +548,21 @@ void WindowCore::partial_clear_world() {
 
     clear_organisms();
 
-    for (auto & column: dc.CPU_simulation_grid) {for (auto & block: column) { block.type = BlockTypes::EmptyBlock;}}
-    for (auto & column: dc.second_simulation_grid)        {for (auto & block: column) {block.type = BlockTypes::EmptyBlock;}}
-
+    for (auto & column: dc.CPU_simulation_grid) {
+        for (auto &block: column) {
+            if (!sp.clear_walls_on_reset) {
+                if (block.type == BlockTypes::WallBlock) { continue; }
+            }
+            block.type = BlockTypes::EmptyBlock;
+        }
+    }
+    for (auto & column: dc.second_simulation_grid) {for (auto &block: column) {
+            if (!sp.clear_walls_on_reset) {
+                if (block.type == BlockTypes::WallBlock) { continue; }
+            }
+            block.type = BlockTypes::EmptyBlock;
+        }
+    }
     dc.total_engine_ticks = 0;
 }
 
@@ -852,6 +850,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_set_fixed_move_range              ->setChecked(sp.set_fixed_move_range);
     _ui.cb_failed_reproduction_eats_food     ->setChecked(sp.failed_reproduction_eats_food);
     _ui.cb_rotate_every_move_tick            ->setChecked(sp.rotate_every_move_tick);
+    _ui.cb_apply_damage_directly             ->setChecked(sp.apply_damage_directly);
     //Settings
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
