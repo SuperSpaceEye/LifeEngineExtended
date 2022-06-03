@@ -11,8 +11,8 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
     mutex(mutex), dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
 
     boost::random_device rd;
-    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
-    mt = boost::mt19937(sd);
+//    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
+    gen = lehmer64(rd());
 }
 
 //TODO refactor pausing/pass_tick/synchronise_tick
@@ -132,10 +132,10 @@ void SimulationEngine::simulation_tick() {
 
     switch (cp.simulation_mode){
         case SimulationModes::CPU_Single_Threaded:
-            SimulationEngineSingleThread::single_threaded_tick(&dc, &sp, &mt);
+            SimulationEngineSingleThread::single_threaded_tick(&dc, &sp, &gen);
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:
-            SimulationEnginePartialMultiThread::partial_multi_thread_tick(&dc, &cp, &op, &sp, &mt);
+            SimulationEnginePartialMultiThread::partial_multi_thread_tick(&dc, &cp, &op, &sp, &gen);
             break;
         case SimulationModes::CPU_Multi_Threaded:
             multi_threaded_tick();
@@ -235,8 +235,8 @@ void SimulationEngine::random_food_drop() {
     if (sp.auto_produce_food_every_n_ticks <= 0) {return;}
     if (dc.engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
-            int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(mt);
-            int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(mt);
+            int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(gen);
+            int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(gen);
             dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
         }
     }

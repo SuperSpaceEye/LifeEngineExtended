@@ -16,6 +16,7 @@ set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 62)
+set(AUTO_UI_FILE_REBUILDING 0)
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
@@ -37,21 +38,23 @@ find_package(Boost COMPONENTS random REQUIRED)
 #find_package(OpenMP)
 if(CUDA_FOUND)
     add_compile_definitions(__CUDA_USED__=1)
-    set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cpp LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.h LifeEngineCpp/Organism/CUDA/CUDA_Brain.cpp LifeEngineCpp/Organism/CUDA/CUDA_Brain.h LifeEngineCpp/Organism/CUDA/CUDA_Organism.cpp LifeEngineCpp/Organism/CUDA/CUDA_Organism.h LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.h)
+    set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cpp LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.h LifeEngineCpp/Organism/CUDA/CUDA_Brain.cpp LifeEngineCpp/Organism/CUDA/CUDA_Brain.h LifeEngineCpp/Organism/CUDA/CUDA_Organism.cpp LifeEngineCpp/Organism/CUDA/CUDA_Organism.h LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.h LifeEngineCpp/PRNGS/splitmix64.h LifeEngineCpp/PRNGS/lehmer64.h LifeEngineCpp/PRNGS/basegen.h LifeEngineCpp/PRNGS/shufflebag.h)
 else()
     add_compile_definitions(__CUDA_USED__=0)
 endif()
 
-add_custom_target(
-        run ALL
-        COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/LifeEngineCpp/mainwindow.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/WindowUI.h"
-        BYPRODUCTS WindowUI.h
-        COMMENT "Generating UI header file."
-)
+add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.cpp LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_SOURCES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h)
 
-add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.cpp LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_SOURCES})
+if (AUTO_UI_FILE_REBUILDING)
+    add_custom_target(
+            run ALL
+            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/LifeEngineCpp/mainwindow.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/WindowUI.h"
+            BYPRODUCTS WindowUI.h
+            COMMENT "Generating UI header file."
+    )
 
-add_dependencies(${PROJECT_NAME} run)
+    add_dependencies(${PROJECT_NAME} run)
+endif()
 
 if (Qt5_FOUND)
     #https://gitlab.kitware.com/cmake/cmake/-/issues/16915

@@ -56,6 +56,7 @@ struct SimulationParameters {
         bool organism_self_blocks_block_sight = false;
         bool failed_reproduction_eats_food = true;
         bool rotate_every_move_tick = false;
+        bool apply_damage_directly = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

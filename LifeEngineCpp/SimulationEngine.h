@@ -22,6 +22,7 @@
 #include "Containers/CPU/OrganismBlockParameters.h"
 #include "Linspace.h"
 #include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
+#include "PRNGS/lehmer64.h"
 
 
 //TODO move simulation grid translation to here
@@ -48,7 +49,8 @@ class SimulationEngine {
 
     void random_food_drop();
 
-    boost::mt19937 mt;
+    //lehmer is like 2 times faster than mt19937
+    lehmer64 gen;
 
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
@@ -57,67 +59,5 @@ public:
     void threaded_mainloop();
 
 };
-
-//struct eager_worker_partial {
-//    EngineDataContainer * dc = nullptr;
-//    int start_relative_x = 0;
-//    int start_relative_y = 0;
-//    int end_relative_x = 0;
-//    int end_relative_y = 0;
-//
-//    std::random_device rd;
-//    std::mt19937 mt;
-//
-//    eager_worker_partial() = default;
-//    eager_worker_partial(EngineDataContainer * dc, int start_relative_x, int start_relative_y, int end_relative_x, int end_relative_y):
-//            dc(dc), start_relative_x(start_relative_x), start_relative_y(start_relative_y), end_relative_x(end_relative_x), end_relative_y(end_relative_y){
-//        mt = std::mt19937(rd());
-//    }
-//    eager_worker_partial(const eager_worker_partial & worker):
-//            dc(worker.dc), start_relative_x(worker.start_relative_x), start_relative_y(worker.start_relative_y),
-//            end_relative_x(worker.end_relative_x), end_relative_y(worker.end_relative_y){
-//        mt = std::mt19937(rd());
-//    }
-//
-//    inline void work() {
-//        has_work = true;
-//    }
-//
-//    inline void finish() {
-//        while (has_work) {}
-//    }
-//
-//    inline void stop_work() {
-//        has_work = true;
-//        exiting = true;
-//    }
-//
-//    inline eager_worker_partial_partial() { stop_thread(); }
-//    inline void stop_thread() {
-//        exiting = true;
-//        has_work = true;
-//        if (thread.joinable()) {
-//            thread.join();
-//        }
-//    }
-//private:
-//    bool has_work = false;
-//
-//    bool exiting = false;
-//    bool thread_started = false;
-//
-//    std::thread thread = std::thread([this] {
-//        thread_started = true;
-//        while (true) {
-//            while (!has_work) {
-//                if (exiting) {
-//                    return;
-//                }
-//            }
-//            SimulationEngine::single_threaded_tick(dc, &mt, start_relative_x, start_relative_y, end_relative_x, end_relative_y);
-//            has_work = false;
-//        }
-//    });
-//};
 
 #endif //LANGUAGES_LIFEENGINE_H

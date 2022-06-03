@@ -485,6 +485,8 @@ void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotat
 
 void WindowCore::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
 
+void WindowCore::cb_apply_damage_directly_slot           (bool state) { sp.apply_damage_directly = state;}
+
 //==================== Table ====================
 
 void WindowCore::table_cell_changed_slot(int row, int col) {

@@ -39,6 +39,7 @@
 #include "Containers/CPU/OrganismBlockParameters.h"
 #include "WindowUI.h"
 #include "OrganismEditor.h"
+#include "PRNGS/lehmer64.h"
 
 enum class CursorMode {
     ModifyFood,
@@ -235,7 +236,7 @@ private:
     Organism * base_organism;
     Organism * chosen_organism;
 
-    boost::mt19937 mt;
+    lehmer64 gen;
 
     bool menu_hidden = false;
     bool allow_menu_hidden_change = true;
@@ -397,6 +398,7 @@ private slots:
     void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_rotate_every_move_tick_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
+    void cb_apply_damage_directly_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 
