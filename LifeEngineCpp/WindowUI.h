@@ -244,7 +244,9 @@ public:
     QCheckBox *cb_failed_reproduction_eats_food;
     QCheckBox *cb_rotate_every_move_tick;
     QCheckBox *cb_apply_damage_directly;
-    QCheckBox *cb_exponential_food_production;
+    QCheckBox *cb_multiply_food_production_prob;
+    QCheckBox *cb_simplified_food_production;
+    QCheckBox *cb_stop_when_one_food_generated;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -315,6 +317,10 @@ public:
     QLabel *label_25;
     QLineEdit *le_font_size;
     QCheckBox *cb_simplified_rendering;
+    QHBoxLayout *horizontalLayout_10;
+    QLabel *label_46;
+    QLineEdit *le_update_info_every_n_milliseconds;
+    QCheckBox *cb_synchronise_info_with_window;
     QButtonGroup *editor_modes;
     QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
@@ -414,7 +420,7 @@ public:
 
         le_sps = new QLineEdit(frame_2);
         le_sps->setObjectName(QStringLiteral("le_sps"));
-        le_sps->setEnabled(false);
+        le_sps->setEnabled(true);
 
         horizontalLayout_5->addWidget(le_sps);
 
@@ -1105,7 +1111,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -828, 540, 1034));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 1092));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1528,10 +1534,20 @@ public:
 
         verticalLayout_20->addWidget(cb_apply_damage_directly);
 
-        cb_exponential_food_production = new QCheckBox(widget);
-        cb_exponential_food_production->setObjectName(QStringLiteral("cb_exponential_food_production"));
+        cb_multiply_food_production_prob = new QCheckBox(widget);
+        cb_multiply_food_production_prob->setObjectName(QStringLiteral("cb_multiply_food_production_prob"));
 
-        verticalLayout_20->addWidget(cb_exponential_food_production);
+        verticalLayout_20->addWidget(cb_multiply_food_production_prob);
+
+        cb_simplified_food_production = new QCheckBox(widget);
+        cb_simplified_food_production->setObjectName(QStringLiteral("cb_simplified_food_production"));
+
+        verticalLayout_20->addWidget(cb_simplified_food_production);
+
+        cb_stop_when_one_food_generated = new QCheckBox(widget);
+        cb_stop_when_one_food_generated->setObjectName(QStringLiteral("cb_stop_when_one_food_generated"));
+
+        verticalLayout_20->addWidget(cb_stop_when_one_food_generated);
 
 
         verticalLayout_9->addWidget(widget);
@@ -1784,7 +1800,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 292));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -194, 540, 400));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -1796,7 +1812,7 @@ public:
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(scrollAreaWidgetContents);
         widget_2->setObjectName(QStringLiteral("widget_2"));
-        widget_2->setMinimumSize(QSize(0, 0));
+        widget_2->setMinimumSize(QSize(0, 400));
         widget_2->setBaseSize(QSize(0, 0));
         verticalLayout_19 = new QVBoxLayout(widget_2);
         verticalLayout_19->setSpacing(2);
@@ -1900,6 +1916,26 @@ public:
 
         verticalLayout_19->addWidget(cb_simplified_rendering);
 
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
+        label_46 = new QLabel(widget_2);
+        label_46->setObjectName(QStringLiteral("label_46"));
+
+        horizontalLayout_10->addWidget(label_46);
+
+        le_update_info_every_n_milliseconds = new QLineEdit(widget_2);
+        le_update_info_every_n_milliseconds->setObjectName(QStringLiteral("le_update_info_every_n_milliseconds"));
+
+        horizontalLayout_10->addWidget(le_update_info_every_n_milliseconds);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_10);
+
+        cb_synchronise_info_with_window = new QCheckBox(widget_2);
+        cb_synchronise_info_with_window->setObjectName(QStringLiteral("cb_synchronise_info_with_window"));
+
+        verticalLayout_19->addWidget(cb_synchronise_info_with_window);
+
 
         verticalLayout_5->addWidget(widget_2);
 
@@ -2001,9 +2037,13 @@ public:
         QObject::connect(cb_rotate_every_move_tick, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_rotate_every_move_tick_slot(bool)));
         QObject::connect(cb_simplified_rendering, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_rendering_slot(bool)));
         QObject::connect(cb_apply_damage_directly, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_apply_damage_directly_slot(bool)));
-        QObject::connect(cb_exponential_food_production, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_exponential_food_production_slot(bool)));
+        QObject::connect(cb_multiply_food_production_prob, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_multiply_food_production_prob_slot(bool)));
+        QObject::connect(cb_simplified_food_production, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_food_production_slot(bool)));
+        QObject::connect(cb_stop_when_one_food_generated, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_stop_when_one_food_generated(bool)));
+        QObject::connect(cb_synchronise_info_with_window, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_synchronise_info_with_window_slot(bool)));
+        QObject::connect(le_update_info_every_n_milliseconds, SIGNAL(returnPressed()), MainWindow, SLOT(le_update_info_every_n_milliseconds_slot()));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(5);
         stackedWidget->setCurrentIndex(0);
 
 
@@ -2207,7 +2247,9 @@ public:
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", Q_NULLPTR));
         cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", Q_NULLPTR));
         cb_apply_damage_directly->setText(QApplication::translate("MainWindow", "Apply damage directly", Q_NULLPTR));
-        cb_exponential_food_production->setText(QApplication::translate("MainWindow", "Exponential food production", Q_NULLPTR));
+        cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability", Q_NULLPTR));
+        cb_simplified_food_production->setText(QApplication::translate("MainWindow", "Simplified food production", Q_NULLPTR));
+        cb_stop_when_one_food_generated->setText(QApplication::translate("MainWindow", "Stop when one food generated", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", Q_NULLPTR));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", Q_NULLPTR));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", Q_NULLPTR));
@@ -2256,6 +2298,8 @@ public:
         cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to stop", Q_NULLPTR));
         label_25->setText(QApplication::translate("MainWindow", "Font size:", Q_NULLPTR));
         cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", Q_NULLPTR));
+        label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", Q_NULLPTR));
+        cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", Q_NULLPTR));
     } // retranslateUi
 

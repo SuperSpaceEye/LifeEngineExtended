@@ -23,8 +23,8 @@ set(AUTO_UI_FILE_REBUILDING 0)
 #set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
 
 #for perf
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
 find_package(CUDA)
 find_package(Qt5 COMPONENTS
@@ -34,6 +34,8 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 find_package(Boost COMPONENTS random REQUIRED)
+
+add_compile_definitions(__VALGRIND_MODE__=0)
 
 #find_package(OpenMP)
 if(CUDA_FOUND)

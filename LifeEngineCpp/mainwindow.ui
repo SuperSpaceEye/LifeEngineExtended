@@ -203,7 +203,7 @@
            <item>
             <widget class="QLineEdit" name="le_sps">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
               <string>-1</string>
@@ -1387,9 +1387,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-828</y>
+                  <y>0</y>
                   <width>540</width>
-                  <height>1034</height>
+                  <height>1092</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1428,7 +1428,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1937,9 +1937,23 @@ p, li { white-space: pre-wrap; }
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_exponential_food_production">
+                     <widget class="QCheckBox" name="cb_multiply_food_production_prob">
                       <property name="text">
-                       <string>Exponential food production</string>
+                       <string>Multiply food production probability</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_simplified_food_production">
+                      <property name="text">
+                       <string>Simplified food production</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_stop_when_one_food_generated">
+                      <property name="text">
+                       <string>Stop when one food generated</string>
                       </property>
                      </widget>
                     </item>
@@ -2339,7 +2353,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>540</width>
-                  <height>292</height>
+                  <height>346</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2527,6 +2541,27 @@ p, li { white-space: pre-wrap; }
                      <widget class="QCheckBox" name="cb_simplified_rendering">
                       <property name="text">
                        <string>Simplified rendering</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_10">
+                      <item>
+                       <widget class="QLabel" name="label_46">
+                        <property name="text">
+                         <string>Update info every n milliseconds:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_update_info_every_n_milliseconds"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_synchronise_info_with_window">
+                      <property name="text">
+                       <string>Synhronise info updates with window updates</string>
                       </property>
                      </widget>
                     </item>
@@ -3722,14 +3757,78 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_exponential_food_production</sender>
+   <sender>cb_multiply_food_production_prob</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>cb_exponential_food_production_slot(bool)</slot>
+   <slot>cb_multiply_food_production_prob_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>647</x>
      <y>865</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_simplified_food_production</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_simplified_food_production_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>865</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_stop_when_one_food_generated</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_stop_when_one_food_generated(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>865</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_synchronise_info_with_window</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_synchronise_info_with_window_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_update_info_every_n_milliseconds</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_update_info_every_n_milliseconds_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>763</x>
+     <y>774</y>
     </hint>
     <hint type="destinationlabel">
      <x>466</x>
@@ -3813,7 +3912,11 @@ p, li { white-space: pre-wrap; }
   <slot>cb_rotate_every_move_tick_slot(bool)</slot>
   <slot>cb_simplified_rendering_slot(bool)</slot>
   <slot>cb_apply_damage_directly_slot(bool)</slot>
-  <slot>cb_exponential_food_production_slot(bool)</slot>
+  <slot>cb_multiply_food_production_prob_slot(bool)</slot>
+  <slot>cb_simplified_food_production_slot(bool)</slot>
+  <slot>cb_stop_when_one_food_generated(bool)</slot>
+  <slot>cb_synchronise_info_with_window_slot(bool)</slot>
+  <slot>le_update_info_every_n_milliseconds_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="editor_modes"/>

@@ -34,6 +34,7 @@ result_struct<T> WindowCore::try_convert_message_box_template(const std::string&
 void WindowCore::tb_pause_slot(bool paused) {
     cp.pause_button_pause = paused;
     parse_full_simulation_grid(cp.pause_button_pause);
+    cp.tb_paused = paused;
 }
 
 void WindowCore::tb_stoprender_slot(bool stopped_render) {
@@ -400,6 +401,13 @@ void WindowCore::le_brush_size_slot() {
     brush_size = result.result;
 }
 
+void WindowCore::le_update_info_every_n_milliseconds_slot() {
+    int fallback = update_info_every_n_milliseconds;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_update_info_every_n_milliseconds, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    update_info_every_n_milliseconds = result.result;}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
@@ -447,6 +455,14 @@ void WindowCore::cb_use_evolved_brain_mutation_rate_slot(bool state) {
     _ui.le_global_brain_mutation_rate->setDisabled(state);
 }
 
+void WindowCore::cb_fill_window_slot(bool state) {
+    fill_window = state;
+    if (!state) {
+        le_simulation_width_slot();
+        le_simulation_height_slot();
+    }
+}
+
 void WindowCore::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void WindowCore::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -454,8 +470,6 @@ void WindowCore::cb_on_touch_kill_slot                   (bool state) { sp.on_to
 void WindowCore::cb_movers_can_produce_food_slot         (bool state) { sp.movers_can_produce_food = state;}
 
 void WindowCore::cb_food_blocks_reproduction_slot        (bool state) { sp.food_blocks_reproduction = state;}
-
-void WindowCore::cb_fill_window_slot                     (bool state) { fill_window = state;}
 
 void WindowCore::cb_reset_on_total_extinction_slot       (bool state) { sp.reset_on_total_extinction = state;}
 
@@ -487,7 +501,13 @@ void WindowCore::cb_simplified_rendering_slot            (bool state) { simplifi
 
 void WindowCore::cb_apply_damage_directly_slot           (bool state) { sp.apply_damage_directly = state;}
 
-void WindowCore::cb_exponential_food_production_slot     (bool state) { sp.exponential_food_production = state;}
+void WindowCore::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state;}
+
+void WindowCore::cb_simplified_food_production_slot      (bool state) { sp.simplified_food_production = state;}
+
+void WindowCore::cb_stop_when_one_food_generated         (bool state) { sp.stop_when_one_food_generated = state;}
+
+void WindowCore::cb_synchronise_info_with_window_slot    (bool state) { synchronise_info_with_window_update = state;}
 
 //==================== Table ====================
 

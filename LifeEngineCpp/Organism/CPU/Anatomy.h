@@ -25,6 +25,10 @@ struct MapAjacent {
     bool is_armored = false;
 };
 
+struct ProducerAdjacent {
+    int producer = -1;
+};
+
 struct BaseSerializedContainer {
 public:
     int relative_x;
@@ -114,7 +118,7 @@ struct SerializedArmorSpaceContainer: BaseSerializedContainer {
 
 struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
-    std::vector<SerializedAdjacentSpaceContainer> producing_space;
+    std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
 
@@ -132,10 +136,10 @@ struct SerializedOrganismStructureContainer {
     SerializedOrganismStructureContainer()=default;
     SerializedOrganismStructureContainer(
             std::vector<SerializedOrganismBlockContainer> organism_blocks,
-            std::vector<SerializedAdjacentSpaceContainer> producing_space,
+            std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space,
             std::vector<SerializedAdjacentSpaceContainer> eating_space,
             std::vector<SerializedAdjacentSpaceContainer> killing_space,
-//            std::vector<SerializedArmorSpaceContainer>    armor_space,
+
             std::vector<SerializedArmorSpaceContainer   > single_adjacent_space,
             std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space,
             std::vector<SerializedAdjacentSpaceContainer> double_adjacent_space,
@@ -149,7 +153,6 @@ struct SerializedOrganismStructureContainer {
             producing_space                (std::move(producing_space)),
             eating_space                   (std::move(eating_space)),
             killing_space                  (std::move(killing_space)),
-//            armor_space                    (std::move(armor_space)),
 
             single_adjacent_space          (std::move(single_adjacent_space)),
             single_diagonal_adjacent_space (std::move(single_diagonal_adjacent_space)),
@@ -197,8 +200,9 @@ private:
             boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space);
 
     static void create_producing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                       boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
+                                       boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
                                        boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
+                                       std::vector<int> & num_producing_space,
                                        int32_t producer_blocks);
 
     static void create_eating_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
@@ -219,13 +223,16 @@ private:
 
     static SerializedOrganismStructureContainer * serialize(
             const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            const boost::unordered_map<int, boost::unordered_map<int, bool>>& producing_space,
+            const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
 
             const boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space,
+
+            const std::vector<int> & num_producing_space,
+
             int32_t mouth_blocks,
             int32_t producer_blocks,
             int32_t mover_blocks,
@@ -242,7 +249,7 @@ private:
 
 public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
-    std::vector<SerializedAdjacentSpaceContainer> _producing_space;
+    std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
     std::vector<SerializedAdjacentSpaceContainer> _eating_space;
     std::vector<SerializedAdjacentSpaceContainer> _killing_space;
 

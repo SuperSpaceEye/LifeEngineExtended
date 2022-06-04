@@ -38,6 +38,10 @@ struct EngineDataContainer {
     std::vector<std::vector<int>> threaded_to_erase;
     std::vector<std::vector<Observation>> threaded_organisms_observations;
 
+    Organism * base_organism;
+    Organism * chosen_organism;
+
+    int auto_reset_counter = 0;
 
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> user_actions_pool;

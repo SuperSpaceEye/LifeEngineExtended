@@ -44,6 +44,9 @@ struct EngineControlParameters {
 
     bool organisms_extinct = false;
 
+    bool tb_paused = false;
+    bool reset_with_chosen = false;
+
     //TODO change this
     SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;

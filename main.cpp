@@ -3,7 +3,7 @@
 #include <QStyleFactory>
 
 #ifndef __CUDA_USED__
-#define __CUDA_USED__=0
+#define __CUDA_USED__ 0
 #endif
 
 //#if __CUDA_USED__
@@ -16,6 +16,9 @@ int main(int argc, char *argv[]) {
 //    engine.cuda_tick();
 //    std::cout << "here\n";
 //#endif
+#if __VALGRIND_MODE__ == 1
+    std::cout << "program started\n";
+#endif
 
     QApplication app(argc, argv);
     app.setStyle(QStyleFactory::create("WindowsVista"));

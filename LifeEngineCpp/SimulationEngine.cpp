@@ -19,8 +19,7 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
     while (cp.engine_working) {
-//        if (cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
-        //it works better without mutex... huh.
+        if (cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
         //std::lock_guard<std::mutex> guard(mutex);
         if (cp.stop_engine) {
             //kill_threads();
@@ -37,6 +36,11 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
+        if (sp.pause_on_total_extinction && cp.organisms_extinct) { cp.tb_paused = true ;cp.organisms_extinct = false;}
+        if (sp.reset_on_total_extinction && cp.organisms_extinct) {
+            reset_world();
+            dc.auto_reset_counter++;
+        }
         if (cp.processing_user_actions) {process_user_action_pool();}
         if ((!cp.engine_paused || cp.engine_pass_tick) && (!cp.pause_button_pause || cp.pass_tick)) {
             //if ((!cp.engine_pause || cp.synchronise_simulation_tick) && !cp.engine_global_pause) {
@@ -46,8 +50,8 @@ void SimulationEngine::threaded_mainloop() {
                 cp.synchronise_simulation_tick = false;
                 simulation_tick();
                 if (sp.auto_produce_n_food > 0) {random_food_drop();}
-//                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
-//                if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
+                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
+                if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
             //}
         }
     }
@@ -250,4 +254,62 @@ bool SimulationEngine::check_if_out_of_bounds(EngineDataContainer *dc, int x, in
             x > dc->simulation_width -1 ||
             y < 0 ||
             y > dc->simulation_height-1);
+}
+
+void SimulationEngine::reset_world() {
+    partial_clear_world();
+    make_walls();
+
+    dc.base_organism->x = dc.simulation_width / 2;
+    dc.base_organism->y = dc.simulation_height / 2;
+
+    dc.chosen_organism->x = dc.simulation_width / 2;
+    dc.chosen_organism->y = dc.simulation_height / 2;
+
+    if (cp.reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
+    else                      {dc.to_place_organisms.push_back(new Organism(dc.base_organism));}
+
+    //Just in case
+    cp.engine_pass_tick = true;
+    cp.synchronise_simulation_tick = true;
+}
+
+void SimulationEngine::partial_clear_world() {
+    clear_organisms();
+
+    for (auto & column: dc.CPU_simulation_grid) {
+        for (auto &block: column) {
+            if (!sp.clear_walls_on_reset) {
+                if (block.type == BlockTypes::WallBlock) { continue; }
+            }
+            block.type = BlockTypes::EmptyBlock;
+        }
+    }
+    for (auto & column: dc.second_simulation_grid) {for (auto &block: column) {
+            if (!sp.clear_walls_on_reset) {
+                if (block.type == BlockTypes::WallBlock) { continue; }
+            }
+            block.type = BlockTypes::EmptyBlock;
+        }
+    }
+    dc.total_engine_ticks = 0;
+}
+
+void SimulationEngine::clear_organisms() {
+    for (auto & organism: dc.organisms) {delete organism;}
+    for (auto & organism: dc.to_place_organisms) {delete organism;}
+    dc.organisms.clear();
+    dc.to_place_organisms.clear();
+}
+
+void SimulationEngine::make_walls() {
+    for (int x = 0; x < dc.simulation_width; x++) {
+        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
+    }
+
+    for (int y = 0; y < dc.simulation_height; y++) {
+        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+    }
 }

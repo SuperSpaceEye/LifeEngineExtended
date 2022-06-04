@@ -19,6 +19,11 @@ WindowCore::WindowCore(QWidget *parent) :
     dc.simulation_width = 200;
     dc.simulation_height = 200;
 
+#if __VALGRIND_MODE__
+    dc.simulation_width = 50;
+    dc.simulation_height = 50;
+#endif
+
     dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
     dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>  (dc.simulation_height, BaseGridBlock{}));
 
@@ -48,16 +53,16 @@ WindowCore::WindowCore(QWidget *parent) :
 
     auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
 
-    base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
+    dc.base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                  Rotation::UP, anatomy, brain, &sp, &bp, 1);
-    chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
+    dc.chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
                                    Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
                                    &sp, &bp, 1);
 
-    base_organism->last_decision = DecisionObservation{};
-    chosen_organism->last_decision = DecisionObservation{};
+    dc.base_organism->last_decision = DecisionObservation{};
+    dc.chosen_organism->last_decision = DecisionObservation{};
 
-    dc.to_place_organisms.push_back(new Organism(chosen_organism));
+    dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));
 
     resize_image();
     reset_scale_view();
@@ -88,6 +93,10 @@ WindowCore::WindowCore(QWidget *parent) :
 
     cb_synchronise_simulation_and_window_slot(true);
     _ui.cb_synchronise_sim_and_win->setChecked(true);
+#if __VALGRIND_MODE__ == 1
+    cb_synchronise_simulation_and_window_slot(false);
+    _ui.cb_synchronise_sim_and_win->setChecked(false);
+#endif
 }
 
 void WindowCore::mainloop_tick() {
@@ -100,8 +109,11 @@ void WindowCore::mainloop_tick() {
     window_frames++;
     end = clock_now();
     delta_window_processing_time = std::abs(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count());
-    // timer
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count() / 1000. > 1) {
+
+    auto info_update = std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count();
+
+    if (synchronise_info_with_window_update || info_update > update_info_every_n_milliseconds) {
+        auto start_timer = clock_now();
         //TODO make pausing logic better.
         cp.engine_pause = true;
         wait_for_engine_to_pause();
@@ -109,10 +121,15 @@ void WindowCore::mainloop_tick() {
         dc.engine_ticks = 0;
         unpause_engine();
 
+        if (info_update == 0) {info_update = 1;}
+
+        auto scale = (info_update/1000.);
+
         auto info = calculate_organisms_info();
 
-        update_fps_labels(window_frames, simulation_frames);
+        update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
+        _ui.lb_auto_reset_count->setText(QString::fromStdString("Auto reset count: "+ std::to_string(auto_reset_num)));
 
         window_frames = 0;
         fps_timer = clock_now();
@@ -126,12 +143,11 @@ void WindowCore::update_fps_labels(int fps, int sps) {
 
 void WindowCore::window_tick() {
     if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
-    if (sp.pause_on_total_extinction && cp.organisms_extinct) {_ui.tb_pause->setChecked(true); cp.organisms_extinct = false;} else
-    if (sp.reset_on_total_extinction && cp.organisms_extinct) {
-        reset_world();
-        auto_reset_num++;
-        _ui.lb_auto_reset_count->setText(QString::fromStdString("Auto reset count: "+ std::to_string(auto_reset_num)));
-    }
+    if (cp.tb_paused) {_ui.tb_pause->setChecked(true);}
+
+#if __VALGRIND_MODE__ == 1
+    return;
+#endif
 
     if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
     if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
@@ -271,8 +287,9 @@ void WindowCore::create_image() {
 
 void inline WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                                            int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
-    lin_width = Linspace<int>()(start_x, end_x, image_width);
-    lin_height = Linspace<int>()(start_y, end_y, image_height);
+    lin_width  = linspace<int>(start_x, end_x+1, image_width+1);
+    lin_height = linspace<int>(start_y, end_y+1, image_height+1);
+
     //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
     // n pixels
     int max_x = lin_width[lin_width.size()-1];
@@ -570,15 +587,14 @@ void WindowCore::reset_world() {
     partial_clear_world();
     make_walls();
 
-    base_organism->x = dc.simulation_width / 2;
-    base_organism->y = dc.simulation_height / 2;
+    dc.base_organism->x = dc.simulation_width / 2;
+    dc.base_organism->y = dc.simulation_height / 2;
 
-    chosen_organism->x = dc.simulation_width / 2;
-    chosen_organism->y = dc.simulation_height / 2;
+    dc.chosen_organism->x = dc.simulation_width / 2;
+    dc.chosen_organism->y = dc.simulation_height / 2;
 
-    if (reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(chosen_organism));}
-    else                   {dc.to_place_organisms.push_back(new Organism(base_organism));}
-    reset_with_chosen = false;
+    if (reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
+    else                   {dc.to_place_organisms.push_back(new Organism(dc.base_organism));}
     //Just in case
     cp.engine_pass_tick = true;
     cp.synchronise_simulation_tick = true;
@@ -853,6 +869,10 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_failed_reproduction_eats_food     ->setChecked(sp.failed_reproduction_eats_food);
     _ui.cb_rotate_every_move_tick            ->setChecked(sp.rotate_every_move_tick);
     _ui.cb_apply_damage_directly             ->setChecked(sp.apply_damage_directly);
+    _ui.cb_multiply_food_production_prob     ->setChecked(sp.multiply_food_production_prob);
+    _ui.cb_simplified_food_production        ->setChecked(sp.simplified_food_production);
+    _ui.cb_stop_when_one_food_generated      ->setChecked(sp.stop_when_one_food_generated);
+
     //Settings
     _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
@@ -874,6 +894,10 @@ void WindowCore::initialize_gui_settings() {
     _ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
     _ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop);
     _ui.cb_simplified_rendering->setChecked(simplified_rendering);
+
+    _ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
+    _ui.cb_synchronise_info_with_window->setChecked(synchronise_info_with_window_update);
+
 }
 
 void WindowCore::update_simulation_size_label() {

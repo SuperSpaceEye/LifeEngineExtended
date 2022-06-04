@@ -233,9 +233,6 @@ private:
 
     bool resize_simulation_grid_flag = false;
 
-    Organism * base_organism;
-    Organism * chosen_organism;
-
     lehmer64 gen;
 
     bool menu_hidden = false;
@@ -248,6 +245,9 @@ private:
     bool wait_for_engine_to_stop = false;
 
     bool simplified_rendering = false;
+
+    int update_info_every_n_milliseconds = 100;
+    bool synchronise_info_with_window_update = false;
 
     void mainloop_tick();
     void window_tick();
@@ -375,6 +375,7 @@ private slots:
     void le_move_range_delimiter_slot();
     void le_brush_size_slot();
     void le_auto_produce_food_every_n_tick_slot();
+    void le_update_info_every_n_milliseconds_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
@@ -399,7 +400,10 @@ private slots:
     void cb_rotate_every_move_tick_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
     void cb_apply_damage_directly_slot(bool state);
-    void cb_exponential_food_production_slot(bool state);
+    void cb_multiply_food_production_prob_slot(bool state);
+    void cb_simplified_food_production_slot(bool state);
+    void cb_stop_when_one_food_generated(bool state);
+    void cb_synchronise_info_with_window_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 
