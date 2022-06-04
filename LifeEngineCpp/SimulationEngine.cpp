@@ -168,58 +168,33 @@ void SimulationEngine::cuda_tick() {
 void SimulationEngine::process_user_action_pool() {
     auto temp = std::vector<Organism*>{};
     for (auto & action: dc.user_actions_pool) {
+        if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
         switch (action.type) {
             case ActionType::TryAddFood:
-                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
                 if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::EmptyBlock) {continue;}
                 dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::FoodBlock;
                 break;
             case ActionType::TryRemoveFood:
-                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
-                if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::FoodBlock) {continue;}
-                dc.CPU_simulation_grid[action.x][action.y].type = EmptyBlock;
+                try_remove_food(action.x, action.y);
                 break;
             case ActionType::TryAddWall:
-                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
+                try_kill_organism(action.x, action.y, temp);
+                try_remove_food(action.x, action.y);
                 if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::EmptyBlock) {continue;}
                 dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::WallBlock;
                 break;
             case ActionType::TryRemoveWall:
-                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
                 if (action.x == 0 || action.y == 0 || action.x == dc.simulation_width-1 || action.y == dc.simulation_height-1) {continue;}
                 if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::WallBlock) {continue;}
                 dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::EmptyBlock;
                 break;
             case ActionType::TryAddOrganism:
-                if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
                 break;
             case ActionType::TryKillOrganism: {
-                    if (check_if_out_of_bounds(&dc, action.x, action.y)) {continue;}
-                    if (dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
-                        dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
-                        dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
-                    Organism * organism_ptr = (dc.CPU_simulation_grid[action.x][action.y].organism);
-                    //if (organism_ptr == nullptr) {continue;}
-                    bool continue_flag = false;
-                    for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
-                    if (continue_flag) {continue;}
-                    temp.push_back(organism_ptr);
-                    for (auto & block: organism_ptr->organism_anatomy->_organism_blocks) {
-                        dc.CPU_simulation_grid
-                        [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
-                        [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
-                    }
-                    for (int i = 0; i < dc.organisms.size(); i++) {
-                        if (dc.organisms[i] == organism_ptr) {
-                            dc.organisms.erase(dc.organisms.begin() + i);
-                            break;
-                        }
-                    }
-                    delete organism_ptr;
-                }
+                try_kill_organism(action.x, action.y, temp);
+            }
                 break;
             case ActionType::TrySelectOrganism: {
-                    if (check_if_out_of_bounds(&dc, action.x, action.y)) { continue; }
                     if (dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
                         dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
                         dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
@@ -240,6 +215,34 @@ void SimulationEngine::random_food_drop() {
             dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
         }
     }
+}
+
+void SimulationEngine::try_remove_food(int x, int y) {
+    if (dc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) { return;}
+    dc.CPU_simulation_grid[x][y].type = EmptyBlock;
+}
+
+void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & temp) {
+    if (dc.CPU_simulation_grid[x][y].type == BlockTypes::EmptyBlock ||
+        dc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock ||
+        dc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) { return; }
+    Organism * organism_ptr = (dc.CPU_simulation_grid[x][y].organism);
+    bool continue_flag = false;
+    for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
+    if (continue_flag) { return;}
+    temp.push_back(organism_ptr);
+    for (auto & block: organism_ptr->organism_anatomy->_organism_blocks) {
+        dc.CPU_simulation_grid
+        [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
+        [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
+    }
+    for (int i = 0; i < dc.organisms.size(); i++) {
+        if (dc.organisms[i] == organism_ptr) {
+            dc.organisms.erase(dc.organisms.begin() + i);
+            break;
+        }
+    }
+    delete organism_ptr;
 }
 
 bool SimulationEngine::check_if_out_of_bounds(EngineDataContainer *dc, int x, int y) {

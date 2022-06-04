@@ -52,6 +52,9 @@ class SimulationEngine {
     //lehmer is like 2 times faster than mt19937
     lehmer64 gen;
 
+    void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
+    void try_remove_food(int x, int y);
+
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
                      OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters,

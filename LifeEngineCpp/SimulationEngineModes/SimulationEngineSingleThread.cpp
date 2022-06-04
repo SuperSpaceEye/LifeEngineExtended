@@ -53,16 +53,17 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
     }
 }
 
-//Each producer will add one run of producing a food
 //TODO produce_food is the most resource intensive stage of simulation (according to perf).
 void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
     if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
     if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 
-    for (int i = 0; i < organism->organism_anatomy->_producer_blocks; i++) {
+    int runs = 1;
+    if (sp->exponential_food_production) { runs = organism->organism_anatomy->_producer_blocks;}
+
+    for (int i = 0; i < runs; i++) {
         for (auto & pc: organism->organism_anatomy->_producing_space) {
-            //if (check_if_out_of_bounds(dc, organism, pc)) {continue;}
             if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
                 if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability) {
                     dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;

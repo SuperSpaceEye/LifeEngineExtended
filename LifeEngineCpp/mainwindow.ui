@@ -1387,9 +1387,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-799</y>
+                  <y>-828</y>
                   <width>540</width>
-                  <height>1005</height>
+                  <height>1034</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1428,7 +1428,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1936,6 +1936,13 @@ p, li { white-space: pre-wrap; }
                       </property>
                      </widget>
                     </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_exponential_food_production">
+                      <property name="text">
+                       <string>Exponential food production</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -1982,7 +1989,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>698</width>
-                  <height>338</height>
+                  <height>377</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2041,6 +2048,19 @@ p, li { white-space: pre-wrap; }
                      </widget>
                     </item>
                     <item>
+                     <spacer name="verticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>10</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_47">
                       <item>
                        <layout class="QVBoxLayout" name="verticalLayout_38">
@@ -2048,6 +2068,13 @@ p, li { white-space: pre-wrap; }
                          <widget class="QLabel" name="lb_moving_organisms">
                           <property name="text">
                            <string>Moving organisms:</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="lb_average_moving_range">
+                          <property name="text">
+                           <string>Average moving range:</string>
                           </property>
                          </widget>
                         </item>
@@ -3694,6 +3721,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_exponential_food_production</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_exponential_food_production_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>865</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3770,14 +3813,15 @@ p, li { white-space: pre-wrap; }
   <slot>cb_rotate_every_move_tick_slot(bool)</slot>
   <slot>cb_simplified_rendering_slot(bool)</slot>
   <slot>cb_apply_damage_directly_slot(bool)</slot>
+  <slot>cb_exponential_food_production_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="editor_modes"/>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

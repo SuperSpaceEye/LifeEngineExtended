@@ -45,6 +45,7 @@ public:
 
     int move_counter = 0;
 
+    //TODO make evolvable
     int max_decision_lifetime = 2;
     int max_do_nothing_lifetime = 4;
 

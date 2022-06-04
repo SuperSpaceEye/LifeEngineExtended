@@ -702,6 +702,7 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.total_avg.anatomy_mutation_rate /= dc.organisms.size();
 
     if (std::isnan(info.total_avg.size))             {info.total_avg.size             = 0;}
+    if (std::isnan(info.move_range))                    {info.move_range               = 0;}
 
     if (std::isnan(info.total_avg._mouth_blocks))    {info.total_avg._mouth_blocks    = 0;}
     if (std::isnan(info.total_avg._producer_blocks)) {info.total_avg._producer_blocks = 0;}
@@ -783,6 +784,7 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
 
     _ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
     _ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
+    _ui.lb_average_moving_range ->setText(QString::fromStdString("Average moving range: "  + to_str(info.move_range, float_precision)));
     _ui.lb_organism_size_2      ->setText(QString::fromStdString("Average organism size: " + to_str(info.moving_avg.size,             float_precision)));
     _ui.lb_mouth_num_2          ->setText(QString::fromStdString("Average mouth num: "     + to_str(info.moving_avg._mouth_blocks,    float_precision)));
     _ui.lb_producer_num_2       ->setText(QString::fromStdString("Average producer num: "  + to_str(info.moving_avg._producer_blocks, float_precision)));

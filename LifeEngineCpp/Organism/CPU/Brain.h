@@ -27,7 +27,6 @@ enum class BrainDecision {
 
     DoNothing,
 
-    //TODO will not be used right now, but for more complex brains it will be.
     TryProduceChild,
 };
 

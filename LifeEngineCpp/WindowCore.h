@@ -399,6 +399,7 @@ private slots:
     void cb_rotate_every_move_tick_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
     void cb_apply_damage_directly_slot(bool state);
+    void cb_exponential_food_production_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

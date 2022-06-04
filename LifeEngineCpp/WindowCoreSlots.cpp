@@ -487,6 +487,8 @@ void WindowCore::cb_simplified_rendering_slot            (bool state) { simplifi
 
 void WindowCore::cb_apply_damage_directly_slot           (bool state) { sp.apply_damage_directly = state;}
 
+void WindowCore::cb_exponential_food_production_slot     (bool state) { sp.exponential_food_production = state;}
+
 //==================== Table ====================
 
 void WindowCore::table_cell_changed_slot(int row, int col) {

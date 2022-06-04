@@ -7,7 +7,7 @@
 
 struct SimulationParameters {
     //evolution controls
-        float food_production_probability = 0.005;
+        float food_production_probability = 0.008;
         int   produce_food_every_n_life_ticks = 1;
         int   lifespan_multiplier = 100;
         int   look_range = 50;
@@ -57,6 +57,7 @@ struct SimulationParameters {
         bool failed_reproduction_eats_food = true;
         bool rotate_every_move_tick = false;
         bool apply_damage_directly = true;
+        bool exponential_food_production = false;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H
