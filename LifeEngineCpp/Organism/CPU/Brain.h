@@ -82,7 +82,7 @@ private:
     static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
     static SimpleActionTable get_random_action_table(lehmer64 &mt);
     DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, lehmer64 &mt);
-    BrainDecision calculate_simple_action(Observation & observation, lehmer64 &mt);
+    BrainDecision calculate_simple_action(Observation & observation, lehmer64 &mt) const;
 public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
@@ -90,7 +90,7 @@ public:
 
     BrainTypes brain_type;
 
-    DecisionObservation get_random_action(lehmer64 &mt);
+    static DecisionObservation get_random_action(lehmer64 &mt);
     DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt);
 
     Brain * mutate(lehmer64 &mt);

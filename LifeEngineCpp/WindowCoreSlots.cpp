@@ -68,7 +68,6 @@ void WindowCore::b_generate_random_walls_slot() {
 }
 
 void WindowCore::b_clear_all_walls_slot() {
-
     cp.engine_pause = true;
     wait_for_engine_to_pause();
 
@@ -461,6 +460,18 @@ void WindowCore::cb_fill_window_slot(bool state) {
         le_simulation_width_slot();
         le_simulation_height_slot();
     }
+}
+
+void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
+    if (!state) {use_cuda = false; return;}
+
+    auto result = cuda_is_available();
+    if (!result) {
+        _ui.cb_use_nvidia_for_image_generation->setChecked(false);
+        display_message("Warning, CUDA is not available on this device.");
+        return;
+    }
+    use_cuda = true;
 }
 
 void WindowCore::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}

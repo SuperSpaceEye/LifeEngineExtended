@@ -285,12 +285,11 @@ void SimulationEngine::partial_clear_world() {
             block.type = BlockTypes::EmptyBlock;
         }
     }
-    for (auto & column: dc.second_simulation_grid) {for (auto &block: column) {
-            if (!sp.clear_walls_on_reset) {
-                if (block.type == BlockTypes::WallBlock) { continue; }
-            }
-            block.type = BlockTypes::EmptyBlock;
+    for (auto & block: dc.second_simulation_grid) {
+        if (!sp.clear_walls_on_reset) {
+            if (block.type == BlockTypes::WallBlock) { continue; }
         }
+        block.type = BlockTypes::EmptyBlock;
     }
     dc.total_engine_ticks = 0;
 }

@@ -5,8 +5,6 @@
 #include "../SimulationEngine.h"
 #include "SimulationEngineSingleThread.h"
 
-#include <chrono>
-
 //std::vector<int> time_points{};
 
 void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, lehmer64 *gen) {

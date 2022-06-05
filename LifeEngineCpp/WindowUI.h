@@ -321,9 +321,10 @@ public:
     QLabel *label_46;
     QLineEdit *le_update_info_every_n_milliseconds;
     QCheckBox *cb_synchronise_info_with_window;
+    QCheckBox *cb_use_nvidia_for_image_generation;
     QButtonGroup *editor_modes;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1800,7 +1801,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -194, 540, 400));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -165, 540, 371));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -1812,7 +1813,7 @@ public:
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(scrollAreaWidgetContents);
         widget_2->setObjectName(QStringLiteral("widget_2"));
-        widget_2->setMinimumSize(QSize(0, 400));
+        widget_2->setMinimumSize(QSize(0, 0));
         widget_2->setBaseSize(QSize(0, 0));
         verticalLayout_19 = new QVBoxLayout(widget_2);
         verticalLayout_19->setSpacing(2);
@@ -1936,6 +1937,11 @@ public:
 
         verticalLayout_19->addWidget(cb_synchronise_info_with_window);
 
+        cb_use_nvidia_for_image_generation = new QCheckBox(widget_2);
+        cb_use_nvidia_for_image_generation->setObjectName(QStringLiteral("cb_use_nvidia_for_image_generation"));
+
+        verticalLayout_19->addWidget(cb_use_nvidia_for_image_generation);
+
 
         verticalLayout_5->addWidget(widget_2);
 
@@ -2042,8 +2048,9 @@ public:
         QObject::connect(cb_stop_when_one_food_generated, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_stop_when_one_food_generated(bool)));
         QObject::connect(cb_synchronise_info_with_window, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_synchronise_info_with_window_slot(bool)));
         QObject::connect(le_update_info_every_n_milliseconds, SIGNAL(returnPressed()), MainWindow, SLOT(le_update_info_every_n_milliseconds_slot()));
+        QObject::connect(cb_use_nvidia_for_image_generation, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_nvidia_for_image_generation_slot(bool)));
 
-        Tabs->setCurrentIndex(5);
+        Tabs->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
 
 
@@ -2300,6 +2307,7 @@ public:
         cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", Q_NULLPTR));
         label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", Q_NULLPTR));
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", Q_NULLPTR));
+        cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image generation", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", Q_NULLPTR));
     } // retranslateUi
 

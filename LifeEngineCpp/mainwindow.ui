@@ -2351,9 +2351,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-165</y>
                   <width>540</width>
-                  <height>346</height>
+                  <height>371</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2562,6 +2562,13 @@ p, li { white-space: pre-wrap; }
                      <widget class="QCheckBox" name="cb_synchronise_info_with_window">
                       <property name="text">
                        <string>Synhronise info updates with window updates</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_use_nvidia_for_image_generation">
+                      <property name="text">
+                       <string>Use NVIDIA GPU for image generation</string>
                       </property>
                      </widget>
                     </item>
@@ -3836,6 +3843,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_use_nvidia_for_image_generation</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_nvidia_for_image_generation_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>647</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3917,14 +3940,15 @@ p, li { white-space: pre-wrap; }
   <slot>cb_stop_when_one_food_generated(bool)</slot>
   <slot>cb_synchronise_info_with_window_slot(bool)</slot>
   <slot>le_update_info_every_n_milliseconds_slot()</slot>
+  <slot>cb_use_nvidia_for_image_generation_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="editor_modes"/>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

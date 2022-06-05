@@ -40,33 +40,21 @@
 #include "WindowUI.h"
 #include "OrganismEditor.h"
 #include "PRNGS/lehmer64.h"
+#include "pix_pos.h"
+#include "textures.h"
+
+#if __CUDA_USED__
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include "cuda_image_creator.cuh"
+#endif
 
 enum class CursorMode {
     ModifyFood,
     ModifyWall,
     KillOrganism,
     ChooseOrganism,
-    PlaceOrganism
-};
-
-#define BLACK1 QColor{14, 19, 24}
-#define BLACK2 QColor{56, 62, 77}
-#define GRAY1 QColor{182, 193, 234}
-#define GRAY2 QColor{161, 172, 209}
-#define GRAY3 QColor{167, 177, 215}
-
-struct Textures {
-    std::vector<std::vector<QColor>> EyeTexture{std::vector<QColor>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1},
-                                                std::vector<QColor>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1},
-                                                std::vector<QColor>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1},
-                                                std::vector<QColor>{GRAY1, GRAY3, BLACK2, GRAY3, GRAY1},
-                                                std::vector<QColor>{GRAY1, GRAY1, GRAY1,  GRAY1, GRAY1}};
-};
-
-struct pix_pos {
-    int start = 0;
-    int stop = 0;
-    pix_pos(int start, int stop): start(start), stop(stop) {}
+    PlaceOrganism,
 };
 
 template<typename T>
@@ -149,8 +137,6 @@ struct OrganismAvgBlockInformation {
     int organisms_with_eyes = 0;
 };
 
-//TODO expand About page.
-
 class WindowCore: public QWidget {
         Q_OBJECT
 private:
@@ -165,8 +151,8 @@ private:
     bool change_main_simulation_grid = false;
     bool change_editing_grid = false;
 
-    float center_x;
-    float center_y;
+    float center_x{};
+    float center_y{};
 
     CursorMode cursor_mode = CursorMode::ModifyFood;
 
@@ -184,7 +170,7 @@ private:
     float window_interval = 0.;
     long delta_window_processing_time = 0;
 
-    Ui::MainWindow _ui;
+    Ui::MainWindow _ui{};
     QTimer * timer;
     //void showEvent(QShowEvent *event);
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
@@ -195,7 +181,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     int window_frames = 0;
-    int simulation_frames = 0;
+    uint32_t simulation_frames = 0;
 
     ColorContainer color_container;
 
@@ -204,6 +190,7 @@ private:
     EngineControlParameters cp;
     EngineDataContainer dc;
     OrganismBlockParameters bp;
+    CUDAImageCreator cuda_creator;
 
     std::thread engine_thread;
     std::mutex engine_mutex;
@@ -233,7 +220,7 @@ private:
 
     bool resize_simulation_grid_flag = false;
 
-    lehmer64 gen;
+    lehmer64 gen{};
 
     bool menu_hidden = false;
     bool allow_menu_hidden_change = true;
@@ -249,13 +236,17 @@ private:
     int update_info_every_n_milliseconds = 100;
     bool synchronise_info_with_window_update = false;
 
+    bool use_cuda = true;
+
+    bool cuda_is_available();
+
     void mainloop_tick();
     void window_tick();
     void set_simulation_interval(int max_simulation_fps);
     void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);
     void resize_image();
-    void set_image_pixel(int x, int y, QColor & color);
+    void set_image_pixel(int x, int y, color & color);
 
     void calculate_new_simulation_size();
     pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
@@ -264,8 +255,8 @@ private:
 
     void create_image();
 
-    QColor &get_color_simplified(BlockTypes type);
-    QColor &get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
+    color & get_color_simplified(BlockTypes type);
+    color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 //    QColor &get_color_simplified(BlockTypes type);
 
     bool wait_for_engine_to_pause();
@@ -277,8 +268,8 @@ private:
     void change_main_grid_left_click();
     void change_main_grid_right_click();
 
-    bool wait_for_engine_to_pause_processing_user_actions();
-    bool wait_for_engine_to_pause_force();
+    bool wait_for_engine_to_pause_processing_user_actions() const;
+    bool wait_for_engine_to_pause_force() const;
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -289,16 +280,16 @@ private:
 
     void resize_simulation_space();
 
-    void inline calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
+    static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                             int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
-    void inline calculate_truncated_linspace(int image_width, int image_height,
+    static void calculate_truncated_linspace(int image_width, int image_height,
                                       std::vector<int> & lin_width,
                                       std::vector<int> & lin_height,
                                       std::vector<int> & truncated_lin_width,
                                       std::vector<int> & truncated_lin_height);
     void inline
-    image_for_loop(int image_width, int image_height, std::vector<int> &lin_width, std::vector<int> &lin_height,
-                   std::vector<int> &truncated_lin_width, std::vector<int> &truncated_lin_height);
+    image_for_loop(int image_width, int image_height, std::vector<int> &lin_width,
+                   std::vector<int> &lin_height);
 
     void partial_clear_world();
     void reset_world();
@@ -308,7 +299,7 @@ private:
 
     void initialize_gui_settings();
 
-    std::string convert_num_bytes(uint64_t num_bytes);
+    static std::string convert_num_bytes(uint64_t num_bytes);
 
     OrganismAvgBlockInformation calculate_organisms_info();
 
@@ -404,6 +395,7 @@ private slots:
     void cb_simplified_food_production_slot(bool state);
     void cb_stop_when_one_food_generated(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
+    void cb_use_nvidia_for_image_generation_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

@@ -25,7 +25,7 @@ WindowCore::WindowCore(QWidget *parent) :
 #endif
 
     dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>  (dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid.resize(dc.simulation_width *dc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
@@ -178,7 +178,7 @@ void WindowCore::reset_scale_view() {
 }
 
 //__attribute__((noinline))
-QColor &WindowCore::get_color_simplified(BlockTypes type) {
+color &WindowCore::get_color_simplified(BlockTypes type) {
     switch (type) {
         case EmptyBlock :   return color_container.empty_block;
         case MouthBlock:    return color_container.mouth;
@@ -193,7 +193,7 @@ QColor &WindowCore::get_color_simplified(BlockTypes type) {
     }
 }
 
-QColor &WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
+color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
     int x;
     int y;
 
@@ -238,7 +238,7 @@ QColor &WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
                 }
             }
 
-            return textures.EyeTexture[y][x];
+            return textures.rawEyeTexture[x + y * 5];
         case FoodBlock:     return color_container.food;
         case WallBlock:     return color_container.wall;
         default: return color_container.empty_block;
@@ -280,12 +280,17 @@ void WindowCore::create_image() {
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
         if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); unpause_engine();}
     }
-
-    image_for_loop(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+    if (!use_cuda) {
+        image_for_loop(image_width, image_height, lin_width, lin_height);
+    } else {
+#if __CUDA_USED__
+        cuda_creator.cuda_create_image(image_width, image_height, lin_width, lin_height, image_vector, color_container, dc, 32);
+#endif
+    }
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
 }
 
-void inline WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
+void WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                                            int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width  = linspace<int>(start_x, end_x+1, image_width+1);
     lin_height = linspace<int>(start_y, end_y+1, image_height+1);
@@ -303,7 +308,7 @@ void inline WindowCore::calculate_linspace(std::vector<int> & lin_width, std::ve
     for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
 }
 
-void inline WindowCore::calculate_truncated_linspace(
+void WindowCore::calculate_truncated_linspace(
         int image_width, int image_height,
         std::vector<int> & lin_width,
         std::vector<int> & lin_height,
@@ -320,10 +325,7 @@ void inline WindowCore::calculate_truncated_linspace(
 
 void inline WindowCore::image_for_loop(int image_width, int image_height,
                                        std::vector<int> &lin_width,
-                                       std::vector<int> &lin_height,
-                                       std::vector<int> &truncated_lin_width,
-                                       std::vector<int> &truncated_lin_height) {
-    //TODO refactor and optimize
+                                       std::vector<int> &lin_height) {
     if (!simplified_rendering) {
         std::vector<pix_pos> width_img_boundaries;
         std::vector<pix_pos> height_img_boundaries;
@@ -350,7 +352,7 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
         }
         height_img_boundaries.emplace_back(count, lin_height.size());
 
-        QColor pixel_color;
+        color pixel_color;
         //width of boundaries of an organisms
 
         //width bound, height bound
@@ -358,7 +360,7 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
             for (auto &h_b: height_img_boundaries) {
                 for (int x = w_b.start; x < w_b.stop; x++) {
                     for (int y = h_b.start; y < h_b.stop; y++) {
-                        auto &block = dc.second_simulation_grid[lin_width[x]][lin_height[y]];
+                        auto &block = dc.second_simulation_grid[lin_width[x] + lin_height[y] * dc.simulation_width];
 
                         if (lin_width[x] < 0 ||
                             lin_width[x] >= dc.simulation_width ||
@@ -369,8 +371,8 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
                             continue;
                         }
 
-                        pixel_color = get_texture_color(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type,
-                                                        dc.second_simulation_grid[lin_width[x]][lin_height[y]].rotation,
+                        pixel_color = get_texture_color(block.type,
+                                                        block.rotation,
                                                         float(x - w_b.start) / (w_b.stop - w_b.start),
                                                         float(y - h_b.start) / (h_b.stop - h_b.start));
                         set_image_pixel(x, y, pixel_color);
@@ -379,25 +381,24 @@ void inline WindowCore::image_for_loop(int image_width, int image_height,
             }
         }
     } else {
-    QColor pixel_color;
+    color pixel_color;
     for (int x = 0; x < image_width; x++) {
         for (int y = 0; y < image_height; y++) {
-            //TODO maybe rewrite in OpenGL?
             if (lin_width[x] < 0 || lin_width[x] >= dc.simulation_width || lin_height[y] < 0 || lin_height[y] >= dc.simulation_height) {pixel_color = color_container.simulation_background_color;}
-            else {pixel_color = get_color_simplified(dc.second_simulation_grid[lin_width[x]][lin_height[y]].type);}
+            else {pixel_color = get_color_simplified(dc.second_simulation_grid[lin_width[x] + lin_height[y] * dc.simulation_width].type);}
             set_image_pixel(x, y, pixel_color);
+            }
         }
-    }
     }
 }
 
 // depth * ( y * width + x) + z
 // depth * width * y + depth * x + z
-void WindowCore::set_image_pixel(int x, int y, QColor &color) {
+void WindowCore::set_image_pixel(int x, int y, color &color) {
     auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
-    image_vector[index+2] = color.red();
-    image_vector[index+1] = color.green();
-    image_vector[index  ] = color.blue();
+    image_vector[index+2] = color.r;
+    image_vector[index+1] = color.g;
+    image_vector[index  ] = color.b;
 }
 
 void WindowCore::set_window_interval(int max_window_fps) {
@@ -433,7 +434,7 @@ bool WindowCore::wait_for_engine_to_pause() {
 }
 
 //Will always wait for engine to pause
-bool WindowCore::wait_for_engine_to_pause_force() {
+bool WindowCore::wait_for_engine_to_pause_force() const {
     auto now = clock_now();
     while (!cp.engine_paused) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -444,7 +445,7 @@ bool WindowCore::wait_for_engine_to_pause_force() {
     return cp.engine_paused;
 }
 
-bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
+bool WindowCore::wait_for_engine_to_pause_processing_user_actions() const {
     auto now = clock_now();
     while (cp.processing_user_actions) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -464,10 +465,10 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
         if (x < 0 || x >= dc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= dc.simulation_height) { continue; }
-            dc.second_simulation_grid[x][y].type = dc.CPU_simulation_grid[x][y].type;
-            dc.second_simulation_grid[x][y].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
-            dc.second_simulation_grid[x][y].organism = dc.CPU_simulation_grid[x][y].organism;
-            dc.second_simulation_grid[x][y].rotation = dc.CPU_simulation_grid[x][y].rotation;
+            dc.second_simulation_grid[x + y * dc.simulation_width].type = dc.CPU_simulation_grid[x][y].type;
+            dc.second_simulation_grid[x + y * dc.simulation_width].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
+            dc.second_simulation_grid[x + y * dc.simulation_width].organism = dc.CPU_simulation_grid[x][y].organism;
+            dc.second_simulation_grid[x + y * dc.simulation_width].rotation = dc.CPU_simulation_grid[x][y].rotation;
         }
     }
 }
@@ -479,10 +480,10 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
 
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
-            dc.second_simulation_grid[x][y].type = dc.CPU_simulation_grid[x][y].type;
-            dc.second_simulation_grid[x][y].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
-            dc.second_simulation_grid[x][y].organism = dc.CPU_simulation_grid[x][y].organism;
-            dc.second_simulation_grid[x][y].rotation = dc.CPU_simulation_grid[x][y].rotation;
+            dc.second_simulation_grid[x + y * dc.simulation_width].type = dc.CPU_simulation_grid[x][y].type;
+            dc.second_simulation_grid[x + y * dc.simulation_width].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
+            dc.second_simulation_grid[x + y * dc.simulation_width].organism = dc.CPU_simulation_grid[x][y].organism;
+            dc.second_simulation_grid[x + y * dc.simulation_width].rotation = dc.CPU_simulation_grid[x][y].rotation;
         }
     }
     unpause_engine();
@@ -529,13 +530,26 @@ void WindowCore::resize_simulation_space() {
     if (fill_window) {calculate_new_simulation_size();}
 
     if (!disable_warnings) {
-        auto msg = DescisionMessageBox("Warning",
+        if (!use_cuda) {
+            auto msg = DescisionMessageBox("Warning",
                                        QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
                                        "New grid will need " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width*2)),
                                        "OK", "Cancel", this);
-        auto result = msg.exec();
-        if (!result) {
-            return;
+            auto result = msg.exec();
+            if (!result) {
+                return;
+            }
+        } else {
+            auto msg = DescisionMessageBox("Warning",
+                                           QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
+                                                                  "New grid will need " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width*2)
+                                                                  + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width))
+                                                                  + " GPU's VRAM",
+                                           "OK", "Cancel", this);
+            auto result = msg.exec();
+            if (!result) {
+                return;
+            }
         }
     }
 
@@ -549,7 +563,7 @@ void WindowCore::resize_simulation_space() {
     dc.second_simulation_grid.clear();
 
     dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width, std::vector<BaseGridBlock>  (dc.simulation_height, BaseGridBlock{}));
+    dc.second_simulation_grid.resize(dc.simulation_width *dc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
@@ -573,12 +587,11 @@ void WindowCore::partial_clear_world() {
             block.type = BlockTypes::EmptyBlock;
         }
     }
-    for (auto & column: dc.second_simulation_grid) {for (auto &block: column) {
-            if (!sp.clear_walls_on_reset) {
-                if (block.type == BlockTypes::WallBlock) { continue; }
-            }
-            block.type = BlockTypes::EmptyBlock;
+    for (auto & block: dc.second_simulation_grid) {
+        if (!sp.clear_walls_on_reset) {
+            if (block.type == BlockTypes::WallBlock) { continue; }
         }
+        block.type = BlockTypes::EmptyBlock;
     }
     dc.total_engine_ticks = 0;
 }
@@ -897,7 +910,6 @@ void WindowCore::initialize_gui_settings() {
 
     _ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     _ui.cb_synchronise_info_with_window->setChecked(synchronise_info_with_window_update);
-
 }
 
 void WindowCore::update_simulation_size_label() {
@@ -905,7 +917,7 @@ void WindowCore::update_simulation_size_label() {
 }
 
 std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
-    int previous = num_bytes;
+    uint64_t previous = num_bytes;
     num_bytes /= 1024;
     if (!num_bytes) {return std::to_string(previous) + " B";}
     previous = num_bytes;
@@ -982,4 +994,18 @@ void WindowCore::change_main_grid_right_click() {
         }
     }
     cp.pause_processing_user_action = false;
+}
+
+bool WindowCore::cuda_is_available() {
+#if __CUDA_USED__
+    int count;
+    cudaGetDeviceCount(&count);
+    if (count <= 0) {
+        return false;
+    } else {
+        return true;
+    }
+#else
+    return false;
+#endif
 }

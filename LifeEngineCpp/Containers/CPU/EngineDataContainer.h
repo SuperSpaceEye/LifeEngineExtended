@@ -30,7 +30,7 @@ struct EngineDataContainer {
     std::vector<Organism*> organisms;
     std::vector<Organism*> to_place_organisms;
 
-    std::vector<std::vector<BaseGridBlock>> second_simulation_grid;
+    std::vector<BaseGridBlock> second_simulation_grid;
 
     std::vector<eager_worker_partial> threads;
     //std::vector<int> thread_points;
