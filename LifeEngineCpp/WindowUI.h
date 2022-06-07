@@ -261,8 +261,9 @@ public:
     QHBoxLayout *horizontalLayout_47;
     QVBoxLayout *verticalLayout_38;
     QLabel *lb_moving_organisms;
-    QLabel *lb_average_moving_range;
     QLabel *lb_organisms_with_eyes;
+    QLabel *lb_avg_org_lifetime_2;
+    QLabel *lb_average_moving_range;
     QLabel *lb_organism_size_2;
     QLabel *lb_anatomy_mutation_rate_2;
     QLabel *lb_brain_mutation_rate_2;
@@ -275,6 +276,7 @@ public:
     QVBoxLayout *verticalLayout_40;
     QLabel *lb_stationary_organisms;
     QLabel *lb_organism_size_3;
+    QLabel *lb_avg_org_lifetime_3;
     QLabel *lb_anatomy_mutation_rate_3;
     QLabel *lb_brain_mutation_rate_3;
     QLabel *lb_producer_num_3;
@@ -285,6 +287,7 @@ public:
     QVBoxLayout *verticalLayout_10;
     QLabel *lb_organisms_alive_2;
     QLabel *lb_organism_size_4;
+    QLabel *lb_avg_org_lifetime_4;
     QLabel *lb_anatomy_mutation_rate_4;
     QLabel *lb_brain_mutation_rate_4;
     QLabel *lb_producer_num_4;
@@ -322,9 +325,9 @@ public:
     QLineEdit *le_update_info_every_n_milliseconds;
     QCheckBox *cb_synchronise_info_with_window;
     QCheckBox *cb_use_nvidia_for_image_generation;
-    QButtonGroup *editor_modes;
     QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *editor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1570,7 +1573,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 698, 377));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, -60, 608, 400));
         QSizePolicy sizePolicy9(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1614,15 +1617,20 @@ public:
 
         verticalLayout_38->addWidget(lb_moving_organisms);
 
-        lb_average_moving_range = new QLabel(widget_5);
-        lb_average_moving_range->setObjectName(QStringLiteral("lb_average_moving_range"));
-
-        verticalLayout_38->addWidget(lb_average_moving_range);
-
         lb_organisms_with_eyes = new QLabel(widget_5);
         lb_organisms_with_eyes->setObjectName(QStringLiteral("lb_organisms_with_eyes"));
 
         verticalLayout_38->addWidget(lb_organisms_with_eyes);
+
+        lb_avg_org_lifetime_2 = new QLabel(widget_5);
+        lb_avg_org_lifetime_2->setObjectName(QStringLiteral("lb_avg_org_lifetime_2"));
+
+        verticalLayout_38->addWidget(lb_avg_org_lifetime_2);
+
+        lb_average_moving_range = new QLabel(widget_5);
+        lb_average_moving_range->setObjectName(QStringLiteral("lb_average_moving_range"));
+
+        verticalLayout_38->addWidget(lb_average_moving_range);
 
         lb_organism_size_2 = new QLabel(widget_5);
         lb_organism_size_2->setObjectName(QStringLiteral("lb_organism_size_2"));
@@ -1684,6 +1692,11 @@ public:
 
         verticalLayout_40->addWidget(lb_organism_size_3);
 
+        lb_avg_org_lifetime_3 = new QLabel(widget_5);
+        lb_avg_org_lifetime_3->setObjectName(QStringLiteral("lb_avg_org_lifetime_3"));
+
+        verticalLayout_40->addWidget(lb_avg_org_lifetime_3);
+
         lb_anatomy_mutation_rate_3 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_3->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_3"));
 
@@ -1733,6 +1746,11 @@ public:
         lb_organism_size_4->setObjectName(QStringLiteral("lb_organism_size_4"));
 
         verticalLayout_10->addWidget(lb_organism_size_4);
+
+        lb_avg_org_lifetime_4 = new QLabel(widget_5);
+        lb_avg_org_lifetime_4->setObjectName(QStringLiteral("lb_avg_org_lifetime_4"));
+
+        verticalLayout_10->addWidget(lb_avg_org_lifetime_4);
 
         lb_anatomy_mutation_rate_4 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_4->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_4"));
@@ -1801,7 +1819,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -165, 540, 371));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 371));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -2254,44 +2272,47 @@ public:
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", Q_NULLPTR));
         cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", Q_NULLPTR));
         cb_apply_damage_directly->setText(QApplication::translate("MainWindow", "Apply damage directly", Q_NULLPTR));
-        cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability", Q_NULLPTR));
+        cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability by number of producers", Q_NULLPTR));
         cb_simplified_food_production->setText(QApplication::translate("MainWindow", "Simplified food production", Q_NULLPTR));
-        cb_stop_when_one_food_generated->setText(QApplication::translate("MainWindow", "Stop when one food generated", Q_NULLPTR));
+        cb_stop_when_one_food_generated->setText(QApplication::translate("MainWindow", "Stop food production when one food is generated", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", Q_NULLPTR));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", Q_NULLPTR));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", Q_NULLPTR));
         lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", Q_NULLPTR));
         lb_moving_organisms->setText(QApplication::translate("MainWindow", "Moving organisms:", Q_NULLPTR));
-        lb_average_moving_range->setText(QApplication::translate("MainWindow", "Average moving range:", Q_NULLPTR));
         lb_organisms_with_eyes->setText(QApplication::translate("MainWindow", "Organisms with eyes:", Q_NULLPTR));
-        lb_organism_size_2->setText(QApplication::translate("MainWindow", "Average organism size:", Q_NULLPTR));
-        lb_anatomy_mutation_rate_2->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate_2->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", Q_NULLPTR));
-        lb_mouth_num_2->setText(QApplication::translate("MainWindow", "Average mouth num: ", Q_NULLPTR));
-        lb_producer_num_2->setText(QApplication::translate("MainWindow", "Average producer num: ", Q_NULLPTR));
-        lb_mover_num_2->setText(QApplication::translate("MainWindow", "Average mover num:", Q_NULLPTR));
-        lb_killer_num_2->setText(QApplication::translate("MainWindow", "Average killer num:", Q_NULLPTR));
-        lb_armor_num_2->setText(QApplication::translate("MainWindow", "Average armor num: ", Q_NULLPTR));
-        lb_eye_num_2->setText(QApplication::translate("MainWindow", "Average eye num: ", Q_NULLPTR));
+        lb_avg_org_lifetime_2->setText(QApplication::translate("MainWindow", "Avg organism lifetime:", Q_NULLPTR));
+        lb_average_moving_range->setText(QApplication::translate("MainWindow", "Avg moving range:", Q_NULLPTR));
+        lb_organism_size_2->setText(QApplication::translate("MainWindow", "Avg organism size:", Q_NULLPTR));
+        lb_anatomy_mutation_rate_2->setText(QApplication::translate("MainWindow", "Avg anatomy mutation rate:", Q_NULLPTR));
+        lb_brain_mutation_rate_2->setText(QApplication::translate("MainWindow", "Avg brain mutation rate:", Q_NULLPTR));
+        lb_mouth_num_2->setText(QApplication::translate("MainWindow", "Avg mouth num: ", Q_NULLPTR));
+        lb_producer_num_2->setText(QApplication::translate("MainWindow", "Avg producer num: ", Q_NULLPTR));
+        lb_mover_num_2->setText(QApplication::translate("MainWindow", "Avg mover num:", Q_NULLPTR));
+        lb_killer_num_2->setText(QApplication::translate("MainWindow", "Avg killer num:", Q_NULLPTR));
+        lb_armor_num_2->setText(QApplication::translate("MainWindow", "Avg armor num: ", Q_NULLPTR));
+        lb_eye_num_2->setText(QApplication::translate("MainWindow", "Avg eye num: ", Q_NULLPTR));
         lb_stationary_organisms->setText(QApplication::translate("MainWindow", "Stationary organisms:", Q_NULLPTR));
-        lb_organism_size_3->setText(QApplication::translate("MainWindow", "Average organism size:", Q_NULLPTR));
-        lb_anatomy_mutation_rate_3->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate_3->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", Q_NULLPTR));
-        lb_producer_num_3->setText(QApplication::translate("MainWindow", "Average producer num: ", Q_NULLPTR));
-        lb_mouth_num_3->setText(QApplication::translate("MainWindow", "Average mouth num: ", Q_NULLPTR));
-        lb_killer_num_3->setText(QApplication::translate("MainWindow", "Average killer num:", Q_NULLPTR));
-        lb_armor_num_3->setText(QApplication::translate("MainWindow", "Average armor num: ", Q_NULLPTR));
-        lb_eye_num_3->setText(QApplication::translate("MainWindow", "Average eye num: ", Q_NULLPTR));
+        lb_organism_size_3->setText(QApplication::translate("MainWindow", "Avg organism size:", Q_NULLPTR));
+        lb_avg_org_lifetime_3->setText(QApplication::translate("MainWindow", "Avg organism lifetime:", Q_NULLPTR));
+        lb_anatomy_mutation_rate_3->setText(QApplication::translate("MainWindow", "Avg anatomy mutation rate:", Q_NULLPTR));
+        lb_brain_mutation_rate_3->setText(QApplication::translate("MainWindow", "Avg brain mutation rate:", Q_NULLPTR));
+        lb_producer_num_3->setText(QApplication::translate("MainWindow", "Avg producer num: ", Q_NULLPTR));
+        lb_mouth_num_3->setText(QApplication::translate("MainWindow", "Avg mouth num: ", Q_NULLPTR));
+        lb_killer_num_3->setText(QApplication::translate("MainWindow", "Avg killer num:", Q_NULLPTR));
+        lb_armor_num_3->setText(QApplication::translate("MainWindow", "Avg armor num: ", Q_NULLPTR));
+        lb_eye_num_3->setText(QApplication::translate("MainWindow", "Avg eye num: ", Q_NULLPTR));
         lb_organisms_alive_2->setText(QApplication::translate("MainWindow", "Organisms alive:", Q_NULLPTR));
-        lb_organism_size_4->setText(QApplication::translate("MainWindow", "Average organism size:", Q_NULLPTR));
-        lb_anatomy_mutation_rate_4->setText(QApplication::translate("MainWindow", "Average anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate_4->setText(QApplication::translate("MainWindow", "Average brain mutation rate:", Q_NULLPTR));
-        lb_producer_num_4->setText(QApplication::translate("MainWindow", "Average producer num: ", Q_NULLPTR));
-        lb_mover_num_4->setText(QApplication::translate("MainWindow", "Average mover num:", Q_NULLPTR));
-        lb_mouth_num_4->setText(QApplication::translate("MainWindow", "Average mouth num: ", Q_NULLPTR));
-        lb_killer_num_4->setText(QApplication::translate("MainWindow", "Average killer num:", Q_NULLPTR));
-        lb_armor_num_4->setText(QApplication::translate("MainWindow", "Average armor num: ", Q_NULLPTR));
-        lb_eye_num_4->setText(QApplication::translate("MainWindow", "Average eye num: ", Q_NULLPTR));
+        lb_organism_size_4->setText(QApplication::translate("MainWindow", "Avg organism size:", Q_NULLPTR));
+        lb_avg_org_lifetime_4->setText(QApplication::translate("MainWindow", "Avg organism lifetime:", Q_NULLPTR));
+        lb_anatomy_mutation_rate_4->setText(QApplication::translate("MainWindow", "Avg anatomy mutation rate:", Q_NULLPTR));
+        lb_brain_mutation_rate_4->setText(QApplication::translate("MainWindow", "Avg brain mutation rate:", Q_NULLPTR));
+        lb_producer_num_4->setText(QApplication::translate("MainWindow", "Avg producer num: ", Q_NULLPTR));
+        lb_mover_num_4->setText(QApplication::translate("MainWindow", "Avg mover num:", Q_NULLPTR));
+        lb_mouth_num_4->setText(QApplication::translate("MainWindow", "Avg mouth num: ", Q_NULLPTR));
+        lb_killer_num_4->setText(QApplication::translate("MainWindow", "Avg killer num:", Q_NULLPTR));
+        lb_armor_num_4->setText(QApplication::translate("MainWindow", "Avg armor num: ", Q_NULLPTR));
+        lb_eye_num_4->setText(QApplication::translate("MainWindow", "Avg eye num: ", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(statistics_tab), QApplication::translate("MainWindow", "Statistics", Q_NULLPTR));
         rb_single_thread_mode->setText(QApplication::translate("MainWindow", "Single thread CPU", Q_NULLPTR));
         rb_partial_multi_thread_mode->setText(QApplication::translate("MainWindow", "Partial multi-thread CPU", Q_NULLPTR));
@@ -2307,7 +2328,7 @@ public:
         cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", Q_NULLPTR));
         label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", Q_NULLPTR));
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", Q_NULLPTR));
-        cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image generation", Q_NULLPTR));
+        cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", Q_NULLPTR));
     } // retranslateUi
 

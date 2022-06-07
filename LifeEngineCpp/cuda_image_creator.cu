@@ -136,7 +136,9 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
 
 void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std::vector<int> &lin_width,
                                          std::vector<int> &lin_height, std::vector<unsigned char> &image_vector,
-                                         ColorContainer &color_container, EngineDataContainer &dc, int block_size) {
+                                         ColorContainer &color_container, EngineDataContainer &dc, int block_size,
+                                         std::vector<int> & truncated_lin_width,
+                                         std::vector<int> & truncated_lin_height) {
     std::vector<pix_pos> width_img_boundaries;
     std::vector<pix_pos> height_img_boundaries;
 
@@ -167,7 +169,7 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
                      width_img_boundaries.size(), height_img_boundaries.size(),
                      lin_width.size(), lin_height.size());
 
-    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, dc);
+    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, truncated_lin_width, truncated_lin_height, dc);
 
     int num_blocks = (width_img_boundaries.size()*height_img_boundaries.size() + block_size - 1) / block_size;
 

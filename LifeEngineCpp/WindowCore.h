@@ -107,19 +107,21 @@ public:
 };
 
 struct OrganismInfoHolder {
-    float size = 0;
-    float _mouth_blocks    = 0;
-    float _producer_blocks = 0;
-    float _mover_blocks    = 0;
-    float _killer_blocks   = 0;
-    float _armor_blocks    = 0;
-    float _eye_blocks      = 0;
-    float brain_mutation_rate = 0;
-    float anatomy_mutation_rate = 0;
+    double size = 0;
+    double _organism_lifetime = 0;
+    double _mouth_blocks    = 0;
+    double _producer_blocks = 0;
+    double _mover_blocks    = 0;
+    double _killer_blocks   = 0;
+    double _armor_blocks    = 0;
+    double _eye_blocks      = 0;
+    double brain_mutation_rate = 0;
+    double anatomy_mutation_rate = 0;
     int total = 0;
 };
 
 struct OrganismAvgBlockInformation {
+
     uint64_t total_size_organism_blocks = 0;
     uint64_t total_size_producing_space = 0;
     uint64_t total_size_eating_space    = 0;
@@ -132,7 +134,7 @@ struct OrganismAvgBlockInformation {
     OrganismInfoHolder station_avg{};
     OrganismInfoHolder moving_avg{};
 
-    float move_range = 0;
+    double move_range = 0;
     int moving_organisms = 0;
     int organisms_with_eyes = 0;
 };
@@ -190,11 +192,12 @@ private:
     EngineControlParameters cp;
     EngineDataContainer dc;
     OrganismBlockParameters bp;
+
+#if __CUDA_USED__
     CUDAImageCreator cuda_creator;
+#endif
 
     std::thread engine_thread;
-    std::mutex engine_mutex;
-
     Textures textures{};
 
     std::vector<unsigned char> image_vector;
@@ -280,6 +283,14 @@ private:
 
     void resize_simulation_space();
 
+    void simplified_for_loop(int image_width, int image_height,
+                             std::vector<int> &lin_width,
+                             std::vector<int> &lin_height);
+
+    void complex_for_loop(int image_width, int image_height,
+                          std::vector<int> &lin_width,
+                          std::vector<int> &lin_height);
+
     static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                             int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
     static void calculate_truncated_linspace(int image_width, int image_height,
@@ -287,9 +298,6 @@ private:
                                       std::vector<int> & lin_height,
                                       std::vector<int> & truncated_lin_width,
                                       std::vector<int> & truncated_lin_height);
-    void inline
-    image_for_loop(int image_width, int image_height, std::vector<int> &lin_width,
-                   std::vector<int> &lin_height);
 
     void partial_clear_world();
     void reset_world();

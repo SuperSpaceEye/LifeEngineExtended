@@ -54,7 +54,7 @@ class CUDAImageCreator {
 
     void simulation_dimensions_changed(int simulation_width, int simulation_height) {
         gpuErrchk(cudaFree(d_second_simulation_grid));
-        gpuErrchk(cudaMalloc((BaseGridBlock**)&d_second_simulation_grid, sizeof(BaseGridBlock) * simulation_width * simulation_height));
+        gpuErrchk(cudaMallocManaged((BaseGridBlock**)&d_second_simulation_grid, sizeof(BaseGridBlock) * simulation_width * simulation_height));
     }
 
     void img_boundaries_changed(int width_img_boundaries_size, int height_img_boundaries_size) {
@@ -140,6 +140,8 @@ class CUDAImageCreator {
 
     void copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
                         std::vector<pix_pos> &width_img_boundaries, std::vector<pix_pos> &height_img_boundaries,
+                        std::vector<int> & truncated_lin_width,
+                        std::vector<int> & truncated_lin_height,
                         EngineDataContainer &dc) {
         gpuErrchk(cudaMemcpy(d_lin_width,
                    lin_width.data(),
@@ -164,7 +166,15 @@ class CUDAImageCreator {
         gpuErrchk(cudaMemcpy(d_second_simulation_grid,
                    dc.second_simulation_grid.data(),
                    sizeof (BaseGridBlock)*dc.second_simulation_grid.size(),
-                   cudaMemcpyHostToDevice));
+                   cudaMemcpyHostToDevice))
+
+//        for (auto & width: truncated_lin_width) {
+//            for (auto & height: truncated_lin_height) {
+//                if (height < 0 || width < 0) { continue;}
+//                d_second_simulation_grid[width + height * dc.simulation_height] = dc.second_simulation_grid[width + height * dc.simulation_height];
+//            }
+//        }
+
     }
 
     void copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height) {
@@ -199,12 +209,24 @@ public:
         d_second_simulation_grid = nullptr;
 //        d_color_container = nullptr;
 //        d_textures = nullptr;
+
+        last_image_width = 0;
+        last_image_height = 0;
+        last_lin_width = 0;
+        last_lin_height = 0;
+
+        last_width_img_boundaries = 0;
+        last_height_img_boundaries = 0;
+        last_simulation_width = 0;
+        last_simulation_height = 0;
     }
 
     void cuda_create_image(int image_width, int image_height,
                            std::vector<int> &lin_width, std::vector<int> &lin_height,
                            std::vector<unsigned char> &image_vector,
-                           ColorContainer &color_container, EngineDataContainer &dc, int block_size);
+                           ColorContainer &color_container, EngineDataContainer &dc, int block_size,
+                           std::vector<int> & truncated_lin_width,
+                           std::vector<int> & truncated_lin_height);
 };
 
 #endif //THELIFEENGINECPP_CUDA_IMAGE_CREATOR_CUH

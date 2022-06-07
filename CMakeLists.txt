@@ -6,7 +6,7 @@ enable_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
-set(CMAKE_CXX_FLAGS -pthread)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -42,10 +42,10 @@ add_compile_definitions(__VALGRIND_MODE__=0)
 #find_package(OpenMP)
 
 if(CUDAToolkit_FOUND)
-    set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cpp LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.h LifeEngineCpp/Organism/CUDA/CUDA_Brain.cpp LifeEngineCpp/Organism/CUDA/CUDA_Brain.h LifeEngineCpp/Organism/CUDA/CUDA_Organism.cpp LifeEngineCpp/Organism/CUDA/CUDA_Organism.h LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.h LifeEngineCpp/cuda_image_creator.cu)
+    set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cpp LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.h LifeEngineCpp/Organism/CUDA/CUDA_Brain.cpp LifeEngineCpp/Organism/CUDA/CUDA_Brain.h LifeEngineCpp/Organism/CUDA/CUDA_Organism.cpp LifeEngineCpp/Organism/CUDA/CUDA_Organism.h LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.h LifeEngineCpp/cuda_image_creator.cuh LifeEngineCpp/cuda_image_creator.cu)
 endif()
 
-add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_SOURCES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/cuda_image_creator.cuh LifeEngineCpp/pix_pos.h LifeEngineCpp/textures.h)
+add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_SOURCES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/pix_pos.h LifeEngineCpp/textures.h)
 
 if (AUTO_UI_FILE_REBUILDING)
     add_custom_target(

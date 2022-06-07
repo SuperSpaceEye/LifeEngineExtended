@@ -157,11 +157,7 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
                 default:
                     break;
             }
-//            if (world_block.type == BlockTypes::EmptyBlock ||
-//                world_block.type == BlockTypes::FoodBlock  ||
-//                world_block.type == BlockTypes::WallBlock  ||
-//                world_block.type == BlockTypes::ArmorBlock
-//                ) {continue;}
+
             if (world_block.organism != nullptr) {
                 if (sp->on_touch_kill) {
                     world_block.organism->damage = world_block.organism->life_points + 1;

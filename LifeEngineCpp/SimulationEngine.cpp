@@ -6,9 +6,8 @@
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 
 SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                                   OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters,
-                                   std::mutex& mutex):
-    mutex(mutex), dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
+                                   OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters):
+    dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
 
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -22,7 +21,7 @@ void SimulationEngine::threaded_mainloop() {
         if (cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
         //std::lock_guard<std::mutex> guard(mutex);
         if (cp.stop_engine) {
-            //kill_threads();
+            SimulationEnginePartialMultiThread::kill_threads(dc);
             cp.engine_working = false;
             cp.engine_paused = true;
             cp.stop_engine = false;
@@ -30,8 +29,8 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) {
-//            SimulationEnginePartialMultiThread::kill_threads(dc);
-//            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+            SimulationEnginePartialMultiThread::kill_threads(dc);
+            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
             cp.build_threads = false;
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
@@ -66,6 +65,12 @@ void SimulationEngine::change_mode() {
         case SimulationModes::CPU_Single_Threaded:
             if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
                 SimulationEnginePartialMultiThread::kill_threads(dc);
+                for (auto & pool : dc.organisms_pools) {
+                    for (auto & organism: pool) {
+                        dc.organisms.emplace_back(organism);
+                    }
+                    pool.clear();
+                }
             }
 //            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
 //
@@ -73,9 +78,15 @@ void SimulationEngine::change_mode() {
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:
             SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+            for (auto & organism: dc.organisms) {
+                int pool = (organism->x / dc.simulation_width) * cp.num_threads;
+                dc.organisms_pools[pool].emplace_back(organism);
+            }
+            dc.organisms.clear();
 //            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
 //
 //            }
+            cp.build_threads = false;
             break;
         case SimulationModes::CPU_Multi_Threaded:
 //            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
@@ -100,39 +111,26 @@ void SimulationEngine::simulation_tick() {
     dc.engine_ticks++;
     dc.total_engine_ticks++;
 
-    if (dc.organisms.empty() && dc.to_place_organisms.empty()) {
-        cp.organisms_extinct = true;
-        if (sp.pause_on_total_extinction || sp.reset_on_total_extinction) {
-            cp.engine_paused = true;
-            return;
+    if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+        if (dc.organisms.empty() && dc.to_place_organisms.empty()) {
+            cp.organisms_extinct = true;
+        } else {
+            cp.organisms_extinct = false;
         }
-    } else {
-        cp.organisms_extinct = false;
+    } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        cp.organisms_extinct = true;
+        for (auto & pool: dc.organisms_pools) {
+            if (!pool.empty() || !dc.to_place_organisms.empty()) {
+                cp.organisms_extinct = false;
+                break;
+            }
+        }
     }
 
-//    switch (cp.simulation_mode) {
-//
-//
-//        case SimulationModes::CPU_Single_Threaded:
-//        case SimulationModes::CPU_Partial_Multi_threaded:
-//        case SimulationModes::CPU_Multi_Threaded:
-//            if (dc.organisms.empty() && dc.to_place_organisms.empty()) {
-//                cp.organisms_extinct = true;
-//                if (sp.pause_on_total_extinction || sp.reset_on_total_extinction) {
-//                    cp.engine_paused = true;
-//                    return;
-//                }
-//            } else {
-//                cp.organisms_extinct = false;
-//            }
-//            break;
-//        case SimulationModes::GPU_CUDA_mode:
-//            break;
-//        case SimulationModes::OPENCL_MODE:
-//            break;
-//        case SimulationModes::GPUFORT_MODE:
-//            break;
-//    }
+    if (cp.organisms_extinct && (sp.pause_on_total_extinction || sp.reset_on_total_extinction)) {
+        cp.engine_paused = true;
+        return;
+    }
 
     switch (cp.simulation_mode){
         case SimulationModes::CPU_Single_Threaded:
@@ -142,30 +140,14 @@ void SimulationEngine::simulation_tick() {
             SimulationEnginePartialMultiThread::partial_multi_thread_tick(&dc, &cp, &op, &sp, &gen);
             break;
         case SimulationModes::CPU_Multi_Threaded:
-            multi_threaded_tick();
             break;
         case SimulationModes::GPU_CUDA_mode:
-            cuda_tick();
             break;
         case SimulationModes::OPENCL_MODE:
             break;
         case SimulationModes::GPUFORT_MODE:
             break;
     }
-}
-
-void SimulationEngine::multi_threaded_tick() {
-//    for (auto & thread :threads) {
-//        thread.work();
-//    }
-//
-//    for (auto & thread: threads) {
-//        thread.finish();
-//    }
-}
-
-void SimulationEngine::cuda_tick() {
-
 }
 
 //TODO refactor
@@ -240,10 +222,21 @@ void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & 
         [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
         [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
     }
-    for (int i = 0; i < dc.organisms.size(); i++) {
-        if (dc.organisms[i] == organism_ptr) {
-            dc.organisms.erase(dc.organisms.begin() + i);
-            break;
+    if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+        for (int i = 0; i < dc.organisms.size(); i++) {
+            if (dc.organisms[i] == organism_ptr) {
+                dc.organisms.erase(dc.organisms.begin() + i);
+                break;
+            }
+        }
+    } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        for (auto &pool: dc.organisms_pools) {
+            for (int i = 0; i < pool.size(); i++) {
+                if (pool[i] == organism_ptr) {
+                    pool.erase(pool.begin() + i);
+                    break;
+                }
+            }
         }
     }
     delete organism_ptr;
@@ -295,9 +288,16 @@ void SimulationEngine::partial_clear_world() {
 }
 
 void SimulationEngine::clear_organisms() {
-    for (auto & organism: dc.organisms) {delete organism;}
+    if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+        for (auto &organism: dc.organisms) { delete organism; }
+        dc.organisms.clear();
+    } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        for (auto &pool: dc.organisms_pools) {
+            for (auto &organism: pool) { delete organism; }
+            pool.clear();
+        }
+    }
     for (auto & organism: dc.to_place_organisms) {delete organism;}
-    dc.organisms.clear();
     dc.to_place_organisms.clear();
 }
 

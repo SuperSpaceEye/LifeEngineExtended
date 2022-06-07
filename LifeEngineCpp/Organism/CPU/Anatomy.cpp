@@ -4,14 +4,12 @@
 
 #include "Anatomy.h"
 
-//TODO program will do some redundant work, but i don't know if optimization i can think of will make it much faster
 Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
     _organism_blocks = std::move(structure->organism_blocks);
 
     _producing_space = std::move(structure->producing_space);
     _eating_space    = std::move(structure->eating_space);
     _killing_space   = std::move(structure->killing_space);
-//    _armor_space     = std::move(structure->armor_space);
 
     _single_adjacent_space          = std::move(structure->single_adjacent_space);
     _single_diagonal_adjacent_space = std::move(structure->single_diagonal_adjacent_space);

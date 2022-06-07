@@ -59,7 +59,7 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     SerializedOrganismBlockContainer()=default;
     SerializedOrganismBlockContainer(BlockTypes type, Rotation rotation, int relative_x, int relative_y,
                                      bool up = false, bool left = false, bool down = false, bool right = false):
-    type(type), rotation(rotation), BaseSerializedContainer(relative_x, relative_y) {
+            BaseSerializedContainer(relative_x, relative_y), type(type), rotation(rotation) {
         neighbors.up    = up;
         neighbors.left  = left;
         neighbors.down  = down;

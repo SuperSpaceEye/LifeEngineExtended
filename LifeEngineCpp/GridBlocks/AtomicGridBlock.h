@@ -9,7 +9,7 @@
 #include "BaseGridBlock.h"
 
 struct AtomicGridBlock {
-//    std::atomic<bool> locked = false;
+    std::atomic<bool> locked{false};
 
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;

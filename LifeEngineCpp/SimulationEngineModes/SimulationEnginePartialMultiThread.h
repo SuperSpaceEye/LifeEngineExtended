@@ -56,6 +56,8 @@ private:
 
     static void start_stage(EngineDataContainer *dc, PartialSimulationStage stage,
                             std::vector<std::vector<int>> &thread_points);
+
+    static void change_organisms_pools(EngineDataContainer *dc, EngineControlParameters * cp);
 public:
     static void
     partial_multi_thread_tick(EngineDataContainer *dc, EngineControlParameters *cp,
