@@ -7,8 +7,8 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <vector>
 #include <thrust/device_vector.h>
+#include <vector>
 
 #include "pix_pos.h"
 #include "textures.h"
@@ -110,6 +110,7 @@ class CUDAImageCreator {
         lin_size_changed(lin_width_size, lin_height_size);
 //        color_container_changed(color_container);
 //        textures_changed(textures);
+        load_symbols(color_container);
     }
 
     void check_if_changed(int image_width, int image_height,
@@ -221,12 +222,12 @@ public:
         last_simulation_height = 0;
     }
 
-    void cuda_create_image(int image_width, int image_height,
-                           std::vector<int> &lin_width, std::vector<int> &lin_height,
-                           std::vector<unsigned char> &image_vector,
-                           ColorContainer &color_container, EngineDataContainer &dc, int block_size,
-                           std::vector<int> & truncated_lin_width,
-                           std::vector<int> & truncated_lin_height);
+    void cuda_create_image(int image_width, int image_height, std::vector<int> &lin_width, std::vector<int> &lin_height,
+                           std::vector<unsigned char> &image_vector, ColorContainer &color_container,
+                           EngineDataContainer &dc, int block_size, std::vector<int> &truncated_lin_width,
+                           std::vector<int> &truncated_lin_height);
+
+    void load_symbols(ColorContainer *colorContainer);
 };
 
 #endif //THELIFEENGINECPP_CUDA_IMAGE_CREATOR_CUH

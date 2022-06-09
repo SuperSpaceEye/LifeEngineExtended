@@ -291,9 +291,7 @@ private:
                              std::vector<int> &lin_width,
                              std::vector<int> &lin_height);
 
-    void complex_for_loop(int image_width, int image_height,
-                          std::vector<int> &lin_width,
-                          std::vector<int> &lin_height);
+    void complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height);
 
     static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                             int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
@@ -379,6 +377,7 @@ private slots:
     void le_brush_size_slot();
     void le_auto_produce_food_every_n_tick_slot();
     void le_update_info_every_n_milliseconds_slot();
+    void le_menu_height_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
@@ -408,6 +407,7 @@ private slots:
     void cb_stop_when_one_food_generated(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
+    void cb_eat_then_produce_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

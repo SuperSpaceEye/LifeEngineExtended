@@ -1,6 +1,6 @@
-#include "LifeEngineCpp/WindowCore.h"
 #include <QApplication>
 #include <QStyleFactory>
+#include "LifeEngineCpp/WindowCore.h"
 
 #if defined(__WIN32)
 #include <windows.h>

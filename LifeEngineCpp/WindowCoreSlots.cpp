@@ -60,7 +60,6 @@ void WindowCore::b_reset_slot() {
 }
 
 void WindowCore::b_resize_and_reset_slot() {
-    //it breaks, if I do it inplace
     resize_simulation_grid_flag = true;
 }
 
@@ -408,6 +407,13 @@ void WindowCore::le_update_info_every_n_milliseconds_slot() {
     if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
     update_info_every_n_milliseconds = result.result;}
 
+void WindowCore::le_menu_height_slot() {
+    int fallback = _ui.menu_frame->frameSize().height();
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_menu_height, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 200) {display_message("Input cannot be less than 200."); return;}
+    _ui.menu_frame->setFixedHeight(result.result);}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
@@ -526,6 +532,8 @@ void WindowCore::cb_simplified_food_production_slot      (bool state) { sp.simpl
 void WindowCore::cb_stop_when_one_food_generated         (bool state) { sp.stop_when_one_food_generated = state;}
 
 void WindowCore::cb_synchronise_info_with_window_slot    (bool state) { synchronise_info_with_window_update = state;}
+
+void WindowCore::cb_eat_then_produce_slot                (bool state) { sp.eat_then_produce = state;}
 
 //==================== Table ====================
 

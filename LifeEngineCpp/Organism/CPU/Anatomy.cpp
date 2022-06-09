@@ -281,9 +281,7 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
 
     for (auto const &xmap: producing_space) {
         for (auto const &yxmap: xmap.second) {
-//            _producing_space.at(yxmap.second.producer).emplace_back(SerializedAdjacentSpaceContainer(xmap.first, yxmap.first));
             _producing_space[yxmap.second.producer].emplace_back(SerializedAdjacentSpaceContainer(xmap.first, yxmap.first));
-            //_producing_space[yxmap.second.producer](xmap.first, yxmap.first);
         }
     }
 

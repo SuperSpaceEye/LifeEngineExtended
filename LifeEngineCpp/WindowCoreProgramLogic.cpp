@@ -107,7 +107,6 @@ void WindowCore::mainloop_tick() {
     }
     window_tick();
     window_frames++;
-    end = clock_now();
     delta_window_processing_time = std::abs(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count());
 
     auto info_update = std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count();
@@ -119,13 +118,14 @@ void WindowCore::mainloop_tick() {
         wait_for_engine_to_pause();
         simulation_frames = dc.engine_ticks;
         dc.engine_ticks = 0;
-        unpause_engine();
 
         if (info_update == 0) {info_update = 1;}
 
         auto scale = (info_update/1000.);
 
         auto info = calculate_organisms_info();
+
+        unpause_engine();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
@@ -134,6 +134,7 @@ void WindowCore::mainloop_tick() {
         window_frames = 0;
         fps_timer = clock_now();
     }
+    end = clock_now();
 }
 
 void WindowCore::update_fps_labels(int fps, int sps) {
@@ -144,13 +145,11 @@ void WindowCore::update_fps_labels(int fps, int sps) {
 void WindowCore::window_tick() {
     if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
     if (cp.tb_paused) {_ui.tb_pause->setChecked(true);}
-
+    if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
+    if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
 #if __VALGRIND_MODE__ == 1
     return;
 #endif
-
-    if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
-    if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
     create_image();
 }
 
@@ -172,12 +171,15 @@ void WindowCore::reset_scale_view() {
     center_x = (float)dc.simulation_width/2;
     center_y = (float)dc.simulation_height/2;
     // finds exponent needed to scale the sprite
-    auto exp = log((float)dc.simulation_height/(float)_ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
-//    auto exp = log(1) / log(1.05);
+    float exp;
+    if (_ui.simulation_graphicsView->viewport()->height() < _ui.simulation_graphicsView->viewport()->width()) {
+        exp = log((float) dc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
+    } else {
+        exp = log((float) dc.simulation_width / (float) _ui.simulation_graphicsView->viewport()->width()) / log(scaling_coefficient);
+    }
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
-//__attribute__((noinline))
 color &WindowCore::get_color_simplified(BlockTypes type) {
     switch (type) {
         case EmptyBlock :   return color_container.empty_block;
@@ -237,7 +239,6 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
                         break;
                 }
             }
-
             return textures.rawEyeTexture[x + y * 5];
         case FoodBlock:     return color_container.food;
         case WallBlock:     return color_container.wall;
@@ -255,11 +256,11 @@ void WindowCore::create_image() {
     int scaled_height = image_height * scaling_zoom;
 
     // start and stop coordinates on simulation grid
-    auto start_x = (int)(center_x-(scaled_width / 2));
-    auto end_x = (int)(center_x+(scaled_width / 2));
+    auto start_x = int(center_x-(scaled_width / 2));
+    auto end_x = int(center_x+(scaled_width / 2));
 
-    auto start_y = (int)(center_y-(scaled_height / 2));
-    auto end_y = (int)(center_y+(scaled_height / 2));
+    auto start_y = int(center_y-(scaled_height / 2));
+    auto end_y = int(center_y+(scaled_height / 2));
 
     std::vector<int> lin_width;
     std::vector<int> lin_height;
@@ -284,7 +285,7 @@ void WindowCore::create_image() {
         simplified_for_loop(image_width, image_height, lin_width, lin_height);
     } else {
         if (!use_cuda) {
-            complex_for_loop(image_width, image_height, lin_width, lin_height);
+            complex_for_loop(lin_width, lin_height);
         } else {
 #if __CUDA_USED__
             cuda_creator.cuda_create_image(image_width,
@@ -346,9 +347,7 @@ void WindowCore::simplified_for_loop(int image_width, int image_height,
     }
 }
 
-void WindowCore::complex_for_loop(int image_width, int image_height,
-                      std::vector<int> &lin_width,
-                      std::vector<int> &lin_height) {
+void WindowCore::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {
     std::vector<pix_pos> width_img_boundaries;
     std::vector<pix_pos> height_img_boundaries;
 
@@ -506,7 +505,9 @@ void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
     wait_for_engine_to_pause_force();
 
     cp.num_threads = num_threads;
-    cp.build_threads = true;
+    if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        cp.build_threads = true;
+    }
 
     unpause_engine();
 }
@@ -525,10 +526,19 @@ void WindowCore::clear_organisms() {
         if (!stop_console_output) {std::cout << "Engine is not paused! Organisms not cleared.\n";}
         return;
     }
-    for (auto & organism: dc.organisms) {delete organism;}
-    for (auto & organism: dc.to_place_organisms) {delete organism;}
-    dc.organisms.clear();
-    dc.to_place_organisms.clear();
+    if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+        for (auto &organism: dc.organisms) { delete organism; }
+        for (auto &organism: dc.to_place_organisms) { delete organism; }
+        dc.organisms.clear();
+        dc.to_place_organisms.clear();
+    } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        for (auto & organism: dc.to_place_organisms) { delete organism; }
+        dc.to_place_organisms.clear();
+        for (int pool_num = 0; pool_num < cp.num_threads; pool_num++) {
+            for (auto & organism: dc.organisms_pools[pool_num]) { delete organism; }
+            dc.organisms_pools[pool_num].clear();
+        }
+    }
 }
 
 void WindowCore::calculate_new_simulation_size() {
@@ -618,8 +628,9 @@ void WindowCore::reset_world() {
     dc.chosen_organism->x = dc.simulation_width / 2;
     dc.chosen_organism->y = dc.simulation_height / 2;
 
-    if (reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
-    else                   {dc.to_place_organisms.push_back(new Organism(dc.base_organism));}
+    if (reset_with_chosen) { dc.to_place_organisms.push_back(new Organism(dc.chosen_organism)); }
+    else { dc.to_place_organisms.push_back(new Organism(dc.base_organism)); }
+
     //Just in case
     cp.engine_pass_tick = true;
     cp.synchronise_simulation_tick = true;
@@ -652,64 +663,84 @@ void WindowCore::make_walls() {
 
 OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     OrganismAvgBlockInformation info;
-    for (auto & organism: dc.organisms) {
-        info.total_size_organism_blocks += organism->organism_anatomy->_organism_blocks.size();
-        info.total_size_producing_space += organism->organism_anatomy->_producing_space.size();
-        info.total_size_eating_space    += organism->organism_anatomy->_eating_space.size();
-        info.total_size_single_adjacent_space += organism->organism_anatomy->_single_adjacent_space.size();
-        info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
-        info.total_size_double_adjacent_space += organism->organism_anatomy->_double_adjacent_space.size();
 
-        if (organism->organism_anatomy->_mover_blocks > 0) {
-            info.move_range += organism->move_range;
-            info.moving_organisms++;
+    bool has_pool = true;
+    int i = 0;
+    //Why while loop? the easier implementation with for loop randomly crashes sometimes, and I don't know why.
+    while (has_pool) {
+        std::vector<Organism*> * pool;
 
-            if(organism->organism_anatomy->_eye_blocks > 0) {
-                info.organisms_with_eyes++;
+        if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+            pool = &dc.organisms;
+            has_pool = false;
+        } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+            pool = &dc.organisms_pools[i];
+            i++;
+            if (i >= cp.num_threads) {
+                has_pool = false;
             }
         }
 
-        info.total_avg.size += organism->organism_anatomy->_organism_blocks.size();
+        for (auto & organism: *pool) {
+            info.total_size_organism_blocks += organism->organism_anatomy->_organism_blocks.size();
+            info.total_size_producing_space += organism->organism_anatomy->_producing_space.size();
+            info.total_size_eating_space += organism->organism_anatomy->_eating_space.size();
+            info.total_size_single_adjacent_space += organism->organism_anatomy->_single_adjacent_space.size();
+            info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
+            info.total_size_double_adjacent_space += organism->organism_anatomy->_double_adjacent_space.size();
 
-        info.total_avg._organism_lifetime += organism->max_lifetime;
-        info.total_avg._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
-        info.total_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
-        info.total_avg._mover_blocks    += organism->organism_anatomy->_mover_blocks;
-        info.total_avg._killer_blocks   += organism->organism_anatomy->_killer_blocks;
-        info.total_avg._armor_blocks    += organism->organism_anatomy->_armor_blocks;
-        info.total_avg._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+            if (organism->organism_anatomy->_mover_blocks > 0) {
+                info.move_range += organism->move_range;
+                info.moving_organisms++;
 
-        info.total_avg.brain_mutation_rate   += organism->brain_mutation_rate;
-        info.total_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+                if (organism->organism_anatomy->_eye_blocks > 0) {
+                    info.organisms_with_eyes++;
+                }
+            }
 
-        if (organism->organism_anatomy->_mover_blocks > 0) {
-            info.moving_avg.size += organism->organism_anatomy->_organism_blocks.size();
+            info.total_avg.size += organism->organism_anatomy->_organism_blocks.size();
 
-            info.moving_avg._organism_lifetime += organism->max_lifetime;
-            info.moving_avg._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
-            info.moving_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
-            info.moving_avg._mover_blocks    += organism->organism_anatomy->_mover_blocks;
-            info.moving_avg._killer_blocks   += organism->organism_anatomy->_killer_blocks;
-            info.moving_avg._armor_blocks    += organism->organism_anatomy->_armor_blocks;
-            info.moving_avg._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+            info.total_avg._organism_lifetime += organism->max_lifetime;
+            info.total_avg._mouth_blocks += organism->organism_anatomy->_mouth_blocks;
+            info.total_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
+            info.total_avg._mover_blocks += organism->organism_anatomy->_mover_blocks;
+            info.total_avg._killer_blocks += organism->organism_anatomy->_killer_blocks;
+            info.total_avg._armor_blocks += organism->organism_anatomy->_armor_blocks;
+            info.total_avg._eye_blocks += organism->organism_anatomy->_eye_blocks;
 
-            info.moving_avg.brain_mutation_rate   += organism->brain_mutation_rate;
-            info.moving_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
-            info.moving_avg.total++;
-        } else {
-            info.station_avg.size += organism->organism_anatomy->_organism_blocks.size();
+            info.total_avg.brain_mutation_rate += organism->brain_mutation_rate;
+            info.total_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+            info.total_avg.total++;
 
-            info.station_avg._organism_lifetime += organism->max_lifetime;
-            info.station_avg._mouth_blocks    += organism->organism_anatomy->_mouth_blocks;
-            info.station_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
-            info.station_avg._mover_blocks    += organism->organism_anatomy->_mover_blocks;
-            info.station_avg._killer_blocks   += organism->organism_anatomy->_killer_blocks;
-            info.station_avg._armor_blocks    += organism->organism_anatomy->_armor_blocks;
-            info.station_avg._eye_blocks      += organism->organism_anatomy->_eye_blocks;
+            if (organism->organism_anatomy->_mover_blocks > 0) {
+                info.moving_avg.size += organism->organism_anatomy->_organism_blocks.size();
 
-            info.station_avg.brain_mutation_rate   += organism->brain_mutation_rate;
-            info.station_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
-            info.station_avg.total++;
+                info.moving_avg._organism_lifetime += organism->max_lifetime;
+                info.moving_avg._mouth_blocks += organism->organism_anatomy->_mouth_blocks;
+                info.moving_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
+                info.moving_avg._mover_blocks += organism->organism_anatomy->_mover_blocks;
+                info.moving_avg._killer_blocks += organism->organism_anatomy->_killer_blocks;
+                info.moving_avg._armor_blocks += organism->organism_anatomy->_armor_blocks;
+                info.moving_avg._eye_blocks += organism->organism_anatomy->_eye_blocks;
+
+                info.moving_avg.brain_mutation_rate += organism->brain_mutation_rate;
+                info.moving_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+                info.moving_avg.total++;
+            } else {
+                info.station_avg.size += organism->organism_anatomy->_organism_blocks.size();
+
+                info.station_avg._organism_lifetime += organism->max_lifetime;
+                info.station_avg._mouth_blocks += organism->organism_anatomy->_mouth_blocks;
+                info.station_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
+                info.station_avg._mover_blocks += organism->organism_anatomy->_mover_blocks;
+                info.station_avg._killer_blocks += organism->organism_anatomy->_killer_blocks;
+                info.station_avg._armor_blocks += organism->organism_anatomy->_armor_blocks;
+                info.station_avg._eye_blocks += organism->organism_anatomy->_eye_blocks;
+
+                info.station_avg.brain_mutation_rate += organism->brain_mutation_rate;
+                info.station_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
+                info.station_avg.total++;
+            }
         }
     }
 
@@ -728,23 +759,23 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
                       info.total_size_single_adjacent_space +
                       info.total_size_single_diagonal_adjacent_space +
                       info.total_size_double_adjacent_space +
-                      (sizeof(Brain) * dc.organisms.size()) +
-                      (sizeof(Anatomy) * dc.organisms.size()) +
-                      (sizeof(Organism) * dc.organisms.size())
+                      (sizeof(Brain) * info.total_avg.total) +
+                      (sizeof(Anatomy) * info.total_avg.total) +
+                      (sizeof(Organism) * info.total_avg.total)
                       ;
 
-    info.total_avg.size /= dc.organisms.size();
+    info.total_avg.size /= info.total_avg.total;
 
-    info.total_avg._organism_lifetime /= dc.organisms.size();
-    info.total_avg._mouth_blocks    /= dc.organisms.size();
-    info.total_avg._producer_blocks /= dc.organisms.size();
-    info.total_avg._mover_blocks    /= dc.organisms.size();
-    info.total_avg._killer_blocks   /= dc.organisms.size();
-    info.total_avg._armor_blocks    /= dc.organisms.size();
-    info.total_avg._eye_blocks      /= dc.organisms.size();
+    info.total_avg._organism_lifetime /= info.total_avg.total;
+    info.total_avg._mouth_blocks    /= info.total_avg.total;
+    info.total_avg._producer_blocks /= info.total_avg.total;
+    info.total_avg._mover_blocks    /= info.total_avg.total;
+    info.total_avg._killer_blocks   /= info.total_avg.total;
+    info.total_avg._armor_blocks    /= info.total_avg.total;
+    info.total_avg._eye_blocks      /= info.total_avg.total;
 
-    info.total_avg.brain_mutation_rate   /= dc.organisms.size();
-    info.total_avg.anatomy_mutation_rate /= dc.organisms.size();
+    info.total_avg.brain_mutation_rate   /= info.total_avg.total;
+    info.total_avg.anatomy_mutation_rate /= info.total_avg.total;
 
     if (std::isnan(info.total_avg.size))             {info.total_avg.size             = 0;}
     if (std::isnan(info.move_range))                    {info.move_range               = 0;}
@@ -820,7 +851,7 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
     _ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
     _ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
-    _ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(dc.organisms.size())));
+    _ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
     _ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size,             float_precision)));
     _ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
     _ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
@@ -909,11 +940,11 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_multiply_food_production_prob     ->setChecked(sp.multiply_food_production_prob);
     _ui.cb_simplified_food_production        ->setChecked(sp.simplified_food_production);
     _ui.cb_stop_when_one_food_generated      ->setChecked(sp.stop_when_one_food_generated);
-    _ui.cb_use_nvidia_for_image_generation   ->setChecked(use_cuda);
+    _ui.cb_eat_then_produce                  ->setChecked(sp.eat_then_produce);
 
     //Settings
-    _ui.le_num_threads            ->setText(QString::fromStdString(std::to_string(cp.num_threads)));
-    _ui.le_float_number_precision ->setText(QString::fromStdString(std::to_string(float_precision)));
+    _ui.le_num_threads->setText(QString::fromStdString(std::to_string(cp.num_threads)));
+    _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
     int font_size = 0;
     if (font().pixelSize() < 0) {
@@ -935,6 +966,11 @@ void WindowCore::initialize_gui_settings() {
 
     _ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     _ui.cb_synchronise_info_with_window->setChecked(synchronise_info_with_window_update);
+    _ui.cb_use_nvidia_for_image_generation->setChecked(use_cuda);
+    _ui.le_menu_height->setText(QString::fromStdString(std::to_string(_ui.menu_frame->frameSize().height())));
+#if __CUDA_USED__ == 0
+    _ui.cb_use_nvidia_for_image_generation->hide();
+#endif
 }
 
 void WindowCore::update_simulation_size_label() {

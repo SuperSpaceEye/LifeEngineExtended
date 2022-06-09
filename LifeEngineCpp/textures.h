@@ -11,8 +11,6 @@ struct color {
     unsigned char r{0};
     unsigned char g{0};
     unsigned char b{0};
-    color(unsigned char r, unsigned char g, unsigned char b): r(r), g(g), b(b) {}
-    color()=default;
 };
 
 #define BLACK1 color{14,  19,  24}

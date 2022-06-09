@@ -247,6 +247,7 @@ public:
     QCheckBox *cb_multiply_food_production_prob;
     QCheckBox *cb_simplified_food_production;
     QCheckBox *cb_stop_when_one_food_generated;
+    QCheckBox *cb_eat_then_produce;
     QWidget *statistics_tab;
     QVBoxLayout *verticalLayout_3;
     QScrollArea *scrollArea_4;
@@ -325,6 +326,9 @@ public:
     QLineEdit *le_update_info_every_n_milliseconds;
     QCheckBox *cb_synchronise_info_with_window;
     QCheckBox *cb_use_nvidia_for_image_generation;
+    QHBoxLayout *horizontalLayout_14;
+    QLabel *label_47;
+    QLineEdit *le_menu_height;
     QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
     QButtonGroup *editor_modes;
@@ -369,7 +373,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(menu_frame->sizePolicy().hasHeightForWidth());
         menu_frame->setSizePolicy(sizePolicy1);
-        menu_frame->setMinimumSize(QSize(0, 0));
+        menu_frame->setMinimumSize(QSize(0, 250));
         menu_frame->setFrameShape(QFrame::NoFrame);
         horizontalLayout = new QHBoxLayout(menu_frame);
         horizontalLayout->setSpacing(0);
@@ -1115,7 +1119,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 1092));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 1121));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1553,6 +1557,11 @@ public:
 
         verticalLayout_20->addWidget(cb_stop_when_one_food_generated);
 
+        cb_eat_then_produce = new QCheckBox(widget);
+        cb_eat_then_produce->setObjectName(QStringLiteral("cb_eat_then_produce"));
+
+        verticalLayout_20->addWidget(cb_eat_then_produce);
+
 
         verticalLayout_9->addWidget(widget);
 
@@ -1573,7 +1582,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, -60, 608, 400));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 608, 400));
         QSizePolicy sizePolicy9(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1819,7 +1828,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 371));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 400));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -1844,6 +1853,7 @@ public:
         simulation_modes->setObjectName(QStringLiteral("simulation_modes"));
         simulation_modes->addButton(rb_single_thread_mode);
         rb_single_thread_mode->setObjectName(QStringLiteral("rb_single_thread_mode"));
+        rb_single_thread_mode->setEnabled(false);
         rb_single_thread_mode->setChecked(true);
 
         verticalLayout_23->addWidget(rb_single_thread_mode);
@@ -1851,7 +1861,7 @@ public:
         rb_partial_multi_thread_mode = new QRadioButton(widget_2);
         simulation_modes->addButton(rb_partial_multi_thread_mode);
         rb_partial_multi_thread_mode->setObjectName(QStringLiteral("rb_partial_multi_thread_mode"));
-        rb_partial_multi_thread_mode->setEnabled(true);
+        rb_partial_multi_thread_mode->setEnabled(false);
 
         verticalLayout_23->addWidget(rb_partial_multi_thread_mode);
 
@@ -1960,6 +1970,21 @@ public:
 
         verticalLayout_19->addWidget(cb_use_nvidia_for_image_generation);
 
+        horizontalLayout_14 = new QHBoxLayout();
+        horizontalLayout_14->setObjectName(QStringLiteral("horizontalLayout_14"));
+        label_47 = new QLabel(widget_2);
+        label_47->setObjectName(QStringLiteral("label_47"));
+
+        horizontalLayout_14->addWidget(label_47);
+
+        le_menu_height = new QLineEdit(widget_2);
+        le_menu_height->setObjectName(QStringLiteral("le_menu_height"));
+
+        horizontalLayout_14->addWidget(le_menu_height);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_14);
+
 
         verticalLayout_5->addWidget(widget_2);
 
@@ -2067,6 +2092,8 @@ public:
         QObject::connect(cb_synchronise_info_with_window, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_synchronise_info_with_window_slot(bool)));
         QObject::connect(le_update_info_every_n_milliseconds, SIGNAL(returnPressed()), MainWindow, SLOT(le_update_info_every_n_milliseconds_slot()));
         QObject::connect(cb_use_nvidia_for_image_generation, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_nvidia_for_image_generation_slot(bool)));
+        QObject::connect(cb_eat_then_produce, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_eat_then_produce_slot(bool)));
+        QObject::connect(le_menu_height, SIGNAL(returnPressed()), MainWindow, SLOT(le_menu_height_slot()));
 
         Tabs->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
@@ -2275,6 +2302,7 @@ public:
         cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability by number of producers", Q_NULLPTR));
         cb_simplified_food_production->setText(QApplication::translate("MainWindow", "Simplified food production", Q_NULLPTR));
         cb_stop_when_one_food_generated->setText(QApplication::translate("MainWindow", "Stop food production when one food is generated", Q_NULLPTR));
+        cb_eat_then_produce->setText(QApplication::translate("MainWindow", "Eat first, then produce food.", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", Q_NULLPTR));
         lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", Q_NULLPTR));
         lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", Q_NULLPTR));
@@ -2329,6 +2357,7 @@ public:
         label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", Q_NULLPTR));
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", Q_NULLPTR));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", Q_NULLPTR));
+        label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", Q_NULLPTR));
     } // retranslateUi
 

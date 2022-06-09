@@ -40,9 +40,11 @@ enum class PartialSimulationStage {
 
 class SimulationEnginePartialMultiThread {
 private:
+    static void place_organisms (EngineDataContainer * dc, EngineControlParameters * cp);
+
     static void place_organism (EngineDataContainer * dc, Organism * organism);
 
-    static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
+    static void eat_food       (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
     static void tick_lifetime(EngineDataContainer *dc, std::vector<std::vector<int>> &to_erase,
                               Organism *organism, int thread_num, int organism_pos);
@@ -52,10 +54,8 @@ private:
     static void get_observations(EngineDataContainer *dc, Organism *&organism,
                                  std::vector<std::vector<Observation>> &organism_observations,
                                  SimulationParameters *sp, int organism_num);
-    static void calculate_threads_points(int num_points, int num_threads, std::vector<std::vector<int>> & thread_points);
 
-    static void start_stage(EngineDataContainer *dc, PartialSimulationStage stage,
-                            std::vector<std::vector<int>> &thread_points);
+    static void start_stage(EngineDataContainer *dc, PartialSimulationStage stage);
 
     static void change_organisms_pools(EngineDataContainer *dc, EngineControlParameters * cp);
 public:
@@ -70,15 +70,12 @@ public:
     static void kill_threads(EngineDataContainer &dc);
 
     static void thread_tick(PartialSimulationStage stage, EngineDataContainer *dc,
-                            SimulationParameters *sp, lehmer64 *gen, int start_pos,
-                            int end_pos, int thread_num);
+                            SimulationParameters *sp, lehmer64 *gen, int thread_num);
 };
 
 struct eager_worker_partial {
     EngineDataContainer * dc = nullptr;
     SimulationParameters * sp = nullptr;
-    int start_pos = 0;
-    int end_pos = 0;
     int thread_num;
 
     std::random_device r;
@@ -87,20 +84,16 @@ struct eager_worker_partial {
     eager_worker_partial() = default;
     eager_worker_partial(EngineDataContainer * dc, SimulationParameters * sp, int thread_num):
             dc(dc), sp(sp), thread_num(thread_num){
-//        auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
         gen = lehmer64(r());
         thread = std::thread{&eager_worker_partial::main_loop, this};
     }
     eager_worker_partial(const eager_worker_partial & worker):
             dc(worker.dc), sp(worker.sp), thread_num(worker.thread_num){
-//        auto seed = std::seed_seq{r(),r(),r(),r(),r(),r(),r(),r()};
         gen = lehmer64(r());
         thread = std::thread{&eager_worker_partial::main_loop, this};
     }
 
-    inline void work(PartialSimulationStage stage, int start, int stop) {
-        start_pos = start;
-        end_pos = stop;
+    inline void work(PartialSimulationStage stage) {
         thread_stage = stage;
         has_work = true;
     }
@@ -147,7 +140,7 @@ private:
                     return;
                 }
             }
-            SimulationEnginePartialMultiThread::thread_tick(thread_stage, dc, sp, &gen, start_pos, end_pos, thread_num);
+            SimulationEnginePartialMultiThread::thread_tick(thread_stage, dc, sp, &gen, thread_num);
             has_work = false;
         }
     }

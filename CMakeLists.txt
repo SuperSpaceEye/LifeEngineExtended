@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.20)
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
-#enable_language(CUDA)
+enable_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
@@ -11,8 +11,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-#set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
-#set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
+set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 61)
@@ -20,15 +20,15 @@ set(AUTO_UI_FILE_REBUILDING 0)
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-#set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=static")
 
 #for perf
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
-#find_package(CUDAToolkit)
+find_package(CUDAToolkit)
 
-set(WIN_COMPILATION 1)
+set(WIN_COMPILATION 0)
 
 if (WIN_COMPILATION)
     set(BOOST_ROOT "C:\\libs\\boost\\boost_1_79_0")
@@ -80,12 +80,14 @@ if(CUDAToolkit_FOUND)
 
     add_compile_definitions(__CUDA_USED__=1)
     set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+#    target_link_libraries(${PROJECT_NAME} CUDA::cudart_static)
 else()
+    message(STATUS "No CUDAToolkit found.")
     add_compile_definitions(__CUDA_USED__=0)
 endif()
 
 if (Qt5_FOUND)
-    if(!WIN_COMPILATION)
+    if(NOT WIN_COMPILATION)
         #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
         get_property( core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
         string( REPLACE "-fPIC" "" new_core_options "${core_options}" )

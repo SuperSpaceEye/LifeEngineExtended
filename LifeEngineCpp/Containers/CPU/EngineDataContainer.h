@@ -35,8 +35,6 @@ struct EngineDataContainer {
     std::vector<BaseGridBlock> second_simulation_grid;
 
     std::vector<eager_worker_partial> threads;
-    //std::vector<int> thread_points;
-    //std::vector<std::vector<BaseMutexGridBlock>> partial_multi_thread_simulation_grid;
     std::vector<std::vector<int>> threaded_to_erase;
     std::vector<std::vector<std::vector<Observation>>> pooled_organisms_observations;
 

@@ -13,8 +13,13 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     auto to_erase = std::vector<int>{};
 
-    for (auto & organism: dc->organisms) {eat_food(dc, sp, organism);}
-    for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *gen);}
+    if (sp->eat_then_produce) {
+        for (auto &organism: dc->organisms) { eat_food(dc, sp, organism); }
+        for (auto &organism: dc->organisms) { produce_food(dc, sp, organism, *gen); }
+    } else {
+        for (auto &organism: dc->organisms) { produce_food(dc, sp, organism, *gen); }
+        for (auto &organism: dc->organisms) { eat_food(dc, sp, organism); }
+    }
 
 //    float avg = 0;
 //    for (auto & point: time_points) {
@@ -63,7 +68,6 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
     }
 }
 
-//TODO produce_food is the most resource intensive stage of simulation (according to perf).
 void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
     if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
     if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
@@ -157,7 +161,6 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
                 default:
                     break;
             }
-
             if (world_block.organism != nullptr) {
                 if (sp->on_touch_kill) {
                     world_block.organism->damage = world_block.organism->life_points + 1;
@@ -269,7 +272,6 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
         default: break;
     }
 
-
     if (new_int_rotation < 0) {new_int_rotation+=4;}
     if (new_int_rotation > 3) {new_int_rotation-=4;}
 
@@ -377,15 +379,6 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
                 organism->move_counter++;
             }
             break;
-//        case BrainDecision::RotateLeft:
-//        case BrainDecision::RotateRight:
-//        case BrainDecision::Flip:
-//            if (organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-//                //rotate_organism(dc, organism, organism->last_decision);
-//            }
-//            break;
-//        case BrainDecision::DoNothing:
-//            break;
         default: break;
     }
     if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_move_range == organism->move_counter)) {
@@ -430,7 +423,6 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     auto max_y = 0;
     auto max_x = 0;
 
-    //a width and height of an organism can only change by one, so to be safe, the distance between organisms = size_of_base_organism + 1
     switch (to_place) {
         case Rotation::UP:
             for (auto & block: organism->organism_anatomy->_organism_blocks) {

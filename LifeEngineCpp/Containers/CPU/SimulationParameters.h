@@ -60,6 +60,7 @@ struct SimulationParameters {
         bool multiply_food_production_prob = false;
         bool simplified_food_production = false;
         bool stop_when_one_food_generated = false;
+        bool eat_then_produce = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H
