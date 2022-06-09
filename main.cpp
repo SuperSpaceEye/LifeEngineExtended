@@ -2,17 +2,9 @@
 #include <QApplication>
 #include <QStyleFactory>
 
-#ifndef __CUDA_USED__
-#define __CUDA_USED__=0
-#endif
-
 #if defined(__WIN32)
 #include <windows.h>
 #endif
-
-//#if __CUDA_USED__
-//#include "LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh"
-//#endif
 
 int main(int argc, char *argv[]) {
 #if defined(__WIN32)
