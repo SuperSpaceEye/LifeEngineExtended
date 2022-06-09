@@ -34,9 +34,6 @@ class CUDAImageCreator {
     unsigned char * d_image_vector = nullptr;
     BaseGridBlock * d_second_simulation_grid = nullptr;
 
-//    ColorContainer * dd_color_container;
-//    Textures * dd_textures;
-
     int last_image_width = 0;
     int last_image_height = 0;
     int last_lin_width = 0;
@@ -69,48 +66,6 @@ class CUDAImageCreator {
         gpuErrchk(cudaFree(d_lin_height));
         gpuErrchk(cudaMalloc((int**)&d_lin_width, sizeof(int) * lin_width_size));
         gpuErrchk(cudaMalloc((int**)&d_lin_height, sizeof(int) * lin_height_size));
-    }
-
-    void color_container_changed(ColorContainer * color_container) {
-//        cudaFree(d_color_container);
-//        ColorContainer * ad_color_container;
-//        cudaMalloc((ColorContainer**)&dd_color_container, sizeof(ColorContainer));
-//        cudaMemcpy(dd_color_container,
-//                   color_container,
-//                   sizeof(ColorContainer),
-//                   cudaMemcpyHostToDevice);
-//        cudaMemcpyToSymbol("d_color_container",
-//                           &ad_color_container,
-//                           sizeof(ColorContainer),
-//                           size_t(color_container),
-//                           cudaMemcpyHostToDevice);
-    }
-
-    void textures_changed(Textures * textures) {
-//        Textures * ad_textures;
-//        cudaMalloc((Textures**)&dd_textures, sizeof(Textures));
-//        cudaMemcpy(dd_textures,
-//                   textures,
-//                   sizeof(Textures),
-//                   cudaMemcpyHostToDevice);
-//        cudaMemcpyToSymbol("d_textures",
-//                           &ad_textures,
-//                           sizeof(Textures),
-//                           size_t(textures),
-//                           cudaMemcpyHostToDevice);
-    }
-
-    void init(int image_width, int image_height,
-              int simulation_width, int simulation_height,
-              int width_img_boundaries_size, int height_img_boundaries_size,
-              int lin_width_size, int lin_height_size,
-              ColorContainer * color_container, Textures * textures) {
-        image_dimensions_changed(image_width, image_height);
-        simulation_dimensions_changed(simulation_width, simulation_height);
-        lin_size_changed(lin_width_size, lin_height_size);
-//        color_container_changed(color_container);
-//        textures_changed(textures);
-        load_symbols(color_container);
     }
 
     void check_if_changed(int image_width, int image_height,
@@ -187,10 +142,6 @@ class CUDAImageCreator {
 
 public:
     CUDAImageCreator()=default;
-    CUDAImageCreator(ColorContainer * color_container, Textures * textures) {
-        color_container_changed(color_container);
-        textures_changed(textures);
-    }
 
     void free() {
         cudaFree(d_image_vector);
@@ -199,8 +150,6 @@ public:
         cudaFree(d_height_img_boundaries);
         cudaFree(d_lin_width);
         cudaFree(d_lin_height);
-//        cudaFree(d_textures);
-//        cudaFree(d_color_container);
 
         d_lin_width = nullptr;
         d_lin_height = nullptr;
@@ -208,8 +157,6 @@ public:
         d_height_img_boundaries = nullptr;
         d_image_vector = nullptr;
         d_second_simulation_grid = nullptr;
-//        d_color_container = nullptr;
-//        d_textures = nullptr;
 
         last_image_width = 0;
         last_image_height = 0;

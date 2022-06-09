@@ -81,6 +81,9 @@ WindowCore::WindowCore(QWidget *parent) :
 
         reset_scale_view();
         initialize_gui_settings();
+        #if defined(__WIN32)
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
+        #endif
     });
 
     timer = new QTimer(parent);
@@ -946,7 +949,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_num_threads->setText(QString::fromStdString(std::to_string(cp.num_threads)));
     _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
-    int font_size = 0;
+    int font_size;
     if (font().pixelSize() < 0) {
         font_size = font().pointSize();
     } else {
@@ -966,7 +969,9 @@ void WindowCore::initialize_gui_settings() {
 
     _ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     _ui.cb_synchronise_info_with_window->setChecked(synchronise_info_with_window_update);
+    disable_warnings = true;
     _ui.cb_use_nvidia_for_image_generation->setChecked(use_cuda);
+    disable_warnings = false;
     _ui.le_menu_height->setText(QString::fromStdString(std::to_string(_ui.menu_frame->frameSize().height())));
 #if __CUDA_USED__ == 0
     _ui.cb_use_nvidia_for_image_generation->hide();

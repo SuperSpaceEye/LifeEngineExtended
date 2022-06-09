@@ -2,15 +2,8 @@
 #include <QStyleFactory>
 #include "LifeEngineCpp/WindowCore.h"
 
-#if defined(__WIN32)
-#include <windows.h>
-#endif
-
 int main(int argc, char *argv[]) {
-#if defined(__WIN32)
-    ShowWindow(GetConsoleWindow(), SW_HIDE);
-#endif
-
+    std::cout << "Loading...\n";
     QApplication app(argc, argv);
     app.setStyle(QStyleFactory::create("WindowsVista"));
     QWidget widget;

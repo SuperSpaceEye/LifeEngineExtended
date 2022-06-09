@@ -12,7 +12,6 @@
 #include <sstream>
 #include <iomanip>
 #include <thread>
-#include <omp.h>
 #include <random>
 
 #include <boost/lexical_cast.hpp>
@@ -47,6 +46,10 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include "cuda_image_creator.cuh"
+#endif
+
+#if defined(__WIN32)
+#include <windows.h>
 #endif
 
 enum class CursorMode {
@@ -162,8 +165,6 @@ private:
 
     CursorMode cursor_mode = CursorMode::ModifyFood;
 
-    int start_height = 100;
-
     void move_center(int delta_x, int delta_y);
     void reset_scale_view();
 
@@ -178,7 +179,6 @@ private:
 
     Ui::MainWindow _ui{};
     QTimer * timer;
-    //void showEvent(QShowEvent *event);
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
 
@@ -264,7 +264,6 @@ private:
 
     color & get_color_simplified(BlockTypes type);
     color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
-//    QColor &get_color_simplified(BlockTypes type);
 
     bool wait_for_engine_to_pause();
     void parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height);

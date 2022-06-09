@@ -481,7 +481,9 @@ void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
     if (!result) {
         _ui.cb_use_nvidia_for_image_generation->setChecked(false);
         use_cuda = false;
-        display_message("Warning, CUDA is not available on this device.");
+        if (!disable_warnings) {
+            display_message("Warning, CUDA is not available on this device.");
+        }
         return;
     }
     use_cuda = true;
