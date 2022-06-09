@@ -6,6 +6,7 @@
 #define THELIFEENGINECPP_LINSPACE_H
 
 #include <vector>
+#include <cmath>
 
 template<typename T>
 std::vector<T> linspace(double start, double end, int num) {

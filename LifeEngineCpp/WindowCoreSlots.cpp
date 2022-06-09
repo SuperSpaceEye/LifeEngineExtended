@@ -14,6 +14,7 @@ void WindowCore::display_message(const std::string &message) {
     QMessageBox msg;
     msg.setText(QString::fromStdString(message));
     msg.setWindowTitle("Warning");
+    msg.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     msg.exec();
 }
 
@@ -473,6 +474,7 @@ void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
     auto result = cuda_is_available();
     if (!result) {
         _ui.cb_use_nvidia_for_image_generation->setChecked(false);
+        use_cuda = false;
         display_message("Warning, CUDA is not available on this device.");
         return;
     }

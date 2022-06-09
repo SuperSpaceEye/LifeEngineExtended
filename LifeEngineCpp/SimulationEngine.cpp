@@ -194,7 +194,7 @@ void SimulationEngine::process_user_action_pool() {
 
 void SimulationEngine::random_food_drop() {
     if (sp.auto_produce_food_every_n_ticks <= 0) {return;}
-    if (dc.engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
+    if (dc.total_engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
             int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(gen);
             int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(gen);

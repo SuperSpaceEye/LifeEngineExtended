@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.19)
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
@@ -11,8 +11,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
-set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
+#set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
+#set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 61)
@@ -26,7 +26,7 @@ set(AUTO_UI_FILE_REBUILDING 0)
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
-find_package(CUDAToolkit)
+#find_package(CUDAToolkit)
 
 set(WIN_COMPILATION 1)
 

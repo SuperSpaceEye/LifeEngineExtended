@@ -103,6 +103,10 @@ public:
     connect(decline_button, &QPushButton::pressed, this, &QDialog::reject);
 
     this->setWindowTitle(title);
+
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
+
     }
 };
 
@@ -319,7 +323,7 @@ private:
     template<typename T>
     result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
     int display_dialog_message(const std::string& message);
-    static void display_message(const std::string& message);
+    void display_message(const std::string& message);
 
 private slots:
     void tb_pause_slot(bool paused);
