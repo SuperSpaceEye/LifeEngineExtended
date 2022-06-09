@@ -5,6 +5,8 @@
 #include "../SimulationEngine.h"
 #include "SimulationEngineSingleThread.h"
 
+//std::vector<int> time_points{};
+
 void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, lehmer64 *gen) {
     for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
     dc->to_place_organisms.clear();
@@ -13,6 +15,14 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     for (auto & organism: dc->organisms) {eat_food(dc, sp, organism);}
     for (auto & organism: dc->organisms) {produce_food(dc, sp, organism, *gen);}
+
+//    float avg = 0;
+//    for (auto & point: time_points) {
+//        avg += point;
+//    }
+//    avg /= time_points.size();
+//    std::cout << "average time: " + std::to_string(avg) << "\n";
+//    time_points.clear();
 
     if (sp->killer_damage_amount > 0) {
         for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
@@ -53,21 +63,55 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
     }
 }
 
-//Each producer will add one run of producing a food
 //TODO produce_food is the most resource intensive stage of simulation (according to perf).
 void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
     if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
     if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 
-    for (int i = 0; i < organism->organism_anatomy->_producer_blocks; i++) {
-        for (auto & pc: organism->organism_anatomy->_producing_space) {
-            //if (check_if_out_of_bounds(dc, organism, pc)) {continue;}
-            if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
-                if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability) {
-                    dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
-                    break;
+    int multiplier = 1;
+    if (sp->multiply_food_production_prob) { multiplier = organism->organism_anatomy->_producer_blocks;}
+
+    if (sp->simplified_food_production) {
+//        auto start = std::chrono::high_resolution_clock::now();
+        produce_food_simplified(dc, sp, organism, gen, multiplier);
+//        auto end = std::chrono::high_resolution_clock::now();
+//        time_points.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+    } else {
+//        auto start = std::chrono::high_resolution_clock::now();
+        produce_food_complex(dc, sp, organism, gen, multiplier);
+//        auto end = std::chrono::high_resolution_clock::now();
+//        time_points.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+    }
+}
+
+void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *dc, SimulationParameters *sp,
+                                                           Organism *organism, lehmer64 &gen, int multiplier) {
+    for (auto & pr: organism->organism_anatomy->_producing_space) {
+        for (auto &pc: pr) {
+            if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(
+                    organism->rotation).y].type == EmptyBlock) {
+                if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
+                    dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y +pc.get_pos(organism->rotation).y].type = FoodBlock;
+                    if (sp->stop_when_one_food_generated) { return;}
+                    continue;
                 }
+            }
+        }
+    }
+}
+
+void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc, SimulationParameters *sp,
+                                                        Organism *organism, lehmer64 &gen, int multiplier) {
+    for (auto & pr: organism->organism_anatomy->_producing_space) {
+        if (pr.empty()) {continue;}
+        auto & pc = pr[std::uniform_int_distribution<int>(0, pr.size()-1)(gen)];
+
+        if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
+            if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
+                dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
+                if (sp->stop_when_one_food_generated) { return;}
+                continue;
             }
         }
     }
@@ -113,11 +157,7 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
                 default:
                     break;
             }
-//            if (world_block.type == BlockTypes::EmptyBlock ||
-//                world_block.type == BlockTypes::FoodBlock  ||
-//                world_block.type == BlockTypes::WallBlock  ||
-//                world_block.type == BlockTypes::ArmorBlock
-//                ) {continue;}
+
             if (world_block.organism != nullptr) {
                 if (sp->on_touch_kill) {
                     world_block.organism->damage = world_block.organism->life_points + 1;

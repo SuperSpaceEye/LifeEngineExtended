@@ -9,7 +9,11 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
                                                                    OrganismBlockParameters *bp,
                                                                    SimulationParameters *sp,
                                                                    lehmer64 *gen) {
-    for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
+    for (auto & organism: dc->to_place_organisms) {
+        place_organism(dc, organism);
+        int pool = (organism->x / dc->simulation_width) * cp->num_threads;
+        dc->organisms_pools[pool].emplace_back(organism);
+    }
     dc->to_place_organisms.clear();
 
     auto simulation_organism_thread_points = std::vector<std::vector<int>>{};
@@ -26,13 +30,61 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     simulation_organism_thread_points = std::vector<std::vector<int>>{};
     calculate_threads_points(dc->organisms.size(), dc->threads.size(), simulation_organism_thread_points);
 
-    SimulationEngineSingleThread::reserve_observations(dc->threaded_organisms_observations, dc->organisms, sp);
+    for (int i = 0; i < dc->organisms_pools.size(); i++) {
+        SimulationEngineSingleThread::reserve_observations(dc->pooled_organisms_observations[i], dc->organisms_pools[i], sp);
+    }
     start_stage(dc, PartialSimulationStage::GetObservations, simulation_organism_thread_points);
 
     start_stage(dc, PartialSimulationStage::ThinkDecision, simulation_organism_thread_points);
-    for (int i = 0; i < dc->organisms.size(); i++)  {SimulationEngineSingleThread::make_decision(dc, sp, dc->organisms[i], gen);}
 
-    for (auto & organism: dc->organisms) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
+    for (auto & pool: dc->organisms_pools) {
+        for (auto & organism: pool)  {SimulationEngineSingleThread::make_decision(dc, sp, organism, gen);}
+    }
+
+    change_organisms_pools(dc, cp);
+
+    for (auto & pool: dc->organisms_pools) {
+        for (auto & organism: pool) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
+    }
+}
+
+//TODO make smarted load balancer
+void SimulationEnginePartialMultiThread::change_organisms_pools(EngineDataContainer *dc, EngineControlParameters * cp) {
+    auto changes = std::vector<std::vector<Organism*>>(cp->num_threads);
+    auto int_pos = std::vector<std::vector<int>>(cp->num_threads);
+    //Go through all pools
+    for (int num_pool = 0; num_pool < cp->num_threads; num_pool++) {
+        //get pool reference
+        auto &pool = dc->organisms_pools[num_pool];
+        //go through all organisms in pool
+        for (int pos_in_pool = 0; pos_in_pool < pool.size(); pos_in_pool++) {
+            //get reference of organism in pool;
+            auto &organism = pool[pos_in_pool];
+            //calculate organism's pool position
+            int organism_pool_pos = (float(organism->x) / dc->simulation_width) * cp->num_threads;
+            //if organism no longer belongs to this pool.
+            if (organism_pool_pos != num_pool) {
+                changes[organism_pool_pos].emplace_back(organism);
+                int_pos[num_pool].emplace_back(pos_in_pool);
+            }
+        }
+    }
+
+    for (int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
+        auto & pool = dc->organisms_pools[pool_num];
+        for (int i = 0; i < int_pos[pool_num].size(); i++) {
+            pool.erase(pool.begin() + int_pos[pool_num][i] - i);
+        }
+    }
+
+    for (int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
+        auto & pool = dc->organisms_pools[pool_num];
+        auto & to_place_pool = changes[pool_num];
+
+        for (auto & organism : to_place_pool) {
+            pool.emplace_back(organism);
+        }
+    }
 }
 
 void SimulationEnginePartialMultiThread::build_threads(EngineDataContainer &dc, EngineControlParameters &cp,
@@ -41,13 +93,32 @@ void SimulationEnginePartialMultiThread::build_threads(EngineDataContainer &dc, 
     dc.threads.reserve(cp.num_threads);
     dc.threaded_to_erase.clear();
     dc.threaded_to_erase.reserve(cp.num_threads);
-    for (int i = 0; i < cp.num_threads; i++) {
-        dc.threaded_to_erase.emplace_back(std::vector<int>{});
+
+    for (auto & pool: dc.organisms_pools) {
+        for (auto & organism: pool) {
+            dc.organisms.emplace_back(organism);
+        }
     }
 
+    dc.organisms_pools.clear();
+    dc.organisms_pools.reserve(cp.num_threads);
+    dc.pooled_organisms_observations.clear();
+    dc.pooled_organisms_observations.reserve(cp.num_threads);
     for (int i = 0; i < cp.num_threads; i++) {
+        dc.threaded_to_erase.emplace_back(std::vector<int>{});
+        dc.organisms_pools.emplace_back(std::vector<Organism*>());
+        dc.pooled_organisms_observations.emplace_back(std::vector<std::vector<Observation>>());
+    }
+
+    for (int i = 0; i < cp.num_threads; ++i) {
         dc.threads.emplace_back(eager_worker_partial{&dc, &sp, i});
     }
+
+    for (auto & organism: dc.organisms) {
+        dc.organisms_pools[0].emplace_back(organism);
+    }
+    change_organisms_pools(&dc, &cp);
+    dc.organisms.clear();
     cp.build_threads = false;
 }
 
@@ -77,8 +148,12 @@ void SimulationEnginePartialMultiThread::calculate_threads_points(int num_points
 
 void SimulationEnginePartialMultiThread::start_stage(EngineDataContainer *dc, PartialSimulationStage stage,
                                                      std::vector<std::vector<int>> &thread_points) {
-    for (int i = 0; i < thread_points.size(); i++) {
-        dc->threads[i].work(stage, thread_points[i][0], thread_points[i][1]);
+//    for (int i = 0; i < thread_points.size(); i++) {
+//        //dc->threads[i].work(stage, thread_points[i][0], thread_points[i][1]);
+//        dc->threads[i].work(stage, 0, dc->organisms_pools[i].size());
+//    }
+    for (int i = 0; i < dc->threads.size(); i++) {
+        dc->threads[i].work(stage, 0, 1);
     }
 
     for (auto & thread: dc->threads) {
@@ -86,15 +161,17 @@ void SimulationEnginePartialMultiThread::start_stage(EngineDataContainer *dc, Pa
         thread.finish();
     }
 
-    if (stage == PartialSimulationStage::PlaceOrganisms) {
-        for (auto organism: dc->to_place_organisms) {
-            dc->organisms.emplace_back(organism);
-        }
-        dc->to_place_organisms.clear();
-    }
+//    if (stage == PartialSimulationStage::PlaceOrganisms) {
+//        for (auto organism: dc->to_place_organisms) {
+//            dc->organisms.emplace_back(organism);
+//        }
+//        dc->to_place_organisms.clear();
+//    }
 
     if (stage == PartialSimulationStage::GetObservations) {
-        dc->threaded_organisms_observations.clear();
+        for (auto & observation_pool: dc->pooled_organisms_observations) {
+            observation_pool.clear();
+        }
     }
 }
 
@@ -154,21 +231,20 @@ void SimulationEnginePartialMultiThread::tick_lifetime(EngineDataContainer *dc, 
 }
 
 void SimulationEnginePartialMultiThread::erase_organisms(EngineDataContainer * dc, std::vector<std::vector<int>>& to_erase) {
-    int i = 0;
-    for (auto & thread_delete: dc->threaded_to_erase) {
-        for (auto & ii: thread_delete) {
-                delete dc->organisms[ii-i];
-                dc->organisms.erase(dc->organisms.begin() + ii - i);
-                i++;
+    for (int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
+        auto & thread_delete = dc->threaded_to_erase[pool_num];
+        auto & pool = dc->organisms_pools[pool_num];
+        for (int i = 0; i < thread_delete.size(); i++) {
+            delete pool[thread_delete[i] - i];
+            pool.erase(pool.begin() + thread_delete[i] - i);
         }
-        thread_delete.clear();
     }
 }
 
 void SimulationEnginePartialMultiThread::get_observations(EngineDataContainer *dc, Organism *&organism,
                                                           std::vector<std::vector<Observation>> &organism_observations,
                                                           SimulationParameters *sp, int organism_num) {
-    organism = dc->organisms[organism_num];
+    //organism = dc->organisms[organism_num];
     if (organism->organism_anatomy->_eye_blocks <= 0 || organism->organism_anatomy->_mover_blocks <=0) {return;}
     if (organism->move_counter != 0) {return;}
     auto eye_i = -1;
@@ -229,40 +305,41 @@ void SimulationEnginePartialMultiThread::thread_tick(PartialSimulationStage stag
                                                      int end_pos, int thread_num) {
     switch (stage) {
         case PartialSimulationStage::PlaceOrganisms:
-            for (int i = start_pos; i < end_pos; i++) {
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
                 place_organism(dc, dc->to_place_organisms[i]);
             }
             break;
         case PartialSimulationStage::ProduceFood:
-            for (int i = start_pos; i < end_pos; i++) {
-                SimulationEngineSingleThread::produce_food(dc, sp, dc->organisms[i], *gen);
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
+                SimulationEngineSingleThread::produce_food(dc, sp, dc->organisms_pools[thread_num][i], *gen);
             }
             break;
         case PartialSimulationStage::EatFood:
-            for (int i = start_pos; i < end_pos; i++) {
-                SimulationEnginePartialMultiThread::eat_food(dc, sp, dc->organisms[i]);
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
+                SimulationEnginePartialMultiThread::eat_food(dc, sp, dc->organisms_pools[thread_num][i]);
             }
             break;
         case PartialSimulationStage::ApplyDamage:
-            for (int i = start_pos; i < end_pos; i++) {
-                SimulationEngineSingleThread::apply_damage(dc, sp, dc->organisms[i]);
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
+                SimulationEngineSingleThread::apply_damage(dc, sp, dc->organisms_pools[thread_num][i]);
             }
             break;
         case PartialSimulationStage::TickLifetime:
-            for (int i = start_pos; i < end_pos; i++) {
-                SimulationEnginePartialMultiThread::tick_lifetime(dc, dc->threaded_to_erase, dc->organisms[i], thread_num, i);
+            dc->threaded_to_erase[thread_num].clear();
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
+                SimulationEnginePartialMultiThread::tick_lifetime(dc, dc->threaded_to_erase, dc->organisms_pools[thread_num][i], thread_num, i);
             }
             break;
         case PartialSimulationStage::GetObservations:
-            for (int i = start_pos; i < end_pos; i++) {
-                SimulationEnginePartialMultiThread::get_observations(dc, dc->organisms[i],
-                                                                     dc->threaded_organisms_observations, sp,
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
+                SimulationEnginePartialMultiThread::get_observations(dc, dc->organisms_pools[thread_num][i],
+                                                                     dc->pooled_organisms_observations[thread_num], sp,
                                                                      i);
             }
             break;
         case PartialSimulationStage::ThinkDecision:
-            for (int i = start_pos; i < end_pos; i++) {
-                dc->organisms[i]->think_decision(dc->threaded_organisms_observations[i], gen);
+            for (int i = 0; i < dc->organisms_pools[thread_num].size(); i++) {
+                dc->organisms_pools[thread_num][i]->think_decision(dc->pooled_organisms_observations[thread_num][i], gen);
             }
             break;
     }

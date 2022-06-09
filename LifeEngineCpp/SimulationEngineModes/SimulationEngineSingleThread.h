@@ -24,6 +24,10 @@ public:
 
     static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen);
 
+    static void produce_food_simplified(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen, int multiplier);
+
+    static void produce_food_complex(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen, int multiplier);
+
     static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
     static void tick_lifetime   (EngineDataContainer * dc, std::vector<int>& to_erase, Organism *organism, int organism_pos);
