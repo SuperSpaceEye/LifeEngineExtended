@@ -83,7 +83,7 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
     return DecisionObservation{calculate_simple_action(observations_vector[observation_i], mt), observations_vector[observation_i]};
 }
 
-BrainDecision Brain::calculate_simple_action(Observation &observation, lehmer64 &mt) {
+BrainDecision Brain::calculate_simple_action(Observation &observation, lehmer64 &mt) const {
     auto action = SimpleDecision{};
     switch (observation.type) {
         case MouthBlock:    action = simple_action_table.MouthBlock;    break;

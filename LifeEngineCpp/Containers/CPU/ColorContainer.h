@@ -5,22 +5,22 @@
 #ifndef THELIFEENGINECPP_COLORCONTAINER_H
 #define THELIFEENGINECPP_COLORCONTAINER_H
 
-#include <QColor>
+#include "../../textures.h"
 
 struct ColorContainer {
     //QColor menu_color = QColor{200, 200, 255};
-    QColor simulation_background_color = QColor(58, 75, 104);
-    QColor organism_boundary = QColor{255, 0, 0};
+    color simulation_background_color {58, 75, 104};
+    color organism_boundary {255, 0, 0};
 
-    QColor empty_block = QColor{14, 19, 24};
-    QColor mouth =       QColor{222,177,77};
-    QColor producer =    QColor{21, 222,89};
-    QColor mover =       QColor{96, 212,255};
-    QColor killer =      QColor{248,35, 128};
-    QColor armor =       QColor{114,48, 219};
-    QColor eye =         QColor{182,193,234};
-    QColor food =        QColor{47, 122,183};
-    QColor wall =        QColor{128, 128, 128};
+    color empty_block {14, 19, 24};
+    color mouth       {222,177,77};
+    color producer    {21, 222,89};
+    color mover       {96, 212,255};
+    color killer      {248,35, 128};
+    color armor       {114,48, 219};
+    color eye         {182,193,234};
+    color food        {47, 122,183};
+    color wall        {128, 128, 128};
 };
 
 

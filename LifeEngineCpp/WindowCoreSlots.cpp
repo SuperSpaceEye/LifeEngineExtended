@@ -14,6 +14,7 @@ void WindowCore::display_message(const std::string &message) {
     QMessageBox msg;
     msg.setText(QString::fromStdString(message));
     msg.setWindowTitle("Warning");
+    msg.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     msg.exec();
 }
 
@@ -34,6 +35,7 @@ result_struct<T> WindowCore::try_convert_message_box_template(const std::string&
 void WindowCore::tb_pause_slot(bool paused) {
     cp.pause_button_pause = paused;
     parse_full_simulation_grid(cp.pause_button_pause);
+    cp.tb_paused = paused;
 }
 
 void WindowCore::tb_stoprender_slot(bool stopped_render) {
@@ -58,7 +60,6 @@ void WindowCore::b_reset_slot() {
 }
 
 void WindowCore::b_resize_and_reset_slot() {
-    //it breaks, if I do it inplace
     resize_simulation_grid_flag = true;
 }
 
@@ -67,7 +68,6 @@ void WindowCore::b_generate_random_walls_slot() {
 }
 
 void WindowCore::b_clear_all_walls_slot() {
-
     cp.engine_pause = true;
     wait_for_engine_to_pause();
 
@@ -400,6 +400,20 @@ void WindowCore::le_brush_size_slot() {
     brush_size = result.result;
 }
 
+void WindowCore::le_update_info_every_n_milliseconds_slot() {
+    int fallback = update_info_every_n_milliseconds;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_update_info_every_n_milliseconds, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    update_info_every_n_milliseconds = result.result;}
+
+void WindowCore::le_menu_height_slot() {
+    int fallback = _ui.menu_frame->frameSize().height();
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_menu_height, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 200) {display_message("Input cannot be less than 200."); return;}
+    _ui.menu_frame->setFixedHeight(result.result);}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
@@ -447,6 +461,34 @@ void WindowCore::cb_use_evolved_brain_mutation_rate_slot(bool state) {
     _ui.le_global_brain_mutation_rate->setDisabled(state);
 }
 
+void WindowCore::cb_fill_window_slot(bool state) {
+    fill_window = state;
+    if (!state) {
+        le_simulation_width_slot();
+        le_simulation_height_slot();
+    }
+}
+
+void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
+    if (!state) {
+        use_cuda = false;
+#if __CUDA_USED__
+        cuda_creator.free();
+#endif
+        return;}
+
+    auto result = cuda_is_available();
+    if (!result) {
+        _ui.cb_use_nvidia_for_image_generation->setChecked(false);
+        use_cuda = false;
+        if (!disable_warnings) {
+            display_message("Warning, CUDA is not available on this device.");
+        }
+        return;
+    }
+    use_cuda = true;
+}
+
 void WindowCore::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void WindowCore::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -454,8 +496,6 @@ void WindowCore::cb_on_touch_kill_slot                   (bool state) { sp.on_to
 void WindowCore::cb_movers_can_produce_food_slot         (bool state) { sp.movers_can_produce_food = state;}
 
 void WindowCore::cb_food_blocks_reproduction_slot        (bool state) { sp.food_blocks_reproduction = state;}
-
-void WindowCore::cb_fill_window_slot                     (bool state) { fill_window = state;}
 
 void WindowCore::cb_reset_on_total_extinction_slot       (bool state) { sp.reset_on_total_extinction = state;}
 
@@ -486,6 +526,16 @@ void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotat
 void WindowCore::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
 
 void WindowCore::cb_apply_damage_directly_slot           (bool state) { sp.apply_damage_directly = state;}
+
+void WindowCore::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state;}
+
+void WindowCore::cb_simplified_food_production_slot      (bool state) { sp.simplified_food_production = state;}
+
+void WindowCore::cb_stop_when_one_food_generated         (bool state) { sp.stop_when_one_food_generated = state;}
+
+void WindowCore::cb_synchronise_info_with_window_slot    (bool state) { synchronise_info_with_window_update = state;}
+
+void WindowCore::cb_eat_then_produce_slot                (bool state) { sp.eat_then_produce = state;}
 
 //==================== Table ====================
 

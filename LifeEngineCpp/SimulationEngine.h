@@ -32,8 +32,6 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
 
-    std::mutex& mutex;
-
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
 
@@ -41,8 +39,6 @@ class SimulationEngine {
 
     void simulation_tick();
     void partial_multi_threaded_tick();
-    void multi_threaded_tick();
-    void cuda_tick();
 
     void change_mode();
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
@@ -52,10 +48,17 @@ class SimulationEngine {
     //lehmer is like 2 times faster than mt19937
     lehmer64 gen;
 
+    void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
+    void try_remove_food(int x, int y);
+
+    void reset_world();
+    void partial_clear_world();
+    void clear_organisms();
+    void make_walls();
+
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                     OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters,
-                     std::mutex& mutex);
+                     OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters);
     void threaded_mainloop();
 
 };
