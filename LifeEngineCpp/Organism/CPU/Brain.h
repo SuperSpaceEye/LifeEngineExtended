@@ -13,6 +13,7 @@
 
 #include "../../BlockTypes.hpp"
 #include "Rotation.h"
+#include "ObservationStuff.h"
 
 enum class BrainDecision {
     //Movement and rotation from organism viewpoint.
@@ -43,13 +44,6 @@ enum class BrainTypes {
     BehaviourTreeBrain,
     //I will need a c++ torch or something.
     NeuralNetworkBrain,
-};
-
-struct Observation {
-    BlockTypes type = BlockTypes::EmptyBlock;
-    int32_t distance = 0;
-    //local rotation
-    Rotation eye_rotation = Rotation::UP;
 };
 
 enum class SimpleDecision {

@@ -14,6 +14,7 @@
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
 #include "../../PRNGS/lehmer64.h"
+#include "ObservationStuff.h"
 
 class Organism {
 //private:

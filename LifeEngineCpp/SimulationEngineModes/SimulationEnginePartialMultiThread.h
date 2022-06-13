@@ -20,6 +20,7 @@
 #include "../Linspace.h"
 #include "SimulationEngineSingleThread.h"
 #include "../PRNGS/lehmer64.h"
+#include "../Organism/CPU/ObservationStuff.h"
 
 struct EngineDataContainer;
 struct eager_worker_partial;

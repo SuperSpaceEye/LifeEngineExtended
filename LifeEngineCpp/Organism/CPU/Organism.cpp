@@ -6,6 +6,7 @@
 
 #include <utility>
 #include "Rotation.h"
+#include "ObservationStuff.h"
 
 Organism::Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,

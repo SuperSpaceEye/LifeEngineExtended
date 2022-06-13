@@ -10,7 +10,7 @@
 #include <thrust/copy.h>
 
 #include "../../GridBlocks/BaseGridBlock.h"
-#include "../../Organism/CUDA/CUDA_Organism.h"
+#include "../../Organism/CUDA/CUDA_Organism.cuh"
 #include "../../Containers/CPU/SimulationParameters.h"
 
 struct CUDASharedData {

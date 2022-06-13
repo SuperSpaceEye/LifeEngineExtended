@@ -1064,8 +1064,7 @@ void WindowCore::change_main_grid_right_click() {
 
 bool WindowCore::cuda_is_available() {
 #if __CUDA_USED__
-    int count;
-    cudaGetDeviceCount(&count);
+    auto count = get_device_count();
     if (count <= 0) {
         return false;
     } else {

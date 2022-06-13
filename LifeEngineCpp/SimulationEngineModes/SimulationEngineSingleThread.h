@@ -16,6 +16,7 @@
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Linspace.h"
+#include "../Organism/CPU/ObservationStuff.h"
 
 class SimulationEngineSingleThread {
 public:

@@ -43,9 +43,8 @@
 #include "textures.h"
 
 #if __CUDA_USED__
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include "cuda_image_creator.cuh"
+#include "get_device_count.cuh"
 #endif
 
 #if defined(__WIN32)
@@ -198,7 +197,7 @@ private:
     OrganismBlockParameters bp;
 
 #if __CUDA_USED__
-    CUDAImageCreator cuda_creator;
+    CUDAImageCreator cuda_creator{};
 #endif
 
     std::thread engine_thread;
