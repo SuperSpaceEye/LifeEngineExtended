@@ -10,8 +10,8 @@ enum class SimulationModes {
     CPU_Partial_Multi_threaded,
     CPU_Multi_Threaded,
     GPU_CUDA_mode,
-    OPENCL_MODE,
-    GPUFORT_MODE //?
+//    OPENCL_MODE,
+//    GPUFORT_MODE //?
 
 };
 
@@ -47,7 +47,6 @@ struct EngineControlParameters {
     bool tb_paused = false;
     bool reset_with_chosen = false;
 
-    //TODO change this
     SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;
     bool change_simulation_mode = false;

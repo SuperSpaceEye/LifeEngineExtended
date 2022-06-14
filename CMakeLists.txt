@@ -3,15 +3,20 @@ cmake_minimum_required(VERSION ${MIN_VERSION})
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
+enable_language(CUDA)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
+set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
-set(CMAKE_CUDA_ARCHITECTURES 62)
+set(CMAKE_CUDA_ARCHITECTURES 61)
 set(AUTO_UI_FILE_REBUILDING 0)
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
@@ -23,9 +28,9 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
 set(CUDA_HEADERS LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cuh LifeEngineCpp/Organism/CUDA/CUDA_Brain.cuh LifeEngineCpp/Organism/CUDA/CUDA_Organism.cuh LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.cuh LifeEngineCpp/cuda_image_creator.cuh LifeEngineCpp/get_device_count.cuh)
-set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cu LifeEngineCpp/Organism/CUDA/CUDA_Brain.cu LifeEngineCpp/Organism/CUDA/CUDA_Organism.cu LifeEngineCpp/cuda_image_creator.cu LifeEngineCpp/get_device_count.cpp)
+set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cu LifeEngineCpp/Organism/CUDA/CUDA_Brain.cu LifeEngineCpp/Organism/CUDA/CUDA_Organism.cu LifeEngineCpp/cuda_image_creator.cu LifeEngineCpp/get_device_count.cu)
 
-set(WIN_COMPILATION 1)
+set(WIN_COMPILATION 0)
 
 set(WIN_USE_CUDA_LIBS 0)
 
@@ -66,15 +71,15 @@ add_compile_definitions(__VALGRIND_MODE__=0)
 
 if(CUDAToolkit_FOUND)
     set(CUDA_FILES ${CUDA_SOURCES} ${CUDA_HEADERS})
-elseif(WIN_USE_CUDA_LIBS)
-    set(CUDA_FILES ${CUDA_HEADERS})
+#elseif(WIN_USE_CUDA_LIBS)
+#    set(CUDA_FILES ${CUDA_HEADERS})
 endif()
 
 #add_library(CUDAFunctions SHARED IMPORTED)
 #set_property(TARGET CUDAFunctions PROPERTY IMPORTED_LOCATION CUDACmake/Release/CUDAPartsDynamic.dll)
 #set_property(TARGET CUDAFunctions PROPERTY IMPORTED_IMPLIB CUDACmake/Release/CUDAPartsDynamic.lib)
 
-add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_FILES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/pix_pos.h LifeEngineCpp/textures.h LifeEngineCpp/Organism/CPU/ObservationStuff.h LifeEngineCpp/GridBlocks/AtomicGridBlock.h)
+add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_FILES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/pix_pos.h LifeEngineCpp/textures.h LifeEngineCpp/Organism/CPU/ObservationStuff.h LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/WindowCoreDataSavingStuff.cpp)
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
 
 if (AUTO_UI_FILE_REBUILDING)
@@ -118,7 +123,7 @@ if(CUDAToolkit_FOUND)
 
     add_compile_definitions(__CUDA_USED__=1)
     set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-    target_link_libraries(${PROJECT_NAME} CUDA::cudart)
+#    target_link_libraries(${PROJECT_NAME} CUDA::cudart)
 elseif(WIN_USE_CUDA_LIBS)
     add_compile_definitions(__CUDA_USED__=1)
 

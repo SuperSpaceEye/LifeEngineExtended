@@ -39,7 +39,6 @@ public:
     float food_needed = 0;
 
     int move_range = 1;
-    bool * can_rotate = nullptr;
     Rotation rotation = Rotation::UP;
 
     bool child_ready = false;
@@ -68,7 +67,7 @@ public:
 
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
     //public:
-    Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
+    Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
              std::shared_ptr<Brain> brain, SimulationParameters *sp,
              OrganismBlockParameters *block_parameters, int move_range,
              float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);

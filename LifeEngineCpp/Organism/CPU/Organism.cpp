@@ -8,11 +8,11 @@
 #include "Rotation.h"
 #include "ObservationStuff.h"
 
-Organism::Organism(int x, int y, bool *can_rotate, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
+Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-        x(x), y(y), can_rotate(can_rotate), rotation(rotation), organism_anatomy(anatomy), sp(sp),
+        x(x), y(y), rotation(rotation), organism_anatomy(anatomy), sp(sp),
         bp(block_parameters), brain(brain), anatomy_mutation_rate(anatomy_mutation_rate),
         brain_mutation_rate(brain_mutation_rate), move_range(move_range) {
     calculate_max_life();
@@ -20,7 +20,7 @@ Organism::Organism(int x, int y, bool *can_rotate, Rotation rotation, std::share
     calculate_food_needed();
 }
 
-Organism::Organism(Organism *organism): x(organism->x), y(organism->y), can_rotate(organism->can_rotate),
+Organism::Organism(Organism *organism): x(organism->x), y(organism->y),
                                         rotation(organism->rotation), organism_anatomy(organism->organism_anatomy), sp(organism->sp),
                                         bp(organism->bp), brain(organism->brain),
                                         anatomy_mutation_rate(organism->anatomy_mutation_rate),
@@ -171,7 +171,6 @@ Organism * Organism::create_child(lehmer64 *gen) {
 
     return new Organism(0,
                         0,
-                        can_rotate,
                         rotation,
                         new_anatomy,
                         new_brain,

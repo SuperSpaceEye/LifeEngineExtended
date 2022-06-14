@@ -53,9 +53,9 @@ WindowCore::WindowCore(QWidget *parent) :
 
     auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
 
-    dc.base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
+    dc.base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2,
                                  Rotation::UP, anatomy, brain, &sp, &bp, 1);
-    dc.chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2, &sp.reproduction_rotation_enabled,
+    dc.chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2,
                                    Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
                                    &sp, &bp, 1);
 

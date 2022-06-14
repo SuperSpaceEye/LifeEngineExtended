@@ -13,6 +13,8 @@
 #include <iomanip>
 #include <thread>
 #include <random>
+#include <fstream>
+#include <filesystem>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
@@ -29,6 +31,7 @@
 #include <QDialog>
 #include <QFont>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 #include "SimulationEngine.h"
 #include "Containers/CPU/ColorContainer.h"
@@ -243,6 +246,35 @@ private:
     bool synchronise_info_with_window_update = false;
 
     bool use_cuda = true;
+
+
+    void write_json_data(){}
+    void read_json_data(){}
+
+    //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
+    void write_data(std::ofstream& os);
+    void write_simulation_parameters(std::ofstream& os);
+    void write_organisms_block_parameters(std::ofstream& os);
+    void write_data_container_data(std::ofstream& os);
+    //    void write_color_container(); TODO: ?
+    void write_simulation_grid(std::ofstream& os);
+    void write_organisms(std::ofstream& os);
+    void write_organism_data(std::ofstream& os, Organism * organism);
+    void write_organism_brain(std::ofstream& os, Brain * brain);
+    void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
+
+    void read_data(std::ifstream& is);
+    void read_simulation_parameters(std::ifstream& is);
+    void read_organisms_block_parameters(std::ifstream& is);
+    void read_data_container_data(std::ifstream& is);
+    //    void read_color_container(); TODO: ?
+    void read_simulation_grid(std::ifstream& is);
+    void read_organisms(std::ifstream& is);
+    void read_organism_data(std::ifstream& is, Organism * organism);
+    void read_organism_brain(std::ifstream& is, Brain * brain);
+    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+    void update_table_values();
+
 
     bool cuda_is_available();
 

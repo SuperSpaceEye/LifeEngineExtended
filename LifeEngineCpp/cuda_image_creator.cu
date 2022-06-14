@@ -5,7 +5,6 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <vector>
 
 #include "cuda_image_creator.cuh"
 

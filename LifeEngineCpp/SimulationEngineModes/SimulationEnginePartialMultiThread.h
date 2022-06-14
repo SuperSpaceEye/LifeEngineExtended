@@ -10,7 +10,7 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
-//#include "EagerWorkerPartial.h"
+
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
 #include "../BlockTypes.hpp"

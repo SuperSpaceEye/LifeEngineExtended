@@ -377,7 +377,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="iconSize">
             <size>
@@ -1038,7 +1038,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QPushButton" name="b_save_world">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Save world</string>
@@ -1053,7 +1053,7 @@ p, li { white-space: pre-wrap; }
                           <item>
                            <widget class="QPushButton" name="b_load_world">
                             <property name="enabled">
-                             <bool>false</bool>
+                             <bool>true</bool>
                             </property>
                             <property name="text">
                              <string>Load world</string>
@@ -1387,7 +1387,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-230</y>
                   <width>540</width>
                   <height>1121</height>
                  </rect>
@@ -3236,7 +3236,7 @@ p, li { white-space: pre-wrap; }
    <sender>le_global_anatomy_mutation_rate</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>le_anatomy_mutation_rate_delimiter_slot()</slot>
+   <slot>le_global_anatomy_mutation_rate_slot()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -4022,12 +4022,12 @@ p, li { white-space: pre-wrap; }
   <slot>le_menu_height_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
+  <buttongroup name="editor_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="editor_modes"/>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

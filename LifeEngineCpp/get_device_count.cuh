@@ -12,6 +12,8 @@
     #else
         #define GET_DEVICE_COUNT_API __declspec(dllimport)
     #endif
+#else
+    #define GET_DEVICE_COUNT_API
 #endif
 
 GET_DEVICE_COUNT_API int get_device_count();

@@ -17,6 +17,7 @@
     #define CUDA_IMAGE_CREATOR_API
 #endif
 
+#include <vector>
 #include "pix_pos.h"
 #include "textures.h"
 #include "Containers/CPU/ColorContainer.h"
