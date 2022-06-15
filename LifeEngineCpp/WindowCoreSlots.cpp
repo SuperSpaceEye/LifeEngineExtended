@@ -99,8 +99,12 @@ void WindowCore::b_save_world_slot() {
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
         filetype = ".tlfcpp";
-    } else {
+    } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
+    } else {
+        unpause_engine();
+        cp.pause_processing_user_action = false;
+        return;
     }
     std::string full_path;
 
@@ -122,6 +126,8 @@ void WindowCore::b_save_world_slot() {
     unpause_engine();
     cp.pause_processing_user_action = false;
 }
+
+//TODO add to simulation engine a function to call to place organism from to_place_organisms
 
 void WindowCore::b_load_world_slot() {
     cp.engine_pause = true;

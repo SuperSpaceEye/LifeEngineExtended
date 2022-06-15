@@ -21,7 +21,9 @@
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+//#include <boost/property_tree/json_parser.hpp>
+#include "CustomJsonParser/json_parser.hpp"
+
 
 #include <QApplication>
 #include <QWidget>
@@ -464,6 +466,26 @@ private slots:
 
 public:
     WindowCore(QWidget *parent);
+
+    void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
+                             boost::property_tree::ptree &edible_neighbors,
+                             boost::property_tree::ptree &growableNeighbors,
+                             boost::property_tree::ptree &cell, boost::property_tree::ptree &value) const;
+
+    void json_write_fossil_record(boost::property_tree::ptree &fossil_record) const;
+
+    void json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
+                              boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
+                              boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain);
+
+    void json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
+                         boost::property_tree::ptree &food, boost::property_tree::ptree &walls);
+
+    void json_read_organism_data(boost::property_tree::ptree &root);
+
+    void json_read_simulation_parameters(const boost::property_tree::ptree &root);
+
+    void json_read_grid_data(boost::property_tree::ptree &root);
 };
 
 
