@@ -13,11 +13,17 @@
 #include <iomanip>
 #include <thread>
 #include <random>
+#include <fstream>
+#include <filesystem>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
+#include <boost/property_tree/ptree.hpp>
+//#include <boost/property_tree/json_parser.hpp>
+#include "CustomJsonParser/json_parser.hpp"
+
 
 #include <QApplication>
 #include <QWidget>
@@ -29,6 +35,7 @@
 #include <QDialog>
 #include <QFont>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 #include "SimulationEngine.h"
 #include "Containers/CPU/ColorContainer.h"
@@ -43,14 +50,32 @@
 #include "textures.h"
 
 #if __CUDA_USED__
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include "cuda_image_creator.cuh"
+#include "get_device_count.cuh"
 #endif
 
 #if defined(__WIN32)
 #include <windows.h>
 #endif
+
+struct OrganismData {
+    int x = 0;
+    int y = 0;
+    int max_lifetime = 0;
+    int lifetime = 0;
+    int move_range = 1;
+    int move_counter = 0;
+    int max_decision_lifetime = 2;
+    int max_do_nothing_lifetime = 4;
+    float anatomy_mutation_rate = 0.05;
+    float brain_mutation_rate = 0.1;
+    float food_collected = 0;
+    float food_needed = 0;
+    float life_points = 0;
+    float damage = 0;
+    Rotation rotation = Rotation::UP;
+    DecisionObservation last_decision = DecisionObservation{};
+};
 
 enum class CursorMode {
     ModifyFood,
@@ -198,7 +223,7 @@ private:
     OrganismBlockParameters bp;
 
 #if __CUDA_USED__
-    CUDAImageCreator cuda_creator;
+    CUDAImageCreator cuda_creator{};
 #endif
 
     std::thread engine_thread;
@@ -244,6 +269,35 @@ private:
     bool synchronise_info_with_window_update = false;
 
     bool use_cuda = true;
+
+
+    void write_json_data(std::string path);
+    void read_json_data(std::string path);
+
+    //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
+    void write_data(std::ofstream& os);
+    void write_simulation_parameters(std::ofstream& os);
+    void write_organisms_block_parameters(std::ofstream& os);
+    void write_data_container_data(std::ofstream& os);
+    //    void write_color_container(); TODO: ?
+    void write_simulation_grid(std::ofstream& os);
+    void write_organisms(std::ofstream& os);
+    void write_organism_data(std::ofstream& os, Organism * organism);
+    void write_organism_brain(std::ofstream& os, Brain * brain);
+    void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
+
+    void read_data(std::ifstream& is);
+    void read_simulation_parameters(std::ifstream& is);
+    void read_organisms_block_parameters(std::ifstream& is);
+    void read_data_container_data(std::ifstream& is);
+    //    void read_color_container(); TODO: ?
+    void read_simulation_grid(std::ifstream& is);
+    void read_organisms(std::ifstream& is);
+    void read_organism_data(std::ifstream& is, OrganismData & data);
+    void read_organism_brain(std::ifstream& is, Brain * brain);
+    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+    void update_table_values();
+
 
     bool cuda_is_available();
 
@@ -412,6 +466,26 @@ private slots:
 
 public:
     WindowCore(QWidget *parent);
+
+    void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
+                             boost::property_tree::ptree &edible_neighbors,
+                             boost::property_tree::ptree &growableNeighbors,
+                             boost::property_tree::ptree &cell, boost::property_tree::ptree &value) const;
+
+    void json_write_fossil_record(boost::property_tree::ptree &fossil_record) const;
+
+    void json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
+                              boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
+                              boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain);
+
+    void json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
+                         boost::property_tree::ptree &food, boost::property_tree::ptree &walls);
+
+    void json_read_organism_data(boost::property_tree::ptree &root);
+
+    void json_read_simulation_parameters(const boost::property_tree::ptree &root);
+
+    void json_read_grid_data(boost::property_tree::ptree &root);
 };
 
 

@@ -22,11 +22,11 @@ struct SimulationParameters {
         int   max_reproducing_distance = 5;
 
         float anatomy_mutations_rate_mutation_modifier = 0.01;
-        float anatomy_min_possible_mutation_rate = 0.01;
+        float anatomy_min_possible_mutation_rate = 0.001;
         float anatomy_mutation_rate_delimiter = 0.5;
 
         float brain_mutation_rate_mutation_modifier = 0.01;
-        float brain_min_possible_mutation_rate = 0.1;
+        float brain_min_possible_mutation_rate = 0.001;
         float brain_mutation_rate_delimiter = 0.5;
 
         int   max_move_range = 5;

@@ -121,6 +121,7 @@ void Anatomy::create_double_adjacent_space(
     }
 }
 
+//TODO it's broken
 void Anatomy::create_producing_space(
         boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
         boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,

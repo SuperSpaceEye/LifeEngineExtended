@@ -16,10 +16,10 @@
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Linspace.h"
+#include "../Organism/CPU/ObservationStuff.h"
 
 class SimulationEngineSingleThread {
 public:
-
     static void place_organism  (EngineDataContainer * dc, Organism * organism);
 
     static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen);
@@ -55,6 +55,7 @@ public:
     static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, lehmer64 *gen);
 
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
+
     static bool check_if_block_out_of_bounds(EngineDataContainer *dc, Organism *organism,
                                              BaseSerializedContainer &block, Rotation rotation);
 

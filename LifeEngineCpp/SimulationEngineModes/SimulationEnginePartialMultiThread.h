@@ -10,7 +10,7 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
-//#include "EagerWorkerPartial.h"
+
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
 #include "../BlockTypes.hpp"
@@ -20,6 +20,7 @@
 #include "../Linspace.h"
 #include "SimulationEngineSingleThread.h"
 #include "../PRNGS/lehmer64.h"
+#include "../Organism/CPU/ObservationStuff.h"
 
 struct EngineDataContainer;
 struct eager_worker_partial;

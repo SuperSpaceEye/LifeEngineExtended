@@ -329,9 +329,9 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_47;
     QLineEdit *le_menu_height;
-    QButtonGroup *simulation_modes;
-    QButtonGroup *cursor_modes;
     QButtonGroup *editor_modes;
+    QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -961,7 +961,7 @@ public:
 
         b_save_world = new QPushButton(widget_3);
         b_save_world->setObjectName(QStringLiteral("b_save_world"));
-        b_save_world->setEnabled(false);
+        b_save_world->setEnabled(true);
 
         verticalLayout_22->addWidget(b_save_world);
 
@@ -970,7 +970,7 @@ public:
         horizontalLayout_21->setSizeConstraint(QLayout::SetMinimumSize);
         b_load_world = new QPushButton(widget_3);
         b_load_world->setObjectName(QStringLiteral("b_load_world"));
-        b_load_world->setEnabled(false);
+        b_load_world->setEnabled(true);
 
         horizontalLayout_21->addWidget(b_load_world);
 
@@ -1119,7 +1119,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 1121));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -230, 540, 1121));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -2050,7 +2050,7 @@ public:
         QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
         QObject::connect(rb_cuda_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_cuda_slot()));
         QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
-        QObject::connect(le_global_anatomy_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
+        QObject::connect(le_global_anatomy_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_global_anatomy_mutation_rate_slot()));
         QObject::connect(le_max_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_reproducing_distance_slot()));
         QObject::connect(cb_fix_reproduction_distance, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fix_reproduction_distance_slot(bool)));
         QObject::connect(cb_use_evolved_anatomy_mutation_rate, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_evolved_anatomy_mutation_rate_slot(bool)));
@@ -2095,7 +2095,7 @@ public:
         QObject::connect(cb_eat_then_produce, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_eat_then_produce_slot(bool)));
         QObject::connect(le_menu_height, SIGNAL(returnPressed()), MainWindow, SLOT(le_menu_height_slot()));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(2);
         stackedWidget->setCurrentIndex(0);
 
 

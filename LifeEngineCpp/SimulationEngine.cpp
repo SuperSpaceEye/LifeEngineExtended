@@ -29,9 +29,9 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) {
-            SimulationEnginePartialMultiThread::kill_threads(dc);
-            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
-            cp.build_threads = false;
+//            SimulationEnginePartialMultiThread::kill_threads(dc);
+//            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+//            cp.build_threads = false;
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
@@ -61,20 +61,28 @@ void SimulationEngine::change_mode() {
         return;
     }
 
+    //switches from
+    switch (cp.simulation_mode) {
+        case SimulationModes::CPU_Single_Threaded:
+            break;
+        case SimulationModes::CPU_Partial_Multi_threaded:
+            SimulationEnginePartialMultiThread::kill_threads(dc);
+            for (auto & pool : dc.organisms_pools) {
+                for (auto & organism: pool) {
+                    dc.organisms.emplace_back(organism);
+                }
+                pool.clear();
+            }
+            break;
+        case SimulationModes::CPU_Multi_Threaded:
+            break;
+        case SimulationModes::GPU_CUDA_mode:
+            break;
+    }
+
+    //switches to
     switch (cp.change_to_mode) {
         case SimulationModes::CPU_Single_Threaded:
-            if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-                SimulationEnginePartialMultiThread::kill_threads(dc);
-                for (auto & pool : dc.organisms_pools) {
-                    for (auto & organism: pool) {
-                        dc.organisms.emplace_back(organism);
-                    }
-                    pool.clear();
-                }
-            }
-//            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
-//
-//            }
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:
             SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
@@ -83,25 +91,11 @@ void SimulationEngine::change_mode() {
                 dc.organisms_pools[pool].emplace_back(organism);
             }
             dc.organisms.clear();
-//            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
-//
-//            }
             cp.build_threads = false;
             break;
         case SimulationModes::CPU_Multi_Threaded:
-//            if (cp.simulation_mode == SimulationModes::GPU_CUDA_mode) {
-//
-//            }
-//            build_threads();
             break;
         case SimulationModes::GPU_CUDA_mode:
-//            if (cp.simulation_mode == SimulationModes::CPU_Multi_Threaded) {
-//                kill_threads();
-//            }
-            break;
-        case SimulationModes::OPENCL_MODE:
-            break;
-        case SimulationModes::GPUFORT_MODE:
             break;
     }
     cp.simulation_mode = cp.change_to_mode;
@@ -142,10 +136,6 @@ void SimulationEngine::simulation_tick() {
         case SimulationModes::CPU_Multi_Threaded:
             break;
         case SimulationModes::GPU_CUDA_mode:
-            break;
-        case SimulationModes::OPENCL_MODE:
-            break;
-        case SimulationModes::GPUFORT_MODE:
             break;
     }
 }

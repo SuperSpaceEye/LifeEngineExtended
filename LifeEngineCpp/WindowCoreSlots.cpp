@@ -83,11 +83,96 @@ void WindowCore::b_clear_all_walls_slot() {
 }
 
 void WindowCore::b_save_world_slot() {
-    if (!disable_warnings) {display_message("Not implemented");}
+    cp.engine_pause = true;
+    cp.pause_processing_user_action = true;
+    wait_for_engine_to_pause_force();
+    wait_for_engine_to_pause_processing_user_actions();
+
+    QString selected_filter;
+    QFileDialog file_dialog{};
+    file_dialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+
+    auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
+                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
+    bool file_exists = std::filesystem::exists(file_name.toStdString());
+
+    std::string filetype;
+    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
+        filetype = ".tlfcpp";
+    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+        filetype = ".json";
+    } else {
+        unpause_engine();
+        cp.pause_processing_user_action = false;
+        return;
+    }
+    std::string full_path;
+
+    if (file_exists) {
+        full_path = file_name.toStdString();
+    } else {
+        full_path = file_name.toStdString() + filetype;
+    }
+
+    if (filetype == ".tlfcpp") {
+        std::ofstream out(full_path, std::ios::out | std::ios::binary);
+        write_data(out);
+        out.close();
+
+    } else {
+        write_json_data(full_path);
+    }
+
+    unpause_engine();
+    cp.pause_processing_user_action = false;
 }
 
+//TODO add to simulation engine a function to call to place organism from to_place_organisms
+
 void WindowCore::b_load_world_slot() {
-    if (!disable_warnings) {display_message("Not implemented");}
+    cp.engine_pause = true;
+    cp.pause_processing_user_action = true;
+    wait_for_engine_to_pause_force();
+    wait_for_engine_to_pause_processing_user_actions();
+
+    QString selected_filter;
+    auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
+                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
+    std::string filetype;
+    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
+        filetype = ".tlfcpp";
+    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+        filetype = ".json";
+    } else {
+        unpause_engine();
+        cp.pause_processing_user_action = false;
+        return;
+    }
+
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
+
+    std::string full_path = file_name.toStdString();
+
+    if (filetype == ".tlfcpp") {
+        std::ifstream in(full_path, std::ios::in | std::ios::binary);
+        read_data(in);
+        in.close();
+
+    } else if (filetype == ".json") {
+        read_json_data(full_path);
+    }
+
+    unpause_engine();
+    cp.pause_processing_user_action = false;
+    initialize_gui_settings();
+    update_table_values();
 }
 
 void WindowCore::b_pass_one_tick_slot() {
@@ -233,7 +318,7 @@ void WindowCore::le_global_anatomy_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_anatomy_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+//    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_anatomy_mutation_rate = result.result;
 }
@@ -243,7 +328,7 @@ void WindowCore::le_global_brain_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_brain_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+//    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_brain_mutation_rate = result.result;
 }
