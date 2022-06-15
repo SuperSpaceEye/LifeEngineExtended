@@ -54,6 +54,25 @@
 #include <windows.h>
 #endif
 
+struct OrganismData {
+    int x = 0;
+    int y = 0;
+    int max_lifetime = 0;
+    int lifetime = 0;
+    int move_range = 1;
+    int move_counter = 0;
+    int max_decision_lifetime = 2;
+    int max_do_nothing_lifetime = 4;
+    float anatomy_mutation_rate = 0.05;
+    float brain_mutation_rate = 0.1;
+    float food_collected = 0;
+    float food_needed = 0;
+    float life_points = 0;
+    float damage = 0;
+    Rotation rotation = Rotation::UP;
+    DecisionObservation last_decision = DecisionObservation{};
+};
+
 enum class CursorMode {
     ModifyFood,
     ModifyWall,
@@ -270,7 +289,7 @@ private:
     //    void read_color_container(); TODO: ?
     void read_simulation_grid(std::ifstream& is);
     void read_organisms(std::ifstream& is);
-    void read_organism_data(std::ifstream& is, Organism * organism);
+    void read_organism_data(std::ifstream& is, OrganismData & data);
     void read_organism_brain(std::ifstream& is, Brain * brain);
     void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
     void update_table_values();
