@@ -65,6 +65,8 @@ find_package(Qt5 COMPONENTS
 
 find_package(Boost COMPONENTS random REQUIRED)
 
+message(STATUS ${Boost_VERSION})
+
 add_compile_definitions(__VALGRIND_MODE__=0)
 
 #find_package(OpenMP)

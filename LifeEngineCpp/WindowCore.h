@@ -20,6 +20,8 @@
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include <QApplication>
 #include <QWidget>
@@ -267,8 +269,8 @@ private:
     bool use_cuda = true;
 
 
-    void write_json_data(){}
-    void read_json_data(){}
+    void write_json_data(std::string path);
+    void read_json_data(std::string path);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);

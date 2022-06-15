@@ -71,7 +71,6 @@ struct SimpleActionTable {
 
 class Brain {
 private:
-    SimpleActionTable simple_action_table;
     static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
     static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
     static SimpleActionTable get_random_action_table(lehmer64 &mt);
@@ -81,6 +80,8 @@ public:
     Brain()=default;
     explicit Brain(std::shared_ptr<Brain> & brain);
     Brain(BrainTypes brain_type);
+
+    SimpleActionTable simple_action_table;
 
     BrainTypes brain_type;
 

@@ -156,22 +156,13 @@ void WindowCore::read_simulation_grid(std::ifstream& is) {
 
 //TODO save child patterns?
 void WindowCore::read_organisms(std::ifstream& is) {
-    for (auto & organism: dc.organisms) {
-        delete organism;
-    }
-    dc.organisms.clear();
-    for (auto & organism: dc.to_place_organisms) {
-        delete organism;
-    }
-    dc.to_place_organisms.clear();
-
     uint32_t num_organisms;
     is.read((char*)&num_organisms, sizeof(uint32_t));
     dc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
         OrganismData data{};
-        auto brain = std::shared_ptr<Brain>(new Brain(), [](Brain*){});
-        auto anatomy = std::shared_ptr<Anatomy>(new Anatomy(), [](Anatomy*){});
+        auto brain = std::make_shared<Brain>();
+        auto anatomy = std::make_shared<Anatomy>();
 
         read_organism_data(is, data);
         read_organism_brain(is, brain.get());
@@ -304,4 +295,124 @@ void WindowCore::update_table_values() {
         }
     }
     _ui.table_organism_block_parameters->update();
+}
+
+namespace pt = boost::property_tree;
+
+void WindowCore::write_json_data(std::string path) {
+
+}
+
+//https://www.cochoy.fr/boost-property-tree/
+void WindowCore::read_json_data(std::string path) {
+    pt::ptree root;
+    pt::read_json(path, root);
+    dc.simulation_height = root.get<int>("num_rows")+2;
+    dc.simulation_width = root.get<int>("num_cols")+2;
+    dc.total_engine_ticks = root.get<int>("total_ticks");
+
+    new_simulation_width = dc.simulation_width;
+    new_simulation_height = dc.simulation_height;
+
+    fill_window = false;
+    _ui.cb_fill_window->setChecked(false);
+    disable_warnings = true;
+
+    resize_simulation_space();
+    make_walls();
+    disable_warnings = false;
+
+    auto test = root.get_child("grid.food");
+
+    for (auto & pair: root.get_child("grid.food")) {
+        int y = pair.second.get<int>("r")+1;
+        int x = pair.second.get<int>("c")+1;
+        dc.CPU_simulation_grid[x][y].type = BlockTypes::FoodBlock;
+    }
+
+    for (auto & pair: root.get_child("grid.walls")) {
+        int y = pair.second.get<int>("r")+1;
+        int x = pair.second.get<int>("c")+1;
+        dc.CPU_simulation_grid[x][y].type = BlockTypes::WallBlock;
+    }
+
+    sp.lifespan_multiplier = root.get<int>("controls.lifespanMultiplier");
+    sp.food_production_probability = float(root.get<int>("controls.foodProdProb"))/100;
+    sp.use_anatomy_evolved_mutation_rate   = !root.get<bool>("controls.useGlobalMutability");
+    sp.global_anatomy_mutation_rate = float(root.get<int>("controls.globalMutability"))/100;
+    sp.add_cell = root.get<int>("controls.addProb");
+    sp.change_cell = root.get<int>("controls.changeProb");
+    sp.remove_cell = root.get<int>("controls.removeProb");
+    sp.runtime_rotation_enabled = root.get<bool>("controls.rotationEnabled");
+    sp.food_blocks_reproduction = root.get<bool>("controls.foodBlocksReproduction");
+    sp.movers_can_produce_food = root.get<bool>("controls.moversCanProduce");
+    sp.on_touch_kill = root.get<bool>("controls.instaKill");
+    sp.look_range = root.get<int>("controls.lookRange");
+//    sp.auto_produce_n_food = root.get<int>("controls.foodDropProb");
+//     = root.get<int>("controls.extraMoverFoodCost");
+
+    for (auto & organism: root.get_child("organisms")) {
+        auto brain = std::make_shared<Brain>();
+        auto anatomy = std::make_shared<Anatomy>();
+
+        int y = organism.second.get<int>("r")+1;
+        int x = organism.second.get<int>("c")+1;
+        int lifetime = organism.second.get<int>("lifetime");
+        int food_collected = organism.second.get<int>("food_collected");
+        int rotation = organism.second.get<int>("rotation");
+        int move_range = organism.second.get<int>("move_range");
+        float mutability = float(organism.second.get<int>("mutability"))/100;
+        int damage = organism.second.get<int>("damage");
+        bool is_mover = organism.second.get<bool>("anatomy.is_mover");
+        bool has_eyes = organism.second.get<bool>("anatomy.has_eyes");
+        for (auto & j_anatomy: organism.second.get_child("anatomy.cells")) {
+            int l_y = j_anatomy.second.get<int>("loc_row");
+            int l_x = j_anatomy.second.get<int>("loc_col");
+            auto state = j_anatomy.second.get<std::string>("state.name");
+            Rotation rotation = Rotation::UP;
+            BlockTypes type = BlockTypes::ProducerBlock;
+            if        (state == "producer") {
+                type = BlockTypes::ProducerBlock;
+            } else if (state == "mouth") {
+                type = BlockTypes::MouthBlock;
+            } else if (state == "killer") {
+                type = BlockTypes::KillerBlock;
+            } else if (state == "mover") {
+                type = BlockTypes::MoverBlock;
+            } else if (state == "eye") {
+                type = BlockTypes::EyeBlock;
+                rotation = static_cast<Rotation>(j_anatomy.second.get<int>("direction"));
+            } else if (state == "armor") {
+                type = BlockTypes::ArmorBlock;
+            }
+            anatomy->set_block(type, rotation, l_x, l_y);
+        }
+        if (is_mover && has_eyes) {
+            brain->simple_action_table.FoodBlock     = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.food"));
+            brain->simple_action_table.WallBlock     = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.wall"));
+            brain->simple_action_table.MouthBlock    = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.mouth"));
+            brain->simple_action_table.ProducerBlock = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.producer"));
+            brain->simple_action_table.MoverBlock    = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.mover"));
+            brain->simple_action_table.KillerBlock   = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.killer"));
+            brain->simple_action_table.ArmorBlock    = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.armor"));
+            brain->simple_action_table.EyeBlock      = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.eye"));
+        }
+
+        auto * new_organism = new Organism(x,
+                                           y,
+                                           static_cast<Rotation>(rotation),
+                                           anatomy,
+                                           brain,
+                                           &sp,
+                                           &bp,
+                                           move_range,
+                                           mutability);
+        new_organism->lifetime = lifetime;
+        new_organism->food_collected = food_collected;
+        new_organism->damage = damage;
+        dc.organisms.emplace_back(new_organism);
+
+    }
+
+//    exit(0);
 }

@@ -116,7 +116,7 @@ void WindowCore::b_save_world_slot() {
         out.close();
 
     } else {
-        write_json_data();
+        write_json_data(full_path);
     }
 
     unpause_engine();
@@ -132,13 +132,25 @@ void WindowCore::b_load_world_slot() {
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
                                                   tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
-
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
         filetype = ".tlfcpp";
-    } else {
+    } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
+    } else {
+        unpause_engine();
+        cp.pause_processing_user_action = false;
+        return;
     }
+
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
 
     std::string full_path = file_name.toStdString();
 
@@ -147,8 +159,8 @@ void WindowCore::b_load_world_slot() {
         read_data(in);
         in.close();
 
-    } else {
-        read_json_data();
+    } else if (filetype == ".json") {
+        read_json_data(full_path);
     }
 
     unpause_engine();
