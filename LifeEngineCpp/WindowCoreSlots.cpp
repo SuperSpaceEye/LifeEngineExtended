@@ -94,8 +94,7 @@ void WindowCore::b_save_world_slot() {
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
                                                   tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
-    bool file_exists = std::filesystem::exists(file_name.toStdString());
-
+    bool file_exists = boost::filesystem::exists(file_name.toStdString());
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
         filetype = ".tlfcpp";
@@ -106,13 +105,13 @@ void WindowCore::b_save_world_slot() {
         cp.pause_processing_user_action = false;
         return;
     }
-    std::string full_path;
+    std::string full_path = file_name.toStdString();
 
-    if (file_exists) {
-        full_path = file_name.toStdString();
-    } else {
+#ifndef __WIN32
+    if (!file_exists) {
         full_path = file_name.toStdString() + filetype;
     }
+#endif
 
     if (filetype == ".tlfcpp") {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
