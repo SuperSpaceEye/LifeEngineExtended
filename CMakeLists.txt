@@ -63,7 +63,7 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 
-find_package(Boost COMPONENTS random system filesystem REQUIRED)
+find_package(Boost COMPONENTS random REQUIRED)
 
 message(STATUS ${Boost_VERSION})
 

@@ -93,8 +93,10 @@ void WindowCore::b_save_world_slot() {
     file_dialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
-                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
-    bool file_exists = boost::filesystem::exists(file_name.toStdString());
+                                                 "Custom save type (*.tlfcpp);;JSON (*.json)", &selected_filter);
+#ifndef __WIN32
+    bool file_exists = std::filesystem::exists(file_name.toStdString());
+#endif
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
         filetype = ".tlfcpp";
@@ -110,7 +112,6 @@ void WindowCore::b_save_world_slot() {
 #ifndef __WIN32
     if (!file_exists) {
         full_path = file_name.toStdString() + filetype;
-    }
 #endif
 
     if (filetype == ".tlfcpp") {
@@ -317,7 +318,7 @@ void WindowCore::le_global_anatomy_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_anatomy_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-//    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_anatomy_mutation_rate = result.result;
 }
@@ -327,7 +328,7 @@ void WindowCore::le_global_brain_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_brain_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-//    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_brain_mutation_rate = result.result;
 }
