@@ -14,13 +14,15 @@
 #include <thread>
 #include <random>
 #include <fstream>
+#ifndef __WIN32
+#include <filesystem>
+#endif
 
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/filesystem.hpp>
 #include "CustomJsonParser/json_parser.hpp"
 
 
@@ -168,6 +170,8 @@ struct OrganismAvgBlockInformation {
     double move_range = 0;
     int moving_organisms = 0;
     int organisms_with_eyes = 0;
+
+    double total_total_mutation_rate = 0;
 };
 
 class WindowCore: public QWidget {

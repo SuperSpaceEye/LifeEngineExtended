@@ -93,12 +93,14 @@ void WindowCore::b_save_world_slot() {
     file_dialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
-                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
-    bool file_exists = boost::filesystem::exists(file_name.toStdString());
+                                                 "Custom save type (*.tlfcpp);;JSON (*.json)", &selected_filter);
+#ifndef __WIN32
+    bool file_exists = std::filesystem::exists(file_name.toStdString());
+#endif
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
         filetype = ".tlfcpp";
-    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+    } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
         unpause_engine();
@@ -125,6 +127,7 @@ void WindowCore::b_save_world_slot() {
     unpause_engine();
     cp.pause_processing_user_action = false;
 }
+
 
 //TODO add to simulation engine a function to call to place organism from to_place_organisms
 
@@ -317,7 +320,7 @@ void WindowCore::le_global_anatomy_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_anatomy_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-//    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_anatomy_mutation_rate = result.result;
 }
@@ -327,7 +330,7 @@ void WindowCore::le_global_brain_mutation_rate_slot() {
     auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_brain_mutation_rate,
                                                           fallback);
     if (!result.is_valid) {return;}
-//    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
     sp.global_brain_mutation_rate = result.result;
 }

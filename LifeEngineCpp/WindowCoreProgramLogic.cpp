@@ -767,6 +767,8 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
                       (sizeof(Organism) * info.total_avg.total)
                       ;
 
+    info.total_total_mutation_rate = info.total_avg.anatomy_mutation_rate;
+
     info.total_avg.size /= info.total_avg.total;
 
     info.total_avg._organism_lifetime /= info.total_avg.total;
