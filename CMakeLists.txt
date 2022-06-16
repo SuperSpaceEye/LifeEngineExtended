@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION ${MIN_VERSION})
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
-#enable_language(CUDA)
+enable_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
@@ -12,8 +12,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-#set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
-#set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
+set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 61)
@@ -30,7 +30,7 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 set(CUDA_HEADERS LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cuh LifeEngineCpp/Organism/CUDA/CUDA_Brain.cuh LifeEngineCpp/Organism/CUDA/CUDA_Organism.cuh LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.cuh LifeEngineCpp/cuda_image_creator.cuh LifeEngineCpp/get_device_count.cuh)
 set(CUDA_SOURCES LifeEngineCpp/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cu LifeEngineCpp/Organism/CUDA/CUDA_Brain.cu LifeEngineCpp/Organism/CUDA/CUDA_Organism.cu LifeEngineCpp/cuda_image_creator.cu LifeEngineCpp/get_device_count.cu)
 
-set(WIN_COMPILATION 1)
+set(WIN_COMPILATION 0)
 
 set(WIN_USE_CUDA_LIBS 0)
 

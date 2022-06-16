@@ -100,7 +100,7 @@ void WindowCore::b_save_world_slot() {
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
         filetype = ".tlfcpp";
-    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+    } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
         unpause_engine();
@@ -112,6 +112,7 @@ void WindowCore::b_save_world_slot() {
 #ifndef __WIN32
     if (!file_exists) {
         full_path = file_name.toStdString() + filetype;
+    }
 #endif
 
     if (filetype == ".tlfcpp") {
@@ -126,6 +127,7 @@ void WindowCore::b_save_world_slot() {
     unpause_engine();
     cp.pause_processing_user_action = false;
 }
+
 
 //TODO add to simulation engine a function to call to place organism from to_place_organisms
 

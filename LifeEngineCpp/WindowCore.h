@@ -170,6 +170,8 @@ struct OrganismAvgBlockInformation {
     double move_range = 0;
     int moving_organisms = 0;
     int organisms_with_eyes = 0;
+
+    double total_total_mutation_rate = 0;
 };
 
 class WindowCore: public QWidget {

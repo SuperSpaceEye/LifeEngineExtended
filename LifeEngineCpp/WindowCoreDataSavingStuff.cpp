@@ -422,6 +422,7 @@ void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
         new_organism->food_collected = food_collected;
         new_organism->damage = damage;
         dc.organisms.emplace_back(new_organism);
+        SimulationEngineSingleThread::place_organism(&dc, new_organism);
     }
 }
 
@@ -442,9 +443,9 @@ void WindowCore::write_json_data(std::string path) {
 
     auto info = calculate_organisms_info();
 
-    root.put("num_rows", dc.simulation_width);
-    root.put("num_cols", dc.simulation_height);
-    root.put("total_mutability", static_cast<int>(info.total_avg.anatomy_mutation_rate*10000));
+    root.put("num_rows", dc.simulation_height);
+    root.put("num_cols", dc.simulation_width);
+    root.put("total_mutability", static_cast<int>(info.total_total_mutation_rate*100));
     root.put("largest_cell_count", 0);
     root.put("reset_count", auto_reset_num);
     root.put("total_ticks", dc.total_engine_ticks);
