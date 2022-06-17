@@ -1060,16 +1060,6 @@ p, li { white-space: pre-wrap; }
                             </property>
                            </widget>
                           </item>
-                          <item>
-                           <widget class="QCheckBox" name="cb_override_evolution_controls">
-                            <property name="enabled">
-                             <bool>false</bool>
-                            </property>
-                            <property name="text">
-                             <string>Override Evolution Controls</string>
-                            </property>
-                           </widget>
-                          </item>
                          </layout>
                         </item>
                        </layout>
@@ -1387,7 +1377,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-230</y>
+                  <y>0</y>
                   <width>540</width>
                   <height>1121</height>
                  </rect>
@@ -3217,22 +3207,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_override_evolution_controls</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_override_evolution_controls_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>736</x>
-     <y>862</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>le_global_anatomy_mutation_rate</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
@@ -3981,7 +3955,6 @@ p, li { white-space: pre-wrap; }
   <slot>cb_clear_walls_on_reset_slot(bool)</slot>
   <slot>b_save_world_slot()</slot>
   <slot>b_load_world_slot()</slot>
-  <slot>cb_override_evolution_controls_slot(bool)</slot>
   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
   <slot>b_kill_all_organisms_slot()</slot>
   <slot>cb_runtime_rotation_enabled_slot(bool)</slot>
@@ -4022,12 +3995,12 @@ p, li { white-space: pre-wrap; }
   <slot>le_menu_height_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="editor_modes"/>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
+  <buttongroup name="editor_modes"/>
  </buttongroups>
 </ui>

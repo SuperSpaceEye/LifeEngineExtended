@@ -156,7 +156,6 @@ public:
     QPushButton *b_save_world;
     QHBoxLayout *horizontalLayout_21;
     QPushButton *b_load_world;
-    QCheckBox *cb_override_evolution_controls;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -329,9 +328,9 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_47;
     QLineEdit *le_menu_height;
-    QButtonGroup *editor_modes;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
+    QButtonGroup *editor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -974,12 +973,6 @@ public:
 
         horizontalLayout_21->addWidget(b_load_world);
 
-        cb_override_evolution_controls = new QCheckBox(widget_3);
-        cb_override_evolution_controls->setObjectName(QStringLiteral("cb_override_evolution_controls"));
-        cb_override_evolution_controls->setEnabled(false);
-
-        horizontalLayout_21->addWidget(cb_override_evolution_controls);
-
 
         verticalLayout_22->addLayout(horizontalLayout_21);
 
@@ -1119,7 +1112,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -230, 540, 1121));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 1121));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -2049,7 +2042,6 @@ public:
         QObject::connect(le_float_number_precision, SIGNAL(returnPressed()), MainWindow, SLOT(le_float_number_precision_slot()));
         QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
         QObject::connect(rb_cuda_mode, SIGNAL(clicked()), MainWindow, SLOT(rb_cuda_slot()));
-        QObject::connect(cb_override_evolution_controls, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_override_evolution_controls_slot(bool)));
         QObject::connect(le_global_anatomy_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_global_anatomy_mutation_rate_slot()));
         QObject::connect(le_max_reproduction_distance, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_reproducing_distance_slot()));
         QObject::connect(cb_fix_reproduction_distance, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_fix_reproduction_distance_slot(bool)));
@@ -2189,7 +2181,6 @@ public:
         cb_clear_walls_on_reset->setText(QApplication::translate("MainWindow", "Clear walls on reset", Q_NULLPTR));
         b_save_world->setText(QApplication::translate("MainWindow", "Save world", Q_NULLPTR));
         b_load_world->setText(QApplication::translate("MainWindow", "Load world", Q_NULLPTR));
-        cb_override_evolution_controls->setText(QApplication::translate("MainWindow", "Override Evolution Controls", Q_NULLPTR));
         label_45->setText(QApplication::translate("MainWindow", "Organism blocks parameters modifiers", Q_NULLPTR));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "Food Cost", Q_NULLPTR));

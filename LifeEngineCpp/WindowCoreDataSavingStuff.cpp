@@ -314,7 +314,6 @@ void WindowCore::read_json_data(std::string path) {
 void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
     dc.simulation_height  = root.get<int>("num_rows") + 2;
     dc.simulation_width   = root.get<int>("num_cols") + 2;
-    dc.total_engine_ticks = root.get<int>("total_ticks");
 
     new_simulation_width = dc.simulation_width;
     new_simulation_height = dc.simulation_height;
@@ -326,6 +325,8 @@ void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
     resize_simulation_space();
     make_walls();
     disable_warnings = false;
+
+    dc.total_engine_ticks = root.get<int>("total_ticks");
 
     for (auto & pair: root.get_child("grid.food")) {
         int y = pair.second.get<int>("r")+1;

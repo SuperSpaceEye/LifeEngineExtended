@@ -590,8 +590,6 @@ void WindowCore::cb_pause_on_total_extinction_slot       (bool state) { sp.pause
 
 void WindowCore::cb_clear_walls_on_reset_slot            (bool state) { sp.clear_walls_on_reset = state;}
 
-void WindowCore::cb_override_evolution_controls_slot     (bool state) { override_evolution_controls_slot = state;}
-
 void WindowCore::cb_generate_random_walls_on_reset_slot  (bool state) { sp.generate_random_walls_on_reset = state;}
 
 void WindowCore::cb_runtime_rotation_enabled_slot        (bool state) { sp.runtime_rotation_enabled = state;}

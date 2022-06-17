@@ -247,7 +247,6 @@ private:
     int new_simulation_height = 200;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
-    bool override_evolution_controls_slot = false;
     bool reset_with_chosen = false;
 
     int float_precision = 4;
@@ -445,7 +444,7 @@ private slots:
     void cb_reset_on_total_extinction_slot(bool state);
     void cb_pause_on_total_extinction_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
-    void cb_override_evolution_controls_slot(bool state);
+
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_runtime_rotation_enabled_slot(bool state);
     void cb_fix_reproduction_distance_slot(bool state);

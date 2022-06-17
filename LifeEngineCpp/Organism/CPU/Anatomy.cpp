@@ -121,7 +121,6 @@ void Anatomy::create_double_adjacent_space(
     }
 }
 
-//TODO it's broken
 void Anatomy::create_producing_space(
         boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
         boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,
@@ -276,8 +275,9 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
         }
     }
 
-    for (int i : num_producing_space) {
-        _producing_space.emplace_back(std::vector<SerializedAdjacentSpaceContainer>(i));
+    for (int i = 0; i < num_producing_space.size(); i++) {
+        _producing_space.emplace_back(std::vector<SerializedAdjacentSpaceContainer>());
+        _producing_space[i].reserve(num_producing_space[i]);
     }
 
     for (auto const &xmap: producing_space) {
