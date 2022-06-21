@@ -41,8 +41,6 @@ public:
     int move_range = 1;
     Rotation rotation = Rotation::UP;
 
-    bool child_ready = false;
-
     int move_counter = 0;
 
     //TODO make evolvable

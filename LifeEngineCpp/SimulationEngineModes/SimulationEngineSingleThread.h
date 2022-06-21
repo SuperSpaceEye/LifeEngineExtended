@@ -38,7 +38,7 @@ public:
 
     static void reserve_observations(std::vector<std::vector<Observation>> &observations,
                                      std::vector<Organism *> &organisms,
-                                     SimulationParameters *sp);
+                                     SimulationParameters *sp, EngineDataContainer *dc);
 
     static void get_observations(EngineDataContainer *dc, SimulationParameters *sp,
                                  std::vector<Organism *> &organisms,

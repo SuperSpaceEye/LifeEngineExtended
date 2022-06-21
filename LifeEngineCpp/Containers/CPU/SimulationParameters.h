@@ -7,7 +7,7 @@
 
 struct SimulationParameters {
     //evolution controls
-        float food_production_probability = 0.08;
+        float food_production_probability = 0.05;
         int   produce_food_every_n_life_ticks = 1;
         int   lifespan_multiplier = 100;
         int   look_range = 50;

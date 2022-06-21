@@ -145,6 +145,33 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
     }
 }
 
+__global__ void
+update_differences(int simulation_width, int diff_len, Differences *diffs, BaseGridBlock *d_second_simulation_grid) {
+    auto i_pos = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i_pos >= diff_len) { return;}
+    auto diff = diffs[i_pos];
+    d_second_simulation_grid[diff.x + diff.y * simulation_width].type = diff.type;
+    d_second_simulation_grid[diff.x + diff.y * simulation_width].rotation = diff.rotation;
+}
+
+void
+CUDAImageCreator::compile_differences(std::vector<int> &truncated_lin_width, std::vector<int> &truncated_lin_height,
+                                      std::vector<Differences> &host_differences, EngineDataContainer *dc) {
+    host_differences.reserve(truncated_lin_width.size() * truncated_lin_height.size());
+
+    for (auto x: truncated_lin_width) {
+        if (x < 0 || x >= dc->simulation_width) { continue;}
+        for (auto y: truncated_lin_height) {
+            if (y < 0 || y >= dc->simulation_height) { continue;}
+            host_differences.emplace_back(Differences{static_cast<uint16_t>(x),
+                                                      static_cast<uint16_t>(y),
+                                                      dc->second_simulation_grid[x + y * dc->simulation_height].type,
+                                                      dc->second_simulation_grid[x + y * dc->simulation_height].rotation,
+            });
+        }
+    }
+}
+
 void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std::vector<int> &lin_width,
                                          std::vector<int> &lin_height,
                                          std::vector<unsigned char> &image_vector, ColorContainer &color_container,
@@ -175,28 +202,36 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
     }
     height_img_boundaries.emplace_back(count, lin_height.size());
 
+    std::vector<Differences> differences{};
+
+    compile_differences(truncated_lin_width, truncated_lin_height, differences, &dc);
+
     check_if_changed(image_width, image_height,
                      dc.simulation_width, dc.simulation_height,
                      width_img_boundaries.size(), height_img_boundaries.size(),
-                     lin_width.size(), lin_height.size());
+                     lin_width.size(), lin_height.size(), differences.size());
 
-    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, truncated_lin_width, truncated_lin_height, dc);
+    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, truncated_lin_width, truncated_lin_height, differences);
+
+    update_differences<<<(differences.size() + block_size - 1) / block_size, block_size>>>(
+            dc.simulation_width, differences.size(),
+            d_differences,
+            d_second_simulation_grid);
+    gpuErrchk( cudaDeviceSynchronize() );
 
     load_symbols(&color_container);
 
     dim3 grid((width_img_boundaries.size() + block_size - 1) / block_size,
               height_img_boundaries.size());
 
-    dim3 block(block_size, block_size);
+//    dim3 block(block_size, block_size);
 
     create_image_kernel<<<grid, block_size>>>(image_width,
                                                   dc.simulation_width, dc.simulation_height,
                                                   width_img_boundaries.size(),height_img_boundaries.size(),
                                                   d_lin_width, d_lin_height,
                                                   d_width_img_boundaries, d_height_img_boundaries,
-                                                  d_image_vector, d_second_simulation_grid
-//                                                  dd_color_container, dd_textures
-                                                  );
+                                                  d_image_vector, d_second_simulation_grid);
 
     gpuErrchk( cudaDeviceSynchronize() );
 
@@ -210,6 +245,7 @@ void CUDAImageCreator::free() {
     cudaFree(d_height_img_boundaries);
     cudaFree(d_lin_width);
     cudaFree(d_lin_height);
+    cudaFree(d_differences);
 
     d_lin_width = nullptr;
     d_lin_height = nullptr;
@@ -227,6 +263,7 @@ void CUDAImageCreator::free() {
     last_height_img_boundaries = 0;
     last_simulation_width = 0;
     last_simulation_height = 0;
+    last_differences = 0;
 }
 
 void CUDAImageCreator::copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height) {
@@ -237,10 +274,10 @@ void CUDAImageCreator::copy_result_image(std::vector<unsigned char> &image_vecto
 }
 
 void CUDAImageCreator::copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
-                    std::vector<pix_pos> &width_img_boundaries, std::vector<pix_pos> &height_img_boundaries,
-                    std::vector<int> & truncated_lin_width,
-                    std::vector<int> & truncated_lin_height,
-                    EngineDataContainer &dc) {
+                                      std::vector<pix_pos> &width_img_boundaries, std::vector<pix_pos> &height_img_boundaries,
+                                      std::vector<int> & truncated_lin_width,
+                                      std::vector<int> & truncated_lin_height,
+                                      std::vector<Differences> &host_differences) {
     gpuErrchk(cudaMemcpy(d_lin_width,
                          lin_width.data(),
                          sizeof (int)*lin_width.size(),
@@ -261,24 +298,15 @@ void CUDAImageCreator::copy_to_device(std::vector<int> &lin_width, std::vector<i
                          sizeof (pix_pos)*height_img_boundaries.size(),
                          cudaMemcpyHostToDevice));
 
-    gpuErrchk(cudaMemcpy(d_second_simulation_grid,
-                         dc.second_simulation_grid.data(),
-                         sizeof (BaseGridBlock)*dc.second_simulation_grid.size(),
-                         cudaMemcpyHostToDevice))
-
-//        for (auto & width: truncated_lin_width) {
-//            for (auto & height: truncated_lin_height) {
-//                if (height < 0 || width < 0) { continue;}
-//                d_second_simulation_grid[width + height * dc.simulation_height] = dc.second_simulation_grid[width + height * dc.simulation_height];
-//            }
-//        }
-
+    gpuErrchk(cudaMemcpy(d_differences,
+                         host_differences.data(),
+                         sizeof(Differences)*host_differences.size(),
+                         cudaMemcpyHostToDevice));
 }
 
-void CUDAImageCreator::check_if_changed(int image_width, int image_height,
-                      int simulation_width, int simulation_height,
-                      int width_img_boundaries_size, int height_img_boundaries_size,
-                      int lin_width_size, int lin_height_size) {
+void CUDAImageCreator::check_if_changed(int image_width, int image_height, int simulation_width, int simulation_height,
+                                        int width_img_boundaries_size, int height_img_boundaries_size,
+                                        int lin_width_size, int lin_height_size, int differences) {
     if (image_width != last_image_width || image_height != last_image_height) {
         last_image_width = image_width;
         last_image_height = image_height;
@@ -298,6 +326,11 @@ void CUDAImageCreator::check_if_changed(int image_width, int image_height,
         last_lin_width = lin_width_size;
         last_lin_height = lin_height_size;
         lin_size_changed(lin_width_size, lin_height_size);
+    }
+
+    if (differences != last_differences) {
+        last_differences = differences;
+        differences_changed(differences);
     }
 }
 
@@ -323,4 +356,9 @@ void CUDAImageCreator::lin_size_changed(int lin_width_size, int lin_height_size)
     gpuErrchk(cudaFree(d_lin_height));
     gpuErrchk(cudaMalloc((int**)&d_lin_width, sizeof(int) * lin_width_size));
     gpuErrchk(cudaMalloc((int**)&d_lin_height, sizeof(int) * lin_height_size));
+}
+
+void CUDAImageCreator::differences_changed(int differences) {
+    gpuErrchk(cudaFree(d_differences));
+    gpuErrchk(cudaMalloc((Differences**)&d_differences, sizeof(Differences)*differences));
 }

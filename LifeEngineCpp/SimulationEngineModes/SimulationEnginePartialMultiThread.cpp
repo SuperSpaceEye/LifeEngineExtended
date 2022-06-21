@@ -26,7 +26,8 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     erase_organisms(dc, dc->threaded_to_erase);
 
     for (int i = 0; i < dc->organisms_pools.size(); i++) {
-        SimulationEngineSingleThread::reserve_observations(dc->pooled_organisms_observations[i], dc->organisms_pools[i], sp);
+        SimulationEngineSingleThread::reserve_observations(dc->pooled_organisms_observations[i], dc->organisms_pools[i],
+                                                           sp, nullptr);
     }
     start_stage(dc, PartialSimulationStage::GetObservations);
     start_stage(dc, PartialSimulationStage::ThinkDecision);

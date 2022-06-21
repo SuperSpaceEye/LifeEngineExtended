@@ -15,11 +15,15 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
 }
 
 //TODO refactor pausing/pass_tick/synchronise_tick
+//TODO takes 4.644% to 1% of processing time
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
+
+    dc.single_thread_to_erase.reserve(dc.minimum_fixed_capacity);
+    dc.single_thread_organisms_observations.reserve(dc.minimum_fixed_capacity);
+
     while (cp.engine_working) {
-        if (cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
-        //std::lock_guard<std::mutex> guard(mutex);
+        if (!dc.unlimited_simulation_fps && cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
         if (cp.stop_engine) {
             SimulationEnginePartialMultiThread::kill_threads(dc);
             cp.engine_working = false;
@@ -35,23 +39,16 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
-        if (sp.pause_on_total_extinction && cp.organisms_extinct) { cp.tb_paused = true ;cp.organisms_extinct = false;}
-        if (sp.reset_on_total_extinction && cp.organisms_extinct) {
-            reset_world();
-            dc.auto_reset_counter++;
-        }
         if (cp.processing_user_actions) {process_user_action_pool();}
         if ((!cp.engine_paused || cp.engine_pass_tick) && (!cp.pause_button_pause || cp.pass_tick)) {
-            //if ((!cp.engine_pause || cp.synchronise_simulation_tick) && !cp.engine_global_pause) {
-                cp.engine_paused = false;
-                cp.engine_pass_tick = false;
-                cp.pass_tick = false;
-                cp.synchronise_simulation_tick = false;
-                simulation_tick();
-                if (sp.auto_produce_n_food > 0) {random_food_drop();}
-                if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
-                if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
-            //}
+            cp.engine_paused = false;
+            cp.engine_pass_tick = false;
+            cp.pass_tick = false;
+            cp.synchronise_simulation_tick = false;
+            simulation_tick();
+            if (sp.auto_produce_n_food > 0) {random_food_drop();}
+            if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
+            if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
         }
     }
 }
@@ -105,24 +102,36 @@ void SimulationEngine::simulation_tick() {
     dc.engine_ticks++;
     dc.total_engine_ticks++;
 
-    if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-        if (dc.organisms.empty() && dc.to_place_organisms.empty()) {
-            cp.organisms_extinct = true;
-        } else {
-            cp.organisms_extinct = false;
-        }
-    } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        cp.organisms_extinct = true;
-        for (auto & pool: dc.organisms_pools) {
-            if (!pool.empty() || !dc.to_place_organisms.empty()) {
+    switch (cp.simulation_mode) {
+        case SimulationModes::CPU_Single_Threaded:
+            if (dc.organisms.empty() && dc.to_place_organisms.empty()) {
+                cp.organisms_extinct = true;
+            } else {
                 cp.organisms_extinct = false;
-                break;
             }
-        }
+            break;
+        case SimulationModes::CPU_Partial_Multi_threaded:
+            cp.organisms_extinct = true;
+            for (auto & pool: dc.organisms_pools) {
+                if (!pool.empty() || !dc.to_place_organisms.empty()) {
+                    cp.organisms_extinct = false;
+                    break;
+                }
+            }
+            break;
+        default: break;
     }
 
     if (cp.organisms_extinct && (sp.pause_on_total_extinction || sp.reset_on_total_extinction)) {
         cp.engine_paused = true;
+        if (sp.reset_on_total_extinction) {
+            reset_world();
+            dc.auto_reset_counter++;
+        }
+        if (sp.pause_on_total_extinction) {
+            cp.tb_paused = true ;
+            cp.organisms_extinct = false;
+        }
         return;
     }
 

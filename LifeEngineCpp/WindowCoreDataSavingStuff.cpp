@@ -180,7 +180,6 @@ void WindowCore::read_organisms(std::ifstream& is) {
         organism->bp                      = &bp;
         organism->sp                      = &sp;
         organism->child_pattern           = nullptr;
-        organism->child_ready             = false;
         organism->life_points             = data.life_points;
         organism->damage                  = data.damage;
         organism->max_lifetime            = data.max_lifetime;

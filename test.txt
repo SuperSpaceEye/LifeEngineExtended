@@ -3,7 +3,6 @@
     #include <random>
     #include <chrono>
 
-
     int num_iter = 1000000;
 
     boost::random_device rd;
