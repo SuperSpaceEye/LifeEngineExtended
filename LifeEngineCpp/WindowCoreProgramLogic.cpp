@@ -744,10 +744,10 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         }
     }
 
-    info.total_size_organism_blocks *= sizeof(SerializedOrganismBlockContainer);
-    info.total_size_producing_space *= sizeof(SerializedAdjacentSpaceContainer);
-    info.total_size_eating_space *= sizeof(SerializedAdjacentSpaceContainer);
-    info.total_size_single_adjacent_space *= sizeof(SerializedArmorSpaceContainer);
+    info.total_size_organism_blocks                *= sizeof(SerializedOrganismBlockContainer);
+    info.total_size_producing_space                *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_eating_space                   *= sizeof(SerializedAdjacentSpaceContainer);
+    info.total_size_single_adjacent_space          *= sizeof(SerializedAdjacentSpaceContainer);
     info.total_size_single_diagonal_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
 
     info.move_range /= info.moving_organisms;
@@ -936,7 +936,6 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_set_fixed_move_range              ->setChecked(sp.set_fixed_move_range);
     _ui.cb_failed_reproduction_eats_food     ->setChecked(sp.failed_reproduction_eats_food);
     _ui.cb_rotate_every_move_tick            ->setChecked(sp.rotate_every_move_tick);
-    _ui.cb_apply_damage_directly             ->setChecked(sp.apply_damage_directly);
     _ui.cb_multiply_food_production_prob     ->setChecked(sp.multiply_food_production_prob);
     _ui.cb_simplified_food_production        ->setChecked(sp.simplified_food_production);
     _ui.cb_stop_when_one_food_generated      ->setChecked(sp.stop_when_one_food_generated);

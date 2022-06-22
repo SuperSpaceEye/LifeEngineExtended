@@ -277,6 +277,7 @@ private:
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
+    void write_version(std::ofstream& os);
     void write_simulation_parameters(std::ofstream& os);
     void write_organisms_block_parameters(std::ofstream& os);
     void write_data_container_data(std::ofstream& os);
@@ -288,6 +289,7 @@ private:
     void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void read_data(std::ifstream& is);
+    bool read_version(std::ifstream& is);
     void read_simulation_parameters(std::ifstream& is);
     void read_organisms_block_parameters(std::ifstream& is);
     void read_data_container_data(std::ifstream& is);
@@ -443,7 +445,6 @@ private slots:
     void cb_reset_on_total_extinction_slot(bool state);
     void cb_pause_on_total_extinction_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
-
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_runtime_rotation_enabled_slot(bool state);
     void cb_fix_reproduction_distance_slot(bool state);
@@ -455,7 +456,6 @@ private slots:
     void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_rotate_every_move_tick_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
-    void cb_apply_damage_directly_slot(bool state);
     void cb_multiply_food_production_prob_slot(bool state);
     void cb_simplified_food_production_slot(bool state);
     void cb_stop_when_one_food_generated(bool state);

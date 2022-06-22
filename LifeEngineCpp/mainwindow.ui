@@ -377,7 +377,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
            <property name="iconSize">
             <size>
@@ -1377,9 +1377,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-875</y>
                   <width>540</width>
-                  <height>1121</height>
+                  <height>1092</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1418,7 +1418,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1916,13 +1916,6 @@ p, li { white-space: pre-wrap; }
                      <widget class="QCheckBox" name="cb_rotate_every_move_tick">
                       <property name="text">
                        <string>Rotate every move tick</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="cb_apply_damage_directly">
-                      <property name="text">
-                       <string>Apply damage directly</string>
                       </property>
                      </widget>
                     </item>
@@ -3767,22 +3760,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_apply_damage_directly</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_apply_damage_directly_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>647</x>
-     <y>865</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>448</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cb_multiply_food_production_prob</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -3984,7 +3961,6 @@ p, li { white-space: pre-wrap; }
   <slot>cb_wait_for_engine_to_stop_slot(bool)</slot>
   <slot>cb_rotate_every_move_tick_slot(bool)</slot>
   <slot>cb_simplified_rendering_slot(bool)</slot>
-  <slot>cb_apply_damage_directly_slot(bool)</slot>
   <slot>cb_multiply_food_production_prob_slot(bool)</slot>
   <slot>cb_simplified_food_production_slot(bool)</slot>
   <slot>cb_stop_when_one_food_generated(bool)</slot>
@@ -3996,11 +3972,11 @@ p, li { white-space: pre-wrap; }
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>
+  <buttongroup name="editor_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="editor_modes"/>
  </buttongroups>
 </ui>

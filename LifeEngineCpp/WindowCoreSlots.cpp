@@ -151,14 +151,14 @@ void WindowCore::b_load_world_slot() {
         return;
     }
 
-    for (auto & organism: dc.organisms) {
-        delete organism;
-    }
-    dc.organisms.clear();
-    for (auto & organism: dc.to_place_organisms) {
-        delete organism;
-    }
-    dc.to_place_organisms.clear();
+//    for (auto & organism: dc.organisms) {
+//        delete organism;
+//    }
+//    dc.organisms.clear();
+//    for (auto & organism: dc.to_place_organisms) {
+//        delete organism;
+//    }
+//    dc.to_place_organisms.clear();
 
     std::string full_path = file_name.toStdString();
 
@@ -609,8 +609,6 @@ void WindowCore::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for
 void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 
 void WindowCore::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
-
-void WindowCore::cb_apply_damage_directly_slot           (bool state) { sp.apply_damage_directly = state;}
 
 void WindowCore::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state;}
 

@@ -242,7 +242,6 @@ public:
     QLineEdit *le_move_range_delimiter;
     QCheckBox *cb_failed_reproduction_eats_food;
     QCheckBox *cb_rotate_every_move_tick;
-    QCheckBox *cb_apply_damage_directly;
     QCheckBox *cb_multiply_food_production_prob;
     QCheckBox *cb_simplified_food_production;
     QCheckBox *cb_stop_when_one_food_generated;
@@ -329,8 +328,8 @@ public:
     QLabel *label_47;
     QLineEdit *le_menu_height;
     QButtonGroup *simulation_modes;
-    QButtonGroup *cursor_modes;
     QButtonGroup *editor_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1112,7 +1111,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 540, 1121));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -875, 540, 1092));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1529,11 +1528,6 @@ public:
         cb_rotate_every_move_tick->setObjectName(QStringLiteral("cb_rotate_every_move_tick"));
 
         verticalLayout_20->addWidget(cb_rotate_every_move_tick);
-
-        cb_apply_damage_directly = new QCheckBox(widget);
-        cb_apply_damage_directly->setObjectName(QStringLiteral("cb_apply_damage_directly"));
-
-        verticalLayout_20->addWidget(cb_apply_damage_directly);
 
         cb_multiply_food_production_prob = new QCheckBox(widget);
         cb_multiply_food_production_prob->setObjectName(QStringLiteral("cb_multiply_food_production_prob"));
@@ -2077,7 +2071,6 @@ public:
         QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop_slot(bool)));
         QObject::connect(cb_rotate_every_move_tick, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_rotate_every_move_tick_slot(bool)));
         QObject::connect(cb_simplified_rendering, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_rendering_slot(bool)));
-        QObject::connect(cb_apply_damage_directly, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_apply_damage_directly_slot(bool)));
         QObject::connect(cb_multiply_food_production_prob, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_multiply_food_production_prob_slot(bool)));
         QObject::connect(cb_simplified_food_production, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_food_production_slot(bool)));
         QObject::connect(cb_stop_when_one_food_generated, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_stop_when_one_food_generated(bool)));
@@ -2087,7 +2080,7 @@ public:
         QObject::connect(cb_eat_then_produce, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_eat_then_produce_slot(bool)));
         QObject::connect(le_menu_height, SIGNAL(returnPressed()), MainWindow, SLOT(le_menu_height_slot()));
 
-        Tabs->setCurrentIndex(2);
+        Tabs->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
 
 
@@ -2289,7 +2282,6 @@ public:
         label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", Q_NULLPTR));
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", Q_NULLPTR));
         cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", Q_NULLPTR));
-        cb_apply_damage_directly->setText(QApplication::translate("MainWindow", "Apply damage directly", Q_NULLPTR));
         cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability by number of producers", Q_NULLPTR));
         cb_simplified_food_production->setText(QApplication::translate("MainWindow", "Simplified food production", Q_NULLPTR));
         cb_stop_when_one_food_generated->setText(QApplication::translate("MainWindow", "Stop food production when one food is generated", Q_NULLPTR));

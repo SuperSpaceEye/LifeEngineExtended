@@ -4,12 +4,20 @@
 
 #include "WindowCore.h"
 
+//TODO increment every time saving logic changes
+int SAVE_VERSION = 1;
+
 void WindowCore::write_data(std::ofstream &os) {
+    write_version(os);
     write_simulation_parameters(os);
     write_organisms_block_parameters(os);
     write_data_container_data(os);
     write_simulation_grid(os);
     write_organisms(os);
+}
+
+void WindowCore::write_version(std::ofstream &os) {
+    os.write((char*)&SAVE_VERSION, sizeof(int));
 }
 
 void WindowCore::write_simulation_parameters(std::ofstream& os) {
@@ -94,7 +102,7 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     os.write((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     os.write((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     os.write((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    os.write((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedArmorSpaceContainer   ) * anatomy->_single_adjacent_space.size());
+    os.write((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_adjacent_space.size());
     os.write((char*)&anatomy->_single_diagonal_adjacent_space[0], sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_diagonal_adjacent_space.size());
 
     for (auto & space: anatomy->_producing_space) {
@@ -105,12 +113,34 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
 }
 
 
+
 void WindowCore::read_data(std::ifstream &is) {
+    //If save version is incompatible
+    if (!read_version(is)) {
+        display_message("Save version is incompatible with current program version.");
+        return;
+    }
+
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
+
     read_simulation_parameters(is);
     read_organisms_block_parameters(is);
     read_data_container_data(is);
     read_simulation_grid(is);
     read_organisms(is);
+}
+
+bool WindowCore::read_version(std::ifstream &is) {
+    int save_version;
+    is.read((char*)&save_version, sizeof(int));
+    return save_version == SAVE_VERSION;
 }
 
 void WindowCore::read_simulation_parameters(std::ifstream& is) {
@@ -235,7 +265,7 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     is.read((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     is.read((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     is.read((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    is.read((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedArmorSpaceContainer   ) * anatomy->_single_adjacent_space.size());
+    is.read((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_adjacent_space.size());
     is.read((char*)&anatomy->_single_diagonal_adjacent_space[0], sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_diagonal_adjacent_space.size());
 
     for (auto & space: anatomy->_producing_space) {
@@ -295,6 +325,15 @@ namespace pt = boost::property_tree;
 
 //https://www.cochoy.fr/boost-property-tree/
 void WindowCore::read_json_data(std::string path) {
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
+
     pt::ptree root;
     pt::read_json(path, root);
 

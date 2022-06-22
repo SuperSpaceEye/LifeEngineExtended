@@ -62,8 +62,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
 //Is it faster? idk. maybe.
 template <typename T>
-constexpr
-void smart_reserve(std::vector<T> &input_vec, uint32_t new_size, uint32_t minimum_fixed_size) {
+inline void smart_reserve(std::vector<T> &input_vec, uint32_t new_size, uint32_t minimum_fixed_size) {
 //    input_vec.clear();
     if (new_size < minimum_fixed_size) {
         return;
@@ -72,8 +71,7 @@ void smart_reserve(std::vector<T> &input_vec, uint32_t new_size, uint32_t minimu
     input_vec.reserve(new_size);
 }
 
-constexpr
-Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
+inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
     uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(rotation1) + static_cast<uint_fast8_t>(rotation2);
     return static_cast<Rotation>(new_int_rotation%4);
 }
@@ -173,35 +171,24 @@ void SimulationEngineSingleThread::erase_organisms(EngineDataContainer *dc, std:
 }
 
 void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
-    if (sp->apply_damage_directly) {
-        for (auto &block: organism->organism_anatomy->_killing_space) {
-            auto world_block = dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][
-                    organism->y + block.get_pos(organism->rotation).y];
-            switch (world_block.type) {
-                case BlockTypes::EmptyBlock:
-                case BlockTypes::FoodBlock:
-                case BlockTypes::WallBlock:
-                case BlockTypes::ArmorBlock:
-                    continue;
-                default:
-                    break;
-            }
-            if (world_block.organism == nullptr) { continue;}
-            if (sp->on_touch_kill) {
-                world_block.organism->damage = world_block.organism->life_points + 1;
+    for (auto &block: organism->organism_anatomy->_killing_space) {
+        auto world_block = dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][
+                organism->y + block.get_pos(organism->rotation).y];
+        switch (world_block.type) {
+            case BlockTypes::EmptyBlock:
+            case BlockTypes::FoodBlock:
+            case BlockTypes::WallBlock:
+            case BlockTypes::ArmorBlock:
+                continue;
+            default:
                 break;
-            }
-            world_block.organism->damage += sp->killer_damage_amount;
         }
-    //TODO delete
-    } else {
-        for (auto & block: organism->organism_anatomy->_single_adjacent_space) {
-            if (block.is_armored) {continue;}
-            if (dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type == KillerBlock) {
-                if (sp->on_touch_kill) { organism->damage = organism->life_points + 1; break;}
-                organism->damage += sp->killer_damage_amount;
-            }
+        if (world_block.organism == nullptr) { continue;}
+        if (sp->on_touch_kill) {
+            world_block.organism->damage = world_block.organism->life_points + 1;
+            break;
         }
+        world_block.organism->damage += sp->killer_damage_amount;
     }
 }
 
