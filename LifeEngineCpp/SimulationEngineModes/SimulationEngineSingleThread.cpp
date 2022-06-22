@@ -63,7 +63,6 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 //Is it faster? idk. maybe.
 template <typename T>
 inline void smart_reserve(std::vector<T> &input_vec, uint32_t new_size, uint32_t minimum_fixed_size) {
-//    input_vec.clear();
     if (new_size < minimum_fixed_size) {
         return;
     }
@@ -78,17 +77,12 @@ inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
     for (auto &block: organism->organism_anatomy->_organism_blocks) {
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].type = block.type;
-//        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-//        [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+        w_block->type = block.type;
         if (block.type == BlockTypes::EyeBlock) {
-            dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-            [organism->y + block.get_pos(organism->rotation).y].rotation = get_global_rotation(block.rotation,
-                                                                                               organism->rotation);
+            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
         }
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].organism = organism;
+        w_block->organism = organism;
     }
 }
 
@@ -117,9 +111,10 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *
                                                            Organism *organism, lehmer64 &gen, int multiplier) {
     for (auto & pr: organism->organism_anatomy->_producing_space) {
         for (auto &pc: pr) {
-            if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type != EmptyBlock) {continue;}
+            auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
+            if (w_block->type != EmptyBlock) {continue;}
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
-                dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y +pc.get_pos(organism->rotation).y].type = FoodBlock;
+                w_block->type = FoodBlock;
                 if (sp->stop_when_one_food_generated) { return;}
                 continue;
             }
@@ -134,10 +129,12 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc,
         //select one space to produce food.
         auto & pc = pr[std::uniform_int_distribution<int>(0, pr.size()-1)(gen)];
 
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
+
         //if space is occupied, then do nothing
-        if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type != EmptyBlock) { continue;}
+        if (w_block->type != EmptyBlock) { continue;}
         if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
-            dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
+            w_block->type = FoodBlock;
             if (sp->stop_when_one_food_generated) { return;}
             continue;
         }
@@ -146,8 +143,9 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc,
 
 void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
     for (auto & pc: organism->organism_anatomy->_eating_space) {
-        if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == FoodBlock) {
-            dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = EmptyBlock;
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
+        if (w_block->type == BlockTypes::FoodBlock) {
+            w_block->type = BlockTypes::EmptyBlock;
             organism->food_collected++;
         }
     }
@@ -157,8 +155,9 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, std::v
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
         for (auto & block: organism->organism_anatomy->_organism_blocks) {
-            dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type = FoodBlock;
-            dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
+            auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+            w_block->type = FoodBlock;
+            w_block->organism = nullptr;
         }
         to_erase.emplace_back(organism_pos);
     }
@@ -249,8 +248,6 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                 pos_x += offset_x;
                 pos_y += offset_y;
 
-                //if (check_if_out_of_bounds(dc, pos_x, pos_y)) {break;}
-
                 last_observation.type = dc->CPU_simulation_grid[pos_x][pos_y].type;
                 last_observation.distance = i;
 
@@ -288,35 +285,30 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
 
     //checks if space for organism is empty, or contains itself
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x][organism->y + block.get_pos(new_rotation).y];
+
         if (check_if_block_out_of_bounds(dc, organism, block, new_rotation) ||
-                (dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x]
-                               [organism->y + block.get_pos(new_rotation).y].type != EmptyBlock &&
-                dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x]
-                               [organism->y + block.get_pos(new_rotation).y].organism != organism)) {
+                (w_block->type != EmptyBlock &&
+                 w_block->organism != organism)) {
             return;
         }
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].type = BlockTypes::EmptyBlock;
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+        w_block->type = BlockTypes::EmptyBlock;
+        w_block->organism = nullptr;
     }
 
     //If there is a place for rotated organism, then rotation can happen
     organism->rotation = new_rotation;
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].type = block.type;
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+        w_block->type = block.type;
         if (block.type == BlockTypes::EyeBlock) {
-            dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-            [organism->y + block.get_pos(organism->rotation).y].rotation = get_global_rotation(block.rotation,organism->rotation);
+            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
         }
-//        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-//        [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].organism = organism;
+        w_block->organism = organism;
     }
 }
 
@@ -336,33 +328,26 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
 
     //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        if (dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-                               [new_y + block.get_pos(organism->rotation).y].type != EmptyBlock &&
-                dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-                [new_y + block.get_pos(organism->rotation).y].organism != organism) {
+        auto * w_block = &dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x][new_y + block.get_pos(organism->rotation).y];
+        if (w_block->type != EmptyBlock &&
+            w_block->organism != organism) {
             return;
         }
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].type = BlockTypes::EmptyBlock;
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+        w_block->type = BlockTypes::EmptyBlock;
+        w_block->organism = nullptr;
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
-        dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-        [new_y + block.get_pos(organism->rotation).y].type = block.type;
+        auto * w_block = &dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x][new_y + block.get_pos(organism->rotation).y];
+        w_block->type = block.type;
         if (block.type == BlockTypes::EyeBlock) {
-            dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-            [new_y + block.get_pos(organism->rotation).y].rotation = get_global_rotation(block.rotation,
-                                                                                         organism->rotation);
+            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
         }
-//        dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-//        [new_y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
-        dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x]
-        [new_y + block.get_pos(organism->rotation).y].organism = organism;
+        w_block->organism = organism;
     }
 
     organism->x = new_x;
@@ -378,8 +363,7 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
             if (organism->organism_anatomy->_mover_blocks > 0) {
                 move_organism(dc, organism, organism->last_decision.decision);
                 if (sp->rotate_every_move_tick && organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-                    rotate_organism(dc, organism,
-                                    static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)));
+                    rotate_organism(dc, organism,static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)));
                 }
                 organism->move_counter++;
             }
@@ -463,13 +447,13 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
         if (check_if_block_out_of_bounds(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
 
-        if (sp->food_blocks_reproduction && dc->CPU_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
-            [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type != EmptyBlock
+        auto * w_block = &dc->CPU_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
+                                    [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y];
+
+        if (sp->food_blocks_reproduction && w_block->type != EmptyBlock
             ||
-            !sp->food_blocks_reproduction && !(dc->CPU_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
-            [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type == EmptyBlock ||
-            dc->CPU_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
-            [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y].type == FoodBlock)
+            !sp->food_blocks_reproduction && !(w_block->type == EmptyBlock ||
+            w_block->type == FoodBlock)
             )
         {return;}
     }
