@@ -2,6 +2,8 @@
 #include <QStyleFactory>
 #include "LifeEngineCpp/WindowCore.h"
 
+//TODO add more comments
+
 int main(int argc, char *argv[]) {
     std::cout << "Loading...\n";
     QApplication app(argc, argv);

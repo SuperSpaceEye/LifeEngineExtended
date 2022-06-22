@@ -54,52 +54,14 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     //for now only for eye blocks
     //local rotation of a block
     Rotation rotation = Rotation::UP;
-    Neighbors neighbors = Neighbors{};
 
     SerializedOrganismBlockContainer()=default;
-    SerializedOrganismBlockContainer(BlockTypes type, Rotation rotation, int relative_x, int relative_y,
-                                     bool up = false, bool left = false, bool down = false, bool right = false):
-            BaseSerializedContainer(relative_x, relative_y), type(type), rotation(rotation) {
-        neighbors.up    = up;
-        neighbors.left  = left;
-        neighbors.down  = down;
-        neighbors.right = right;
-    }
+    SerializedOrganismBlockContainer(BlockTypes type, Rotation rotation, int relative_x, int relative_y):
+            BaseSerializedContainer(relative_x, relative_y), type(type), rotation(rotation) {}
     Rotation get_block_rotation_on_grid(Rotation organism_rotation) {
         int new_int_rotation = static_cast<int>(organism_rotation) + static_cast<int>(rotation);
         if (new_int_rotation > 3) {new_int_rotation-=4;}
         return static_cast<Rotation>(new_int_rotation);
-    }
-
-    Neighbors get_rotated_block_neighbors(Rotation organism_rotation) {
-        auto new_neighbors = Neighbors{};
-        switch (organism_rotation) {
-            case Rotation::UP:
-                new_neighbors.up    = neighbors.up;
-                new_neighbors.left  = neighbors.left;
-                new_neighbors.down  = neighbors.down;
-                new_neighbors.right = neighbors.right;
-                break;
-            case Rotation::LEFT:
-                new_neighbors.up    = neighbors.left;
-                new_neighbors.left  = neighbors.down;
-                new_neighbors.down  = neighbors.right;
-                new_neighbors.right = neighbors.up;
-                break;
-            case Rotation::DOWN:
-                new_neighbors.up    = neighbors.down;
-                new_neighbors.left  = neighbors.right;
-                new_neighbors.down  = neighbors.up;
-                new_neighbors.right = neighbors.left;
-                break;
-            case Rotation::RIGHT:
-                new_neighbors.up    = neighbors.right;
-                new_neighbors.left  = neighbors.up;
-                new_neighbors.down  = neighbors.left;
-                new_neighbors.right = neighbors.down;
-                break;
-        }
-        return new_neighbors;
     }
 };
 
@@ -124,7 +86,6 @@ struct SerializedOrganismStructureContainer {
 
     std::vector<SerializedArmorSpaceContainer   > single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space;
-    std::vector<SerializedAdjacentSpaceContainer> double_adjacent_space;
 
     int32_t mouth_blocks{};
     int32_t producer_blocks{};
@@ -142,7 +103,6 @@ struct SerializedOrganismStructureContainer {
 
             std::vector<SerializedArmorSpaceContainer   > single_adjacent_space,
             std::vector<SerializedAdjacentSpaceContainer> single_diagonal_adjacent_space,
-            std::vector<SerializedAdjacentSpaceContainer> double_adjacent_space,
             int32_t mouth_blocks,
             int32_t producer_blocks,
             int32_t mover_blocks,
@@ -156,7 +116,6 @@ struct SerializedOrganismStructureContainer {
 
             single_adjacent_space          (std::move(single_adjacent_space)),
             single_diagonal_adjacent_space (std::move(single_diagonal_adjacent_space)),
-            double_adjacent_space          (std::move(double_adjacent_space)),
             mouth_blocks(mouth_blocks),
             producer_blocks(producer_blocks),
             mover_blocks(mover_blocks),
@@ -173,12 +132,6 @@ private:
                                     boost::unordered_map<int, boost::unordered_map<int, MapAjacent>> &single_adjacent_space,
                                     const BaseGridBlock &block);
 
-    static void set_double_adjacent(int x, int y, int x_offset, int y_offset,
-                                    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                    boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space);
-
     static void set_single_diagonal_adjacent(int x, int y, int x_offset, int y_offset,
                                              boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                              boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
@@ -192,12 +145,6 @@ private:
             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
             boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
-
-    static void create_double_adjacent_space(
-            boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
-            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
-            boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space);
 
     static void create_producing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                        boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
@@ -219,8 +166,6 @@ private:
                                       boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                       int & x, int & y);
 
-    static void calculate_neighbors(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks);
-
     static SerializedOrganismStructureContainer * serialize(
             const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
             const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
@@ -229,7 +174,6 @@ private:
 
             const boost::unordered_map<int, boost::unordered_map<int, MapAjacent>>& single_adjacent_space,
             const boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space,
-            const boost::unordered_map<int, boost::unordered_map<int, bool>>& double_adjacent_space,
 
             const std::vector<int> & num_producing_space,
 
@@ -256,7 +200,6 @@ public:
 //    std::vector<SerializedArmorSpaceContainer   > _armor_space;
     std::vector<SerializedArmorSpaceContainer   > _single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
-    std::vector<SerializedAdjacentSpaceContainer> _double_adjacent_space;
 
     int32_t _mouth_blocks    = 0;
     int32_t _producer_blocks = 0;

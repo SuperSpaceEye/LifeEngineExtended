@@ -17,8 +17,8 @@
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
     bool hovering = false;
-    explicit EditBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{}) :
-    BaseGridBlock(type, rotation, neighbors){}
+    explicit EditBlock(BlockTypes type, Rotation rotation = Rotation::UP) :
+    BaseGridBlock(type, rotation){}
 };
 
 class OrganismEditor {

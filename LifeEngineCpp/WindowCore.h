@@ -160,7 +160,6 @@ struct OrganismAvgBlockInformation {
     uint64_t total_size_eating_space    = 0;
     uint64_t total_size_single_adjacent_space = 0;
     uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size_double_adjacent_space = 0;
     uint64_t total_size = 0;
 
     OrganismInfoHolder total_avg{};

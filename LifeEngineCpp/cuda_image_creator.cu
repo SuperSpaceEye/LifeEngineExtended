@@ -217,6 +217,7 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
             dc.simulation_width, differences.size(),
             d_differences,
             d_second_simulation_grid);
+
     gpuErrchk( cudaDeviceSynchronize() );
 
     load_symbols(&color_container);
@@ -253,6 +254,7 @@ void CUDAImageCreator::free() {
     d_height_img_boundaries = nullptr;
     d_image_vector = nullptr;
     d_second_simulation_grid = nullptr;
+    d_differences = nullptr;
 
     last_image_width = 0;
     last_image_height = 0;

@@ -480,7 +480,6 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
         for (int y: lin_height) {
             if (y < 0 || y >= dc.simulation_height) { continue; }
             dc.second_simulation_grid[x + y * dc.simulation_width].type = dc.CPU_simulation_grid[x][y].type;
-            dc.second_simulation_grid[x + y * dc.simulation_width].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
             dc.second_simulation_grid[x + y * dc.simulation_width].organism = dc.CPU_simulation_grid[x][y].organism;
             dc.second_simulation_grid[x + y * dc.simulation_width].rotation = dc.CPU_simulation_grid[x][y].rotation;
         }
@@ -495,7 +494,6 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
     for (int x = 0; x < dc.simulation_width; x++) {
         for (int y = 0; y < dc.simulation_height; y++) {
             dc.second_simulation_grid[x + y * dc.simulation_width].type = dc.CPU_simulation_grid[x][y].type;
-            dc.second_simulation_grid[x + y * dc.simulation_width].neighbors = dc.CPU_simulation_grid[x][y].neighbors;
             dc.second_simulation_grid[x + y * dc.simulation_width].organism = dc.CPU_simulation_grid[x][y].organism;
             dc.second_simulation_grid[x + y * dc.simulation_width].rotation = dc.CPU_simulation_grid[x][y].rotation;
         }
@@ -690,7 +688,6 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
             info.total_size_eating_space += organism->organism_anatomy->_eating_space.size();
             info.total_size_single_adjacent_space += organism->organism_anatomy->_single_adjacent_space.size();
             info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
-            info.total_size_double_adjacent_space += organism->organism_anatomy->_double_adjacent_space.size();
 
             if (organism->organism_anatomy->_mover_blocks > 0) {
                 info.move_range += organism->move_range;
@@ -752,7 +749,6 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.total_size_eating_space *= sizeof(SerializedAdjacentSpaceContainer);
     info.total_size_single_adjacent_space *= sizeof(SerializedArmorSpaceContainer);
     info.total_size_single_diagonal_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
-    info.total_size_double_adjacent_space *= sizeof(SerializedAdjacentSpaceContainer);
 
     info.move_range /= info.moving_organisms;
 
@@ -761,7 +757,6 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
                       info.total_size_eating_space +
                       info.total_size_single_adjacent_space +
                       info.total_size_single_diagonal_adjacent_space +
-                      info.total_size_double_adjacent_space +
                       (sizeof(Brain) * info.total_avg.total) +
                       (sizeof(Anatomy) * info.total_avg.total) +
                       (sizeof(Organism) * info.total_avg.total)

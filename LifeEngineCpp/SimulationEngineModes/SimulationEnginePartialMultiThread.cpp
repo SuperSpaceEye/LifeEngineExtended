@@ -156,8 +156,6 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].type = block.type;
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].organism = organism;

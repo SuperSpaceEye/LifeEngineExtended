@@ -13,21 +13,18 @@ struct AtomicGridBlock {
 
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
-    Neighbors neighbors{};
 
     Organism * organism = nullptr;
     AtomicGridBlock()=default;
     AtomicGridBlock(const AtomicGridBlock & block): type(block.type),
                                                     rotation(block.rotation),
-                                                    neighbors(block.neighbors),
                                                     organism(block.organism) {}
-    explicit AtomicGridBlock(BlockTypes type, Rotation rotation = Rotation::UP, Neighbors neighbors = Neighbors{},
+    explicit AtomicGridBlock(BlockTypes type, Rotation rotation = Rotation::UP,
             Organism * organism = nullptr):
-    type(type), rotation(rotation), neighbors(neighbors), organism(organism) {}
+    type(type), rotation(rotation), organism(organism) {}
     AtomicGridBlock& operator=(const AtomicGridBlock & block) {
         type = block.type;
         rotation = block.rotation;
-        neighbors = block.neighbors;
         organism = block.organism;
         return *this;
     };
