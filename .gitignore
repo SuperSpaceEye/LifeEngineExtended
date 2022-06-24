@@ -1,5 +1,0 @@
-# Project exclude paths
-/cmake-build-debug/
-/cmake-build-release/
-/cmake-build-relwithdebinfo/
-.gitignore
