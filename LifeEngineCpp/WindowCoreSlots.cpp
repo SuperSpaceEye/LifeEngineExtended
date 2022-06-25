@@ -14,7 +14,6 @@ void WindowCore::display_message(const std::string &message) {
     QMessageBox msg;
     msg.setText(QString::fromStdString(message));
     msg.setWindowTitle("Warning");
-    msg.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     msg.exec();
 }
 
@@ -32,17 +31,25 @@ result_struct<T> WindowCore::try_convert_message_box_template(const std::string&
 
 //==================== Toggle buttons ====================
 
-void WindowCore::tb_pause_slot(bool paused) {
-    cp.pause_button_pause = paused;
+void WindowCore::tb_pause_slot(bool state) {
+    cp.pause_button_pause = state;
     parse_full_simulation_grid(cp.pause_button_pause);
-    cp.tb_paused = paused;
+    cp.tb_paused = state;
 }
 
-void WindowCore::tb_stoprender_slot(bool stopped_render) {
-    pause_image_construction = stopped_render;
+void WindowCore::tb_stoprender_slot(bool state) {
+    pause_image_construction = state;
     parse_full_simulation_grid(pause_image_construction);
     // calculating delta time is not needed when no image is being created.
     cp.calculate_simulation_tick_delta_time = !cp.calculate_simulation_tick_delta_time;
+}
+
+void WindowCore::tb_open_statistics_slot(bool state) {
+    if (state) {
+       s.show();
+    } else {
+       s.close();
+    }
 }
 
 //==================== Buttons ====================
@@ -90,7 +97,6 @@ void WindowCore::b_save_world_slot() {
 
     QString selected_filter;
     QFileDialog file_dialog{};
-    file_dialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
                                                  "Custom save type (*.tlfcpp);;JSON (*.json)", &selected_filter);
@@ -574,6 +580,18 @@ void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
         return;
     }
     use_cuda = true;
+}
+
+void WindowCore::cb_statistics_always_on_top_slot        (bool state) {
+    auto hidden = s.isHidden();
+
+   s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        s.show();
+    }
 }
 
 void WindowCore::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}

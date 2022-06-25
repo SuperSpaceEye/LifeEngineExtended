@@ -253,48 +253,8 @@ public:
     QVBoxLayout *verticalLayout_24;
     QWidget *widget_5;
     QVBoxLayout *verticalLayout_37;
-    QLabel *lb_simulation_size;
-    QLabel *lb_organisms_memory_consumption;
-    QLabel *lb_total_engine_ticks;
-    QSpacerItem *verticalSpacer_2;
-    QHBoxLayout *horizontalLayout_47;
-    QVBoxLayout *verticalLayout_38;
-    QLabel *lb_moving_organisms;
-    QLabel *lb_organisms_with_eyes;
-    QLabel *lb_avg_org_lifetime_2;
-    QLabel *lb_average_moving_range;
-    QLabel *lb_organism_size_2;
-    QLabel *lb_anatomy_mutation_rate_2;
-    QLabel *lb_brain_mutation_rate_2;
-    QLabel *lb_mouth_num_2;
-    QLabel *lb_producer_num_2;
-    QLabel *lb_mover_num_2;
-    QLabel *lb_killer_num_2;
-    QLabel *lb_armor_num_2;
-    QLabel *lb_eye_num_2;
-    QVBoxLayout *verticalLayout_40;
-    QLabel *lb_stationary_organisms;
-    QLabel *lb_organism_size_3;
-    QLabel *lb_avg_org_lifetime_3;
-    QLabel *lb_anatomy_mutation_rate_3;
-    QLabel *lb_brain_mutation_rate_3;
-    QLabel *lb_producer_num_3;
-    QLabel *lb_mouth_num_3;
-    QLabel *lb_killer_num_3;
-    QLabel *lb_armor_num_3;
-    QLabel *lb_eye_num_3;
-    QVBoxLayout *verticalLayout_10;
-    QLabel *lb_organisms_alive_2;
-    QLabel *lb_organism_size_4;
-    QLabel *lb_avg_org_lifetime_4;
-    QLabel *lb_anatomy_mutation_rate_4;
-    QLabel *lb_brain_mutation_rate_4;
-    QLabel *lb_producer_num_4;
-    QLabel *lb_mover_num_4;
-    QLabel *lb_mouth_num_4;
-    QLabel *lb_killer_num_4;
-    QLabel *lb_armor_num_4;
-    QLabel *lb_eye_num_4;
+    QPushButton *tb_open_statisctics;
+    QCheckBox *cb_statistics_always_on_top;
     QWidget *settings_tab;
     QVBoxLayout *verticalLayout_7;
     QScrollArea *scrollArea;
@@ -327,15 +287,15 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_47;
     QLineEdit *le_menu_height;
-    QButtonGroup *simulation_modes;
     QButtonGroup *editor_modes;
+    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(934, 898);
+        MainWindow->resize(900, 900);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -819,7 +779,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QStringLiteral("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 540, 452));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 506, 452));
         QSizePolicy sizePolicy4(QSizePolicy::Ignored, QSizePolicy::Minimum);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1111,7 +1071,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -875, 540, 1092));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 1092));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1569,7 +1529,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 608, 400));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 520, 217));
         QSizePolicy sizePolicy9(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1585,214 +1545,16 @@ public:
         verticalLayout_37 = new QVBoxLayout(widget_5);
         verticalLayout_37->setObjectName(QStringLiteral("verticalLayout_37"));
         verticalLayout_37->setContentsMargins(0, 0, 0, 0);
-        lb_simulation_size = new QLabel(widget_5);
-        lb_simulation_size->setObjectName(QStringLiteral("lb_simulation_size"));
+        tb_open_statisctics = new QPushButton(widget_5);
+        tb_open_statisctics->setObjectName(QStringLiteral("tb_open_statisctics"));
+        tb_open_statisctics->setCheckable(true);
 
-        verticalLayout_37->addWidget(lb_simulation_size);
+        verticalLayout_37->addWidget(tb_open_statisctics);
 
-        lb_organisms_memory_consumption = new QLabel(widget_5);
-        lb_organisms_memory_consumption->setObjectName(QStringLiteral("lb_organisms_memory_consumption"));
+        cb_statistics_always_on_top = new QCheckBox(widget_5);
+        cb_statistics_always_on_top->setObjectName(QStringLiteral("cb_statistics_always_on_top"));
 
-        verticalLayout_37->addWidget(lb_organisms_memory_consumption);
-
-        lb_total_engine_ticks = new QLabel(widget_5);
-        lb_total_engine_ticks->setObjectName(QStringLiteral("lb_total_engine_ticks"));
-
-        verticalLayout_37->addWidget(lb_total_engine_ticks);
-
-        verticalSpacer_2 = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_37->addItem(verticalSpacer_2);
-
-        horizontalLayout_47 = new QHBoxLayout();
-        horizontalLayout_47->setObjectName(QStringLiteral("horizontalLayout_47"));
-        verticalLayout_38 = new QVBoxLayout();
-        verticalLayout_38->setObjectName(QStringLiteral("verticalLayout_38"));
-        lb_moving_organisms = new QLabel(widget_5);
-        lb_moving_organisms->setObjectName(QStringLiteral("lb_moving_organisms"));
-
-        verticalLayout_38->addWidget(lb_moving_organisms);
-
-        lb_organisms_with_eyes = new QLabel(widget_5);
-        lb_organisms_with_eyes->setObjectName(QStringLiteral("lb_organisms_with_eyes"));
-
-        verticalLayout_38->addWidget(lb_organisms_with_eyes);
-
-        lb_avg_org_lifetime_2 = new QLabel(widget_5);
-        lb_avg_org_lifetime_2->setObjectName(QStringLiteral("lb_avg_org_lifetime_2"));
-
-        verticalLayout_38->addWidget(lb_avg_org_lifetime_2);
-
-        lb_average_moving_range = new QLabel(widget_5);
-        lb_average_moving_range->setObjectName(QStringLiteral("lb_average_moving_range"));
-
-        verticalLayout_38->addWidget(lb_average_moving_range);
-
-        lb_organism_size_2 = new QLabel(widget_5);
-        lb_organism_size_2->setObjectName(QStringLiteral("lb_organism_size_2"));
-
-        verticalLayout_38->addWidget(lb_organism_size_2);
-
-        lb_anatomy_mutation_rate_2 = new QLabel(widget_5);
-        lb_anatomy_mutation_rate_2->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_2"));
-
-        verticalLayout_38->addWidget(lb_anatomy_mutation_rate_2);
-
-        lb_brain_mutation_rate_2 = new QLabel(widget_5);
-        lb_brain_mutation_rate_2->setObjectName(QStringLiteral("lb_brain_mutation_rate_2"));
-
-        verticalLayout_38->addWidget(lb_brain_mutation_rate_2);
-
-        lb_mouth_num_2 = new QLabel(widget_5);
-        lb_mouth_num_2->setObjectName(QStringLiteral("lb_mouth_num_2"));
-
-        verticalLayout_38->addWidget(lb_mouth_num_2);
-
-        lb_producer_num_2 = new QLabel(widget_5);
-        lb_producer_num_2->setObjectName(QStringLiteral("lb_producer_num_2"));
-
-        verticalLayout_38->addWidget(lb_producer_num_2);
-
-        lb_mover_num_2 = new QLabel(widget_5);
-        lb_mover_num_2->setObjectName(QStringLiteral("lb_mover_num_2"));
-
-        verticalLayout_38->addWidget(lb_mover_num_2);
-
-        lb_killer_num_2 = new QLabel(widget_5);
-        lb_killer_num_2->setObjectName(QStringLiteral("lb_killer_num_2"));
-
-        verticalLayout_38->addWidget(lb_killer_num_2);
-
-        lb_armor_num_2 = new QLabel(widget_5);
-        lb_armor_num_2->setObjectName(QStringLiteral("lb_armor_num_2"));
-
-        verticalLayout_38->addWidget(lb_armor_num_2);
-
-        lb_eye_num_2 = new QLabel(widget_5);
-        lb_eye_num_2->setObjectName(QStringLiteral("lb_eye_num_2"));
-
-        verticalLayout_38->addWidget(lb_eye_num_2);
-
-
-        horizontalLayout_47->addLayout(verticalLayout_38);
-
-        verticalLayout_40 = new QVBoxLayout();
-        verticalLayout_40->setObjectName(QStringLiteral("verticalLayout_40"));
-        lb_stationary_organisms = new QLabel(widget_5);
-        lb_stationary_organisms->setObjectName(QStringLiteral("lb_stationary_organisms"));
-
-        verticalLayout_40->addWidget(lb_stationary_organisms);
-
-        lb_organism_size_3 = new QLabel(widget_5);
-        lb_organism_size_3->setObjectName(QStringLiteral("lb_organism_size_3"));
-
-        verticalLayout_40->addWidget(lb_organism_size_3);
-
-        lb_avg_org_lifetime_3 = new QLabel(widget_5);
-        lb_avg_org_lifetime_3->setObjectName(QStringLiteral("lb_avg_org_lifetime_3"));
-
-        verticalLayout_40->addWidget(lb_avg_org_lifetime_3);
-
-        lb_anatomy_mutation_rate_3 = new QLabel(widget_5);
-        lb_anatomy_mutation_rate_3->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_3"));
-
-        verticalLayout_40->addWidget(lb_anatomy_mutation_rate_3);
-
-        lb_brain_mutation_rate_3 = new QLabel(widget_5);
-        lb_brain_mutation_rate_3->setObjectName(QStringLiteral("lb_brain_mutation_rate_3"));
-
-        verticalLayout_40->addWidget(lb_brain_mutation_rate_3);
-
-        lb_producer_num_3 = new QLabel(widget_5);
-        lb_producer_num_3->setObjectName(QStringLiteral("lb_producer_num_3"));
-
-        verticalLayout_40->addWidget(lb_producer_num_3);
-
-        lb_mouth_num_3 = new QLabel(widget_5);
-        lb_mouth_num_3->setObjectName(QStringLiteral("lb_mouth_num_3"));
-
-        verticalLayout_40->addWidget(lb_mouth_num_3);
-
-        lb_killer_num_3 = new QLabel(widget_5);
-        lb_killer_num_3->setObjectName(QStringLiteral("lb_killer_num_3"));
-
-        verticalLayout_40->addWidget(lb_killer_num_3);
-
-        lb_armor_num_3 = new QLabel(widget_5);
-        lb_armor_num_3->setObjectName(QStringLiteral("lb_armor_num_3"));
-
-        verticalLayout_40->addWidget(lb_armor_num_3);
-
-        lb_eye_num_3 = new QLabel(widget_5);
-        lb_eye_num_3->setObjectName(QStringLiteral("lb_eye_num_3"));
-
-        verticalLayout_40->addWidget(lb_eye_num_3);
-
-
-        horizontalLayout_47->addLayout(verticalLayout_40);
-
-        verticalLayout_10 = new QVBoxLayout();
-        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
-        lb_organisms_alive_2 = new QLabel(widget_5);
-        lb_organisms_alive_2->setObjectName(QStringLiteral("lb_organisms_alive_2"));
-
-        verticalLayout_10->addWidget(lb_organisms_alive_2);
-
-        lb_organism_size_4 = new QLabel(widget_5);
-        lb_organism_size_4->setObjectName(QStringLiteral("lb_organism_size_4"));
-
-        verticalLayout_10->addWidget(lb_organism_size_4);
-
-        lb_avg_org_lifetime_4 = new QLabel(widget_5);
-        lb_avg_org_lifetime_4->setObjectName(QStringLiteral("lb_avg_org_lifetime_4"));
-
-        verticalLayout_10->addWidget(lb_avg_org_lifetime_4);
-
-        lb_anatomy_mutation_rate_4 = new QLabel(widget_5);
-        lb_anatomy_mutation_rate_4->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_4"));
-
-        verticalLayout_10->addWidget(lb_anatomy_mutation_rate_4);
-
-        lb_brain_mutation_rate_4 = new QLabel(widget_5);
-        lb_brain_mutation_rate_4->setObjectName(QStringLiteral("lb_brain_mutation_rate_4"));
-
-        verticalLayout_10->addWidget(lb_brain_mutation_rate_4);
-
-        lb_producer_num_4 = new QLabel(widget_5);
-        lb_producer_num_4->setObjectName(QStringLiteral("lb_producer_num_4"));
-
-        verticalLayout_10->addWidget(lb_producer_num_4);
-
-        lb_mover_num_4 = new QLabel(widget_5);
-        lb_mover_num_4->setObjectName(QStringLiteral("lb_mover_num_4"));
-
-        verticalLayout_10->addWidget(lb_mover_num_4);
-
-        lb_mouth_num_4 = new QLabel(widget_5);
-        lb_mouth_num_4->setObjectName(QStringLiteral("lb_mouth_num_4"));
-
-        verticalLayout_10->addWidget(lb_mouth_num_4);
-
-        lb_killer_num_4 = new QLabel(widget_5);
-        lb_killer_num_4->setObjectName(QStringLiteral("lb_killer_num_4"));
-
-        verticalLayout_10->addWidget(lb_killer_num_4);
-
-        lb_armor_num_4 = new QLabel(widget_5);
-        lb_armor_num_4->setObjectName(QStringLiteral("lb_armor_num_4"));
-
-        verticalLayout_10->addWidget(lb_armor_num_4);
-
-        lb_eye_num_4 = new QLabel(widget_5);
-        lb_eye_num_4->setObjectName(QStringLiteral("lb_eye_num_4"));
-
-        verticalLayout_10->addWidget(lb_eye_num_4);
-
-
-        horizontalLayout_47->addLayout(verticalLayout_10);
-
-
-        verticalLayout_37->addLayout(horizontalLayout_47);
+        verticalLayout_37->addWidget(cb_statistics_always_on_top);
 
 
         verticalLayout_24->addWidget(widget_5);
@@ -1815,7 +1577,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 540, 400));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 400));
         QSizePolicy sizePolicy10(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -2079,8 +1841,10 @@ public:
         QObject::connect(cb_use_nvidia_for_image_generation, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_nvidia_for_image_generation_slot(bool)));
         QObject::connect(cb_eat_then_produce, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_eat_then_produce_slot(bool)));
         QObject::connect(le_menu_height, SIGNAL(returnPressed()), MainWindow, SLOT(le_menu_height_slot()));
+        QObject::connect(tb_open_statisctics, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_statistics_slot(bool)));
+        QObject::connect(cb_statistics_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_statistics_always_on_top_slot(bool)));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(4);
         stackedWidget->setCurrentIndex(0);
 
 
@@ -2287,43 +2051,8 @@ public:
         cb_stop_when_one_food_generated->setText(QApplication::translate("MainWindow", "Stop food production when one food is generated", Q_NULLPTR));
         cb_eat_then_produce->setText(QApplication::translate("MainWindow", "Eat first, then produce food.", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", Q_NULLPTR));
-        lb_simulation_size->setText(QApplication::translate("MainWindow", "Simulation size:", Q_NULLPTR));
-        lb_organisms_memory_consumption->setText(QApplication::translate("MainWindow", "Organism's memory consumption:", Q_NULLPTR));
-        lb_total_engine_ticks->setText(QApplication::translate("MainWindow", "Total engine ticks: ", Q_NULLPTR));
-        lb_moving_organisms->setText(QApplication::translate("MainWindow", "Moving organisms:", Q_NULLPTR));
-        lb_organisms_with_eyes->setText(QApplication::translate("MainWindow", "Organisms with eyes:", Q_NULLPTR));
-        lb_avg_org_lifetime_2->setText(QApplication::translate("MainWindow", "Avg organism lifetime:", Q_NULLPTR));
-        lb_average_moving_range->setText(QApplication::translate("MainWindow", "Avg moving range:", Q_NULLPTR));
-        lb_organism_size_2->setText(QApplication::translate("MainWindow", "Avg organism size:", Q_NULLPTR));
-        lb_anatomy_mutation_rate_2->setText(QApplication::translate("MainWindow", "Avg anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate_2->setText(QApplication::translate("MainWindow", "Avg brain mutation rate:", Q_NULLPTR));
-        lb_mouth_num_2->setText(QApplication::translate("MainWindow", "Avg mouth num: ", Q_NULLPTR));
-        lb_producer_num_2->setText(QApplication::translate("MainWindow", "Avg producer num: ", Q_NULLPTR));
-        lb_mover_num_2->setText(QApplication::translate("MainWindow", "Avg mover num:", Q_NULLPTR));
-        lb_killer_num_2->setText(QApplication::translate("MainWindow", "Avg killer num:", Q_NULLPTR));
-        lb_armor_num_2->setText(QApplication::translate("MainWindow", "Avg armor num: ", Q_NULLPTR));
-        lb_eye_num_2->setText(QApplication::translate("MainWindow", "Avg eye num: ", Q_NULLPTR));
-        lb_stationary_organisms->setText(QApplication::translate("MainWindow", "Stationary organisms:", Q_NULLPTR));
-        lb_organism_size_3->setText(QApplication::translate("MainWindow", "Avg organism size:", Q_NULLPTR));
-        lb_avg_org_lifetime_3->setText(QApplication::translate("MainWindow", "Avg organism lifetime:", Q_NULLPTR));
-        lb_anatomy_mutation_rate_3->setText(QApplication::translate("MainWindow", "Avg anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate_3->setText(QApplication::translate("MainWindow", "Avg brain mutation rate:", Q_NULLPTR));
-        lb_producer_num_3->setText(QApplication::translate("MainWindow", "Avg producer num: ", Q_NULLPTR));
-        lb_mouth_num_3->setText(QApplication::translate("MainWindow", "Avg mouth num: ", Q_NULLPTR));
-        lb_killer_num_3->setText(QApplication::translate("MainWindow", "Avg killer num:", Q_NULLPTR));
-        lb_armor_num_3->setText(QApplication::translate("MainWindow", "Avg armor num: ", Q_NULLPTR));
-        lb_eye_num_3->setText(QApplication::translate("MainWindow", "Avg eye num: ", Q_NULLPTR));
-        lb_organisms_alive_2->setText(QApplication::translate("MainWindow", "Organisms alive:", Q_NULLPTR));
-        lb_organism_size_4->setText(QApplication::translate("MainWindow", "Avg organism size:", Q_NULLPTR));
-        lb_avg_org_lifetime_4->setText(QApplication::translate("MainWindow", "Avg organism lifetime:", Q_NULLPTR));
-        lb_anatomy_mutation_rate_4->setText(QApplication::translate("MainWindow", "Avg anatomy mutation rate:", Q_NULLPTR));
-        lb_brain_mutation_rate_4->setText(QApplication::translate("MainWindow", "Avg brain mutation rate:", Q_NULLPTR));
-        lb_producer_num_4->setText(QApplication::translate("MainWindow", "Avg producer num: ", Q_NULLPTR));
-        lb_mover_num_4->setText(QApplication::translate("MainWindow", "Avg mover num:", Q_NULLPTR));
-        lb_mouth_num_4->setText(QApplication::translate("MainWindow", "Avg mouth num: ", Q_NULLPTR));
-        lb_killer_num_4->setText(QApplication::translate("MainWindow", "Avg killer num:", Q_NULLPTR));
-        lb_armor_num_4->setText(QApplication::translate("MainWindow", "Avg armor num: ", Q_NULLPTR));
-        lb_eye_num_4->setText(QApplication::translate("MainWindow", "Avg eye num: ", Q_NULLPTR));
+        tb_open_statisctics->setText(QApplication::translate("MainWindow", "Open Statistics Window", Q_NULLPTR));
+        cb_statistics_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(statistics_tab), QApplication::translate("MainWindow", "Statistics", Q_NULLPTR));
         rb_single_thread_mode->setText(QApplication::translate("MainWindow", "Single thread CPU", Q_NULLPTR));
         rb_partial_multi_thread_mode->setText(QApplication::translate("MainWindow", "Partial multi-thread CPU", Q_NULLPTR));

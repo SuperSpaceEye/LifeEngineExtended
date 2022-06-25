@@ -16,6 +16,8 @@ WindowCore::WindowCore(QWidget *parent) :
     //https://stackoverflow.com/questions/32714105/mousemoveevent-is-not-called
     QCoreApplication::instance()->installEventFilter(this);
 
+    s.init(&_ui);
+
     dc.simulation_width = 200;
     dc.simulation_height = 200;
 
@@ -848,47 +850,47 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
 }
 
 void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
-    _ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
-    _ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
+  s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
+  s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
-    _ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
-    _ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size,             float_precision)));
-    _ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
-    _ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
-    _ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.total_avg._producer_blocks, float_precision)));
-    _ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: "     + to_str(info.total_avg._mover_blocks,    float_precision)));
-    _ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.total_avg._killer_blocks,   float_precision)));
-    _ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.total_avg._armor_blocks,    float_precision)));
-    _ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.total_avg._eye_blocks,      float_precision)));
-    _ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
-    _ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
+  s._ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
+  s._ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size,             float_precision)));
+  s._ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
+  s._ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
+  s._ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.total_avg._producer_blocks, float_precision)));
+  s._ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: "     + to_str(info.total_avg._mover_blocks,    float_precision)));
+  s._ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.total_avg._killer_blocks,   float_precision)));
+  s._ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.total_avg._armor_blocks,    float_precision)));
+  s._ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.total_avg._eye_blocks,      float_precision)));
+  s._ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
+  s._ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
 
 
-    _ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
-    _ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
-    _ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
-    _ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: "  + to_str(info.move_range, float_precision)));
-    _ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size,             float_precision)));
-    _ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.moving_avg._mouth_blocks,    float_precision)));
-    _ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.moving_avg._producer_blocks, float_precision)));
-    _ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: "     + to_str(info.moving_avg._mover_blocks,    float_precision)));
-    _ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.moving_avg._killer_blocks,   float_precision)));
-    _ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.moving_avg._armor_blocks,    float_precision)));
-    _ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.moving_avg._eye_blocks,      float_precision)));
-    _ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
-    _ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.moving_avg.brain_mutation_rate,   float_precision)));
+  s._ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
+  s._ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
+  s._ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
+  s._ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: "  + to_str(info.move_range, float_precision)));
+  s._ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size,             float_precision)));
+  s._ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.moving_avg._mouth_blocks,    float_precision)));
+  s._ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.moving_avg._producer_blocks, float_precision)));
+  s._ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: "     + to_str(info.moving_avg._mover_blocks,    float_precision)));
+  s._ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.moving_avg._killer_blocks,   float_precision)));
+  s._ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.moving_avg._armor_blocks,    float_precision)));
+  s._ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.moving_avg._eye_blocks,      float_precision)));
+  s._ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
+  s._ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.moving_avg.brain_mutation_rate,   float_precision)));
 
 
-    _ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: "  + std::to_string(info.station_avg.total)));
-    _ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size,             float_precision)));
-    _ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
-    _ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.station_avg._mouth_blocks,    float_precision)));
-    _ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.station_avg._producer_blocks, float_precision)));
-    _ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.station_avg._killer_blocks,   float_precision)));
-    _ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.station_avg._armor_blocks,    float_precision)));
-    _ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.station_avg._eye_blocks,      float_precision)));
-    _ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
-    _ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.station_avg.brain_mutation_rate,   float_precision)));
+  s._ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: "  + std::to_string(info.station_avg.total)));
+  s._ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size,             float_precision)));
+  s._ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
+  s._ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.station_avg._mouth_blocks,    float_precision)));
+  s._ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.station_avg._producer_blocks, float_precision)));
+  s._ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.station_avg._killer_blocks,   float_precision)));
+  s._ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.station_avg._armor_blocks,    float_precision)));
+  s._ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.station_avg._eye_blocks,      float_precision)));
+  s._ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
+  s._ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.station_avg.brain_mutation_rate,   float_precision)));
 }
 
 // So that changes in code values would be set by default in gui.
@@ -975,7 +977,7 @@ void WindowCore::initialize_gui_settings() {
 }
 
 void WindowCore::update_simulation_size_label() {
-    _ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(dc.simulation_width) + "x" + std::to_string(dc.simulation_height)));
+  s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(dc.simulation_width) + "x" + std::to_string(dc.simulation_height)));
 }
 
 std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {

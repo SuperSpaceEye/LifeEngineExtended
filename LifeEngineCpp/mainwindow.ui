@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>934</width>
-    <height>898</height>
+    <width>900</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -819,7 +819,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>540</width>
+                  <width>506</width>
                   <height>452</height>
                  </rect>
                 </property>
@@ -1377,8 +1377,8 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-875</y>
-                  <width>540</width>
+                  <y>0</y>
+                  <width>506</width>
                   <height>1092</height>
                  </rect>
                 </property>
@@ -1992,8 +1992,8 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>608</width>
-                  <height>400</height>
+                  <width>520</width>
+                  <height>217</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2031,292 +2031,21 @@ p, li { white-space: pre-wrap; }
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QLabel" name="lb_simulation_size">
+                     <widget class="QPushButton" name="tb_open_statisctics">
                       <property name="text">
-                       <string>Simulation size:</string>
+                       <string>Open Statistics Window</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLabel" name="lb_organisms_memory_consumption">
+                     <widget class="QCheckBox" name="cb_statistics_always_on_top">
                       <property name="text">
-                       <string>Organism's memory consumption:</string>
+                       <string>Always on top</string>
                       </property>
                      </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_total_engine_ticks">
-                      <property name="text">
-                       <string>Total engine ticks: </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>10</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_47">
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_38">
-                        <item>
-                         <widget class="QLabel" name="lb_moving_organisms">
-                          <property name="text">
-                           <string>Moving organisms:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organisms_with_eyes">
-                          <property name="text">
-                           <string>Organisms with eyes:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_avg_org_lifetime_2">
-                          <property name="text">
-                           <string>Avg organism lifetime:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_average_moving_range">
-                          <property name="text">
-                           <string>Avg moving range:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organism_size_2">
-                          <property name="text">
-                           <string>Avg organism size:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_anatomy_mutation_rate_2">
-                          <property name="text">
-                           <string>Avg anatomy mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_brain_mutation_rate_2">
-                          <property name="text">
-                           <string>Avg brain mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mouth_num_2">
-                          <property name="text">
-                           <string>Avg mouth num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_producer_num_2">
-                          <property name="text">
-                           <string>Avg producer num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mover_num_2">
-                          <property name="text">
-                           <string>Avg mover num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_killer_num_2">
-                          <property name="text">
-                           <string>Avg killer num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_armor_num_2">
-                          <property name="text">
-                           <string>Avg armor num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_eye_num_2">
-                          <property name="text">
-                           <string>Avg eye num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_40">
-                        <item>
-                         <widget class="QLabel" name="lb_stationary_organisms">
-                          <property name="text">
-                           <string>Stationary organisms:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organism_size_3">
-                          <property name="text">
-                           <string>Avg organism size:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_avg_org_lifetime_3">
-                          <property name="text">
-                           <string>Avg organism lifetime:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_anatomy_mutation_rate_3">
-                          <property name="text">
-                           <string>Avg anatomy mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_brain_mutation_rate_3">
-                          <property name="text">
-                           <string>Avg brain mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_producer_num_3">
-                          <property name="text">
-                           <string>Avg producer num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mouth_num_3">
-                          <property name="text">
-                           <string>Avg mouth num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_killer_num_3">
-                          <property name="text">
-                           <string>Avg killer num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_armor_num_3">
-                          <property name="text">
-                           <string>Avg armor num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_eye_num_3">
-                          <property name="text">
-                           <string>Avg eye num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_10">
-                        <item>
-                         <widget class="QLabel" name="lb_organisms_alive_2">
-                          <property name="text">
-                           <string>Organisms alive:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organism_size_4">
-                          <property name="text">
-                           <string>Avg organism size:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_avg_org_lifetime_4">
-                          <property name="text">
-                           <string>Avg organism lifetime:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_anatomy_mutation_rate_4">
-                          <property name="text">
-                           <string>Avg anatomy mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_brain_mutation_rate_4">
-                          <property name="text">
-                           <string>Avg brain mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_producer_num_4">
-                          <property name="text">
-                           <string>Avg producer num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mover_num_4">
-                          <property name="text">
-                           <string>Avg mover num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mouth_num_4">
-                          <property name="text">
-                           <string>Avg mouth num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_killer_num_4">
-                          <property name="text">
-                           <string>Avg killer num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_armor_num_4">
-                          <property name="text">
-                           <string>Avg armor num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_eye_num_4">
-                          <property name="text">
-                           <string>Avg eye num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
                     </item>
                    </layout>
                   </widget>
@@ -2363,7 +2092,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>540</width>
+                  <width>506</width>
                   <height>400</height>
                  </rect>
                 </property>
@@ -3887,6 +3616,38 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tb_open_statisctics</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_statistics_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>702</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_statistics_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_statistics_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>637</x>
+     <y>828</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3969,10 +3730,12 @@ p, li { white-space: pre-wrap; }
   <slot>cb_use_nvidia_for_image_generation_slot(bool)</slot>
   <slot>cb_eat_then_produce_slot(bool)</slot>
   <slot>le_menu_height_slot()</slot>
+  <slot>tb_open_statistics_slot(bool)</slot>
+  <slot>cb_statistics_always_on_top_slot(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="editor_modes"/>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>

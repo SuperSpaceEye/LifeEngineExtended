@@ -37,6 +37,7 @@
 #include <QFont>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QToolBar>
 
 #include "SimulationEngine.h"
 #include "Containers/CPU/ColorContainer.h"
@@ -44,11 +45,14 @@
 #include "Containers/CPU/EngineControlContainer.h"
 #include "Containers/CPU/EngineDataContainer.h"
 #include "Containers/CPU/OrganismBlockParameters.h"
-#include "WindowUI.h"
 #include "OrganismEditor.h"
 #include "PRNGS/lehmer64.h"
 #include "pix_pos.h"
 #include "textures.h"
+
+#include "WindowUI.h"
+#include "StatisticsCore.h"
+
 
 #if __CUDA_USED__
 #include "cuda_image_creator.cuh"
@@ -132,10 +136,6 @@ public:
     connect(decline_button, &QPushButton::pressed, this, &QDialog::reject);
 
     this->setWindowTitle(title);
-
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
-
     }
 };
 
@@ -205,6 +205,7 @@ private:
     long delta_window_processing_time = 0;
 
     Ui::MainWindow _ui{};
+    StatisticsCore s;
     QTimer * timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
@@ -380,8 +381,9 @@ private:
     void display_message(const std::string& message);
 
 private slots:
-    void tb_pause_slot(bool paused);
-    void tb_stoprender_slot(bool stopped_render);
+    void tb_pause_slot(bool state);
+    void tb_stoprender_slot(bool state);
+    void tb_open_statistics_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -462,6 +464,7 @@ private slots:
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_eat_then_produce_slot(bool state);
+    void cb_statistics_always_on_top_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

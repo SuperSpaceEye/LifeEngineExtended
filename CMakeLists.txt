@@ -19,8 +19,8 @@ set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 set(CMAKE_CUDA_ARCHITECTURES 61)
 set(AUTO_UI_FILE_REBUILDING 0)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 
 #for perf
@@ -81,7 +81,7 @@ endif()
 #set_property(TARGET CUDAFunctions PROPERTY IMPORTED_LOCATION CUDACmake/Release/CUDAPartsDynamic.dll)
 #set_property(TARGET CUDAFunctions PROPERTY IMPORTED_IMPLIB CUDACmake/Release/CUDAPartsDynamic.lib)
 
-add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_FILES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/pix_pos.h LifeEngineCpp/textures.h LifeEngineCpp/Organism/CPU/ObservationStuff.h LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/WindowCoreDataSavingStuff.cpp LifeEngineCpp/CustomJsonParser/json_parser.hpp LifeEngineCpp/CustomJsonParser/write.hpp)
+add_executable(${PROJECT_NAME} main.cpp LifeEngineCpp/SimulationEngine.cpp LifeEngineCpp/SimulationEngine.h LifeEngineCpp/WindowCoreProgramLogic.cpp LifeEngineCpp/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Linspace.h LifeEngineCpp/WindowUI.h LifeEngineCpp/WindowCoreSlots.cpp LifeEngineCpp/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/OrganismEditor.cpp LifeEngineCpp/OrganismEditor.h LifeEngineCpp/Actions.h ${CUDA_FILES} LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/pix_pos.h LifeEngineCpp/textures.h LifeEngineCpp/Organism/CPU/ObservationStuff.h LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/WindowCoreDataSavingStuff.cpp LifeEngineCpp/CustomJsonParser/json_parser.hpp LifeEngineCpp/CustomJsonParser/write.hpp LifeEngineCpp/StatisticsCore.h)
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
 
 if (AUTO_UI_FILE_REBUILDING)
@@ -89,7 +89,14 @@ if (AUTO_UI_FILE_REBUILDING)
             run ALL
             COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/LifeEngineCpp/mainwindow.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/WindowUI.h"
             BYPRODUCTS WindowUI.h
-            COMMENT "Generating UI header file."
+            COMMENT "Generating Main Window header file."
+    )
+
+    add_custom_target(
+            run ALL
+            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/LifeEngineCpp/statistics.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/StatisticsUI.h"
+            BYPRODUCTS StatisticsUI.h
+            COMMENT "Generating Statistics header file."
     )
 
     add_dependencies(${PROJECT_NAME} run)
