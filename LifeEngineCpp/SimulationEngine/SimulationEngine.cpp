@@ -3,7 +3,6 @@
 //
 
 #include "SimulationEngine.h"
-#include "SimulationEngineModes/SimulationEngineSingleThread.h"
 
 SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
                                    OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters):

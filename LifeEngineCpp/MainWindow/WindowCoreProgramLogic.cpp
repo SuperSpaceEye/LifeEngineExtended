@@ -17,6 +17,7 @@ WindowCore::WindowCore(QWidget *parent) :
     QCoreApplication::instance()->installEventFilter(this);
 
     s.init(&_ui);
+    ee.init(0, 0, &_ui);
 
     dc.simulation_width = 200;
     dc.simulation_height = 200;
@@ -168,7 +169,7 @@ void WindowCore::move_center(int delta_x, int delta_y) {
         center_x -= delta_x * scaling_zoom;
         center_y -= delta_y * scaling_zoom;
     } else {
-        edit_engine.move_center(delta_x, delta_y);
+        ee.move_center(delta_x, delta_y);
     }
 }
 
@@ -251,7 +252,6 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
     }
 }
 
-//TODO bug. it has double pixel row and column at the left and up boundaries.
 void WindowCore::create_image() {
     resize_image();
     auto image_width = _ui.simulation_graphicsView->viewport()->width();

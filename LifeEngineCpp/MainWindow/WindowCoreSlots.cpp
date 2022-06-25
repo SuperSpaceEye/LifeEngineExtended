@@ -52,6 +52,14 @@ void WindowCore::tb_open_statistics_slot(bool state) {
     }
 }
 
+void WindowCore::tb_open_organism_editor_slot(bool state) {
+    if (state) {
+        ee.show();
+    } else {
+        ee.close();
+    }
+}
+
 //==================== Buttons ====================
 
 void WindowCore::b_clear_slot() {
@@ -582,15 +590,27 @@ void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
     use_cuda = true;
 }
 
-void WindowCore::cb_statistics_always_on_top_slot        (bool state) {
+void WindowCore::cb_statistics_always_on_top_slot(bool state) {
     auto hidden = s.isHidden();
 
-   s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
         s.show();
+    }
+}
+
+void WindowCore::cb_editor_always_on_top_slot(bool state) {
+    auto hidden = ee.isHidden();
+
+    ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        ee.show();
     }
 }
 

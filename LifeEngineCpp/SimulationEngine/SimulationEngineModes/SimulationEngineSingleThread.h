@@ -9,14 +9,14 @@
 #include <iostream>
 #include <vector>
 
-#include "../GridBlocks/BaseGridBlock.h"
-#include "../Organism/CPU/Organism.h"
-#include "../BlockTypes.hpp"
-#include "../Containers/CPU/EngineControlContainer.h"
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Linspace.h"
-#include "../Organism/CPU/ObservationStuff.h"
+#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../Organism/CPU/Organism.h"
+#include "../../BlockTypes.hpp"
+#include "../../Containers/CPU/EngineControlContainer.h"
+#include "../../Containers/CPU/EngineDataContainer.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../Linspace.h"
+#include "../../Organism/CPU/ObservationStuff.h"
 
 class SimulationEngineSingleThread {
 public:

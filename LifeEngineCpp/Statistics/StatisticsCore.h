@@ -4,9 +4,8 @@
 
 #ifndef THELIFEENGINECPP_STATISTICSCORE_H
 #define THELIFEENGINECPP_STATISTICSCORE_H
-
 #include "StatisticsUI.h"
-#include "WindowUI.h"
+#include "../MainWindow/WindowUI.h"
 
 class StatisticsCore: public QWidget {
     Q_OBJECT
@@ -19,7 +18,7 @@ public:
         _parent_ui = parent_ui;
     }
 
-    void closeEvent(QCloseEvent * event) {
+    void closeEvent(QCloseEvent * event) override {
         _parent_ui->tb_open_statisctics->setChecked(false);
         QWidget::closeEvent(event);
     }

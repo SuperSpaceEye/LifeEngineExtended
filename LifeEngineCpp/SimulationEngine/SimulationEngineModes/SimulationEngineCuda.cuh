@@ -15,7 +15,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/copy.h>
 
-#include "../Organism/CUDA/CUDA_Organism.cuh"
+#include "../../Organism/CUDA/CUDA_Organism.cuh"
 
 class SimulationEngineCuda {
 public:

@@ -1,6 +1,6 @@
 #include <QApplication>
 #include <QStyleFactory>
-#include "LifeEngineCpp/WindowCore.h"
+#include "LifeEngineCpp/MainWindow/WindowCore.h"
 
 //TODO add more comments
 //TODO add benchmarks
