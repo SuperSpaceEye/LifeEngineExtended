@@ -3,7 +3,6 @@
 //
 
 #include "OrganismEditor.h"
-#include "../MainWindow/WindowUI.h"
 
 void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui) {
     _ui.setupUi(this);
