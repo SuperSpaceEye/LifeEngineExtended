@@ -34,7 +34,7 @@ enum class BrainDecision {
 //Maybe for later
 enum class BrainTypes {
     RandomActions,
-    // chooses the closest observation to an organism, and acts upon it. If do nothing, then returns random action.
+    // chooses the closest observation to an editor_organism, and acts upon it. If do nothing, then returns random action.
     // If no meaningful action, then returns random action.
     SimpleBrain,
     //TODO will try to implement in the future

@@ -55,6 +55,8 @@ void WindowCore::tb_open_statistics_slot(bool state) {
 void WindowCore::tb_open_organism_editor_slot(bool state) {
     if (state) {
         ee.show();
+        ee.resize_image();
+        ee.create_image();
     } else {
         ee.close();
     }

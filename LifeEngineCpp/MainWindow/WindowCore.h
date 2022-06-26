@@ -38,6 +38,8 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QToolBar>
+#include <QWheelEvent>
+
 
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Containers/CPU/ColorContainer.h"

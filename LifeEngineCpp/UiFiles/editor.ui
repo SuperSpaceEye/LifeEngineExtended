@@ -114,6 +114,15 @@
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
+                    <property name="verticalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                    </property>
+                    <property name="horizontalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                    </property>
+                    <property name="sizeAdjustPolicy">
+                     <enum>QAbstractScrollArea::AdjustToContents</enum>
+                    </property>
                    </widget>
                   </item>
                   <item>
@@ -424,7 +433,316 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>b_load_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_load_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>814</x>
+     <y>501</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_reset_editing_view</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_reset_editing_view_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>698</x>
+     <y>238</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_resize_editing_grid</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_resize_editing_grid_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>698</x>
+     <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_save_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_save_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>583</x>
+     <y>501</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_anatomy_mutation_rate</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Editor</receiver>
+   <slot>le_anatomy_mutation_rate_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>783</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_grid_height</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Editor</receiver>
+   <slot>le_grid_height_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>741</x>
+     <y>368</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_grid_width</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Editor</receiver>
+   <slot>le_grid_width_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>739</x>
+     <y>335</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_move_range</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Editor</receiver>
+   <slot>le_move_range_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>743</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_armor</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_armor_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>698</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_chose_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_choose_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>352</x>
+     <y>501</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_edit_anatomy</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_edit_anatomy_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>533</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_edit_brain</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_edit_brain_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>698</x>
+     <y>533</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_eye</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_eye_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>851</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_killer</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_killer_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>546</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_mouth</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_mouth_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>546</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_mover</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_mover_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>851</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_place_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_place_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>501</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_producer</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_producer_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>698</x>
+     <y>87</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>b_reset_editing_view_slot()</slot>
+  <slot>b_resize_editing_grid_slot()</slot>
+  <slot>le_grid_width_slot()</slot>
+  <slot>le_grid_height_slot()</slot>
+  <slot>le_move_range_slot()</slot>
+  <slot>le_anatomy_mutation_rate_slot()</slot>
+  <slot>b_save_organism_slot()</slot>
+  <slot>b_load_organism_slot()</slot>
+  <slot>rb_edit_anatomy_slot()</slot>
+  <slot>rb_edit_brain_slot()</slot>
+  <slot>rb_place_organism_slot()</slot>
+  <slot>rb_choose_organism_slot()</slot>
+  <slot>rb_mouth_slot()</slot>
+  <slot>rb_producer_slot()</slot>
+  <slot>rb_mover_slot()</slot>
+  <slot>rb_killer_slot()</slot>
+  <slot>rb_armor_slot()</slot>
+  <slot>rb_eye_slot()</slot>
+ </slots>
  <buttongroups>
   <buttongroup name="edit_group"/>
   <buttongroup name="organism_action_group"/>

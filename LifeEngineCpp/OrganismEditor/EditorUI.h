@@ -368,6 +368,24 @@ public:
 
 
         retranslateUi(Editor);
+        QObject::connect(b_load_organism, SIGNAL(clicked()), Editor, SLOT(b_load_organism_slot()));
+        QObject::connect(b_reset_editing_view, SIGNAL(clicked()), Editor, SLOT(b_reset_editing_view_slot()));
+        QObject::connect(b_resize_editing_grid, SIGNAL(clicked()), Editor, SLOT(b_resize_editing_grid_slot()));
+        QObject::connect(b_save_organism, SIGNAL(clicked()), Editor, SLOT(b_save_organism_slot()));
+        QObject::connect(le_anatomy_mutation_rate, SIGNAL(returnPressed()), Editor, SLOT(le_anatomy_mutation_rate_slot()));
+        QObject::connect(le_grid_height, SIGNAL(returnPressed()), Editor, SLOT(le_grid_height_slot()));
+        QObject::connect(le_grid_width, SIGNAL(returnPressed()), Editor, SLOT(le_grid_width_slot()));
+        QObject::connect(le_move_range, SIGNAL(returnPressed()), Editor, SLOT(le_move_range_slot()));
+        QObject::connect(rb_armor, SIGNAL(clicked()), Editor, SLOT(rb_armor_slot()));
+        QObject::connect(rb_chose_organism, SIGNAL(clicked()), Editor, SLOT(rb_choose_organism_slot()));
+        QObject::connect(rb_edit_anatomy, SIGNAL(clicked()), Editor, SLOT(rb_edit_anatomy_slot()));
+        QObject::connect(rb_edit_brain, SIGNAL(clicked()), Editor, SLOT(rb_edit_brain_slot()));
+        QObject::connect(rb_eye, SIGNAL(clicked()), Editor, SLOT(rb_eye_slot()));
+        QObject::connect(rb_killer, SIGNAL(clicked()), Editor, SLOT(rb_killer_slot()));
+        QObject::connect(rb_mouth, SIGNAL(clicked()), Editor, SLOT(rb_mouth_slot()));
+        QObject::connect(rb_mover, SIGNAL(clicked()), Editor, SLOT(rb_mover_slot()));
+        QObject::connect(rb_place_organism, SIGNAL(clicked()), Editor, SLOT(rb_place_organism_slot()));
+        QObject::connect(rb_producer, SIGNAL(clicked()), Editor, SLOT(rb_producer_slot()));
 
         stackedWidget->setCurrentIndex(0);
 

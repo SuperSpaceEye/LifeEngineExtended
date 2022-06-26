@@ -17,7 +17,7 @@ WindowCore::WindowCore(QWidget *parent) :
     QCoreApplication::instance()->installEventFilter(this);
 
     s.init(&_ui);
-    ee.init(0, 0, &_ui);
+    ee.init(15, 15, &_ui, &color_container, &sp, &bp);
 
     dc.simulation_width = 200;
     dc.simulation_height = 200;
@@ -28,7 +28,7 @@ WindowCore::WindowCore(QWidget *parent) :
 #endif
 
     dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width *dc.simulation_height, BaseGridBlock{});
+    dc.second_simulation_grid.resize(dc.simulation_width * dc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
@@ -254,25 +254,25 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
 
 void WindowCore::create_image() {
     resize_image();
-    auto image_width = _ui.simulation_graphicsView->viewport()->width();
+    auto image_width  = _ui.simulation_graphicsView->viewport()->width();
     auto image_height = _ui.simulation_graphicsView->viewport()->height();
 
-    int scaled_width = image_width * scaling_zoom;
+    int scaled_width  = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
 
     // start and stop coordinates on simulation grid
     auto start_x = int(center_x-(scaled_width / 2));
-    auto end_x = int(center_x+(scaled_width / 2));
+    auto end_x   = int(center_x+(scaled_width / 2));
 
     auto start_y = int(center_y-(scaled_height / 2));
-    auto end_y = int(center_y+(scaled_height / 2));
+    auto end_y   = int(center_y+(scaled_height / 2));
 
     std::vector<int> lin_width;
     std::vector<int> lin_height;
 
     calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
 
-    std::vector<int> truncated_lin_width; truncated_lin_width.reserve(image_width);
+    std::vector<int> truncated_lin_width;  truncated_lin_width .reserve(image_width);
     std::vector<int> truncated_lin_height; truncated_lin_height.reserve(image_height);
 
     calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
@@ -308,8 +308,8 @@ void WindowCore::create_image() {
 
 void WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                                            int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
-    lin_width  = linspace<int>(start_x, end_x+1, image_width+1);
-    lin_height = linspace<int>(start_y, end_y+1, image_height+1);
+    lin_width  = linspace<int>(start_x, end_x, image_width);
+    lin_height = linspace<int>(start_y, end_y, image_height);
 
     //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
     // n pixels
