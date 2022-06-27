@@ -6,16 +6,23 @@
 
 //==================== Buttons ====================
 
-void OrganismEditor::b_load_organism_slot() {
-
-}
-
 void OrganismEditor::b_reset_editing_view_slot() {
     reset_scale_view();
     create_image();
 }
 
 void OrganismEditor::b_resize_editing_grid_slot() {
+    resize_editing_grid(new_editor_width, new_editor_height);
+
+    editor_organism->x = new_editor_width  / 2;
+    editor_organism->y = new_editor_height / 2;
+
+    reset_scale_view();
+    clear_grid();
+    create_image();
+}
+
+void OrganismEditor::b_load_organism_slot() {
 
 }
 
