@@ -6,11 +6,13 @@
 #define THELIFEENGINECPP_ORGANISMEDITOR_H
 
 #include <vector>
+#include <cmath>
+
 #include <QGraphicsPixmapItem>
 #include <QTimer>
 #include <QWheelEvent>
 
-#include "../Linspace.h"
+#include "../Stuff/Linspace.h"
 #include "../Organism/CPU/Organism.h"
 #include "../Organism/CPU/Anatomy.h"
 #include "../Organism/CPU/Brain.h"
@@ -18,9 +20,11 @@
 #include "../GridBlocks/BaseGridBlock.h"
 #include "EditorUI.h"
 #include "../MainWindow/WindowUI.h"
-#include "../pix_pos.h"
+#include "../Stuff/pix_pos.h"
 #include "../Containers/CPU/ColorContainer.h"
-#include "../textures.h"
+#include "../Stuff/textures.h"
+#include "../Stuff/CursorMode.h"
+#include "../Stuff/MiscFuncs.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -33,16 +37,18 @@ struct EditBlock : BaseGridBlock {
 class OrganismEditor: public QWidget {
     Q_OBJECT
 private:
-    Ui::Editor _ui{};
     Ui::MainWindow * _parent_ui = nullptr;
 
     std::vector<std::vector<EditBlock>> edit_grid;
     std::vector<unsigned char> edit_image;
     Organism * editor_organism;
+    CursorMode * c_mode = nullptr;
 
     Textures textures{};
 
     ColorContainer * color_container;
+
+    BlockTypes chosen_block_type = BlockTypes::MouthBlock;
 
     float scaling_coefficient = 1.2;
     float scaling_zoom = 1;
@@ -50,8 +56,11 @@ private:
     float center_x;
     float center_y;
 
-    int editor_width;
-    int editor_height;
+    int editor_width = 15;
+    int editor_height = 15;
+
+    int new_editor_width = 15;
+    int new_editor_height = 15;
 
     QGraphicsPixmapItem pixmap_item;
     QGraphicsScene scene;
@@ -67,10 +76,12 @@ private:
     void clear_grid();
 
 public:
+    Ui::Editor _ui{};
+
     OrganismEditor()=default;
 
     void init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-              SimulationParameters *sp, OrganismBlockParameters *bp);
+              SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode);
 
     void set_block(int x, int y, BaseGridBlock block);
     BaseGridBlock get_block(int x, int y);
@@ -79,7 +90,6 @@ public:
 
     void resize_editing_grid(int width, int height);
     void resize_image();
-//    std::vector<unsigned char> create_image();
 
     void move_center(int delta_x, int delta_y);
     void reset_scale_view();

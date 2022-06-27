@@ -49,16 +49,18 @@
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../PRNGS/lehmer64.h"
-#include "../pix_pos.h"
-#include "../textures.h"
+#include "../Stuff/pix_pos.h"
+#include "../Stuff/textures.h"
+#include "../Stuff/MiscFuncs.h"
+#include "../Stuff/CursorMode.h"
 
 #include "WindowUI.h"
 #include "../Statistics/StatisticsCore.h"
 
 
 #if __CUDA_USED__
-#include "../cuda_image_creator.cuh"
-#include "../get_device_count.cuh"
+#include "../Stuff/cuda_image_creator.cuh"
+#include "../Stuff/get_device_count.cuh"
 #endif
 
 #if defined(__WIN32)
@@ -84,61 +86,9 @@ struct OrganismData {
     DecisionObservation last_decision = DecisionObservation{};
 };
 
-enum class CursorMode {
-    ModifyFood,
-    ModifyWall,
-    KillOrganism,
-    ChooseOrganism,
-    PlaceOrganism,
-};
-
-template<typename T>
-struct result_struct {
-    bool is_valid;
-    T result;
-};
-
 struct pos_on_grid {
     int x;
     int y;
-};
-
-template <typename T> std::string to_str(const T& t, int float_precision = 2) {
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(float_precision) << t;
-    return stream.str();
-}
-
-class DescisionMessageBox : public QDialog {
-    Q_OBJECT
-
-private:
-    QVBoxLayout *vertical_layout;
-    QHBoxLayout *horizontal_layout;
-    QPushButton *accept_button;
-    QPushButton *decline_button;
-    QLabel *content_label;
-public:
-    DescisionMessageBox(const QString& title, const QString& content,
-                        const QString& accept_text, const QString& decline_text, QWidget* parent=0)
-                        : QDialog(parent) {
-    vertical_layout = new QVBoxLayout();
-    horizontal_layout = new QHBoxLayout();
-    accept_button = new QPushButton(accept_text, this);
-    decline_button = new QPushButton(decline_text, this);
-    content_label = new QLabel(content, this);
-
-    setLayout(vertical_layout);
-    vertical_layout->addWidget(content_label, 2);
-    vertical_layout->addLayout(horizontal_layout, 1);
-    horizontal_layout->addWidget(accept_button);
-    horizontal_layout->addWidget(decline_button);
-
-    connect(accept_button, &QPushButton::pressed, this, &QDialog::accept);
-    connect(decline_button, &QPushButton::pressed, this, &QDialog::reject);
-
-    this->setWindowTitle(title);
-    }
 };
 
 struct OrganismInfoHolder {
@@ -376,11 +326,6 @@ private:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void keyPressEvent(QKeyEvent * event) override;
     void keyReleaseEvent(QKeyEvent * event) override;
-
-    template<typename T>
-    result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
-    int display_dialog_message(const std::string& message);
-    void display_message(const std::string& message);
 
 private slots:
     void tb_pause_slot(bool state);

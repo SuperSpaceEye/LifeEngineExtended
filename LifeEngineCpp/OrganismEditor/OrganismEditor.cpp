@@ -3,10 +3,10 @@
 //
 
 #include "OrganismEditor.h"
-#include "../textures.h"
+#include "../Stuff/textures.h"
 
 void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-                          SimulationParameters *sp, OrganismBlockParameters *bp) {
+                          SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode) {
     _ui.setupUi(this);
     _parent_ui = parent_ui;
 
@@ -14,6 +14,7 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     editor_height = height;
 
     this->color_container = color_container;
+    c_mode = cursor_mode;
 
     _ui.editor_graphicsView->show();
     _ui.editor_graphicsView->setEnabled(false);
@@ -80,14 +81,37 @@ void OrganismEditor::reset_scale_view() {
         center_y++;
     }
 
-    // finds exponent needed to scale the sprite
+    //Ok, I don't know why did I do this or how it works, but basically it should calculate scale view with a bit of
+    //background space and also center the center properly.
+
+    // if coeff 1/4 then coeff2 1/4
+    // if coeff 1/4n < 1/4 then coeff2 = root((n-1)*3, coeff) e.g coeff = 1/(4*2) = 1/8, coeff2 = root((2-1)*3 1/8) => 1/2
+    // if coeff 1/4n > 1/4 then coeff2 = root((n-1)*1/3, coeff) e.g coeff = 1/(4*1/2) = 1/2, coeff2 = root((2-1)*(1/3), 1/2) => 1/8
+    double coeff = 4;
+
+    double coeff1 = double(1)/coeff;
+    double coeff2;
+
+    if (coeff == 4) {
+        coeff2 = 1.0/4;
+    } else if (coeff < 4) {
+        double num = 4.0/coeff;
+        coeff2 = std::pow(coeff1, (num-1)*3);
+    } else {
+        double num = coeff / 4.0;
+        coeff2 = std::pow(coeff1, (num-1)*(1.0/3));
+    }
+
     float exp;
     if (_ui.editor_graphicsView->viewport()->height() < _ui.editor_graphicsView->viewport()->width()) {
-        exp = log((float) editor_height / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
+        exp = log((float) editor_height * (1 + coeff1) / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
     } else {
-        exp = log((float) editor_width / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
+        exp = log((float) editor_width * (1 + coeff1) / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
     }
     scaling_zoom = pow(scaling_coefficient, exp);
+
+    center_y -= _ui.editor_graphicsView->viewport()->height() * scaling_zoom * coeff1 * coeff2;
+    center_x -= _ui.editor_graphicsView->viewport()->width() * scaling_zoom * coeff1 * coeff2;
 }
 
 void OrganismEditor::resize_editing_grid(int width, int height) {

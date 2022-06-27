@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "../../BlockTypes.hpp"
+#include "../../Stuff/BlockTypes.hpp"
 #include "Rotation.h"
 
 struct Observation {

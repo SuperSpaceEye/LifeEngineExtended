@@ -12,7 +12,7 @@
 //#include "../Organism_parts/OrganismBlock.h"
 #include "Rotation.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
-#include "../../BlockTypes.hpp"
+#include "../../Stuff/BlockTypes.hpp"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../PRNGS/lehmer64.h"
 

@@ -13,11 +13,11 @@
 
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../Organism/CPU/Organism.h"
-#include "../../BlockTypes.hpp"
+#include "../../Stuff/BlockTypes.hpp"
 #include "../../Containers/CPU/EngineControlContainer.h"
 #include "../../Containers/CPU/EngineDataContainer.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
-#include "../../Linspace.h"
+#include "../../Stuff/Linspace.h"
 #include "SimulationEngineSingleThread.h"
 #include "../../PRNGS/lehmer64.h"
 #include "../../Organism/CPU/ObservationStuff.h"

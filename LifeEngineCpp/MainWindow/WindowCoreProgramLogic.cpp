@@ -17,7 +17,7 @@ WindowCore::WindowCore(QWidget *parent) :
     QCoreApplication::instance()->installEventFilter(this);
 
     s.init(&_ui);
-    ee.init(15, 15, &_ui, &color_container, &sp, &bp);
+    ee.init(15, 15, &_ui, &color_container, &sp, &bp, &cursor_mode);
 
     dc.simulation_width = 200;
     dc.simulation_height = 200;
@@ -176,7 +176,7 @@ void WindowCore::move_center(int delta_x, int delta_y) {
 void WindowCore::reset_scale_view() {
     center_x = (float)dc.simulation_width/2;
     center_y = (float)dc.simulation_height/2;
-    // finds exponent needed to scale the sprite
+    // finds exponent needed to scale the image
     float exp;
     if (_ui.simulation_graphicsView->viewport()->height() < _ui.simulation_graphicsView->viewport()->width()) {
         exp = log((float) dc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
@@ -974,6 +974,10 @@ void WindowCore::initialize_gui_settings() {
 #if __CUDA_USED__ == 0
     _ui.cb_use_nvidia_for_image_generation->hide();
 #endif
+
+    //So that when user clicks on rbs in organism editors, rbs in main window would be unchecked and vice versa
+    _ui.rb_null_button->hide();
+    ee._ui.rb_null_button->hide();
 }
 
 void WindowCore::update_simulation_size_label() {

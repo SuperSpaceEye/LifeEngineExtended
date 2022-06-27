@@ -11,7 +11,7 @@
 #include <memory>
 #include "../../PRNGS/lehmer64.h"
 
-#include "../../BlockTypes.hpp"
+#include "../../Stuff/BlockTypes.hpp"
 #include "Rotation.h"
 #include "ObservationStuff.h"
 

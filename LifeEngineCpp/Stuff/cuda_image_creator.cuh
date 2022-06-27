@@ -20,8 +20,8 @@
 #include <vector>
 #include "pix_pos.h"
 #include "textures.h"
-#include "Containers/CPU/ColorContainer.h"
-#include "Containers/CPU/EngineDataContainer.h"
+#include "../Containers/CPU/ColorContainer.h"
+#include "../Containers/CPU/EngineDataContainer.h"
 
 struct Differences {
     uint16_t x;

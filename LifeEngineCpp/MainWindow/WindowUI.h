@@ -62,6 +62,7 @@ public:
     QRadioButton *rb_food;
     QRadioButton *rb_kill;
     QRadioButton *rb_wall;
+    QRadioButton *rb_null_button;
     QHBoxLayout *horizontalLayout_41;
     QLabel *label_43;
     QLineEdit *le_brush_size;
@@ -240,14 +241,14 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_47;
     QLineEdit *le_menu_height;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(900, 900);
+        MainWindow->resize(898, 900);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -414,6 +415,14 @@ public:
 
         horizontalLayout_3->addWidget(rb_wall);
 
+        rb_null_button = new QRadioButton(frame_2);
+        cursor_modes->addButton(rb_null_button);
+        rb_null_button->setObjectName(QStringLiteral("rb_null_button"));
+        rb_null_button->setEnabled(false);
+        rb_null_button->setMaximumSize(QSize(0, 0));
+
+        horizontalLayout_3->addWidget(rb_null_button);
+
 
         verticalLayout_6->addLayout(horizontalLayout_3);
 
@@ -500,7 +509,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QStringLiteral("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 506, 452));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 504, 452));
         QSizePolicy sizePolicy3(QSizePolicy::Ignored, QSizePolicy::Minimum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -792,7 +801,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 506, 1092));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 504, 1092));
         QSizePolicy sizePolicy5(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -1250,7 +1259,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 520, 217));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 518, 217));
         QSizePolicy sizePolicy8(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1298,7 +1307,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 506, 400));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 504, 400));
         QSizePolicy sizePolicy9(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1592,6 +1601,7 @@ public:
         rb_food->setText(QApplication::translate("MainWindow", "Food mode", Q_NULLPTR));
         rb_kill->setText(QApplication::translate("MainWindow", "Kill mode", Q_NULLPTR));
         rb_wall->setText(QApplication::translate("MainWindow", "Wall mode", Q_NULLPTR));
+        rb_null_button->setText(QString());
         label_43->setText(QApplication::translate("MainWindow", "Brush size:", Q_NULLPTR));
         cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", Q_NULLPTR));
         textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -1600,15 +1610,15 @@ public:
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version is basica"
-                        "lly an alpha, so many things are not implemeted and will probably change.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version is in alp"
+                        "ha stage, so many things are not implemeted and will probably change.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Important Information:</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*sps is the number of simulation ticks per second.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*setting max fps/sps/num organisms to &lt;0 will enable unlimited mode.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*checking &quot;Fix reproducing distance&quot; will set reproducing distance to min value.</p>\n"
-"<p style=\" margin-top:0px; m"
-                        "argin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p>\n"
+"<p style=\" margin-top:0px; margi"
+                        "n-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This project's Github: https://github.com/SuperSpaceEye/TheLifeEngineCpp</p></body></html>", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", Q_NULLPTR));

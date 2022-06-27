@@ -5,7 +5,7 @@
 #ifndef THELIFEENGINECPP_COLORCONTAINER_H
 #define THELIFEENGINECPP_COLORCONTAINER_H
 
-#include "../../textures.h"
+#include "../../Stuff/textures.h"
 
 struct ColorContainer {
     //QColor menu_color = QColor{200, 200, 255};

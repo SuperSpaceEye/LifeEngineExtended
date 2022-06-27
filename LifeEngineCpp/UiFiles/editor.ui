@@ -348,7 +348,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page_2"/>
+            <widget class="QWidget" name="brain_edit_page"/>
            </widget>
           </item>
           <item>
@@ -361,7 +361,7 @@
                  <string>Place Organism</string>
                 </property>
                 <property name="checked">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">organism_action_group</string>
@@ -372,6 +372,28 @@
                <widget class="QRadioButton" name="rb_chose_organism">
                 <property name="text">
                  <string>Choose organism</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">organism_action_group</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="rb_null_button">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">organism_action_group</string>
@@ -744,8 +766,8 @@
   <slot>rb_eye_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="edit_group"/>
   <buttongroup name="organism_action_group"/>
   <buttongroup name="cells_group"/>
+  <buttongroup name="edit_group"/>
  </buttongroups>
 </ui>

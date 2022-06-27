@@ -4,31 +4,6 @@
 
 #include "WindowCore.h"
 
-int WindowCore::display_dialog_message(const std::string& message) {
-    if (disable_warnings) {return true;}
-    DescisionMessageBox msg{"Warning", QString::fromStdString(message), "OK", "Cancel", this};
-    return msg.exec();
-}
-
-void WindowCore::display_message(const std::string &message) {
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(message));
-    msg.setWindowTitle("Warning");
-    msg.exec();
-}
-
-template<typename T>
-result_struct<T> WindowCore::try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value) {
-    T result;
-    if (boost::conversion::try_lexical_convert<T>(line_edit->text().toStdString(), result)) {
-        return result_struct<T>{true, result};
-    } else {
-        display_message(message);
-        line_edit->setText(QString::fromStdString(to_str(fallback_value, 5)));
-        return result_struct<T>{false, result};
-    }
-}
-
 //==================== Toggle buttons ====================
 
 void WindowCore::tb_pause_slot(bool state) {
@@ -65,13 +40,13 @@ void WindowCore::tb_open_organism_editor_slot(bool state) {
 //==================== Buttons ====================
 
 void WindowCore::b_clear_slot() {
-    if (display_dialog_message("All organisms and simulation grid will be cleared.")) {
+    if (display_dialog_message("All organisms and simulation grid will be cleared.", disable_warnings)) {
         clear_world();
     }
 }
 
 void WindowCore::b_reset_slot() {
-    if (display_dialog_message("All organisms and simulation grid will be reset.")) {
+    if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
         reset_world();
     }
 }
@@ -202,7 +177,7 @@ void WindowCore::b_reset_view_slot() {
 }
 
 void WindowCore::b_kill_all_organisms_slot() {
-    if (!display_dialog_message("All organisms will be killed.")) {return;}
+    if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
     cp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
@@ -240,13 +215,14 @@ void WindowCore::le_num_threads_slot() {
     int fallback = int(cp.num_threads);
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_num_threads, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) { display_dialog_message("Number of threads cannot be less than 1."); return;}
+    if (result.result < 1) { display_dialog_message("Number of threads cannot be less than 1.", disable_warnings); return;}
     if (result.result > std::thread::hardware_concurrency()-1 && !disable_warnings) {
         auto accept = display_dialog_message(
                 "Warning, setting number of processes (" + std::to_string(result.result)
                 + ") higher than the number of CPU cores (" +
                 std::to_string(std::thread::hardware_concurrency()) +
-                ") is not recommended, and will hurt the performance. To get the best result, try using less CPU threads than available CPU cores.");
+                ") is not recommended, and will hurt the performance. To get the best result, try using less CPU threads than available CPU cores.",
+                disable_warnings);
         if (!accept) {return;}
     }
     set_simulation_num_threads(result.result);
@@ -521,14 +497,17 @@ void WindowCore::le_menu_height_slot() {
 
 void WindowCore::rb_food_slot() {
     set_cursor_mode(CursorMode::ModifyFood);
+    ee._ui.rb_null_button->setChecked(true);
 }
 
 void WindowCore::rb_wall_slot() {
     set_cursor_mode(CursorMode::ModifyWall);
+    ee._ui.rb_null_button->setChecked(true);
 }
 
 void WindowCore::rb_kill_slot() {
     set_cursor_mode(CursorMode::KillOrganism);
+    ee._ui.rb_null_button->setChecked(true);
 }
 
 void WindowCore::rb_single_thread_slot() {

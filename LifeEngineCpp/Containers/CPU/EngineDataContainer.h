@@ -6,7 +6,7 @@
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
 //#include "../../Organism/CPU/Organism.h"
-#include "../../Actions.h"
+#include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../GridBlocks/AtomicGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"

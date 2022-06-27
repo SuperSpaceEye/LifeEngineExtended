@@ -27,60 +27,68 @@ void OrganismEditor::b_save_organism_slot() {
 
 
 void OrganismEditor::le_anatomy_mutation_rate_slot() {
-
-}
-
-void OrganismEditor::le_grid_height_slot() {
-
+    float fallback = editor_organism->anatomy_mutation_rate;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_anatomy_mutation_rate,
+                                                          fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
+    editor_organism->anatomy_mutation_rate = result.result;
 }
 
 void OrganismEditor::le_grid_width_slot() {
+    int fallback = new_editor_width;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_grid_width, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 10) {display_message("Input cannot be less than 10."); return;}
+    new_editor_width = result.result;
+}
 
+void OrganismEditor::le_grid_height_slot() {
+    int fallback = new_editor_height;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_grid_height, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 10) {display_message("Input cannot be less than 10."); return;}
+    new_editor_height = result.result;
 }
 
 void OrganismEditor::le_move_range_slot() {
-
+    int fallback = editor_organism->move_range;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_move_range, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    editor_organism->move_range = result.result;
 }
 
 //==================== Radio buttons ====================
 
 
-void OrganismEditor::rb_armor_slot() {
+void OrganismEditor::rb_armor_slot    () { chosen_block_type = BlockTypes::ArmorBlock    ;}
 
-}
+void OrganismEditor::rb_eye_slot      () { chosen_block_type = BlockTypes::EyeBlock      ;}
 
-void OrganismEditor::rb_eye_slot() {
+void OrganismEditor::rb_killer_slot   () { chosen_block_type = BlockTypes::KillerBlock   ;}
 
-}
+void OrganismEditor::rb_mouth_slot    () { chosen_block_type = BlockTypes::MouthBlock    ;}
 
-void OrganismEditor::rb_killer_slot() {
+void OrganismEditor::rb_mover_slot    () { chosen_block_type = BlockTypes::MoverBlock    ;}
 
-}
-
-void OrganismEditor::rb_mouth_slot() {
-
-}
-
-void OrganismEditor::rb_mover_slot() {
-
-}
-
-void OrganismEditor::rb_producer_slot() {
-
-}
+void OrganismEditor::rb_producer_slot () { chosen_block_type = BlockTypes::ProducerBlock ;}
 
 void OrganismEditor::rb_place_organism_slot() {
-
+    *c_mode = CursorMode::PlaceOrganism;
+    _parent_ui->rb_null_button->setChecked(true);
 }
 
 void OrganismEditor::rb_choose_organism_slot() {
-
+    *c_mode = CursorMode::ChooseOrganism;
+    _parent_ui->rb_null_button->setChecked(true);
 }
 
 void OrganismEditor::rb_edit_anatomy_slot() {
-
+    _ui.stackedWidget->setCurrentIndex(0);
 }
 
 void OrganismEditor::rb_edit_brain_slot() {
-
+    _ui.stackedWidget->setCurrentIndex(1);
 }

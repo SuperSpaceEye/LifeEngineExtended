@@ -6,7 +6,7 @@
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
 #include <iostream>
-#include "../BlockTypes.hpp"
+#include "../Stuff/BlockTypes.hpp"
 #include "../Organism/CPU/Rotation.h"
 
 class Organism;

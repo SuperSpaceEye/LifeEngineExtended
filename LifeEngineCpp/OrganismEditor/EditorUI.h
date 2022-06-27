@@ -70,19 +70,20 @@ public:
     QLineEdit *le_grid_height;
     QPushButton *b_resize_editing_grid;
     QSpacerItem *verticalSpacer;
-    QWidget *page_2;
+    QWidget *brain_edit_page;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_6;
     QRadioButton *rb_place_organism;
     QRadioButton *rb_chose_organism;
+    QRadioButton *rb_null_button;
     QPushButton *b_save_organism;
     QPushButton *b_load_organism;
     QHBoxLayout *horizontalLayout_4;
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
-    QButtonGroup *edit_group;
     QButtonGroup *organism_action_group;
     QButtonGroup *cells_group;
+    QButtonGroup *edit_group;
 
     void setupUi(QWidget *Editor)
     {
@@ -132,6 +133,9 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(editor_graphicsView->sizePolicy().hasHeightForWidth());
         editor_graphicsView->setSizePolicy(sizePolicy1);
+        editor_graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        editor_graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        editor_graphicsView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
         horizontalLayout_3->addWidget(editor_graphicsView);
 
@@ -297,9 +301,9 @@ public:
         verticalLayout_3->addLayout(verticalLayout_2);
 
         stackedWidget->addWidget(anatomy_edit_page);
-        page_2 = new QWidget();
-        page_2->setObjectName(QStringLiteral("page_2"));
-        stackedWidget->addWidget(page_2);
+        brain_edit_page = new QWidget();
+        brain_edit_page->setObjectName(QStringLiteral("brain_edit_page"));
+        stackedWidget->addWidget(brain_edit_page);
 
         verticalLayout->addWidget(stackedWidget);
 
@@ -312,7 +316,7 @@ public:
         organism_action_group->setObjectName(QStringLiteral("organism_action_group"));
         organism_action_group->addButton(rb_place_organism);
         rb_place_organism->setObjectName(QStringLiteral("rb_place_organism"));
-        rb_place_organism->setChecked(true);
+        rb_place_organism->setChecked(false);
 
         horizontalLayout_6->addWidget(rb_place_organism);
 
@@ -321,6 +325,15 @@ public:
         rb_chose_organism->setObjectName(QStringLiteral("rb_chose_organism"));
 
         horizontalLayout_6->addWidget(rb_chose_organism);
+
+        rb_null_button = new QRadioButton(widget);
+        organism_action_group->addButton(rb_null_button);
+        rb_null_button->setObjectName(QStringLiteral("rb_null_button"));
+        rb_null_button->setEnabled(false);
+        rb_null_button->setMaximumSize(QSize(0, 0));
+        rb_null_button->setChecked(true);
+
+        horizontalLayout_6->addWidget(rb_null_button);
 
         b_save_organism = new QPushButton(widget);
         b_save_organism->setObjectName(QStringLiteral("b_save_organism"));
@@ -411,6 +424,7 @@ public:
         b_resize_editing_grid->setText(QApplication::translate("Editor", "Resize editing grid", Q_NULLPTR));
         rb_place_organism->setText(QApplication::translate("Editor", "Place Organism", Q_NULLPTR));
         rb_chose_organism->setText(QApplication::translate("Editor", "Choose organism", Q_NULLPTR));
+        rb_null_button->setText(QString());
         b_save_organism->setText(QApplication::translate("Editor", "Save Organism", Q_NULLPTR));
         b_load_organism->setText(QApplication::translate("Editor", "Load Organism", Q_NULLPTR));
         rb_edit_anatomy->setText(QApplication::translate("Editor", "Edit Anatomy", Q_NULLPTR));
