@@ -10,7 +10,7 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     _ui.setupUi(this);
     _parent_ui = parent_ui;
 
-    editor_width = width;
+    editor_width  = width;
     editor_height = height;
 
     this->color_container = color_container;
@@ -27,8 +27,8 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
 
     auto brain = std::make_shared<Brain>();
 
-    editor_organism = new Organism(editor_width/2,
-                                   editor_height/2,
+    editor_organism = new Organism(editor_width  / 2,
+                                   editor_height / 2,
                                    Rotation::UP,
                                    anatomy,
                                    brain,
@@ -72,52 +72,33 @@ void OrganismEditor::move_center(int delta_x, int delta_y) {
 
 void OrganismEditor::reset_scale_view() {
     center_x = (float)editor_width/2;
-    if (editor_width%2 != 0) {
-        center_x++;
-    }
+//    if (editor_width%2 != 0) {
+//        center_x++;
+//    }
 
     center_y = (float)editor_height/2;
-    if (editor_height%2 != 0) {
-        center_y++;
-    }
+//    if (editor_height%2 != 0) {
+//        center_y++;
+//    }
 
-    //Ok, I don't know why did I do this or how it works, but basically it should calculate scale view with a bit of
-    //background space and also center the center properly.
-
-    // if coeff 1/4 then coeff2 1/4
-    // if coeff 1/4n < 1/4 then coeff2 = root((n-1)*3, coeff) e.g coeff = 1/(4*2) = 1/8, coeff2 = root((2-1)*3 1/8) => 1/2
-    // if coeff 1/4n > 1/4 then coeff2 = root((n-1)*1/3, coeff) e.g coeff = 1/(4*1/2) = 1/2, coeff2 = root((2-1)*(1/3), 1/2) => 1/8
-    double coeff = 4;
-
-    double coeff1 = double(1)/coeff;
-    double coeff2;
-
-    if (coeff == 4) {
-        coeff2 = 1.0/4;
-    } else if (coeff < 4) {
-        double num = 4.0/coeff;
-        coeff2 = std::pow(coeff1, (num-1)*3);
-    } else {
-        double num = coeff / 4.0;
-        coeff2 = std::pow(coeff1, (num-1)*(1.0/3));
-    }
+    //I don't care anymore
 
     float exp;
     if (_ui.editor_graphicsView->viewport()->height() < _ui.editor_graphicsView->viewport()->width()) {
-        exp = log((float) editor_height * (1 + coeff1) / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
+        exp = log((float) editor_height / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
     } else {
-        exp = log((float) editor_width * (1 + coeff1) / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
+        exp = log((float) editor_width / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
     }
     scaling_zoom = pow(scaling_coefficient, exp);
-
-    center_y -= _ui.editor_graphicsView->viewport()->height() * scaling_zoom * coeff1 * coeff2;
-    center_x -= _ui.editor_graphicsView->viewport()->width() * scaling_zoom * coeff1 * coeff2;
 }
 
 void OrganismEditor::resize_editing_grid(int width, int height) {
     editor_width = width;
     editor_height = height;
-    edit_grid.resize(width, std::vector<EditBlock>(height));
+    edit_grid.clear();
+    edit_grid.resize(width, std::vector<EditBlock>(height, EditBlock{}));
+
+    place_organism_on_a_grid();
 }
 
 void OrganismEditor::resize_image() {
@@ -204,8 +185,6 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
         for (auto &h_b: height_img_boundaries) {
             for (int x = w_b.start; x < w_b.stop; x++) {
                 for (int y = h_b.start; y < h_b.stop; y++) {
-                    auto &block = edit_grid[lin_width[x]][lin_height[y]];
-
                     if (lin_width[x] < 0 ||
                         lin_width[x] >= editor_width ||
                         lin_height[y] < 0 ||
@@ -214,6 +193,8 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
                         set_image_pixel(x, y, pixel_color);
                         continue;
                     }
+
+                    auto &block = edit_grid.at(lin_width[x]).at(lin_height[y]);
 
                     pixel_color = get_texture_color(block.type,
                                                     block.rotation,
@@ -285,9 +266,9 @@ color & OrganismEditor::get_texture_color(BlockTypes type, Rotation rotation, fl
 }
 
 void OrganismEditor::clear_grid() {
-    for (auto row: edit_grid) {
+    for (auto & row: edit_grid) {
         for (auto & block: row) {
-            block = EditBlock{BlockTypes::EmptyBlock, Rotation::UP};
+            block.type = BlockTypes::EmptyBlock;
         }
     }
 }
@@ -296,8 +277,8 @@ void OrganismEditor::place_organism_on_a_grid() {
     clear_grid();
 
     for (auto & block: editor_organism->organism_anatomy->_organism_blocks) {
-        auto x = editor_organism->x + block.get_pos(editor_organism->rotation).x;
-        auto y = editor_organism->y + block.get_pos(editor_organism->rotation).y;
+        auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
+        auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
         edit_grid[x][y].type = block.type;
         edit_grid[x][y].rotation = block.rotation;
     }
