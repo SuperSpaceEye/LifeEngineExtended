@@ -19,7 +19,7 @@ struct SimulationParameters {
         float killer_damage_amount = 1;
 
         int   min_reproducing_distance = 1;
-        int   max_reproducing_distance = 5;
+        int   max_reproducing_distance = 3;
 
         float anatomy_mutations_rate_mutation_modifier = 0.01;
         float anatomy_min_possible_mutation_rate = 0.001;
@@ -29,8 +29,8 @@ struct SimulationParameters {
         float brain_min_possible_mutation_rate = 0.001;
         float brain_mutation_rate_delimiter = 0.5;
 
-        int   max_move_range = 5;
         int   min_move_range = 1;
+        int   max_move_range = 5;
         float move_range_delimiter = 0.5;
         bool  set_fixed_move_range = false;
         int   min_organism_size = 1;
@@ -39,6 +39,13 @@ struct SimulationParameters {
             int add_cell = 33;
             int change_cell = 33;
             int remove_cell = 33;
+
+        int   perlin_octaves = 4;
+        float perlin_persistence = 0.5;
+        float perlin_upper_bound = 0.4;
+        float perlin_lower_bound = 0.3;
+        float perlin_x_modifier = 0.015;
+        float perlin_y_modifier = 0.015;
 
         bool reproduction_rotation_enabled = true;
         bool on_touch_kill = false;

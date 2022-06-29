@@ -21,6 +21,7 @@
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Stuff/Linspace.h"
+#include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
 #include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
@@ -32,6 +33,8 @@ class SimulationEngine {
     EngineDataContainer& dc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
+
+    siv::PerlinNoise perlin;
 
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
@@ -62,6 +65,10 @@ public:
                      OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters);
     void threaded_mainloop();
 
+    void make_random_walls();
+
+    void set_wall(std::vector<Organism *> &temp, const Action &action);
+    void clear_walls();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

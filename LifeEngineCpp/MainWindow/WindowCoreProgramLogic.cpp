@@ -590,8 +590,6 @@ void WindowCore::resize_simulation_space() {
     dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
     dc.second_simulation_grid.resize(dc.simulation_width *dc.simulation_height, BaseGridBlock{});
 
-    update_simulation_size_label();
-
     cp.build_threads = true;
     reset_world();
 
@@ -633,6 +631,11 @@ void WindowCore::reset_world() {
 
     if (reset_with_chosen) { dc.to_place_organisms.push_back(new Organism(dc.chosen_organism)); }
     else { dc.to_place_organisms.push_back(new Organism(dc.base_organism)); }
+
+    if (sp.generate_random_walls_on_reset) {
+        engine->clear_walls();
+        engine->make_random_walls();
+    }
 
     //Just in case
     cp.engine_pass_tick = true;
@@ -911,6 +914,11 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
     _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
     _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
+    _ui.le_perlin_persistence                ->setText(QString::fromStdString(to_str(sp.perlin_persistence, 2)));
+    _ui.le_perlin_upper_bound                ->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 2)));
+    _ui.le_perlin_lower_bound                ->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 2)));
+    _ui.le_perlin_x_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  2)));
+    _ui.le_perlin_y_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  2)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
@@ -924,6 +932,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_max_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
     _ui.le_min_move_range                    ->setText(QString::fromStdString(std::to_string(sp.min_move_range)));
     _ui.le_max_move_range                    ->setText(QString::fromStdString(std::to_string(sp.max_move_range)));
+    _ui.le_perlin_octaves                    ->setText(QString::fromStdString(std::to_string(sp.perlin_octaves)));
 
     _ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
     _ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);

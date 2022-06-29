@@ -56,20 +56,14 @@ void WindowCore::b_resize_and_reset_slot() {
 }
 
 void WindowCore::b_generate_random_walls_slot() {
-    if (!disable_warnings) {display_message("Not implemented");}
+    engine->make_random_walls();
 }
 
 void WindowCore::b_clear_all_walls_slot() {
     cp.engine_pause = true;
     wait_for_engine_to_pause();
 
-    for (int x = 1; x < dc.simulation_width-1; x++) {
-        for (int y = 1; y < dc.simulation_height-1; y++) {
-            if (dc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock) {
-                dc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
-            }
-        }
-    }
+    engine->clear_walls();
 
     unpause_engine();
 }
@@ -141,15 +135,6 @@ void WindowCore::b_load_world_slot() {
         cp.pause_processing_user_action = false;
         return;
     }
-
-//    for (auto & organism: dc.organisms) {
-//        delete organism;
-//    }
-//    dc.organisms.clear();
-//    for (auto & organism: dc.to_place_organisms) {
-//        delete organism;
-//    }
-//    dc.to_place_organisms.clear();
 
     std::string full_path = file_name.toStdString();
 
@@ -492,6 +477,58 @@ void WindowCore::le_menu_height_slot() {
     if (!result.is_valid) {return;}
     if (result.result < 200) {display_message("Input cannot be less than 200."); return;}
     _ui.menu_frame->setFixedHeight(result.result);}
+
+
+void WindowCore::le_perlin_octaves_slot() {
+    int fallback = sp.perlin_octaves;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_perlin_octaves, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    sp.perlin_octaves = result.result;
+}
+
+void WindowCore::le_perlin_persistence_slot() {
+    float fallback = sp.perlin_persistence;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_persistence, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
+    sp.perlin_persistence = result.result;
+}
+
+void WindowCore::le_perlin_upper_bound_slot() {
+    float fallback = sp.perlin_upper_bound;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_upper_bound, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < sp.perlin_lower_bound) {display_message("Input cannot be less than lower bound."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
+    sp.perlin_upper_bound = result.result;
+}
+
+void WindowCore::le_perlin_lower_bound_slot() {
+    float fallback = sp.perlin_lower_bound;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_lower_bound, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result > sp.perlin_upper_bound) {display_message("Input cannot be more than upper bound."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.perlin_lower_bound = result.result;
+}
+
+void WindowCore::le_perlin_x_modifier_slot() {
+    float fallback = sp.perlin_x_modifier;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_x_modifier, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.perlin_x_modifier = result.result;
+}
+
+void WindowCore::le_perlin_y_modifier_slot() {
+    float fallback = sp.perlin_y_modifier;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_y_modifier, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.perlin_y_modifier = result.result;
+}
 
 //==================== Radio button ====================
 

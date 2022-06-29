@@ -241,6 +241,26 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_47;
     QLineEdit *le_menu_height;
+    QSpacerItem *verticalSpacer_2;
+    QLabel *label_22;
+    QHBoxLayout *horizontalLayout_20;
+    QLabel *label_26;
+    QLineEdit *le_perlin_octaves;
+    QHBoxLayout *horizontalLayout_31;
+    QLabel *label_27;
+    QLineEdit *le_perlin_persistence;
+    QHBoxLayout *horizontalLayout_32;
+    QLabel *label_28;
+    QLineEdit *le_perlin_upper_bound;
+    QHBoxLayout *horizontalLayout_33;
+    QLabel *label_29;
+    QLineEdit *le_perlin_lower_bound;
+    QHBoxLayout *horizontalLayout_34;
+    QLabel *label_30;
+    QLineEdit *le_perlin_x_modifier;
+    QHBoxLayout *horizontalLayout_17;
+    QLabel *label_31;
+    QLineEdit *le_perlin_y_modifier;
     QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
 
@@ -625,13 +645,13 @@ public:
         verticalLayout_22->setContentsMargins(-1, -1, -1, 0);
         b_generate_random_walls = new QPushButton(widget_3);
         b_generate_random_walls->setObjectName(QStringLiteral("b_generate_random_walls"));
-        b_generate_random_walls->setEnabled(false);
+        b_generate_random_walls->setEnabled(true);
 
         verticalLayout_22->addWidget(b_generate_random_walls);
 
         cb_generate_random_walls_on_reset = new QCheckBox(widget_3);
         cb_generate_random_walls_on_reset->setObjectName(QStringLiteral("cb_generate_random_walls_on_reset"));
-        cb_generate_random_walls_on_reset->setEnabled(false);
+        cb_generate_random_walls_on_reset->setEnabled(true);
 
         verticalLayout_22->addWidget(cb_generate_random_walls_on_reset);
 
@@ -1307,7 +1327,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 504, 400));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -393, 504, 610));
         QSizePolicy sizePolicy9(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1464,6 +1484,105 @@ public:
 
         verticalLayout_19->addLayout(horizontalLayout_14);
 
+        verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout_19->addItem(verticalSpacer_2);
+
+        label_22 = new QLabel(widget_2);
+        label_22->setObjectName(QStringLiteral("label_22"));
+
+        verticalLayout_19->addWidget(label_22);
+
+        horizontalLayout_20 = new QHBoxLayout();
+        horizontalLayout_20->setObjectName(QStringLiteral("horizontalLayout_20"));
+        label_26 = new QLabel(widget_2);
+        label_26->setObjectName(QStringLiteral("label_26"));
+
+        horizontalLayout_20->addWidget(label_26);
+
+        le_perlin_octaves = new QLineEdit(widget_2);
+        le_perlin_octaves->setObjectName(QStringLiteral("le_perlin_octaves"));
+
+        horizontalLayout_20->addWidget(le_perlin_octaves);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_20);
+
+        horizontalLayout_31 = new QHBoxLayout();
+        horizontalLayout_31->setObjectName(QStringLiteral("horizontalLayout_31"));
+        label_27 = new QLabel(widget_2);
+        label_27->setObjectName(QStringLiteral("label_27"));
+
+        horizontalLayout_31->addWidget(label_27);
+
+        le_perlin_persistence = new QLineEdit(widget_2);
+        le_perlin_persistence->setObjectName(QStringLiteral("le_perlin_persistence"));
+
+        horizontalLayout_31->addWidget(le_perlin_persistence);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_31);
+
+        horizontalLayout_32 = new QHBoxLayout();
+        horizontalLayout_32->setObjectName(QStringLiteral("horizontalLayout_32"));
+        label_28 = new QLabel(widget_2);
+        label_28->setObjectName(QStringLiteral("label_28"));
+
+        horizontalLayout_32->addWidget(label_28);
+
+        le_perlin_upper_bound = new QLineEdit(widget_2);
+        le_perlin_upper_bound->setObjectName(QStringLiteral("le_perlin_upper_bound"));
+
+        horizontalLayout_32->addWidget(le_perlin_upper_bound);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_32);
+
+        horizontalLayout_33 = new QHBoxLayout();
+        horizontalLayout_33->setObjectName(QStringLiteral("horizontalLayout_33"));
+        label_29 = new QLabel(widget_2);
+        label_29->setObjectName(QStringLiteral("label_29"));
+
+        horizontalLayout_33->addWidget(label_29);
+
+        le_perlin_lower_bound = new QLineEdit(widget_2);
+        le_perlin_lower_bound->setObjectName(QStringLiteral("le_perlin_lower_bound"));
+
+        horizontalLayout_33->addWidget(le_perlin_lower_bound);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_33);
+
+        horizontalLayout_34 = new QHBoxLayout();
+        horizontalLayout_34->setObjectName(QStringLiteral("horizontalLayout_34"));
+        label_30 = new QLabel(widget_2);
+        label_30->setObjectName(QStringLiteral("label_30"));
+
+        horizontalLayout_34->addWidget(label_30);
+
+        le_perlin_x_modifier = new QLineEdit(widget_2);
+        le_perlin_x_modifier->setObjectName(QStringLiteral("le_perlin_x_modifier"));
+
+        horizontalLayout_34->addWidget(le_perlin_x_modifier);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_34);
+
+        horizontalLayout_17 = new QHBoxLayout();
+        horizontalLayout_17->setObjectName(QStringLiteral("horizontalLayout_17"));
+        label_31 = new QLabel(widget_2);
+        label_31->setObjectName(QStringLiteral("label_31"));
+
+        horizontalLayout_17->addWidget(label_31);
+
+        le_perlin_y_modifier = new QLineEdit(widget_2);
+        le_perlin_y_modifier->setObjectName(QStringLiteral("le_perlin_y_modifier"));
+
+        horizontalLayout_17->addWidget(le_perlin_y_modifier);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_17);
+
 
         verticalLayout_5->addWidget(widget_2);
 
@@ -1575,6 +1694,12 @@ public:
         QObject::connect(cb_statistics_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_statistics_always_on_top_slot(bool)));
         QObject::connect(tb_open_organism_editor, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_organism_editor_slot(bool)));
         QObject::connect(cb_editor_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_editor_always_on_top_slot(bool)));
+        QObject::connect(le_perlin_lower_bound, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_lower_bound_slot()));
+        QObject::connect(le_perlin_octaves, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_octaves_slot()));
+        QObject::connect(le_perlin_persistence, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_persistence_slot()));
+        QObject::connect(le_perlin_upper_bound, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_upper_bound_slot()));
+        QObject::connect(le_perlin_x_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_x_modifier_slot()));
+        QObject::connect(le_perlin_y_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_y_modifier_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -1776,6 +1901,13 @@ public:
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", Q_NULLPTR));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", Q_NULLPTR));
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", Q_NULLPTR));
+        label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", Q_NULLPTR));
+        label_26->setText(QApplication::translate("MainWindow", "Octaves: ", Q_NULLPTR));
+        label_27->setText(QApplication::translate("MainWindow", "Persistence: ", Q_NULLPTR));
+        label_28->setText(QApplication::translate("MainWindow", "Upper bound: ", Q_NULLPTR));
+        label_29->setText(QApplication::translate("MainWindow", "Lower bound: ", Q_NULLPTR));
+        label_30->setText(QApplication::translate("MainWindow", "x modifier: ", Q_NULLPTR));
+        label_31->setText(QApplication::translate("MainWindow", "y modifier: ", Q_NULLPTR));
         Tabs->setTabText(Tabs->indexOf(settings_tab), QApplication::translate("MainWindow", "Settings", Q_NULLPTR));
     } // retranslateUi
 

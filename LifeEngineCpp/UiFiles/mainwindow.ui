@@ -692,7 +692,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QPushButton" name="b_generate_random_walls">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Generate random walls</string>
@@ -702,7 +702,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QCheckBox" name="cb_generate_random_walls_on_reset">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Generate random walls on reset</string>
@@ -1785,9 +1785,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-393</y>
                   <width>504</width>
-                  <height>400</height>
+                  <height>610</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2020,6 +2020,113 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QLineEdit" name="le_menu_height"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>15</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_22">
+                      <property name="text">
+                       <string>Perlin Settings:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_20">
+                      <item>
+                       <widget class="QLabel" name="label_26">
+                        <property name="text">
+                         <string>Octaves: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_octaves"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_31">
+                      <item>
+                       <widget class="QLabel" name="label_27">
+                        <property name="text">
+                         <string>Persistence: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_persistence"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_32">
+                      <item>
+                       <widget class="QLabel" name="label_28">
+                        <property name="text">
+                         <string>Upper bound: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_upper_bound"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_33">
+                      <item>
+                       <widget class="QLabel" name="label_29">
+                        <property name="text">
+                         <string>Lower bound: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_lower_bound"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_34">
+                      <item>
+                       <widget class="QLabel" name="label_30">
+                        <property name="text">
+                         <string>x modifier: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_x_modifier"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_17">
+                      <item>
+                       <widget class="QLabel" name="label_31">
+                        <property name="text">
+                         <string>y modifier: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_y_modifier"/>
                       </item>
                      </layout>
                     </item>
@@ -3374,6 +3481,102 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_perlin_lower_bound</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_lower_bound_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>817</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_octaves</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_octaves_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>663</x>
+     <y>730</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_persistence</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_persistence_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>759</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_upper_bound</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_upper_bound_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>788</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_x_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_x_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>671</x>
+     <y>846</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_y_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_y_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>671</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3460,6 +3663,12 @@ p, li { white-space: pre-wrap; }
   <slot>cb_statistics_always_on_top_slot(bool)</slot>
   <slot>tb_open_organism_editor_slot(bool)</slot>
   <slot>cb_editor_always_on_top_slot(bool)</slot>
+  <slot>le_perlin_octaves_slot()</slot>
+  <slot>le_perlin_persistence_slot()</slot>
+  <slot>le_perlin_upper_bound_slot()</slot>
+  <slot>le_perlin_lower_bound_slot()</slot>
+  <slot>le_perlin_x_modifier_slot()</slot>
+  <slot>le_perlin_y_modifier_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="cursor_modes">

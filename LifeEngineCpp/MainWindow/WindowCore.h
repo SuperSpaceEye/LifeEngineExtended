@@ -384,6 +384,12 @@ private slots:
     void le_auto_produce_food_every_n_tick_slot();
     void le_update_info_every_n_milliseconds_slot();
     void le_menu_height_slot();
+    void le_perlin_octaves_slot();
+    void le_perlin_persistence_slot();
+    void le_perlin_upper_bound_slot();
+    void le_perlin_lower_bound_slot();
+    void le_perlin_x_modifier_slot();
+    void le_perlin_y_modifier_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);

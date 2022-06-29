@@ -81,7 +81,6 @@ void OrganismEditor::reset_scale_view() {
 //        center_y++;
 //    }
 
-
     //I don't care anymore
 
     float exp;

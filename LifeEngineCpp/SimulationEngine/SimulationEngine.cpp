@@ -131,6 +131,10 @@ void SimulationEngine::simulation_tick() {
             cp.tb_paused = true ;
             cp.organisms_extinct = false;
         }
+        if (sp.generate_random_walls_on_reset) {
+            clear_walls();
+            make_random_walls();
+        }
         return;
     }
 
@@ -162,10 +166,7 @@ void SimulationEngine::process_user_action_pool() {
                 try_remove_food(action.x, action.y);
                 break;
             case ActionType::TryAddWall:
-                try_kill_organism(action.x, action.y, temp);
-                try_remove_food(action.x, action.y);
-                if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::EmptyBlock) {continue;}
-                dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::WallBlock;
+                set_wall(temp, action);
                 break;
             case ActionType::TryRemoveWall:
                 if (action.x == 0 || action.y == 0 || action.x == dc.simulation_width-1 || action.y == dc.simulation_height-1) {continue;}
@@ -188,6 +189,22 @@ void SimulationEngine::process_user_action_pool() {
         }
     }
     dc.user_actions_pool.clear();
+}
+
+void SimulationEngine::clear_walls() {
+    for (int x = 1; x < dc.simulation_width-1; x++) {
+        for (int y = 1; y < dc.simulation_height-1; y++) {
+            if (dc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock) {
+                dc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
+            }
+        }
+    }
+}
+
+void SimulationEngine::set_wall(std::vector<Organism *> &temp, const Action &action) {
+    try_kill_organism(action.x, action.y, temp);
+    try_remove_food(action.x, action.y);
+    dc.CPU_simulation_grid[action.x][action.y].type = WallBlock;
 }
 
 void SimulationEngine::random_food_drop() {
@@ -309,4 +326,21 @@ void SimulationEngine::make_walls() {
         dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
         dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
     }
+}
+
+void SimulationEngine::make_random_walls() {
+    perlin.reseed(gen());
+
+    auto temp = std::vector<Organism*>{};
+
+    for (int x = 0; x < dc.simulation_width; x++) {
+        for (int y = 0; y < dc.simulation_height; y++) {
+            auto noise = perlin.octave2D_01((x * sp.perlin_x_modifier), (y * sp.perlin_y_modifier), sp.perlin_octaves, sp.perlin_persistence);
+
+            if (noise >= sp.perlin_lower_bound && noise <= sp.perlin_upper_bound) {
+                set_wall(temp, Action{ActionType::TryAddWall, x, y});
+            }
+        }
+    }
+
 }
