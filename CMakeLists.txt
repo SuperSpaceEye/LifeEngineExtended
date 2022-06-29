@@ -12,8 +12,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
-set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 61)
@@ -36,6 +34,8 @@ set(WIN_USE_CUDA_LIBS 0)
 
 if(NOT WIN_COMPILATION)
     set(WIN_USE_CUDA_LIBS 0)
+    set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
+    set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 endif()
 
 if (NOT WIN_USE_CUDA_LIBS AND NOT WIN_COMPILATION)
