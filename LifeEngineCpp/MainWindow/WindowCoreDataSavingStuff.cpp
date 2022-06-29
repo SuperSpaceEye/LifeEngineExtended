@@ -4,12 +4,20 @@
 
 #include "WindowCore.h"
 
+//TODO increment every time saving logic changes
+int SAVE_VERSION = 1;
+
 void WindowCore::write_data(std::ofstream &os) {
+    write_version(os);
     write_simulation_parameters(os);
     write_organisms_block_parameters(os);
     write_data_container_data(os);
     write_simulation_grid(os);
     write_organisms(os);
+}
+
+void WindowCore::write_version(std::ofstream &os) {
+    os.write((char*)&SAVE_VERSION, sizeof(int));
 }
 
 void WindowCore::write_simulation_parameters(std::ofstream& os) {
@@ -67,6 +75,8 @@ void WindowCore::write_organism_brain(std::ofstream& os, Brain * brain) {
     os.write((char*)brain, sizeof(Brain));
 }
 
+//TODO do i need to save spaces?
+
 void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     uint32_t organism_blocks_size                = anatomy->_organism_blocks.size();
     uint32_t producing_space_size                = anatomy->_producing_space.size();
@@ -74,7 +84,6 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     uint32_t killing_space_size                  = anatomy->_killing_space.size();
     uint32_t single_adjacent_space_size          = anatomy->_single_adjacent_space.size();
     uint32_t single_diagonal_adjacent_space_size = anatomy->_single_diagonal_adjacent_space.size();
-    uint32_t double_adjacent_space_size          = anatomy->_double_adjacent_space.size();
 
     os.write((char*)&organism_blocks_size,                sizeof(uint32_t));
     os.write((char*)&producing_space_size,                sizeof(uint32_t));
@@ -82,7 +91,6 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     os.write((char*)&killing_space_size,                  sizeof(uint32_t));
     os.write((char*)&single_adjacent_space_size,          sizeof(uint32_t));
     os.write((char*)&single_diagonal_adjacent_space_size, sizeof(uint32_t));
-    os.write((char*)&double_adjacent_space_size,          sizeof(uint32_t));
 
     os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -94,9 +102,8 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     os.write((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     os.write((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     os.write((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    os.write((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedArmorSpaceContainer   ) * anatomy->_single_adjacent_space.size());
+    os.write((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_adjacent_space.size());
     os.write((char*)&anatomy->_single_diagonal_adjacent_space[0], sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_diagonal_adjacent_space.size());
-    os.write((char*)&anatomy->_double_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_double_adjacent_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
@@ -106,12 +113,34 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
 }
 
 
+
 void WindowCore::read_data(std::ifstream &is) {
+    //If save version is incompatible
+    if (!read_version(is)) {
+        display_message("Save version is incompatible with current program version.");
+        return;
+    }
+
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
+
     read_simulation_parameters(is);
     read_organisms_block_parameters(is);
     read_data_container_data(is);
     read_simulation_grid(is);
     read_organisms(is);
+}
+
+bool WindowCore::read_version(std::ifstream &is) {
+    int save_version;
+    is.read((char*)&save_version, sizeof(int));
+    return save_version == SAVE_VERSION;
 }
 
 void WindowCore::read_simulation_parameters(std::ifstream& is) {
@@ -180,7 +209,6 @@ void WindowCore::read_organisms(std::ifstream& is) {
         organism->bp                      = &bp;
         organism->sp                      = &sp;
         organism->child_pattern           = nullptr;
-        organism->child_ready             = false;
         organism->life_points             = data.life_points;
         organism->damage                  = data.damage;
         organism->max_lifetime            = data.max_lifetime;
@@ -212,7 +240,6 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     uint32_t killing_space_size                  = 0;
     uint32_t single_adjacent_space_size          = 0;
     uint32_t single_diagonal_adjacent_space_size = 0;
-    uint32_t double_adjacent_space_size          = 0;
 
     is.read((char*)&organism_blocks_size,                sizeof(uint32_t));
     is.read((char*)&producing_space_size,                sizeof(uint32_t));
@@ -220,7 +247,6 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     is.read((char*)&killing_space_size,                  sizeof(uint32_t));
     is.read((char*)&single_adjacent_space_size,          sizeof(uint32_t));
     is.read((char*)&single_diagonal_adjacent_space_size, sizeof(uint32_t));
-    is.read((char*)&double_adjacent_space_size,          sizeof(uint32_t));
 
     anatomy->_organism_blocks               .resize(organism_blocks_size);
     anatomy->_producing_space               .resize(producing_space_size);
@@ -228,7 +254,6 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     anatomy->_killing_space                 .resize(killing_space_size);
     anatomy->_single_adjacent_space         .resize(single_adjacent_space_size);
     anatomy->_single_diagonal_adjacent_space.resize(single_diagonal_adjacent_space_size);
-    anatomy->_double_adjacent_space         .resize(double_adjacent_space_size);
 
     is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -240,9 +265,8 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     is.read((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     is.read((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     is.read((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    is.read((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedArmorSpaceContainer   ) * anatomy->_single_adjacent_space.size());
+    is.read((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_adjacent_space.size());
     is.read((char*)&anatomy->_single_diagonal_adjacent_space[0], sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_diagonal_adjacent_space.size());
-    is.read((char*)&anatomy->_double_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_double_adjacent_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;
@@ -301,6 +325,15 @@ namespace pt = boost::property_tree;
 
 //https://www.cochoy.fr/boost-property-tree/
 void WindowCore::read_json_data(std::string path) {
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
+
     pt::ptree root;
     pt::read_json(path, root);
 
@@ -314,7 +347,6 @@ void WindowCore::read_json_data(std::string path) {
 void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
     dc.simulation_height  = root.get<int>("num_rows") + 2;
     dc.simulation_width   = root.get<int>("num_cols") + 2;
-    dc.total_engine_ticks = root.get<int>("total_ticks");
 
     new_simulation_width = dc.simulation_width;
     new_simulation_height = dc.simulation_height;
@@ -326,6 +358,8 @@ void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
     resize_simulation_space();
     make_walls();
     disable_warnings = false;
+
+    dc.total_engine_ticks = root.get<int>("total_ticks");
 
     for (auto & pair: root.get_child("grid.food")) {
         int y = pair.second.get<int>("r")+1;

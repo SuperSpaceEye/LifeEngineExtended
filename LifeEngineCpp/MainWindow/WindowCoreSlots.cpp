@@ -4,57 +4,49 @@
 
 #include "WindowCore.h"
 
-int WindowCore::display_dialog_message(const std::string& message) {
-    if (disable_warnings) {return true;}
-    DescisionMessageBox msg{"Warning", QString::fromStdString(message), "OK", "Cancel", this};
-    return msg.exec();
-}
-
-void WindowCore::display_message(const std::string &message) {
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(message));
-    msg.setWindowTitle("Warning");
-    msg.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-    msg.exec();
-}
-
-template<typename T>
-result_struct<T> WindowCore::try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value) {
-    T result;
-    if (boost::conversion::try_lexical_convert<T>(line_edit->text().toStdString(), result)) {
-        return result_struct<T>{true, result};
-    } else {
-        display_message(message);
-        line_edit->setText(QString::fromStdString(to_str(fallback_value, 5)));
-        return result_struct<T>{false, result};
-    }
-}
-
 //==================== Toggle buttons ====================
 
-void WindowCore::tb_pause_slot(bool paused) {
-    cp.pause_button_pause = paused;
+void WindowCore::tb_pause_slot(bool state) {
+    cp.pause_button_pause = state;
     parse_full_simulation_grid(cp.pause_button_pause);
-    cp.tb_paused = paused;
+    cp.tb_paused = state;
 }
 
-void WindowCore::tb_stoprender_slot(bool stopped_render) {
-    pause_image_construction = stopped_render;
+void WindowCore::tb_stoprender_slot(bool state) {
+    pause_image_construction = state;
     parse_full_simulation_grid(pause_image_construction);
     // calculating delta time is not needed when no image is being created.
     cp.calculate_simulation_tick_delta_time = !cp.calculate_simulation_tick_delta_time;
 }
 
+void WindowCore::tb_open_statistics_slot(bool state) {
+    if (state) {
+       s.show();
+    } else {
+       s.close();
+    }
+}
+
+void WindowCore::tb_open_organism_editor_slot(bool state) {
+    if (state) {
+        ee.show();
+        ee.resize_image();
+        ee.create_image();
+    } else {
+        ee.close();
+    }
+}
+
 //==================== Buttons ====================
 
 void WindowCore::b_clear_slot() {
-    if (display_dialog_message("All organisms and simulation grid will be cleared.")) {
+    if (display_dialog_message("All organisms and simulation grid will be cleared.", disable_warnings)) {
         clear_world();
     }
 }
 
 void WindowCore::b_reset_slot() {
-    if (display_dialog_message("All organisms and simulation grid will be reset.")) {
+    if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
         reset_world();
     }
 }
@@ -64,20 +56,14 @@ void WindowCore::b_resize_and_reset_slot() {
 }
 
 void WindowCore::b_generate_random_walls_slot() {
-    if (!disable_warnings) {display_message("Not implemented");}
+    engine->make_random_walls();
 }
 
 void WindowCore::b_clear_all_walls_slot() {
     cp.engine_pause = true;
     wait_for_engine_to_pause();
 
-    for (int x = 1; x < dc.simulation_width-1; x++) {
-        for (int y = 1; y < dc.simulation_height-1; y++) {
-            if (dc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock) {
-                dc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
-            }
-        }
-    }
+    engine->clear_walls();
 
     unpause_engine();
 }
@@ -90,7 +76,6 @@ void WindowCore::b_save_world_slot() {
 
     QString selected_filter;
     QFileDialog file_dialog{};
-    file_dialog.setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
                                                  "Custom save type (*.tlfcpp);;JSON (*.json)", &selected_filter);
@@ -151,15 +136,6 @@ void WindowCore::b_load_world_slot() {
         return;
     }
 
-    for (auto & organism: dc.organisms) {
-        delete organism;
-    }
-    dc.organisms.clear();
-    for (auto & organism: dc.to_place_organisms) {
-        delete organism;
-    }
-    dc.to_place_organisms.clear();
-
     std::string full_path = file_name.toStdString();
 
     if (filetype == ".tlfcpp") {
@@ -186,7 +162,7 @@ void WindowCore::b_reset_view_slot() {
 }
 
 void WindowCore::b_kill_all_organisms_slot() {
-    if (!display_dialog_message("All organisms will be killed.")) {return;}
+    if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
     cp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
@@ -224,13 +200,14 @@ void WindowCore::le_num_threads_slot() {
     int fallback = int(cp.num_threads);
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_num_threads, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) { display_dialog_message("Number of threads cannot be less than 1."); return;}
+    if (result.result < 1) { display_dialog_message("Number of threads cannot be less than 1.", disable_warnings); return;}
     if (result.result > std::thread::hardware_concurrency()-1 && !disable_warnings) {
         auto accept = display_dialog_message(
                 "Warning, setting number of processes (" + std::to_string(result.result)
                 + ") higher than the number of CPU cores (" +
                 std::to_string(std::thread::hardware_concurrency()) +
-                ") is not recommended, and will hurt the performance. To get the best result, try using less CPU threads than available CPU cores.");
+                ") is not recommended, and will hurt the performance. To get the best result, try using less CPU threads than available CPU cores.",
+                disable_warnings);
         if (!accept) {return;}
     }
     set_simulation_num_threads(result.result);
@@ -501,18 +478,73 @@ void WindowCore::le_menu_height_slot() {
     if (result.result < 200) {display_message("Input cannot be less than 200."); return;}
     _ui.menu_frame->setFixedHeight(result.result);}
 
+
+void WindowCore::le_perlin_octaves_slot() {
+    int fallback = sp.perlin_octaves;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_perlin_octaves, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    sp.perlin_octaves = result.result;
+}
+
+void WindowCore::le_perlin_persistence_slot() {
+    float fallback = sp.perlin_persistence;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_persistence, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
+    sp.perlin_persistence = result.result;
+}
+
+void WindowCore::le_perlin_upper_bound_slot() {
+    float fallback = sp.perlin_upper_bound;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_upper_bound, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < sp.perlin_lower_bound) {display_message("Input cannot be less than lower bound."); return;}
+    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
+    sp.perlin_upper_bound = result.result;
+}
+
+void WindowCore::le_perlin_lower_bound_slot() {
+    float fallback = sp.perlin_lower_bound;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_lower_bound, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result > sp.perlin_upper_bound) {display_message("Input cannot be more than upper bound."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.perlin_lower_bound = result.result;
+}
+
+void WindowCore::le_perlin_x_modifier_slot() {
+    float fallback = sp.perlin_x_modifier;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_x_modifier, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.perlin_x_modifier = result.result;
+}
+
+void WindowCore::le_perlin_y_modifier_slot() {
+    float fallback = sp.perlin_y_modifier;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_y_modifier, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
+    sp.perlin_y_modifier = result.result;
+}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
     set_cursor_mode(CursorMode::ModifyFood);
+    ee._ui.rb_null_button->setChecked(true);
 }
 
 void WindowCore::rb_wall_slot() {
     set_cursor_mode(CursorMode::ModifyWall);
+    ee._ui.rb_null_button->setChecked(true);
 }
 
 void WindowCore::rb_kill_slot() {
     set_cursor_mode(CursorMode::KillOrganism);
+    ee._ui.rb_null_button->setChecked(true);
 }
 
 void WindowCore::rb_single_thread_slot() {
@@ -576,6 +608,30 @@ void WindowCore::cb_use_nvidia_for_image_generation_slot(bool state) {
     use_cuda = true;
 }
 
+void WindowCore::cb_statistics_always_on_top_slot(bool state) {
+    auto hidden = s.isHidden();
+
+    s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        s.show();
+    }
+}
+
+void WindowCore::cb_editor_always_on_top_slot(bool state) {
+    auto hidden = ee.isHidden();
+
+    ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        ee.show();
+    }
+}
+
 void WindowCore::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void WindowCore::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -589,8 +645,6 @@ void WindowCore::cb_reset_on_total_extinction_slot       (bool state) { sp.reset
 void WindowCore::cb_pause_on_total_extinction_slot       (bool state) { sp.pause_on_total_extinction = state;}
 
 void WindowCore::cb_clear_walls_on_reset_slot            (bool state) { sp.clear_walls_on_reset = state;}
-
-void WindowCore::cb_override_evolution_controls_slot     (bool state) { override_evolution_controls_slot = state;}
 
 void WindowCore::cb_generate_random_walls_on_reset_slot  (bool state) { sp.generate_random_walls_on_reset = state;}
 
@@ -611,8 +665,6 @@ void WindowCore::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for
 void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 
 void WindowCore::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
-
-void WindowCore::cb_apply_damage_directly_slot           (bool state) { sp.apply_damage_directly = state;}
 
 void WindowCore::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state;}
 

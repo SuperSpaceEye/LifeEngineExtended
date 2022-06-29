@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>934</width>
-    <height>898</height>
+    <width>898</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -315,6 +315,25 @@
              </attribute>
             </widget>
            </item>
+           <item>
+            <widget class="QRadioButton" name="rb_null_button">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">cursor_modes</string>
+             </attribute>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>
@@ -377,7 +396,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
            <property name="iconSize">
             <size>
@@ -420,7 +439,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version is basically an alpha, so many things are not implemeted and will probably change.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version is in alpha stage, so many things are not implemeted and will probably change.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Important Information:&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*sps is the number of simulation ticks per second.&lt;/p&gt;
@@ -444,347 +463,22 @@ p, li { white-space: pre-wrap; }
             <attribute name="title">
              <string>Editor</string>
             </attribute>
-            <layout class="QHBoxLayout" name="horizontalLayout_31">
+            <layout class="QVBoxLayout" name="verticalLayout_10">
              <item>
-              <widget class="QGraphicsView" name="editor_graphicsView">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                 <horstretch>100</horstretch>
-                 <verstretch>100</verstretch>
-                </sizepolicy>
+              <widget class="QPushButton" name="tb_open_organism_editor">
+               <property name="text">
+                <string>Open Organism Editor Window</string>
                </property>
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Box</enum>
-               </property>
-               <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAsNeeded</enum>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
+               <property name="checkable">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QScrollArea" name="scrollArea_5">
-               <property name="widgetResizable">
-                <bool>true</bool>
+              <widget class="QCheckBox" name="cb_editor_always_on_top">
+               <property name="text">
+                <string>Always on top</string>
                </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents_5">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>516</width>
-                  <height>240</height>
-                 </rect>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_32">
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="QWidget" name="widget_4" native="true">
-                   <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="1,0">
-                    <property name="spacing">
-                     <number>0</number>
-                    </property>
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_16">
-                      <item>
-                       <widget class="QRadioButton" name="rb_select">
-                        <property name="text">
-                         <string>Select organism from world</string>
-                        </property>
-                        <property name="checked">
-                         <bool>true</bool>
-                        </property>
-                        <attribute name="buttonGroup">
-                         <string notr="true">editor_modes</string>
-                        </attribute>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QRadioButton" name="rb_edit">
-                        <property name="text">
-                         <string>Edit organim</string>
-                        </property>
-                        <attribute name="buttonGroup">
-                         <string notr="true">editor_modes</string>
-                        </attribute>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QRadioButton" name="rb_drop">
-                        <property name="text">
-                         <string>Drop organism</string>
-                        </property>
-                        <attribute name="buttonGroup">
-                         <string notr="true">editor_modes</string>
-                        </attribute>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="b_save_organism">
-                        <property name="text">
-                         <string>Save Organism</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="b_load_organism">
-                        <property name="text">
-                         <string>Load Organism</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pushButton">
-                        <property name="text">
-                         <string>Reset with Editor Organism</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </item>
-                    <item>
-                     <widget class="QStackedWidget" name="stackedWidget">
-                      <property name="currentIndex">
-                       <number>0</number>
-                      </property>
-                      <widget class="QWidget" name="page_organism_details">
-                       <layout class="QVBoxLayout" name="verticalLayout_25">
-                        <item>
-                         <widget class="QLabel" name="label_22">
-                          <property name="text">
-                           <string>Organims Details</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_26">
-                          <property name="text">
-                           <string>Cell count:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_27">
-                          <property name="text">
-                           <string>Mutation Rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                      <widget class="QWidget" name="page_edit_organism">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <layout class="QVBoxLayout" name="verticalLayout_28">
-                        <item>
-                         <widget class="QLabel" name="label_28">
-                          <property name="text">
-                           <string>Edit Organism</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <layout class="QHBoxLayout" name="horizontalLayout_36">
-                          <item>
-                           <widget class="QRadioButton" name="radioButton_2">
-                            <property name="text">
-                             <string>Mouth</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QRadioButton" name="radioButton_5">
-                            <property name="text">
-                             <string>KIller</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QRadioButton" name="radioButton">
-                            <property name="text">
-                             <string>Killer</string>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </item>
-                        <item>
-                         <layout class="QHBoxLayout" name="horizontalLayout_37">
-                          <item>
-                           <widget class="QRadioButton" name="radioButton_6">
-                            <property name="text">
-                             <string>Producer</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QRadioButton" name="radioButton_4">
-                            <property name="text">
-                             <string>Mover</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QRadioButton" name="radioButton_3">
-                            <property name="text">
-                             <string>RadioButton</string>
-                            </property>
-                           </widget>
-                          </item>
-                         </layout>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_29">
-                          <property name="text">
-                           <string>Cell count:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <layout class="QHBoxLayout" name="horizontalLayout_33">
-                          <item>
-                           <widget class="QLabel" name="label_30">
-                            <property name="text">
-                             <string>Move Range:</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLineEdit" name="lineEdit"/>
-                          </item>
-                         </layout>
-                        </item>
-                        <item>
-                         <layout class="QHBoxLayout" name="horizontalLayout_35">
-                          <item>
-                           <widget class="QLabel" name="label_31">
-                            <property name="text">
-                             <string>Mutation Rate:</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QLineEdit" name="lineEdit_2"/>
-                          </item>
-                         </layout>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_32">
-                          <property name="text">
-                           <string>Brain</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="pushButton_2">
-                          <property name="text">
-                           <string>Edit Brain Table</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                      <widget class="QWidget" name="page_place">
-                       <layout class="QVBoxLayout" name="verticalLayout_29">
-                        <item>
-                         <widget class="QLabel" name="label_34">
-                          <property name="text">
-                           <string>Organism Details</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_36">
-                          <property name="text">
-                           <string>Cell count:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_35">
-                          <property name="text">
-                           <string>Move Range:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_33">
-                          <property name="text">
-                           <string>Mutation Rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_39">
-                          <property name="text">
-                           <string>Brain</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_38">
-                          <property name="text">
-                           <string>Mobe Towards:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_37">
-                          <property name="text">
-                           <string>Move Away From:</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
               </widget>
              </item>
             </layout>
@@ -819,7 +513,7 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>540</width>
+                  <width>504</width>
                   <height>452</height>
                  </rect>
                 </property>
@@ -998,7 +692,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QPushButton" name="b_generate_random_walls">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Generate random walls</string>
@@ -1008,7 +702,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QCheckBox" name="cb_generate_random_walls_on_reset">
                           <property name="enabled">
-                           <bool>false</bool>
+                           <bool>true</bool>
                           </property>
                           <property name="text">
                            <string>Generate random walls on reset</string>
@@ -1057,16 +751,6 @@ p, li { white-space: pre-wrap; }
                             </property>
                             <property name="text">
                              <string>Load world</string>
-                            </property>
-                           </widget>
-                          </item>
-                          <item>
-                           <widget class="QCheckBox" name="cb_override_evolution_controls">
-                            <property name="enabled">
-                             <bool>false</bool>
-                            </property>
-                            <property name="text">
-                             <string>Override Evolution Controls</string>
                             </property>
                            </widget>
                           </item>
@@ -1387,9 +1071,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-230</y>
-                  <width>540</width>
-                  <height>1121</height>
+                  <y>0</y>
+                  <width>504</width>
+                  <height>1092</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1428,7 +1112,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1930,13 +1614,6 @@ p, li { white-space: pre-wrap; }
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_apply_damage_directly">
-                      <property name="text">
-                       <string>Apply damage directly</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <widget class="QCheckBox" name="cb_multiply_food_production_prob">
                       <property name="text">
                        <string>Multiply food production probability by number of producers</string>
@@ -2009,8 +1686,8 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>608</width>
-                  <height>400</height>
+                  <width>518</width>
+                  <height>217</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2048,292 +1725,21 @@ p, li { white-space: pre-wrap; }
                      <number>0</number>
                     </property>
                     <item>
-                     <widget class="QLabel" name="lb_simulation_size">
+                     <widget class="QPushButton" name="tb_open_statisctics">
                       <property name="text">
-                       <string>Simulation size:</string>
+                       <string>Open Statistics Window</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLabel" name="lb_organisms_memory_consumption">
+                     <widget class="QCheckBox" name="cb_statistics_always_on_top">
                       <property name="text">
-                       <string>Organism's memory consumption:</string>
+                       <string>Always on top</string>
                       </property>
                      </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="lb_total_engine_ticks">
-                      <property name="text">
-                       <string>Total engine ticks: </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>10</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_47">
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_38">
-                        <item>
-                         <widget class="QLabel" name="lb_moving_organisms">
-                          <property name="text">
-                           <string>Moving organisms:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organisms_with_eyes">
-                          <property name="text">
-                           <string>Organisms with eyes:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_avg_org_lifetime_2">
-                          <property name="text">
-                           <string>Avg organism lifetime:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_average_moving_range">
-                          <property name="text">
-                           <string>Avg moving range:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organism_size_2">
-                          <property name="text">
-                           <string>Avg organism size:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_anatomy_mutation_rate_2">
-                          <property name="text">
-                           <string>Avg anatomy mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_brain_mutation_rate_2">
-                          <property name="text">
-                           <string>Avg brain mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mouth_num_2">
-                          <property name="text">
-                           <string>Avg mouth num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_producer_num_2">
-                          <property name="text">
-                           <string>Avg producer num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mover_num_2">
-                          <property name="text">
-                           <string>Avg mover num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_killer_num_2">
-                          <property name="text">
-                           <string>Avg killer num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_armor_num_2">
-                          <property name="text">
-                           <string>Avg armor num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_eye_num_2">
-                          <property name="text">
-                           <string>Avg eye num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_40">
-                        <item>
-                         <widget class="QLabel" name="lb_stationary_organisms">
-                          <property name="text">
-                           <string>Stationary organisms:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organism_size_3">
-                          <property name="text">
-                           <string>Avg organism size:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_avg_org_lifetime_3">
-                          <property name="text">
-                           <string>Avg organism lifetime:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_anatomy_mutation_rate_3">
-                          <property name="text">
-                           <string>Avg anatomy mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_brain_mutation_rate_3">
-                          <property name="text">
-                           <string>Avg brain mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_producer_num_3">
-                          <property name="text">
-                           <string>Avg producer num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mouth_num_3">
-                          <property name="text">
-                           <string>Avg mouth num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_killer_num_3">
-                          <property name="text">
-                           <string>Avg killer num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_armor_num_3">
-                          <property name="text">
-                           <string>Avg armor num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_eye_num_3">
-                          <property name="text">
-                           <string>Avg eye num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                      <item>
-                       <layout class="QVBoxLayout" name="verticalLayout_10">
-                        <item>
-                         <widget class="QLabel" name="lb_organisms_alive_2">
-                          <property name="text">
-                           <string>Organisms alive:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_organism_size_4">
-                          <property name="text">
-                           <string>Avg organism size:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_avg_org_lifetime_4">
-                          <property name="text">
-                           <string>Avg organism lifetime:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_anatomy_mutation_rate_4">
-                          <property name="text">
-                           <string>Avg anatomy mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_brain_mutation_rate_4">
-                          <property name="text">
-                           <string>Avg brain mutation rate:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_producer_num_4">
-                          <property name="text">
-                           <string>Avg producer num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mover_num_4">
-                          <property name="text">
-                           <string>Avg mover num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_mouth_num_4">
-                          <property name="text">
-                           <string>Avg mouth num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_killer_num_4">
-                          <property name="text">
-                           <string>Avg killer num:</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_armor_num_4">
-                          <property name="text">
-                           <string>Avg armor num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_eye_num_4">
-                          <property name="text">
-                           <string>Avg eye num: </string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </item>
-                     </layout>
                     </item>
                    </layout>
                   </widget>
@@ -2379,9 +1785,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>540</width>
-                  <height>400</height>
+                  <y>-393</y>
+                  <width>504</width>
+                  <height>610</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2614,6 +2020,113 @@ p, li { white-space: pre-wrap; }
                       </item>
                       <item>
                        <widget class="QLineEdit" name="le_menu_height"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>15</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_22">
+                      <property name="text">
+                       <string>Perlin Settings:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_20">
+                      <item>
+                       <widget class="QLabel" name="label_26">
+                        <property name="text">
+                         <string>Octaves: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_octaves"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_31">
+                      <item>
+                       <widget class="QLabel" name="label_27">
+                        <property name="text">
+                         <string>Persistence: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_persistence"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_32">
+                      <item>
+                       <widget class="QLabel" name="label_28">
+                        <property name="text">
+                         <string>Upper bound: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_upper_bound"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_33">
+                      <item>
+                       <widget class="QLabel" name="label_29">
+                        <property name="text">
+                         <string>Lower bound: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_lower_bound"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_34">
+                      <item>
+                       <widget class="QLabel" name="label_30">
+                        <property name="text">
+                         <string>x modifier: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_x_modifier"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_17">
+                      <item>
+                       <widget class="QLabel" name="label_31">
+                        <property name="text">
+                         <string>y modifier: </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_perlin_y_modifier"/>
                       </item>
                      </layout>
                     </item>
@@ -3217,22 +2730,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_override_evolution_controls</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_override_evolution_controls_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>736</x>
-     <y>862</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>le_global_anatomy_mutation_rate</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
@@ -3793,22 +3290,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>cb_apply_damage_directly</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_apply_damage_directly_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>647</x>
-     <y>865</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>448</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cb_multiply_food_production_prob</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -3936,6 +3417,166 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tb_open_statisctics</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_statistics_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>702</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_statistics_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_statistics_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>637</x>
+     <y>828</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tb_open_organism_editor</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_organism_editor_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>637</x>
+     <y>750</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_editor_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_editor_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>637</x>
+     <y>829</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_lower_bound</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_lower_bound_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>817</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_octaves</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_octaves_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>663</x>
+     <y>730</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_persistence</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_persistence_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>759</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_upper_bound</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_upper_bound_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>681</x>
+     <y>788</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_x_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_x_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>671</x>
+     <y>846</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_perlin_y_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_perlin_y_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>671</x>
+     <y>875</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3981,7 +3622,6 @@ p, li { white-space: pre-wrap; }
   <slot>cb_clear_walls_on_reset_slot(bool)</slot>
   <slot>b_save_world_slot()</slot>
   <slot>b_load_world_slot()</slot>
-  <slot>cb_override_evolution_controls_slot(bool)</slot>
   <slot>cb_generate_random_walls_on_reset_slot(bool)</slot>
   <slot>b_kill_all_organisms_slot()</slot>
   <slot>cb_runtime_rotation_enabled_slot(bool)</slot>
@@ -4011,7 +3651,6 @@ p, li { white-space: pre-wrap; }
   <slot>cb_wait_for_engine_to_stop_slot(bool)</slot>
   <slot>cb_rotate_every_move_tick_slot(bool)</slot>
   <slot>cb_simplified_rendering_slot(bool)</slot>
-  <slot>cb_apply_damage_directly_slot(bool)</slot>
   <slot>cb_multiply_food_production_prob_slot(bool)</slot>
   <slot>cb_simplified_food_production_slot(bool)</slot>
   <slot>cb_stop_when_one_food_generated(bool)</slot>
@@ -4020,9 +3659,18 @@ p, li { white-space: pre-wrap; }
   <slot>cb_use_nvidia_for_image_generation_slot(bool)</slot>
   <slot>cb_eat_then_produce_slot(bool)</slot>
   <slot>le_menu_height_slot()</slot>
+  <slot>tb_open_statistics_slot(bool)</slot>
+  <slot>cb_statistics_always_on_top_slot(bool)</slot>
+  <slot>tb_open_organism_editor_slot(bool)</slot>
+  <slot>cb_editor_always_on_top_slot(bool)</slot>
+  <slot>le_perlin_octaves_slot()</slot>
+  <slot>le_perlin_persistence_slot()</slot>
+  <slot>le_perlin_upper_bound_slot()</slot>
+  <slot>le_perlin_lower_bound_slot()</slot>
+  <slot>le_perlin_x_modifier_slot()</slot>
+  <slot>le_perlin_y_modifier_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="editor_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>

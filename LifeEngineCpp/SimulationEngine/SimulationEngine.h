@@ -14,15 +14,17 @@
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 
-#include "GridBlocks/BaseGridBlock.h"
-#include "Organism/CPU/Organism.h"
-#include "BlockTypes.hpp"
-#include "Containers/CPU/EngineControlContainer.h"
-#include "Containers/CPU/EngineDataContainer.h"
-#include "Containers/CPU/OrganismBlockParameters.h"
-#include "Linspace.h"
+#include "../GridBlocks/BaseGridBlock.h"
+#include "../Organism/CPU/Organism.h"
+#include "../Stuff/BlockTypes.hpp"
+#include "../Containers/CPU/EngineControlContainer.h"
+#include "../Containers/CPU/EngineDataContainer.h"
+#include "../Containers/CPU/OrganismBlockParameters.h"
+#include "../Stuff/Linspace.h"
+#include "../Stuff/PerlinNoise.hpp"
+#include "../PRNGS/lehmer64.h"
 #include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
-#include "PRNGS/lehmer64.h"
+#include "SimulationEngineModes/SimulationEngineSingleThread.h"
 
 
 //TODO move simulation grid translation to here
@@ -31,6 +33,8 @@ class SimulationEngine {
     EngineDataContainer& dc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
+
+    siv::PerlinNoise perlin;
 
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
@@ -61,6 +65,10 @@ public:
                      OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters);
     void threaded_mainloop();
 
+    void make_random_walls();
+
+    void set_wall(std::vector<Organism *> &temp, const Action &action);
+    void clear_walls();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

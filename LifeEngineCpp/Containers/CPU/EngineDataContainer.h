@@ -6,7 +6,7 @@
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
 //#include "../../Organism/CPU/Organism.h"
-#include "../../Actions.h"
+#include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../GridBlocks/AtomicGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
@@ -32,6 +32,10 @@ struct EngineDataContainer {
     std::vector<Organism*> organisms;
     std::vector<Organism*> to_place_organisms;
 
+    std::vector<int> single_thread_to_erase{};
+    std::vector<int> single_thread_observation_count{};
+    std::vector<std::vector<Observation>> single_thread_organisms_observations{};
+
     std::vector<std::vector<Organism*>> organisms_pools;
 
     std::vector<BaseGridBlock> second_simulation_grid;
@@ -47,6 +51,8 @@ struct EngineDataContainer {
 
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> user_actions_pool;
+
+    uint32_t minimum_fixed_capacity = 100'000;
 
     Organism * selected_organims = nullptr;
 };

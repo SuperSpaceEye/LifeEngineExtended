@@ -137,9 +137,8 @@ DecisionObservation Brain::get_decision(std::vector<Observation> &observation_ve
         return action;
     }
 
-    auto new_int_action = static_cast<int>(action.decision) + static_cast<int>(organism_rotation);
-    if (new_int_action > 3) {new_int_action-=4;}
-    action.decision = static_cast<BrainDecision>(new_int_action);
+    uint_fast8_t new_int_action = static_cast<uint_fast8_t>(action.decision) + static_cast<uint_fast8_t>(organism_rotation);
+    action.decision = static_cast<BrainDecision>(new_int_action%4);
 
     return action;
 }

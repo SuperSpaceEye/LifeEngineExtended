@@ -3,13 +3,6 @@
 //
 
 #include "WindowCore.h"
-//
-//void WindowCore::closeEvent(QCloseEvent *event) {
-//    cp.stop_engine = true;
-//    while (!wait_for_engine_to_pause()) {}
-//    std::cout << "here\n";
-//    QWidget::closeEvent(event);
-//}
 
 bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
     //https://doc.qt.io/qt-5/qt.html#MouseButton-enum
@@ -64,8 +57,11 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
         } break;
         case QEvent::Close: {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
-            cp.stop_engine = true;
-            while (!wait_for_engine_to_pause_force()) {}
+            if (watched->objectName().toStdString() == "QWidgetClassWindow") {
+                cp.stop_engine = true;
+                while (!wait_for_engine_to_pause_force()) {}
+                exit(0);
+            }
             close_event->accept();
         } break;
         default: break;

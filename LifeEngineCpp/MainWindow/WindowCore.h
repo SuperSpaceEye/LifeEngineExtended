@@ -23,7 +23,7 @@
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include "CustomJsonParser/json_parser.hpp"
+#include "../CustomJsonParser/json_parser.hpp"
 
 
 #include <QApplication>
@@ -37,22 +37,30 @@
 #include <QFont>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QToolBar>
+#include <QWheelEvent>
 
-#include "SimulationEngine.h"
-#include "Containers/CPU/ColorContainer.h"
-#include "Containers/CPU/SimulationParameters.h"
-#include "Containers/CPU/EngineControlContainer.h"
-#include "Containers/CPU/EngineDataContainer.h"
-#include "Containers/CPU/OrganismBlockParameters.h"
+
+#include "../SimulationEngine/SimulationEngine.h"
+#include "../Containers/CPU/ColorContainer.h"
+#include "../Containers/CPU/SimulationParameters.h"
+#include "../Containers/CPU/EngineControlContainer.h"
+#include "../Containers/CPU/EngineDataContainer.h"
+#include "../Containers/CPU/OrganismBlockParameters.h"
+#include "../OrganismEditor/OrganismEditor.h"
+#include "../PRNGS/lehmer64.h"
+#include "../Stuff/pix_pos.h"
+#include "../Stuff/textures.h"
+#include "../Stuff/MiscFuncs.h"
+#include "../Stuff/CursorMode.h"
+
 #include "WindowUI.h"
-#include "OrganismEditor.h"
-#include "PRNGS/lehmer64.h"
-#include "pix_pos.h"
-#include "textures.h"
+#include "../Statistics/StatisticsCore.h"
+
 
 #if __CUDA_USED__
-#include "cuda_image_creator.cuh"
-#include "get_device_count.cuh"
+#include "../Stuff/cuda_image_creator.cuh"
+#include "../Stuff/get_device_count.cuh"
 #endif
 
 #if defined(__WIN32)
@@ -78,65 +86,9 @@ struct OrganismData {
     DecisionObservation last_decision = DecisionObservation{};
 };
 
-enum class CursorMode {
-    ModifyFood,
-    ModifyWall,
-    KillOrganism,
-    ChooseOrganism,
-    PlaceOrganism,
-};
-
-template<typename T>
-struct result_struct {
-    bool is_valid;
-    T result;
-};
-
 struct pos_on_grid {
     int x;
     int y;
-};
-
-template <typename T> std::string to_str(const T& t, int float_precision = 2) {
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(float_precision) << t;
-    return stream.str();
-}
-
-class DescisionMessageBox : public QDialog {
-    Q_OBJECT
-
-private:
-    QVBoxLayout *vertical_layout;
-    QHBoxLayout *horizontal_layout;
-    QPushButton *accept_button;
-    QPushButton *decline_button;
-    QLabel *content_label;
-public:
-    DescisionMessageBox(const QString& title, const QString& content,
-                        const QString& accept_text, const QString& decline_text, QWidget* parent=0)
-                        : QDialog(parent) {
-    vertical_layout = new QVBoxLayout();
-    horizontal_layout = new QHBoxLayout();
-    accept_button = new QPushButton(accept_text, this);
-    decline_button = new QPushButton(decline_text, this);
-    content_label = new QLabel(content, this);
-
-    setLayout(vertical_layout);
-    vertical_layout->addWidget(content_label, 2);
-    vertical_layout->addLayout(horizontal_layout, 1);
-    horizontal_layout->addWidget(accept_button);
-    horizontal_layout->addWidget(decline_button);
-
-    connect(accept_button, &QPushButton::pressed, this, &QDialog::accept);
-    connect(decline_button, &QPushButton::pressed, this, &QDialog::reject);
-
-    this->setWindowTitle(title);
-
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
-
-    }
 };
 
 struct OrganismInfoHolder {
@@ -160,7 +112,6 @@ struct OrganismAvgBlockInformation {
     uint64_t total_size_eating_space    = 0;
     uint64_t total_size_single_adjacent_space = 0;
     uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size_double_adjacent_space = 0;
     uint64_t total_size = 0;
 
     OrganismInfoHolder total_avg{};
@@ -200,12 +151,13 @@ private:
     int last_mouse_y = 0;
 
     SimulationEngine* engine;
-    OrganismEditor edit_engine;
+    OrganismEditor ee;
 
     float window_interval = 0.;
     long delta_window_processing_time = 0;
 
     Ui::MainWindow _ui{};
+    StatisticsCore s;
     QTimer * timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
@@ -247,7 +199,6 @@ private:
     int new_simulation_height = 200;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
-    bool override_evolution_controls_slot = false;
     bool reset_with_chosen = false;
 
     int float_precision = 4;
@@ -279,6 +230,7 @@ private:
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
+    void write_version(std::ofstream& os);
     void write_simulation_parameters(std::ofstream& os);
     void write_organisms_block_parameters(std::ofstream& os);
     void write_data_container_data(std::ofstream& os);
@@ -290,6 +242,7 @@ private:
     void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void read_data(std::ifstream& is);
+    bool read_version(std::ifstream& is);
     void read_simulation_parameters(std::ifstream& is);
     void read_organisms_block_parameters(std::ifstream& is);
     void read_data_container_data(std::ifstream& is);
@@ -374,14 +327,11 @@ private:
     void keyPressEvent(QKeyEvent * event) override;
     void keyReleaseEvent(QKeyEvent * event) override;
 
-    template<typename T>
-    result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value);
-    int display_dialog_message(const std::string& message);
-    void display_message(const std::string& message);
-
 private slots:
-    void tb_pause_slot(bool paused);
-    void tb_stoprender_slot(bool stopped_render);
+    void tb_pause_slot(bool state);
+    void tb_stoprender_slot(bool state);
+    void tb_open_statistics_slot(bool state);
+    void tb_open_organism_editor_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -434,6 +384,12 @@ private slots:
     void le_auto_produce_food_every_n_tick_slot();
     void le_update_info_every_n_milliseconds_slot();
     void le_menu_height_slot();
+    void le_perlin_octaves_slot();
+    void le_perlin_persistence_slot();
+    void le_perlin_upper_bound_slot();
+    void le_perlin_lower_bound_slot();
+    void le_perlin_x_modifier_slot();
+    void le_perlin_y_modifier_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
@@ -445,7 +401,6 @@ private slots:
     void cb_reset_on_total_extinction_slot(bool state);
     void cb_pause_on_total_extinction_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
-    void cb_override_evolution_controls_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_runtime_rotation_enabled_slot(bool state);
     void cb_fix_reproduction_distance_slot(bool state);
@@ -457,13 +412,14 @@ private slots:
     void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_rotate_every_move_tick_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
-    void cb_apply_damage_directly_slot(bool state);
     void cb_multiply_food_production_prob_slot(bool state);
     void cb_simplified_food_production_slot(bool state);
     void cb_stop_when_one_food_generated(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_eat_then_produce_slot(bool state);
+    void cb_statistics_always_on_top_slot(bool state);
+    void cb_editor_always_on_top_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

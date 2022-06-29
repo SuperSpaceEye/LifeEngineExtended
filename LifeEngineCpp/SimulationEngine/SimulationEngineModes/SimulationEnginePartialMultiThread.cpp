@@ -26,7 +26,8 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     erase_organisms(dc, dc->threaded_to_erase);
 
     for (int i = 0; i < dc->organisms_pools.size(); i++) {
-        SimulationEngineSingleThread::reserve_observations(dc->pooled_organisms_observations[i], dc->organisms_pools[i], sp);
+        SimulationEngineSingleThread::reserve_observations(dc->pooled_organisms_observations[i], dc->organisms_pools[i],
+                                                           sp, nullptr);
     }
     start_stage(dc, PartialSimulationStage::GetObservations);
     start_stage(dc, PartialSimulationStage::ThinkDecision);
@@ -154,8 +155,6 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
     for (auto &block: organism->organism_anatomy->_organism_blocks) {
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].type = block.type;
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].neighbors = block.get_rotated_block_neighbors(organism->rotation);
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]

@@ -20,8 +20,15 @@
 #include <vector>
 #include "pix_pos.h"
 #include "textures.h"
-#include "Containers/CPU/ColorContainer.h"
-#include "Containers/CPU/EngineDataContainer.h"
+#include "../Containers/CPU/ColorContainer.h"
+#include "../Containers/CPU/EngineDataContainer.h"
+
+struct Differences {
+    uint16_t x;
+    uint16_t y;
+    BlockTypes type;
+    Rotation rotation;
+};
 
 class CUDAImageCreator {
     int * d_lin_width = nullptr;
@@ -31,6 +38,7 @@ class CUDAImageCreator {
     pix_pos *d_height_img_boundaries = nullptr;
     unsigned char * d_image_vector = nullptr;
     BaseGridBlock * d_second_simulation_grid = nullptr;
+    Differences * d_differences = nullptr;
 
     int last_image_width = 0;
     int last_image_height = 0;
@@ -41,6 +49,7 @@ class CUDAImageCreator {
     int last_height_img_boundaries = 0;
     int last_simulation_width = 0;
     int last_simulation_height = 0;
+    int last_differences = 0;
 
     void image_dimensions_changed(int image_width, int image_height);
 
@@ -50,16 +59,20 @@ class CUDAImageCreator {
 
     void lin_size_changed(int lin_width_size, int lin_height_size);
 
-    void check_if_changed(int image_width, int image_height,
-                          int simulation_width, int simulation_height,
+    void differences_changed(int differences);
+
+    void check_if_changed(int image_width, int image_height, int simulation_width, int simulation_height,
                           int width_img_boundaries_size, int height_img_boundaries_size,
-                          int lin_width_size, int lin_height_size);
+                          int lin_width_size, int lin_height_size, int differences);
 
     void copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
                         std::vector<pix_pos> &width_img_boundaries, std::vector<pix_pos> &height_img_boundaries,
                         std::vector<int> & truncated_lin_width,
                         std::vector<int> & truncated_lin_height,
-                        EngineDataContainer &dc);
+                        std::vector<Differences> &host_differences);
+
+    void compile_differences(std::vector<int> &truncated_lin_width, std::vector<int> &truncated_lin_height,
+                             std::vector<Differences> &host_differences, EngineDataContainer *dc);
 
     void copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height);
 

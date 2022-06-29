@@ -9,14 +9,14 @@
 #include <iostream>
 #include <vector>
 
-#include "../GridBlocks/BaseGridBlock.h"
-#include "../Organism/CPU/Organism.h"
-#include "../BlockTypes.hpp"
-#include "../Containers/CPU/EngineControlContainer.h"
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Linspace.h"
-#include "../Organism/CPU/ObservationStuff.h"
+#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../Organism/CPU/Organism.h"
+#include "../../Stuff/BlockTypes.hpp"
+#include "../../Containers/CPU/EngineControlContainer.h"
+#include "../../Containers/CPU/EngineDataContainer.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../Stuff/Linspace.h"
+#include "../../Organism/CPU/ObservationStuff.h"
 
 class SimulationEngineSingleThread {
 public:
@@ -38,7 +38,7 @@ public:
 
     static void reserve_observations(std::vector<std::vector<Observation>> &observations,
                                      std::vector<Organism *> &organisms,
-                                     SimulationParameters *sp);
+                                     SimulationParameters *sp, EngineDataContainer *dc);
 
     static void get_observations(EngineDataContainer *dc, SimulationParameters *sp,
                                  std::vector<Organism *> &organisms,
