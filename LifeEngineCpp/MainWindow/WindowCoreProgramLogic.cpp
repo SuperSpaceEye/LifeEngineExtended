@@ -914,11 +914,11 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
     _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
     _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
-    _ui.le_perlin_persistence                ->setText(QString::fromStdString(to_str(sp.perlin_persistence, 2)));
-    _ui.le_perlin_upper_bound                ->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 2)));
-    _ui.le_perlin_lower_bound                ->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 2)));
-    _ui.le_perlin_x_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  2)));
-    _ui.le_perlin_y_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  2)));
+    _ui.le_perlin_persistence                ->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
+    _ui.le_perlin_upper_bound                ->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 3)));
+    _ui.le_perlin_lower_bound                ->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 3)));
+    _ui.le_perlin_x_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  3)));
+    _ui.le_perlin_y_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  3)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
