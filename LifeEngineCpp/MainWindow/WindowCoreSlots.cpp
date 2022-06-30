@@ -56,7 +56,11 @@ void WindowCore::b_resize_and_reset_slot() {
 }
 
 void WindowCore::b_generate_random_walls_slot() {
+    cp.engine_pause = true;
+    wait_for_engine_to_pause_force();
     engine->make_random_walls();
+
+    unpause_engine();
 }
 
 void WindowCore::b_clear_all_walls_slot() {
