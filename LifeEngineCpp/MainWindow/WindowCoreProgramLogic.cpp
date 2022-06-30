@@ -437,11 +437,6 @@ void WindowCore::set_simulation_interval(int max_simulation_fps) {
     dc.unlimited_simulation_fps = false;
 }
 
-//Optimization break waiting functions
-#pragma optimize("", off)
-
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
 
 //Can wait, or it can not.
 bool WindowCore::wait_for_engine_to_pause() {
@@ -450,7 +445,7 @@ bool WindowCore::wait_for_engine_to_pause() {
 }
 
 //Will always wait for engine to pause
-bool WindowCore::wait_for_engine_to_pause_force() const {
+bool WindowCore::wait_for_engine_to_pause_force() {
     auto now = clock_now();
     while (!cp.engine_paused) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -461,7 +456,7 @@ bool WindowCore::wait_for_engine_to_pause_force() const {
     return cp.engine_paused;
 }
 
-bool WindowCore::wait_for_engine_to_pause_processing_user_actions() const {
+bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
     auto now = clock_now();
     while (cp.processing_user_actions) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -469,12 +464,9 @@ bool WindowCore::wait_for_engine_to_pause_processing_user_actions() const {
             now = clock_now();
         }
     }
-    return cp.engine_paused;
+    return !cp.processing_user_actions;
 }
 
-#pragma GCC pop_options
-
-#pragma optimize("", on)
 
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
@@ -688,10 +680,10 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
         }
 
         for (auto & organism: *pool) {
-            info.total_size_organism_blocks += organism->organism_anatomy->_organism_blocks.size();
-            info.total_size_producing_space += organism->organism_anatomy->_producing_space.size();
-            info.total_size_eating_space += organism->organism_anatomy->_eating_space.size();
-            info.total_size_single_adjacent_space += organism->organism_anatomy->_single_adjacent_space.size();
+            info.total_size_organism_blocks                += organism->organism_anatomy->_organism_blocks.size();
+            info.total_size_producing_space                += organism->organism_anatomy->_producing_space.size();
+            info.total_size_eating_space                   += organism->organism_anatomy->_eating_space.size();
+            info.total_size_single_adjacent_space          += organism->organism_anatomy->_single_adjacent_space.size();
             info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
 
             if (organism->organism_anatomy->_mover_blocks > 0) {
@@ -706,14 +698,15 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
             info.total_avg.size += organism->organism_anatomy->_organism_blocks.size();
 
             info.total_avg._organism_lifetime += organism->max_lifetime;
-            info.total_avg._mouth_blocks += organism->organism_anatomy->_mouth_blocks;
-            info.total_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
-            info.total_avg._mover_blocks += organism->organism_anatomy->_mover_blocks;
-            info.total_avg._killer_blocks += organism->organism_anatomy->_killer_blocks;
-            info.total_avg._armor_blocks += organism->organism_anatomy->_armor_blocks;
-            info.total_avg._eye_blocks += organism->organism_anatomy->_eye_blocks;
+            info.total_avg._organism_age      += organism->lifetime;
+            info.total_avg._mouth_blocks      += organism->organism_anatomy->_mouth_blocks;
+            info.total_avg._producer_blocks   += organism->organism_anatomy->_producer_blocks;
+            info.total_avg._mover_blocks      += organism->organism_anatomy->_mover_blocks;
+            info.total_avg._killer_blocks     += organism->organism_anatomy->_killer_blocks;
+            info.total_avg._armor_blocks      += organism->organism_anatomy->_armor_blocks;
+            info.total_avg._eye_blocks        += organism->organism_anatomy->_eye_blocks;
 
-            info.total_avg.brain_mutation_rate += organism->brain_mutation_rate;
+            info.total_avg.brain_mutation_rate   += organism->brain_mutation_rate;
             info.total_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
             info.total_avg.total++;
 
@@ -721,28 +714,30 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
                 info.moving_avg.size += organism->organism_anatomy->_organism_blocks.size();
 
                 info.moving_avg._organism_lifetime += organism->max_lifetime;
-                info.moving_avg._mouth_blocks += organism->organism_anatomy->_mouth_blocks;
-                info.moving_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
-                info.moving_avg._mover_blocks += organism->organism_anatomy->_mover_blocks;
-                info.moving_avg._killer_blocks += organism->organism_anatomy->_killer_blocks;
-                info.moving_avg._armor_blocks += organism->organism_anatomy->_armor_blocks;
-                info.moving_avg._eye_blocks += organism->organism_anatomy->_eye_blocks;
+                info.moving_avg._organism_age      += organism->lifetime;
+                info.moving_avg._mouth_blocks      += organism->organism_anatomy->_mouth_blocks;
+                info.moving_avg._producer_blocks   += organism->organism_anatomy->_producer_blocks;
+                info.moving_avg._mover_blocks      += organism->organism_anatomy->_mover_blocks;
+                info.moving_avg._killer_blocks     += organism->organism_anatomy->_killer_blocks;
+                info.moving_avg._armor_blocks      += organism->organism_anatomy->_armor_blocks;
+                info.moving_avg._eye_blocks        += organism->organism_anatomy->_eye_blocks;
 
-                info.moving_avg.brain_mutation_rate += organism->brain_mutation_rate;
+                info.moving_avg.brain_mutation_rate   += organism->brain_mutation_rate;
                 info.moving_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
                 info.moving_avg.total++;
             } else {
                 info.station_avg.size += organism->organism_anatomy->_organism_blocks.size();
 
                 info.station_avg._organism_lifetime += organism->max_lifetime;
-                info.station_avg._mouth_blocks += organism->organism_anatomy->_mouth_blocks;
-                info.station_avg._producer_blocks += organism->organism_anatomy->_producer_blocks;
-                info.station_avg._mover_blocks += organism->organism_anatomy->_mover_blocks;
-                info.station_avg._killer_blocks += organism->organism_anatomy->_killer_blocks;
-                info.station_avg._armor_blocks += organism->organism_anatomy->_armor_blocks;
-                info.station_avg._eye_blocks += organism->organism_anatomy->_eye_blocks;
+                info.station_avg._organism_age      += organism->lifetime;
+                info.station_avg._mouth_blocks      += organism->organism_anatomy->_mouth_blocks;
+                info.station_avg._producer_blocks   += organism->organism_anatomy->_producer_blocks;
+                info.station_avg._mover_blocks      += organism->organism_anatomy->_mover_blocks;
+                info.station_avg._killer_blocks     += organism->organism_anatomy->_killer_blocks;
+                info.station_avg._armor_blocks      += organism->organism_anatomy->_armor_blocks;
+                info.station_avg._eye_blocks        += organism->organism_anatomy->_eye_blocks;
 
-                info.station_avg.brain_mutation_rate += organism->brain_mutation_rate;
+                info.station_avg.brain_mutation_rate   += organism->brain_mutation_rate;
                 info.station_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
                 info.station_avg.total++;
             }
@@ -772,26 +767,28 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.total_avg.size /= info.total_avg.total;
 
     info.total_avg._organism_lifetime /= info.total_avg.total;
-    info.total_avg._mouth_blocks    /= info.total_avg.total;
-    info.total_avg._producer_blocks /= info.total_avg.total;
-    info.total_avg._mover_blocks    /= info.total_avg.total;
-    info.total_avg._killer_blocks   /= info.total_avg.total;
-    info.total_avg._armor_blocks    /= info.total_avg.total;
-    info.total_avg._eye_blocks      /= info.total_avg.total;
+    info.total_avg._organism_age      /= info.total_avg.total;
+    info.total_avg._mouth_blocks      /= info.total_avg.total;
+    info.total_avg._producer_blocks   /= info.total_avg.total;
+    info.total_avg._mover_blocks      /= info.total_avg.total;
+    info.total_avg._killer_blocks     /= info.total_avg.total;
+    info.total_avg._armor_blocks      /= info.total_avg.total;
+    info.total_avg._eye_blocks        /= info.total_avg.total;
 
     info.total_avg.brain_mutation_rate   /= info.total_avg.total;
     info.total_avg.anatomy_mutation_rate /= info.total_avg.total;
 
     if (std::isnan(info.total_avg.size))             {info.total_avg.size             = 0;}
-    if (std::isnan(info.move_range))                    {info.move_range               = 0;}
+    if (std::isnan(info.move_range))                 {info.move_range               = 0;}
 
-    if (std::isnan(info.total_avg._organism_lifetime))    {info.total_avg._organism_lifetime    = 0;}
-    if (std::isnan(info.total_avg._mouth_blocks))    {info.total_avg._mouth_blocks    = 0;}
-    if (std::isnan(info.total_avg._producer_blocks)) {info.total_avg._producer_blocks = 0;}
-    if (std::isnan(info.total_avg._mover_blocks))    {info.total_avg._mover_blocks    = 0;}
-    if (std::isnan(info.total_avg._killer_blocks))   {info.total_avg._killer_blocks   = 0;}
-    if (std::isnan(info.total_avg._armor_blocks))    {info.total_avg._armor_blocks    = 0;}
-    if (std::isnan(info.total_avg._eye_blocks))      {info.total_avg._eye_blocks      = 0;}
+    if (std::isnan(info.total_avg._organism_lifetime)) {info.total_avg._organism_lifetime = 0;}
+    if (std::isnan(info.total_avg._organism_age))      {info.total_avg._organism_age      = 0;}
+    if (std::isnan(info.total_avg._mouth_blocks))      {info.total_avg._mouth_blocks      = 0;}
+    if (std::isnan(info.total_avg._producer_blocks))   {info.total_avg._producer_blocks   = 0;}
+    if (std::isnan(info.total_avg._mover_blocks))      {info.total_avg._mover_blocks      = 0;}
+    if (std::isnan(info.total_avg._killer_blocks))     {info.total_avg._killer_blocks     = 0;}
+    if (std::isnan(info.total_avg._armor_blocks))      {info.total_avg._armor_blocks      = 0;}
+    if (std::isnan(info.total_avg._eye_blocks))        {info.total_avg._eye_blocks        = 0;}
 
     if (std::isnan(info.total_avg.brain_mutation_rate))   {info.total_avg.brain_mutation_rate   = 0;}
     if (std::isnan(info.total_avg.anatomy_mutation_rate)) {info.total_avg.anatomy_mutation_rate = 0;}
@@ -800,25 +797,27 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.moving_avg.size /= info.moving_avg.total;
 
     info.moving_avg._organism_lifetime /= info.moving_avg.total;
-    info.moving_avg._mouth_blocks    /= info.moving_avg.total;
-    info.moving_avg._producer_blocks /= info.moving_avg.total;
-    info.moving_avg._mover_blocks    /= info.moving_avg.total;
-    info.moving_avg._killer_blocks   /= info.moving_avg.total;
-    info.moving_avg._armor_blocks    /= info.moving_avg.total;
-    info.moving_avg._eye_blocks      /= info.moving_avg.total;
+    info.moving_avg._organism_age      /= info.moving_avg.total;
+    info.moving_avg._mouth_blocks      /= info.moving_avg.total;
+    info.moving_avg._producer_blocks   /= info.moving_avg.total;
+    info.moving_avg._mover_blocks      /= info.moving_avg.total;
+    info.moving_avg._killer_blocks     /= info.moving_avg.total;
+    info.moving_avg._armor_blocks      /= info.moving_avg.total;
+    info.moving_avg._eye_blocks        /= info.moving_avg.total;
 
     info.moving_avg.brain_mutation_rate   /= info.moving_avg.total;
     info.moving_avg.anatomy_mutation_rate /= info.moving_avg.total;
 
     if (std::isnan(info.moving_avg.size))             {info.moving_avg.size             = 0;}
 
-    if (std::isnan(info.moving_avg._organism_lifetime))    {info.moving_avg._organism_lifetime    = 0;}
-    if (std::isnan(info.moving_avg._mouth_blocks))    {info.moving_avg._mouth_blocks    = 0;}
-    if (std::isnan(info.moving_avg._producer_blocks)) {info.moving_avg._producer_blocks = 0;}
-    if (std::isnan(info.moving_avg._mover_blocks))    {info.moving_avg._mover_blocks    = 0;}
-    if (std::isnan(info.moving_avg._killer_blocks))   {info.moving_avg._killer_blocks   = 0;}
-    if (std::isnan(info.moving_avg._armor_blocks))    {info.moving_avg._armor_blocks    = 0;}
-    if (std::isnan(info.moving_avg._eye_blocks))      {info.moving_avg._eye_blocks      = 0;}
+    if (std::isnan(info.moving_avg._organism_lifetime)) {info.moving_avg._organism_lifetime = 0;}
+    if (std::isnan(info.moving_avg._organism_age))      {info.moving_avg._organism_age      = 0;}
+    if (std::isnan(info.moving_avg._mouth_blocks))      {info.moving_avg._mouth_blocks      = 0;}
+    if (std::isnan(info.moving_avg._producer_blocks))   {info.moving_avg._producer_blocks   = 0;}
+    if (std::isnan(info.moving_avg._mover_blocks))      {info.moving_avg._mover_blocks      = 0;}
+    if (std::isnan(info.moving_avg._killer_blocks))     {info.moving_avg._killer_blocks     = 0;}
+    if (std::isnan(info.moving_avg._armor_blocks))      {info.moving_avg._armor_blocks      = 0;}
+    if (std::isnan(info.moving_avg._eye_blocks))        {info.moving_avg._eye_blocks        = 0;}
 
     if (std::isnan(info.moving_avg.brain_mutation_rate))   {info.moving_avg.brain_mutation_rate   = 0;}
     if (std::isnan(info.moving_avg.anatomy_mutation_rate)) {info.moving_avg.anatomy_mutation_rate = 0;}
@@ -827,25 +826,27 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     info.station_avg.size /= info.station_avg.total;
 
     info.station_avg._organism_lifetime /= info.station_avg.total;
-    info.station_avg._mouth_blocks    /= info.station_avg.total;
-    info.station_avg._producer_blocks /= info.station_avg.total;
-    info.station_avg._mover_blocks    /= info.station_avg.total;
-    info.station_avg._killer_blocks   /= info.station_avg.total;
-    info.station_avg._armor_blocks    /= info.station_avg.total;
-    info.station_avg._eye_blocks      /= info.station_avg.total;
+    info.station_avg._organism_age      /= info.station_avg.total;
+    info.station_avg._mouth_blocks      /= info.station_avg.total;
+    info.station_avg._producer_blocks   /= info.station_avg.total;
+    info.station_avg._mover_blocks      /= info.station_avg.total;
+    info.station_avg._killer_blocks     /= info.station_avg.total;
+    info.station_avg._armor_blocks      /= info.station_avg.total;
+    info.station_avg._eye_blocks        /= info.station_avg.total;
 
     info.station_avg.brain_mutation_rate   /= info.station_avg.total;
     info.station_avg.anatomy_mutation_rate /= info.station_avg.total;
 
     if (std::isnan(info.station_avg.size))             {info.station_avg.size             = 0;}
 
-    if (std::isnan(info.station_avg._organism_lifetime))    {info.station_avg._organism_lifetime    = 0;}
-    if (std::isnan(info.station_avg._mouth_blocks))    {info.station_avg._mouth_blocks    = 0;}
-    if (std::isnan(info.station_avg._producer_blocks)) {info.station_avg._producer_blocks = 0;}
-    if (std::isnan(info.station_avg._mover_blocks))    {info.station_avg._mover_blocks    = 0;}
-    if (std::isnan(info.station_avg._killer_blocks))   {info.station_avg._killer_blocks   = 0;}
-    if (std::isnan(info.station_avg._armor_blocks))    {info.station_avg._armor_blocks    = 0;}
-    if (std::isnan(info.station_avg._eye_blocks))      {info.station_avg._eye_blocks      = 0;}
+    if (std::isnan(info.station_avg._organism_lifetime)) {info.station_avg._organism_lifetime = 0;}
+    if (std::isnan(info.station_avg._organism_age))      {info.station_avg._organism_age      = 0;}
+    if (std::isnan(info.station_avg._mouth_blocks))      {info.station_avg._mouth_blocks      = 0;}
+    if (std::isnan(info.station_avg._producer_blocks))   {info.station_avg._producer_blocks   = 0;}
+    if (std::isnan(info.station_avg._mover_blocks))      {info.station_avg._mover_blocks      = 0;}
+    if (std::isnan(info.station_avg._killer_blocks))     {info.station_avg._killer_blocks     = 0;}
+    if (std::isnan(info.station_avg._armor_blocks))      {info.station_avg._armor_blocks      = 0;}
+    if (std::isnan(info.station_avg._eye_blocks))        {info.station_avg._eye_blocks        = 0;}
 
     if (std::isnan(info.station_avg.brain_mutation_rate))   {info.station_avg.brain_mutation_rate   = 0;}
     if (std::isnan(info.station_avg.anatomy_mutation_rate)) {info.station_avg.anatomy_mutation_rate = 0;}
@@ -853,47 +854,50 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
 }
 
 void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
-  s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
-  s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
+    s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
+    s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
-  s._ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
-  s._ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size,             float_precision)));
-  s._ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
-  s._ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.total_avg._mouth_blocks,    float_precision)));
-  s._ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.total_avg._producer_blocks, float_precision)));
-  s._ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: "     + to_str(info.total_avg._mover_blocks,    float_precision)));
-  s._ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.total_avg._killer_blocks,   float_precision)));
-  s._ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.total_avg._armor_blocks,    float_precision)));
-  s._ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.total_avg._eye_blocks,      float_precision)));
-  s._ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
-  s._ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
+    s._ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
+    s._ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: "     + to_str(info.total_avg.size,               float_precision)));
+    s._ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
+    s._ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism age: "      + to_str(info.total_avg._organism_age,      float_precision)));
+    s._ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: "         + to_str(info.total_avg._mouth_blocks,      float_precision)));
+    s._ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: "      + to_str(info.total_avg._producer_blocks,   float_precision)));
+    s._ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: "         + to_str(info.total_avg._mover_blocks,      float_precision)));
+    s._ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: "        + to_str(info.total_avg._killer_blocks,     float_precision)));
+    s._ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: "         + to_str(info.total_avg._armor_blocks,      float_precision)));
+    s._ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: "           + to_str(info.total_avg._eye_blocks,        float_precision)));
+    s._ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
+    s._ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
 
 
-  s._ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
-  s._ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
-  s._ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
-  s._ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: "  + to_str(info.move_range, float_precision)));
-  s._ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size,             float_precision)));
-  s._ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.moving_avg._mouth_blocks,    float_precision)));
-  s._ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.moving_avg._producer_blocks, float_precision)));
-  s._ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: "     + to_str(info.moving_avg._mover_blocks,    float_precision)));
-  s._ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.moving_avg._killer_blocks,   float_precision)));
-  s._ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.moving_avg._armor_blocks,    float_precision)));
-  s._ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.moving_avg._eye_blocks,      float_precision)));
-  s._ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
-  s._ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.moving_avg.brain_mutation_rate,   float_precision)));
+    s._ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
+    s._ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
+    s._ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
+    s._ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism age: "      + to_str(info.moving_avg._organism_age,      float_precision)));
+    s._ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: "      + to_str(info.move_range,                    float_precision)));
+    s._ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: "     + to_str(info.moving_avg.size,               float_precision)));
+    s._ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: "         + to_str(info.moving_avg._mouth_blocks,      float_precision)));
+    s._ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: "      + to_str(info.moving_avg._producer_blocks,   float_precision)));
+    s._ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: "         + to_str(info.moving_avg._mover_blocks,      float_precision)));
+    s._ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: "        + to_str(info.moving_avg._killer_blocks,     float_precision)));
+    s._ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: "         + to_str(info.moving_avg._armor_blocks,      float_precision)));
+    s._ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: "           + to_str(info.moving_avg._eye_blocks,        float_precision)));
+    s._ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
+    s._ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.moving_avg.brain_mutation_rate,   float_precision)));
 
 
-  s._ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: "  + std::to_string(info.station_avg.total)));
-  s._ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size,             float_precision)));
-  s._ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
-  s._ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: "     + to_str(info.station_avg._mouth_blocks,    float_precision)));
-  s._ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: "  + to_str(info.station_avg._producer_blocks, float_precision)));
-  s._ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: "    + to_str(info.station_avg._killer_blocks,   float_precision)));
-  s._ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: "     + to_str(info.station_avg._armor_blocks,    float_precision)));
-  s._ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: "       + to_str(info.station_avg._eye_blocks,      float_precision)));
-  s._ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
-  s._ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.station_avg.brain_mutation_rate,   float_precision)));
+    s._ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: "  + std::to_string(info.station_avg.total)));
+    s._ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: "     + to_str(info.station_avg.size,               float_precision)));
+    s._ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
+    s._ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism age: "      + to_str(info.station_avg._organism_age,      float_precision)));
+    s._ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: "         + to_str(info.station_avg._mouth_blocks,      float_precision)));
+    s._ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: "      + to_str(info.station_avg._producer_blocks,   float_precision)));
+    s._ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: "        + to_str(info.station_avg._killer_blocks,     float_precision)));
+    s._ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: "         + to_str(info.station_avg._armor_blocks,      float_precision)));
+    s._ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: "           + to_str(info.station_avg._eye_blocks,        float_precision)));
+    s._ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
+    s._ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.station_avg.brain_mutation_rate,   float_precision)));
 }
 
 // So that changes in code values would be set by default in gui.
@@ -914,13 +918,13 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
     _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
     _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
+    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,             0)));
     _ui.le_perlin_persistence                ->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
     _ui.le_perlin_upper_bound                ->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 3)));
     _ui.le_perlin_lower_bound                ->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 3)));
     _ui.le_perlin_x_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  3)));
     _ui.le_perlin_y_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  3)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
-    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(std::to_string(sp.lifespan_multiplier)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
     _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
     _ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));

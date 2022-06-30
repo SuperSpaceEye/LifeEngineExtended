@@ -174,6 +174,7 @@ public:
     QCheckBox *cb_on_touch_kill;
     QCheckBox *cb_movers_can_produce_food;
     QCheckBox *cb_food_blocks_reproduction;
+    QCheckBox *cb_food_blocks_movement;
     QVBoxLayout *verticalLayout_26;
     QHBoxLayout *horizontalLayout_25;
     QLabel *label_17;
@@ -821,7 +822,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 504, 1092));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -585, 504, 1121));
         QSizePolicy sizePolicy5(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -1129,6 +1130,12 @@ public:
 
         verticalLayout_20->addWidget(cb_food_blocks_reproduction);
 
+        cb_food_blocks_movement = new QCheckBox(widget);
+        cb_food_blocks_movement->setObjectName(QStringLiteral("cb_food_blocks_movement"));
+        cb_food_blocks_movement->setChecked(true);
+
+        verticalLayout_20->addWidget(cb_food_blocks_movement);
+
         verticalLayout_26 = new QVBoxLayout();
         verticalLayout_26->setObjectName(QStringLiteral("verticalLayout_26"));
         horizontalLayout_25 = new QHBoxLayout();
@@ -1327,7 +1334,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -393, 504, 610));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 504, 610));
         QSizePolicy sizePolicy9(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1700,8 +1707,9 @@ public:
         QObject::connect(le_perlin_upper_bound, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_upper_bound_slot()));
         QObject::connect(le_perlin_x_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_x_modifier_slot()));
         QObject::connect(le_perlin_y_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_perlin_y_modifier_slot()));
+        QObject::connect(cb_food_blocks_movement, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_food_blocks_movement_slot(bool)));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1865,6 +1873,7 @@ public:
         cb_on_touch_kill->setText(QApplication::translate("MainWindow", "On touch kill", Q_NULLPTR));
         cb_movers_can_produce_food->setText(QApplication::translate("MainWindow", "Movers can produce food", Q_NULLPTR));
         cb_food_blocks_reproduction->setText(QApplication::translate("MainWindow", "Food blocks reproduction", Q_NULLPTR));
+        cb_food_blocks_movement->setText(QApplication::translate("MainWindow", "Food blocks movement", Q_NULLPTR));
         label_17->setText(QApplication::translate("MainWindow", "Min reproducing distance: ", Q_NULLPTR));
         le_min_reproduction_distance->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
         label_16->setText(QApplication::translate("MainWindow", "Max reproducing distance: ", Q_NULLPTR));

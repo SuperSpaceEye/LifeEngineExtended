@@ -5,7 +5,7 @@
 #include "WindowCore.h"
 
 //TODO increment every time saving logic changes
-int SAVE_VERSION = 1;
+int SAVE_VERSION = 2;
 
 void WindowCore::write_data(std::ofstream &os) {
     write_version(os);
@@ -25,7 +25,7 @@ void WindowCore::write_simulation_parameters(std::ofstream& os) {
 }
 
 void WindowCore::write_organisms_block_parameters(std::ofstream& os) {
-    os.write((char*)&bp, sizeof(BlockParameters));
+    os.write((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
 void WindowCore::write_data_container_data(std::ofstream& os) {
@@ -135,6 +135,8 @@ void WindowCore::read_data(std::ifstream &is) {
     read_data_container_data(is);
     read_simulation_grid(is);
     read_organisms(is);
+
+    dc.total_engine_ticks = dc.loaded_engine_ticks;
 }
 
 bool WindowCore::read_version(std::ifstream &is) {
@@ -148,18 +150,19 @@ void WindowCore::read_simulation_parameters(std::ifstream& is) {
 }
 
 void WindowCore::read_organisms_block_parameters(std::ifstream& is) {
-    is.read((char*)&bp, sizeof(BlockParameters));
+    is.read((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
 void WindowCore::read_data_container_data(std::ifstream& is) {
-    is.read((char*)&dc.total_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&dc.simulation_width,   sizeof(uint16_t));
-    is.read((char*)&dc.simulation_height,  sizeof(uint16_t));
+    is.read((char*)&dc.loaded_engine_ticks, sizeof(uint32_t));
+    is.read((char*)&dc.simulation_width,    sizeof(uint16_t));
+    is.read((char*)&dc.simulation_height,   sizeof(uint16_t));
 
     new_simulation_width = dc.simulation_width;
     new_simulation_height = dc.simulation_height;
     fill_window = false;
     _ui.cb_fill_window->setChecked(false);
+    update_simulation_size_label();
 }
 //    void WindowCore::read_color_container(){}
 void WindowCore::read_simulation_grid(std::ifstream& is) {
@@ -183,6 +186,15 @@ void WindowCore::read_simulation_grid(std::ifstream& is) {
 
 //TODO save child patterns?
 void WindowCore::read_organisms(std::ifstream& is) {
+    for (auto & organism: dc.organisms) {
+        delete organism;
+    }
+    dc.organisms.clear();
+    for (auto & organism: dc.to_place_organisms) {
+        delete organism;
+    }
+    dc.to_place_organisms.clear();
+
     uint32_t num_organisms;
     is.read((char*)&num_organisms, sizeof(uint32_t));
     dc.organisms.reserve(num_organisms);
@@ -342,6 +354,8 @@ void WindowCore::read_json_data(std::string path) {
     json_read_simulation_parameters(root);
 
     json_read_organism_data(root);
+
+    dc.total_engine_ticks = dc.loaded_engine_ticks;
 }
 
 void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
@@ -355,11 +369,13 @@ void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
     _ui.cb_fill_window->setChecked(false);
     disable_warnings = true;
 
+    update_simulation_size_label();
+
     resize_simulation_space();
     make_walls();
     disable_warnings = false;
 
-    dc.total_engine_ticks = root.get<int>("total_ticks");
+    dc.loaded_engine_ticks = root.get<int>("total_ticks");
 
     for (auto & pair: root.get_child("grid.food")) {
         int y = pair.second.get<int>("r")+1;
@@ -375,7 +391,7 @@ void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
 }
 
 void WindowCore::json_read_simulation_parameters(const boost::property_tree::ptree &root) {
-    sp.lifespan_multiplier               = root.get<int>("controls.lifespanMultiplier");
+    sp.lifespan_multiplier               = root.get<float>("controls.lifespanMultiplier");
     sp.food_production_probability       = float(root.get<int>("controls.foodProdProb")) / 100;
     sp.use_anatomy_evolved_mutation_rate = !root.get<bool>("controls.useGlobalMutability");
     sp.global_anatomy_mutation_rate      = float(root.get<int>("controls.globalMutability")) / 100;
@@ -408,6 +424,8 @@ void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
         bool is_mover      = organism.second.get<bool>("anatomy.is_mover");
         bool has_eyes      = organism.second.get<bool>("anatomy.has_eyes");
 
+        auto block_data = std::vector<SerializedOrganismBlockContainer>{};
+
         for (auto & cell: organism.second.get_child("anatomy.cells")) {
             int l_y = cell.second.get<int>("loc_row");
             int l_x = cell.second.get<int>("loc_col");
@@ -430,8 +448,12 @@ void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
             } else if (state == "armor") {
                 type = ArmorBlock;
             }
-            anatomy->set_block(type, rotation, l_x, l_y);
+
+            if (type == MoverBlock) {type = MouthBlock;}
+            block_data.emplace_back(type, rotation, l_x, l_y);
         }
+        anatomy->set_many_blocks(block_data);
+
         if (is_mover && has_eyes) {
             brain->simple_action_table.FoodBlock     = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.food"));
             brain->simple_action_table.WallBlock     = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.wall"));
@@ -477,8 +499,8 @@ void WindowCore::write_json_data(std::string path) {
 
     auto info = calculate_organisms_info();
 
-    root.put("num_rows", dc.simulation_height);
-    root.put("num_cols", dc.simulation_width);
+    root.put("num_rows", dc.simulation_height-2);
+    root.put("num_cols", dc.simulation_width-2);
     root.put("total_mutability", static_cast<int>(info.total_total_mutation_rate*100));
     root.put("largest_cell_count", 0);
     root.put("reset_count", auto_reset_num);
@@ -509,23 +531,38 @@ void WindowCore::write_json_data(std::string path) {
 
 void WindowCore::json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
                                  boost::property_tree::ptree &food, boost::property_tree::ptree &walls) {
-    grid.put("cols", dc.simulation_width);
-    grid.put("rows", dc.simulation_height);
+    grid.put("cols", dc.simulation_width-2);
+    grid.put("rows", dc.simulation_height-2);
 
-    for (int x = 0; x < dc.simulation_width; x++) {
-        for (int y = 0; y < dc.simulation_height; y++) {
+    bool no_food = true;
+    bool no_wall = true;
+
+    for (int x = 1; x < dc.simulation_width-1; x++) {
+        for (int y = 1; y < dc.simulation_height-1; y++) {
             if (dc.CPU_simulation_grid[x][y].type != WallBlock &&
                 dc.CPU_simulation_grid[x][y].type != FoodBlock) {continue;}
             cell = pt::ptree{};
 
-            cell.put("c", x);
-            cell.put("r", y);
+            cell.put("c", x-1);
+            cell.put("r", y-1);
             if (dc.CPU_simulation_grid[x][y].type == FoodBlock) {
                 food.push_back(std::make_pair("", cell));
+                no_food = false;
             } else {
                 walls.push_back(std::make_pair("", cell));
+                no_wall = false;
             }
         }
+    }
+
+    cell = pt::ptree{};
+
+    if (no_food) {
+        walls.push_back(std::make_pair("", cell));
+    }
+
+    if (no_wall) {
+        walls.push_back(std::make_pair("", cell));
     }
 
     grid.put_child("food", food);
@@ -541,8 +578,8 @@ void WindowCore::json_write_organisms(boost::property_tree::ptree &organisms, bo
         cells = pt::ptree{};
         brain = pt::ptree{};
 
-        j_organism.put("c", organism->x);
-        j_organism.put("r", organism->y);
+        j_organism.put("c", organism->x-1);
+        j_organism.put("r", organism->y-1);
         j_organism.put("lifetime", organism->lifetime);
         j_organism.put("food_collected", static_cast<int>(organism->food_collected));
         j_organism.put("living", true);
@@ -620,7 +657,7 @@ WindowCore::json_write_controls(boost::property_tree::ptree &controls, boost::pr
                                 boost::property_tree::ptree &edible_neighbors,
                                 boost::property_tree::ptree &growableNeighbors, boost::property_tree::ptree &cell,
                                 boost::property_tree::ptree &value) const {
-    controls.put("lifespanMultiplier", static_cast<int>(sp.lifespan_multiplier));
+    controls.put("lifespanMultiplier", static_cast<float>(sp.lifespan_multiplier));
     controls.put("foodProdProb", static_cast<int>(sp.food_production_probability*100));
 
     cell = pt::ptree{};

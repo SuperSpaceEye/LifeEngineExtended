@@ -266,7 +266,8 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
     }
 }
 
-void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Organism *organism, BrainDecision decision) {
+void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
+                                                   SimulationParameters *sp) {
     auto new_int_rotation = static_cast<int>(organism->rotation);
     switch (decision) {
         case BrainDecision::RotateLeft:
@@ -287,11 +288,23 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x][organism->y + block.get_pos(new_rotation).y];
 
-        if (check_if_block_out_of_bounds(dc, organism, block, new_rotation) ||
-                (w_block->type != EmptyBlock &&
-                 w_block->organism != organism)) {
-            return;
+        if (check_if_block_out_of_bounds(dc, organism, block, new_rotation)) { return;}
+
+        if (sp->food_blocks_movement) {
+            if (w_block->type != EmptyBlock && w_block->organism != organism) {
+                return;
+            }
+        } else {
+            if ((w_block->type != EmptyBlock && w_block->type != FoodBlock) && w_block->organism != organism) {
+                return;
+            }
         }
+
+//        if (check_if_block_out_of_bounds(dc, organism, block, new_rotation) ||
+//                (w_block->type != EmptyBlock &&
+//                 w_block->organism != organism)) {
+//            return;
+//        }
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
@@ -312,7 +325,8 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer * dc, Org
     }
 }
 
-void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision) {
+void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
+                                                 SimulationParameters *sp) {
     // rotates movement relative to simulation grid
 
     int new_x = organism->x;
@@ -329,9 +343,15 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
     //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         auto * w_block = &dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x][new_y + block.get_pos(organism->rotation).y];
-        if (w_block->type != EmptyBlock &&
-            w_block->organism != organism) {
-            return;
+        if (sp->food_blocks_movement) {
+            if (w_block->type != EmptyBlock &&
+                w_block->organism != organism) {
+                return;
+            }
+        } else {
+            if ((w_block->type != EmptyBlock && w_block->type != FoodBlock) && w_block->organism != organism) {
+                return;
+            }
         }
     }
 
@@ -361,9 +381,11 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
         case BrainDecision::MoveLeft:
         case BrainDecision::MoveRight:
             if (organism->organism_anatomy->_mover_blocks > 0) {
-                move_organism(dc, organism, organism->last_decision.decision);
+                move_organism(dc, organism, organism->last_decision.decision, sp);
                 if (sp->rotate_every_move_tick && organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-                    rotate_organism(dc, organism,static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)));
+                    rotate_organism(dc, organism,
+                                    static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)),
+                                    sp);
                 }
                 organism->move_counter++;
             }
@@ -373,7 +395,8 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
     if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_move_range == organism->move_counter)) {
         organism->move_counter = 0;
         if (!sp->rotate_every_move_tick && organism->organism_anatomy->_mover_blocks > 0 && sp->runtime_rotation_enabled) {
-            rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)));
+            rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)),
+                            sp);
         }
     }
 }
@@ -388,6 +411,7 @@ void SimulationEngineSingleThread::try_make_child(EngineDataContainer *dc, Simul
     place_child(dc, sp, organism, child_organisms, gen);
 }
 
+//TODO refactor
 void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
                                                std::vector<Organism *> &child_organisms, lehmer64 *gen) {
     auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*gen));
@@ -406,6 +430,19 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     //LEFT - min_x
     //DOWN - max_y
     //RIGHT - max_x
+
+    organism->child_pattern->rotation = rotation;
+
+    //TODO this is probably wrong and broken
+    if (sp->check_if_path_is_clear) {
+        for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
+            if (!path_is_clear(organism->x + block.get_pos(rotation).x,
+                               organism->y + block.get_pos(rotation).y,
+                               to_place,
+                               distance,
+                               organism, dc, sp)) {return;}
+        }
+    }
 
     auto min_y = 0;
     auto min_x = 0;
@@ -441,7 +478,6 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
 
     organism->child_pattern->x = organism->x + min_x + max_x;
     organism->child_pattern->y = organism->y + min_y + max_y;
-    organism->child_pattern->rotation = rotation;
 
     //checking, if there is space for a child
     for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
@@ -479,4 +515,42 @@ bool SimulationEngineSingleThread::check_if_block_out_of_bounds(EngineDataContai
     return check_if_out_of_bounds(dc,
                                   organism->x + block.get_pos(rotation).x,
                                   organism->y + block.get_pos(rotation).y);
+}
+
+bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation direction, int steps, Organism *allow_organism, EngineDataContainer *dc,
+                   SimulationParameters *sp) {
+    for (int i = 0; i < steps; i++) {
+        switch (direction) {
+            case Rotation::UP:
+                y -= 1;
+                break;
+            case Rotation::LEFT:
+                x -= 1;
+                break;
+            case Rotation::DOWN:
+                y += 1;
+                break;
+            case Rotation::RIGHT:
+                x += 1;
+                break;
+        }
+        if (check_if_out_of_bounds(dc, x, y)) {return false;};
+
+        auto * block = &dc->CPU_simulation_grid[x][y];
+        switch (block->type) {
+            case BlockTypes::EmptyBlock:
+                continue;
+            case BlockTypes::WallBlock:
+                return false;
+            case BlockTypes::FoodBlock:
+                if (sp->food_blocks_reproduction) {
+                    return false;
+                }
+                continue;
+            default:
+                if (block->organism == allow_organism) { continue;}
+                return false;
+        }
+    }
+    return true;
 }

@@ -44,9 +44,11 @@ public:
                                  std::vector<Organism *> &organisms,
                                  std::vector<std::vector<Observation>> &organism_observations);
 
-    static void rotate_organism (EngineDataContainer * dc, Organism *organism, BrainDecision decision);
+    static void rotate_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
+                                SimulationParameters *sp);
 
-    static void move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision);
+    static void move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
+                              SimulationParameters *sp);
 
     static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen);
 
@@ -62,6 +64,9 @@ public:
     static void single_threaded_tick(EngineDataContainer * dc,
                                      SimulationParameters * sp,
                                      lehmer64 *gen);
+
+    static bool path_is_clear(int x, int y, Rotation direction, int steps, Organism *allow_organism, EngineDataContainer *dc,
+                              SimulationParameters *sp);
 };
 
 

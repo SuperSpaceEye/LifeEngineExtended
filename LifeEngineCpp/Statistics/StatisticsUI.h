@@ -41,6 +41,7 @@ public:
     QLabel *lb_moving_organisms;
     QLabel *lb_organisms_with_eyes;
     QLabel *lb_avg_org_lifetime_2;
+    QLabel *lb_avg_age_2;
     QLabel *lb_average_moving_range;
     QLabel *lb_organism_size_2;
     QLabel *lb_anatomy_mutation_rate_2;
@@ -55,6 +56,7 @@ public:
     QLabel *lb_stationary_organisms;
     QLabel *lb_organism_size_3;
     QLabel *lb_avg_org_lifetime_3;
+    QLabel *lb_avg_age_3;
     QLabel *lb_anatomy_mutation_rate_3;
     QLabel *lb_brain_mutation_rate_3;
     QLabel *lb_producer_num_3;
@@ -66,6 +68,7 @@ public:
     QLabel *lb_organisms_alive_2;
     QLabel *lb_organism_size_4;
     QLabel *lb_avg_org_lifetime_4;
+    QLabel *lb_avg_age_4;
     QLabel *lb_anatomy_mutation_rate_4;
     QLabel *lb_brain_mutation_rate_4;
     QLabel *lb_producer_num_4;
@@ -149,6 +152,11 @@ public:
 
         verticalLayout_38->addWidget(lb_avg_org_lifetime_2);
 
+        lb_avg_age_2 = new QLabel(widget_5);
+        lb_avg_age_2->setObjectName(QStringLiteral("lb_avg_age_2"));
+
+        verticalLayout_38->addWidget(lb_avg_age_2);
+
         lb_average_moving_range = new QLabel(widget_5);
         lb_average_moving_range->setObjectName(QStringLiteral("lb_average_moving_range"));
 
@@ -219,6 +227,11 @@ public:
 
         verticalLayout_40->addWidget(lb_avg_org_lifetime_3);
 
+        lb_avg_age_3 = new QLabel(widget_5);
+        lb_avg_age_3->setObjectName(QStringLiteral("lb_avg_age_3"));
+
+        verticalLayout_40->addWidget(lb_avg_age_3);
+
         lb_anatomy_mutation_rate_3 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_3->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_3"));
 
@@ -273,6 +286,11 @@ public:
         lb_avg_org_lifetime_4->setObjectName(QStringLiteral("lb_avg_org_lifetime_4"));
 
         verticalLayout_10->addWidget(lb_avg_org_lifetime_4);
+
+        lb_avg_age_4 = new QLabel(widget_5);
+        lb_avg_age_4->setObjectName(QStringLiteral("lb_avg_age_4"));
+
+        verticalLayout_10->addWidget(lb_avg_age_4);
 
         lb_anatomy_mutation_rate_4 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_4->setObjectName(QStringLiteral("lb_anatomy_mutation_rate_4"));
@@ -346,6 +364,7 @@ public:
         lb_moving_organisms->setText(QApplication::translate("Statistics", "Moving organisms:", Q_NULLPTR));
         lb_organisms_with_eyes->setText(QApplication::translate("Statistics", "Organisms with eyes:", Q_NULLPTR));
         lb_avg_org_lifetime_2->setText(QApplication::translate("Statistics", "Avg organism lifetime:", Q_NULLPTR));
+        lb_avg_age_2->setText(QApplication::translate("Statistics", "Avg organism age:", Q_NULLPTR));
         lb_average_moving_range->setText(QApplication::translate("Statistics", "Avg moving range:", Q_NULLPTR));
         lb_organism_size_2->setText(QApplication::translate("Statistics", "Avg organism size:", Q_NULLPTR));
         lb_anatomy_mutation_rate_2->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", Q_NULLPTR));
@@ -359,6 +378,7 @@ public:
         lb_stationary_organisms->setText(QApplication::translate("Statistics", "Stationary organisms:", Q_NULLPTR));
         lb_organism_size_3->setText(QApplication::translate("Statistics", "Avg organism size:", Q_NULLPTR));
         lb_avg_org_lifetime_3->setText(QApplication::translate("Statistics", "Avg organism lifetime:", Q_NULLPTR));
+        lb_avg_age_3->setText(QApplication::translate("Statistics", "Avg organism age:", Q_NULLPTR));
         lb_anatomy_mutation_rate_3->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", Q_NULLPTR));
         lb_brain_mutation_rate_3->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", Q_NULLPTR));
         lb_producer_num_3->setText(QApplication::translate("Statistics", "Avg producer num: ", Q_NULLPTR));
@@ -369,6 +389,7 @@ public:
         lb_organisms_alive_2->setText(QApplication::translate("Statistics", "Organisms alive:", Q_NULLPTR));
         lb_organism_size_4->setText(QApplication::translate("Statistics", "Avg organism size:", Q_NULLPTR));
         lb_avg_org_lifetime_4->setText(QApplication::translate("Statistics", "Avg organism lifetime:", Q_NULLPTR));
+        lb_avg_age_4->setText(QApplication::translate("Statistics", "Avg organism age:", Q_NULLPTR));
         lb_anatomy_mutation_rate_4->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", Q_NULLPTR));
         lb_brain_mutation_rate_4->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", Q_NULLPTR));
         lb_producer_num_4->setText(QApplication::translate("Statistics", "Avg producer num: ", Q_NULLPTR));

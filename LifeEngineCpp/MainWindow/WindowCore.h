@@ -94,6 +94,7 @@ struct pos_on_grid {
 struct OrganismInfoHolder {
     double size = 0;
     double _organism_lifetime = 0;
+    double _organism_age    = 0;
     double _mouth_blocks    = 0;
     double _producer_blocks = 0;
     double _mover_blocks    = 0;
@@ -284,8 +285,8 @@ private:
     void change_main_grid_left_click();
     void change_main_grid_right_click();
 
-    bool wait_for_engine_to_pause_processing_user_actions() const;
-    bool wait_for_engine_to_pause_force() const;
+    bool wait_for_engine_to_pause_processing_user_actions();
+    bool wait_for_engine_to_pause_force();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -420,6 +421,7 @@ private slots:
     void cb_eat_then_produce_slot(bool state);
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
+    void cb_food_blocks_movement_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

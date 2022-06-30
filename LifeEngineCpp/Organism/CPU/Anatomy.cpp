@@ -619,6 +619,72 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     delete new_structure;
 }
 
+void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blocks) {
+    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
+    boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> producing_space;
+    boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
+    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
+
+    boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
+    boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
+
+    std::vector<int> num_producing_space;
+
+    for (auto & block: blocks) {
+        switch (block.type) {
+            case MouthBlock:    _mouth_blocks++    ; break;
+            case ProducerBlock: _producer_blocks++ ; break;
+            case MoverBlock:    _mover_blocks++    ; break;
+            case KillerBlock:   _killer_blocks++   ; break;
+            case ArmorBlock:    _armor_blocks++    ; break;
+            case EyeBlock:      _eye_blocks++      ; break;
+            default: break;
+        }
+
+        organism_blocks[block.relative_x][block.relative_y].type     = block.type;
+        organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
+    }
+
+    create_single_adjacent_space(organism_blocks, single_adjacent_space);
+    create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+
+    create_producing_space(organism_blocks, producing_space, single_adjacent_space, num_producing_space, _producer_blocks);
+    create_eating_space(   organism_blocks, eating_space,    single_adjacent_space, _mouth_blocks);
+    create_killing_space(  organism_blocks, killing_space,   single_adjacent_space, _killer_blocks);
+
+    auto new_structure = serialize(organism_blocks,
+                               producing_space,
+                               eating_space,
+                               killing_space,
+                               single_adjacent_space,
+                               single_diagonal_adjacent_space,
+                               num_producing_space,
+
+                               _mouth_blocks,
+                               _producer_blocks,
+                               _mover_blocks,
+                               _killer_blocks,
+                               _armor_blocks,
+                               _eye_blocks);
+
+    _organism_blocks = std::move(new_structure->organism_blocks);
+
+    _producing_space = std::move(new_structure->producing_space);
+    _eating_space    = std::move(new_structure->eating_space);
+
+    _single_adjacent_space          = std::move(new_structure->single_adjacent_space);
+    _single_diagonal_adjacent_space = std::move(new_structure->single_diagonal_adjacent_space);
+
+    _mouth_blocks    = new_structure->mouth_blocks;
+    _producer_blocks = new_structure->producer_blocks;
+    _mover_blocks    = new_structure->mover_blocks;
+    _killer_blocks   = new_structure->killer_blocks;
+    _armor_blocks    = new_structure->armor_blocks;
+    _eye_blocks      = new_structure->eye_blocks;
+
+    delete new_structure;
+}
+
 template<typename T>
 int Anatomy::get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map) {
     int total_size = 0;

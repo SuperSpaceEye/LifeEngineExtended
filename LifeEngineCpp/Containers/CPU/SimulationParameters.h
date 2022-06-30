@@ -9,7 +9,7 @@ struct SimulationParameters {
     //evolution controls
         float food_production_probability = 0.05;
         int   produce_food_every_n_life_ticks = 1;
-        int   lifespan_multiplier = 100;
+        float lifespan_multiplier = 100;
         int   look_range = 50;
         int   auto_produce_food_every_n_ticks = 0;
         int   auto_produce_n_food = 0;
@@ -19,7 +19,7 @@ struct SimulationParameters {
         float killer_damage_amount = 1;
 
         int   min_reproducing_distance = 1;
-        int   max_reproducing_distance = 3;
+        int   max_reproducing_distance = 5;
 
         float anatomy_mutations_rate_mutation_modifier = 0.01;
         float anatomy_min_possible_mutation_rate = 0.001;
@@ -67,6 +67,9 @@ struct SimulationParameters {
         bool simplified_food_production = false;
         bool stop_when_one_food_generated = false;
         bool eat_then_produce = true;
+        //TODO add cb to evolution settings
+        bool check_if_path_is_clear = false;
+        bool food_blocks_movement = false;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

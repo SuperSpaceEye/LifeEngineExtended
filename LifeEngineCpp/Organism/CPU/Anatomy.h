@@ -205,6 +205,7 @@ public:
     SerializedOrganismStructureContainer * remove_random_block(lehmer64 &gen);
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);
+    void set_many_blocks(std::vector<SerializedOrganismBlockContainer> & blocks);
 };
 
 

@@ -149,6 +149,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="lb_avg_age_2">
+                <property name="text">
+                 <string>Avg organism age:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="lb_average_moving_range">
                 <property name="text">
                  <string>Avg moving range:</string>
@@ -244,6 +251,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="lb_avg_age_3">
+                <property name="text">
+                 <string>Avg organism age:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="lb_anatomy_mutation_rate_3">
                 <property name="text">
                  <string>Avg anatomy mutation rate:</string>
@@ -314,6 +328,13 @@
                <widget class="QLabel" name="lb_avg_org_lifetime_4">
                 <property name="text">
                  <string>Avg organism lifetime:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lb_avg_age_4">
+                <property name="text">
+                 <string>Avg organism age:</string>
                 </property>
                </widget>
               </item>

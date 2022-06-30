@@ -73,7 +73,9 @@ void WindowCore::b_clear_all_walls_slot() {
 }
 
 void WindowCore::b_save_world_slot() {
-    cp.engine_pause = true;
+    bool flag = synchronise_simulation_and_window;
+    synchronise_simulation_and_window = false;
+    cp.engine_global_pause = true;
     cp.pause_processing_user_action = true;
     wait_for_engine_to_pause_force();
     wait_for_engine_to_pause_processing_user_actions();
@@ -92,7 +94,8 @@ void WindowCore::b_save_world_slot() {
     } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
-        unpause_engine();
+        synchronise_simulation_and_window = flag;
+        cp.engine_global_pause = false;
         cp.pause_processing_user_action = false;
         return;
     }
@@ -113,15 +116,15 @@ void WindowCore::b_save_world_slot() {
         write_json_data(full_path);
     }
 
-    unpause_engine();
+    synchronise_simulation_and_window = flag;
+    cp.engine_global_pause = false;
     cp.pause_processing_user_action = false;
 }
 
-
-//TODO add to simulation engine a function to call to place organism from to_place_organisms
-
 void WindowCore::b_load_world_slot() {
-    cp.engine_pause = true;
+    bool flag = synchronise_simulation_and_window;
+    synchronise_simulation_and_window = false;
+    cp.engine_global_pause = true;
     cp.pause_processing_user_action = true;
     wait_for_engine_to_pause_force();
     wait_for_engine_to_pause_processing_user_actions();
@@ -135,7 +138,8 @@ void WindowCore::b_load_world_slot() {
     } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
     } else {
-        unpause_engine();
+        synchronise_simulation_and_window = flag;
+        cp.engine_global_pause = false;
         cp.pause_processing_user_action = false;
         return;
     }
@@ -151,7 +155,8 @@ void WindowCore::b_load_world_slot() {
         read_json_data(full_path);
     }
 
-    unpause_engine();
+    synchronise_simulation_and_window = flag;
+    cp.engine_global_pause = false;
     cp.pause_processing_user_action = false;
     initialize_gui_settings();
     update_table_values();
@@ -254,11 +259,11 @@ void WindowCore::le_food_production_probability_slot() {
 }
 
 void WindowCore::le_lifespan_multiplier_slot() {
-    int fallback = sp.lifespan_multiplier;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_lifespan_multiplier,
+    float fallback = sp.lifespan_multiplier;
+    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_lifespan_multiplier,
                                                         fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
+    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     sp.lifespan_multiplier = result.result;
 }
 
@@ -679,6 +684,8 @@ void WindowCore::cb_stop_when_one_food_generated         (bool state) { sp.stop_
 void WindowCore::cb_synchronise_info_with_window_slot    (bool state) { synchronise_info_with_window_update = state;}
 
 void WindowCore::cb_eat_then_produce_slot                (bool state) { sp.eat_then_produce = state;}
+
+void WindowCore::cb_food_blocks_movement_slot            (bool state) { sp.food_blocks_movement = state;}
 
 //==================== Table ====================
 
