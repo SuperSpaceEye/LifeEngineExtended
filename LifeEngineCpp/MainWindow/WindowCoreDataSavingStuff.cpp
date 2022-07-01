@@ -112,7 +112,17 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     }
 }
 
+void WindowCore::recover_state(SimulationParameters &recovery_sp, OrganismBlockParameters &recovery_bp,
+                               uint16_t recovery_simulation_width, uint16_t recovery_simulation_height) {
+    sp = recovery_sp;
+    bp = recovery_bp;
+    dc.simulation_width = recovery_simulation_width;
+    dc.simulation_height = recovery_simulation_height;
+    new_simulation_width = recovery_simulation_width;
+    new_simulation_height = recovery_simulation_height;
 
+    reset_world();
+}
 
 void WindowCore::read_data(std::ifstream &is) {
     //If save version is incompatible
@@ -121,20 +131,24 @@ void WindowCore::read_data(std::ifstream &is) {
         return;
     }
 
-    for (auto & organism: dc.organisms) {
-        delete organism;
-    }
-    dc.organisms.clear();
-    for (auto & organism: dc.to_place_organisms) {
-        delete organism;
-    }
-    dc.to_place_organisms.clear();
+    clear_organisms();
 
-    read_simulation_parameters(is);
-    read_organisms_block_parameters(is);
-    read_data_container_data(is);
-    read_simulation_grid(is);
-    read_organisms(is);
+    SimulationParameters recovery_sp = sp;
+    OrganismBlockParameters recovery_bp = bp;
+    uint16_t recovery_simulation_width = dc.simulation_width;
+    uint16_t recovery_simulation_height = dc.simulation_height;
+
+    try {
+        read_simulation_parameters(is);
+        read_organisms_block_parameters(is);
+        if (read_data_container_data(is)) {
+            recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        }
+        read_simulation_grid(is);
+        if (read_organisms(is)) {
+            recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        }
+    } catch (std::string & e1) { recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);}
 
     dc.total_engine_ticks = dc.loaded_engine_ticks;
 }
@@ -153,18 +167,39 @@ void WindowCore::read_organisms_block_parameters(std::ifstream& is) {
     is.read((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
-void WindowCore::read_data_container_data(std::ifstream& is) {
+bool WindowCore::read_data_container_data(std::ifstream& is) {
+    uint16_t sim_width;
+    uint16_t sim_height;
+
     is.read((char*)&dc.loaded_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&dc.simulation_width,    sizeof(uint16_t));
-    is.read((char*)&dc.simulation_height,   sizeof(uint16_t));
+    is.read((char*)&sim_width,    sizeof(uint16_t));
+    is.read((char*)&sim_height,   sizeof(uint16_t));
+
+    if (sim_width > max_loaded_world_side) {
+        if (!display_dialog_message("The loaded side of a simulation width is " + std::to_string(sim_width) + ". The save file may be corrupted, continue?", false)) {
+            return true;
+        }
+    }
+
+    if (sim_height > max_loaded_world_side) {
+        if (!display_dialog_message("The loaded side of a simulation height is " + std::to_string(sim_height) + ". The save file may be corrupted, continue?", false)) {
+            return true;
+        }
+    }
+
+    dc.simulation_width  = sim_width;
+    dc.simulation_height = sim_height;
 
     new_simulation_width = dc.simulation_width;
     new_simulation_height = dc.simulation_height;
     fill_window = false;
     _ui.cb_fill_window->setChecked(false);
     update_simulation_size_label();
+    return false;
 }
 //    void WindowCore::read_color_container(){}
+
+//TODO only save food/walls ?
 void WindowCore::read_simulation_grid(std::ifstream& is) {
     disable_warnings = true;
     resize_simulation_space();
@@ -185,7 +220,7 @@ void WindowCore::read_simulation_grid(std::ifstream& is) {
 }
 
 //TODO save child patterns?
-void WindowCore::read_organisms(std::ifstream& is) {
+bool WindowCore::read_organisms(std::ifstream& is) {
     for (auto & organism: dc.organisms) {
         delete organism;
     }
@@ -197,6 +232,14 @@ void WindowCore::read_organisms(std::ifstream& is) {
 
     uint32_t num_organisms;
     is.read((char*)&num_organisms, sizeof(uint32_t));
+
+    if (num_organisms > max_loaded_num_organisms) {
+        if (!display_dialog_message("The loaded number of organisms is " + std::to_string(num_organisms) +
+        ". The save file may be corrupted and could crash your computer, continue?", false)) {
+            return true;
+        }
+    }
+
     dc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
         OrganismData data{};
@@ -235,6 +278,8 @@ void WindowCore::read_organisms(std::ifstream& is) {
         dc.organisms.emplace_back(organism);
         SimulationEngineSingleThread::place_organism(&dc, organism);
     }
+
+    return false;
 }
 
 void WindowCore::read_organism_data(std::ifstream& is, OrganismData & data) {
@@ -337,14 +382,7 @@ namespace pt = boost::property_tree;
 
 //https://www.cochoy.fr/boost-property-tree/
 void WindowCore::read_json_data(std::string path) {
-    for (auto & organism: dc.organisms) {
-        delete organism;
-    }
-    dc.organisms.clear();
-    for (auto & organism: dc.to_place_organisms) {
-        delete organism;
-    }
-    dc.to_place_organisms.clear();
+    clear_organisms();
 
     pt::ptree root;
     pt::read_json(path, root);

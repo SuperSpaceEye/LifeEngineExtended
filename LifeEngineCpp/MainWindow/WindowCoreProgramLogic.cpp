@@ -467,7 +467,6 @@ bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
     return !cp.processing_user_actions;
 }
 
-
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= dc.simulation_width) { continue; }
@@ -918,7 +917,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
     _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
     _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
-    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,             0)));
+    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,             3)));
     _ui.le_perlin_persistence                ->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
     _ui.le_perlin_upper_bound                ->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 3)));
     _ui.le_perlin_lower_bound                ->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 3)));

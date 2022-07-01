@@ -225,6 +225,9 @@ private:
 
     bool use_cuda = true;
 
+    //Will give a warning if num is higher than this.
+    int max_loaded_num_organisms = 1'000'000;
+    int max_loaded_world_side = 10'000;
 
     void write_json_data(std::string path);
     void read_json_data(std::string path);
@@ -242,14 +245,19 @@ private:
     void write_organism_brain(std::ofstream& os, Brain * brain);
     void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
+    void recover_state(SimulationParameters &recovery_sp,
+                       OrganismBlockParameters &recovery_bp,
+                       uint16_t recovery_simulation_width,
+                       uint16_t recovery_simulation_height);
+
     void read_data(std::ifstream& is);
     bool read_version(std::ifstream& is);
     void read_simulation_parameters(std::ifstream& is);
     void read_organisms_block_parameters(std::ifstream& is);
-    void read_data_container_data(std::ifstream& is);
+    bool read_data_container_data(std::ifstream& is);
     //    void read_color_container(); TODO: ?
     void read_simulation_grid(std::ifstream& is);
-    void read_organisms(std::ifstream& is);
+    bool read_organisms(std::ifstream& is);
     void read_organism_data(std::ifstream& is, OrganismData & data);
     void read_organism_brain(std::ifstream& is, Brain * brain);
     void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
