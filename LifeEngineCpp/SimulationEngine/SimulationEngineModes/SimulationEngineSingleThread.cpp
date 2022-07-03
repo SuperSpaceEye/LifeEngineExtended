@@ -194,17 +194,17 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
                                                         std::vector<Organism *> &organisms,
                                                         SimulationParameters *sp, EngineDataContainer *dc) {
-    smart_reserve(dc->single_thread_organisms_observations, organisms.size(), dc->minimum_fixed_capacity);
+    smart_reserve(observations, organisms.size(), dc->minimum_fixed_capacity);
     for (auto & organism: organisms) {
         // if organism is moving, then do not observe.
         if (organism->move_counter == 0 && organism->organism_anatomy->_mover_blocks > 0 && organism->organism_anatomy->_eye_blocks > 0) {
-            dc->single_thread_organisms_observations.emplace_back(organism->organism_anatomy->_eye_blocks);
+            observations.emplace_back(organism->organism_anatomy->_eye_blocks);
         } else {
-            dc->single_thread_organisms_observations.emplace_back(0);
+            observations.emplace_back(0);
         }
     }
-    smart_reserve(observations, organisms.size(), dc->minimum_fixed_capacity);
-    for (auto & item: dc->single_thread_organisms_observations) {observations.emplace_back(std::vector<Observation>(item));}
+//    smart_reserve(observations, organisms.size(), dc->minimum_fixed_capacity);
+//    for (auto & item: dc->single_thread_organisms_observations) {observations.emplace_back(std::vector<Observation>(item));}
 }
 
 void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, SimulationParameters *sp,

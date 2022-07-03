@@ -13,6 +13,7 @@
 
 struct eager_worker_partial;
 class Organism;
+struct pool_changes_info;
 
 struct EngineDataContainer {
     uint64_t delta_time = 0;
@@ -45,6 +46,8 @@ struct EngineDataContainer {
     std::vector<eager_worker_partial> threads;
     std::vector<std::vector<int>> threaded_to_erase;
     std::vector<std::vector<std::vector<Observation>>> pooled_organisms_observations;
+    std::vector<std::vector<pool_changes_info>> sorted_organisms_by_x_position;
+    std::vector<std::vector<pool_changes_info*>> pool_changes;
 
     Organism * base_organism;
     Organism * chosen_organism;
@@ -56,7 +59,16 @@ struct EngineDataContainer {
 
     uint32_t minimum_fixed_capacity = 100'000;
 
+    uint32_t multithread_change_every_n_ticks = 1;
+
     Organism * selected_organims = nullptr;
+};
+
+struct pool_changes_info {
+    Organism * organism;
+    int position_in_old_pool;
+    int old_pool;
+    int new_pool;
 };
 
 

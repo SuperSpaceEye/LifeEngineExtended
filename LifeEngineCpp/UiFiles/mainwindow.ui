@@ -396,7 +396,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>3</number>
+            <number>5</number>
            </property>
            <property name="iconSize">
             <size>
@@ -1071,7 +1071,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-585</y>
+                  <y>0</y>
                   <width>504</width>
                   <height>1121</height>
                  </rect>
@@ -1857,7 +1857,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QRadioButton" name="rb_single_thread_mode">
                         <property name="enabled">
-                         <bool>false</bool>
+                         <bool>true</bool>
                         </property>
                         <property name="text">
                          <string>Single thread CPU</string>
@@ -1873,7 +1873,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QRadioButton" name="rb_partial_multi_thread_mode">
                         <property name="enabled">
-                         <bool>false</bool>
+                         <bool>true</bool>
                         </property>
                         <property name="text">
                          <string>Partial multi-thread CPU</string>

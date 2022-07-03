@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION ${MIN_VERSION})
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
-enable_language(CUDA)
+#enable_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
@@ -60,10 +60,10 @@ find_package(Qt5 COMPONENTS
         Core
         Gui
         Widgets
-        Charts
+#        Charts
         REQUIRED)
 
-find_package(Gnuplot REQUIRED)
+#find_package(Gnuplot REQUIRED)
 
 
 find_package(Boost COMPONENTS random REQUIRED)
@@ -169,7 +169,7 @@ if (Qt5_FOUND)
             Qt5::Core
             Qt5::Gui
             Qt5::Widgets
-            Qt5::Charts
+#            Qt5::Charts
             )
 endif()
 

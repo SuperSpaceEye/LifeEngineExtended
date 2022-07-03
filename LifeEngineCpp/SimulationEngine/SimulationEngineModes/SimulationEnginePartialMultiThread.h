@@ -59,6 +59,11 @@ private:
     static void start_stage(EngineDataContainer *dc, PartialSimulationStage stage);
 
     static void change_organisms_pools(EngineDataContainer *dc, EngineControlParameters * cp);
+
+    static void sort_organisms(EngineDataContainer *dc, EngineControlParameters *cp);
+
+    static int calculate_num_organisms(EngineDataContainer *dc);
+
 public:
     static void
     partial_multi_thread_tick(EngineDataContainer *dc, EngineControlParameters *cp,
@@ -72,6 +77,12 @@ public:
 
     static void thread_tick(PartialSimulationStage stage, EngineDataContainer *dc,
                             SimulationParameters *sp, lehmer64 *gen, int thread_num);
+
+    static void init(EngineDataContainer &dc, EngineControlParameters &cp,
+                     SimulationParameters &sp);
+
+    static void stop(EngineDataContainer &dc, EngineControlParameters &cp,
+                     SimulationParameters &sp);
 };
 
 struct eager_worker_partial {
