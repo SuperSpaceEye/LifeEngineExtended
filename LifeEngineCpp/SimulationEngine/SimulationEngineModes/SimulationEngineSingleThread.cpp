@@ -268,7 +268,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
 
 void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
                                                    SimulationParameters *sp) {
-    auto new_int_rotation = static_cast<int>(organism->rotation);
+    auto new_int_rotation = static_cast<uint_fast8_t>(organism->rotation);
     switch (decision) {
         case BrainDecision::RotateLeft:
             new_int_rotation += 1;
@@ -299,12 +299,6 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
                 return;
             }
         }
-
-//        if (check_if_block_out_of_bounds(dc, organism, block, new_rotation) ||
-//                (w_block->type != EmptyBlock &&
-//                 w_block->organism != organism)) {
-//            return;
-//        }
     }
 
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
@@ -318,9 +312,10 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
         w_block->type = block.type;
-        if (block.type == BlockTypes::EyeBlock) {
-            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-        }
+        w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
+//        if (block.type == BlockTypes::EyeBlock) {
+//            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
+//        }
         w_block->organism = organism;
     }
 }
@@ -364,9 +359,11 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
     for (auto & block: organism->organism_anatomy->_organism_blocks) {
         auto * w_block = &dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x][new_y + block.get_pos(organism->rotation).y];
         w_block->type = block.type;
-        if (block.type == BlockTypes::EyeBlock) {
-            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-        }
+        w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
+
+//        if (block.type == BlockTypes::EyeBlock) {
+//            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
+//        }
         w_block->organism = organism;
     }
 

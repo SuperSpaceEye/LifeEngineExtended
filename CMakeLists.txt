@@ -60,7 +60,10 @@ find_package(Qt5 COMPONENTS
         Core
         Gui
         Widgets
+        Charts
         REQUIRED)
+
+find_package(Gnuplot REQUIRED)
 
 
 find_package(Boost COMPONENTS random REQUIRED)
@@ -147,7 +150,6 @@ if(CUDAToolkit_FOUND)
 #    target_link_libraries(${PROJECT_NAME} CUDA::cudart)
 elseif(WIN_USE_CUDA_LIBS)
     add_compile_definitions(__CUDA_USED__=1)
-
 else()
     message(STATUS "No CUDAToolkit found.")
     add_compile_definitions(__CUDA_USED__=0)
@@ -167,6 +169,7 @@ if (Qt5_FOUND)
             Qt5::Core
             Qt5::Gui
             Qt5::Widgets
+            Qt5::Charts
             )
 endif()
 

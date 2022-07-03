@@ -55,9 +55,8 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     SerializedOrganismBlockContainer(BlockTypes type, Rotation rotation, int relative_x, int relative_y):
             BaseSerializedContainer(relative_x, relative_y), type(type), rotation(rotation) {}
     Rotation get_block_rotation_on_grid(Rotation organism_rotation) {
-        int new_int_rotation = static_cast<int>(organism_rotation) + static_cast<int>(rotation);
-        if (new_int_rotation > 3) {new_int_rotation-=4;}
-        return static_cast<Rotation>(new_int_rotation);
+        uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(organism_rotation) + static_cast<uint_fast8_t>(rotation);
+        return static_cast<Rotation>(new_int_rotation%4);
     }
 };
 

@@ -39,6 +39,7 @@
 #include <QFileDialog>
 #include <QToolBar>
 #include <QWheelEvent>
+//#include <QtCharts>
 
 
 #include "../SimulationEngine/SimulationEngine.h"
