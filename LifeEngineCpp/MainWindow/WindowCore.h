@@ -206,8 +206,6 @@ private:
     int new_simulation_height = 200;
     // visual only. Controls precision of floats in labels
     int float_precision = 4;
-    // num of auto resets. TODO remove?
-    int auto_reset_num = 0;
     int brush_size = 2;
     int update_info_every_n_milliseconds = 100;
     //Will give a warning if num is higher than this.

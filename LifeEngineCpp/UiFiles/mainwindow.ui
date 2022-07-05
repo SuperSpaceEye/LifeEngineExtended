@@ -396,7 +396,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>5</number>
+            <number>2</number>
            </property>
            <property name="iconSize">
             <size>
@@ -514,7 +514,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>504</width>
-                  <height>452</height>
+                  <height>429</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -575,7 +575,7 @@ p, li { white-space: pre-wrap; }
                           <item>
                            <widget class="QLabel" name="label_8">
                             <property name="text">
-                             <string>Start cell size:</string>
+                             <string>Starting cell size:</string>
                             </property>
                            </widget>
                           </item>
@@ -644,13 +644,6 @@ p, li { white-space: pre-wrap; }
                          <widget class="QCheckBox" name="cb_reset_on_total_extinction">
                           <property name="text">
                            <string>Reset on total extinction</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="lb_auto_reset_count">
-                          <property name="text">
-                           <string>Auto reset count: 0</string>
                           </property>
                          </widget>
                         </item>
@@ -3698,11 +3691,11 @@ p, li { white-space: pre-wrap; }
   <slot>cb_food_blocks_movement_slot(bool)</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

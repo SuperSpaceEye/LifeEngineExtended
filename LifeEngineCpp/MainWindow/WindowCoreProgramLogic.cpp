@@ -135,7 +135,6 @@ void WindowCore::mainloop_tick() {
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
-        _ui.lb_auto_reset_count->setText(QString::fromStdString("Auto reset count: "+ std::to_string(auto_reset_num)));
 
         window_frames = 0;
         fps_timer = clock_now();

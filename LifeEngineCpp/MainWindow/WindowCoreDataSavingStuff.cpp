@@ -541,7 +541,7 @@ void WindowCore::write_json_data(std::string path) {
     root.put("num_cols", edc.simulation_width - 2);
     root.put("total_mutability", static_cast<int>(info.total_total_mutation_rate*100));
     root.put("largest_cell_count", 0);
-    root.put("reset_count", auto_reset_num);
+    root.put("reset_count", 0);
     root.put("total_ticks", edc.total_engine_ticks);
     root.put("data_update_rate", 100);
 
