@@ -16,14 +16,11 @@ public:
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
 
-    Organism * organism = nullptr;
     BaseGridBlock()=default;
     BaseGridBlock(const BaseGridBlock & block): type(block.type),
-                                                rotation(block.rotation),
-                                                organism(block.organism) {}
-    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP,
-                           Organism * organism = nullptr):
-                            type(type), rotation(rotation), organism(organism) {}
+                                                rotation(block.rotation) {}
+    explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP): type(type),
+                                                                               rotation(rotation) {}
     BaseGridBlock& operator=(const BaseGridBlock & block) = default;
 };
 #endif //THELIFEENGINECPP_BASEGRIDBLOCK_H

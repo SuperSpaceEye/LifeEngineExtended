@@ -13,6 +13,7 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     if (dc->total_engine_ticks % dc->multithread_change_every_n_ticks == 0) {
         sort_organisms(dc, cp);
     }
+//    change_organisms_pools(dc, cp);
 
     if (sp->eat_then_produce) {
         start_stage(dc, PartialSimulationStage::EatFood);
@@ -38,8 +39,6 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
     for (auto & pool: dc->organisms_pools) {
         for (auto & organism: pool)  {SimulationEngineSingleThread::make_decision(dc, sp, organism, gen);}
     }
-
-//    change_organisms_pools(edc, ecp);
 
     for (auto & pool: dc->organisms_pools) {
         for (auto & organism: pool) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
@@ -80,8 +79,11 @@ void SimulationEnginePartialMultiThread::change_organisms_pools(EngineDataContai
 
     for (int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
         auto & pool = dc->organisms_pools[pool_num];
-        for (int i = 0; i < int_pos[pool_num].size(); i++) {
-            pool.erase(pool.begin() + int_pos[pool_num][i] - i);
+        const auto & _int_pos = int_pos[pool_num];
+        int num_deleted = 0;
+        for (int i : _int_pos) {
+            pool.erase(pool.begin() + i - num_deleted);
+            num_deleted++;
         }
     }
 
@@ -95,20 +97,14 @@ void SimulationEnginePartialMultiThread::change_organisms_pools(EngineDataContai
     }
 }
 
-//TODO probably here something that segfaults simulation
+//TODO i am sure that segfaults happen because of double insertion of organism pointers. i just don't see where it happens.
 void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc, EngineControlParameters *cp) {
     //Sorting organisms by their x position
-    for (auto & vec: dc->sorted_organisms_by_x_position) {
-        if (!vec.empty()) {
-            throw "bad error";
-        }
-    }
-
     for (int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
         auto pool = dc->organisms_pools[pool_num];
         int pos = 0;
         for (auto & organism: pool) {
-            dc->sorted_organisms_by_x_position.at(organism->x).emplace_back(pool_changes_info{organism, pos, pool_num, 0});
+            dc->sorted_organisms_by_x_position.at(organism->x).emplace_back(pool_changes_info{organism, pos, pool_num, -1});
             pos++;
         }
     }
@@ -117,25 +113,19 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
     int num_organism_in_pool = total_organisms_num / cp->num_threads;
 //    int num_of_left_organisms = total_organisms_num - num_organism_in_pool * ecp->num_threads;
 
-    for (auto & pool: dc->pool_changes) {
-        if (!pool.empty()) {
-            throw "error";
-        }
-    }
-
     int current_pool = 0;
     int num_organism = 0;
-    int tnum_orrganims = 0;
+    bool looped_around = false;
     for (auto & position: dc->sorted_organisms_by_x_position) {
-        for (auto & info: position) {
-            if (current_pool != info.old_pool) {
-                info.new_pool = current_pool;
-                dc->pool_changes.at(info.old_pool).emplace_back(&info);
+        for (auto & organism_info: position) {
+            if (current_pool != organism_info.old_pool) {
+                organism_info.new_pool = current_pool;
+                dc->pool_changes.at(organism_info.old_pool).emplace_back(&organism_info);
             }
 
             num_organism++;
-            tnum_orrganims++;
-            if (num_organism > num_organism_in_pool) {
+
+            if (!looped_around && num_organism >= num_organism_in_pool) {
                 current_pool++;
                 num_organism = 0;
             }
@@ -143,18 +133,20 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
             //If loop got to the end but there are still organisms, then assign them to the last pool.
             if (current_pool >= cp->num_threads) {
                 current_pool--;
-                num_organism = 0;
+                looped_around = true;
+                num_organism = num_organism_in_pool;
             }
         }
     }
 
     //moving organisms from old pools to new pools
-    for (int i = 0; i < dc->pool_changes.size(); i++) {
-        auto & pool = dc->organisms_pools[i];
-        const auto & pool_info = dc->pool_changes.at(i);
+    for (int pool_num = 0; pool_num < dc->pool_changes.size(); pool_num++) {
+        auto & pool = dc->organisms_pools.at(pool_num);
+        const auto & pool_info = dc->pool_changes.at(pool_num);
         int num_deleted_organisms = 0;
         //deleting organism from old pools
         for (auto & info: pool_info) {
+            pool[info->position_in_old_pool - num_deleted_organisms] = nullptr;
             pool.erase(pool.begin() + info->position_in_old_pool - num_deleted_organisms);
             num_deleted_organisms++;
         }
@@ -306,7 +298,7 @@ void SimulationEnginePartialMultiThread::erase_organisms(EngineDataContainer * d
         auto & thread_delete = dc->threaded_to_erase[pool_num];
         auto & pool = dc->organisms_pools[pool_num];
         for (int i = 0; i < thread_delete.size(); i++) {
-            delete pool[thread_delete[i] - i];
+            delete pool.at(thread_delete[i] - i);
             pool.erase(pool.begin() + thread_delete[i] - i);
         }
     }

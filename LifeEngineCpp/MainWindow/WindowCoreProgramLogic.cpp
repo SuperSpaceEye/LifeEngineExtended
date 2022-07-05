@@ -466,13 +466,13 @@ bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
     return !ecp.processing_user_actions;
 }
 
+//TODO rare crashes could be because of parsing. Needs further research.
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= edc.simulation_height) { continue; }
             edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid[x + y * edc.simulation_width].organism = edc.CPU_simulation_grid[x][y].organism;
             edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
@@ -486,7 +486,6 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
             edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid[x + y * edc.simulation_width].organism = edc.CPU_simulation_grid[x][y].organism;
             edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
