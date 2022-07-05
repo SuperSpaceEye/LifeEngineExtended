@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION ${MIN_VERSION})
 set(PROJECT_NAME TheLifeEngineCpp)
 project(${PROJECT_NAME})
 
-#enable_language(CUDA)
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -63,9 +61,6 @@ find_package(Qt5 COMPONENTS
 #        Charts
         REQUIRED)
 
-#find_package(Gnuplot REQUIRED)
-
-
 find_package(Boost COMPONENTS random REQUIRED)
 
 message(STATUS ${Boost_VERSION})
@@ -75,6 +70,7 @@ add_compile_definitions(__VALGRIND_MODE__=0)
 #find_package(OpenMP)
 
 if(CUDAToolkit_FOUND)
+    enable_language(CUDA)
     set(CUDA_FILES ${CUDA_SOURCES} ${CUDA_HEADERS})
 #elseif(WIN_USE_CUDA_LIBS)
 #    set(CUDA_FILES ${CUDA_HEADERS})

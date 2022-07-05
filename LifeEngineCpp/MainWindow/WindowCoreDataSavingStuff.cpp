@@ -29,20 +29,20 @@ void WindowCore::write_organisms_block_parameters(std::ofstream& os) {
 }
 
 void WindowCore::write_data_container_data(std::ofstream& os) {
-    os.write((char*)&dc.total_engine_ticks, sizeof(uint32_t));
-    os.write((char*)&dc.simulation_width,   sizeof(uint16_t));
-    os.write((char*)&dc.simulation_height,  sizeof(uint16_t));
+    os.write((char*)&edc.total_engine_ticks, sizeof(uint32_t));
+    os.write((char*)&edc.simulation_width, sizeof(uint16_t));
+    os.write((char*)&edc.simulation_height, sizeof(uint16_t));
 }
 //    void WindowCore::write_color_container(){}
 void WindowCore::write_simulation_grid(std::ofstream& os) {
-    for (auto & col: dc.CPU_simulation_grid) {
+    for (auto & col: edc.CPU_simulation_grid) {
         os.write((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
     }
 }
 void WindowCore::write_organisms(std::ofstream& os) {
-    uint32_t size = dc.organisms.size();
+    uint32_t size = edc.organisms.size();
     os.write((char*)&size, sizeof(uint32_t));
-    for (auto & organism: dc.organisms) {
+    for (auto & organism: edc.organisms) {
         write_organism_data(os, organism);
         write_organism_brain(os, organism->brain.get());
         write_organism_anatomy(os, organism->organism_anatomy.get());
@@ -116,8 +116,8 @@ void WindowCore::recover_state(SimulationParameters &recovery_sp, OrganismBlockP
                                uint16_t recovery_simulation_width, uint16_t recovery_simulation_height) {
     sp = recovery_sp;
     bp = recovery_bp;
-    dc.simulation_width = recovery_simulation_width;
-    dc.simulation_height = recovery_simulation_height;
+    edc.simulation_width = recovery_simulation_width;
+    edc.simulation_height = recovery_simulation_height;
     new_simulation_width = recovery_simulation_width;
     new_simulation_height = recovery_simulation_height;
 
@@ -135,8 +135,8 @@ void WindowCore::read_data(std::ifstream &is) {
 
     SimulationParameters recovery_sp = sp;
     OrganismBlockParameters recovery_bp = bp;
-    uint16_t recovery_simulation_width = dc.simulation_width;
-    uint16_t recovery_simulation_height = dc.simulation_height;
+    uint16_t recovery_simulation_width = edc.simulation_width;
+    uint16_t recovery_simulation_height = edc.simulation_height;
 
     try {
         read_simulation_parameters(is);
@@ -150,7 +150,7 @@ void WindowCore::read_data(std::ifstream &is) {
         }
     } catch (std::string & e1) { recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);}
 
-    dc.total_engine_ticks = dc.loaded_engine_ticks;
+    edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
 bool WindowCore::read_version(std::ifstream &is) {
@@ -171,7 +171,7 @@ bool WindowCore::read_data_container_data(std::ifstream& is) {
     uint16_t sim_width;
     uint16_t sim_height;
 
-    is.read((char*)&dc.loaded_engine_ticks, sizeof(uint32_t));
+    is.read((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
     is.read((char*)&sim_width,    sizeof(uint16_t));
     is.read((char*)&sim_height,   sizeof(uint16_t));
 
@@ -187,11 +187,11 @@ bool WindowCore::read_data_container_data(std::ifstream& is) {
         }
     }
 
-    dc.simulation_width  = sim_width;
-    dc.simulation_height = sim_height;
+    edc.simulation_width  = sim_width;
+    edc.simulation_height = sim_height;
 
-    new_simulation_width = dc.simulation_width;
-    new_simulation_height = dc.simulation_height;
+    new_simulation_width = edc.simulation_width;
+    new_simulation_height = edc.simulation_height;
     fill_window = false;
     _ui.cb_fill_window->setChecked(false);
     update_simulation_size_label();
@@ -202,14 +202,14 @@ bool WindowCore::read_data_container_data(std::ifstream& is) {
 //TODO only save food/walls ?
 void WindowCore::read_simulation_grid(std::ifstream& is) {
     disable_warnings = true;
-    resize_simulation_space();
+    resize_simulation_grid();
     disable_warnings = false;
 
-    for (auto & col: dc.CPU_simulation_grid) {
+    for (auto & col: edc.CPU_simulation_grid) {
         is.read((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
     }
 
-    for (auto & column: dc.CPU_simulation_grid) {
+    for (auto & column: edc.CPU_simulation_grid) {
         for (auto &block: column) {
             if (block.type == BlockTypes::WallBlock ||
                 block.type == BlockTypes::EmptyBlock ||
@@ -221,14 +221,14 @@ void WindowCore::read_simulation_grid(std::ifstream& is) {
 
 //TODO save child patterns?
 bool WindowCore::read_organisms(std::ifstream& is) {
-    for (auto & organism: dc.organisms) {
+    for (auto & organism: edc.organisms) {
         delete organism;
     }
-    dc.organisms.clear();
-    for (auto & organism: dc.to_place_organisms) {
+    edc.organisms.clear();
+    for (auto & organism: edc.to_place_organisms) {
         delete organism;
     }
-    dc.to_place_organisms.clear();
+    edc.to_place_organisms.clear();
 
     uint32_t num_organisms;
     is.read((char*)&num_organisms, sizeof(uint32_t));
@@ -240,7 +240,7 @@ bool WindowCore::read_organisms(std::ifstream& is) {
         }
     }
 
-    dc.organisms.reserve(num_organisms);
+    edc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
         OrganismData data{};
         auto brain = std::make_shared<Brain>();
@@ -275,8 +275,8 @@ bool WindowCore::read_organisms(std::ifstream& is) {
         organism->max_do_nothing_lifetime = data.max_do_nothing_lifetime;
         organism->last_decision           = data.last_decision;
 
-        dc.organisms.emplace_back(organism);
-        SimulationEngineSingleThread::place_organism(&dc, organism);
+        edc.organisms.emplace_back(organism);
+        SimulationEngineSingleThread::place_organism(&edc, organism);
     }
 
     return false;
@@ -336,7 +336,7 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
 void WindowCore::update_table_values() {
     for (int row = 0; row < 6; row++) {
         for (int col = 0; col < 3; col++) {
-            BlockParameters *type;
+            BParameters *type;
             switch (static_cast<BlocksNames>(row)) {
                 case BlocksNames::MouthBlock:
                     type = &bp.MouthBlock;
@@ -393,15 +393,15 @@ void WindowCore::read_json_data(std::string path) {
 
     json_read_organism_data(root);
 
-    dc.total_engine_ticks = dc.loaded_engine_ticks;
+    edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
 void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
-    dc.simulation_height  = root.get<int>("num_rows") + 2;
-    dc.simulation_width   = root.get<int>("num_cols") + 2;
+    edc.simulation_height  = root.get<int>("num_rows") + 2;
+    edc.simulation_width   = root.get<int>("num_cols") + 2;
 
-    new_simulation_width = dc.simulation_width;
-    new_simulation_height = dc.simulation_height;
+    new_simulation_width = edc.simulation_width;
+    new_simulation_height = edc.simulation_height;
 
     fill_window = false;
     _ui.cb_fill_window->setChecked(false);
@@ -409,22 +409,22 @@ void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
 
     update_simulation_size_label();
 
-    resize_simulation_space();
-    make_walls();
+    resize_simulation_grid();
+    make_border_walls();
     disable_warnings = false;
 
-    dc.loaded_engine_ticks = root.get<int>("total_ticks");
+    edc.loaded_engine_ticks = root.get<int>("total_ticks");
 
     for (auto & pair: root.get_child("grid.food")) {
         int y = pair.second.get<int>("r")+1;
         int x = pair.second.get<int>("c")+1;
-        dc.CPU_simulation_grid[x][y].type = FoodBlock;
+        edc.CPU_simulation_grid[x][y].type = FoodBlock;
     }
 
     for (auto & pair: root.get_child("grid.walls")) {
         int y = pair.second.get<int>("r")+1;
         int x = pair.second.get<int>("c")+1;
-        dc.CPU_simulation_grid[x][y].type = WallBlock;
+        edc.CPU_simulation_grid[x][y].type = WallBlock;
     }
 }
 
@@ -515,8 +515,8 @@ void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
         new_organism->lifetime = lifetime;
         new_organism->food_collected = food_collected;
         new_organism->damage = damage;
-        dc.organisms.emplace_back(new_organism);
-        SimulationEngineSingleThread::place_organism(&dc, new_organism);
+        edc.organisms.emplace_back(new_organism);
+        SimulationEngineSingleThread::place_organism(&edc, new_organism);
     }
 }
 
@@ -535,14 +535,14 @@ struct my_id_translator
 void WindowCore::write_json_data(std::string path) {
     pt::ptree root, grid, organisms, fossil_record, controls, killable_neighbors, edible_neighbors, growableNeighbors, cell, value, anatomy, cells, j_organism, food, walls, brain;
 
-    auto info = calculate_organisms_info();
+    auto info = parse_organisms_info();
 
-    root.put("num_rows", dc.simulation_height-2);
-    root.put("num_cols", dc.simulation_width-2);
+    root.put("num_rows", edc.simulation_height - 2);
+    root.put("num_cols", edc.simulation_width - 2);
     root.put("total_mutability", static_cast<int>(info.total_total_mutation_rate*100));
     root.put("largest_cell_count", 0);
     root.put("reset_count", auto_reset_num);
-    root.put("total_ticks", dc.total_engine_ticks);
+    root.put("total_ticks", edc.total_engine_ticks);
     root.put("data_update_rate", 100);
 
     json_write_grid(grid, cell, food, walls);
@@ -569,21 +569,21 @@ void WindowCore::write_json_data(std::string path) {
 
 void WindowCore::json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
                                  boost::property_tree::ptree &food, boost::property_tree::ptree &walls) {
-    grid.put("cols", dc.simulation_width-2);
-    grid.put("rows", dc.simulation_height-2);
+    grid.put("cols", edc.simulation_width - 2);
+    grid.put("rows", edc.simulation_height - 2);
 
     bool no_food = true;
     bool no_wall = true;
 
-    for (int x = 1; x < dc.simulation_width-1; x++) {
-        for (int y = 1; y < dc.simulation_height-1; y++) {
-            if (dc.CPU_simulation_grid[x][y].type != WallBlock &&
-                dc.CPU_simulation_grid[x][y].type != FoodBlock) {continue;}
+    for (int x = 1; x < edc.simulation_width - 1; x++) {
+        for (int y = 1; y < edc.simulation_height - 1; y++) {
+            if (edc.CPU_simulation_grid[x][y].type != WallBlock &&
+                edc.CPU_simulation_grid[x][y].type != FoodBlock) {continue;}
             cell = pt::ptree{};
 
             cell.put("c", x-1);
             cell.put("r", y-1);
-            if (dc.CPU_simulation_grid[x][y].type == FoodBlock) {
+            if (edc.CPU_simulation_grid[x][y].type == FoodBlock) {
                 food.push_back(std::make_pair("", cell));
                 no_food = false;
             } else {
@@ -610,7 +610,7 @@ void WindowCore::json_write_grid(boost::property_tree::ptree &grid, boost::prope
 void WindowCore::json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
                                       boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
                                       boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain) {
-    for (auto & organism: dc.organisms) {
+    for (auto & organism: edc.organisms) {
         j_organism = pt::ptree{};
         anatomy = pt::ptree{};
         cells = pt::ptree{};

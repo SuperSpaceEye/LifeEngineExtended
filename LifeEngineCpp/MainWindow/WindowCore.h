@@ -130,54 +130,7 @@ struct OrganismAvgBlockInformation {
 class WindowCore: public QWidget {
         Q_OBJECT
 private:
-    // relative_x>1
-    float scaling_coefficient = 1.2;
-    float scaling_zoom = 1;
-
-    bool wheel_mouse_button_pressed = false;
-    bool right_mouse_button_pressed = false;
-    bool left_mouse_button_pressed = false;
-
-    bool change_main_simulation_grid = false;
-    bool change_editing_grid = false;
-
-    float center_x{};
-    float center_y{};
-
     CursorMode cursor_mode = CursorMode::ModifyFood;
-
-    void move_center(int delta_x, int delta_y);
-    void reset_scale_view();
-
-    int last_mouse_x = 0;
-    int last_mouse_y = 0;
-
-    SimulationEngine* engine;
-    OrganismEditor ee;
-
-    float window_interval = 0.;
-    long delta_window_processing_time = 0;
-
-    Ui::MainWindow _ui{};
-    StatisticsCore s;
-    QTimer * timer;
-    std::chrono::time_point<std::chrono::high_resolution_clock> start;
-    std::chrono::time_point<std::chrono::high_resolution_clock> end;
-
-    static auto clock_now() {return std::chrono::high_resolution_clock::now();}
-    std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
-    std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
-    std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
-    int window_frames = 0;
-    uint32_t simulation_frames = 0;
-
-    ColorContainer color_container;
-
-    SimulationParameters sp;
-
-    EngineControlParameters cp;
-    EngineDataContainer dc;
-    OrganismBlockParameters bp;
 
 #if __CUDA_USED__
     CUDAImageCreator cuda_creator{};
@@ -190,47 +143,103 @@ private:
     QGraphicsScene scene;
     QGraphicsPixmapItem pixmap_item;
 
-    bool pause_image_construction = false;
+    ColorContainer cc;
+    SimulationParameters sp;
+    EngineControlParameters ecp;
+    EngineDataContainer edc;
+    OrganismBlockParameters bp;
 
-    bool stop_console_output = true;
-    bool synchronise_simulation_and_window = false;
+    Ui::MainWindow _ui{};
+    QTimer * timer;
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> end;
 
-    int cell_size = 1;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
+    std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
 
-    int new_simulation_width = 200;
-    int new_simulation_height = 200;
+    SimulationEngine* engine;
+    OrganismEditor ee;
+    StatisticsCore s;
+
+    // coefficient of a zoom
+    float scaling_coefficient = 1.2;
+    // actual zoom
+    float scaling_zoom = 1;
+    float center_x = 0;
+    float center_y = 0;
+    float window_interval = 0.;
+
+    bool wheel_mouse_button_pressed = false;
+    bool right_mouse_button_pressed = false;
+    bool left_mouse_button_pressed = false;
+    bool change_main_simulation_grid = false;
+    bool change_editing_grid = false;
+    bool use_cuda = true;
+    bool synchronise_info_update_with_window_update = false;
+    bool wait_for_engine_to_stop_to_render = false;
+    // do not use textures (now for eyes only)
+    bool simplified_rendering = false;
+    //TODO redundant?
+    bool resize_simulation_grid_flag = false;
+    bool menu_hidden = false;
+    //is needed to prevent multiple switches when pressing button
+    bool allow_menu_hidden_change = true;
+    //TODO remove?
+    bool disable_warnings = false;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
     bool reset_with_chosen = false;
+    //stops copying from main simulation grid to secondary grid from which image is constructed
+    bool pause_grid_parsing = false;
+    //TODO remove?
+    bool stop_console_output = true;
+    bool synchronise_simulation_and_window = false;
 
+    int last_mouse_x_pos = 0;
+    int last_mouse_y_pos = 0;
+    int window_frames = 0;
+    // if fill_window, then size of a cell on a screen should be around this value
+    int starting_cell_size_on_resize = 1;
+    // TODO redundant?
+    int new_simulation_width = 200;
+    int new_simulation_height = 200;
+    // visual only. Controls precision of floats in labels
     int float_precision = 4;
+    // num of auto resets. TODO remove?
     int auto_reset_num = 0;
-
-    bool resize_simulation_grid_flag = false;
-
-    lehmer64 gen{};
-
-    bool menu_hidden = false;
-    bool allow_menu_hidden_change = true;
-
-    bool disable_warnings = false;
-
     int brush_size = 2;
-
-    bool wait_for_engine_to_stop = false;
-
-    bool simplified_rendering = false;
-
     int update_info_every_n_milliseconds = 100;
-    bool synchronise_info_with_window_update = false;
-
-    bool use_cuda = true;
-
     //Will give a warning if num is higher than this.
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
 
+    static auto clock_now() {return std::chrono::high_resolution_clock::now();}
+
+    // moves the center of viewpoint
+    void move_center(int delta_x, int delta_y);
+    void reset_scale_view();
+
     void write_json_data(std::string path);
+    void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
+                             boost::property_tree::ptree &edible_neighbors,
+                             boost::property_tree::ptree &growableNeighbors,
+                             boost::property_tree::ptree &cell, boost::property_tree::ptree &value) const;
+
+    void json_write_fossil_record(boost::property_tree::ptree &fossil_record) const;
+
+    void json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
+                              boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
+                              boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain);
+
+    void json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
+                         boost::property_tree::ptree &food, boost::property_tree::ptree &walls);
+
+    void json_read_organism_data(boost::property_tree::ptree &root);
+
+    void json_read_simulation_parameters(const boost::property_tree::ptree &root);
+
+    void json_read_grid_data(boost::property_tree::ptree &root);
     void read_json_data(std::string path);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
@@ -273,8 +282,9 @@ private:
     void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);
     void resize_image();
-    void set_image_pixel(int x, int y, color & color);
+    void inline set_image_pixel(int x, int y, color & color);
 
+    // for fill_view
     void calculate_new_simulation_size();
     pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
 
@@ -286,16 +296,18 @@ private:
     color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     bool wait_for_engine_to_pause();
+    bool wait_for_engine_to_pause_processing_user_actions();
+    bool wait_for_engine_to_pause_force();
+
+    // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height);
     void parse_full_simulation_grid(bool parse);
+    // clears all organisms
     void clear_organisms();
-    void make_walls();
+    void make_border_walls();
 
     void change_main_grid_left_click();
     void change_main_grid_right_click();
-
-    bool wait_for_engine_to_pause_processing_user_actions();
-    bool wait_for_engine_to_pause_force();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -304,13 +316,15 @@ private:
 
     void update_statistics_info(OrganismAvgBlockInformation info);
 
-    void resize_simulation_space();
+    void resize_simulation_grid();
 
-    void simplified_for_loop(int image_width, int image_height,
-                             std::vector<int> &lin_width,
-                             std::vector<int> &lin_height);
+    // creates simple colored cells
+    void simplified_image_creation(int image_width, int image_height,
+                                   std::vector<int> &lin_width,
+                                   std::vector<int> &lin_height);
 
-    void complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height);
+    // creates cells with textures (right now only eye)
+    void complex_image_creation(std::vector<int> &lin_width, std::vector<int> &lin_height);
 
     static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                             int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
@@ -326,11 +340,13 @@ private:
 
     void update_simulation_size_label();
 
+    // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
     void initialize_gui_settings();
 
+    // converts num bytes to string of shortened number with postfix (like 14 KiB)
     static std::string convert_num_bytes(uint64_t num_bytes);
 
-    OrganismAvgBlockInformation calculate_organisms_info();
+    OrganismAvgBlockInformation parse_organisms_info();
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -436,26 +452,6 @@ private slots:
 
 public:
     WindowCore(QWidget *parent);
-
-    void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
-                             boost::property_tree::ptree &edible_neighbors,
-                             boost::property_tree::ptree &growableNeighbors,
-                             boost::property_tree::ptree &cell, boost::property_tree::ptree &value) const;
-
-    void json_write_fossil_record(boost::property_tree::ptree &fossil_record) const;
-
-    void json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
-                              boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
-                              boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain);
-
-    void json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
-                         boost::property_tree::ptree &food, boost::property_tree::ptree &walls);
-
-    void json_read_organism_data(boost::property_tree::ptree &root);
-
-    void json_read_simulation_parameters(const boost::property_tree::ptree &root);
-
-    void json_read_grid_data(boost::property_tree::ptree &root);
 };
 
 

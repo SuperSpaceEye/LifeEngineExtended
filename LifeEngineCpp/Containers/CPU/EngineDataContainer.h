@@ -66,9 +66,9 @@ struct EngineDataContainer {
 
 struct pool_changes_info {
     Organism * organism;
-    int position_in_old_pool;
-    int old_pool;
-    int new_pool;
+    int position_in_old_pool = -1;
+    int old_pool = 500;
+    int new_pool = 500;
 };
 
 

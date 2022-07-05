@@ -10,6 +10,9 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
                                                                    SimulationParameters *sp,
                                                                    lehmer64 *gen) {
     place_organisms(dc, cp);
+    if (dc->total_engine_ticks % dc->multithread_change_every_n_ticks == 0) {
+        sort_organisms(dc, cp);
+    }
 
     if (sp->eat_then_produce) {
         start_stage(dc, PartialSimulationStage::EatFood);
@@ -36,10 +39,7 @@ void SimulationEnginePartialMultiThread::partial_multi_thread_tick(EngineDataCon
         for (auto & organism: pool)  {SimulationEngineSingleThread::make_decision(dc, sp, organism, gen);}
     }
 
-//    change_organisms_pools(dc, cp);
-    if (dc->total_engine_ticks % dc->multithread_change_every_n_ticks == 0) {
-        sort_organisms(dc, cp);
-    }
+//    change_organisms_pools(edc, ecp);
 
     for (auto & pool: dc->organisms_pools) {
         for (auto & organism: pool) {SimulationEngineSingleThread::try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
@@ -51,7 +51,7 @@ void SimulationEnginePartialMultiThread::place_organisms(EngineDataContainer * d
         place_organism(dc, organism);
         int pool = (organism->x / dc->simulation_width) * cp->num_threads;
         dc->organisms_pools[pool].emplace_back(organism);
-//        dc->organisms_pools[0].emplace_back(organism);
+//        edc->organisms_pools[0].emplace_back(organism);
     }
     dc->to_place_organisms.clear();
 }
@@ -98,31 +98,46 @@ void SimulationEnginePartialMultiThread::change_organisms_pools(EngineDataContai
 //TODO probably here something that segfaults simulation
 void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc, EngineControlParameters *cp) {
     //Sorting organisms by their x position
-    for(int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
+    for (auto & vec: dc->sorted_organisms_by_x_position) {
+        if (!vec.empty()) {
+            throw "bad error";
+        }
+    }
+
+    for (int pool_num = 0; pool_num < dc->organisms_pools.size(); pool_num++) {
         auto pool = dc->organisms_pools[pool_num];
         int pos = 0;
         for (auto & organism: pool) {
-            dc->sorted_organisms_by_x_position[organism->x].emplace_back(pool_changes_info{organism, pos, pool_num, 0});
+            dc->sorted_organisms_by_x_position.at(organism->x).emplace_back(pool_changes_info{organism, pos, pool_num, 0});
             pos++;
         }
     }
 
     int total_organisms_num = calculate_num_organisms(dc);
     int num_organism_in_pool = total_organisms_num / cp->num_threads;
-//    int num_of_left_organisms = total_organisms_num - num_organism_in_pool * cp->num_threads;
+//    int num_of_left_organisms = total_organisms_num - num_organism_in_pool * ecp->num_threads;
+
+    for (auto & pool: dc->pool_changes) {
+        if (!pool.empty()) {
+            throw "error";
+        }
+    }
 
     int current_pool = 0;
     int num_organism = 0;
+    int tnum_orrganims = 0;
     for (auto & position: dc->sorted_organisms_by_x_position) {
         for (auto & info: position) {
             if (current_pool != info.old_pool) {
                 info.new_pool = current_pool;
-                dc->pool_changes[info.old_pool].emplace_back(&info);
+                dc->pool_changes.at(info.old_pool).emplace_back(&info);
             }
 
             num_organism++;
+            tnum_orrganims++;
             if (num_organism > num_organism_in_pool) {
                 current_pool++;
+                num_organism = 0;
             }
 
             //If loop got to the end but there are still organisms, then assign them to the last pool.
@@ -136,20 +151,20 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
     //moving organisms from old pools to new pools
     for (int i = 0; i < dc->pool_changes.size(); i++) {
         auto & pool = dc->organisms_pools[i];
-        auto & pool_info = dc->pool_changes[i];
+        const auto & pool_info = dc->pool_changes.at(i);
         int num_deleted_organisms = 0;
         //deleting organism from old pools
         for (auto & info: pool_info) {
-            if (i != info->old_pool) {
-                throw "fuck";
-            }
             pool.erase(pool.begin() + info->position_in_old_pool - num_deleted_organisms);
             num_deleted_organisms++;
         }
+    }
 
+    for (int i = 0; i < dc->pool_changes.size(); i++) {
+        auto & pool_info = dc->pool_changes.at(i);
         //moving them to new pools
         for (auto & info: pool_info) {
-            dc->organisms_pools[info->new_pool].emplace_back(info->organism);
+            dc->organisms_pools.at(info->new_pool).emplace_back(info->organism);
         }
     }
 
@@ -243,7 +258,7 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
     }
 }
 
-//void SimulationEnginePartialMultiThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, boost::mt19937 & gen) {
+//void SimulationEnginePartialMultiThread::produce_food(EngineDataContainer * edc, SimulationParameters * sp, Organism *organism, boost::mt19937 & gen) {
 //    if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
 //    if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
 //    if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
@@ -251,9 +266,9 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
 //    for (int i = 0; i < organism->organism_anatomy->_producer_blocks; i++) {
 //        for (auto & pc: organism->organism_anatomy->_producing_space) {
 //            //TODO locking here?
-//            if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
+//            if (edc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
 //                if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability) {
-//                    dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
+//                    edc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = FoodBlock;
 //                    break;
 //                }
 //            }

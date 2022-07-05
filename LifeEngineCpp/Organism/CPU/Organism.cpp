@@ -52,7 +52,6 @@ float Organism::calculate_max_life() {
     return life_points;
 }
 
-//TODO for the future
 int Organism::calculate_organism_lifetime() {
     max_lifetime = organism_anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
     return max_lifetime;

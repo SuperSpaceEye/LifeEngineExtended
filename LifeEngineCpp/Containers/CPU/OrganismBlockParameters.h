@@ -5,19 +5,19 @@
 #ifndef THELIFEENGINECPP_ORGANISMBLOCKPARAMETERS_H
 #define THELIFEENGINECPP_ORGANISMBLOCKPARAMETERS_H
 
-struct BlockParameters {
+struct BParameters {
     // food_cost_modifier - how much food does organism have to spend on one block when creating a child
     // life_point_amount - how much organism gains life points from this block
     float food_cost_modifier = 1; float life_point_amount = 1; float chance_weight = 1;
 };
 
 struct OrganismBlockParameters {
-    BlockParameters MouthBlock    = {1, 1, 1};
-    BlockParameters ProducerBlock = {1, 1, 1};
-    BlockParameters MoverBlock    = {1, 1, 1};
-    BlockParameters KillerBlock   = {1, 1, 1};
-    BlockParameters ArmorBlock    = {1, 1, 1};
-    BlockParameters EyeBlock      = {1, 1, 1};
+    BParameters MouthBlock    = {1, 1, 1};
+    BParameters ProducerBlock = {1, 1, 1};
+    BParameters MoverBlock    = {1, 1, 1};
+    BParameters KillerBlock   = {1, 1, 1};
+    BParameters ArmorBlock    = {1, 1, 1};
+    BParameters EyeBlock      = {1, 1, 1};
 };
 
 enum class BlocksNames {

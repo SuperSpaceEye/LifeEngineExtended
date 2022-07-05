@@ -17,32 +17,32 @@ WindowCore::WindowCore(QWidget *parent) :
     QCoreApplication::instance()->installEventFilter(this);
 
     s.init(&_ui);
-    ee.init(15, 15, &_ui, &color_container, &sp, &bp, &cursor_mode);
+    ee.init(15, 15, &_ui, &cc, &sp, &bp, &cursor_mode);
 
-    dc.simulation_width = 200;
-    dc.simulation_height = 200;
+    edc.simulation_width = 200;
+    edc.simulation_height = 200;
 
 #if __VALGRIND_MODE__
-    dc.simulation_width = 50;
-    dc.simulation_height = 50;
+    edc.simulation_width = 50;
+    edc.simulation_height = 50;
 #endif
 
-    dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width * dc.simulation_height, BaseGridBlock{});
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
+    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
-    engine = new SimulationEngine(std::ref(dc), std::ref(cp), std::ref(bp), std::ref(sp));
+    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp));
 
-    make_walls();
+    make_border_walls();
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
-    boost::random_device rd;
+//    boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
-    gen = lehmer64(rd());
+//    gen = lehmer64(rd());
 
-    color_container = ColorContainer{};
+    cc = ColorContainer{};
     sp = SimulationParameters{};
 
     auto anatomy = std::make_shared<Anatomy>();
@@ -56,16 +56,16 @@ WindowCore::WindowCore(QWidget *parent) :
 
     auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
 
-    dc.base_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2,
-                                 Rotation::UP, anatomy, brain, &sp, &bp, 1);
-    dc.chosen_organism = new Organism(dc.simulation_width / 2, dc.simulation_height / 2,
-                                   Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
-                                   &sp, &bp, 1);
+    edc.base_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
+                                     Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    edc.chosen_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
+                                       Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
+                                       &sp, &bp, 1);
 
-    dc.base_organism->last_decision = DecisionObservation{};
-    dc.chosen_organism->last_decision = DecisionObservation{};
+    edc.base_organism->last_decision = DecisionObservation{};
+    edc.chosen_organism->last_decision = DecisionObservation{};
 
-    dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));
+    edc.to_place_organisms.push_back(new Organism(edc.chosen_organism));
 
     resize_image();
     reset_scale_view();
@@ -108,28 +108,28 @@ WindowCore::WindowCore(QWidget *parent) :
 void WindowCore::mainloop_tick() {
     start = clock_now();
     if (synchronise_simulation_and_window) {
-        cp.engine_pass_tick = true;
-        cp.synchronise_simulation_tick = true;
+        ecp.engine_pass_tick = true;
+        ecp.synchronise_simulation_tick = true;
     }
     window_tick();
     window_frames++;
-    delta_window_processing_time = std::abs(std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count());
+    std::abs(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     auto info_update = std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count();
 
-    if (synchronise_info_with_window_update || info_update > update_info_every_n_milliseconds) {
+    if (synchronise_info_update_with_window_update || info_update > update_info_every_n_milliseconds) {
         auto start_timer = clock_now();
         //TODO make pausing logic better.
-        cp.engine_pause = true;
+        ecp.engine_pause = true;
         wait_for_engine_to_pause();
-        simulation_frames = dc.engine_ticks;
-        dc.engine_ticks = 0;
+        uint32_t simulation_frames = edc.engine_ticks;
+        edc.engine_ticks = 0;
 
         if (info_update == 0) {info_update = 1;}
 
         auto scale = (info_update/1000.);
 
-        auto info = calculate_organisms_info();
+        auto info = parse_organisms_info();
 
         unpause_engine();
 
@@ -149,8 +149,8 @@ void WindowCore::update_fps_labels(int fps, int sps) {
 }
 
 void WindowCore::window_tick() {
-    if (resize_simulation_grid_flag) {resize_simulation_space(); resize_simulation_grid_flag=false;}
-    if (cp.tb_paused) {_ui.tb_pause->setChecked(true);}
+    if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
+    if (ecp.tb_paused) {_ui.tb_pause->setChecked(true);}
     if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
     if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
 #if __VALGRIND_MODE__ == 1
@@ -174,30 +174,30 @@ void WindowCore::move_center(int delta_x, int delta_y) {
 }
 
 void WindowCore::reset_scale_view() {
-    center_x = (float)dc.simulation_width/2;
-    center_y = (float)dc.simulation_height/2;
+    center_x = (float)edc.simulation_width / 2;
+    center_y = (float)edc.simulation_height / 2;
     // finds exponent needed to scale the image
     float exp;
     if (_ui.simulation_graphicsView->viewport()->height() < _ui.simulation_graphicsView->viewport()->width()) {
-        exp = log((float) dc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
+        exp = log((float) edc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
     } else {
-        exp = log((float) dc.simulation_width / (float) _ui.simulation_graphicsView->viewport()->width()) / log(scaling_coefficient);
+        exp = log((float) edc.simulation_width / (float) _ui.simulation_graphicsView->viewport()->width()) / log(scaling_coefficient);
     }
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
 color &WindowCore::get_color_simplified(BlockTypes type) {
     switch (type) {
-        case EmptyBlock :   return color_container.empty_block;
-        case MouthBlock:    return color_container.mouth;
-        case ProducerBlock: return color_container.producer;
-        case MoverBlock:    return color_container.mover;
-        case KillerBlock:   return color_container.killer;
-        case ArmorBlock:    return color_container.armor;
-        case EyeBlock:      return color_container.eye;
-        case FoodBlock:     return color_container.food;
-        case WallBlock:     return color_container.wall;
-        default: return color_container.empty_block;
+        case EmptyBlock :   return cc.empty_block;
+        case MouthBlock:    return cc.mouth;
+        case ProducerBlock: return cc.producer;
+        case MoverBlock:    return cc.mover;
+        case KillerBlock:   return cc.killer;
+        case ArmorBlock:    return cc.armor;
+        case EyeBlock:      return cc.eye;
+        case FoodBlock:     return cc.food;
+        case WallBlock:     return cc.wall;
+        default: return cc.empty_block;
     }
 }
 
@@ -206,12 +206,12 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
     int y;
 
     switch (type) {
-        case EmptyBlock :   return color_container.empty_block;
-        case MouthBlock:    return color_container.mouth;
-        case ProducerBlock: return color_container.producer;
-        case MoverBlock:    return color_container.mover;
-        case KillerBlock:   return color_container.killer;
-        case ArmorBlock:    return color_container.armor;
+        case EmptyBlock :   return cc.empty_block;
+        case MouthBlock:    return cc.mouth;
+        case ProducerBlock: return cc.producer;
+        case MoverBlock:    return cc.mover;
+        case KillerBlock:   return cc.killer;
+        case ArmorBlock:    return cc.armor;
         case EyeBlock:
             x = relative_x_scale * 5;
             y = relative_y_scale * 5;
@@ -246,9 +246,9 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
                 }
             }
             return textures.rawEyeTexture[x + y * 5];
-        case FoodBlock:     return color_container.food;
-        case WallBlock:     return color_container.wall;
-        default: return color_container.empty_block;
+        case FoodBlock:     return cc.food;
+        case WallBlock:     return cc.wall;
+        default: return cc.empty_block;
     }
 }
 
@@ -277,20 +277,20 @@ void WindowCore::create_image() {
 
     calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 
-    if ((!pause_image_construction && !cp.engine_global_pause) || synchronise_simulation_and_window) {
+    if ((!pause_grid_parsing && !ecp.engine_global_pause) || synchronise_simulation_and_window) {
         //it does not help
         //#pragma omp parallel for
-        cp.engine_pause = true;
+        ecp.engine_pause = true;
         // pausing engine to parse data from engine.
         auto paused = wait_for_engine_to_pause();
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
         if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); unpause_engine();}
     }
     if (simplified_rendering) {
-        simplified_for_loop(image_width, image_height, lin_width, lin_height);
+        simplified_image_creation(image_width, image_height, lin_width, lin_height);
     } else {
         if (!use_cuda) {
-            complex_for_loop(lin_width, lin_height);
+            complex_image_creation(lin_width, lin_height);
         } else {
 #if __CUDA_USED__
             cuda_creator.cuda_create_image(image_width,
@@ -298,8 +298,8 @@ void WindowCore::create_image() {
                                            lin_width,
                                            lin_height,
                                            image_vector,
-                                           color_container,
-                                           dc, 32, truncated_lin_width, truncated_lin_height);
+                                           cc,
+                                           edc, 32, truncated_lin_width, truncated_lin_height);
 #endif
         }
     }
@@ -339,20 +339,20 @@ void WindowCore::calculate_truncated_linspace(
     truncated_lin_height.pop_back();
 }
 
-void WindowCore::simplified_for_loop(int image_width, int image_height,
-                         std::vector<int> &lin_width,
-                         std::vector<int> &lin_height) {
+void WindowCore::simplified_image_creation(int image_width, int image_height,
+                                           std::vector<int> &lin_width,
+                                           std::vector<int> &lin_height) {
     color pixel_color;
     for (int x = 0; x < image_width; x++) {
         for (int y = 0; y < image_height; y++) {
-            if (lin_width[x] < 0 || lin_width[x] >= dc.simulation_width || lin_height[y] < 0 || lin_height[y] >= dc.simulation_height) {pixel_color = color_container.simulation_background_color;}
-            else {pixel_color = get_color_simplified(dc.second_simulation_grid[lin_width[x] + lin_height[y] * dc.simulation_width].type);}
+            if (lin_width[x] < 0 || lin_width[x] >= edc.simulation_width || lin_height[y] < 0 || lin_height[y] >= edc.simulation_height) { pixel_color = cc.simulation_background_color;}
+            else {pixel_color = get_color_simplified(edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width].type);}
             set_image_pixel(x, y, pixel_color);
         }
     }
 }
 
-void WindowCore::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {
+void WindowCore::complex_image_creation(std::vector<int> &lin_width, std::vector<int> &lin_height) {
     std::vector<pix_pos> width_img_boundaries;
     std::vector<pix_pos> height_img_boundaries;
 
@@ -386,13 +386,13 @@ void WindowCore::complex_for_loop(std::vector<int> &lin_width, std::vector<int> 
         for (auto &h_b: height_img_boundaries) {
             for (int x = w_b.start; x < w_b.stop; x++) {
                 for (int y = h_b.start; y < h_b.stop; y++) {
-                    auto &block = dc.second_simulation_grid[lin_width[x] + lin_height[y] * dc.simulation_width];
+                    auto &block = edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width];
 
                     if (lin_width[x] < 0 ||
-                        lin_width[x] >= dc.simulation_width ||
+                        lin_width[x] >= edc.simulation_width ||
                         lin_height[y] < 0 ||
-                        lin_height[y] >= dc.simulation_height) {
-                        pixel_color = color_container.simulation_background_color;
+                        lin_height[y] >= edc.simulation_height) {
+                        pixel_color = cc.simulation_background_color;
                         set_image_pixel(x, y, pixel_color);
                         continue;
                     }
@@ -429,78 +429,78 @@ void WindowCore::set_window_interval(int max_window_fps) {
 
 void WindowCore::set_simulation_interval(int max_simulation_fps) {
     if (max_simulation_fps <= 0) {
-        dc.simulation_interval = 0.;
-        dc.unlimited_simulation_fps = true;
+        edc.simulation_interval = 0.;
+        edc.unlimited_simulation_fps = true;
         return;
     }
-    dc.simulation_interval = 1./max_simulation_fps;
-    dc.unlimited_simulation_fps = false;
+    edc.simulation_interval = 1. / max_simulation_fps;
+    edc.unlimited_simulation_fps = false;
 }
 
 
 //Can wait, or it can not.
 bool WindowCore::wait_for_engine_to_pause() {
-    if (!wait_for_engine_to_stop || cp.engine_global_pause) {return true;}
+    if (!wait_for_engine_to_stop_to_render || ecp.engine_global_pause) {return true;}
     return wait_for_engine_to_pause_force();
 }
 
 //Will always wait for engine to pause
 bool WindowCore::wait_for_engine_to_pause_force() {
     auto now = clock_now();
-    while (!cp.engine_paused) {
+    while (!ecp.engine_paused) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
             std::cout << "Waiting for engine to pause\n";
             now = clock_now();
         }
     }
-    return cp.engine_paused;
+    return ecp.engine_paused;
 }
 
 bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
     auto now = clock_now();
-    while (cp.processing_user_actions) {
+    while (ecp.processing_user_actions) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
             std::cout << "Waiting for engine to pause processing user actions\n";
             now = clock_now();
         }
     }
-    return !cp.processing_user_actions;
+    return !ecp.processing_user_actions;
 }
 
 void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
     for (int x: lin_width) {
-        if (x < 0 || x >= dc.simulation_width) { continue; }
+        if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
-            if (y < 0 || y >= dc.simulation_height) { continue; }
-            dc.second_simulation_grid[x + y * dc.simulation_width].type = dc.CPU_simulation_grid[x][y].type;
-            dc.second_simulation_grid[x + y * dc.simulation_width].organism = dc.CPU_simulation_grid[x][y].organism;
-            dc.second_simulation_grid[x + y * dc.simulation_width].rotation = dc.CPU_simulation_grid[x][y].rotation;
+            if (y < 0 || y >= edc.simulation_height) { continue; }
+            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.second_simulation_grid[x + y * edc.simulation_width].organism = edc.CPU_simulation_grid[x][y].organism;
+            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
 }
 
 void WindowCore::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     while(!wait_for_engine_to_pause_force()) {}
 
-    for (int x = 0; x < dc.simulation_width; x++) {
-        for (int y = 0; y < dc.simulation_height; y++) {
-            dc.second_simulation_grid[x + y * dc.simulation_width].type = dc.CPU_simulation_grid[x][y].type;
-            dc.second_simulation_grid[x + y * dc.simulation_width].organism = dc.CPU_simulation_grid[x][y].organism;
-            dc.second_simulation_grid[x + y * dc.simulation_width].rotation = dc.CPU_simulation_grid[x][y].rotation;
+    for (int x = 0; x < edc.simulation_width; x++) {
+        for (int y = 0; y < edc.simulation_height; y++) {
+            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.second_simulation_grid[x + y * edc.simulation_width].organism = edc.CPU_simulation_grid[x][y].organism;
+            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
     unpause_engine();
 }
 
 void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
-    cp.num_threads = num_threads;
-    if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        cp.build_threads = true;
+    ecp.num_threads = num_threads;
+    if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        ecp.build_threads = true;
     }
 
     unpause_engine();
@@ -511,26 +511,26 @@ void WindowCore::set_cursor_mode(CursorMode mode) {
 }
 
 void WindowCore::set_simulation_mode(SimulationModes mode) {
-    cp.change_to_mode = mode;
-    cp.change_simulation_mode = true;
+    ecp.change_to_mode = mode;
+    ecp.change_simulation_mode = true;
 }
 
 void WindowCore::clear_organisms() {
-    if (!cp.engine_paused) {
+    if (!ecp.engine_paused) {
         if (!stop_console_output) {std::cout << "Engine is not paused! Organisms not cleared.\n";}
         return;
     }
-    if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-        for (auto &organism: dc.organisms) { delete organism; }
-        for (auto &organism: dc.to_place_organisms) { delete organism; }
-        dc.organisms.clear();
-        dc.to_place_organisms.clear();
-    } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        for (auto & organism: dc.to_place_organisms) { delete organism; }
-        dc.to_place_organisms.clear();
-        for (int pool_num = 0; pool_num < cp.num_threads; pool_num++) {
-            for (auto & organism: dc.organisms_pools[pool_num]) { delete organism; }
-            dc.organisms_pools[pool_num].clear();
+    if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+        for (auto &organism: edc.organisms) { delete organism; }
+        for (auto &organism: edc.to_place_organisms) { delete organism; }
+        edc.organisms.clear();
+        edc.to_place_organisms.clear();
+    } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        for (auto & organism: edc.to_place_organisms) { delete organism; }
+        edc.to_place_organisms.clear();
+        for (int pool_num = 0; pool_num < ecp.num_threads; pool_num++) {
+            for (auto & organism: edc.organisms_pools[pool_num]) { delete organism; }
+            edc.organisms_pools[pool_num].clear();
         }
     }
 }
@@ -538,11 +538,11 @@ void WindowCore::clear_organisms() {
 void WindowCore::calculate_new_simulation_size() {
     auto window_size = _ui.simulation_graphicsView->viewport()->size();
 
-    new_simulation_width  = window_size.width() / cell_size;
-    new_simulation_height = window_size.height() / cell_size;
+    new_simulation_width  = window_size.width() / starting_cell_size_on_resize;
+    new_simulation_height = window_size.height() / starting_cell_size_on_resize;
 }
 
-void WindowCore::resize_simulation_space() {
+void WindowCore::resize_simulation_grid() {
     if (fill_window) {calculate_new_simulation_size();}
 
     if (!disable_warnings) {
@@ -569,31 +569,31 @@ void WindowCore::resize_simulation_space() {
         }
     }
 
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
-    dc.simulation_width = new_simulation_width;
-    dc.simulation_height = new_simulation_height;
+    edc.simulation_width = new_simulation_width;
+    edc.simulation_height = new_simulation_height;
 
-    dc.CPU_simulation_grid.clear();
-    dc.second_simulation_grid.clear();
+    edc.CPU_simulation_grid.clear();
+    edc.second_simulation_grid.clear();
 
-    dc.CPU_simulation_grid   .resize(dc.simulation_width, std::vector<AtomicGridBlock>(dc.simulation_height, AtomicGridBlock{}));
-    dc.second_simulation_grid.resize(dc.simulation_width *dc.simulation_height, BaseGridBlock{});
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
+    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
-    cp.build_threads = true;
+    ecp.build_threads = true;
     reset_world();
 
     reset_scale_view();
 }
 
 void WindowCore::partial_clear_world() {
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
     clear_organisms();
 
-    for (auto & column: dc.CPU_simulation_grid) {
+    for (auto & column: edc.CPU_simulation_grid) {
         for (auto &block: column) {
             if (!sp.clear_walls_on_reset) {
                 if (block.type == BlockTypes::WallBlock) { continue; }
@@ -601,27 +601,27 @@ void WindowCore::partial_clear_world() {
             block.type = BlockTypes::EmptyBlock;
         }
     }
-    for (auto & block: dc.second_simulation_grid) {
+    for (auto & block: edc.second_simulation_grid) {
         if (!sp.clear_walls_on_reset) {
             if (block.type == BlockTypes::WallBlock) { continue; }
         }
         block.type = BlockTypes::EmptyBlock;
     }
-    dc.total_engine_ticks = 0;
+    edc.total_engine_ticks = 0;
 }
 
 void WindowCore::reset_world() {
     partial_clear_world();
-    make_walls();
+    make_border_walls();
 
-    dc.base_organism->x = dc.simulation_width / 2;
-    dc.base_organism->y = dc.simulation_height / 2;
+    edc.base_organism->x = edc.simulation_width / 2;
+    edc.base_organism->y = edc.simulation_height / 2;
 
-    dc.chosen_organism->x = dc.simulation_width / 2;
-    dc.chosen_organism->y = dc.simulation_height / 2;
+    edc.chosen_organism->x = edc.simulation_width / 2;
+    edc.chosen_organism->y = edc.simulation_height / 2;
 
-    if (reset_with_chosen) { dc.to_place_organisms.push_back(new Organism(dc.chosen_organism)); }
-    else { dc.to_place_organisms.push_back(new Organism(dc.base_organism)); }
+    if (reset_with_chosen) { edc.to_place_organisms.push_back(new Organism(edc.chosen_organism)); }
+    else { edc.to_place_organisms.push_back(new Organism(edc.base_organism)); }
 
     if (sp.generate_random_walls_on_reset) {
         engine->clear_walls();
@@ -629,36 +629,36 @@ void WindowCore::reset_world() {
     }
 
     //Just in case
-    cp.engine_pass_tick = true;
-    cp.synchronise_simulation_tick = true;
+    ecp.engine_pass_tick = true;
+    ecp.synchronise_simulation_tick = true;
     unpause_engine();
 }
 
 void WindowCore::clear_world() {
     partial_clear_world();
-    make_walls();
+    make_border_walls();
     unpause_engine();
 }
 
 void WindowCore::unpause_engine() {
     if (!synchronise_simulation_and_window) {
-        cp.engine_pause = false;
+        ecp.engine_pause = false;
     }
 }
 
-void WindowCore::make_walls() {
-    for (int x = 0; x < dc.simulation_width; x++) {
-        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
+void WindowCore::make_border_walls() {
+    for (int x = 0; x < edc.simulation_width; x++) {
+        edc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+        edc.CPU_simulation_grid[x][edc.simulation_height - 1].type = BlockTypes::WallBlock;
     }
 
-    for (int y = 0; y < dc.simulation_height; y++) {
-        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+    for (int y = 0; y < edc.simulation_height; y++) {
+        edc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+        edc.CPU_simulation_grid[edc.simulation_width - 1][y].type = BlockTypes::WallBlock;
     }
 }
 
-OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
+OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
     OrganismAvgBlockInformation info;
 
     bool has_pool = true;
@@ -667,13 +667,13 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
     while (has_pool) {
         std::vector<Organism*> * pool;
 
-        if (cp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-            pool = &dc.organisms;
+        if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+            pool = &edc.organisms;
             has_pool = false;
-        } else if (cp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-            pool = &dc.organisms_pools[i];
+        } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+            pool = &edc.organisms_pools[i];
             i++;
-            if (i >= cp.num_threads) {
+            if (i >= ecp.num_threads) {
                 has_pool = false;
             }
         }
@@ -853,7 +853,7 @@ OrganismAvgBlockInformation WindowCore::calculate_organisms_info() {
 }
 
 void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
-    s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(dc.total_engine_ticks)));
+    s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(edc.total_engine_ticks)));
     s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
     s._ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
@@ -902,10 +902,10 @@ void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
 // So that changes in code values would be set by default in gui.
 void WindowCore::initialize_gui_settings() {
     //World settings
-    _ui.le_cell_size         ->setText(QString::fromStdString(std::to_string(cell_size)));
-    _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(dc.simulation_width)));
-    _ui.le_simulation_height ->setText(QString::fromStdString(std::to_string(dc.simulation_height)));
-    _ui.le_max_organisms     ->setText(QString::fromStdString(std::to_string(dc.max_organisms)));
+    _ui.le_cell_size         ->setText(QString::fromStdString(std::to_string(starting_cell_size_on_resize)));
+    _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(edc.simulation_width)));
+    _ui.le_simulation_height ->setText(QString::fromStdString(std::to_string(edc.simulation_height)));
+    _ui.le_max_organisms     ->setText(QString::fromStdString(std::to_string(edc.max_organisms)));
     _ui.le_brush_size        ->setText(QString::fromStdString(std::to_string(brush_size)));
     _ui.cb_reset_on_total_extinction ->setChecked(sp.reset_on_total_extinction);
     _ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
@@ -956,7 +956,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_eat_then_produce                  ->setChecked(sp.eat_then_produce);
 
     //Settings
-    _ui.le_num_threads->setText(QString::fromStdString(std::to_string(cp.num_threads)));
+    _ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
     int font_size;
@@ -974,11 +974,11 @@ void WindowCore::initialize_gui_settings() {
 
     _ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
     _ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
-    _ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop);
+    _ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop_to_render);
     _ui.cb_simplified_rendering->setChecked(simplified_rendering);
 
     _ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
-    _ui.cb_synchronise_info_with_window->setChecked(synchronise_info_with_window_update);
+    _ui.cb_synchronise_info_with_window->setChecked(synchronise_info_update_with_window_update);
     disable_warnings = true;
     _ui.cb_use_nvidia_for_image_generation->setChecked(use_cuda);
     disable_warnings = false;
@@ -993,7 +993,7 @@ void WindowCore::initialize_gui_settings() {
 }
 
 void WindowCore::update_simulation_size_label() {
-  s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(dc.simulation_width) + "x" + std::to_string(dc.simulation_height)));
+  s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
 }
 
 std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
@@ -1022,49 +1022,49 @@ pos_on_grid WindowCore::calculate_cursor_pos_on_grid(int x, int y) {
 
 void WindowCore::change_main_grid_left_click() {
     //cursor pos on grid
-    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
-    cp.pause_processing_user_action = true;
+    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+    ecp.pause_processing_user_action = true;
     wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    dc.user_actions_pool.push_back(
+                    edc.user_actions_pool.push_back(
                             Action{ActionType::TryAddFood, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::ModifyWall:
-                    dc.user_actions_pool.push_back(
+                    edc.user_actions_pool.push_back(
                             Action{ActionType::TryAddWall, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::KillOrganism:
-                    dc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x+x, cpg.y+y});
+                    edc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::ChooseOrganism:
-                    dc.user_actions_pool.push_back(Action{ActionType::TrySelectOrganism, cpg.x+x, cpg.y+y});
+                    edc.user_actions_pool.push_back(Action{ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::PlaceOrganism:
                     break;
             }
         }
     }
-    cp.pause_processing_user_action = false;
+    ecp.pause_processing_user_action = false;
 }
 
 void WindowCore::change_main_grid_right_click() {
-    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x, last_mouse_y);
-    cp.pause_processing_user_action = true;
+    auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+    ecp.pause_processing_user_action = true;
     wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    dc.user_actions_pool.push_back(Action{ActionType::TryRemoveFood, cpg.x+x, cpg.y+y});
+                    edc.user_actions_pool.push_back(Action{ActionType::TryRemoveFood, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::ModifyWall:
-                    dc.user_actions_pool.push_back(Action{ActionType::TryRemoveWall, cpg.x+x, cpg.y+y});
+                    edc.user_actions_pool.push_back(Action{ActionType::TryRemoveWall, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::KillOrganism:
-                    dc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x+x, cpg.y+y});
+                    edc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x + x, cpg.y + y});
                     break;
                 case CursorMode::ChooseOrganism:
                     break;
@@ -1073,7 +1073,7 @@ void WindowCore::change_main_grid_right_click() {
             }
         }
     }
-    cp.pause_processing_user_action = false;
+    ecp.pause_processing_user_action = false;
 }
 
 bool WindowCore::cuda_is_available() {

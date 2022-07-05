@@ -7,16 +7,16 @@
 //==================== Toggle buttons ====================
 
 void WindowCore::tb_pause_slot(bool state) {
-    cp.pause_button_pause = state;
-    parse_full_simulation_grid(cp.pause_button_pause);
-    cp.tb_paused = state;
+    ecp.pause_button_pause = state;
+    parse_full_simulation_grid(ecp.pause_button_pause);
+    ecp.tb_paused = state;
 }
 
 void WindowCore::tb_stoprender_slot(bool state) {
-    pause_image_construction = state;
-    parse_full_simulation_grid(pause_image_construction);
+    pause_grid_parsing = state;
+    parse_full_simulation_grid(pause_grid_parsing);
     // calculating delta time is not needed when no image is being created.
-    cp.calculate_simulation_tick_delta_time = !cp.calculate_simulation_tick_delta_time;
+    ecp.calculate_simulation_tick_delta_time = !ecp.calculate_simulation_tick_delta_time;
 }
 
 void WindowCore::tb_open_statistics_slot(bool state) {
@@ -56,7 +56,7 @@ void WindowCore::b_resize_and_reset_slot() {
 }
 
 void WindowCore::b_generate_random_walls_slot() {
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
     engine->make_random_walls();
 
@@ -64,7 +64,7 @@ void WindowCore::b_generate_random_walls_slot() {
 }
 
 void WindowCore::b_clear_all_walls_slot() {
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     wait_for_engine_to_pause();
 
     engine->clear_walls();
@@ -75,8 +75,8 @@ void WindowCore::b_clear_all_walls_slot() {
 void WindowCore::b_save_world_slot() {
     bool flag = synchronise_simulation_and_window;
     synchronise_simulation_and_window = false;
-    cp.engine_global_pause = true;
-    cp.pause_processing_user_action = true;
+    ecp.engine_global_pause = true;
+    ecp.pause_processing_user_action = true;
     wait_for_engine_to_pause_force();
     wait_for_engine_to_pause_processing_user_actions();
 
@@ -95,8 +95,8 @@ void WindowCore::b_save_world_slot() {
         filetype = ".json";
     } else {
         synchronise_simulation_and_window = flag;
-        cp.engine_global_pause = false;
-        cp.pause_processing_user_action = false;
+        ecp.engine_global_pause = false;
+        ecp.pause_processing_user_action = false;
         return;
     }
     std::string full_path = file_name.toStdString();
@@ -117,15 +117,15 @@ void WindowCore::b_save_world_slot() {
     }
 
     synchronise_simulation_and_window = flag;
-    cp.engine_global_pause = false;
-    cp.pause_processing_user_action = false;
+    ecp.engine_global_pause = false;
+    ecp.pause_processing_user_action = false;
 }
 
 void WindowCore::b_load_world_slot() {
     bool flag = synchronise_simulation_and_window;
     synchronise_simulation_and_window = false;
-    cp.engine_global_pause = true;
-    cp.pause_processing_user_action = true;
+    ecp.engine_global_pause = true;
+    ecp.pause_processing_user_action = true;
     wait_for_engine_to_pause_force();
     wait_for_engine_to_pause_processing_user_actions();
 
@@ -139,8 +139,8 @@ void WindowCore::b_load_world_slot() {
         filetype = ".json";
     } else {
         synchronise_simulation_and_window = flag;
-        cp.engine_global_pause = false;
-        cp.pause_processing_user_action = false;
+        ecp.engine_global_pause = false;
+        ecp.pause_processing_user_action = false;
         return;
     }
 
@@ -156,14 +156,14 @@ void WindowCore::b_load_world_slot() {
     }
 
     synchronise_simulation_and_window = flag;
-    cp.engine_global_pause = false;
-    cp.pause_processing_user_action = false;
+    ecp.engine_global_pause = false;
+    ecp.pause_processing_user_action = false;
     initialize_gui_settings();
     update_table_values();
 }
 
 void WindowCore::b_pass_one_tick_slot() {
-    cp.pass_tick = true;
+    ecp.pass_tick = true;
     parse_full_simulation_grid(true);
 }
 void WindowCore::b_reset_view_slot() {
@@ -172,13 +172,13 @@ void WindowCore::b_reset_view_slot() {
 
 void WindowCore::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
-    cp.engine_pause = true;
+    ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
-    for (auto & organism: dc.organisms) {
+    for (auto & organism: edc.organisms) {
         organism->lifetime = organism->max_lifetime*2;
     }
-    for (auto & organism: dc.to_place_organisms) {
+    for (auto & organism: edc.to_place_organisms) {
         organism->lifetime = organism->max_lifetime*2;
     }
 
@@ -190,7 +190,7 @@ void WindowCore::b_kill_all_organisms_slot() {
 //There should be a better way of doing this, but I don't see one
 
 void WindowCore::le_max_sps_slot() {
-    int fallback = int(1/dc.simulation_interval);
+    int fallback = int(1 / edc.simulation_interval);
     if (fallback < 0) {fallback = -1;}
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_sps, fallback);
     if (!result.is_valid) {return;}
@@ -206,7 +206,7 @@ void WindowCore::le_max_fps_slot() {
 }
 
 void WindowCore::le_num_threads_slot() {
-    int fallback = int(cp.num_threads);
+    int fallback = int(ecp.num_threads);
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_num_threads, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 1) { display_dialog_message("Number of threads cannot be less than 1.", disable_warnings); return;}
@@ -223,15 +223,15 @@ void WindowCore::le_num_threads_slot() {
 }
 
 void WindowCore::le_cell_size_slot() {
-    int fallback = cell_size;
+    int fallback = starting_cell_size_on_resize;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_cell_size, fallback);
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Size of cell cannot be less than 1."); return;}
-    cell_size = result.result;
+    starting_cell_size_on_resize = result.result;
 }
 
 void WindowCore::le_simulation_width_slot() {
-    int fallback = dc.simulation_width;
+    int fallback = edc.simulation_width;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_width,
                                                         fallback);
     if (!result.is_valid) {return;}
@@ -240,7 +240,7 @@ void WindowCore::le_simulation_width_slot() {
 }
 
 void WindowCore::le_simulation_height_slot() {
-    int fallback = dc.simulation_height;
+    int fallback = edc.simulation_height;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_height,
                                                         fallback);
     if (!result.is_valid) {return;}
@@ -364,10 +364,10 @@ void WindowCore::le_max_reproducing_distance_slot() {
 }
 
 void WindowCore::le_max_organisms_slot() {
-    int fallback = dc.max_organisms;
+    int fallback = edc.max_organisms;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_organisms, fallback);
     if (!result.is_valid) {return;}
-    dc.max_organisms = result.result;
+    edc.max_organisms = result.result;
 }
 
 void WindowCore::le_float_number_precision_slot() {
@@ -576,7 +576,7 @@ void WindowCore::rb_cuda_slot() {
 
 void WindowCore::cb_synchronise_simulation_and_window_slot(bool state) {
     synchronise_simulation_and_window = state;
-    cp.engine_pause = state;
+    ecp.engine_pause = state;
 }
 
 void WindowCore::cb_use_evolved_anatomy_mutation_rate_slot(bool state) {
@@ -669,7 +669,7 @@ void WindowCore::cb_self_organism_blocks_block_sight_slot(bool state){ sp.organi
 
 void WindowCore::cb_failed_reproduction_eats_food_slot   (bool state) { sp.failed_reproduction_eats_food = state;}
 
-void WindowCore::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop = state;}
+void WindowCore::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop_to_render = state;}
 
 void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 
@@ -681,7 +681,7 @@ void WindowCore::cb_simplified_food_production_slot      (bool state) { sp.simpl
 
 void WindowCore::cb_stop_when_one_food_generated         (bool state) { sp.stop_when_one_food_generated = state;}
 
-void WindowCore::cb_synchronise_info_with_window_slot    (bool state) { synchronise_info_with_window_update = state;}
+void WindowCore::cb_synchronise_info_with_window_slot    (bool state) { synchronise_info_update_with_window_update = state;}
 
 void WindowCore::cb_eat_then_produce_slot                (bool state) { sp.eat_then_produce = state;}
 
@@ -698,7 +698,7 @@ void WindowCore::table_cell_changed_slot(int row, int col) {
     } else {
         if (!disable_warnings) {display_message("Value should be float.");}
     }
-    BlockParameters * type;
+    BParameters * type;
     switch (static_cast<BlocksNames>(row)) {
         case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
         case BlocksNames::ProducerBlock: type = &bp.ProducerBlock; break;

@@ -10,13 +10,13 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
         case QEvent::MouseMove: {
             auto mouse_event = dynamic_cast<QMouseEvent *>(event);
             if (wheel_mouse_button_pressed) {
-                int delta_x = mouse_event->x() - last_mouse_x;
-                int delta_y = mouse_event->y() - last_mouse_y;
+                int delta_x = mouse_event->x() - last_mouse_x_pos;
+                int delta_y = mouse_event->y() - last_mouse_y_pos;
 
                 move_center(delta_x, delta_y);
             }
-            last_mouse_x = mouse_event->x();
-            last_mouse_y = mouse_event->y();
+            last_mouse_x_pos = mouse_event->x();
+            last_mouse_y_pos = mouse_event->y();
         } break;
         case QEvent::MouseButtonPress: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);
@@ -24,15 +24,15 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
             if (mouse_event->button() == Qt::MiddleButton) {
                 wheel_mouse_button_pressed = true;
                 change_main_simulation_grid = true;
-                last_mouse_x = position.x();
-                last_mouse_y = position.y();
+                last_mouse_x_pos = position.x();
+                last_mouse_y_pos = position.y();
             } else if (mouse_event->button() == Qt::RightButton) {
                 right_mouse_button_pressed = true;
             } else if (mouse_event->button() == Qt::LeftButton) {
                 left_mouse_button_pressed = true;
             }
-            last_mouse_x = position.x();
-            last_mouse_y = position.y();
+            last_mouse_x_pos = position.x();
+            last_mouse_y_pos = position.y();
 
             change_main_simulation_grid = _ui.simulation_graphicsView->underMouse();
             change_editing_grid = _ui.simulation_graphicsView->underMouse();
@@ -58,7 +58,7 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
         case QEvent::Close: {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
             if (watched->objectName().toStdString() == "QWidgetClassWindow") {
-                cp.stop_engine = true;
+                ecp.stop_engine = true;
                 while (!wait_for_engine_to_pause_force()) {}
                 exit(0);
             }
