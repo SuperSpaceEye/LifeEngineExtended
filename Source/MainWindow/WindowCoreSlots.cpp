@@ -349,7 +349,7 @@ void WindowCore::le_min_reproducing_distance_slot() {
     int fallback = sp.min_reproducing_distance;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_reproduction_distance, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 1) { display_message("Input cannot be less than 1."); return;}
+    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
     if (result.result > sp.max_reproducing_distance) { display_message("Input cannot be more than max reproducing distance."); return;}
     sp.min_reproducing_distance = result.result;
 }

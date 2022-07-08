@@ -19,7 +19,7 @@ struct SimulationParameters {
         float killer_damage_amount = 1;
 
         int   min_reproducing_distance = 1;
-        int   max_reproducing_distance = 5;
+        int   max_reproducing_distance = 3;
 
         float anatomy_mutations_rate_mutation_modifier = 0.01;
         float anatomy_min_possible_mutation_rate = 0.001;

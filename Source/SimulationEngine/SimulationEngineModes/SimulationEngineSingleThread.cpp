@@ -423,10 +423,10 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     if (!sp->reproduction_distance_fixed) {
         distance = std::uniform_int_distribution<int>(sp->min_reproducing_distance, sp->max_reproducing_distance)(*gen);
     }
-    //UP - min_y,
-    //LEFT - min_x
-    //DOWN - max_y
-    //RIGHT - max_x
+    //UP - o_min_y,
+    //LEFT - o_min_x
+    //DOWN - o_max_y
+    //RIGHT - o_max_x
 
     organism->child_pattern->rotation = rotation;
 
@@ -441,40 +441,99 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
         }
     }
 
-    auto min_y = 0;
-    auto min_x = 0;
-    auto max_y = 0;
-    auto max_x = 0;
+    auto o_min_y = INT32_MAX;
+    auto o_min_x = INT32_MAX;
+    auto o_max_y = INT32_MIN;
+    auto o_max_x = INT32_MIN;
+
+    auto c_min_y = INT32_MAX;
+    auto c_min_x = INT32_MAX;
+    auto c_max_y = INT32_MIN;
+    auto c_max_x = INT32_MIN;
+
+    //To get the position of a child on an axis you need to know the largest/smallest position of organism blocks on an axis
+    // and smallest/largest position of a child organism block + -1/+1 to compensate for organism center and + -/+ distance.
+    //For example, if a child is reproduced up of organism, you need the upmost coordinate among organism blocks and
+    // lowest coordinate of child organism blocks with -1 to compensate for organism center. With that, child will spawn
+    // basically attached to the parent organism, so then you subtract the random distance.
 
     switch (to_place) {
         case Rotation::UP:
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
-                if (block.get_pos(organism->rotation).y < min_y) {min_y = block.get_pos(organism->rotation).y;}
+                if (block.get_pos(organism->rotation).y < o_min_y) { o_min_y = block.get_pos(organism->rotation).y;}
             }
-            min_y -= distance;
+            for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->child_pattern->rotation).y > c_max_y) { c_max_y = block.get_pos(organism->child_pattern->rotation).y;}
+            }
+            o_min_y -= distance;
+            c_max_y = -std::abs(c_max_y) - 1;
+
+            o_min_x = 0;
+            o_max_y = 0;
+            o_max_x = 0;
+
+            c_min_y = 0;
+            c_min_x = 0;
+            c_max_x = 0;
             break;
         case Rotation::LEFT:
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
-                if (block.get_pos(organism->rotation).x < min_x) {min_x = block.get_pos(organism->rotation).x;}
+                if (block.get_pos(organism->rotation).x < o_min_x) { o_min_x = block.get_pos(organism->rotation).x;}
             }
-            min_x -= distance;
+            for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->child_pattern->rotation).x > c_max_x) { c_max_x = block.get_pos(organism->child_pattern->rotation).x;}
+            }
+            o_min_x -= distance;
+            c_max_x = -std::abs(c_max_x) - 1;
+
+            o_min_y = 0;
+            o_max_y = 0;
+            o_max_x = 0;
+
+            c_min_y = 0;
+            c_min_x = 0;
+            c_max_y = 0;
             break;
         case Rotation::DOWN:
             for (auto & block: organism->organism_anatomy->_organism_blocks) {
-                if (block.get_pos(organism->rotation).y > max_y) {max_y = block.get_pos(organism->rotation).y;}
+                if (block.get_pos(organism->rotation).y > o_max_y) { o_max_y = block.get_pos(organism->rotation).y;}
             }
-            max_y += distance;
+            for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->child_pattern->rotation).y < c_min_y) { c_min_y = block.get_pos(organism->child_pattern->rotation).y;}
+            }
+            o_max_y += distance;
+            c_min_y = std::abs(c_min_y) + 1;
+
+            o_min_y = 0;
+            o_min_x = 0;
+            o_max_x = 0;
+
+            c_min_x = 0;
+            c_max_y = 0;
+            c_max_x = 0;
             break;
         case Rotation::RIGHT:
             for (auto & block: organism->organism_anatomy->_organism_blocks){
-                if (block.get_pos(organism->rotation).x > max_x) {max_x = block.get_pos(organism->rotation).x;}
+                if (block.get_pos(organism->rotation).x > o_max_x) { o_max_x = block.get_pos(organism->rotation).x;}
             }
-            max_x += distance;
+            for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->child_pattern->rotation).x < c_min_x) { c_min_x = block.get_pos(organism->child_pattern->rotation).x;}
+            }
+            o_max_x += distance;
+            c_min_x = std::abs(c_min_x) + 1;
+
+            o_min_y = 0;
+            o_min_x = 0;
+            o_max_y = 0;
+
+            c_min_y = 0;
+            c_max_y = 0;
+            c_max_x = 0;
             break;
     }
 
-    organism->child_pattern->x = organism->x + min_x + max_x;
-    organism->child_pattern->y = organism->y + min_y + max_y;
+    organism->child_pattern->x = organism->x + o_min_x + o_max_x + c_min_x + c_max_x;
+    organism->child_pattern->y = organism->y + o_min_y + o_max_y + c_min_y + c_max_y;
 
     //checking, if there is space for a child
     for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
