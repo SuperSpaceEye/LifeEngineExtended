@@ -695,8 +695,6 @@ OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
             info.total_size_organism_blocks                += organism->organism_anatomy->_organism_blocks.size();
             info.total_size_producing_space                += organism->organism_anatomy->_producing_space.size();
             info.total_size_eating_space                   += organism->organism_anatomy->_eating_space.size();
-            info.total_size_single_adjacent_space          += organism->organism_anatomy->_single_adjacent_space.size();
-            info.total_size_single_diagonal_adjacent_space += organism->organism_anatomy->_single_diagonal_adjacent_space.size();
 
             if (organism->organism_anatomy->_mover_blocks > 0) {
                 info.move_range += organism->move_range;

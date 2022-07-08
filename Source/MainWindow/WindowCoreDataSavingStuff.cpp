@@ -5,7 +5,7 @@
 #include "WindowCore.h"
 
 //TODO increment every time saving logic changes
-int SAVE_VERSION = 2;
+int SAVE_VERSION = 3;
 
 void WindowCore::write_data(std::ofstream &os) {
     write_version(os);
@@ -82,15 +82,11 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     uint32_t producing_space_size                = anatomy->_producing_space.size();
     uint32_t eating_space_size                   = anatomy->_eating_space.size();
     uint32_t killing_space_size                  = anatomy->_killing_space.size();
-    uint32_t single_adjacent_space_size          = anatomy->_single_adjacent_space.size();
-    uint32_t single_diagonal_adjacent_space_size = anatomy->_single_diagonal_adjacent_space.size();
 
     os.write((char*)&organism_blocks_size,                sizeof(uint32_t));
     os.write((char*)&producing_space_size,                sizeof(uint32_t));
     os.write((char*)&eating_space_size,                   sizeof(uint32_t));
     os.write((char*)&killing_space_size,                  sizeof(uint32_t));
-    os.write((char*)&single_adjacent_space_size,          sizeof(uint32_t));
-    os.write((char*)&single_diagonal_adjacent_space_size, sizeof(uint32_t));
 
     os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -102,8 +98,6 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     os.write((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     os.write((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     os.write((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    os.write((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_adjacent_space.size());
-    os.write((char*)&anatomy->_single_diagonal_adjacent_space[0], sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_diagonal_adjacent_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
@@ -309,8 +303,6 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     anatomy->_producing_space               .resize(producing_space_size);
     anatomy->_eating_space                  .resize(eating_space_size);
     anatomy->_killing_space                 .resize(killing_space_size);
-    anatomy->_single_adjacent_space         .resize(single_adjacent_space_size);
-    anatomy->_single_diagonal_adjacent_space.resize(single_diagonal_adjacent_space_size);
 
     is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -322,8 +314,6 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     is.read((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     is.read((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     is.read((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    is.read((char*)&anatomy->_single_adjacent_space[0],          sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_adjacent_space.size());
-    is.read((char*)&anatomy->_single_diagonal_adjacent_space[0], sizeof(SerializedAdjacentSpaceContainer) * anatomy->_single_diagonal_adjacent_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;

@@ -360,7 +360,6 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
         auto * w_block = &dc->CPU_simulation_grid[new_x + block.get_pos(organism->rotation).x][new_y + block.get_pos(organism->rotation).y];
         w_block->type = block.type;
         w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-
 //        if (block.type == BlockTypes::EyeBlock) {
 //            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
 //        }
