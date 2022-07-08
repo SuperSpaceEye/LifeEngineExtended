@@ -1,6 +1,6 @@
 set(MIN_VERSION 3.22)
 cmake_minimum_required(VERSION ${MIN_VERSION})
-set(PROJECT_NAME TheLifeEngineCpp)
+set(PROJECT_NAME TheLifeEngineExtended)
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)

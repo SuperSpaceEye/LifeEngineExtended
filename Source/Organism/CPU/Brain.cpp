@@ -70,7 +70,7 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
 
     for (int i = 0; i < observations_vector.size(); i++) {
         //if observation is blocked by something, then pass
-        if (observations_vector[i].distance == 0) {
+        if (observations_vector[i].distance == 0 || calculate_simple_action(observations_vector[i]) == BrainDecision::DoNothing) {
             continue;
         }
         if (observations_vector[i].distance < min_distance) {
@@ -79,12 +79,13 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
         }
     }
     //if there is no meaningful observations, then return random action;
-    if (observation_i < 0) {return get_random_action(mt);}
+//    if (observation_i < 0) {return get_random_action(mt);}
+    if (observation_i < 0) {return DecisionObservation{BrainDecision::DoNothing, Observation{}};}
 
-    return DecisionObservation{calculate_simple_action(observations_vector[observation_i], mt), observations_vector[observation_i]};
+    return DecisionObservation{calculate_simple_action(observations_vector[observation_i]), observations_vector[observation_i]};
 }
 
-BrainDecision Brain::calculate_simple_action(Observation &observation, lehmer64 &mt) const {
+BrainDecision Brain::calculate_simple_action(Observation &observation) const {
     auto action = SimpleDecision{};
     switch (observation.type) {
         case MouthBlock:    action = simple_action_table.MouthBlock;    break;

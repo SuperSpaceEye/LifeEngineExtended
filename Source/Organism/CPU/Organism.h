@@ -45,7 +45,7 @@ public:
 
     //TODO make evolvable
     int max_decision_lifetime = 2;
-    int max_do_nothing_lifetime = 4;
+    int max_do_nothing_lifetime = 3;
 
     DecisionObservation last_decision = DecisionObservation{};
 

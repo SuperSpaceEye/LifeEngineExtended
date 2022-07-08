@@ -173,14 +173,29 @@ void WindowCore::move_center(int delta_x, int delta_y) {
 }
 
 void WindowCore::reset_scale_view() {
+    float exp;
     center_x = (float)edc.simulation_width / 2;
     center_y = (float)edc.simulation_height / 2;
     // finds exponent needed to scale the image
-    float exp;
-    if (_ui.simulation_graphicsView->viewport()->height() < _ui.simulation_graphicsView->viewport()->width()) {
-        exp = log((float) edc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) / log(scaling_coefficient);
+
+    //if simulation dimensions are equal, then exponent depends on window size
+    if (edc.simulation_width == edc.simulation_height) {
+        if (_ui.simulation_graphicsView->viewport()->height() < _ui.simulation_graphicsView->viewport()->width()) {
+            exp = log((float) edc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) /
+                  log(scaling_coefficient);
+        } else {
+            exp = log((float) edc.simulation_width / (float) _ui.simulation_graphicsView->viewport()->width()) /
+                  log(scaling_coefficient);
+        }
+    // if not equal, then to capture full view you need to scale by largest dimension
     } else {
-        exp = log((float) edc.simulation_width / (float) _ui.simulation_graphicsView->viewport()->width()) / log(scaling_coefficient);
+        if (edc.simulation_width > edc.simulation_height) {
+            exp = log((float) edc.simulation_width / (float) _ui.simulation_graphicsView->viewport()->width()) /
+                  log(scaling_coefficient);
+        } else {
+            exp = log((float) edc.simulation_height / (float) _ui.simulation_graphicsView->viewport()->height()) /
+                  log(scaling_coefficient);
+        }
     }
     scaling_zoom = pow(scaling_coefficient, exp);
 }
