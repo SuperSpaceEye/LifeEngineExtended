@@ -70,6 +70,7 @@ struct SimulationParameters {
         //TODO add cb to evolution settings
         bool check_if_path_is_clear = false;
         bool food_blocks_movement = false;
+        bool use_new_child_pos_calculator = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

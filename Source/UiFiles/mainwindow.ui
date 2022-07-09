@@ -1222,9 +1222,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-933</y>
                   <width>504</width>
-                  <height>1121</height>
+                  <height>1179</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1263,7 +1263,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1799,6 +1799,20 @@ p, li { white-space: pre-wrap; }
                      <widget class="QCheckBox" name="cb_eat_then_produce">
                       <property name="text">
                        <string>Eat first, then produce food.</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_use_new_child_pos_calculator">
+                      <property name="text">
+                       <string>Use new child position calculator</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_checks_if_path_is_clear">
+                      <property name="text">
+                       <string>Check if path is clear</string>
                       </property>
                      </widget>
                     </item>
@@ -3654,6 +3668,38 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_use_new_child_pos_calculator</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_new_child_pos_calculator_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>629</x>
+     <y>867</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_checks_if_path_is_clear</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_check_if_path_is_clear_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>629</x>
+     <y>896</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3747,6 +3793,8 @@ p, li { white-space: pre-wrap; }
   <slot>le_perlin_x_modifier_slot()</slot>
   <slot>le_perlin_y_modifier_slot()</slot>
   <slot>cb_food_blocks_movement_slot(bool)</slot>
+  <slot>cb_use_new_child_pos_calculator_slot(bool)</slot>
+  <slot>cb_check_if_path_is_clear_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

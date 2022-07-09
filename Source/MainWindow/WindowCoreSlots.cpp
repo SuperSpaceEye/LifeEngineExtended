@@ -687,6 +687,10 @@ void WindowCore::cb_eat_then_produce_slot                (bool state) { sp.eat_t
 
 void WindowCore::cb_food_blocks_movement_slot            (bool state) { sp.food_blocks_movement = state;}
 
+void WindowCore::cb_use_new_child_pos_calculator_slot    (bool state) { sp.use_new_child_pos_calculator = state;}
+
+void WindowCore::cb_check_if_path_is_clear_slot          (bool state) { sp.check_if_path_is_clear = state;}
+
 //==================== Table ====================
 
 void WindowCore::table_cell_changed_slot(int row, int col) {

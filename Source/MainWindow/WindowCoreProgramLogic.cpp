@@ -965,6 +965,8 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_simplified_food_production        ->setChecked(sp.simplified_food_production);
     _ui.cb_stop_when_one_food_generated      ->setChecked(sp.stop_when_one_food_generated);
     _ui.cb_eat_then_produce                  ->setChecked(sp.eat_then_produce);
+    _ui.cb_use_new_child_pos_calculator      ->setChecked(sp.use_new_child_pos_calculator);
+    _ui.cb_checks_if_path_is_clear           ->setChecked(sp.check_if_path_is_clear);
 
     //Settings
     _ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));

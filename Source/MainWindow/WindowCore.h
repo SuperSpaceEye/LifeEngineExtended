@@ -445,6 +445,8 @@ private slots:
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
     void cb_food_blocks_movement_slot(bool state);
+    void cb_use_new_child_pos_calculator_slot(bool state);
+    void cb_check_if_path_is_clear_slot(bool state);
 
     void table_cell_changed_slot(int row, int col);
 

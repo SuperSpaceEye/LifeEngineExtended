@@ -422,24 +422,54 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     if (!sp->reproduction_distance_fixed) {
         distance = std::uniform_int_distribution<int>(sp->min_reproducing_distance, sp->max_reproducing_distance)(*gen);
     }
-    //UP - o_min_y,
-    //LEFT - o_min_x
-    //DOWN - o_max_y
-    //RIGHT - o_max_x
 
     organism->child_pattern->rotation = rotation;
 
+    // Old and new versions drastically influence evolution, so I will add both.
+    if (sp->use_new_child_pos_calculator) {
+        new_child_pos_calculator(organism, to_place, distance);
+    } else {
+        old_child_pos_calculator(organism, to_place, distance);
+    }
+
     //TODO this is probably wrong and broken
     if (sp->check_if_path_is_clear) {
+        int c_distance = std::abs(organism->x - organism->child_pattern->x) + std::abs(organism->y - organism->child_pattern->y);
+
         for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
             if (!path_is_clear(organism->x + block.get_pos(rotation).x,
                                organism->y + block.get_pos(rotation).y,
                                to_place,
-                               distance,
+                               c_distance,
                                organism, dc, sp)) {return;}
         }
     }
 
+    //checking, if there is space for a child
+    for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
+        if (check_if_block_out_of_bounds(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
+
+        auto * w_block = &dc->CPU_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
+                                    [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y];
+
+        if (sp->food_blocks_reproduction && w_block->type != EmptyBlock
+            ||
+            !sp->food_blocks_reproduction && !(w_block->type == EmptyBlock ||
+            w_block->type == FoodBlock)
+            )
+        {return;}
+    }
+
+    child_organisms.emplace_back(organism->child_pattern);
+    //only deduct food when reproduction is successful and flag is false
+    if (!sp->failed_reproduction_eats_food) {
+        organism->food_collected -= organism->child_pattern->food_needed;
+    }
+    organism->child_pattern = nullptr;
+}
+
+void
+SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const Rotation &to_place, int distance) {
     auto o_min_y = INT32_MAX;
     auto o_min_x = INT32_MAX;
     auto o_max_y = INT32_MIN;
@@ -465,7 +495,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
                 if (block.get_pos(organism->child_pattern->rotation).y > c_max_y) { c_max_y = block.get_pos(organism->child_pattern->rotation).y;}
             }
             o_min_y -= distance;
-            c_max_y = -std::abs(c_max_y) - 1;
+            c_max_y = -abs(c_max_y) - 1;
 
             o_min_x = 0;
             o_max_y = 0;
@@ -483,7 +513,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
                 if (block.get_pos(organism->child_pattern->rotation).x > c_max_x) { c_max_x = block.get_pos(organism->child_pattern->rotation).x;}
             }
             o_min_x -= distance;
-            c_max_x = -std::abs(c_max_x) - 1;
+            c_max_x = -abs(c_max_x) - 1;
 
             o_min_y = 0;
             o_max_y = 0;
@@ -501,7 +531,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
                 if (block.get_pos(organism->child_pattern->rotation).y < c_min_y) { c_min_y = block.get_pos(organism->child_pattern->rotation).y;}
             }
             o_max_y += distance;
-            c_min_y = std::abs(c_min_y) + 1;
+            c_min_y = abs(c_min_y) + 1;
 
             o_min_y = 0;
             o_min_x = 0;
@@ -519,7 +549,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
                 if (block.get_pos(organism->child_pattern->rotation).x < c_min_x) { c_min_x = block.get_pos(organism->child_pattern->rotation).x;}
             }
             o_max_x += distance;
-            c_min_x = std::abs(c_min_x) + 1;
+            c_min_x = abs(c_min_x) + 1;
 
             o_min_y = 0;
             o_min_x = 0;
@@ -533,28 +563,61 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
 
     organism->child_pattern->x = organism->x + o_min_x + o_max_x + c_min_x + c_max_x;
     organism->child_pattern->y = organism->y + o_min_y + o_max_y + c_min_y + c_max_y;
+}
 
-    //checking, if there is space for a child
-    for (auto & block: organism->child_pattern->organism_anatomy->_organism_blocks) {
-        if (check_if_block_out_of_bounds(dc, organism->child_pattern, block, organism->child_pattern->rotation)) {return;}
+void SimulationEngineSingleThread::old_child_pos_calculator(Organism *organism, const Rotation &to_place,
+                                                            int distance) {
+    auto min_y = INT32_MAX;
+    auto min_x = INT32_MAX;
+    auto max_y = INT32_MIN;
+    auto max_x = INT32_MIN;
 
-        auto * w_block = &dc->CPU_simulation_grid[organism->child_pattern->x + block.get_pos(organism->child_pattern->rotation).x]
-                                    [organism->child_pattern->y + block.get_pos(organism->child_pattern->rotation).y];
+    switch (to_place) {
+        case Rotation::UP:
+            for (auto & block: organism->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->rotation).y < min_y) {min_y = block.get_pos(organism->rotation).y;}
+            }
+            min_y -= distance;
 
-        if (sp->food_blocks_reproduction && w_block->type != EmptyBlock
-            ||
-            !sp->food_blocks_reproduction && !(w_block->type == EmptyBlock ||
-            w_block->type == FoodBlock)
-            )
-        {return;}
+            min_x = 0;
+            max_y = 0;
+            max_x = 0;
+
+            break;
+        case Rotation::LEFT:
+            for (auto & block: organism->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->rotation).x < min_x) {min_x = block.get_pos(organism->rotation).x;}
+            }
+            min_x -= distance;
+
+            min_y = 0;
+            max_y = 0;
+            max_x = 0;
+            break;
+        case Rotation::DOWN:
+            for (auto & block: organism->organism_anatomy->_organism_blocks) {
+                if (block.get_pos(organism->rotation).y > max_y) {max_y = block.get_pos(organism->rotation).y;}
+            }
+            max_y += distance;
+
+            min_y = 0;
+            min_x = 0;
+            max_x = 0;
+            break;
+        case Rotation::RIGHT:
+            for (auto & block: organism->organism_anatomy->_organism_blocks){
+                if (block.get_pos(organism->rotation).x > max_x) {max_x = block.get_pos(organism->rotation).x;}
+            }
+            max_x += distance;
+
+            min_y = 0;
+            min_x = 0;
+            max_y = 0;
+            break;
     }
 
-    child_organisms.emplace_back(organism->child_pattern);
-    //only deduct food when reproduction is successful and flag is false
-    if (!sp->failed_reproduction_eats_food) {
-        organism->food_collected -= organism->child_pattern->food_needed;
-    }
-    organism->child_pattern = nullptr;
+    organism->child_pattern->x = organism->x + min_x + max_x;
+    organism->child_pattern->y = organism->y + min_y + max_y;
 }
 
 bool SimulationEngineSingleThread::check_if_out_of_bounds(EngineDataContainer *dc, int x, int y) {

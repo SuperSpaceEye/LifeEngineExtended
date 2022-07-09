@@ -67,6 +67,10 @@ public:
 
     static bool path_is_clear(int x, int y, Rotation direction, int steps, Organism *allow_organism, EngineDataContainer *dc,
                               SimulationParameters *sp);
+
+    static void new_child_pos_calculator(Organism *organism, const Rotation &to_place, int distance);
+
+    static void old_child_pos_calculator(Organism *organism, const Rotation &to_place, int distance);
 };
 
 
