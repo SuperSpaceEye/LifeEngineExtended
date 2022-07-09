@@ -240,7 +240,7 @@ void SimulationEnginePartialMultiThread::start_stage(EngineDataContainer *dc, Pa
 }
 
 void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc, Organism *organism) {
-    for (auto &block: organism->organism_anatomy->_organism_blocks) {
+    for (auto &block: organism->anatomy->_organism_blocks) {
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
         [organism->y + block.get_pos(organism->rotation).y].type = block.type;
         dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
@@ -251,12 +251,12 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
 }
 
 //void SimulationEnginePartialMultiThread::produce_food(EngineDataContainer * edc, SimulationParameters * sp, Organism *organism, boost::mt19937 & gen) {
-//    if (organism->organism_anatomy->_producer_blocks <= 0) {return;}
-//    if (organism->organism_anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
+//    if (organism->anatomy->_producer_blocks <= 0) {return;}
+//    if (organism->anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
 //    if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 //
-//    for (int i = 0; i < organism->organism_anatomy->_producer_blocks; i++) {
-//        for (auto & pc: organism->organism_anatomy->_producing_space) {
+//    for (int i = 0; i < organism->anatomy->_producer_blocks; i++) {
+//        for (auto & pc: organism->anatomy->_producing_space) {
 //            //TODO locking here?
 //            if (edc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == EmptyBlock) {
 //                if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability) {
@@ -270,7 +270,7 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
 
 //TODO this function takes like 40% of thread_tick work, so it needs redoing.
 void SimulationEnginePartialMultiThread::eat_food(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism) {
-    for (auto & pc: organism->organism_anatomy->_eating_space) {
+    for (auto & pc: organism->anatomy->_eating_space) {
         while (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].locked) {}
         dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].locked = true;
         if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == FoodBlock) {
@@ -285,7 +285,7 @@ void SimulationEnginePartialMultiThread::tick_lifetime(EngineDataContainer *dc, 
                                                        Organism *organism, int thread_num, int organism_pos) {
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
-        for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        for (auto & block: organism->anatomy->_organism_blocks) {
             dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type = FoodBlock;
             dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
         }
@@ -307,10 +307,10 @@ void SimulationEnginePartialMultiThread::erase_organisms(EngineDataContainer * d
 void SimulationEnginePartialMultiThread::get_observations(EngineDataContainer *dc, Organism *&organism,
                                                           std::vector<std::vector<Observation>> &organism_observations,
                                                           SimulationParameters *sp, int organism_num) {
-    if (organism->organism_anatomy->_eye_blocks <= 0 || organism->organism_anatomy->_mover_blocks <=0) {return;}
+    if (organism->anatomy->_eye_blocks <= 0 || organism->anatomy->_mover_blocks <= 0) {return;}
     if (organism->move_counter != 0) {return;}
     auto eye_i = -1;
-    for (auto & block: organism->organism_anatomy->_organism_blocks) {
+    for (auto & block: organism->anatomy->_organism_blocks) {
         if (block.type != BlockTypes::EyeBlock) {continue;}
         eye_i++;
         auto pos_x = organism->x + block.get_pos(organism->rotation).x;

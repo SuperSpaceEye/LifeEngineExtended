@@ -14,6 +14,7 @@ struct SimulationParameters {
         int   auto_produce_food_every_n_ticks = 0;
         int   auto_produce_n_food = 0;
         int   extra_reproduction_cost = 0;
+        int   extra_mover_reproductive_cost = 0;
         float global_anatomy_mutation_rate = 0.05;
         float global_brain_mutation_rate = 0.1;
         float killer_damage_amount = 1;

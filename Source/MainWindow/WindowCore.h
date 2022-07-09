@@ -414,6 +414,7 @@ private slots:
     void le_perlin_lower_bound_slot();
     void le_perlin_x_modifier_slot();
     void le_perlin_y_modifier_slot();
+    void le_extra_mover_reproduction_cost_slot();
 
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);

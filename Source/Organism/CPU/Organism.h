@@ -38,6 +38,8 @@ public:
     float food_collected = 0;
     float food_needed = 0;
 
+    float multiplier = 1;
+
     int move_range = 1;
     Rotation rotation = Rotation::UP;
 
@@ -49,7 +51,7 @@ public:
 
     DecisionObservation last_decision = DecisionObservation{};
 
-    std::shared_ptr<Anatomy> organism_anatomy = nullptr;
+    std::shared_ptr<Anatomy> anatomy = nullptr;
     std::shared_ptr<Brain> brain = nullptr;
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
@@ -64,6 +66,8 @@ public:
     static int mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range);
 
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
+
+    void init_values();
     //public:
     Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
              std::shared_ptr<Brain> brain, SimulationParameters *sp,

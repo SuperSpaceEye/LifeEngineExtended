@@ -69,6 +69,9 @@ public:
 
     void set_wall(std::vector<Organism *> &temp, const Action &action);
     void clear_walls();
+
+    //TODO make getters and setters for it.
+    void reinit_organisms();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

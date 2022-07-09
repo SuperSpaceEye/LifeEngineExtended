@@ -220,7 +220,7 @@ void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & 
     for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
     if (continue_flag) { return;}
     temp.push_back(organism_ptr);
-    for (auto & block: organism_ptr->organism_anatomy->_organism_blocks) {
+    for (auto & block: organism_ptr->anatomy->_organism_blocks) {
         dc.CPU_simulation_grid
         [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
         [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
@@ -330,5 +330,32 @@ void SimulationEngine::make_random_walls() {
             }
         }
     }
+}
 
+void SimulationEngine::reinit_organisms() {
+    cp.engine_pause = true;
+    while(!cp.engine_paused) {}
+
+    switch (cp.simulation_mode) {
+        case SimulationModes::CPU_Single_Threaded:
+            for (auto & organism: dc.organisms) {
+                organism->init_values();
+            }
+            break;
+        case SimulationModes::CPU_Partial_Multi_threaded:
+        case SimulationModes::CPU_Multi_Threaded:
+            for (auto & pool: dc.organisms_pools) {
+                for (auto & organism: pool) {
+                    organism->init_values();
+                }
+            }
+            for (auto & organism: dc.to_place_organisms) {
+                organism->init_values();
+            }
+            break;
+        case SimulationModes::GPU_CUDA_mode:
+            break;
+    }
+
+    cp.engine_pause = false;
 }

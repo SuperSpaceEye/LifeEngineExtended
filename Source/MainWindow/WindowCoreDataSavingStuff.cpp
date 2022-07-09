@@ -45,7 +45,7 @@ void WindowCore::write_organisms(std::ofstream& os) {
     for (auto & organism: edc.organisms) {
         write_organism_data(os, organism);
         write_organism_brain(os, organism->brain.get());
-        write_organism_anatomy(os, organism->organism_anatomy.get());
+        write_organism_anatomy(os, organism->anatomy.get());
     }
 }
 
@@ -621,11 +621,11 @@ void WindowCore::json_write_organisms(boost::property_tree::ptree &organisms, bo
         j_organism.put("damage", organism->damage);
 
         anatomy.put("birth_distance", 6);
-        anatomy.put("is_producer", static_cast<bool>(organism->organism_anatomy->_producer_blocks));
-        anatomy.put("is_mover", static_cast<bool>(organism->organism_anatomy->_mover_blocks));
-        anatomy.put("has_eyes", static_cast<bool>(organism->organism_anatomy->_eye_blocks));
+        anatomy.put("is_producer", static_cast<bool>(organism->anatomy->_producer_blocks));
+        anatomy.put("is_mover", static_cast<bool>(organism->anatomy->_mover_blocks));
+        anatomy.put("has_eyes", static_cast<bool>(organism->anatomy->_eye_blocks));
 
-        for (auto & block: organism->organism_anatomy->_organism_blocks) {
+        for (auto & block: organism->anatomy->_organism_blocks) {
             cell = pt::ptree{};
             std::string state_name;
 

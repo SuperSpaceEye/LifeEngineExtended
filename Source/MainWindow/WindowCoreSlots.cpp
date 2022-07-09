@@ -265,6 +265,7 @@ void WindowCore::le_lifespan_multiplier_slot() {
     if (!result.is_valid) {return;}
     if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
     sp.lifespan_multiplier = result.result;
+    engine->reinit_organisms();
 }
 
 void WindowCore::le_look_range_slot() {
@@ -539,6 +540,13 @@ void WindowCore::le_perlin_y_modifier_slot() {
     sp.perlin_y_modifier = result.result;
 }
 
+void WindowCore::le_extra_mover_reproduction_cost_slot() {
+    int fallback = sp.extra_mover_reproductive_cost;
+    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_extra_mover_reproduction_cost, fallback);
+    if (!result.is_valid) {return;}
+    sp.extra_mover_reproductive_cost = result.result;
+}
+
 //==================== Radio button ====================
 
 void WindowCore::rb_food_slot() {
@@ -675,7 +683,7 @@ void WindowCore::cb_rotate_every_move_tick_slot          (bool state) { sp.rotat
 
 void WindowCore::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
 
-void WindowCore::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state;}
+void WindowCore::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state; engine->reinit_organisms();}
 
 void WindowCore::cb_simplified_food_production_slot      (bool state) { sp.simplified_food_production = state;}
 
@@ -723,4 +731,6 @@ void WindowCore::table_cell_changed_slot(int row, int col) {
 
     _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
     _ui.table_organism_block_parameters->update();
+
+    engine->reinit_organisms();
 }

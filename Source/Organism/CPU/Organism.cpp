@@ -12,33 +12,41 @@ Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> ana
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-        x(x), y(y), rotation(rotation), organism_anatomy(anatomy), sp(sp),
+        x(x), y(y), rotation(rotation), anatomy(anatomy), sp(sp),
         bp(block_parameters), brain(brain), anatomy_mutation_rate(anatomy_mutation_rate),
         brain_mutation_rate(brain_mutation_rate), move_range(move_range) {
-    calculate_max_life();
-    calculate_organism_lifetime();
-    calculate_food_needed();
+    init_values();
 }
 
 Organism::Organism(Organism *organism): x(organism->x), y(organism->y),
-                                        rotation(organism->rotation), organism_anatomy(organism->organism_anatomy), sp(organism->sp),
+                                        rotation(organism->rotation), anatomy(organism->anatomy), sp(organism->sp),
                                         bp(organism->bp), brain(organism->brain),
                                         anatomy_mutation_rate(organism->anatomy_mutation_rate),
                                         brain_mutation_rate(organism->brain_mutation_rate),
                                         move_range(organism->move_range){
-    calculate_max_life();
-    calculate_organism_lifetime();
-    calculate_food_needed();
+    init_values();
 }
 
 Organism::~Organism() {
-    //delete organism_anatomy;
+    //delete anatomy;
     delete child_pattern;
+}
+
+void Organism::init_values() {
+    calculate_max_life();
+    calculate_organism_lifetime();
+    calculate_food_needed();
+
+    multiplier = 1;
+
+    if (sp->multiply_food_production_prob) {
+        multiplier *= anatomy->_producer_blocks;
+    }
 }
 
 float Organism::calculate_max_life() {
     life_points = 0;
-    for (auto& item: organism_anatomy->_organism_blocks) {
+    for (auto& item: anatomy->_organism_blocks) {
         switch (item.type) {
             case MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
             case ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
@@ -53,13 +61,13 @@ float Organism::calculate_max_life() {
 }
 
 int Organism::calculate_organism_lifetime() {
-    max_lifetime = organism_anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
+    max_lifetime = anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
     return max_lifetime;
 }
 
 float Organism::calculate_food_needed() {
-    food_needed = sp->extra_reproduction_cost;
-    for (auto & block: organism_anatomy->_organism_blocks) {
+    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy->_mover_blocks > 0);
+    for (auto & block: anatomy->_organism_blocks) {
         switch (block.type) {
             case MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
             case ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
@@ -100,14 +108,14 @@ void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_ana
 
         int choice = std::uniform_int_distribution<int>(0, total_chance)(*gen);
 
-        if (choice < sp->add_cell) {new_anatomy.reset(new Anatomy(organism_anatomy->add_random_block(*bp, *gen)));return;}
+        if (choice < sp->add_cell) {new_anatomy.reset(new Anatomy(anatomy->add_random_block(*bp, *gen)));return;}
         choice -= sp->add_cell;
-        if (choice < sp->change_cell) {new_anatomy.reset(new Anatomy(organism_anatomy->change_random_block(*bp, *gen)));return;}
+        if (choice < sp->change_cell) {new_anatomy.reset(new Anatomy(anatomy->change_random_block(*bp, *gen)));return;}
         choice -= sp->change_cell;
-        if (choice < sp->remove_cell && organism_anatomy->_organism_blocks.size() > sp->min_organism_size) {new_anatomy.reset(new Anatomy(organism_anatomy->remove_random_block(*gen)));return;}
+        if (choice < sp->remove_cell && anatomy->_organism_blocks.size() > sp->min_organism_size) {new_anatomy.reset(new Anatomy(anatomy->remove_random_block(*gen)));return;}
     }
     //if not mutated.
-    new_anatomy.reset(new Anatomy(organism_anatomy));
+    new_anatomy.reset(new Anatomy(anatomy));
 }
 
 void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain,

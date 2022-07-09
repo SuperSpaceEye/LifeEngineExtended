@@ -407,14 +407,14 @@ void WindowCore::complex_image_creation(std::vector<int> &lin_width, std::vector
                         lin_height[y] < 0 ||
                         lin_height[y] >= edc.simulation_height) {
                         pixel_color = cc.simulation_background_color;
-                        set_image_pixel(x, y, pixel_color);
-                        continue;
+//                        set_image_pixel(x, y, pixel_color);
+//                        continue;
+                    } else {
+                        pixel_color = get_texture_color(block.type,
+                                                        block.rotation,
+                                                        float(x - w_b.start) / (w_b.stop - w_b.start),
+                                                        float(y - h_b.start) / (h_b.stop - h_b.start));
                     }
-
-                    pixel_color = get_texture_color(block.type,
-                                                    block.rotation,
-                                                    float(x - w_b.start) / (w_b.stop - w_b.start),
-                                                    float(y - h_b.start) / (h_b.stop - h_b.start));
                     set_image_pixel(x, y, pixel_color);
                 }
             }
@@ -594,7 +594,9 @@ void WindowCore::resize_simulation_grid() {
     edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
     edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
-    ecp.build_threads = true;
+    if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+        ecp.build_threads = true;
+    }
     reset_world();
 
     reset_scale_view();
@@ -692,60 +694,60 @@ OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
         }
 
         for (auto & organism: *pool) {
-            info.total_size_organism_blocks                += organism->organism_anatomy->_organism_blocks.size();
-            info.total_size_producing_space                += organism->organism_anatomy->_producing_space.size();
-            info.total_size_eating_space                   += organism->organism_anatomy->_eating_space.size();
+            info.total_size_organism_blocks                += organism->anatomy->_organism_blocks.size();
+            info.total_size_producing_space                += organism->anatomy->_producing_space.size();
+            info.total_size_eating_space                   += organism->anatomy->_eating_space.size();
 
-            if (organism->organism_anatomy->_mover_blocks > 0) {
+            if (organism->anatomy->_mover_blocks > 0) {
                 info.move_range += organism->move_range;
                 info.moving_organisms++;
 
-                if (organism->organism_anatomy->_eye_blocks > 0) {
+                if (organism->anatomy->_eye_blocks > 0) {
                     info.organisms_with_eyes++;
                 }
             }
 
-            info.total_avg.size += organism->organism_anatomy->_organism_blocks.size();
+            info.total_avg.size += organism->anatomy->_organism_blocks.size();
 
             info.total_avg._organism_lifetime += organism->max_lifetime;
             info.total_avg._organism_age      += organism->lifetime;
-            info.total_avg._mouth_blocks      += organism->organism_anatomy->_mouth_blocks;
-            info.total_avg._producer_blocks   += organism->organism_anatomy->_producer_blocks;
-            info.total_avg._mover_blocks      += organism->organism_anatomy->_mover_blocks;
-            info.total_avg._killer_blocks     += organism->organism_anatomy->_killer_blocks;
-            info.total_avg._armor_blocks      += organism->organism_anatomy->_armor_blocks;
-            info.total_avg._eye_blocks        += organism->organism_anatomy->_eye_blocks;
+            info.total_avg._mouth_blocks      += organism->anatomy->_mouth_blocks;
+            info.total_avg._producer_blocks   += organism->anatomy->_producer_blocks;
+            info.total_avg._mover_blocks      += organism->anatomy->_mover_blocks;
+            info.total_avg._killer_blocks     += organism->anatomy->_killer_blocks;
+            info.total_avg._armor_blocks      += organism->anatomy->_armor_blocks;
+            info.total_avg._eye_blocks        += organism->anatomy->_eye_blocks;
 
             info.total_avg.brain_mutation_rate   += organism->brain_mutation_rate;
             info.total_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
             info.total_avg.total++;
 
-            if (organism->organism_anatomy->_mover_blocks > 0) {
-                info.moving_avg.size += organism->organism_anatomy->_organism_blocks.size();
+            if (organism->anatomy->_mover_blocks > 0) {
+                info.moving_avg.size += organism->anatomy->_organism_blocks.size();
 
                 info.moving_avg._organism_lifetime += organism->max_lifetime;
                 info.moving_avg._organism_age      += organism->lifetime;
-                info.moving_avg._mouth_blocks      += organism->organism_anatomy->_mouth_blocks;
-                info.moving_avg._producer_blocks   += organism->organism_anatomy->_producer_blocks;
-                info.moving_avg._mover_blocks      += organism->organism_anatomy->_mover_blocks;
-                info.moving_avg._killer_blocks     += organism->organism_anatomy->_killer_blocks;
-                info.moving_avg._armor_blocks      += organism->organism_anatomy->_armor_blocks;
-                info.moving_avg._eye_blocks        += organism->organism_anatomy->_eye_blocks;
+                info.moving_avg._mouth_blocks      += organism->anatomy->_mouth_blocks;
+                info.moving_avg._producer_blocks   += organism->anatomy->_producer_blocks;
+                info.moving_avg._mover_blocks      += organism->anatomy->_mover_blocks;
+                info.moving_avg._killer_blocks     += organism->anatomy->_killer_blocks;
+                info.moving_avg._armor_blocks      += organism->anatomy->_armor_blocks;
+                info.moving_avg._eye_blocks        += organism->anatomy->_eye_blocks;
 
                 info.moving_avg.brain_mutation_rate   += organism->brain_mutation_rate;
                 info.moving_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
                 info.moving_avg.total++;
             } else {
-                info.station_avg.size += organism->organism_anatomy->_organism_blocks.size();
+                info.station_avg.size += organism->anatomy->_organism_blocks.size();
 
                 info.station_avg._organism_lifetime += organism->max_lifetime;
                 info.station_avg._organism_age      += organism->lifetime;
-                info.station_avg._mouth_blocks      += organism->organism_anatomy->_mouth_blocks;
-                info.station_avg._producer_blocks   += organism->organism_anatomy->_producer_blocks;
-                info.station_avg._mover_blocks      += organism->organism_anatomy->_mover_blocks;
-                info.station_avg._killer_blocks     += organism->organism_anatomy->_killer_blocks;
-                info.station_avg._armor_blocks      += organism->organism_anatomy->_armor_blocks;
-                info.station_avg._eye_blocks        += organism->organism_anatomy->_eye_blocks;
+                info.station_avg._mouth_blocks      += organism->anatomy->_mouth_blocks;
+                info.station_avg._producer_blocks   += organism->anatomy->_producer_blocks;
+                info.station_avg._mover_blocks      += organism->anatomy->_mover_blocks;
+                info.station_avg._killer_blocks     += organism->anatomy->_killer_blocks;
+                info.station_avg._armor_blocks      += organism->anatomy->_armor_blocks;
+                info.station_avg._eye_blocks        += organism->anatomy->_eye_blocks;
 
                 info.station_avg.brain_mutation_rate   += organism->brain_mutation_rate;
                 info.station_avg.anatomy_mutation_rate += organism->anatomy_mutation_rate;
@@ -929,11 +931,6 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
     _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
     _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,             3)));
-    _ui.le_perlin_persistence                ->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
-    _ui.le_perlin_upper_bound                ->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 3)));
-    _ui.le_perlin_lower_bound                ->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 3)));
-    _ui.le_perlin_x_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  3)));
-    _ui.le_perlin_y_modifier                 ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  3)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
     _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
@@ -946,7 +943,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_max_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
     _ui.le_min_move_range                    ->setText(QString::fromStdString(std::to_string(sp.min_move_range)));
     _ui.le_max_move_range                    ->setText(QString::fromStdString(std::to_string(sp.max_move_range)));
-    _ui.le_perlin_octaves                    ->setText(QString::fromStdString(std::to_string(sp.perlin_octaves)));
+    _ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(std::to_string(sp.extra_mover_reproductive_cost)));
 
     _ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
     _ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);
@@ -969,8 +966,15 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_checks_if_path_is_clear           ->setChecked(sp.check_if_path_is_clear);
 
     //Settings
+    _ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
+    _ui.le_perlin_upper_bound->setText(QString::fromStdString(to_str(sp.perlin_upper_bound, 3)));
+    _ui.le_perlin_lower_bound->setText(QString::fromStdString(to_str(sp.perlin_lower_bound, 3)));
+    _ui.le_perlin_x_modifier ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  3)));
+    _ui.le_perlin_y_modifier ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  3)));
+
     _ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
+    _ui.le_perlin_octaves->setText(QString::fromStdString(std::to_string(sp.perlin_octaves)));
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
     int font_size;
     if (font().pixelSize() < 0) {

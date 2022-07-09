@@ -128,6 +128,7 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
     for (int x = w_b.start; x < w_b.stop; x++) {
         for (int y = h_b.start; y < h_b.stop; y++) {
             auto &block = d_second_simulation_grid[d_lin_width[x] + d_lin_height[y] * simulation_width];
+
             if (d_lin_width[x] < 0 ||
                 d_lin_width[x] >= simulation_width ||
                 d_lin_height[y] < 0 ||
@@ -165,8 +166,8 @@ CUDAImageCreator::compile_differences(std::vector<int> &truncated_lin_width, std
             if (y < 0 || y >= dc->simulation_height) { continue;}
             host_differences.emplace_back(Differences{static_cast<uint16_t>(x),
                                                       static_cast<uint16_t>(y),
-                                                      dc->second_simulation_grid[x + y * dc->simulation_height].type,
-                                                      dc->second_simulation_grid[x + y * dc->simulation_height].rotation,
+                                                      dc->second_simulation_grid[x + y * dc->simulation_width].type,
+                                                      dc->second_simulation_grid[x + y * dc->simulation_width].rotation,
             });
         }
     }

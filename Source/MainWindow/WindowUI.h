@@ -156,6 +156,9 @@ public:
     QHBoxLayout *horizontalLayout_18;
     QLabel *label_6;
     QLineEdit *le_extra_reproduction_cost;
+    QHBoxLayout *horizontalLayout_37;
+    QLabel *label_32;
+    QLineEdit *le_extra_mover_reproduction_cost;
     QCheckBox *cb_use_evolved_anatomy_mutation_rate;
     QVBoxLayout *mutation_rate_layout;
     QHBoxLayout *horizontalLayout_12;
@@ -900,7 +903,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -933, 504, 1179));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 504, 1212));
         QSizePolicy sizePolicy7(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy7.setHorizontalStretch(0);
         sizePolicy7.setVerticalStretch(0);
@@ -1042,6 +1045,21 @@ public:
 
 
         verticalLayout_20->addLayout(horizontalLayout_18);
+
+        horizontalLayout_37 = new QHBoxLayout();
+        horizontalLayout_37->setObjectName(QStringLiteral("horizontalLayout_37"));
+        label_32 = new QLabel(widget);
+        label_32->setObjectName(QStringLiteral("label_32"));
+
+        horizontalLayout_37->addWidget(label_32);
+
+        le_extra_mover_reproduction_cost = new QLineEdit(widget);
+        le_extra_mover_reproduction_cost->setObjectName(QStringLiteral("le_extra_mover_reproduction_cost"));
+
+        horizontalLayout_37->addWidget(le_extra_mover_reproduction_cost);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_37);
 
         cb_use_evolved_anatomy_mutation_rate = new QCheckBox(widget);
         cb_use_evolved_anatomy_mutation_rate->setObjectName(QStringLiteral("cb_use_evolved_anatomy_mutation_rate"));
@@ -1748,6 +1766,7 @@ public:
         QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop_slot(bool)));
         QObject::connect(cb_use_new_child_pos_calculator, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_new_child_pos_calculator_slot(bool)));
         QObject::connect(cb_checks_if_path_is_clear, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_check_if_path_is_clear_slot(bool)));
+        QObject::connect(le_extra_mover_reproduction_cost, SIGNAL(returnPressed()), MainWindow, SLOT(le_extra_mover_reproduction_cost_slot()));
 
         Tabs->setCurrentIndex(1);
 
@@ -1883,15 +1902,16 @@ public:
         le_food_production_probability->setText(QApplication::translate("MainWindow", "0.5", Q_NULLPTR));
         label_15->setText(QApplication::translate("MainWindow", "Produce food every n tick:", Q_NULLPTR));
         le_produce_food_every_n_tick->setText(QApplication::translate("MainWindow", "1", Q_NULLPTR));
-        label_5->setText(QApplication::translate("MainWindow", "llifespan multiplier:", Q_NULLPTR));
+        label_5->setText(QApplication::translate("MainWindow", "Llifespan multiplier:", Q_NULLPTR));
         le_lifespan_multiplier->setText(QApplication::translate("MainWindow", "100", Q_NULLPTR));
-        label_7->setText(QApplication::translate("MainWindow", "look range:", Q_NULLPTR));
+        label_7->setText(QApplication::translate("MainWindow", "Look range:", Q_NULLPTR));
         le_look_range->setText(QApplication::translate("MainWindow", "50", Q_NULLPTR));
-        label_9->setText(QApplication::translate("MainWindow", "auto produce n food:", Q_NULLPTR));
+        label_9->setText(QApplication::translate("MainWindow", "Auto produce n food:", Q_NULLPTR));
         le_auto_produce_n_food->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
-        label_44->setText(QApplication::translate("MainWindow", "auto produce food every n tick:", Q_NULLPTR));
-        label_6->setText(QApplication::translate("MainWindow", "extra reproduction cost:", Q_NULLPTR));
+        label_44->setText(QApplication::translate("MainWindow", "Auto produce food every n tick:", Q_NULLPTR));
+        label_6->setText(QApplication::translate("MainWindow", "Extra reproduction cost:", Q_NULLPTR));
         le_extra_reproduction_cost->setText(QApplication::translate("MainWindow", "0", Q_NULLPTR));
+        label_32->setText(QApplication::translate("MainWindow", "Extra mover reproduction cost:", Q_NULLPTR));
         cb_use_evolved_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved anatomy mutation rate", Q_NULLPTR));
         lb_mutation_rate->setText(QApplication::translate("MainWindow", "Global anatomy mutation rate:", Q_NULLPTR));
         le_global_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "0.05", Q_NULLPTR));

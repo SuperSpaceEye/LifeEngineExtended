@@ -1222,9 +1222,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-933</y>
+                  <y>0</y>
                   <width>504</width>
-                  <height>1179</height>
+                  <height>1212</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1263,7 +1263,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1344,7 +1344,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QLabel" name="label_5">
                         <property name="text">
-                         <string>llifespan multiplier:</string>
+                         <string>Llifespan multiplier:</string>
                         </property>
                        </widget>
                       </item>
@@ -1364,7 +1364,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLabel" name="label_7">
                           <property name="text">
-                           <string>look range:</string>
+                           <string>Look range:</string>
                           </property>
                          </widget>
                         </item>
@@ -1386,7 +1386,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLabel" name="label_9">
                           <property name="text">
-                           <string>auto produce n food:</string>
+                           <string>Auto produce n food:</string>
                           </property>
                          </widget>
                         </item>
@@ -1406,7 +1406,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QLabel" name="label_44">
                         <property name="text">
-                         <string>auto produce food every n tick:</string>
+                         <string>Auto produce food every n tick:</string>
                         </property>
                        </widget>
                       </item>
@@ -1420,7 +1420,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QLabel" name="label_6">
                         <property name="text">
-                         <string>extra reproduction cost:</string>
+                         <string>Extra reproduction cost:</string>
                         </property>
                        </widget>
                       </item>
@@ -1430,6 +1430,20 @@ p, li { white-space: pre-wrap; }
                          <string>0</string>
                         </property>
                        </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_37">
+                      <item>
+                       <widget class="QLabel" name="label_32">
+                        <property name="text">
+                         <string>Extra mover reproduction cost:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_extra_mover_reproduction_cost"/>
                       </item>
                      </layout>
                     </item>
@@ -3700,6 +3714,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_extra_mover_reproduction_cost</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_extra_mover_reproduction_cost_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>738</x>
+     <y>781</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3795,6 +3825,7 @@ p, li { white-space: pre-wrap; }
   <slot>cb_food_blocks_movement_slot(bool)</slot>
   <slot>cb_use_new_child_pos_calculator_slot(bool)</slot>
   <slot>cb_check_if_path_is_clear_slot(bool)</slot>
+  <slot>le_extra_mover_reproduction_cost_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

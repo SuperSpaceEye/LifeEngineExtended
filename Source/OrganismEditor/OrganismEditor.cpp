@@ -276,7 +276,7 @@ void OrganismEditor::clear_grid() {
 void OrganismEditor::place_organism_on_a_grid() {
     clear_grid();
 
-    for (auto & block: editor_organism->organism_anatomy->_organism_blocks) {
+    for (auto & block: editor_organism->anatomy->_organism_blocks) {
         auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
         auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
         edit_grid[x][y].type = block.type;
