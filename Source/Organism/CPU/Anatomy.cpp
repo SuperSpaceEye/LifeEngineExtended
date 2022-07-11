@@ -174,35 +174,13 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
     _eating_space.reserve(   get_map_size(eating_space));
     _killing_space.reserve(get_map_size(killing_space));
 
-    //item.first = position in map, item.second = content
-    for (auto const &xmap: organism_blocks) {
-        for (auto const &yxmap: xmap.second) {
-            _organism_blocks.emplace_back(yxmap.second.type, yxmap.second.rotation, xmap.first, yxmap.first);
-        }
-    }
+    serialize_organism_blocks(organism_blocks, _organism_blocks);
 
-    for (int i = 0; i < num_producing_space.size(); i++) {
-        _producing_space.emplace_back(std::vector<SerializedAdjacentSpaceContainer>());
-        _producing_space[i].reserve(num_producing_space[i]);
-    }
+    serialize_producing_space(producing_space, num_producing_space, _producing_space);
 
-    for (auto const &xmap: producing_space) {
-        for (auto const &yxmap: xmap.second) {
-            _producing_space[yxmap.second.producer].emplace_back(SerializedAdjacentSpaceContainer(xmap.first, yxmap.first));
-        }
-    }
+    serialize_eating_space(eating_space, _eating_space);
 
-    for (auto const &xmap: eating_space) {
-        for (auto const &yxmap: xmap.second) {
-            _eating_space.emplace_back(xmap.first, yxmap.first);
-        }
-    }
-
-    for (auto const &xmap: killing_space) {
-        for (auto const &yxmap: xmap.second) {
-            _killing_space.emplace_back(xmap.first, yxmap.first);
-        }
-    }
+    serialize_killing_space(killing_space, _killing_space);
 
     return new SerializedOrganismStructureContainer{_organism_blocks,
 
@@ -216,6 +194,66 @@ SerializedOrganismStructureContainer * Anatomy::serialize(
                                                     killer_blocks,
                                                     armor_blocks,
                                                     eye_blocks};
+}
+
+void
+Anatomy::serialize_killing_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
+                                 std::vector<SerializedAdjacentSpaceContainer> &_killing_space) {
+    for (auto const &xmap: killing_space) {
+        for (auto const &yxmap: xmap.second) {
+            _killing_space.emplace_back(xmap.first, yxmap.first);
+        }
+    }
+}
+
+void
+Anatomy::serialize_eating_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
+                                std::vector<SerializedAdjacentSpaceContainer> &_eating_space) {
+    for (auto const &xmap: eating_space) {
+        for (auto const &yxmap: xmap.second) {
+            _eating_space.emplace_back(xmap.first, yxmap.first);
+        }
+    }
+}
+
+void Anatomy::serialize_organism_blocks(
+        const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+        std::vector<SerializedOrganismBlockContainer> &_organism_blocks) {//item.first = position in map, item.second = content
+    for (auto const &xmap: organism_blocks) {
+        for (auto const &yxmap: xmap.second) {
+            _organism_blocks.emplace_back(yxmap.second.type, yxmap.second.rotation, xmap.first, yxmap.first);
+        }
+    }
+}
+
+void Anatomy::serialize_producing_space(
+        const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,
+        const std::vector<int> &num_producing_space,
+        std::vector<std::vector<SerializedAdjacentSpaceContainer>> &_producing_space) {
+
+    for (int i = 0; i < num_producing_space.size(); i++) {
+        _producing_space.emplace_back(std::vector<SerializedAdjacentSpaceContainer>());
+        _producing_space[i].reserve(num_producing_space[i]);
+    }
+
+    for (auto const &xmap: producing_space) {
+        for (auto const &yxmap: xmap.second) {
+            _producing_space[yxmap.second.producer].emplace_back(SerializedAdjacentSpaceContainer(xmap.first, yxmap.first));
+        }
+    }
+
+    //pruning empty producing spaces
+    int deleted = 0;
+    auto size = _producing_space.size();
+    for (int i = 0; i < size; i++) {
+        if (_producing_space[i-deleted].empty()) {
+            _producing_space.erase(_producing_space.begin() + i - deleted);
+            deleted++;
+        }
+    }
+
+    //TODO downsizing vector?
+//    std::vector<std::vector<SerializedAdjacentSpaceContainer>>(_producing_space).swap(_producing_space);
 }
 
 SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int block_choice, Rotation rotation, int x_,

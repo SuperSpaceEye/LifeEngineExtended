@@ -161,6 +161,19 @@ private:
             int32_t armor_blocks,
             int32_t eye_blocks);
 
+    static inline void serialize_producing_space(const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,
+                                                 const std::vector<int> &num_producing_space,
+                                                 std::vector<std::vector<SerializedAdjacentSpaceContainer>> &_producing_space);
+
+    static inline void serialize_organism_blocks(const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                                 std::vector<SerializedOrganismBlockContainer> &_organism_blocks);
+
+    static inline void serialize_eating_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
+                                              std::vector<SerializedAdjacentSpaceContainer> &_eating_space);
+
+    static inline void serialize_killing_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
+                                               std::vector<SerializedAdjacentSpaceContainer> &_killing_space);
+
     template<typename T>
     static int get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map);
 

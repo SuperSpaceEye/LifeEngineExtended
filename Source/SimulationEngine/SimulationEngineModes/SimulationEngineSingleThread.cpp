@@ -122,19 +122,18 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *
 void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc, SimulationParameters *sp,
                                                         Organism *organism, lehmer64 &gen, float multiplier) {
     for (auto & pr: organism->anatomy->_producing_space) {
-        if (pr.empty()) {continue;}
-        //select one space to produce food.
+        //First checks if producer can produce
+        if (std::uniform_real_distribution<float>(0, 1)(gen) > sp->food_production_probability * multiplier) { continue;}
+
+        //Then selects one space to produce food.
         auto & pc = pr[std::uniform_int_distribution<int>(0, pr.size()-1)(gen)];
 
         auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
 
         //if space is occupied, then do nothing
         if (w_block->type != EmptyBlock) { continue;}
-        if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
-            w_block->type = FoodBlock;
-            if (sp->stop_when_one_food_generated) { return;}
-            continue;
-        }
+        w_block->type = FoodBlock;
+        if (sp->stop_when_one_food_generated) { return;}
     }
 }
 
