@@ -390,7 +390,7 @@ void WindowCore::le_produce_food_every_n_slot() {
     int fallback = sp.produce_food_every_n_life_ticks;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_produce_food_every_n_tick, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
+    if (result.result < 1) { display_message("Input cannot be less than 1."); return;}
     sp.produce_food_every_n_life_ticks = result.result;
 }
 
@@ -487,7 +487,6 @@ void WindowCore::le_menu_height_slot() {
     if (!result.is_valid) {return;}
     if (result.result < 200) {display_message("Input cannot be less than 200."); return;}
     _ui.menu_frame->setFixedHeight(result.result);}
-
 
 void WindowCore::le_perlin_octaves_slot() {
     int fallback = sp.perlin_octaves;
