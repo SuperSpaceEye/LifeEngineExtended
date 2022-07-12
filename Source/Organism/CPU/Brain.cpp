@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 12.05.2022.
 //
@@ -38,14 +42,14 @@ SimpleActionTable Brain::mutate_action_table(SimpleActionTable &parents_simple_a
     auto new_decision = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
 
     switch (mutate_type){
-        case MouthBlock:    new_simple_action_table.MouthBlock    = new_decision;break;
-        case ProducerBlock: new_simple_action_table.ProducerBlock = new_decision;break;
-        case MoverBlock:    new_simple_action_table.MoverBlock    = new_decision;break;
-        case KillerBlock:   new_simple_action_table.KillerBlock   = new_decision;break;
-        case ArmorBlock:    new_simple_action_table.ArmorBlock    = new_decision;break;
-        case EyeBlock:      new_simple_action_table.EyeBlock      = new_decision;break;
-        case FoodBlock:     new_simple_action_table.FoodBlock     = new_decision;break;
-        case WallBlock:     new_simple_action_table.WallBlock     = new_decision;break;
+        case BlockTypes::MouthBlock:    new_simple_action_table.MouthBlock    = new_decision;break;
+        case BlockTypes::ProducerBlock: new_simple_action_table.ProducerBlock = new_decision;break;
+        case BlockTypes::MoverBlock:    new_simple_action_table.MoverBlock    = new_decision;break;
+        case BlockTypes::KillerBlock:   new_simple_action_table.KillerBlock   = new_decision;break;
+        case BlockTypes::ArmorBlock:    new_simple_action_table.ArmorBlock    = new_decision;break;
+        case BlockTypes::EyeBlock:      new_simple_action_table.EyeBlock      = new_decision;break;
+        case BlockTypes::FoodBlock:     new_simple_action_table.FoodBlock     = new_decision;break;
+        case BlockTypes::WallBlock:     new_simple_action_table.WallBlock     = new_decision;break;
         default: break;
     }
     return new_simple_action_table;
@@ -88,14 +92,16 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
 BrainDecision Brain::calculate_simple_action(Observation &observation) const {
     auto action = SimpleDecision{};
     switch (observation.type) {
-        case MouthBlock:    action = simple_action_table.MouthBlock;    break;
-        case ProducerBlock: action = simple_action_table.ProducerBlock; break;
-        case MoverBlock:    action = simple_action_table.MoverBlock;    break;
-        case KillerBlock:   action = simple_action_table.KillerBlock;   break;
-        case ArmorBlock:    action = simple_action_table.ArmorBlock;    break;
-        case EyeBlock:      action = simple_action_table.EyeBlock;      break;
-        case FoodBlock:     action = simple_action_table.FoodBlock;     break;
-        case WallBlock:     action = simple_action_table.WallBlock;     break;
+        case BlockTypes::MouthBlock:    action = simple_action_table.MouthBlock;    break;
+        case BlockTypes::ProducerBlock: action = simple_action_table.ProducerBlock; break;
+        case BlockTypes::MoverBlock:    action = simple_action_table.MoverBlock;    break;
+        case BlockTypes::KillerBlock:   action = simple_action_table.KillerBlock;   break;
+        case BlockTypes::ArmorBlock:    action = simple_action_table.ArmorBlock;    break;
+        case BlockTypes::EyeBlock:      action = simple_action_table.EyeBlock;      break;
+        case BlockTypes::FoodBlock:     action = simple_action_table.FoodBlock;     break;
+        case BlockTypes::WallBlock:     action = simple_action_table.WallBlock;     break;
+        case BlockTypes::EmptyBlock:    action = SimpleDecision::DoNothing;         break;
+        default: throw "unknown block";
     }
 
     switch (action) {
@@ -127,8 +133,10 @@ DecisionObservation Brain::get_decision(std::vector<Observation> &observation_ve
     switch (brain_type) {
         case BrainTypes::RandomActions:
             action = get_random_action(mt);
+            break;
         case BrainTypes::SimpleBrain:
             action = get_simple_action(observation_vector, mt);
+            break;
         case BrainTypes::BehaviourTreeBrain:
             break;
         case BrainTypes::NeuralNetworkBrain:

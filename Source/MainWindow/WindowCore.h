@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 16.03.2022.
 //
@@ -218,7 +222,7 @@ private:
     void move_center(int delta_x, int delta_y);
     void reset_scale_view();
 
-    void write_json_data(std::string path);
+    void write_json_data(const std::string &path);
     void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
                              boost::property_tree::ptree &edible_neighbors,
                              boost::property_tree::ptree &growableNeighbors,
@@ -238,7 +242,7 @@ private:
     void json_read_simulation_parameters(const boost::property_tree::ptree &root);
 
     void json_read_grid_data(boost::property_tree::ptree &root);
-    void read_json_data(std::string path);
+    void read_json_data(const std::string &path);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
@@ -312,7 +316,7 @@ private:
     void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
-    void update_statistics_info(OrganismAvgBlockInformation info);
+    void update_statistics_info(const OrganismAvgBlockInformation &info);
 
     void resize_simulation_grid();
 

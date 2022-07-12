@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 16.05.2022.
 //
@@ -68,9 +72,9 @@ public:
     static bool path_is_clear(int x, int y, Rotation direction, int steps, Organism *allow_organism, EngineDataContainer *dc,
                               SimulationParameters *sp);
 
-    static void new_child_pos_calculator(Organism *organism, const Rotation &to_place, int distance);
+    static void new_child_pos_calculator(Organism *organism, const Rotation to_place, int distance);
 
-    static void old_child_pos_calculator(Organism *organism, const Rotation &to_place, int distance);
+    static void old_child_pos_calculator(Organism *organism, const Rotation to_place, int distance);
 };
 
 

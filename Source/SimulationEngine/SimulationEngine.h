@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 16.03.2022.
 //
@@ -67,7 +71,7 @@ public:
 
     void make_random_walls();
 
-    void set_wall(std::vector<Organism *> &temp, const Action &action);
+    void set_wall(std::vector<Organism *> &temp, const Action action);
     void clear_walls();
 
     //TODO make getters and setters for it.

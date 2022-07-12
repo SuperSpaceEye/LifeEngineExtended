@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 20.03.2022.
 //
@@ -296,15 +300,15 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
     int32_t eye_blocks      = _eye_blocks;
 
     switch (type) {
-        case MouthBlock:    mouth_blocks++    ; break;
-        case ProducerBlock: producer_blocks++ ; break;
-        case MoverBlock:    mover_blocks++    ; break;
-        case KillerBlock:   killer_blocks++   ; break;
-        case ArmorBlock:    armor_blocks++    ; break;
-        case EyeBlock:      eye_blocks++      ; break;
-        case EmptyBlock:
-        case FoodBlock:
-        case WallBlock:
+        case BlockTypes::MouthBlock:    mouth_blocks++    ; break;
+        case BlockTypes::ProducerBlock: producer_blocks++ ; break;
+        case BlockTypes::MoverBlock:    mover_blocks++    ; break;
+        case BlockTypes::KillerBlock:   killer_blocks++   ; break;
+        case BlockTypes::ArmorBlock:    armor_blocks++    ; break;
+        case BlockTypes::EyeBlock:      eye_blocks++      ; break;
+        case BlockTypes::EmptyBlock:
+        case BlockTypes::FoodBlock:
+        case BlockTypes::WallBlock:
             break;
     }
 
@@ -415,28 +419,28 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
     int32_t eye_blocks      = _eye_blocks;
 
     switch (_organism_blocks[block_choice].type) {
-        case MouthBlock:    mouth_blocks--    ; break;
-        case ProducerBlock: producer_blocks-- ; break;
-        case MoverBlock:    mover_blocks--    ; break;
-        case KillerBlock:   killer_blocks--   ; break;
-        case ArmorBlock:    armor_blocks--    ; break;
-        case EyeBlock:      eye_blocks--      ; break;
-        case EmptyBlock:
-        case FoodBlock:
-        case WallBlock:
+        case BlockTypes::MouthBlock:    mouth_blocks--    ; break;
+        case BlockTypes::ProducerBlock: producer_blocks-- ; break;
+        case BlockTypes::MoverBlock:    mover_blocks--    ; break;
+        case BlockTypes::KillerBlock:   killer_blocks--   ; break;
+        case BlockTypes::ArmorBlock:    armor_blocks--    ; break;
+        case BlockTypes::EyeBlock:      eye_blocks--      ; break;
+        case BlockTypes::EmptyBlock:
+        case BlockTypes::FoodBlock:
+        case BlockTypes::WallBlock:
             break;
     }
 
     switch (type) {
-        case MouthBlock:    mouth_blocks++    ; break;
-        case ProducerBlock: producer_blocks++ ; break;
-        case MoverBlock:    mover_blocks++    ; break;
-        case KillerBlock:   killer_blocks++   ; break;
-        case ArmorBlock:    armor_blocks++    ; break;
-        case EyeBlock:      eye_blocks++      ; break;
-        case EmptyBlock:
-        case FoodBlock:
-        case WallBlock:
+        case BlockTypes::MouthBlock:    mouth_blocks++    ; break;
+        case BlockTypes::ProducerBlock: producer_blocks++ ; break;
+        case BlockTypes::MoverBlock:    mover_blocks++    ; break;
+        case BlockTypes::KillerBlock:   killer_blocks++   ; break;
+        case BlockTypes::ArmorBlock:    armor_blocks++    ; break;
+        case BlockTypes::EyeBlock:      eye_blocks++      ; break;
+        case BlockTypes::EmptyBlock:
+        case BlockTypes::FoodBlock:
+        case BlockTypes::WallBlock:
             break;
     }
 
@@ -521,15 +525,15 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
     int32_t eye_blocks      = _eye_blocks;
 
     switch (_organism_blocks[block_choice].type) {
-        case MouthBlock:    mouth_blocks--    ; break;
-        case ProducerBlock: producer_blocks-- ; break;
-        case MoverBlock:    mover_blocks--    ; break;
-        case KillerBlock:   killer_blocks--   ; break;
-        case ArmorBlock:    armor_blocks--    ; break;
-        case EyeBlock:      eye_blocks--      ; break;
-        case EmptyBlock:
-        case FoodBlock:
-        case WallBlock:
+        case BlockTypes::MouthBlock:    mouth_blocks--    ; break;
+        case BlockTypes::ProducerBlock: producer_blocks-- ; break;
+        case BlockTypes::MoverBlock:    mover_blocks--    ; break;
+        case BlockTypes::KillerBlock:   killer_blocks--   ; break;
+        case BlockTypes::ArmorBlock:    armor_blocks--    ; break;
+        case BlockTypes::EyeBlock:      eye_blocks--      ; break;
+        case BlockTypes::EmptyBlock:
+        case BlockTypes::FoodBlock:
+        case BlockTypes::WallBlock:
             break;
     }
 
@@ -604,28 +608,28 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
             switch (item.type) {
-                case MouthBlock:    _mouth_blocks--    ; break;
-                case ProducerBlock: _producer_blocks-- ; break;
-                case MoverBlock:    _mover_blocks--    ; break;
-                case KillerBlock:   _killer_blocks--   ; break;
-                case ArmorBlock:    _armor_blocks--    ; break;
-                case EyeBlock:      _eye_blocks--      ; break;
-                case EmptyBlock:
-                case FoodBlock:
-                case WallBlock:
+                case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
+                case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
+                case BlockTypes::MoverBlock:    _mover_blocks--    ; break;
+                case BlockTypes::KillerBlock:   _killer_blocks--   ; break;
+                case BlockTypes::ArmorBlock:    _armor_blocks--    ; break;
+                case BlockTypes::EyeBlock:      _eye_blocks--      ; break;
+                case BlockTypes::EmptyBlock:
+                case BlockTypes::FoodBlock:
+                case BlockTypes::WallBlock:
                     break;
             }
 
             switch (type) {
-                case MouthBlock:    _mouth_blocks++    ; break;
-                case ProducerBlock: _producer_blocks++ ; break;
-                case MoverBlock:    _mover_blocks++    ; break;
-                case KillerBlock:   _killer_blocks++   ; break;
-                case ArmorBlock:    _armor_blocks++    ; break;
-                case EyeBlock:      _eye_blocks++      ; break;
-                case EmptyBlock:
-                case FoodBlock:
-                case WallBlock:
+                case BlockTypes::MouthBlock:    _mouth_blocks++    ; break;
+                case BlockTypes::ProducerBlock: _producer_blocks++ ; break;
+                case BlockTypes::MoverBlock:    _mover_blocks++    ; break;
+                case BlockTypes::KillerBlock:   _killer_blocks++   ; break;
+                case BlockTypes::ArmorBlock:    _armor_blocks++    ; break;
+                case BlockTypes::EyeBlock:      _eye_blocks++      ; break;
+                case BlockTypes::EmptyBlock:
+                case BlockTypes::FoodBlock:
+                case BlockTypes::WallBlock:
                     break;
             }
             item.type = type;
@@ -693,12 +697,12 @@ void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blo
 
     for (auto & block: blocks) {
         switch (block.type) {
-            case MouthBlock:    _mouth_blocks++    ; break;
-            case ProducerBlock: _producer_blocks++ ; break;
-            case MoverBlock:    _mover_blocks++    ; break;
-            case KillerBlock:   _killer_blocks++   ; break;
-            case ArmorBlock:    _armor_blocks++    ; break;
-            case EyeBlock:      _eye_blocks++      ; break;
+            case BlockTypes::MouthBlock:    _mouth_blocks++    ; break;
+            case BlockTypes::ProducerBlock: _producer_blocks++ ; break;
+            case BlockTypes::MoverBlock:    _mover_blocks++    ; break;
+            case BlockTypes::KillerBlock:   _killer_blocks++   ; break;
+            case BlockTypes::ArmorBlock:    _armor_blocks++    ; break;
+            case BlockTypes::EyeBlock:      _eye_blocks++      ; break;
             default: break;
         }
 

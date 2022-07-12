@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 16.03.2022.
 //
@@ -202,15 +206,15 @@ void WindowCore::reset_scale_view() {
 
 color &WindowCore::get_color_simplified(BlockTypes type) {
     switch (type) {
-        case EmptyBlock :   return cc.empty_block;
-        case MouthBlock:    return cc.mouth;
-        case ProducerBlock: return cc.producer;
-        case MoverBlock:    return cc.mover;
-        case KillerBlock:   return cc.killer;
-        case ArmorBlock:    return cc.armor;
-        case EyeBlock:      return cc.eye;
-        case FoodBlock:     return cc.food;
-        case WallBlock:     return cc.wall;
+        case BlockTypes::EmptyBlock :   return cc.empty_block;
+        case BlockTypes::MouthBlock:    return cc.mouth;
+        case BlockTypes::ProducerBlock: return cc.producer;
+        case BlockTypes::MoverBlock:    return cc.mover;
+        case BlockTypes::KillerBlock:   return cc.killer;
+        case BlockTypes::ArmorBlock:    return cc.armor;
+        case BlockTypes::EyeBlock:      return cc.eye;
+        case BlockTypes::FoodBlock:     return cc.food;
+        case BlockTypes::WallBlock:     return cc.wall;
         default: return cc.empty_block;
     }
 }
@@ -220,13 +224,13 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
     int y;
 
     switch (type) {
-        case EmptyBlock :   return cc.empty_block;
-        case MouthBlock:    return cc.mouth;
-        case ProducerBlock: return cc.producer;
-        case MoverBlock:    return cc.mover;
-        case KillerBlock:   return cc.killer;
-        case ArmorBlock:    return cc.armor;
-        case EyeBlock:
+        case BlockTypes::EmptyBlock :   return cc.empty_block;
+        case BlockTypes::MouthBlock:    return cc.mouth;
+        case BlockTypes::ProducerBlock: return cc.producer;
+        case BlockTypes::MoverBlock:    return cc.mover;
+        case BlockTypes::KillerBlock:   return cc.killer;
+        case BlockTypes::ArmorBlock:    return cc.armor;
+        case BlockTypes::EyeBlock:
             x = relative_x_scale * 5;
             y = relative_y_scale * 5;
             {
@@ -260,8 +264,8 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
                 }
             }
             return textures.rawEyeTexture[x + y * 5];
-        case FoodBlock:     return cc.food;
-        case WallBlock:     return cc.wall;
+        case BlockTypes::FoodBlock:     return cc.food;
+        case BlockTypes::WallBlock:     return cc.wall;
         default: return cc.empty_block;
     }
 }
@@ -691,12 +695,14 @@ OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
             if (i >= ecp.num_threads) {
                 has_pool = false;
             }
+        } else {
+            throw "no pool";
         }
 
         for (auto & organism: *pool) {
-            info.total_size_organism_blocks                += organism->anatomy->_organism_blocks.size();
-            info.total_size_producing_space                += organism->anatomy->_producing_space.size();
-            info.total_size_eating_space                   += organism->anatomy->_eating_space.size();
+            info.total_size_organism_blocks += organism->anatomy->_organism_blocks.size();
+            info.total_size_producing_space += organism->anatomy->_producing_space.size();
+            info.total_size_eating_space    += organism->anatomy->_eating_space.size();
 
             if (organism->anatomy->_mover_blocks > 0) {
                 info.move_range += organism->move_range;
@@ -865,7 +871,7 @@ OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
     return info;
 }
 
-void WindowCore::update_statistics_info(OrganismAvgBlockInformation info) {
+void WindowCore::update_statistics_info(const OrganismAvgBlockInformation &info) {
     s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(edc.total_engine_ticks)));
     s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
@@ -1046,18 +1052,16 @@ void WindowCore::change_main_grid_left_click() {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    edc.user_actions_pool.push_back(
-                            Action{ActionType::TryAddFood, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ModifyWall:
-                    edc.user_actions_pool.push_back(
-                            Action{ActionType::TryAddWall, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::KillOrganism:
-                    edc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
-                    edc.user_actions_pool.push_back(Action{ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::PlaceOrganism:
                     break;
@@ -1075,13 +1079,13 @@ void WindowCore::change_main_grid_right_click() {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    edc.user_actions_pool.push_back(Action{ActionType::TryRemoveFood, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ModifyWall:
-                    edc.user_actions_pool.push_back(Action{ActionType::TryRemoveWall, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::KillOrganism:
-                    edc.user_actions_pool.push_back(Action{ActionType::TryKillOrganism, cpg.x + x, cpg.y + y});
+                    edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
                     break;

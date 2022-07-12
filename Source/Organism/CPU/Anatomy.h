@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 20.03.2022.
 //
@@ -33,7 +37,7 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
-    pos get_pos(Rotation rotation) {
+    inline pos get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return pos{ relative_x,  relative_y};
             case Rotation::LEFT:  return pos{-relative_y,  relative_x};

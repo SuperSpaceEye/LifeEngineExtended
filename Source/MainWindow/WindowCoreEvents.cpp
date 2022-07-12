@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 07.05.2022.
 //
@@ -23,9 +27,6 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
             auto position = mouse_event->pos();
             if (mouse_event->button() == Qt::MiddleButton) {
                 wheel_mouse_button_pressed = true;
-                change_main_simulation_grid = true;
-                last_mouse_x_pos = position.x();
-                last_mouse_y_pos = position.y();
             } else if (mouse_event->button() == Qt::RightButton) {
                 right_mouse_button_pressed = true;
             } else if (mouse_event->button() == Qt::LeftButton) {
@@ -35,7 +36,7 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
             last_mouse_y_pos = position.y();
 
             change_main_simulation_grid = _ui.simulation_graphicsView->underMouse();
-            change_editing_grid = _ui.simulation_graphicsView->underMouse();
+            change_editing_grid = ee._ui.editor_graphicsView->underMouse();
         } break;
         case QEvent::MouseButtonRelease: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);

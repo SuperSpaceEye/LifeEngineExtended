@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 16.05.2022.
 //
@@ -241,12 +245,10 @@ void SimulationEnginePartialMultiThread::start_stage(EngineDataContainer *dc, Pa
 
 void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc, Organism *organism) {
     for (auto &block: organism->anatomy->_organism_blocks) {
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].type = block.type;
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].rotation = block.rotation;
-        dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-        [organism->y + block.get_pos(organism->rotation).y].organism = organism;
+        auto pos = block.get_pos(organism->rotation);
+        dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].type = block.type;
+        dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].rotation = block.rotation;
+        dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].organism = organism;
     }
 }
 
@@ -271,13 +273,14 @@ void SimulationEnginePartialMultiThread::place_organism(EngineDataContainer *dc,
 //TODO this function takes like 40% of thread_tick work, so it needs redoing.
 void SimulationEnginePartialMultiThread::eat_food(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism) {
     for (auto & pc: organism->anatomy->_eating_space) {
-        while (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].locked) {}
-        dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].locked = true;
-        if (dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type == FoodBlock) {
-            dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].type = EmptyBlock;
+        auto pos = pc.get_pos(organism->rotation);
+        while (dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].locked) {}
+        dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].locked = true;
+        if (dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].type == BlockTypes::FoodBlock) {
+            dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].type = BlockTypes::EmptyBlock;
             organism->food_collected++;
         }
-        dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y].locked = false;
+        dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].locked = false;
     }
 }
 
@@ -286,8 +289,9 @@ void SimulationEnginePartialMultiThread::tick_lifetime(EngineDataContainer *dc, 
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
         for (auto & block: organism->anatomy->_organism_blocks) {
-            dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].type = FoodBlock;
-            dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y].organism = nullptr;
+            auto pos = block.get_pos(organism->rotation);
+            dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].type = BlockTypes::FoodBlock;
+            dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y].organism = nullptr;
         }
         to_erase[thread_num].emplace_back(organism_pos);
     }
@@ -336,7 +340,7 @@ void SimulationEnginePartialMultiThread::get_observations(EngineDataContainer *d
                 break;
         }
 
-        auto last_observation = Observation{EmptyBlock, 0, block.rotation};
+        auto last_observation = Observation{BlockTypes::EmptyBlock, 0, block.rotation};
 
         for (int i = 1; i < sp->look_range; i++) {
             pos_x += offset_x;

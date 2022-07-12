@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 30.03.2022.
 //
@@ -49,8 +53,8 @@ struct EngineDataContainer {
     std::vector<std::vector<pool_changes_info>> sorted_organisms_by_x_position;
     std::vector<std::vector<pool_changes_info*>> pool_changes;
 
-    Organism * base_organism;
-    Organism * chosen_organism;
+    Organism * base_organism = nullptr;
+    Organism * chosen_organism = nullptr;
 
     int auto_reset_counter = 0;
 
@@ -65,7 +69,7 @@ struct EngineDataContainer {
 };
 
 struct pool_changes_info {
-    Organism * organism;
+    Organism * organism = nullptr;
     int position_in_old_pool = -1;
     int old_pool = 500;
     int new_pool = 500;

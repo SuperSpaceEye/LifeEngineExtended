@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by SpaceEye on 12.06.22.
 //
@@ -11,7 +15,7 @@
 #include "Rotation.h"
 
 struct Observation {
-    BlockTypes type = EmptyBlock;
+    BlockTypes type = BlockTypes::EmptyBlock;
     int32_t distance = 0;
     //local rotation
     Rotation eye_rotation = Rotation::UP;

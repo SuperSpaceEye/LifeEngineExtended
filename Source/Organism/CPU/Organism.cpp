@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 20.03.2022.
 //
@@ -48,12 +52,12 @@ float Organism::calculate_max_life() {
     life_points = 0;
     for (auto& item: anatomy->_organism_blocks) {
         switch (item.type) {
-            case MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
-            case ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
-            case MoverBlock:    life_points += bp->MoverBlock.   life_point_amount; break;
-            case KillerBlock:   life_points += bp->KillerBlock.  life_point_amount; break;
-            case ArmorBlock:    life_points += bp->ArmorBlock.   life_point_amount; break;
-            case EyeBlock:      life_points += bp->EyeBlock.     life_point_amount; break;
+            case BlockTypes::MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
+            case BlockTypes::ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
+            case BlockTypes::MoverBlock:    life_points += bp->MoverBlock.   life_point_amount; break;
+            case BlockTypes::KillerBlock:   life_points += bp->KillerBlock.  life_point_amount; break;
+            case BlockTypes::ArmorBlock:    life_points += bp->ArmorBlock.   life_point_amount; break;
+            case BlockTypes::EyeBlock:      life_points += bp->EyeBlock.     life_point_amount; break;
             default: throw std::runtime_error("Unknown block");
         }
     }
@@ -69,12 +73,12 @@ float Organism::calculate_food_needed() {
     food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy->_mover_blocks > 0);
     for (auto & block: anatomy->_organism_blocks) {
         switch (block.type) {
-            case MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
-            case ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
-            case MoverBlock:    food_needed += bp->MoverBlock.   food_cost_modifier; break;
-            case KillerBlock:   food_needed += bp->KillerBlock.  food_cost_modifier; break;
-            case ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost_modifier; break;
-            case EyeBlock:      food_needed += bp->EyeBlock.     food_cost_modifier; break;
+            case BlockTypes::MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
+            case BlockTypes::ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
+            case BlockTypes::MoverBlock:    food_needed += bp->MoverBlock.   food_cost_modifier; break;
+            case BlockTypes::KillerBlock:   food_needed += bp->KillerBlock.  food_cost_modifier; break;
+            case BlockTypes::ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost_modifier; break;
+            case BlockTypes::EyeBlock:      food_needed += bp->EyeBlock.     food_cost_modifier; break;
             default: throw std::runtime_error("Unknown block");
         }
     }

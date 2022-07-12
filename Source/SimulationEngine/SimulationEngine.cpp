@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 16.03.2022.
 //
@@ -189,10 +193,10 @@ void SimulationEngine::clear_walls() {
     }
 }
 
-void SimulationEngine::set_wall(std::vector<Organism *> &temp, const Action &action) {
+void SimulationEngine::set_wall(std::vector<Organism *> &temp, const Action action) {
     try_kill_organism(action.x, action.y, temp);
     try_remove_food(action.x, action.y);
-    dc.CPU_simulation_grid[action.x][action.y].type = WallBlock;
+    dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::WallBlock;
 }
 
 void SimulationEngine::random_food_drop() {
@@ -201,14 +205,14 @@ void SimulationEngine::random_food_drop() {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
             int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(gen);
             int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(gen);
-            dc.user_actions_pool.push_back(Action{ActionType::TryAddFood, x, y});
+            dc.user_actions_pool.emplace_back(ActionType::TryAddFood, x, y);
         }
     }
 }
 
 void SimulationEngine::try_remove_food(int x, int y) {
     if (dc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) { return;}
-    dc.CPU_simulation_grid[x][y].type = EmptyBlock;
+    dc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
 }
 
 void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & temp) {

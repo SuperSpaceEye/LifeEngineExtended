@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 25.06.22.
 //
@@ -219,13 +223,13 @@ color & OrganismEditor::get_texture_color(BlockTypes type, Rotation rotation, fl
     int y;
 
     switch (type) {
-        case EmptyBlock :   return color_container->empty_block;
-        case MouthBlock:    return color_container->mouth;
-        case ProducerBlock: return color_container->producer;
-        case MoverBlock:    return color_container->mover;
-        case KillerBlock:   return color_container->killer;
-        case ArmorBlock:    return color_container->armor;
-        case EyeBlock:
+        case BlockTypes::EmptyBlock :   return color_container->empty_block;
+        case BlockTypes::MouthBlock:    return color_container->mouth;
+        case BlockTypes::ProducerBlock: return color_container->producer;
+        case BlockTypes::MoverBlock:    return color_container->mover;
+        case BlockTypes::KillerBlock:   return color_container->killer;
+        case BlockTypes::ArmorBlock:    return color_container->armor;
+        case BlockTypes::EyeBlock:
             x = relative_x_scale * 5;
             y = relative_y_scale * 5;
             {
@@ -259,8 +263,8 @@ color & OrganismEditor::get_texture_color(BlockTypes type, Rotation rotation, fl
                 }
             }
             return textures.rawEyeTexture[x + y * 5];
-        case FoodBlock:     return color_container->food;
-        case WallBlock:     return color_container->wall;
+        case BlockTypes::FoodBlock:     return color_container->food;
+        case BlockTypes::WallBlock:     return color_container->wall;
         default: return color_container->empty_block;
     }
 }

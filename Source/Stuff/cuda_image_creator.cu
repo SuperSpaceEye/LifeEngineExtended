@@ -43,19 +43,19 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
     int temp;
 
     switch (type) {
-        case EmptyBlock :
+        case BlockTypes::EmptyBlock :
             return const_color_container.empty_block;
-        case MouthBlock:
+        case BlockTypes::MouthBlock:
             return const_color_container.mouth;
-        case ProducerBlock:
+        case BlockTypes::ProducerBlock:
             return const_color_container.producer;
-        case MoverBlock:
+        case BlockTypes::MoverBlock:
             return const_color_container.mover;
-        case KillerBlock:
+        case BlockTypes::KillerBlock:
             return const_color_container.killer;
-        case ArmorBlock:
+        case BlockTypes::ArmorBlock:
             return const_color_container.armor;
-        case EyeBlock: {
+        case BlockTypes::EyeBlock: {
             x = relative_x_scale * 5;
             y = relative_y_scale * 5;
             {
@@ -103,8 +103,8 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
                                            GRAY1, GRAY1, GRAY1, GRAY1, GRAY1};
             return rawEyeTexture[x + y * 5];
         }
-        case FoodBlock:     return const_color_container.food;
-        case WallBlock:     return const_color_container.wall;
+        case BlockTypes::FoodBlock:     return const_color_container.food;
+        case BlockTypes::WallBlock:     return const_color_container.wall;
         default: return const_color_container.simulation_background_color;
     }
 }
