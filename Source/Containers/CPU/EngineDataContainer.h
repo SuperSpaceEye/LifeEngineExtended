@@ -30,8 +30,8 @@ struct EngineDataContainer {
     // if -1, then unlimited
     int32_t max_organisms = -1;
     // dimensions of the simulation
-    uint16_t simulation_width = 600;
-    uint16_t simulation_height = 600;
+    uint32_t simulation_width = 600;
+    uint32_t simulation_height = 600;
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
 

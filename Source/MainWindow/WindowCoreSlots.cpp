@@ -227,192 +227,114 @@ void WindowCore::le_num_threads_slot() {
 }
 
 void WindowCore::le_cell_size_slot() {
-    int fallback = starting_cell_size_on_resize;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_cell_size, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Size of cell cannot be less than 1."); return;}
-    starting_cell_size_on_resize = result.result;
+    le_slot_lower_bound(starting_cell_size_on_resize, starting_cell_size_on_resize, "int",
+                        _ui.le_cell_size, 1, "1");
 }
 
 void WindowCore::le_simulation_width_slot() {
-    int fallback = edc.simulation_width;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_width,
-                                                        fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 10) {display_message("Simulation width cannot be less than 10."); return;}
-    new_simulation_width = result.result;
+    le_slot_lower_bound<uint32_t>(edc.simulation_width, new_simulation_width, "int",
+                                  _ui.le_simulation_width, 10, "10");
 }
 
 void WindowCore::le_simulation_height_slot() {
-    int fallback = edc.simulation_height;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_simulation_height,
-                                                        fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 10) {display_message("Simulation height cannot be less than 10."); return;}
-    new_simulation_height = result.result;
+    le_slot_lower_bound<uint32_t>(edc.simulation_height, new_simulation_height, "int",
+                                  _ui.le_simulation_height, 10, "10");
 }
 
-//I don't know how to do it better.
 void WindowCore::le_food_production_probability_slot() {
-    float fallback = sp.food_production_probability;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float",
-                                                          _ui.le_food_production_probability, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result <= 0 || result.result > 1) {display_message("Input must be between 0 and 1."); return;}
-    sp.food_production_probability = result.result;
+    le_slot_lower_upper_bound<float>(sp.food_production_probability, sp.food_production_probability, "float",
+                                     _ui.le_food_production_probability, 0, "0", 1, "1");
 }
 
 void WindowCore::le_lifespan_multiplier_slot() {
-    float fallback = sp.lifespan_multiplier;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_lifespan_multiplier,
-                                                        fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.lifespan_multiplier = result.result;
+    le_slot_lower_bound<float>(sp.lifespan_multiplier, sp.lifespan_multiplier, "float",
+                               _ui.le_lifespan_multiplier, 0, "0");
     engine->reinit_organisms();
 }
 
 void WindowCore::le_look_range_slot() {
-    int fallback = sp.look_range;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_look_range, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    sp.look_range = result.result;
+    le_slot_lower_bound(sp.look_range, sp.look_range, "int",
+                        _ui.le_look_range, 1, "1");
 }
 
 void WindowCore::le_auto_food_drop_rate_slot() {
-    int fallback = sp.auto_produce_n_food;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_produce_n_food,
-                                                        fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.auto_produce_n_food = result.result;
+    le_slot_lower_bound(sp.auto_produce_n_food, sp.auto_produce_n_food, "int",
+                        _ui.le_auto_produce_n_food, 0, "0");
 }
 
 void WindowCore::le_auto_produce_food_every_n_tick_slot() {
-    int fallback = sp.auto_produce_food_every_n_ticks;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_auto_produce_food_every_n_tick,
-                                                        fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.auto_produce_food_every_n_ticks = result.result;
+    le_slot_lower_bound(sp.auto_produce_food_every_n_ticks, sp.auto_produce_food_every_n_ticks, "int",
+                        _ui.le_auto_produce_food_every_n_tick, 0, "0");
 }
 
 void WindowCore::le_extra_reproduction_cost_slot() {
-    int fallback = sp.extra_reproduction_cost;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_extra_reproduction_cost,
-                                                        fallback);
-    if (!result.is_valid) {return;}
-    sp.extra_reproduction_cost = result.result;
+    le_slot_no_bound(sp.extra_reproduction_cost, sp.extra_reproduction_cost, "int", _ui.le_extra_reproduction_cost);
 }
 
 void WindowCore::le_global_anatomy_mutation_rate_slot() {
-    float fallback = sp.global_anatomy_mutation_rate;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_anatomy_mutation_rate,
-                                                          fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
-    sp.global_anatomy_mutation_rate = result.result;
+    le_slot_lower_upper_bound<float>(sp.global_anatomy_mutation_rate, sp.global_anatomy_mutation_rate, "float",
+                                     _ui.le_global_anatomy_mutation_rate, 0, "0", 1, "1");
 }
 
 void WindowCore::le_global_brain_mutation_rate_slot() {
-    float fallback = sp.global_brain_mutation_rate;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_global_brain_mutation_rate,
-                                                          fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
-    sp.global_brain_mutation_rate = result.result;
+    le_slot_lower_upper_bound<float>(sp.global_brain_mutation_rate, sp.global_brain_mutation_rate, "float",
+                                     _ui.le_global_brain_mutation_rate, 0, "0", 1, "1");
 }
 
 void WindowCore::le_add_cell_slot() {
-    int fallback = sp.add_cell;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_add, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.add_cell = result.result;
+    le_slot_lower_bound(sp.add_cell, sp.add_cell, "int",
+                        _ui.le_add, 0, "0");
 }
 
 void WindowCore::le_change_cell_slot() {
-    int fallback = sp.change_cell;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_change, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.change_cell = result.result;
+    le_slot_lower_bound(sp.change_cell, sp.change_cell, "int",
+                        _ui.le_change, 0, "0");
 }
 
 void WindowCore::le_remove_cell_slot() {
-    int fallback = sp.remove_cell;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_remove, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.remove_cell = result.result;
+    le_slot_lower_bound(sp.remove_cell, sp.remove_cell, "int",
+                        _ui.le_remove, 0, "0");
 }
 
 void WindowCore::le_min_reproducing_distance_slot() {
-    int fallback = sp.min_reproducing_distance;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_reproduction_distance, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    if (result.result > sp.max_reproducing_distance) { display_message("Input cannot be more than max reproducing distance."); return;}
-    sp.min_reproducing_distance = result.result;
+    le_slot_lower_upper_bound<int>(sp.min_reproducing_distance, sp.min_reproducing_distance, "int",
+                                   _ui.le_min_reproduction_distance, 0, "0",
+                                   sp.max_reproducing_distance,"max reproducing distance");
 }
 
 void WindowCore::le_max_reproducing_distance_slot() {
-    int fallback = sp.max_reproducing_distance;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_reproduction_distance, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) { display_message("Input cannot be less than 1."); return;}
-    if (result.result < sp.min_reproducing_distance) { display_message("Input cannot be less than min reproducing distance."); return;}
-    sp.max_reproducing_distance = result.result;
+    le_slot_lower_lower_bound(sp.max_reproducing_distance, sp.max_reproducing_distance, "int",
+                              _ui.le_max_reproduction_distance, 1, "1",
+                              sp.min_reproducing_distance, "min reproducing distance");
 }
 
 void WindowCore::le_max_organisms_slot() {
-    int fallback = edc.max_organisms;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_organisms, fallback);
-    if (!result.is_valid) {return;}
-    edc.max_organisms = result.result;
+    le_slot_no_bound(edc.max_organisms, edc.max_organisms, "int", _ui.le_max_organisms);
 }
 
 void WindowCore::le_float_number_precision_slot() {
-    int fallback = float_precision;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_float_number_precision, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    float_precision = result.result;
+    le_slot_lower_bound(float_precision, float_precision, "int",
+                        _ui.le_float_number_precision, 0, "0");
 }
 
 void WindowCore::le_killer_damage_amount_slot() {
-    float fallback = sp.killer_damage_amount;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_killer_damage_amount, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    sp.killer_damage_amount = result.result;
+    le_slot_lower_bound<float>(sp.killer_damage_amount, sp.killer_damage_amount, "float",
+                               _ui.le_killer_damage_amount, 0, "0");
 }
 void WindowCore::le_produce_food_every_n_slot() {
-    int fallback = sp.produce_food_every_n_life_ticks;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_produce_food_every_n_tick, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) { display_message("Input cannot be less than 1."); return;}
-    sp.produce_food_every_n_life_ticks = result.result;
+    le_slot_lower_bound(sp.produce_food_every_n_life_ticks, sp.produce_food_every_n_life_ticks, "int",
+                        _ui.le_produce_food_every_n_tick, 1, "1");
 }
 
 void WindowCore::le_anatomy_mutation_rate_delimiter_slot() {
-    float fallback = sp.anatomy_mutation_rate_delimiter;
-    auto result = try_convert_message_box_template<float>("Inputted text is not float", _ui.le_anatomy_mutation_rate_delimiter, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    if (result.result > 1) { display_message("Input cannot be more than 1."); return;}
-    sp.anatomy_mutation_rate_delimiter = result.result;
+    le_slot_lower_upper_bound<float>(sp.anatomy_mutation_rate_delimiter, sp.anatomy_mutation_rate_delimiter, "float",
+                                     _ui.le_anatomy_mutation_rate_delimiter, 0, "0",
+                                     1, "1");
 }
 void WindowCore::le_brain_mutation_rate_delimiter_slot() {
-    float fallback = sp.brain_mutation_rate_delimiter;
-    auto result = try_convert_message_box_template<float>("Inputted text is not float", _ui.le_brain_mutation_rate_delimiter, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) { display_message("Input cannot be less than 0."); return;}
-    if (result.result > 1) { display_message("Input cannot be more than 1."); return;}
-    sp.brain_mutation_rate_delimiter = result.result;
+    le_slot_lower_upper_bound<float>(sp.brain_mutation_rate_delimiter, sp.brain_mutation_rate_delimiter, "float",
+                                     _ui.le_brain_mutation_rate_delimiter, 0, "0",
+                                     1, "1");
 }
 
 void WindowCore::le_font_size_slot() {
@@ -444,46 +366,32 @@ void WindowCore::le_font_size_slot() {
 }
 
 void WindowCore::le_max_move_range_slot() {
-    int fallback = sp.max_move_range;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_max_move_range, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    if (result.result < sp.min_move_range) { display_message("Input cannot be less than min move distance."); return;}
-    sp.max_move_range = result.result;
+    le_slot_lower_lower_bound(sp.max_move_range, sp.max_move_range, "int",
+                              _ui.le_max_move_range, 1, "1",
+                              sp.min_move_range, "min move distance");
 }
 
 void WindowCore::le_min_move_range_slot() {
-    int fallback = sp.min_move_range;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_min_move_range, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    if (result.result > sp.max_move_range) { display_message("Input cannot be more than max move distance"); return;}
-    sp.min_move_range = result.result;
+    le_slot_lower_upper_bound<int>(sp.min_move_range, sp.min_move_range, "int",
+                                   _ui.le_min_move_range, 1, "1",
+                                   sp.max_move_range, "max move distance");
 }
 
 void WindowCore::le_move_range_delimiter_slot() {
-    float fallback = sp.move_range_delimiter;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_move_range_delimiter, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    if (result.result > 0) { display_message("Input cannot be more than 0"); return;}
-    sp.move_range_delimiter = result.result;
+    le_slot_lower_upper_bound<float>(sp.move_range_delimiter, sp.move_range_delimiter, "float",
+                                     _ui.le_move_range_delimiter, 0, "0",
+                                     1, "1");
 }
 
 void WindowCore::le_brush_size_slot() {
-    int fallback = brush_size;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_brush_size, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    brush_size = result.result;
+    le_slot_lower_bound(brush_size, brush_size, "int",
+                        _ui.le_brush_size, 1, "1");
 }
 
 void WindowCore::le_update_info_every_n_milliseconds_slot() {
-    int fallback = update_info_every_n_milliseconds;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_update_info_every_n_milliseconds, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    update_info_every_n_milliseconds = result.result;}
+    le_slot_lower_bound(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
+                        _ui.le_update_info_every_n_milliseconds, 1, "1");
+}
 
 void WindowCore::le_menu_height_slot() {
     int fallback = _ui.menu_frame->frameSize().height();
@@ -493,61 +401,52 @@ void WindowCore::le_menu_height_slot() {
     _ui.menu_frame->setFixedHeight(result.result);}
 
 void WindowCore::le_perlin_octaves_slot() {
-    int fallback = sp.perlin_octaves;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_perlin_octaves, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    sp.perlin_octaves = result.result;
+    le_slot_lower_bound(sp.perlin_octaves, sp.perlin_octaves, "int",
+                        _ui.le_perlin_octaves, 1, "1");
 }
 
 void WindowCore::le_perlin_persistence_slot() {
-    float fallback = sp.perlin_persistence;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_persistence, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
-    sp.perlin_persistence = result.result;
+    le_slot_lower_upper_bound<float>(sp.perlin_persistence, sp.perlin_persistence, "float",
+                                     _ui.le_perlin_persistence, 0, "0",
+                                     1, "1");
 }
 
 void WindowCore::le_perlin_upper_bound_slot() {
-    float fallback = sp.perlin_upper_bound;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_upper_bound, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < sp.perlin_lower_bound) {display_message("Input cannot be less than lower bound."); return;}
-    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
-    sp.perlin_upper_bound = result.result;
+    le_slot_lower_upper_bound<float>(sp.perlin_upper_bound, sp.perlin_upper_bound, "float",
+                                     _ui.le_perlin_lower_bound, sp.perlin_lower_bound, "lower bound",
+                                     1, "1");
 }
 
 void WindowCore::le_perlin_lower_bound_slot() {
-    float fallback = sp.perlin_lower_bound;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_lower_bound, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result > sp.perlin_upper_bound) {display_message("Input cannot be more than upper bound."); return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.perlin_lower_bound = result.result;
+    le_slot_lower_upper_bound<float>(sp.perlin_lower_bound, sp.perlin_lower_bound, "float",
+                                     _ui.le_perlin_upper_bound, 0, "0",
+                                     sp.perlin_upper_bound, "upper bound");
 }
 
 void WindowCore::le_perlin_x_modifier_slot() {
-    float fallback = sp.perlin_x_modifier;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_x_modifier, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.perlin_x_modifier = result.result;
+    le_slot_lower_bound<float>(sp.perlin_x_modifier, sp.perlin_x_modifier, "float",
+                               _ui.le_perlin_x_modifier, 0, "0");
 }
 
 void WindowCore::le_perlin_y_modifier_slot() {
-    float fallback = sp.perlin_y_modifier;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_perlin_y_modifier, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    sp.perlin_y_modifier = result.result;
+    le_slot_lower_bound<float>(sp.perlin_y_modifier, sp.perlin_y_modifier, "float",
+                               _ui.le_perlin_y_modifier, 0, "0");
 }
 
 void WindowCore::le_extra_mover_reproduction_cost_slot() {
-    int fallback = sp.extra_mover_reproductive_cost;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_extra_mover_reproduction_cost, fallback);
-    if (!result.is_valid) {return;}
-    sp.extra_mover_reproductive_cost = result.result;
+    le_slot_no_bound(sp.extra_mover_reproductive_cost, sp.extra_mover_reproductive_cost, "int", _ui.le_extra_mover_reproduction_cost);
+}
+
+void WindowCore::le_anatomy_min_possible_mutation_rate_slot() {
+    le_slot_lower_upper_bound<float>(sp.anatomy_min_possible_mutation_rate, sp.anatomy_min_possible_mutation_rate,
+                                     "float", _ui.le_anatomy_min_possible_mutation_rate, 0,
+                                     "0", 1, "1");
+}
+
+void WindowCore::le_brain_min_possible_mutation_rate_slot() {
+    le_slot_lower_upper_bound<float>(sp.brain_min_possible_mutation_rate, sp.brain_min_possible_mutation_rate, "float",
+                                     _ui.le_brain_min_possible_mutation_rate, 0, "0",
+                                     1, "1");
 }
 
 //==================== Radio button ====================

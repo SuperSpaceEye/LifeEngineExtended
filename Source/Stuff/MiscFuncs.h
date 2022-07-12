@@ -83,4 +83,64 @@ result_struct<T> try_convert_message_box_template(const std::string& message, QL
     }
 }
 
+template<typename T>
+void le_slot_no_bound(T & _fallback,
+                      T & to_change,
+                      const std::string & type,
+                      QLineEdit * lineEdit) {
+    T fallback = _fallback;
+    auto result = try_convert_message_box_template<T>("Input is not a type " + type + ".", lineEdit, fallback);
+    if (!result.is_valid) {return;}
+    to_change = result.result;
+}
+
+template<typename T>
+void le_slot_lower_bound(T & _fallback,
+                         T & to_change,
+                         const std::string & type,
+                         QLineEdit * lineEdit,
+                         T lower_bound,
+                         const std::string & lower_bound_string) {
+    T fallback = _fallback;
+    auto result = try_convert_message_box_template<T>("Input is not a type " + type + ".", lineEdit, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < lower_bound) {display_message("Input cannot be less than " + lower_bound_string + "."); return;}
+    to_change = result.result;
+}
+
+template<typename T>
+void le_slot_lower_upper_bound(T & _fallback,
+                               T & to_change,
+                               const std::string & type,
+                               QLineEdit * lineEdit,
+                               T lower_bound,
+                               const std::string & lower_bound_string,
+                               T upper_bound,
+                               const std::string & upper_bound_string) {
+    T fallback = _fallback;
+    auto result = try_convert_message_box_template<T>("Input is not a type " + type + ".", lineEdit, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result < lower_bound) {display_message("Input cannot be less than " + lower_bound_string + "."); return;}
+    if (result.result > upper_bound) {display_message("Input cannot be more than " + upper_bound_string + "."); return;}
+    to_change = result.result;
+}
+
+template<typename T>
+void le_slot_lower_lower_bound(T & _fallback,
+                               T & to_change,
+                               const std::string & type,
+                               QLineEdit * lineEdit,
+                               T lower_bound,
+                               const std::string & lower_bound_string,
+                               T lower2_bound,
+                               const std::string & lower2_bound_string) {
+    T fallback = _fallback;
+    auto result = try_convert_message_box_template<T>("Input is not a type " + type + ".", lineEdit, fallback);
+    if (!result.is_valid) {return;}
+    if (result.result <  lower_bound) {display_message("Input cannot be less than " + lower_bound_string  + "."); return;}
+    if (result.result < lower2_bound) {display_message("Input cannot be less than " + lower2_bound_string + "."); return;}
+    to_change = result.result;
+}
+
+
 #endif //THELIFEENGINECPP_MISCFUNCS_H

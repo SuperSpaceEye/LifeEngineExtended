@@ -11,15 +11,10 @@
 
 //std::vector<int> time_points{};
 
-//93.1% of threaded_mainloop
 void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, lehmer64 *gen) {
-    //2.32% for everything else
-
-    //0.119%
     for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
     dc->to_place_organisms.clear();
 
-    //TODO this takes like 50% of function execution
     if (sp->eat_then_produce) {
         for (auto &organism: dc->organisms) { eat_food(dc, sp, organism); }
         for (auto &organism: dc->organisms) { produce_food(dc, sp, organism, *gen); }
@@ -36,31 +31,23 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 //    std::cout << "average time: " + std::to_string(avg) << "\n";
 //    time_points.clear();
 
-    //3.74%
     if (sp->killer_damage_amount > 0) {
         for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
     }
 
     dc->single_thread_to_erase.clear();
 
-    //1.74%
     for (int i = 0; i < dc->organisms.size(); i++)  {tick_lifetime(dc, dc->single_thread_to_erase, dc->organisms[i], i);}
-    //2.01%
     for (int i = 0; i < dc->single_thread_to_erase.size(); ++i) {erase_organisms(dc, dc->single_thread_to_erase, i);}
 
     dc->single_thread_organisms_observations.clear();
 
-    //1.46%
     reserve_observations(dc->single_thread_organisms_observations, dc->organisms, sp, dc);
-    //3.59%
     get_observations(dc, sp, dc->organisms, dc->single_thread_organisms_observations);
 
-    //9.29%
     for (int i = 0; i < dc->organisms.size(); i++)  {dc->organisms[i]->think_decision(dc->single_thread_organisms_observations[i], gen);}
-    //6.49%
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], gen);}
 
-    //8.77%
     for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
 }
 

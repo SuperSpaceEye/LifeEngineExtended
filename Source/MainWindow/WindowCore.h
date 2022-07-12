@@ -206,8 +206,8 @@ private:
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
     // TODO redundant?
-    int new_simulation_width = 200;
-    int new_simulation_height = 200;
+    uint32_t new_simulation_width = 200;
+    uint32_t new_simulation_height = 200;
     // visual only. Controls precision of floats in labels
     int float_precision = 4;
     int brush_size = 2;
@@ -380,7 +380,7 @@ private slots:
     void rb_cuda_slot();
     void rb_partial_multi_thread_slot();
 
-    void le_num_threads_slot();
+    //Evolution Controls
     void le_food_production_probability_slot();
     void le_lifespan_multiplier_slot();
     void le_look_range_slot();
@@ -391,25 +391,21 @@ private slots:
     void le_add_cell_slot();
     void le_change_cell_slot();
     void le_remove_cell_slot();
-    void le_max_sps_slot();
-    void le_max_fps_slot();
-    void le_cell_size_slot();
-    void le_simulation_width_slot();
-    void le_simulation_height_slot();
     void le_min_reproducing_distance_slot();
     void le_max_reproducing_distance_slot();
-    void le_max_organisms_slot();
-    void le_float_number_precision_slot();
     void le_killer_damage_amount_slot();
     void le_produce_food_every_n_slot();
     void le_anatomy_mutation_rate_delimiter_slot();
     void le_brain_mutation_rate_delimiter_slot();
-    void le_font_size_slot();
     void le_max_move_range_slot();
     void le_min_move_range_slot();
     void le_move_range_delimiter_slot();
-    void le_brush_size_slot();
     void le_auto_produce_food_every_n_tick_slot();
+    void le_anatomy_min_possible_mutation_rate_slot();
+    void le_brain_min_possible_mutation_rate_slot();
+    void le_extra_mover_reproduction_cost_slot();
+    //Settings
+    void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
     void le_menu_height_slot();
     void le_perlin_octaves_slot();
@@ -418,43 +414,56 @@ private slots:
     void le_perlin_lower_bound_slot();
     void le_perlin_x_modifier_slot();
     void le_perlin_y_modifier_slot();
-    void le_extra_mover_reproduction_cost_slot();
+    void le_font_size_slot();
+    void le_float_number_precision_slot();
+    //Other
+    void le_max_sps_slot();
+    void le_max_fps_slot();
+    void le_cell_size_slot();
+    void le_simulation_width_slot();
+    void le_simulation_height_slot();
+    void le_max_organisms_slot();
+    void le_brush_size_slot();
 
+    //Evolution Controls
     void cb_reproduction_rotation_enabled_slot(bool state);
     void cb_on_touch_kill_slot(bool state);
     void cb_use_evolved_anatomy_mutation_rate_slot(bool state);
     void cb_movers_can_produce_food_slot(bool state);
     void cb_food_blocks_reproduction_slot(bool state);
-    void cb_synchronise_simulation_and_window_slot(bool state);
-    void cb_fill_window_slot(bool state);
     void cb_reset_on_total_extinction_slot(bool state);
     void cb_pause_on_total_extinction_slot(bool state);
-    void cb_clear_walls_on_reset_slot(bool state);
-    void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_runtime_rotation_enabled_slot(bool state);
     void cb_fix_reproduction_distance_slot(bool state);
     void cb_use_evolved_brain_mutation_rate_slot(bool state);
-    void cb_disable_warnings_slot(bool state);
     void cb_self_organism_blocks_block_sight_slot(bool state);
     void cb_set_fixed_move_range_slot(bool state);
     void cb_failed_reproduction_eats_food_slot(bool state);
-    void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_rotate_every_move_tick_slot(bool state);
-    void cb_simplified_rendering_slot(bool state);
     void cb_multiply_food_production_prob_slot(bool state);
     void cb_simplified_food_production_slot(bool state);
     void cb_stop_when_one_food_generated(bool state);
-    void cb_synchronise_info_with_window_slot(bool state);
-    void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_eat_then_produce_slot(bool state);
-    void cb_statistics_always_on_top_slot(bool state);
-    void cb_editor_always_on_top_slot(bool state);
     void cb_food_blocks_movement_slot(bool state);
     void cb_use_new_child_pos_calculator_slot(bool state);
     void cb_check_if_path_is_clear_slot(bool state);
+    //Other
+    void cb_synchronise_simulation_and_window_slot(bool state);
+    void cb_fill_window_slot(bool state);
+    void cb_clear_walls_on_reset_slot(bool state);
+    void cb_generate_random_walls_on_reset_slot(bool state);
+    //Settings
+    void cb_disable_warnings_slot(bool state);
+    void cb_wait_for_engine_to_stop_slot(bool state);
+    void cb_synchronise_info_with_window_slot(bool state);
+    void cb_use_nvidia_for_image_generation_slot(bool state);
+    void cb_simplified_rendering_slot(bool state);
+    //Windows
+    void cb_statistics_always_on_top_slot(bool state);
+    void cb_editor_always_on_top_slot(bool state);
 
+    //Evolution Controls
     void table_cell_changed_slot(int row, int col);
-
 public:
     WindowCore(QWidget *parent);
 };

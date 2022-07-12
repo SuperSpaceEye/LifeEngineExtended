@@ -930,13 +930,15 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
     _ui.cb_fill_window               ->setChecked(fill_window);
     //Evolution settings
-    _ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability,     4)));
-    _ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate,    2)));
-    _ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate,      2)));
-    _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
-    _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,   2)));
-    _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,            2)));
-    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,             3)));
+    _ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability,       4)));
+    _ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate,      2)));
+    _ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate,        2)));
+    _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter,   2)));
+    _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,     2)));
+    _ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter,              2)));
+    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,               3)));
+    _ui.le_brain_min_possible_mutation_rate  ->setText(QString::fromStdString(to_str(sp.brain_min_possible_mutation_rate,  3)));
+    _ui.le_anatomy_min_possible_mutation_rate->setText(QString::fromStdString(to_str(sp.anatomy_min_possible_mutation_rate,3)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
     _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
