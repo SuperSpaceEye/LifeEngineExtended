@@ -54,7 +54,6 @@ void SimulationEnginePartialMultiThread::place_organisms(EngineDataContainer * d
         place_organism(dc, organism);
         int pool = (organism->x / dc->simulation_width) * cp->num_threads;
         dc->organisms_pools[pool].emplace_back(organism);
-//        edc->organisms_pools[0].emplace_back(organism);
     }
     dc->to_place_organisms.clear();
 }
@@ -143,6 +142,15 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
         }
     }
 
+    //TODO think of a better way
+    //sorting is needed to properly offset erasing
+    for (auto & change_pool: dc->pool_changes) {
+        std::sort(change_pool.begin(), change_pool.end(),
+                  [](const pool_changes_info * a, const pool_changes_info * b){
+                                return a->position_in_old_pool < b->position_in_old_pool;
+        });
+    }
+
     //moving organisms from old pools to new pools
     for (int pool_num = 0; pool_num < dc->pool_changes.size(); pool_num++) {
         auto & pool = dc->organisms_pools.at(pool_num);
@@ -150,7 +158,6 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
         int num_deleted_organisms = 0;
         //deleting organism from old pools
         for (auto & info: pool_info) {
-            pool[info->position_in_old_pool - num_deleted_organisms] = nullptr;
             pool.erase(pool.begin() + info->position_in_old_pool - num_deleted_organisms);
             num_deleted_organisms++;
         }
@@ -236,7 +243,7 @@ void SimulationEnginePartialMultiThread::start_stage(EngineDataContainer *dc, Pa
         thread.finish();
     }
 
-    if (stage == PartialSimulationStage::GetObservations) {
+    if (stage == PartialSimulationStage::TickLifetime) {
         for (auto & observation_pool: dc->pooled_organisms_observations) {
             observation_pool.clear();
         }
@@ -302,7 +309,7 @@ void SimulationEnginePartialMultiThread::erase_organisms(EngineDataContainer * d
         auto & thread_delete = dc->threaded_to_erase[pool_num];
         auto & pool = dc->organisms_pools[pool_num];
         for (int i = 0; i < thread_delete.size(); i++) {
-            delete pool.at(thread_delete[i] - i);
+            delete pool[thread_delete[i] - i];
             pool.erase(pool.begin() + thread_delete[i] - i);
         }
     }

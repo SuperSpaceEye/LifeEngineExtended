@@ -254,6 +254,7 @@ public:
     QHBoxLayout *horizontalLayout_14;
     QLabel *label_47;
     QLineEdit *le_menu_height;
+    QCheckBox *cb_really_stop_render;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -799,7 +800,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1240, 606, 1467));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1467));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1416,7 +1417,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 610));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -245, 606, 635));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1572,6 +1573,11 @@ public:
 
 
         verticalLayout_19->addLayout(horizontalLayout_14);
+
+        cb_really_stop_render = new QCheckBox(widget_2);
+        cb_really_stop_render->setObjectName(QString::fromUtf8("cb_really_stop_render"));
+
+        verticalLayout_19->addWidget(cb_really_stop_render);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1795,6 +1801,7 @@ public:
         QObject::connect(le_extra_mover_reproduction_cost, SIGNAL(returnPressed()), MainWindow, SLOT(le_extra_mover_reproduction_cost_slot()));
         QObject::connect(le_anatomy_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_min_possible_mutation_rate_slot()));
         QObject::connect(le_brain_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_min_possible_mutation_rate_slot()));
+        QObject::connect(cb_really_stop_render, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_really_stop_render_slot(bool)));
 
         Tabs->setCurrentIndex(1);
 
@@ -1810,7 +1817,7 @@ public:
         le_fps->setText(QApplication::translate("MainWindow", "60", nullptr));
         lb_sps->setText(QApplication::translate("MainWindow", "sps:", nullptr));
         label_3->setText(QApplication::translate("MainWindow", "Set max sps:", nullptr));
-        le_sps->setText(QApplication::translate("MainWindow", "-1", nullptr));
+        le_sps->setText(QApplication::translate("MainWindow", "60", nullptr));
         b_reset->setText(QApplication::translate("MainWindow", "Reset", nullptr));
         b_reset_view->setText(QApplication::translate("MainWindow", "Reset view", nullptr));
         b_pass_one_tick->setText(QApplication::translate("MainWindow", "Pass one tick", nullptr));
@@ -2000,6 +2007,7 @@ public:
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", nullptr));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", nullptr));
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", nullptr));
+        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

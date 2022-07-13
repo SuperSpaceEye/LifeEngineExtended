@@ -206,7 +206,7 @@
               <bool>true</bool>
              </property>
              <property name="text">
-              <string>-1</string>
+              <string>60</string>
              </property>
             </widget>
            </item>
@@ -985,7 +985,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-1240</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>1467</height>
                  </rect>
@@ -1914,9 +1914,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-245</y>
                   <width>606</width>
-                  <height>610</height>
+                  <height>635</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2151,6 +2151,13 @@ p, li { white-space: pre-wrap; }
                        <widget class="QLineEdit" name="le_menu_height"/>
                       </item>
                      </layout>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_really_stop_render">
+                      <property name="text">
+                       <string>Really stop render</string>
+                      </property>
+                     </widget>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -3802,6 +3809,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_really_stop_render</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_really_stop_render_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>840</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3900,6 +3923,7 @@ p, li { white-space: pre-wrap; }
   <slot>le_extra_mover_reproduction_cost_slot()</slot>
   <slot>le_anatomy_min_possible_mutation_rate_slot()</slot>
   <slot>le_brain_min_possible_mutation_rate_slot()</slot>
+  <slot>cb_really_stop_render_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="cursor_modes">

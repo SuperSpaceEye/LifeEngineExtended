@@ -601,6 +601,8 @@ void WindowCore::cb_use_new_child_pos_calculator_slot    (bool state) { sp.use_n
 
 void WindowCore::cb_check_if_path_is_clear_slot          (bool state) { sp.check_if_path_is_clear = state;}
 
+void WindowCore::cb_really_stop_render_slot              (bool state) { really_stop_render = state;}
+
 //==================== Table ====================
 
 void WindowCore::table_cell_changed_slot(int row, int col) {

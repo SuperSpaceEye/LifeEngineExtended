@@ -11,7 +11,7 @@
 
 struct SimulationParameters {
     //evolution controls
-    float food_production_probability = 0.05;
+    float food_production_probability = 0.005;
     int   produce_food_every_n_life_ticks = 1;
     float lifespan_multiplier = 100;
     int   look_range = 50;
@@ -26,11 +26,11 @@ struct SimulationParameters {
     int   min_reproducing_distance = 0;
     int   max_reproducing_distance = 3;
 
-    float anatomy_mutations_rate_mutation_modifier = 0.01;
+    float anatomy_mutations_rate_mutation_step = 0.01;
     float anatomy_min_possible_mutation_rate = 0.001;
     float anatomy_mutation_rate_delimiter = 0.5;
 
-    float brain_mutation_rate_mutation_modifier = 0.01;
+    float brain_mutation_rate_mutation_step = 0.01;
     float brain_min_possible_mutation_rate = 0.001;
     float brain_mutation_rate_delimiter = 0.5;
 
@@ -57,7 +57,7 @@ struct SimulationParameters {
     bool use_anatomy_evolved_mutation_rate = true;
     bool use_brain_evolved_mutation_rate = true;
     bool movers_can_produce_food = false;
-    bool food_blocks_reproduction = true;
+    bool food_blocks_reproduction = false;
     //world controls
     bool reset_on_total_extinction = true;
     bool pause_on_total_extinction = false;
@@ -68,7 +68,7 @@ struct SimulationParameters {
     bool organism_self_blocks_block_sight = false;
     bool failed_reproduction_eats_food = true;
     bool rotate_every_move_tick = false;
-    bool multiply_food_production_prob = false;
+    bool multiply_food_production_prob = true;
     bool simplified_food_production = false;
     bool stop_when_one_food_generated = false;
     bool eat_then_produce = true;

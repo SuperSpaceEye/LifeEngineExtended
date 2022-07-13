@@ -9,7 +9,7 @@
 #include "WindowCore.h"
 
 //TODO increment every time saving logic changes
-int SAVE_VERSION = 3;
+uint32_t SAVE_VERSION = 3;
 
 void WindowCore::write_data(std::ofstream &os) {
     write_version(os);
@@ -21,7 +21,7 @@ void WindowCore::write_data(std::ofstream &os) {
 }
 
 void WindowCore::write_version(std::ofstream &os) {
-    os.write((char*)&SAVE_VERSION, sizeof(int));
+    os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
 }
 
 void WindowCore::write_simulation_parameters(std::ofstream& os) {
@@ -34,8 +34,8 @@ void WindowCore::write_organisms_block_parameters(std::ofstream& os) {
 
 void WindowCore::write_data_container_data(std::ofstream& os) {
     os.write((char*)&edc.total_engine_ticks, sizeof(uint32_t));
-    os.write((char*)&edc.simulation_width, sizeof(uint16_t));
-    os.write((char*)&edc.simulation_height, sizeof(uint16_t));
+    os.write((char*)&edc.simulation_width,   sizeof(uint32_t));
+    os.write((char*)&edc.simulation_height,  sizeof(uint32_t));
 }
 //    void WindowCore::write_color_container(){}
 void WindowCore::write_simulation_grid(std::ofstream& os) {
@@ -47,8 +47,8 @@ void WindowCore::write_organisms(std::ofstream& os) {
     uint32_t size = edc.organisms.size();
     os.write((char*)&size, sizeof(uint32_t));
     for (auto & organism: edc.organisms) {
-        write_organism_data(os, organism);
-        write_organism_brain(os, organism->brain.get());
+        write_organism_data(os,    organism);
+        write_organism_brain(os,   organism->brain.get());
         write_organism_anatomy(os, organism->anatomy.get());
     }
 }
@@ -111,7 +111,7 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
 }
 
 void WindowCore::recover_state(SimulationParameters &recovery_sp, OrganismBlockParameters &recovery_bp,
-                               uint16_t recovery_simulation_width, uint16_t recovery_simulation_height) {
+                               uint32_t recovery_simulation_width, uint32_t recovery_simulation_height) {
     sp = recovery_sp;
     bp = recovery_bp;
     edc.simulation_width = recovery_simulation_width;
@@ -133,8 +133,8 @@ void WindowCore::read_data(std::ifstream &is) {
 
     SimulationParameters recovery_sp = sp;
     OrganismBlockParameters recovery_bp = bp;
-    uint16_t recovery_simulation_width = edc.simulation_width;
-    uint16_t recovery_simulation_height = edc.simulation_height;
+    uint32_t recovery_simulation_width = edc.simulation_width;
+    uint32_t recovery_simulation_height = edc.simulation_height;
 
     try {
         read_simulation_parameters(is);
@@ -166,21 +166,21 @@ void WindowCore::read_organisms_block_parameters(std::ifstream& is) {
 }
 
 bool WindowCore::read_data_container_data(std::ifstream& is) {
-    uint16_t sim_width;
-    uint16_t sim_height;
+    uint32_t sim_width;
+    uint32_t sim_height;
 
     is.read((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&sim_width,    sizeof(uint16_t));
-    is.read((char*)&sim_height,   sizeof(uint16_t));
+    is.read((char*)&sim_width,    sizeof(uint32_t));
+    is.read((char*)&sim_height,   sizeof(uint32_t));
 
     if (sim_width > max_loaded_world_side) {
-        if (!display_dialog_message("The loaded side of a simulation width is " + std::to_string(sim_width) + ". The save file may be corrupted, continue?", false)) {
+        if (!display_dialog_message("The loaded side of a simulation width is " + std::to_string(sim_width) + ". Continue?", false)) {
             return true;
         }
     }
 
     if (sim_height > max_loaded_world_side) {
-        if (!display_dialog_message("The loaded side of a simulation height is " + std::to_string(sim_height) + ". The save file may be corrupted, continue?", false)) {
+        if (!display_dialog_message("The loaded side of a simulation height is " + std::to_string(sim_height) + ". Continue?", false)) {
             return true;
         }
     }
@@ -293,15 +293,11 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     uint32_t producing_space_size                = 0;
     uint32_t eating_space_size                   = 0;
     uint32_t killing_space_size                  = 0;
-    uint32_t single_adjacent_space_size          = 0;
-    uint32_t single_diagonal_adjacent_space_size = 0;
 
     is.read((char*)&organism_blocks_size,                sizeof(uint32_t));
     is.read((char*)&producing_space_size,                sizeof(uint32_t));
     is.read((char*)&eating_space_size,                   sizeof(uint32_t));
     is.read((char*)&killing_space_size,                  sizeof(uint32_t));
-    is.read((char*)&single_adjacent_space_size,          sizeof(uint32_t));
-    is.read((char*)&single_diagonal_adjacent_space_size, sizeof(uint32_t));
 
     anatomy->_organism_blocks.resize(organism_blocks_size);
     anatomy->_producing_space.resize(producing_space_size);

@@ -24,8 +24,8 @@
 #include "../Containers/CPU/EngineDataContainer.h"
 
 struct Differences {
-    uint16_t x;
-    uint16_t y;
+    uint32_t x;
+    uint32_t y;
     BlockTypes type;
     Rotation rotation;
 };

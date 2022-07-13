@@ -199,6 +199,7 @@ private:
     //TODO remove?
     bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
+    bool really_stop_render = false;
 
     int last_mouse_x_pos = 0;
     int last_mouse_y_pos = 0;
@@ -259,8 +260,8 @@ private:
 
     void recover_state(SimulationParameters &recovery_sp,
                        OrganismBlockParameters &recovery_bp,
-                       uint16_t recovery_simulation_width,
-                       uint16_t recovery_simulation_height);
+                       uint32_t recovery_simulation_width,
+                       uint32_t recovery_simulation_height);
 
     void read_data(std::ifstream& is);
     bool read_version(std::ifstream& is);
@@ -458,6 +459,7 @@ private slots:
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
+    void cb_really_stop_render_slot(bool state);
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);

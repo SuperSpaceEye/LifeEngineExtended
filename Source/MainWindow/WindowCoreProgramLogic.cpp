@@ -97,12 +97,9 @@ WindowCore::WindowCore(QWidget *parent) :
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
 
     set_window_interval(60);
-    set_simulation_interval(-1);
+    set_simulation_interval(60);
 
     timer->start();
-
-    cb_synchronise_simulation_and_window_slot(true);
-    _ui.cb_synchronise_sim_and_win->setChecked(true);
 #if __VALGRIND_MODE__ == 1
     cb_synchronise_simulation_and_window_slot(false);
     _ui.cb_synchronise_sim_and_win->setChecked(false);
@@ -159,6 +156,7 @@ void WindowCore::window_tick() {
 #if __VALGRIND_MODE__ == 1
     return;
 #endif
+    if (pause_grid_parsing && really_stop_render) { return;}
     create_image();
 }
 
@@ -566,7 +564,7 @@ void WindowCore::resize_simulation_grid() {
         if (!use_cuda) {
             auto msg = DescisionMessageBox("Warning",
                                        QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                       "New grid will need " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width*2)),
+                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(AtomicGridBlock))*new_simulation_height*new_simulation_width)),
                                        "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
@@ -575,7 +573,7 @@ void WindowCore::resize_simulation_grid() {
         } else {
             auto msg = DescisionMessageBox("Warning",
                                            QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                                                  "New grid will need " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width*2)
+                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(AtomicGridBlock))*new_simulation_height*new_simulation_width)
                                                                   + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width))
                                                                   + " GPU's VRAM",
                                            "OK", "Cancel", this);
@@ -958,6 +956,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_on_touch_kill                     ->setChecked(sp.on_touch_kill);
     _ui.cb_movers_can_produce_food           ->setChecked(sp.movers_can_produce_food);
     _ui.cb_food_blocks_reproduction          ->setChecked(sp.food_blocks_reproduction);
+    _ui.cb_food_blocks_movement              ->setChecked(sp.food_blocks_movement);
     _ui.cb_fix_reproduction_distance         ->setChecked(sp.reproduction_distance_fixed);
     _ui.cb_use_evolved_brain_mutation_rate   ->setChecked(sp.use_brain_evolved_mutation_rate);
     _ui.cb_use_evolved_anatomy_mutation_rate ->setChecked(sp.use_anatomy_evolved_mutation_rate);
@@ -1008,6 +1007,7 @@ void WindowCore::initialize_gui_settings() {
     _ui.cb_use_nvidia_for_image_generation->setChecked(use_cuda);
     disable_warnings = false;
     _ui.le_menu_height->setText(QString::fromStdString(std::to_string(_ui.menu_frame->frameSize().height())));
+    _ui.cb_really_stop_render->setChecked(really_stop_render);
 #if __CUDA_USED__ == 0
     _ui.cb_use_nvidia_for_image_generation->hide();
 #endif

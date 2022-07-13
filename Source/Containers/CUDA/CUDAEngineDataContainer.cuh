@@ -14,8 +14,8 @@
 #include "../../Containers/CPU/SimulationParameters.h"
 
 struct CUDASharedData {
-    uint16_t simulation_width = 600;
-    uint16_t simulation_height = 600;
+    uint32_t simulation_width = 600;
+    uint32_t simulation_height = 600;
     SimulationParameters sp{};
 };
 
