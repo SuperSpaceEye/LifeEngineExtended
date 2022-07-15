@@ -1,6 +1,6 @@
 #include <QApplication>
 #include <QStyleFactory>
-#include "Source/MainWindow/WindowCore.h"
+#include "Source/MainWindow/MainWindow.h"
 
 //TODO add more comments
 //TODO add benchmarks
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     app.setStyle(QStyleFactory::create("WindowsVista"));
     QWidget widget;
 
-    auto window = WindowCore{&widget};
+    auto window = MainWindow{&widget};
     widget.show();
     return app.exec();
 }

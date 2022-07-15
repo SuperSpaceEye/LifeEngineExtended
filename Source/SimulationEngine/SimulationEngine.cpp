@@ -36,7 +36,6 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) {
-            SimulationEnginePartialMultiThread::kill_threads(dc);
             SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
             cp.build_threads = false;
         }
@@ -193,7 +192,7 @@ void SimulationEngine::clear_walls() {
     }
 }
 
-void SimulationEngine::set_wall(std::vector<Organism *> &temp, const Action action) {
+void SimulationEngine::set_wall(std::vector<Organism *> &temp, const Action &action) {
     try_kill_organism(action.x, action.y, temp);
     try_remove_food(action.x, action.y);
     dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::WallBlock;

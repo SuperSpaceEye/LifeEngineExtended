@@ -6,9 +6,9 @@
 // Created by spaceeye on 16.03.2022.
 //
 
-#include "WindowCore.h"
+#include "MainWindow.h"
 
-WindowCore::WindowCore(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
         QWidget(parent){
     _ui.setupUi(this);
 
@@ -54,9 +54,12 @@ WindowCore::WindowCore(QWidget *parent) :
     anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
     anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
-//    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
-//    anatomy->set_block(BlockTypes::EyeBlock, Rotation::RIGHT, -1, -1);
-//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 1);
+//    anatomy->set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
+//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 2);
+//    anatomy->set_block(BlockTypes::KillerBlock, Rotation::UP, 1, 1);
+//    anatomy->set_block(BlockTypes::ArmorBlock, Rotation::UP, -1, 1);
+//    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, 2);
+//    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 3);
 
     auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
 
@@ -74,6 +77,7 @@ WindowCore::WindowCore(QWidget *parent) :
     resize_image();
     reset_scale_view();
 
+    //Will execute on first QT show event
     QTimer::singleShot(0, [&]{
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
         engine_thread.detach();
@@ -94,6 +98,7 @@ WindowCore::WindowCore(QWidget *parent) :
     });
 
     timer = new QTimer(parent);
+    //Will execute as fast as possible
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
 
     set_window_interval(60);
@@ -106,7 +111,7 @@ WindowCore::WindowCore(QWidget *parent) :
 #endif
 }
 
-void WindowCore::mainloop_tick() {
+void MainWindow::mainloop_tick() {
     start = clock_now();
     if (synchronise_simulation_and_window) {
         ecp.engine_pass_tick = true;
@@ -143,12 +148,12 @@ void WindowCore::mainloop_tick() {
     end = clock_now();
 }
 
-void WindowCore::update_fps_labels(int fps, int sps) {
+void MainWindow::update_fps_labels(int fps, int sps) {
     _ui.lb_fps->setText(QString::fromStdString("fps: " + std::to_string(fps)));
     _ui.lb_sps->setText(QString::fromStdString("sps: "+std::to_string(sps)));
 }
 
-void WindowCore::window_tick() {
+void MainWindow::window_tick() {
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
     if (ecp.tb_paused) {_ui.tb_pause->setChecked(true);}
     if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
@@ -160,12 +165,12 @@ void WindowCore::window_tick() {
     create_image();
 }
 
-void WindowCore::resize_image() {
+void MainWindow::resize_image() {
     image_vector.clear();
     image_vector.reserve(4 * _ui.simulation_graphicsView->viewport()->width() * _ui.simulation_graphicsView->viewport()->height());
 }
 
-void WindowCore::move_center(int delta_x, int delta_y) {
+void MainWindow::move_center(int delta_x, int delta_y) {
     if (change_main_simulation_grid) {
         center_x -= delta_x * scaling_zoom;
         center_y -= delta_y * scaling_zoom;
@@ -174,7 +179,7 @@ void WindowCore::move_center(int delta_x, int delta_y) {
     }
 }
 
-void WindowCore::reset_scale_view() {
+void MainWindow::reset_scale_view() {
     float exp;
     center_x = (float)edc.simulation_width / 2;
     center_y = (float)edc.simulation_height / 2;
@@ -202,7 +207,7 @@ void WindowCore::reset_scale_view() {
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
-color &WindowCore::get_color_simplified(BlockTypes type) {
+color &MainWindow::get_color_simplified(BlockTypes type) {
     switch (type) {
         case BlockTypes::EmptyBlock :   return cc.empty_block;
         case BlockTypes::MouthBlock:    return cc.mouth;
@@ -217,7 +222,7 @@ color &WindowCore::get_color_simplified(BlockTypes type) {
     }
 }
 
-color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
+color & MainWindow::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
     int x;
     int y;
 
@@ -268,7 +273,7 @@ color & WindowCore::get_texture_color(BlockTypes type, Rotation rotation, float 
     }
 }
 
-void WindowCore::create_image() {
+void MainWindow::create_image() {
     resize_image();
     auto image_width  = _ui.simulation_graphicsView->viewport()->width();
     auto image_height = _ui.simulation_graphicsView->viewport()->height();
@@ -322,8 +327,8 @@ void WindowCore::create_image() {
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
 }
 
-void WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                                           int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
+void MainWindow::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
+                                    int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width  = linspace<int>(start_x, end_x, image_width);
     lin_height = linspace<int>(start_y, end_y, image_height);
 
@@ -340,10 +345,10 @@ void WindowCore::calculate_linspace(std::vector<int> & lin_width, std::vector<in
     for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
 }
 
-void WindowCore::calculate_truncated_linspace(
+void MainWindow::calculate_truncated_linspace(
         int image_width, int image_height,
-        std::vector<int> & lin_width,
-        std::vector<int> & lin_height,
+        const std::vector<int> &lin_width,
+        const std::vector<int> &lin_height,
         std::vector<int> & truncated_lin_width,
         std::vector<int> & truncated_lin_height) {
 
@@ -355,9 +360,9 @@ void WindowCore::calculate_truncated_linspace(
     truncated_lin_height.pop_back();
 }
 
-void WindowCore::simplified_image_creation(int image_width, int image_height,
-                                           std::vector<int> &lin_width,
-                                           std::vector<int> &lin_height) {
+void MainWindow::simplified_image_creation(int image_width, int image_height,
+                                           const std::vector<int> &lin_width,
+                                           const std::vector<int> &lin_height) {
     color pixel_color;
     for (int x = 0; x < image_width; x++) {
         for (int y = 0; y < image_height; y++) {
@@ -368,7 +373,7 @@ void WindowCore::simplified_image_creation(int image_width, int image_height,
     }
 }
 
-void WindowCore::complex_image_creation(std::vector<int> &lin_width, std::vector<int> &lin_height) {
+void MainWindow::complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
     std::vector<pix_pos> width_img_boundaries;
     std::vector<pix_pos> height_img_boundaries;
 
@@ -426,14 +431,14 @@ void WindowCore::complex_image_creation(std::vector<int> &lin_width, std::vector
 
 // depth * ( y * width + x) + z
 // depth * width * y + depth * x + z
-void WindowCore::set_image_pixel(int x, int y, color &color) {
+void MainWindow::set_image_pixel(int x, int y, const color &color) {
     auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
     image_vector[index+2] = color.r;
     image_vector[index+1] = color.g;
     image_vector[index  ] = color.b;
 }
 
-void WindowCore::set_window_interval(int max_window_fps) {
+void MainWindow::set_window_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
         window_interval = 0.;
         timer->setInterval(0);
@@ -443,7 +448,7 @@ void WindowCore::set_window_interval(int max_window_fps) {
     timer->setInterval(1000/max_window_fps);
 }
 
-void WindowCore::set_simulation_interval(int max_simulation_fps) {
+void MainWindow::set_simulation_interval(int max_simulation_fps) {
     if (max_simulation_fps <= 0) {
         edc.simulation_interval = 0.;
         edc.unlimited_simulation_fps = true;
@@ -455,13 +460,13 @@ void WindowCore::set_simulation_interval(int max_simulation_fps) {
 
 
 //Can wait, or it can not.
-bool WindowCore::wait_for_engine_to_pause() {
+bool MainWindow::wait_for_engine_to_pause() {
     if (!wait_for_engine_to_stop_to_render || ecp.engine_global_pause) {return true;}
     return wait_for_engine_to_pause_force();
 }
 
 //Will always wait for engine to pause
-bool WindowCore::wait_for_engine_to_pause_force() {
+bool MainWindow::wait_for_engine_to_pause_force() {
     auto now = clock_now();
     while (!ecp.engine_paused) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -472,7 +477,7 @@ bool WindowCore::wait_for_engine_to_pause_force() {
     return ecp.engine_paused;
 }
 
-bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
+bool MainWindow::wait_for_engine_to_pause_processing_user_actions() {
     auto now = clock_now();
     while (ecp.processing_user_actions) {
         if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
@@ -484,7 +489,7 @@ bool WindowCore::wait_for_engine_to_pause_processing_user_actions() {
 }
 
 //TODO rare crashes could be because of parsing. Needs further research.
-void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height) {
+void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
@@ -495,7 +500,7 @@ void WindowCore::parse_simulation_grid(std::vector<int> & lin_width, std::vector
     }
 }
 
-void WindowCore::parse_full_simulation_grid(bool parse) {
+void MainWindow::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
     ecp.engine_pause = true;
     while(!wait_for_engine_to_pause_force()) {}
@@ -509,7 +514,7 @@ void WindowCore::parse_full_simulation_grid(bool parse) {
     unpause_engine();
 }
 
-void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
+void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
     ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
@@ -521,16 +526,16 @@ void WindowCore::set_simulation_num_threads(uint8_t num_threads) {
     unpause_engine();
 }
 
-void WindowCore::set_cursor_mode(CursorMode mode) {
+void MainWindow::set_cursor_mode(CursorMode mode) {
     cursor_mode = mode;
 }
 
-void WindowCore::set_simulation_mode(SimulationModes mode) {
+void MainWindow::set_simulation_mode(SimulationModes mode) {
     ecp.change_to_mode = mode;
     ecp.change_simulation_mode = true;
 }
 
-void WindowCore::clear_organisms() {
+void MainWindow::clear_organisms() {
     if (!ecp.engine_paused) {
         if (!stop_console_output) {std::cout << "Engine is not paused! Organisms not cleared.\n";}
         return;
@@ -550,14 +555,14 @@ void WindowCore::clear_organisms() {
     }
 }
 
-void WindowCore::calculate_new_simulation_size() {
+void MainWindow::calculate_new_simulation_size() {
     auto window_size = _ui.simulation_graphicsView->viewport()->size();
 
     new_simulation_width  = window_size.width() / starting_cell_size_on_resize;
     new_simulation_height = window_size.height() / starting_cell_size_on_resize;
 }
 
-void WindowCore::resize_simulation_grid() {
+void MainWindow::resize_simulation_grid() {
     if (fill_window) {calculate_new_simulation_size();}
 
     if (!disable_warnings) {
@@ -604,7 +609,7 @@ void WindowCore::resize_simulation_grid() {
     reset_scale_view();
 }
 
-void WindowCore::partial_clear_world() {
+void MainWindow::partial_clear_world() {
     ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
 
@@ -627,7 +632,7 @@ void WindowCore::partial_clear_world() {
     edc.total_engine_ticks = 0;
 }
 
-void WindowCore::reset_world() {
+void MainWindow::reset_world() {
     partial_clear_world();
     make_border_walls();
 
@@ -651,19 +656,19 @@ void WindowCore::reset_world() {
     unpause_engine();
 }
 
-void WindowCore::clear_world() {
+void MainWindow::clear_world() {
     partial_clear_world();
     make_border_walls();
     unpause_engine();
 }
 
-void WindowCore::unpause_engine() {
+void MainWindow::unpause_engine() {
     if (!synchronise_simulation_and_window) {
         ecp.engine_pause = false;
     }
 }
 
-void WindowCore::make_border_walls() {
+void MainWindow::make_border_walls() {
     for (int x = 0; x < edc.simulation_width; x++) {
         edc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
         edc.CPU_simulation_grid[x][edc.simulation_height - 1].type = BlockTypes::WallBlock;
@@ -675,7 +680,7 @@ void WindowCore::make_border_walls() {
     }
 }
 
-OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
+OrganismAvgBlockInformation MainWindow::parse_organisms_info() {
     OrganismAvgBlockInformation info;
 
     bool has_pool = true;
@@ -869,7 +874,7 @@ OrganismAvgBlockInformation WindowCore::parse_organisms_info() {
     return info;
 }
 
-void WindowCore::update_statistics_info(const OrganismAvgBlockInformation &info) {
+void MainWindow::update_statistics_info(const OrganismAvgBlockInformation &info) {
     s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(edc.total_engine_ticks)));
     s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                                 convert_num_bytes(info.total_size)));
@@ -917,7 +922,7 @@ void WindowCore::update_statistics_info(const OrganismAvgBlockInformation &info)
 }
 
 // So that changes in code values would be set by default in gui.
-void WindowCore::initialize_gui_settings() {
+void MainWindow::initialize_gui_settings() {
     //World settings
     _ui.le_cell_size         ->setText(QString::fromStdString(std::to_string(starting_cell_size_on_resize)));
     _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(edc.simulation_width)));
@@ -937,11 +942,12 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,               3)));
     _ui.le_brain_min_possible_mutation_rate  ->setText(QString::fromStdString(to_str(sp.brain_min_possible_mutation_rate,  3)));
     _ui.le_anatomy_min_possible_mutation_rate->setText(QString::fromStdString(to_str(sp.anatomy_min_possible_mutation_rate,3)));
+    _ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost,     0)));
+    _ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost,           0)));
     _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     _ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
     _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
     _ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));
-    _ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(std::to_string(sp.extra_reproduction_cost)));
     _ui.le_add                               ->setText(QString::fromStdString(std::to_string(sp.add_cell)));
     _ui.le_change                            ->setText(QString::fromStdString(std::to_string(sp.change_cell)));
     _ui.le_remove                            ->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
@@ -949,7 +955,6 @@ void WindowCore::initialize_gui_settings() {
     _ui.le_max_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
     _ui.le_min_move_range                    ->setText(QString::fromStdString(std::to_string(sp.min_move_range)));
     _ui.le_max_move_range                    ->setText(QString::fromStdString(std::to_string(sp.max_move_range)));
-    _ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(std::to_string(sp.extra_mover_reproductive_cost)));
 
     _ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
     _ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);
@@ -995,7 +1000,6 @@ void WindowCore::initialize_gui_settings() {
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
 
-
     _ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
     _ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
     _ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop_to_render);
@@ -1015,13 +1019,21 @@ void WindowCore::initialize_gui_settings() {
     //So that when user clicks on rbs in organism editors, rbs in main window would be unchecked and vice versa
     _ui.rb_null_button->hide();
     ee._ui.rb_null_button->hide();
+
+    //TODO
+    _ui.rb_single_thread_mode->hide();
+    _ui.rb_partial_multi_thread_mode->hide();
+    _ui.le_num_threads->hide();
+    _ui.tb_open_organism_editor->setEnabled(false);
+    _ui.cb_editor_always_on_top->setEnabled(false);
+    _ui.lb_set_num_threads->hide();
 }
 
-void WindowCore::update_simulation_size_label() {
+void MainWindow::update_simulation_size_label() {
   s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
 }
 
-std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
+std::string MainWindow::convert_num_bytes(uint64_t num_bytes) {
     uint64_t previous = num_bytes;
     num_bytes /= 1024;
     if (!num_bytes) {return std::to_string(previous) + " B";}
@@ -1038,14 +1050,14 @@ std::string WindowCore::convert_num_bytes(uint64_t num_bytes) {
     return std::to_string(num_bytes) + " TiB";
 }
 
-pos_on_grid WindowCore::calculate_cursor_pos_on_grid(int x, int y) {
+pos_on_grid MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
     auto c_pos = pos_on_grid{};
     c_pos.x = static_cast<int>((x - float(_ui.simulation_graphicsView->viewport()->width() )/2)*scaling_zoom + center_x);
     c_pos.y = static_cast<int>((y - float(_ui.simulation_graphicsView->viewport()->height())/2)*scaling_zoom + center_y);
     return c_pos;
 }
 
-void WindowCore::change_main_grid_left_click() {
+void MainWindow::change_main_grid_left_click() {
     //cursor pos on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     ecp.pause_processing_user_action = true;
@@ -1073,7 +1085,7 @@ void WindowCore::change_main_grid_left_click() {
     ecp.pause_processing_user_action = false;
 }
 
-void WindowCore::change_main_grid_right_click() {
+void MainWindow::change_main_grid_right_click() {
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     ecp.pause_processing_user_action = true;
     wait_for_engine_to_pause_processing_user_actions();
@@ -1099,7 +1111,7 @@ void WindowCore::change_main_grid_right_click() {
     ecp.pause_processing_user_action = false;
 }
 
-bool WindowCore::cuda_is_available() {
+bool MainWindow::cuda_is_available() {
 #if __CUDA_USED__
     auto count = get_device_count();
     if (count <= 0) {

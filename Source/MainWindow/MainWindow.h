@@ -131,7 +131,7 @@ struct OrganismAvgBlockInformation {
     double total_total_mutation_rate = 0;
 };
 
-class WindowCore: public QWidget {
+class MainWindow: public QWidget {
         Q_OBJECT
 private:
     CursorMode cursor_mode = CursorMode::ModifyFood;
@@ -258,8 +258,8 @@ private:
     void write_organism_brain(std::ofstream& os, Brain * brain);
     void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
-    void recover_state(SimulationParameters &recovery_sp,
-                       OrganismBlockParameters &recovery_bp,
+    void recover_state(const SimulationParameters &recovery_sp,
+                       const OrganismBlockParameters &recovery_bp,
                        uint32_t recovery_simulation_width,
                        uint32_t recovery_simulation_height);
 
@@ -285,7 +285,7 @@ private:
     void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);
     void resize_image();
-    void inline set_image_pixel(int x, int y, color & color);
+    void inline set_image_pixel(int x, int y, const color &color);
 
     // for fill_view
     void calculate_new_simulation_size();
@@ -303,7 +303,7 @@ private:
     bool wait_for_engine_to_pause_force();
 
     // parses actual simulation grid to grid from which image is created
-    void parse_simulation_grid(std::vector<int> & lin_width, std::vector<int> & lin_height);
+    void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
     void parse_full_simulation_grid(bool parse);
     // clears all organisms
     void clear_organisms();
@@ -323,19 +323,19 @@ private:
 
     // creates simple colored cells
     void simplified_image_creation(int image_width, int image_height,
-                                   std::vector<int> &lin_width,
-                                   std::vector<int> &lin_height);
+                                   const std::vector<int> &lin_width,
+                                   const std::vector<int> &lin_height);
 
     // creates cells with textures (right now only eye)
-    void complex_image_creation(std::vector<int> &lin_width, std::vector<int> &lin_height);
+    void complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
 
     static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
                             int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
     static void calculate_truncated_linspace(int image_width, int image_height,
-                                      std::vector<int> & lin_width,
-                                      std::vector<int> & lin_height,
-                                      std::vector<int> & truncated_lin_width,
-                                      std::vector<int> & truncated_lin_height);
+                                             const std::vector<int> &lin_width,
+                                             const std::vector<int> &lin_height,
+                                             std::vector<int> & truncated_lin_width,
+                                             std::vector<int> & truncated_lin_height);
 
     void partial_clear_world();
     void reset_world();
@@ -467,7 +467,7 @@ private slots:
     //Evolution Controls
     void table_cell_changed_slot(int row, int col);
 public:
-    WindowCore(QWidget *parent);
+    MainWindow(QWidget *parent);
 };
 
 

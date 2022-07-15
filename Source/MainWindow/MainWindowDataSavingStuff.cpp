@@ -6,12 +6,12 @@
 // Created by spaceeye on 13.06.22.
 //
 
-#include "WindowCore.h"
+#include "MainWindow.h"
 
 //TODO increment every time saving logic changes
 uint32_t SAVE_VERSION = 3;
 
-void WindowCore::write_data(std::ofstream &os) {
+void MainWindow::write_data(std::ofstream &os) {
     write_version(os);
     write_simulation_parameters(os);
     write_organisms_block_parameters(os);
@@ -20,30 +20,30 @@ void WindowCore::write_data(std::ofstream &os) {
     write_organisms(os);
 }
 
-void WindowCore::write_version(std::ofstream &os) {
+void MainWindow::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
 }
 
-void WindowCore::write_simulation_parameters(std::ofstream& os) {
+void MainWindow::write_simulation_parameters(std::ofstream& os) {
     os.write((char*)&sp, sizeof(SimulationParameters));
 }
 
-void WindowCore::write_organisms_block_parameters(std::ofstream& os) {
+void MainWindow::write_organisms_block_parameters(std::ofstream& os) {
     os.write((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
-void WindowCore::write_data_container_data(std::ofstream& os) {
+void MainWindow::write_data_container_data(std::ofstream& os) {
     os.write((char*)&edc.total_engine_ticks, sizeof(uint32_t));
     os.write((char*)&edc.simulation_width,   sizeof(uint32_t));
     os.write((char*)&edc.simulation_height,  sizeof(uint32_t));
 }
-//    void WindowCore::write_color_container(){}
-void WindowCore::write_simulation_grid(std::ofstream& os) {
+//    void MainWindow::write_color_container(){}
+void MainWindow::write_simulation_grid(std::ofstream& os) {
     for (auto & col: edc.CPU_simulation_grid) {
         os.write((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
     }
 }
-void WindowCore::write_organisms(std::ofstream& os) {
+void MainWindow::write_organisms(std::ofstream& os) {
     uint32_t size = edc.organisms.size();
     os.write((char*)&size, sizeof(uint32_t));
     for (auto & organism: edc.organisms) {
@@ -53,7 +53,7 @@ void WindowCore::write_organisms(std::ofstream& os) {
     }
 }
 
-void WindowCore::write_organism_data(std::ofstream& os, Organism * organism) {
+void MainWindow::write_organism_data(std::ofstream& os, Organism * organism) {
     OrganismData data{};
     data.x                       = organism->x;
     data.y                       = organism->y;
@@ -75,13 +75,13 @@ void WindowCore::write_organism_data(std::ofstream& os, Organism * organism) {
     os.write((char*)&data, sizeof(OrganismData));
 }
 
-void WindowCore::write_organism_brain(std::ofstream& os, Brain * brain) {
+void MainWindow::write_organism_brain(std::ofstream& os, Brain * brain) {
     os.write((char*)brain, sizeof(Brain));
 }
 
 //TODO do i need to save spaces?
 
-void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
+void MainWindow::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     uint32_t organism_blocks_size                = anatomy->_organism_blocks.size();
     uint32_t producing_space_size                = anatomy->_producing_space.size();
     uint32_t eating_space_size                   = anatomy->_eating_space.size();
@@ -110,7 +110,7 @@ void WindowCore::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     }
 }
 
-void WindowCore::recover_state(SimulationParameters &recovery_sp, OrganismBlockParameters &recovery_bp,
+void MainWindow::recover_state(const SimulationParameters &recovery_sp, const OrganismBlockParameters &recovery_bp,
                                uint32_t recovery_simulation_width, uint32_t recovery_simulation_height) {
     sp = recovery_sp;
     bp = recovery_bp;
@@ -122,14 +122,15 @@ void WindowCore::recover_state(SimulationParameters &recovery_sp, OrganismBlockP
     reset_world();
 }
 
-void WindowCore::read_data(std::ifstream &is) {
+void MainWindow::read_data(std::ifstream &is) {
     //If save version is incompatible
     if (!read_version(is)) {
         display_message("Save version is incompatible with current program version.");
         return;
     }
 
-    clear_organisms();
+    partial_clear_world();
+    make_border_walls();
 
     SimulationParameters recovery_sp = sp;
     OrganismBlockParameters recovery_bp = bp;
@@ -151,21 +152,21 @@ void WindowCore::read_data(std::ifstream &is) {
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-bool WindowCore::read_version(std::ifstream &is) {
+bool MainWindow::read_version(std::ifstream &is) {
     int save_version;
     is.read((char*)&save_version, sizeof(int));
     return save_version == SAVE_VERSION;
 }
 
-void WindowCore::read_simulation_parameters(std::ifstream& is) {
+void MainWindow::read_simulation_parameters(std::ifstream& is) {
     is.read((char*)&sp, sizeof(SimulationParameters));
 }
 
-void WindowCore::read_organisms_block_parameters(std::ifstream& is) {
+void MainWindow::read_organisms_block_parameters(std::ifstream& is) {
     is.read((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
-bool WindowCore::read_data_container_data(std::ifstream& is) {
+bool MainWindow::read_data_container_data(std::ifstream& is) {
     uint32_t sim_width;
     uint32_t sim_height;
 
@@ -195,10 +196,10 @@ bool WindowCore::read_data_container_data(std::ifstream& is) {
     update_simulation_size_label();
     return false;
 }
-//    void WindowCore::read_color_container(){}
+//    void MainWindow::read_color_container(){}
 
 //TODO only save food/walls ?
-void WindowCore::read_simulation_grid(std::ifstream& is) {
+void MainWindow::read_simulation_grid(std::ifstream& is) {
     disable_warnings = true;
     resize_simulation_grid();
     disable_warnings = false;
@@ -218,16 +219,7 @@ void WindowCore::read_simulation_grid(std::ifstream& is) {
 }
 
 //TODO save child patterns?
-bool WindowCore::read_organisms(std::ifstream& is) {
-    for (auto & organism: edc.organisms) {
-        delete organism;
-    }
-    edc.organisms.clear();
-    for (auto & organism: edc.to_place_organisms) {
-        delete organism;
-    }
-    edc.to_place_organisms.clear();
-
+bool MainWindow::read_organisms(std::ifstream& is) {
     uint32_t num_organisms;
     is.read((char*)&num_organisms, sizeof(uint32_t));
 
@@ -280,15 +272,15 @@ bool WindowCore::read_organisms(std::ifstream& is) {
     return false;
 }
 
-void WindowCore::read_organism_data(std::ifstream& is, OrganismData & data) {
+void MainWindow::read_organism_data(std::ifstream& is, OrganismData & data) {
     is.read((char*)&data, sizeof(OrganismData));
 }
 
-void WindowCore::read_organism_brain(std::ifstream& is, Brain * brain) {
+void MainWindow::read_organism_brain(std::ifstream& is, Brain * brain) {
     is.read((char*)brain, sizeof(Brain));
 }
 
-void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
+void MainWindow::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     uint32_t organism_blocks_size                = 0;
     uint32_t producing_space_size                = 0;
     uint32_t eating_space_size                   = 0;
@@ -323,7 +315,7 @@ void WindowCore::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     }
 }
 
-void WindowCore::update_table_values() {
+void MainWindow::update_table_values() {
     for (int row = 0; row < 6; row++) {
         for (int col = 0; col < 3; col++) {
             BParameters *type;
@@ -371,8 +363,9 @@ namespace pt = boost::property_tree;
 //TODO https://github.com/Tencent/rapidjson ?
 
 //https://www.cochoy.fr/boost-property-tree/
-void WindowCore::read_json_data(const std::string &path) {
-    clear_organisms();
+void MainWindow::read_json_data(const std::string &path) {
+    partial_clear_world();
+    make_border_walls();
 
     pt::ptree root;
     pt::read_json(path, root);
@@ -386,7 +379,7 @@ void WindowCore::read_json_data(const std::string &path) {
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
+void MainWindow::json_read_grid_data(boost::property_tree::ptree &root) {
     edc.simulation_height  = root.get<int>("num_rows") + 2;
     edc.simulation_width   = root.get<int>("num_cols") + 2;
 
@@ -418,7 +411,7 @@ void WindowCore::json_read_grid_data(boost::property_tree::ptree &root) {
     }
 }
 
-void WindowCore::json_read_simulation_parameters(const boost::property_tree::ptree &root) {
+void MainWindow::json_read_simulation_parameters(const boost::property_tree::ptree &root) {
     sp.lifespan_multiplier               = root.get<int>("controls.lifespanMultiplier");
     sp.food_production_probability       = float(root.get<int>("controls.foodProdProb")) / 100;
     sp.use_anatomy_evolved_mutation_rate = !root.get<bool>("controls.useGlobalMutability");
@@ -431,12 +424,10 @@ void WindowCore::json_read_simulation_parameters(const boost::property_tree::ptr
     sp.movers_can_produce_food           = root.get<bool>("controls.moversCanProduce");
     sp.on_touch_kill                     = root.get<bool>("controls.instaKill");
     sp.look_range                        = root.get<int>("controls.lookRange");
-//    sp.auto_produce_n_food = root.get<int>("controls.foodDropProb");
-//     = root.get<int>("controls.extraMoverFoodCost");
-
+    sp.extra_mover_reproductive_cost     = root.get<int>("controls.extraMoverFoodCost");
 }
 
-void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
+void MainWindow::json_read_organism_data(boost::property_tree::ptree &root) {
     for (auto & organism: root.get_child("organisms")) {
         auto brain = std::make_shared<Brain>();
         auto anatomy = std::make_shared<Anatomy>();
@@ -459,7 +450,7 @@ void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
             int l_x = cell.second.get<int>("loc_col");
             auto state = cell.second.get<std::string>("state.name");
 
-            Rotation rotation = Rotation::UP;
+            Rotation _rotation = Rotation::UP;
             BlockTypes type = BlockTypes::ProducerBlock;
 
             if        (state == "producer") {
@@ -472,12 +463,12 @@ void WindowCore::json_read_organism_data(boost::property_tree::ptree &root) {
                 type = BlockTypes::MoverBlock;
             } else if (state == "eye") {
                 type = BlockTypes::EyeBlock;
-                rotation = static_cast<Rotation>(cell.second.get<int>("direction"));
+                _rotation = static_cast<Rotation>(cell.second.get<int>("direction"));
             } else if (state == "armor") {
                 type = BlockTypes::ArmorBlock;
             }
 
-            block_data.emplace_back(type, rotation, l_x, l_y);
+            block_data.emplace_back(type, _rotation, l_x, l_y);
         }
         anatomy->set_many_blocks(block_data);
 
@@ -522,7 +513,7 @@ struct my_id_translator
     boost::optional<T> put_value(const T &v) { return '"' + v +'"'; }
 };
 
-void WindowCore::write_json_data(const std::string &path) {
+void MainWindow::write_json_data(const std::string &path) {
     pt::ptree root, grid, organisms, fossil_record, controls, killable_neighbors, edible_neighbors, growableNeighbors, cell, value, anatomy, cells, j_organism, food, walls, brain;
 
     auto info = parse_organisms_info();
@@ -557,7 +548,7 @@ void WindowCore::write_json_data(const std::string &path) {
     file.close();
 }
 
-void WindowCore::json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
+void MainWindow::json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
                                  boost::property_tree::ptree &food, boost::property_tree::ptree &walls) {
     grid.put("cols", edc.simulation_width - 2);
     grid.put("rows", edc.simulation_height - 2);
@@ -597,7 +588,7 @@ void WindowCore::json_write_grid(boost::property_tree::ptree &grid, boost::prope
     grid.put_child("walls", walls);
 }
 
-void WindowCore::json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
+void MainWindow::json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
                                       boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
                                       boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain) {
     for (auto & organism: edc.organisms) {
@@ -675,7 +666,7 @@ void WindowCore::json_write_organisms(boost::property_tree::ptree &organisms, bo
     }
 }
 
-void WindowCore::json_write_fossil_record(boost::property_tree::ptree &fossil_record) const {
+void MainWindow::json_write_fossil_record(boost::property_tree::ptree &fossil_record) const {
     fossil_record.put("min_discard", 10);
     fossil_record.put("record_size_limit", 500);
     fossil_record.put("records", "{}");
@@ -683,7 +674,7 @@ void WindowCore::json_write_fossil_record(boost::property_tree::ptree &fossil_re
 }
 
 void
-WindowCore::json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
+MainWindow::json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
                                 boost::property_tree::ptree &edible_neighbors,
                                 boost::property_tree::ptree &growableNeighbors, boost::property_tree::ptree &cell,
                                 boost::property_tree::ptree &value) const {

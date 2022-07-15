@@ -6,10 +6,7 @@
 // Created by spaceeye on 16.05.2022.
 //
 
-#include "../SimulationEngine.h"
 #include "SimulationEngineSingleThread.h"
-
-//std::vector<int> time_points{};
 
 void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, lehmer64 *gen) {
     for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
@@ -22,14 +19,6 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
         for (auto &organism: dc->organisms) { produce_food(dc, sp, organism, *gen); }
         for (auto &organism: dc->organisms) { eat_food(dc, sp, organism); }
     }
-
-//    float avg = 0;
-//    for (auto & point: time_points) {
-//        avg += point;
-//    }
-//    avg /= time_points.size();
-//    std::cout << "average time: " + std::to_string(avg) << "\n";
-//    time_points.clear();
 
     if (sp->killer_damage_amount > 0) {
         for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
@@ -78,20 +67,14 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
 }
 
 void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
-    if (organism->anatomy->_producer_blocks <= 0) {return;}
-    if (!sp->movers_can_produce_food && organism->anatomy->_mover_blocks > 0) {return;}
+    if (organism->anatomy->_producer_blocks == 0) {return;}
+    if (organism->anatomy->_mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp->simplified_food_production) {
-//        auto start = std::chrono::high_resolution_clock::now();
         produce_food_simplified(dc, sp, organism, gen, organism->multiplier);
-//        auto end = std::chrono::high_resolution_clock::now();
-//        time_points.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
     } else {
-//        auto start = std::chrono::high_resolution_clock::now();
         produce_food_complex(dc, sp, organism, gen, organism->multiplier);
-//        auto end = std::chrono::high_resolution_clock::now();
-//        time_points.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
     }
 }
 

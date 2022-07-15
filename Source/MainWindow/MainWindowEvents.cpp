@@ -6,9 +6,9 @@
 // Created by spaceeye on 07.05.2022.
 //
 
-#include "WindowCore.h"
+#include "MainWindow.h"
 
-bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
+bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     //https://doc.qt.io/qt-5/qt.html#MouseButton-enum
     switch (event->type()) {
         case QEvent::MouseMove: {
@@ -70,7 +70,7 @@ bool WindowCore::eventFilter(QObject *watched, QEvent *event) {
     return false;
 }
 
-void WindowCore::wheelEvent(QWheelEvent *event) {
+void MainWindow::wheelEvent(QWheelEvent *event) {
     if (_ui.simulation_graphicsView->underMouse()) {
         if (event->delta() > 0) {
             scaling_zoom /= scaling_coefficient;
@@ -80,7 +80,7 @@ void WindowCore::wheelEvent(QWheelEvent *event) {
     }
 }
 
-void WindowCore::keyPressEvent(QKeyEvent * event) {
+void MainWindow::keyPressEvent(QKeyEvent * event) {
     if (event->key() == Qt::Key_M) {
         if (_ui.simulation_graphicsView->underMouse()) {
             if (allow_menu_hidden_change) {
@@ -98,7 +98,7 @@ void WindowCore::keyPressEvent(QKeyEvent * event) {
     }
 }
 
-void WindowCore::keyReleaseEvent(QKeyEvent * event) {
+void MainWindow::keyReleaseEvent(QKeyEvent * event) {
     if (event->key() == Qt::Key_M) {
         allow_menu_hidden_change = true;
     }

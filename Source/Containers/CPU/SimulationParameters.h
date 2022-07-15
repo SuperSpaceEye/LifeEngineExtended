@@ -11,14 +11,14 @@
 
 struct SimulationParameters {
     //evolution controls
-    float food_production_probability = 0.005;
+    float food_production_probability = 0.01; //0.005;
     int   produce_food_every_n_life_ticks = 1;
     float lifespan_multiplier = 100;
     int   look_range = 50;
     int   auto_produce_food_every_n_ticks = 0;
     int   auto_produce_n_food = 0;
-    int   extra_reproduction_cost = 0;
-    int   extra_mover_reproductive_cost = 0;
+    float extra_reproduction_cost = 0;
+    float extra_mover_reproductive_cost = 0;
     float global_anatomy_mutation_rate = 0.05;
     float global_brain_mutation_rate = 0.1;
     float killer_damage_amount = 1;
@@ -49,8 +49,8 @@ struct SimulationParameters {
     float perlin_persistence = 0.5;
     float perlin_upper_bound = 0.4;
     float perlin_lower_bound = 0.3;
-    float perlin_x_modifier = 0.015;
-    float perlin_y_modifier = 0.015;
+    float perlin_x_modifier = 0.015; //0.005 for 1000 size
+    float perlin_y_modifier = 0.015; //0.005
 
     bool reproduction_rotation_enabled = true;
     bool on_touch_kill = false;

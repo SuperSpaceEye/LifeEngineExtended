@@ -71,7 +71,7 @@ public:
 
     void make_random_walls();
 
-    void set_wall(std::vector<Organism *> &temp, const Action action);
+    void set_wall(std::vector<Organism *> &temp, const Action &action);
     void clear_walls();
 
     //TODO make getters and setters for it.

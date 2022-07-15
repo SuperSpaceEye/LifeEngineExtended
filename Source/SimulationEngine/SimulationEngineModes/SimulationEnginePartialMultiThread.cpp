@@ -153,8 +153,8 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
 
     //moving organisms from old pools to new pools
     for (int pool_num = 0; pool_num < dc->pool_changes.size(); pool_num++) {
-        auto & pool = dc->organisms_pools.at(pool_num);
-        const auto & pool_info = dc->pool_changes.at(pool_num);
+        auto & pool = dc->organisms_pools[pool_num];
+        const auto & pool_info = dc->pool_changes[pool_num];
         int num_deleted_organisms = 0;
         //deleting organism from old pools
         for (auto & info: pool_info) {
@@ -164,10 +164,10 @@ void SimulationEnginePartialMultiThread::sort_organisms(EngineDataContainer *dc,
     }
 
     for (int i = 0; i < dc->pool_changes.size(); i++) {
-        auto & pool_info = dc->pool_changes.at(i);
+        auto & pool_info = dc->pool_changes[i];
         //moving them to new pools
         for (auto & info: pool_info) {
-            dc->organisms_pools.at(info->new_pool).emplace_back(info->organism);
+            dc->organisms_pools[info->new_pool].emplace_back(info->organism);
         }
     }
 
@@ -207,6 +207,8 @@ void SimulationEnginePartialMultiThread::build_threads(EngineDataContainer &dc, 
     dc.organisms_pools.reserve(cp.num_threads);
     dc.pooled_organisms_observations.clear();
     dc.pooled_organisms_observations.reserve(cp.num_threads);
+    dc.sorted_organisms_by_x_position.resize(dc.simulation_width, std::vector<pool_changes_info>());
+    dc.pool_changes.resize(cp.num_threads, std::vector<pool_changes_info*>());
     for (int i = 0; i < cp.num_threads; i++) {
         dc.threaded_to_erase.emplace_back(std::vector<int>{});
         dc.organisms_pools.emplace_back(std::vector<Organism*>());

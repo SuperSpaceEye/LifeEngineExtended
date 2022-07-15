@@ -235,7 +235,7 @@ public:
     QRadioButton *rb_multi_thread_mode;
     QRadioButton *rb_cuda_mode;
     QHBoxLayout *horizontalLayout_4;
-    QLabel *label;
+    QLabel *lb_set_num_threads;
     QLineEdit *le_num_threads;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_19;
@@ -275,8 +275,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1417,7 +1417,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -245, 606, 635));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 635));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1475,10 +1475,10 @@ public:
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
-        label = new QLabel(widget_2);
-        label->setObjectName(QString::fromUtf8("label"));
+        lb_set_num_threads = new QLabel(widget_2);
+        lb_set_num_threads->setObjectName(QString::fromUtf8("lb_set_num_threads"));
 
-        horizontalLayout_4->addWidget(label);
+        horizontalLayout_4->addWidget(lb_set_num_threads);
 
         le_num_threads = new QLineEdit(widget_2);
         le_num_threads->setObjectName(QString::fromUtf8("le_num_threads"));
@@ -1995,7 +1995,7 @@ public:
         rb_partial_multi_thread_mode->setText(QApplication::translate("MainWindow", "Partial multi-thread CPU", nullptr));
         rb_multi_thread_mode->setText(QApplication::translate("MainWindow", "Multi-thread CPU", nullptr));
         rb_cuda_mode->setText(QApplication::translate("MainWindow", "CUDA", nullptr));
-        label->setText(QApplication::translate("MainWindow", "Set number of CPU threads:", nullptr));
+        lb_set_num_threads->setText(QApplication::translate("MainWindow", "Set number of CPU threads:", nullptr));
         le_num_threads->setText(QApplication::translate("MainWindow", "1", nullptr));
         label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
