@@ -1,9 +1,7 @@
 set(MIN_VERSION 3.22)
 cmake_minimum_required(VERSION ${MIN_VERSION})
-set(PROJECT_NAME TheLifeEngineCpp)
+set(PROJECT_NAME TheLifeEngineExtended)
 project(${PROJECT_NAME})
-
-enable_language(CUDA)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
@@ -17,16 +15,16 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_CUDA_ARCHITECTURES 61)
 set(AUTO_UI_FILE_REBUILDING 0)
 
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -03")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 
 #for perf
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
-set(CUDA_HEADERS LifeEngineCpp/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cuh LifeEngineCpp/Organism/CUDA/CUDA_Brain.cuh LifeEngineCpp/Organism/CUDA/CUDA_Organism.cuh LifeEngineCpp/Containers/CUDA/CUDAEngineDataContainer.cuh LifeEngineCpp/Stuff/cuda_image_creator.cuh LifeEngineCpp/Stuff/get_device_count.cuh)
-set(CUDA_SOURCES LifeEngineCpp/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu LifeEngineCpp/Organism/CUDA/CUDA_Anatomy.cu LifeEngineCpp/Organism/CUDA/CUDA_Brain.cu LifeEngineCpp/Organism/CUDA/CUDA_Organism.cu LifeEngineCpp/Stuff/cuda_image_creator.cu LifeEngineCpp/Stuff/get_device_count.cu)
+set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Organism/CUDA/CUDA_Anatomy.cuh Source/Organism/CUDA/CUDA_Brain.cuh Source/Organism/CUDA/CUDA_Organism.cuh Source/Containers/CUDA/CUDAEngineDataContainer.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
+set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Organism/CUDA/CUDA_Anatomy.cu Source/Organism/CUDA/CUDA_Brain.cu Source/Organism/CUDA/CUDA_Organism.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
 set(WIN_COMPILATION 0)
 
@@ -60,18 +58,20 @@ find_package(Qt5 COMPONENTS
         Core
         Gui
         Widgets
+#        Charts
         REQUIRED)
-
 
 find_package(Boost COMPONENTS random REQUIRED)
 
 message(STATUS ${Boost_VERSION})
 
 add_compile_definitions(__VALGRIND_MODE__=0)
+add_compile_definitions(__BENCHMARK_MODE__=1)
 
 #find_package(OpenMP)
 
 if(CUDAToolkit_FOUND)
+    enable_language(CUDA)
     set(CUDA_FILES ${CUDA_SOURCES} ${CUDA_HEADERS})
 #elseif(WIN_USE_CUDA_LIBS)
 #    set(CUDA_FILES ${CUDA_HEADERS})
@@ -81,7 +81,7 @@ endif()
 #set_property(TARGET CUDAFunctions PROPERTY IMPORTED_LOCATION CUDACmake/Release/CUDAPartsDynamic.dll)
 #set_property(TARGET CUDAFunctions PROPERTY IMPORTED_IMPLIB CUDACmake/Release/CUDAPartsDynamic.lib)
 
-set(PROJECT_FILES main.cpp LifeEngineCpp/SimulationEngine/SimulationEngine.cpp LifeEngineCpp/SimulationEngine/SimulationEngine.h LifeEngineCpp/MainWindow/WindowCoreProgramLogic.cpp LifeEngineCpp/MainWindow/WindowCore.h LifeEngineCpp/Organism/CPU/Organism.cpp LifeEngineCpp/Organism/CPU/Organism.h LifeEngineCpp/GridBlocks/BaseGridBlock.h LifeEngineCpp/Containers/CPU/ColorContainer.h LifeEngineCpp/Organism/CPU/Anatomy.cpp LifeEngineCpp/Organism/CPU/Anatomy.h LifeEngineCpp/Stuff/BlockTypes.hpp LifeEngineCpp/Containers/CPU/SimulationParameters.h LifeEngineCpp/Containers/CPU/EngineControlContainer.h LifeEngineCpp/Containers/CPU/OrganismBlockParameters.h LifeEngineCpp/Stuff/Linspace.h LifeEngineCpp/MainWindow/WindowUI.h LifeEngineCpp/MainWindow/WindowCoreSlots.cpp LifeEngineCpp/MainWindow/WindowCoreEvents.cpp LifeEngineCpp/Organism/CPU/Brain.cpp LifeEngineCpp/Organism/CPU/Brain.h LifeEngineCpp/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp LifeEngineCpp/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.h LifeEngineCpp/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp LifeEngineCpp/Stuff/Actions.h LifeEngineCpp/PRNGS/xorshf96.h LifeEngineCpp/PRNGS/RandomGenerator.h LifeEngineCpp/Stuff/pix_pos.h LifeEngineCpp/Stuff/textures.h LifeEngineCpp/Organism/CPU/ObservationStuff.h LifeEngineCpp/GridBlocks/AtomicGridBlock.h LifeEngineCpp/MainWindow/WindowCoreDataSavingStuff.cpp LifeEngineCpp/CustomJsonParser/json_parser.hpp LifeEngineCpp/CustomJsonParser/write.hpp LifeEngineCpp/Statistics/StatisticsCore.h LifeEngineCpp/OrganismEditor/OrganismEditor.h LifeEngineCpp/OrganismEditor/OrganismEditor.cpp LifeEngineCpp/OrganismEditor/OrganismEditorSlots.cpp LifeEngineCpp/Stuff/MiscFuncs.h LifeEngineCpp/Stuff/MiscFuncs.cpp LifeEngineCpp/Stuff/PerlinNoise.hpp)
+set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/SimulationEngine/SimulationEngine.h Source/MainWindow/MainWindowProgramLogic.cpp Source/MainWindow/MainWindow.h Source/Organism/CPU/Organism.cpp Source/Organism/CPU/Organism.h Source/GridBlocks/BaseGridBlock.h Source/Containers/CPU/ColorContainer.h Source/Organism/CPU/Anatomy.cpp Source/Organism/CPU/Anatomy.h Source/Stuff/BlockTypes.hpp Source/Containers/CPU/SimulationParameters.h Source/Containers/CPU/EngineControlContainer.h Source/Containers/CPU/OrganismBlockParameters.h Source/Stuff/Linspace.h Source/MainWindow/WindowUI.h Source/MainWindow/MainWindowSlots.cpp Source/MainWindow/MainWindowEvents.cpp Source/Organism/CPU/Brain.cpp Source/Organism/CPU/Brain.h Source/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp Source/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.h Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp Source/Stuff/Actions.h Source/PRNGS/xorshf96.h Source/PRNGS/RandomGenerator.h Source/Stuff/pix_pos.h Source/Stuff/textures.h Source/Organism/CPU/ObservationStuff.h Source/GridBlocks/AtomicGridBlock.h Source/MainWindow/MainWindowDataSavingStuff.cpp Source/CustomJsonParser/json_parser.hpp Source/CustomJsonParser/write.hpp Source/Statistics/StatisticsCore.h Source/OrganismEditor/OrganismEditor.h Source/OrganismEditor/OrganismEditor.cpp Source/OrganismEditor/OrganismEditorSlots.cpp Source/Stuff/MiscFuncs.h Source/Stuff/MiscFuncs.cpp Source/Stuff/PerlinNoise.hpp)
 
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES})
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
@@ -147,7 +147,6 @@ if(CUDAToolkit_FOUND)
 #    target_link_libraries(${PROJECT_NAME} CUDA::cudart)
 elseif(WIN_USE_CUDA_LIBS)
     add_compile_definitions(__CUDA_USED__=1)
-
 else()
     message(STATUS "No CUDAToolkit found.")
     add_compile_definitions(__CUDA_USED__=0)
@@ -167,6 +166,7 @@ if (Qt5_FOUND)
             Qt5::Core
             Qt5::Gui
             Qt5::Widgets
+#            Qt5::Charts
             )
 endif()
 
