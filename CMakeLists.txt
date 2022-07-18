@@ -26,7 +26,7 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Organism/CUDA/CUDA_Anatomy.cuh Source/Organism/CUDA/CUDA_Brain.cuh Source/Organism/CUDA/CUDA_Organism.cuh Source/Containers/CUDA/CUDAEngineDataContainer.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Organism/CUDA/CUDA_Anatomy.cu Source/Organism/CUDA/CUDA_Brain.cu Source/Organism/CUDA/CUDA_Organism.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
-set(WIN_COMPILATION 1)
+set(WIN_COMPILATION 0)
 
 set(WIN_USE_CUDA_LIBS 0)
 

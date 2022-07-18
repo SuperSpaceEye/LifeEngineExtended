@@ -72,6 +72,7 @@ void OrganismEditor::move_center(int delta_x, int delta_y) {
     center_x -= delta_x * scaling_zoom;
     center_y -= delta_y * scaling_zoom;
     create_image();
+//    std::this_thread::sleep_for(std::chrono::milliseconds(int(1./60*1000)));
 }
 
 void OrganismEditor::reset_scale_view() {
@@ -88,11 +89,12 @@ void OrganismEditor::reset_scale_view() {
     //I don't care anymore
 
     float exp;
-    if (_ui.editor_graphicsView->viewport()->height() < _ui.editor_graphicsView->viewport()->width()) {
-        exp = log((float) editor_height / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
+    if (editor_width < editor_height) {
+        exp = log((float) (editor_height+4) / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
     } else {
-        exp = log((float) editor_width / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
+        exp = log((float) (editor_width+4) / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
     }
+
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
@@ -141,18 +143,6 @@ void OrganismEditor::calculate_linspace(std::vector<int> & lin_width, std::vecto
                                     int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width  = linspace<int>(start_x, end_x, image_width);
     lin_height = linspace<int>(start_y, end_y, image_height);
-
-    //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
-    // n pixels
-    int max_x = lin_width[lin_width.size()-1];
-    int max_y = lin_height[lin_height.size()-1];
-    int del_x = 0;
-    int del_y = 0;
-    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
-    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
-
-    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
-    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
 }
 
 void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {

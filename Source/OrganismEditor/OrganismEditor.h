@@ -11,6 +11,8 @@
 
 #include <vector>
 #include <cmath>
+#include <thread>
+#include <chrono>
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
@@ -68,6 +70,8 @@ private:
 
     QGraphicsPixmapItem pixmap_item;
     QGraphicsScene scene;
+
+    std::chrono::time_point<std::chrono::milliseconds> point;
 
     void closeEvent(QCloseEvent * event) override;
     void resizeEvent(QResizeEvent * event) override;

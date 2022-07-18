@@ -80,8 +80,8 @@ public:
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
     QButtonGroup *organism_action_group;
-    QButtonGroup *cells_group;
     QButtonGroup *edit_group;
+    QButtonGroup *cells_group;
 
     void setupUi(QWidget *Editor)
     {
@@ -126,11 +126,12 @@ public:
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         editor_graphicsView = new QGraphicsView(anatomy_edit_page);
         editor_graphicsView->setObjectName(QString::fromUtf8("editor_graphicsView"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(editor_graphicsView->sizePolicy().hasHeightForWidth());
         editor_graphicsView->setSizePolicy(sizePolicy1);
+        editor_graphicsView->setMinimumSize(QSize(400, 400));
         editor_graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         editor_graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         editor_graphicsView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
