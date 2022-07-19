@@ -18,10 +18,10 @@
 #endif
 
 #include <vector>
-#include "pix_pos.h"
 #include "textures.h"
 #include "../Containers/CPU/ColorContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
+#include "../Stuff/Vector2.h"
 
 struct Differences {
     uint32_t x;
@@ -34,8 +34,8 @@ class CUDAImageCreator {
     int * d_lin_width = nullptr;
     int * d_lin_height = nullptr;
 
-    pix_pos *d_width_img_boundaries = nullptr;
-    pix_pos *d_height_img_boundaries = nullptr;
+    Vector2<int> *d_width_img_boundaries = nullptr;
+    Vector2<int> *d_height_img_boundaries = nullptr;
     unsigned char * d_image_vector = nullptr;
     BaseGridBlock * d_second_simulation_grid = nullptr;
     Differences * d_differences = nullptr;
@@ -66,7 +66,7 @@ class CUDAImageCreator {
                           int lin_width_size, int lin_height_size, int differences);
 
     void copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
-                        std::vector<pix_pos> &width_img_boundaries, std::vector<pix_pos> &height_img_boundaries,
+                        std::vector<Vector2<int>> &width_img_boundaries, std::vector<Vector2<int>> &height_img_boundaries,
                         std::vector<int> & truncated_lin_width,
                         std::vector<int> & truncated_lin_height,
                         std::vector<Differences> &host_differences);

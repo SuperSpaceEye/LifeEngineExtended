@@ -279,7 +279,7 @@ void MainWindow::create_image() {
     int scaled_width  = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
 
-    // start and stop coordinates on simulation grid
+    // start and y coordinates on simulation grid
     auto start_x = int(center_x-(scaled_width / 2));
     auto end_x   = int(center_x+(scaled_width / 2));
 
@@ -370,8 +370,9 @@ void MainWindow::simplified_image_creation(int image_width, int image_height,
 }
 
 void MainWindow::complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
-    std::vector<pix_pos> width_img_boundaries;
-    std::vector<pix_pos> height_img_boundaries;
+    //x - start, y - stop
+    std::vector<Vector2<int>> width_img_boundaries;
+    std::vector<Vector2<int>> height_img_boundaries;
 
     auto last = INT32_MIN;
     auto count = 0;
@@ -401,8 +402,8 @@ void MainWindow::complex_image_creation(const std::vector<int> &lin_width, const
     //width bound, height bound
     for (auto &w_b: width_img_boundaries) {
         for (auto &h_b: height_img_boundaries) {
-            for (int x = w_b.start; x < w_b.stop; x++) {
-                for (int y = h_b.start; y < h_b.stop; y++) {
+            for (int x = w_b.x; x < w_b.y; x++) {
+                for (int y = h_b.x; y < h_b.y; y++) {
                     auto &block = edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width];
 
                     if (lin_width[x] < 0 ||
@@ -410,13 +411,11 @@ void MainWindow::complex_image_creation(const std::vector<int> &lin_width, const
                         lin_height[y] < 0 ||
                         lin_height[y] >= edc.simulation_height) {
                         pixel_color = cc.simulation_background_color;
-//                        set_image_pixel(x, y, pixel_color);
-//                        continue;
                     } else {
                         pixel_color = get_texture_color(block.type,
                                                         block.rotation,
-                                                        float(x - w_b.start) / (w_b.stop - w_b.start),
-                                                        float(y - h_b.start) / (h_b.stop - h_b.start));
+                                                        float(x - w_b.x) / (w_b.y - w_b.x),
+                                                        float(y - h_b.x) / (h_b.y - h_b.x));
                     }
                     set_image_pixel(x, y, pixel_color);
                 }
@@ -566,6 +565,8 @@ void MainWindow::resize_simulation_grid() {
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
         ecp.build_threads = true;
     }
+
+    engine->init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 
     engine->reset_world();
     unpause_engine();
@@ -964,15 +965,15 @@ std::string MainWindow::convert_num_bytes(uint64_t num_bytes) {
     return std::to_string(num_bytes) + " TiB";
 }
 
-pos_on_grid MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
-    auto c_pos = pos_on_grid{};
+Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
+    auto c_pos = Vector2<int>{};
     c_pos.x = static_cast<int>((x - float(_ui.simulation_graphicsView->viewport()->width() )/2)*scaling_zoom + center_x);
     c_pos.y = static_cast<int>((y - float(_ui.simulation_graphicsView->viewport()->height())/2)*scaling_zoom + center_y);
     return c_pos;
 }
 
 void MainWindow::change_main_grid_left_click() {
-    //cursor pos on grid
+    //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     ecp.pause_processing_user_action = true;
     wait_for_engine_to_pause_processing_user_actions();

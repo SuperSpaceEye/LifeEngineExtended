@@ -15,6 +15,8 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
+    //TODO only do if enabled?
+    init_auto_food_drop(dc.simulation_width, dc.simulation_height);
 }
 
 //TODO it's kind of a mess right now
@@ -203,9 +205,9 @@ void SimulationEngine::random_food_drop() {
     if (sp.auto_produce_food_every_n_ticks <= 0) {return;}
     if (dc.total_engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
-            int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(gen);
-            int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(gen);
-            dc.user_actions_pool.emplace_back(ActionType::TryAddFood, x, y);
+            auto & vec = auto_food_drop_coordinates_shuffled[auto_food_drop_index % auto_food_drop_coordinates_shuffled.size()];
+            auto_food_drop_index++;
+            dc.user_actions_pool.emplace_back(ActionType::TryAddFood, vec.x, vec.y);
         }
     }
 }
@@ -363,4 +365,15 @@ void SimulationEngine::reinit_organisms() {
     }
 
     cp.engine_pause = false;
+}
+
+void SimulationEngine::init_auto_food_drop(int width, int height) {
+    auto_food_drop_coordinates_shuffled.reserve((width-2)*(height-2));
+    for (int x = 1; x < width-1; x++) {
+        for (int y = 1; y < height-1; y++) {
+            auto_food_drop_coordinates_shuffled.emplace_back(Vector2<int>{x, y});
+        }
+    }
+
+    std::shuffle(auto_food_drop_coordinates_shuffled.begin(), auto_food_drop_coordinates_shuffled.end(), gen);
 }

@@ -2113,7 +2113,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QCheckBox" name="cb_wait_for_engine_to_stop">
                       <property name="text">
-                       <string>Wait for engine to stop</string>
+                       <string>Wait for engine to y</string>
                       </property>
                      </widget>
                     </item>
@@ -2183,7 +2183,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QCheckBox" name="cb_really_stop_render">
                       <property name="text">
-                       <string>Really stop render</string>
+                       <string>Really y render</string>
                       </property>
                      </widget>
                     </item>

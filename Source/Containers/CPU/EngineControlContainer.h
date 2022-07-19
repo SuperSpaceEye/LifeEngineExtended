@@ -20,7 +20,7 @@ enum class SimulationModes {
 };
 
 struct EngineControlParameters {
-    // if false then engine will stop
+    // if false then engine will y
     volatile bool engine_working = true;
 
     volatile bool stop_engine = false;

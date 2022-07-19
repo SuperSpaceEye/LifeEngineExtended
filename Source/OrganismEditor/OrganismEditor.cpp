@@ -122,7 +122,7 @@ void OrganismEditor::create_image() {
     int scaled_width = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
 
-    // start and stop coordinates on simulation grid
+    // start and y coordinates on simulation grid
     auto start_x = int(center_x-(scaled_width / 2));
     auto end_x = int(center_x+(scaled_width / 2));
 
@@ -146,8 +146,9 @@ void OrganismEditor::calculate_linspace(std::vector<int> & lin_width, std::vecto
 }
 
 void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {
-    std::vector<pix_pos> width_img_boundaries;
-    std::vector<pix_pos> height_img_boundaries;
+    //x - start, y - stop
+    std::vector<Vector2<int>> width_img_boundaries;
+    std::vector<Vector2<int>> height_img_boundaries;
 
     auto last = INT32_MIN;
     auto count = 0;
@@ -177,8 +178,8 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
     //width bound, height bound
     for (auto &w_b: width_img_boundaries) {
         for (auto &h_b: height_img_boundaries) {
-            for (int x = w_b.start; x < w_b.stop; x++) {
-                for (int y = h_b.start; y < h_b.stop; y++) {
+            for (int x = w_b.x; x < w_b.y; x++) {
+                for (int y = h_b.x; y < h_b.y; y++) {
                     if (lin_width[x] < 0 ||
                         lin_width[x] >= editor_width ||
                         lin_height[y] < 0 ||
@@ -192,8 +193,8 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
 
                     pixel_color = get_texture_color(block.type,
                                                     block.rotation,
-                                                    float(x - w_b.start) / (w_b.stop - w_b.start),
-                                                    float(y - h_b.start) / (h_b.stop - h_b.start));
+                                                    float(x - w_b.x) / (w_b.y - w_b.x),
+                                                    float(y - h_b.x) / (h_b.y - h_b.x));
                     set_image_pixel(x, y, pixel_color);
                 }
             }

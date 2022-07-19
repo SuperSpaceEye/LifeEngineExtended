@@ -14,6 +14,7 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
+#include <algorithm>
 
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
@@ -21,6 +22,7 @@
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
 #include "../Stuff/BlockTypes.hpp"
+#include "../Stuff/Vector2.h"
 #include "../Containers/CPU/EngineControlContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
@@ -30,13 +32,15 @@
 #include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 
-
 //TODO move simulation grid translation to here
 class SimulationEngine {
     EngineControlParameters& cp;
     EngineDataContainer& dc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
+
+    uint32_t auto_food_drop_index = 0;
+    std::vector<Vector2<int>> auto_food_drop_coordinates_shuffled{};
 
     siv::PerlinNoise perlin;
 
@@ -75,6 +79,8 @@ public:
     void partial_clear_world();
     void clear_organisms();
     void make_walls();
+
+    void init_auto_food_drop(int width, int height);
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

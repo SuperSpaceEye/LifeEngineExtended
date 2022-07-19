@@ -26,7 +26,7 @@
 #include "../GridBlocks/BaseGridBlock.h"
 #include "EditorUI.h"
 #include "../MainWindow/WindowUI.h"
-#include "../Stuff/pix_pos.h"
+#include "../Stuff/Vector2.h"
 #include "../Containers/CPU/ColorContainer.h"
 #include "../Stuff/textures.h"
 #include "../Stuff/CursorMode.h"

@@ -54,10 +54,10 @@
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../PRNGS/lehmer64.h"
-#include "../Stuff/pix_pos.h"
 #include "../Stuff/textures.h"
 #include "../Stuff/MiscFuncs.h"
 #include "../Stuff/CursorMode.h"
+#include "../Stuff/Vector2.h"
 
 #include "WindowUI.h"
 #include "../Statistics/StatisticsCore.h"
@@ -89,11 +89,6 @@ struct OrganismData {
     float damage = 0;
     Rotation rotation = Rotation::UP;
     DecisionObservation last_decision = DecisionObservation{};
-};
-
-struct pos_on_grid {
-    int x;
-    int y;
 };
 
 struct OrganismInfoHolder {
@@ -294,7 +289,7 @@ private:
 
     // for fill_view
     void calculate_new_simulation_size();
-    pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
+    Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void pause_engine();
     void unpause_engine();

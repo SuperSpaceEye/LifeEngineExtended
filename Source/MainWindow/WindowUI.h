@@ -2078,14 +2078,14 @@ public:
         label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
         cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", nullptr));
-        cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to stop", nullptr));
+        cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to y", nullptr));
         label_25->setText(QApplication::translate("MainWindow", "Font size:", nullptr));
         cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", nullptr));
         label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", nullptr));
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", nullptr));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", nullptr));
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", nullptr));
-        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
+        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really y render", nullptr));
         label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
         label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
