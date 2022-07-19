@@ -228,8 +228,8 @@ void MainWindow::le_num_threads_slot() {
 }
 
 void MainWindow::le_cell_size_slot() {
-    le_slot_lower_bound(starting_cell_size_on_resize, starting_cell_size_on_resize, "int",
-                        _ui.le_cell_size, 1, "1");
+    le_slot_lower_bound<int>(starting_cell_size_on_resize, starting_cell_size_on_resize, "int",
+                             _ui.le_cell_size, 1, "1");
 }
 
 void MainWindow::le_simulation_width_slot() {
@@ -254,22 +254,22 @@ void MainWindow::le_lifespan_multiplier_slot() {
 }
 
 void MainWindow::le_look_range_slot() {
-    le_slot_lower_bound(sp.look_range, sp.look_range, "int",
-                        _ui.le_look_range, 1, "1");
+    le_slot_lower_bound<int>(sp.look_range, sp.look_range, "int",
+                             _ui.le_look_range, 1, "1");
 }
 
 void MainWindow::le_auto_food_drop_rate_slot() {
-    le_slot_lower_bound(sp.auto_produce_n_food, sp.auto_produce_n_food, "int",
-                        _ui.le_auto_produce_n_food, 0, "0");
+    le_slot_lower_bound<int>(sp.auto_produce_n_food, sp.auto_produce_n_food, "int",
+                             _ui.le_auto_produce_n_food, 0, "0");
 }
 
 void MainWindow::le_auto_produce_food_every_n_tick_slot() {
-    le_slot_lower_bound(sp.auto_produce_food_every_n_ticks, sp.auto_produce_food_every_n_ticks, "int",
-                        _ui.le_auto_produce_food_every_n_tick, 0, "0");
+    le_slot_lower_bound<int>(sp.auto_produce_food_every_n_ticks, sp.auto_produce_food_every_n_ticks, "int",
+                             _ui.le_auto_produce_food_every_n_tick, 0, "0");
 }
 
 void MainWindow::le_extra_reproduction_cost_slot() {
-    le_slot_no_bound(sp.extra_reproduction_cost, sp.extra_reproduction_cost, "float", _ui.le_extra_reproduction_cost);
+    le_slot_no_bound<float>(sp.extra_reproduction_cost, sp.extra_reproduction_cost, "float", _ui.le_extra_reproduction_cost);
 }
 
 void MainWindow::le_global_anatomy_mutation_rate_slot() {
@@ -283,18 +283,18 @@ void MainWindow::le_global_brain_mutation_rate_slot() {
 }
 
 void MainWindow::le_add_cell_slot() {
-    le_slot_lower_bound(sp.add_cell, sp.add_cell, "int",
-                        _ui.le_add, 0, "0");
+    le_slot_lower_bound<int>(sp.add_cell, sp.add_cell, "int",
+                             _ui.le_add, 0, "0");
 }
 
 void MainWindow::le_change_cell_slot() {
-    le_slot_lower_bound(sp.change_cell, sp.change_cell, "int",
-                        _ui.le_change, 0, "0");
+    le_slot_lower_bound<int>(sp.change_cell, sp.change_cell, "int",
+                             _ui.le_change, 0, "0");
 }
 
 void MainWindow::le_remove_cell_slot() {
-    le_slot_lower_bound(sp.remove_cell, sp.remove_cell, "int",
-                        _ui.le_remove, 0, "0");
+    le_slot_lower_bound<int>(sp.remove_cell, sp.remove_cell, "int",
+                             _ui.le_remove, 0, "0");
 }
 
 void MainWindow::le_min_reproducing_distance_slot() {
@@ -304,18 +304,18 @@ void MainWindow::le_min_reproducing_distance_slot() {
 }
 
 void MainWindow::le_max_reproducing_distance_slot() {
-    le_slot_lower_lower_bound(sp.max_reproducing_distance, sp.max_reproducing_distance, "int",
-                              _ui.le_max_reproduction_distance, 1, "1",
-                              sp.min_reproducing_distance, "min reproducing distance");
+    le_slot_lower_lower_bound<int>(sp.max_reproducing_distance, sp.max_reproducing_distance, "int",
+                                   _ui.le_max_reproduction_distance, 1, "1",
+                                   sp.min_reproducing_distance, "min reproducing distance");
 }
 
 void MainWindow::le_max_organisms_slot() {
-    le_slot_no_bound(edc.max_organisms, edc.max_organisms, "int", _ui.le_max_organisms);
+    le_slot_no_bound<int>(edc.max_organisms, edc.max_organisms, "int", _ui.le_max_organisms);
 }
 
 void MainWindow::le_float_number_precision_slot() {
-    le_slot_lower_bound(float_precision, float_precision, "int",
-                        _ui.le_float_number_precision, 0, "0");
+    le_slot_lower_bound<int>(float_precision, float_precision, "int",
+                             _ui.le_float_number_precision, 0, "0");
 }
 
 void MainWindow::le_killer_damage_amount_slot() {
@@ -323,8 +323,8 @@ void MainWindow::le_killer_damage_amount_slot() {
                                _ui.le_killer_damage_amount, 0, "0");
 }
 void MainWindow::le_produce_food_every_n_slot() {
-    le_slot_lower_bound(sp.produce_food_every_n_life_ticks, sp.produce_food_every_n_life_ticks, "int",
-                        _ui.le_produce_food_every_n_tick, 1, "1");
+    le_slot_lower_bound<int>(sp.produce_food_every_n_life_ticks, sp.produce_food_every_n_life_ticks, "int",
+                             _ui.le_produce_food_every_n_tick, 1, "1");
 }
 
 void MainWindow::le_anatomy_mutation_rate_delimiter_slot() {
@@ -367,9 +367,9 @@ void MainWindow::le_font_size_slot() {
 }
 
 void MainWindow::le_max_move_range_slot() {
-    le_slot_lower_lower_bound(sp.max_move_range, sp.max_move_range, "int",
-                              _ui.le_max_move_range, 1, "1",
-                              sp.min_move_range, "min move distance");
+    le_slot_lower_lower_bound<int>(sp.max_move_range, sp.max_move_range, "int",
+                                   _ui.le_max_move_range, 1, "1",
+                                   sp.min_move_range, "min move distance");
 }
 
 void MainWindow::le_min_move_range_slot() {
@@ -385,13 +385,13 @@ void MainWindow::le_move_range_delimiter_slot() {
 }
 
 void MainWindow::le_brush_size_slot() {
-    le_slot_lower_bound(brush_size, brush_size, "int",
-                        _ui.le_brush_size, 1, "1");
+    le_slot_lower_bound<int>(brush_size, brush_size, "int",
+                             _ui.le_brush_size, 1, "1");
 }
 
 void MainWindow::le_update_info_every_n_milliseconds_slot() {
-    le_slot_lower_bound(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
-                        _ui.le_update_info_every_n_milliseconds, 1, "1");
+    le_slot_lower_bound<int>(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
+                             _ui.le_update_info_every_n_milliseconds, 1, "1");
 }
 
 void MainWindow::le_menu_height_slot() {
@@ -402,8 +402,8 @@ void MainWindow::le_menu_height_slot() {
     _ui.menu_frame->setFixedHeight(result.result);}
 
 void MainWindow::le_perlin_octaves_slot() {
-    le_slot_lower_bound(sp.perlin_octaves, sp.perlin_octaves, "int",
-                        _ui.le_perlin_octaves, 1, "1");
+    le_slot_lower_bound<int>(sp.perlin_octaves, sp.perlin_octaves, "int",
+                             _ui.le_perlin_octaves, 1, "1");
 }
 
 void MainWindow::le_perlin_persistence_slot() {
@@ -435,7 +435,7 @@ void MainWindow::le_perlin_y_modifier_slot() {
 }
 
 void MainWindow::le_extra_mover_reproduction_cost_slot() {
-    le_slot_no_bound(sp.extra_mover_reproductive_cost, sp.extra_mover_reproductive_cost, "float", _ui.le_extra_mover_reproduction_cost);
+    le_slot_no_bound<float>(sp.extra_mover_reproductive_cost, sp.extra_mover_reproductive_cost, "float", _ui.le_extra_mover_reproduction_cost);
 }
 
 void MainWindow::le_anatomy_min_possible_mutation_rate_slot() {
@@ -465,6 +465,11 @@ void MainWindow::le_brain_mutation_rate_step_slot() {
 void MainWindow::le_keyboard_movement_amount_slot() {
     le_slot_lower_bound<float>(keyboard_movement_amount, keyboard_movement_amount, "float",
                                _ui.le_keyboard_movement_amount, 0, "0");
+}
+
+void MainWindow::le_scaling_coefficient_slot() {
+    le_slot_lower_bound<float>(scaling_coefficient, scaling_coefficient, "float",
+                               _ui.le_scaling_coefficient, 1, "1");
 }
 
 //==================== Radio button ====================

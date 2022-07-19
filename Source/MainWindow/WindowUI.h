@@ -264,6 +264,9 @@ public:
     QHBoxLayout *horizontalLayout_48;
     QLabel *label_36;
     QLineEdit *le_keyboard_movement_amount;
+    QHBoxLayout *horizontalLayout_49;
+    QLabel *label_37;
+    QLineEdit *le_scaling_coefficient;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -1456,7 +1459,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 664));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -366, 606, 693));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1632,6 +1635,21 @@ public:
 
 
         verticalLayout_19->addLayout(horizontalLayout_48);
+
+        horizontalLayout_49 = new QHBoxLayout();
+        horizontalLayout_49->setObjectName(QString::fromUtf8("horizontalLayout_49"));
+        label_37 = new QLabel(widget_2);
+        label_37->setObjectName(QString::fromUtf8("label_37"));
+
+        horizontalLayout_49->addWidget(label_37);
+
+        le_scaling_coefficient = new QLineEdit(widget_2);
+        le_scaling_coefficient->setObjectName(QString::fromUtf8("le_scaling_coefficient"));
+
+        horizontalLayout_49->addWidget(le_scaling_coefficient);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_49);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1859,6 +1877,7 @@ public:
         QObject::connect(le_brain_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_step_slot()));
         QObject::connect(le_anatomy_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_step_slot()));
         QObject::connect(le_keyboard_movement_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_keyboard_movement_amount_slot()));
+        QObject::connect(le_scaling_coefficient, SIGNAL(returnPressed()), MainWindow, SLOT(le_scaling_coefficient_slot()));
 
         Tabs->setCurrentIndex(1);
 
@@ -2068,6 +2087,7 @@ public:
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", nullptr));
         cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
         label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
+        label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

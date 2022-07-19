@@ -463,24 +463,12 @@ bool MainWindow::wait_for_engine_to_pause() {
 
 //Will always wait for engine to pause
 bool MainWindow::wait_for_engine_to_pause_force() {
-    auto now = clock_now();
-    while (!ecp.engine_paused) {
-        if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
-            std::cout << "Waiting for engine to pause\n";
-            now = clock_now();
-        }
-    }
+    while (!ecp.engine_paused) {}
     return ecp.engine_paused;
 }
 
 bool MainWindow::wait_for_engine_to_pause_processing_user_actions() {
-    auto now = clock_now();
-    while (ecp.processing_user_actions) {
-        if (!stop_console_output && std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - now).count() / 1000 > 1) {
-            std::cout << "Waiting for engine to pause processing user actions\n";
-            now = clock_now();
-        }
-    }
+    while (ecp.processing_user_actions) {}
     return !ecp.processing_user_actions;
 }
 
@@ -721,8 +709,8 @@ OrganismAvgBlockInformation MainWindow::parse_organisms_info() {
     info.total_avg.brain_mutation_rate   /= info.total_avg.total;
     info.total_avg.anatomy_mutation_rate /= info.total_avg.total;
 
-    if (std::isnan(info.total_avg.size))             {info.total_avg.size             = 0;}
-    if (std::isnan(info.move_range))                 {info.move_range               = 0;}
+    if (std::isnan(info.total_avg.size))             {info.total_avg.size = 0;}
+    if (std::isnan(info.move_range))                 {info.move_range     = 0;}
 
     if (std::isnan(info.total_avg._organism_lifetime)) {info.total_avg._organism_lifetime = 0;}
     if (std::isnan(info.total_avg._organism_age))      {info.total_avg._organism_age      = 0;}
@@ -908,6 +896,7 @@ void MainWindow::initialize_gui_settings() {
     _ui.le_perlin_x_modifier ->setText(QString::fromStdString(to_str(sp.perlin_x_modifier,  3)));
     _ui.le_perlin_y_modifier ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier,  3)));
     _ui.le_keyboard_movement_amount->setText(QString::fromStdString(to_str(keyboard_movement_amount, 1)));
+    _ui.le_scaling_coefficient->setText(QString::fromStdString(to_str(scaling_coefficient, 1)));
 
     _ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     _ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));

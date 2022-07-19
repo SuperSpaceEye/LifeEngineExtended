@@ -199,8 +199,6 @@ private:
     bool reset_with_chosen = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
-    //TODO remove?
-    bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
     bool really_stop_render = false;
 
@@ -215,7 +213,6 @@ private:
     int window_frames = 0;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
-    // TODO redundant?
     uint32_t new_simulation_width = 200;
     uint32_t new_simulation_height = 200;
     // visual only. Controls precision of floats in labels
@@ -284,7 +281,6 @@ private:
     void read_organism_brain(std::ifstream& is, Brain * brain);
     void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
     void update_table_values();
-
 
     bool cuda_is_available();
 
@@ -425,6 +421,7 @@ private slots:
     void le_perlin_y_modifier_slot();
     void le_font_size_slot();
     void le_float_number_precision_slot();
+    void le_scaling_coefficient_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();

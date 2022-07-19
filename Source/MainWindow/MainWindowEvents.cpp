@@ -113,7 +113,7 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
                     }
                 }
             }
-        }
+        } break;
 
         //TODO refactor?
         case Qt::Key_Up:
@@ -129,7 +129,7 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
 
         case Qt::Key_R: reset_scale_view();break;
         case Qt::Key_Space: _ui.tb_pause->setChecked(!ecp.tb_paused);break;
-        case Qt::Key_Period: b_pass_one_tick_slot();
+        case Qt::Key_Period: b_pass_one_tick_slot();break;
 
         case Qt::Key_Plus: scaling_zoom /= scaling_coefficient;break;
         case Qt::Key_Minus: scaling_zoom *= scaling_coefficient;break;
