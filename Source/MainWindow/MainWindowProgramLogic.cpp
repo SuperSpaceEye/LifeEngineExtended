@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp));
 
-    make_border_walls();
+    engine->make_walls();
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
@@ -125,9 +125,7 @@ void MainWindow::mainloop_tick() {
 
     if (synchronise_info_update_with_window_update || info_update > update_info_every_n_milliseconds) {
         auto start_timer = clock_now();
-        //TODO make pausing logic better.
-        ecp.engine_pause = true;
-        wait_for_engine_to_pause();
+        pause_engine();
         uint32_t simulation_frames = edc.engine_ticks;
         edc.engine_ticks = 0;
 
@@ -299,8 +297,6 @@ void MainWindow::create_image() {
     calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 
     if ((!pause_grid_parsing && !ecp.engine_global_pause) || synchronise_simulation_and_window) {
-        //it does not help
-        //#pragma omp parallel for
         ecp.engine_pause = true;
         // pausing engine to parse data from engine.
         auto paused = wait_for_engine_to_pause();
@@ -502,8 +498,7 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
 
 void MainWindow::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
-    ecp.engine_pause = true;
-    while(!wait_for_engine_to_pause_force()) {}
+    pause_engine();
 
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
@@ -511,12 +506,12 @@ void MainWindow::parse_full_simulation_grid(bool parse) {
             edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
+
     unpause_engine();
 }
 
 void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    pause_engine();
 
     ecp.num_threads = num_threads;
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
@@ -533,26 +528,6 @@ void MainWindow::set_cursor_mode(CursorMode mode) {
 void MainWindow::set_simulation_mode(SimulationModes mode) {
     ecp.change_to_mode = mode;
     ecp.change_simulation_mode = true;
-}
-
-void MainWindow::clear_organisms() {
-    if (!ecp.engine_paused) {
-        if (!stop_console_output) {std::cout << "Engine is not paused! Organisms not cleared.\n";}
-        return;
-    }
-    if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-        for (auto &organism: edc.organisms) { delete organism; }
-        for (auto &organism: edc.to_place_organisms) { delete organism; }
-        edc.organisms.clear();
-        edc.to_place_organisms.clear();
-    } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        for (auto & organism: edc.to_place_organisms) { delete organism; }
-        edc.to_place_organisms.clear();
-        for (int pool_num = 0; pool_num < ecp.num_threads; pool_num++) {
-            for (auto & organism: edc.organisms_pools[pool_num]) { delete organism; }
-            edc.organisms_pools[pool_num].clear();
-        }
-    }
 }
 
 void MainWindow::calculate_new_simulation_size() {
@@ -589,8 +564,7 @@ void MainWindow::resize_simulation_grid() {
         }
     }
 
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    pause_engine();
 
     edc.simulation_width = new_simulation_width;
     edc.simulation_height = new_simulation_height;
@@ -604,79 +578,27 @@ void MainWindow::resize_simulation_grid() {
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
         ecp.build_threads = true;
     }
-    reset_world();
+
+    engine->reset_world();
+    unpause_engine();
 
     reset_scale_view();
 }
 
-void MainWindow::partial_clear_world() {
+void MainWindow::clear_world() {
+    engine->partial_clear_world();
+    engine->make_walls();
+    unpause_engine();
+}
+
+void MainWindow::pause_engine() {
     ecp.engine_pause = true;
     wait_for_engine_to_pause_force();
-
-    clear_organisms();
-
-    for (auto & column: edc.CPU_simulation_grid) {
-        for (auto &block: column) {
-            if (!sp.clear_walls_on_reset) {
-                if (block.type == BlockTypes::WallBlock) { continue; }
-            }
-            block.type = BlockTypes::EmptyBlock;
-        }
-    }
-    for (auto & block: edc.second_simulation_grid) {
-        if (!sp.clear_walls_on_reset) {
-            if (block.type == BlockTypes::WallBlock) { continue; }
-        }
-        block.type = BlockTypes::EmptyBlock;
-    }
-    edc.total_engine_ticks = 0;
-}
-
-void MainWindow::reset_world() {
-    partial_clear_world();
-    make_border_walls();
-
-    edc.base_organism->x = edc.simulation_width / 2;
-    edc.base_organism->y = edc.simulation_height / 2;
-
-    edc.chosen_organism->x = edc.simulation_width / 2;
-    edc.chosen_organism->y = edc.simulation_height / 2;
-
-    if (reset_with_chosen) { edc.to_place_organisms.push_back(new Organism(edc.chosen_organism)); }
-    else { edc.to_place_organisms.push_back(new Organism(edc.base_organism)); }
-
-    if (sp.generate_random_walls_on_reset) {
-        engine->clear_walls();
-        engine->make_random_walls();
-    }
-
-    //Just in case
-    ecp.engine_pass_tick = true;
-    ecp.synchronise_simulation_tick = true;
-    unpause_engine();
-}
-
-void MainWindow::clear_world() {
-    partial_clear_world();
-    make_border_walls();
-    unpause_engine();
 }
 
 void MainWindow::unpause_engine() {
     if (!synchronise_simulation_and_window) {
         ecp.engine_pause = false;
-    }
-}
-
-void MainWindow::make_border_walls() {
-    for (int x = 0; x < edc.simulation_width; x++) {
-        edc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        edc.CPU_simulation_grid[x][edc.simulation_height - 1].type = BlockTypes::WallBlock;
-    }
-
-    for (int y = 0; y < edc.simulation_height; y++) {
-        edc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        edc.CPU_simulation_grid[edc.simulation_width - 1][y].type = BlockTypes::WallBlock;
     }
 }
 

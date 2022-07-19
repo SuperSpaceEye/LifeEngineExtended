@@ -126,11 +126,11 @@ private slots:
     void rb_mouth_slot();
     void rb_mover_slot();
     void rb_producer_slot();
-    void rb_place_organism_slot();
-    void rb_choose_organism_slot();
     void rb_edit_anatomy_slot();
     void rb_edit_brain_slot();
-
+public slots:
+    void rb_place_organism_slot();
+    void rb_choose_organism_slot();
 };
 
 #endif //THELIFEENGINECPP_ORGANISMEDITOR_H

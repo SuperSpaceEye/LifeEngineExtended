@@ -58,12 +58,6 @@ class SimulationEngine {
 
     void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
     void try_remove_food(int x, int y);
-
-    void reset_world();
-    void partial_clear_world();
-    void clear_organisms();
-    void make_walls();
-
 public:
     SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
                      OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters);
@@ -76,6 +70,11 @@ public:
 
     //TODO make getters and setters for it.
     void reinit_organisms();
+
+    void reset_world();
+    void partial_clear_world();
+    void clear_organisms();
+    void make_walls();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

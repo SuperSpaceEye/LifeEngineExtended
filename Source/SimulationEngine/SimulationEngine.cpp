@@ -17,8 +17,7 @@ SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, E
     gen = lehmer64(rd());
 }
 
-//TODO refactor pausing/pass_tick/synchronise_tick
-//TODO takes 4.644% to 1% of processing time
+//TODO it's kind of a mess right now
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
 
@@ -43,11 +42,12 @@ void SimulationEngine::threaded_mainloop() {
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
         if (cp.processing_user_actions) {process_user_action_pool();}
         if ((!cp.engine_paused || cp.engine_pass_tick) && (!cp.pause_button_pause || cp.pass_tick)) {
+            //TODO the cause of rare segfault could be here
+            simulation_tick();
             cp.engine_paused = false;
             cp.engine_pass_tick = false;
             cp.pass_tick = false;
             cp.synchronise_simulation_tick = false;
-            simulation_tick();
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
             if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
@@ -335,6 +335,7 @@ void SimulationEngine::make_random_walls() {
     }
 }
 
+//DO NOT USE IN SimulationEngine
 void SimulationEngine::reinit_organisms() {
     cp.engine_pause = true;
     while(!cp.engine_paused) {}

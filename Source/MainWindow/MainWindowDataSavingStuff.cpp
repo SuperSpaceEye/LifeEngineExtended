@@ -119,7 +119,8 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     new_simulation_width = recovery_simulation_width;
     new_simulation_height = recovery_simulation_height;
 
-    reset_world();
+    engine->reset_world();
+    unpause_engine();
 }
 
 void MainWindow::read_data(std::ifstream &is) {
@@ -129,8 +130,8 @@ void MainWindow::read_data(std::ifstream &is) {
         return;
     }
 
-    partial_clear_world();
-    make_border_walls();
+    engine->partial_clear_world();
+    engine->make_walls();
 
     SimulationParameters recovery_sp = sp;
     OrganismBlockParameters recovery_bp = bp;
@@ -364,8 +365,8 @@ namespace pt = boost::property_tree;
 
 //https://www.cochoy.fr/boost-property-tree/
 void MainWindow::read_json_data(const std::string &path) {
-    partial_clear_world();
-    make_border_walls();
+    engine->partial_clear_world();
+    engine->make_walls();
 
     pt::ptree root;
     pt::read_json(path, root);
@@ -393,7 +394,7 @@ void MainWindow::json_read_grid_data(boost::property_tree::ptree &root) {
     update_simulation_size_label();
 
     resize_simulation_grid();
-    make_border_walls();
+    engine->make_walls();
     disable_warnings = false;
 
     edc.loaded_engine_ticks = root.get<int>("total_ticks");
@@ -535,12 +536,6 @@ void MainWindow::write_json_data(const std::string &path) {
     root.put_child("organisms", organisms);
     root.put_child("fossil_record", fossil_record);
     root.put_child("controls", controls);
-
-//    std::stringstream ss;
-//    pt::write_json(ss, root);
-//    std::string my_string_to_send_somewhere_else = ss.str();
-
-//    std::cout << my_string_to_send_somewhere_else << std::endl;
 
     std::fstream file;
     file.open(path, std::ios_base::out);

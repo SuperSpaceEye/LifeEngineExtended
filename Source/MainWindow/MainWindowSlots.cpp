@@ -45,13 +45,20 @@ void MainWindow::tb_open_organism_editor_slot(bool state) {
 
 void MainWindow::b_clear_slot() {
     if (display_dialog_message("All organisms and simulation grid will be cleared.", disable_warnings)) {
+        bool flag = sp.clear_walls_on_reset;
+        sp.clear_walls_on_reset = true;
+        pause_engine();
         clear_world();
+        unpause_engine();
+        sp.clear_walls_on_reset = flag;
     }
 }
 
 void MainWindow::b_reset_slot() {
     if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
-        reset_world();
+        pause_engine();
+        engine->reset_world();
+        unpause_engine();
     }
 }
 
@@ -60,19 +67,14 @@ void MainWindow::b_resize_and_reset_slot() {
 }
 
 void MainWindow::b_generate_random_walls_slot() {
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    pause_engine();
     engine->make_random_walls();
-
     unpause_engine();
 }
 
 void MainWindow::b_clear_all_walls_slot() {
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause();
-
+    pause_engine();
     engine->clear_walls();
-
     unpause_engine();
 }
 
@@ -176,8 +178,7 @@ void MainWindow::b_reset_view_slot() {
 
 void MainWindow::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    pause_engine();
 
     for (auto & organism: edc.organisms) {
         organism->lifetime = organism->max_lifetime*2;

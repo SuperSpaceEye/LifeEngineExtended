@@ -37,6 +37,9 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
             change_main_simulation_grid = _ui.simulation_graphicsView->underMouse();
             change_editing_grid = ee._ui.editor_graphicsView->underMouse();
+
+            //Removes focus from line edits, buttons, etc. so that user can use keyboard buttons without problems.
+            if (_ui.simulation_graphicsView->underMouse()) {setFocus();}
         } break;
         case QEvent::MouseButtonRelease: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);
@@ -112,11 +115,31 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
             }
         }
 
+        //TODO refactor?
+        case Qt::Key_Up:
         case Qt::Key_W: W_pressed = true;break;
+        case Qt::Key_Down:
         case Qt::Key_S: S_pressed = true;break;
-        case Qt::Key_D: D_pressed = true;break;
+        case Qt::Key_Left:
         case Qt::Key_A: A_pressed = true;break;
+        case Qt::Key_Right:
+        case Qt::Key_D: D_pressed = true;break;
+
         case Qt::Key_Shift: SHIFT_pressed = true;break;
+
+        case Qt::Key_R: reset_scale_view();break;
+        case Qt::Key_Space: _ui.tb_pause->setChecked(!ecp.tb_paused);break;
+        case Qt::Key_Period: b_pass_one_tick_slot();
+
+        case Qt::Key_Plus: scaling_zoom /= scaling_coefficient;break;
+        case Qt::Key_Minus: scaling_zoom *= scaling_coefficient;break;
+
+        case Qt::Key_1: rb_food_slot();_ui.rb_food->setChecked(true);break;
+        case Qt::Key_2: rb_kill_slot();_ui.rb_kill->setChecked(true);break;
+        case Qt::Key_3: rb_wall_slot();_ui.rb_wall->setChecked(true);break;
+        case Qt::Key_4: ee.rb_place_organism_slot();ee._ui.rb_place_organism->setChecked(true);break;
+        case Qt::Key_5: ee.rb_choose_organism_slot();ee._ui.rb_chose_organism->setChecked(true);break;
+
     }
 }
 
@@ -124,10 +147,15 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event) {
     switch (event->key()) {
         case Qt::Key_M: allow_menu_hidden_change = true;break;
 
+        case Qt::Key_Up:
         case Qt::Key_W: W_pressed = false;break;
+        case Qt::Key_Down:
         case Qt::Key_S: S_pressed = false;break;
-        case Qt::Key_D: D_pressed = false;break;
+        case Qt::Key_Left:
         case Qt::Key_A: A_pressed = false;break;
+        case Qt::Key_Right:
+        case Qt::Key_D: D_pressed = false;break;
+
         case Qt::Key_Shift: SHIFT_pressed = false;break;
     }
 }

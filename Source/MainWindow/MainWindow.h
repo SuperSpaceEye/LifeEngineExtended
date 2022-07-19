@@ -300,6 +300,7 @@ private:
     void calculate_new_simulation_size();
     pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
 
+    void pause_engine();
     void unpause_engine();
 
     void create_image();
@@ -314,9 +315,6 @@ private:
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
     void parse_full_simulation_grid(bool parse);
-    // clears all organisms
-    void clear_organisms();
-    void make_border_walls();
 
     void change_main_grid_left_click();
     void change_main_grid_right_click();
@@ -346,8 +344,6 @@ private:
                                              std::vector<int> & truncated_lin_width,
                                              std::vector<int> & truncated_lin_height);
 
-    void partial_clear_world();
-    void reset_world();
     void clear_world();
 
     void update_simulation_size_label();
