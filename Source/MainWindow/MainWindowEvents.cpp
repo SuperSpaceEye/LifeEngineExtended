@@ -67,7 +67,21 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         } break;
         default: break;
     }
+
+    process_keyboard_events();
+    last_event_execution = clock_now();
+
     return false;
+}
+
+void MainWindow::process_keyboard_events() {
+    float mult;
+    if (SHIFT_pressed) { mult = SHIFT_keyboard_movement_multiplier;} else { mult = 1;}
+    mult *= std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - last_event_execution).count()/1000.;
+    if (W_pressed) { center_y -= keyboard_movement_amount * scaling_zoom * mult;}
+    if (S_pressed) { center_y += keyboard_movement_amount * scaling_zoom * mult;}
+    if (D_pressed) { center_x += keyboard_movement_amount * scaling_zoom * mult;}
+    if (A_pressed) { center_x -= keyboard_movement_amount * scaling_zoom * mult;}
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
@@ -81,25 +95,39 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent * event) {
-    if (event->key() == Qt::Key_M) {
-        if (_ui.simulation_graphicsView->underMouse()) {
-            if (allow_menu_hidden_change) {
-                if (!menu_hidden) {
-                    _ui.menu_frame->hide();
-                    menu_hidden = true;
-                    allow_menu_hidden_change = false;
-                } else {
-                    _ui.menu_frame->show();
-                    menu_hidden = false;
-                    allow_menu_hidden_change = false;
+    switch (event->key()) {
+        case Qt::Key_M: {
+            if (_ui.simulation_graphicsView->underMouse()) {
+                if (allow_menu_hidden_change) {
+                    if (!menu_hidden) {
+                        _ui.menu_frame->hide();
+                        menu_hidden = true;
+                        allow_menu_hidden_change = false;
+                    } else {
+                        _ui.menu_frame->show();
+                        menu_hidden = false;
+                        allow_menu_hidden_change = false;
+                    }
                 }
             }
         }
+
+        case Qt::Key_W: W_pressed = true;break;
+        case Qt::Key_S: S_pressed = true;break;
+        case Qt::Key_D: D_pressed = true;break;
+        case Qt::Key_A: A_pressed = true;break;
+        case Qt::Key_Shift: SHIFT_pressed = true;break;
     }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent * event) {
-    if (event->key() == Qt::Key_M) {
-        allow_menu_hidden_change = true;
+    switch (event->key()) {
+        case Qt::Key_M: allow_menu_hidden_change = true;break;
+
+        case Qt::Key_W: W_pressed = false;break;
+        case Qt::Key_S: S_pressed = false;break;
+        case Qt::Key_D: D_pressed = false;break;
+        case Qt::Key_A: A_pressed = false;break;
+        case Qt::Key_Shift: SHIFT_pressed = false;break;
     }
 }

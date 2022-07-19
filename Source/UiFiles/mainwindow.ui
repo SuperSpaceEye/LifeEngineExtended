@@ -985,9 +985,9 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-452</y>
                   <width>606</width>
-                  <height>1467</height>
+                  <height>1533</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1026,7 +1026,7 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1249,6 +1249,20 @@ p, li { white-space: pre-wrap; }
                      </layout>
                     </item>
                     <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_46">
+                      <item>
+                       <widget class="QLabel" name="label">
+                        <property name="text">
+                         <string>Anatomy mutation rate mutation step:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_anatomy_mutation_rate_step"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_43">
                       <item>
                        <widget class="QLabel" name="label_33">
@@ -1302,6 +1316,20 @@ p, li { white-space: pre-wrap; }
                          <string>0.1</string>
                         </property>
                        </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_47">
+                      <item>
+                       <widget class="QLabel" name="label_35">
+                        <property name="text">
+                         <string>Brain mutation rate mutation step:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_brain_mutation_rate_step"/>
                       </item>
                      </layout>
                     </item>
@@ -1554,7 +1582,7 @@ p, li { white-space: pre-wrap; }
                         <item>
                          <widget class="QLabel" name="label_42">
                           <property name="text">
-                           <string>Move range delimiter</string>
+                           <string>Move range delimiter:</string>
                           </property>
                          </widget>
                         </item>
@@ -1916,7 +1944,7 @@ p, li { white-space: pre-wrap; }
                   <x>0</x>
                   <y>0</y>
                   <width>606</width>
-                  <height>635</height>
+                  <height>664</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2158,6 +2186,20 @@ p, li { white-space: pre-wrap; }
                        <string>Really stop render</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_48">
+                      <item>
+                       <widget class="QLabel" name="label_36">
+                        <property name="text">
+                         <string>Keyboard movement amount:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_keyboard_movement_amount"/>
+                      </item>
+                     </layout>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -3825,6 +3867,54 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_brain_mutation_rate_step</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_brain_mutation_rate_step_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>768</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_anatomy_mutation_rate_step</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_anatomy_mutation_rate_step_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>781</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_keyboard_movement_amount</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_keyboard_movement_amount_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>784</x>
+     <y>805</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -3924,6 +4014,9 @@ p, li { white-space: pre-wrap; }
   <slot>le_anatomy_min_possible_mutation_rate_slot()</slot>
   <slot>le_brain_min_possible_mutation_rate_slot()</slot>
   <slot>cb_really_stop_render_slot(bool)</slot>
+  <slot>le_anatomy_mutation_rate_step_slot()</slot>
+  <slot>le_brain_mutation_rate_step_slot()</slot>
+  <slot>le_keyboard_movement_amount_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

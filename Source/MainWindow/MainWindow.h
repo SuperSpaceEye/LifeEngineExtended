@@ -161,6 +161,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine* engine;
     OrganismEditor ee;
@@ -173,6 +174,8 @@ private:
     float center_x = 0;
     float center_y = 0;
     float window_interval = 0.;
+    float keyboard_movement_amount = 0.5;
+    float SHIFT_keyboard_movement_multiplier = 2;
 
     bool wheel_mouse_button_pressed = false;
     bool right_mouse_button_pressed = false;
@@ -200,6 +203,12 @@ private:
     bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
     bool really_stop_render = false;
+
+    bool W_pressed = false;
+    bool A_pressed = false;
+    bool S_pressed = false;
+    bool D_pressed = false;
+    bool SHIFT_pressed = false;
 
     int last_mouse_x_pos = 0;
     int last_mouse_y_pos = 0;
@@ -405,6 +414,9 @@ private slots:
     void le_anatomy_min_possible_mutation_rate_slot();
     void le_brain_min_possible_mutation_rate_slot();
     void le_extra_mover_reproduction_cost_slot();
+    void le_anatomy_mutation_rate_step_slot();
+    void le_brain_mutation_rate_step_slot();
+    void le_keyboard_movement_amount_slot();
     //Settings
     void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
@@ -468,6 +480,8 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
+
+    void process_keyboard_events();
 };
 
 

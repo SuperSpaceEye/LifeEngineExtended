@@ -158,6 +158,9 @@ public:
     QHBoxLayout *horizontalLayout_12;
     QLabel *lb_mutation_rate;
     QLineEdit *le_global_anatomy_mutation_rate;
+    QHBoxLayout *horizontalLayout_46;
+    QLabel *label;
+    QLineEdit *le_anatomy_mutation_rate_step;
     QHBoxLayout *horizontalLayout_43;
     QLabel *label_33;
     QLineEdit *le_anatomy_min_possible_mutation_rate;
@@ -168,6 +171,9 @@ public:
     QHBoxLayout *horizontalLayout_27;
     QLabel *label_20;
     QLineEdit *le_global_brain_mutation_rate;
+    QHBoxLayout *horizontalLayout_47;
+    QLabel *label_35;
+    QLineEdit *le_brain_mutation_rate_step;
     QHBoxLayout *horizontalLayout_44;
     QLabel *label_34;
     QLineEdit *le_brain_min_possible_mutation_rate;
@@ -255,6 +261,9 @@ public:
     QLabel *label_47;
     QLineEdit *le_menu_height;
     QCheckBox *cb_really_stop_render;
+    QHBoxLayout *horizontalLayout_48;
+    QLabel *label_36;
+    QLineEdit *le_keyboard_movement_amount;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -800,7 +809,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1467));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -452, 606, 1533));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -986,6 +995,21 @@ public:
 
         verticalLayout_20->addLayout(mutation_rate_layout);
 
+        horizontalLayout_46 = new QHBoxLayout();
+        horizontalLayout_46->setObjectName(QString::fromUtf8("horizontalLayout_46"));
+        label = new QLabel(widget);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout_46->addWidget(label);
+
+        le_anatomy_mutation_rate_step = new QLineEdit(widget);
+        le_anatomy_mutation_rate_step->setObjectName(QString::fromUtf8("le_anatomy_mutation_rate_step"));
+
+        horizontalLayout_46->addWidget(le_anatomy_mutation_rate_step);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_46);
+
         horizontalLayout_43 = new QHBoxLayout();
         horizontalLayout_43->setObjectName(QString::fromUtf8("horizontalLayout_43"));
         label_33 = new QLabel(widget);
@@ -1035,6 +1059,21 @@ public:
 
 
         verticalLayout_20->addLayout(horizontalLayout_27);
+
+        horizontalLayout_47 = new QHBoxLayout();
+        horizontalLayout_47->setObjectName(QString::fromUtf8("horizontalLayout_47"));
+        label_35 = new QLabel(widget);
+        label_35->setObjectName(QString::fromUtf8("label_35"));
+
+        horizontalLayout_47->addWidget(label_35);
+
+        le_brain_mutation_rate_step = new QLineEdit(widget);
+        le_brain_mutation_rate_step->setObjectName(QString::fromUtf8("le_brain_mutation_rate_step"));
+
+        horizontalLayout_47->addWidget(le_brain_mutation_rate_step);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_47);
 
         horizontalLayout_44 = new QHBoxLayout();
         horizontalLayout_44->setObjectName(QString::fromUtf8("horizontalLayout_44"));
@@ -1417,7 +1456,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 635));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 664));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1578,6 +1617,21 @@ public:
         cb_really_stop_render->setObjectName(QString::fromUtf8("cb_really_stop_render"));
 
         verticalLayout_19->addWidget(cb_really_stop_render);
+
+        horizontalLayout_48 = new QHBoxLayout();
+        horizontalLayout_48->setObjectName(QString::fromUtf8("horizontalLayout_48"));
+        label_36 = new QLabel(widget_2);
+        label_36->setObjectName(QString::fromUtf8("label_36"));
+
+        horizontalLayout_48->addWidget(label_36);
+
+        le_keyboard_movement_amount = new QLineEdit(widget_2);
+        le_keyboard_movement_amount->setObjectName(QString::fromUtf8("le_keyboard_movement_amount"));
+
+        horizontalLayout_48->addWidget(le_keyboard_movement_amount);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_48);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1802,6 +1856,9 @@ public:
         QObject::connect(le_anatomy_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_min_possible_mutation_rate_slot()));
         QObject::connect(le_brain_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_min_possible_mutation_rate_slot()));
         QObject::connect(cb_really_stop_render, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_really_stop_render_slot(bool)));
+        QObject::connect(le_brain_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_step_slot()));
+        QObject::connect(le_anatomy_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_step_slot()));
+        QObject::connect(le_keyboard_movement_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_keyboard_movement_amount_slot()));
 
         Tabs->setCurrentIndex(1);
 
@@ -1890,12 +1947,14 @@ public:
         cb_use_evolved_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved anatomy mutation rate", nullptr));
         lb_mutation_rate->setText(QApplication::translate("MainWindow", "Global anatomy mutation rate:", nullptr));
         le_global_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "0.05", nullptr));
+        label->setText(QApplication::translate("MainWindow", "Anatomy mutation rate mutation step:", nullptr));
         label_33->setText(QApplication::translate("MainWindow", "Anatomy min possible mutation rate:", nullptr));
         label_23->setText(QApplication::translate("MainWindow", "Anatomy mutation rate delimiter:", nullptr));
         le_anatomy_mutation_rate_delimiter->setText(QApplication::translate("MainWindow", "0.5", nullptr));
         cb_use_evolved_brain_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved brain mutation rate", nullptr));
         label_20->setText(QApplication::translate("MainWindow", "Global brain mutation rate:", nullptr));
         le_global_brain_mutation_rate->setText(QApplication::translate("MainWindow", "0.1", nullptr));
+        label_35->setText(QApplication::translate("MainWindow", "Brain mutation rate mutation step:", nullptr));
         label_34->setText(QApplication::translate("MainWindow", "Brain min possible mutation rate:", nullptr));
         label_24->setText(QApplication::translate("MainWindow", "Brain mutation rate delimiter:", nullptr));
         label_21->setText(QApplication::translate("MainWindow", "Killer damage amount:", nullptr));
@@ -1921,7 +1980,7 @@ public:
         cb_set_fixed_move_range->setText(QApplication::translate("MainWindow", "Set fixed move range", nullptr));
         label_41->setText(QApplication::translate("MainWindow", "Min move range:", nullptr));
         label_40->setText(QApplication::translate("MainWindow", "Max move range:", nullptr));
-        label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", nullptr));
+        label_42->setText(QApplication::translate("MainWindow", "Move range delimiter:", nullptr));
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", nullptr));
         cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", nullptr));
         cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability by number of producers", nullptr));
@@ -2008,6 +2067,7 @@ public:
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", nullptr));
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", nullptr));
         cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
+        label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

@@ -449,6 +449,23 @@ void MainWindow::le_brain_min_possible_mutation_rate_slot() {
                                      1, "1");
 }
 
+void MainWindow::le_anatomy_mutation_rate_step_slot() {
+    le_slot_lower_upper_bound<float>(sp.anatomy_mutations_rate_mutation_step, sp.anatomy_mutations_rate_mutation_step, "float",
+                                     _ui.le_anatomy_mutation_rate_step, 0, "0",
+                                     1, "1");
+}
+
+void MainWindow::le_brain_mutation_rate_step_slot() {
+    le_slot_lower_upper_bound<float>(sp.brain_mutation_rate_mutation_step, sp.brain_mutation_rate_mutation_step, "float",
+                                     _ui.le_brain_mutation_rate_step, 0, "0",
+                                     1, "1");
+}
+
+void MainWindow::le_keyboard_movement_amount_slot() {
+    le_slot_lower_bound<float>(keyboard_movement_amount, keyboard_movement_amount, "float",
+                               _ui.le_keyboard_movement_amount, 0, "0");
+}
+
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
