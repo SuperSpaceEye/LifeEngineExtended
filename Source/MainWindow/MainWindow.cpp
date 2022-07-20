@@ -82,9 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
         engine_thread.detach();
 
-        start = clock_now();
-        end = clock_now();
-
         fps_timer = clock_now();
 
         scene.addItem(&pixmap_item);
@@ -112,14 +109,12 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::mainloop_tick() {
-    start = clock_now();
     if (synchronise_simulation_and_window) {
         ecp.engine_pass_tick = true;
         ecp.synchronise_simulation_tick = true;
     }
     window_tick();
     window_frames++;
-    std::abs(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
 
     auto info_update = std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count();
 
@@ -143,7 +138,6 @@ void MainWindow::mainloop_tick() {
         window_frames = 0;
         fps_timer = clock_now();
     }
-    end = clock_now();
 }
 
 void MainWindow::update_fps_labels(int fps, int sps) {

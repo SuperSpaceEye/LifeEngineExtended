@@ -150,8 +150,6 @@ private:
 
     Ui::MainWindow _ui{};
     QTimer * timer;
-    std::chrono::time_point<std::chrono::high_resolution_clock> start;
-    std::chrono::time_point<std::chrono::high_resolution_clock> end;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
