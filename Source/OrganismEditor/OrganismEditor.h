@@ -42,28 +42,21 @@ struct EditBlock : BaseGridBlock {
 
 class OrganismEditor: public QWidget {
     Q_OBJECT
-private:
+public:
     Ui::MainWindow * _parent_ui = nullptr;
 
     std::vector<std::vector<EditBlock>> edit_grid;
     std::vector<unsigned char> edit_image;
-    Organism * editor_organism;
     CursorMode * c_mode = nullptr;
 
     Textures textures{};
 
     ColorContainer * color_container;
 
-    BlockTypes chosen_block_type = BlockTypes::MouthBlock;
+    double scaling_coefficient = 1.2;
 
-    float scaling_coefficient = 1.2;
-    float scaling_zoom = 1;
-
-    float center_x;
-    float center_y;
-
-    int editor_width = 15;
-    int editor_height = 15;
+    double center_x;
+    double center_y;
 
     int new_editor_width = 15;
     int new_editor_height = 15;
@@ -83,8 +76,20 @@ private:
     void place_organism_on_a_grid();
     void clear_grid();
 
-public:
+    void initialize_gui();
+
+    QLabel actual_cursor;
+
     Ui::Editor _ui{};
+
+    int editor_width = 15;
+    int editor_height = 15;
+    double scaling_zoom = 1;
+
+    Organism * editor_organism;
+
+    BlockTypes chosen_block_type = BlockTypes::MouthBlock;
+    Rotation chosen_rotation = Rotation::UP;
 
     OrganismEditor()=default;
 
@@ -95,6 +100,8 @@ public:
     BaseGridBlock get_block(int x, int y);
     void set_organism(Organism organism);
     Organism get_organism();
+
+    Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void resize_editing_grid(int width, int height);
     void resize_image();

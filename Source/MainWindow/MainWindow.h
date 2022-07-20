@@ -308,6 +308,9 @@ private:
     void change_main_grid_left_click();
     void change_main_grid_right_click();
 
+    void change_editing_grid_left_click();
+    void change_editing_grid_right_click();
+
     void set_simulation_num_threads(uint8_t num_threads);
 
     void set_cursor_mode(CursorMode mode);
@@ -338,7 +341,7 @@ private:
     void update_simulation_size_label();
 
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
-    void initialize_gui_settings();
+    void initialize_gui();
 
     // converts num bytes to string of shortened number with postfix (like 14 KiB)
     static std::string convert_num_bytes(uint64_t num_bytes);

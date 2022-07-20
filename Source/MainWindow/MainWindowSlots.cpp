@@ -34,8 +34,13 @@ void MainWindow::tb_open_statistics_slot(bool state) {
 void MainWindow::tb_open_organism_editor_slot(bool state) {
     if (state) {
         ee.show();
-        ee.resize_image();
-        ee.create_image();
+        QTimer::singleShot(100, [&]{
+            ee.reset_scale_view();
+            ee.resize_image();
+            ee.create_image();
+        });
+//        ee.resize_image();
+//        ee.create_image();
     } else {
         ee.close();
     }
@@ -164,7 +169,7 @@ void MainWindow::b_load_world_slot() {
     synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     ecp.pause_processing_user_action = false;
-    initialize_gui_settings();
+    initialize_gui();
     update_table_values();
 }
 
@@ -651,10 +656,11 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     switch (static_cast<ParametersNames>(col)) {
         case ParametersNames::FoodCostModifier: value = &type->food_cost_modifier; break;
         case ParametersNames::LifePointAmount:  value = &type->life_point_amount;  break;
+        case ParametersNames::LifetimeWeight:   value = &type->lifetime_weight;    break;
         case ParametersNames::ChanceWeight:     value = &type->chance_weight;      break;
     }
 
-    if(set_result) {*value = result; return;}
+    if(set_result) {*value = result; engine->reinit_organisms(); return;}
 
     _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
     _ui.table_organism_block_parameters->update();

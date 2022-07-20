@@ -48,6 +48,7 @@ void Organism::init_values() {
     }
 }
 
+//TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
 float Organism::calculate_max_life() {
     life_points = 0;
     for (auto& item: anatomy->_organism_blocks) {
@@ -65,7 +66,19 @@ float Organism::calculate_max_life() {
 }
 
 int Organism::calculate_organism_lifetime() {
-    max_lifetime = anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
+    float lifetime_weights = 0;
+    for (auto & block: anatomy->_organism_blocks) {
+        switch (block.type) {
+            case BlockTypes::MouthBlock:    lifetime_weights += bp->MouthBlock.   lifetime_weight; break;
+            case BlockTypes::ProducerBlock: lifetime_weights += bp->ProducerBlock.lifetime_weight; break;
+            case BlockTypes::MoverBlock:    lifetime_weights += bp->MoverBlock.   lifetime_weight; break;
+            case BlockTypes::KillerBlock:   lifetime_weights += bp->KillerBlock.  lifetime_weight; break;
+            case BlockTypes::ArmorBlock:    lifetime_weights += bp->ArmorBlock.   lifetime_weight; break;
+            case BlockTypes::EyeBlock:      lifetime_weights += bp->EyeBlock.     lifetime_weight; break;
+            default: throw std::runtime_error("Unknown block");
+        }
+    }
+    max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
 }
 
