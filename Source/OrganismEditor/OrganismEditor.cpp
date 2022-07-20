@@ -44,6 +44,20 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     resize_image();
     reset_scale_view();
     create_image();
+
+    initialize_gui();
+
+    actual_cursor.setParent(this);
+    actual_cursor.setGeometry(50, 50, 5, 5);
+    actual_cursor.setStyleSheet("background-color:red;");
+    actual_cursor.hide();
+}
+
+void OrganismEditor::initialize_gui() {
+    _ui.le_move_range->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
+    _ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism->anatomy_mutation_rate)));
+    _ui.le_grid_width->setText(QString::fromStdString(std::to_string(editor_width)));
+    _ui.le_grid_height->setText(QString::fromStdString(std::to_string(editor_height)));
 }
 
 void OrganismEditor::closeEvent(QCloseEvent * event) {
@@ -53,8 +67,6 @@ void OrganismEditor::closeEvent(QCloseEvent * event) {
 
 void OrganismEditor::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
-    resize_image();
-    create_image();
 }
 
 void OrganismEditor::wheelEvent(QWheelEvent *event) {
@@ -277,4 +289,15 @@ void OrganismEditor::place_organism_on_a_grid() {
         edit_grid[x][y].type = block.type;
         edit_grid[x][y].rotation = block.rotation;
     }
+}
+
+Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
+    x -= (_ui.editor_graphicsView->x() + 6 + 1);
+    y -= (_ui.editor_graphicsView->y() + 6 + 1);
+
+    //TODO for some reason it becomes less accurate when coordinates go away from 0,0
+    auto c_pos = Vector2<int>{};
+    c_pos.x = static_cast<int>((x - _ui.editor_graphicsView->viewport()->width() /2.)*scaling_zoom + center_x);
+    c_pos.y = static_cast<int>((y - _ui.editor_graphicsView->viewport()->height()/2.)*scaling_zoom + center_y);
+    return c_pos;
 }

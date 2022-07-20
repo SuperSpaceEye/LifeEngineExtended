@@ -605,8 +605,10 @@ void Anatomy::reset_organism_center(std::vector<SerializedOrganismBlockContainer
 }
 
 void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
+    int num_block = 0;
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
+            if (type != BlockTypes::EmptyBlock) {
             switch (item.type) {
                 case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
                 case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
@@ -618,6 +620,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
                 case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
                     break;
+            }
             }
 
             switch (type) {
@@ -632,42 +635,54 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
                 case BlockTypes::WallBlock:
                     break;
             }
-            item.type = type;
-            return;
+            if (type != BlockTypes::EmptyBlock) {
+                item.type = type;
+                return;
+            } else {
+                break;
+            }
         }
+        num_block++;
     }
 
-    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
+    if (type == BlockTypes::EmptyBlock && num_block == _organism_blocks.size()) { return;}
 
-    for (auto& block: _organism_blocks) {
-        organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-        organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
-    }
+    SerializedOrganismStructureContainer *new_structure;
 
-    boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
+    if (type == BlockTypes::EmptyBlock) {
+        new_structure = remove_block(num_block);
+    } else {
+        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
 
-    create_single_adjacent_space(organism_blocks, single_adjacent_space);
-    create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
-
-    std::vector<SerializedAdjacentSpaceContainer> _single_adjacent_space;
-    std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
-
-    for (auto const &xmap: single_adjacent_space) {
-        for (auto const &yxmap: xmap.second) {
-            _single_adjacent_space.emplace_back(xmap.first, yxmap.first);
+        for (auto& block: _organism_blocks) {
+            organism_blocks[block.relative_x][block.relative_y].type     = block.type;
+            organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
         }
-    }
 
-    for (auto const &xmap: single_diagonal_adjacent_space) {
-        for (auto const &yxmap: xmap.second) {
-            _single_diagonal_adjacent_space.emplace_back(xmap.first, yxmap.first);
+        boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
+        boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
+
+        create_single_adjacent_space(organism_blocks, single_adjacent_space);
+        create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+
+        std::vector<SerializedAdjacentSpaceContainer> _single_adjacent_space;
+        std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
+
+        for (auto const &xmap: single_adjacent_space) {
+            for (auto const &yxmap: xmap.second) {
+                _single_adjacent_space.emplace_back(xmap.first, yxmap.first);
+            }
         }
-    }
 
-    auto *new_structure = add_block(type, -1, rotation, x, y,
-                                   organism_blocks, _single_adjacent_space,
-                                   _single_diagonal_adjacent_space, single_adjacent_space);
+        for (auto const &xmap: single_diagonal_adjacent_space) {
+            for (auto const &yxmap: xmap.second) {
+                _single_diagonal_adjacent_space.emplace_back(xmap.first, yxmap.first);
+            }
+        }
+         new_structure = add_block(type, -1, rotation, x, y,
+                                        organism_blocks, _single_adjacent_space,
+                                        _single_diagonal_adjacent_space, single_adjacent_space);
+    }
 
     _organism_blocks = std::move(new_structure->organism_blocks);
 

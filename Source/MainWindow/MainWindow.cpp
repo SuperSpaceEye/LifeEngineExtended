@@ -88,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
         _ui.simulation_graphicsView->setScene(&scene);
 
         reset_scale_view();
-        initialize_gui_settings();
+        initialize_gui();
         #if defined(__WIN32)
         ShowWindow(GetConsoleWindow(), SW_HIDE);
         #endif
@@ -148,8 +148,13 @@ void MainWindow::update_fps_labels(int fps, int sps) {
 void MainWindow::window_tick() {
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
     if (ecp.tb_paused) {_ui.tb_pause->setChecked(true);}
+
     if (left_mouse_button_pressed  && change_main_simulation_grid) {change_main_grid_left_click();}
     if (right_mouse_button_pressed && change_main_simulation_grid) {change_main_grid_right_click();}
+
+    if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
+    if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
+
 #if __VALGRIND_MODE__ == 1
     return;
 #endif
@@ -827,7 +832,7 @@ void MainWindow::update_statistics_info(const OrganismAvgBlockInformation &info)
 }
 
 // So that changes in code values would be set by default in gui.
-void MainWindow::initialize_gui_settings() {
+void MainWindow::initialize_gui() {
     //World settings
     _ui.le_cell_size         ->setText(QString::fromStdString(std::to_string(starting_cell_size_on_resize)));
     _ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(edc.simulation_width)));
@@ -1018,6 +1023,30 @@ void MainWindow::change_main_grid_right_click() {
         }
     }
     ecp.pause_processing_user_action = false;
+}
+
+void MainWindow::change_editing_grid_left_click() {
+    auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+    cpg.x -= 0;
+    cpg.y -= 0;
+    if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
+
+    //relative position
+    auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
+    ee.editor_organism->anatomy->set_block(ee.chosen_block_type, ee.chosen_rotation, r_pos.x, r_pos.y);
+    ee.create_image();
+}
+
+void MainWindow::change_editing_grid_right_click() {
+    auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+    if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
+    if (cpg.x == ee.editor_organism->x && cpg.y == ee.editor_organism->y) {return;}
+    if (ee.editor_organism->anatomy->_organism_blocks.size() == 1) { return;}
+
+    //relative position
+    auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
+    ee.editor_organism->anatomy->set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
+    ee.create_image();
 }
 
 bool MainWindow::cuda_is_available() {

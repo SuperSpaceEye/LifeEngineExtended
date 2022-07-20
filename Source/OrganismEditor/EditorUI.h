@@ -79,8 +79,8 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
-    QButtonGroup *organism_action_group;
     QButtonGroup *edit_group;
+    QButtonGroup *organism_action_group;
     QButtonGroup *cells_group;
 
     void setupUi(QWidget *Editor)

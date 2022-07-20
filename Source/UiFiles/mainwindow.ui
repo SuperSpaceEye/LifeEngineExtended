@@ -449,6 +449,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*setting max fps/sps/num organisms to &amp;lt;0 will enable unlimited mode.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*checking &amp;quot;Fix reproducing distance&amp;quot; will set reproducing distance to min value.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &amp;quot;M&amp;quot;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*To finilize changes in line edits you should press Enter.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This project's Github: https://github.com/SuperSpaceEye/LifeEngineExtended&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -985,7 +986,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-452</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>1533</height>
                  </rect>
@@ -1803,6 +1804,11 @@ p, li { white-space: pre-wrap; }
                    </column>
                    <column>
                     <property name="text">
+                     <string>Lifetime Weight</string>
+                    </property>
+                   </column>
+                   <column>
+                    <property name="text">
                      <string>Chance Weight</string>
                     </property>
                    </column>
@@ -1824,6 +1830,11 @@ p, li { white-space: pre-wrap; }
                      <string>1</string>
                     </property>
                    </item>
+                   <item row="0" column="3">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
                    <item row="1" column="0">
                     <property name="text">
                      <string>1</string>
@@ -1835,6 +1846,11 @@ p, li { white-space: pre-wrap; }
                     </property>
                    </item>
                    <item row="1" column="2">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
+                   <item row="1" column="3">
                     <property name="text">
                      <string>1</string>
                     </property>
@@ -1854,6 +1870,11 @@ p, li { white-space: pre-wrap; }
                      <string>1</string>
                     </property>
                    </item>
+                   <item row="2" column="3">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
                    <item row="3" column="0">
                     <property name="text">
                      <string>1</string>
@@ -1865,6 +1886,11 @@ p, li { white-space: pre-wrap; }
                     </property>
                    </item>
                    <item row="3" column="2">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
+                   <item row="3" column="3">
                     <property name="text">
                      <string>1</string>
                     </property>
@@ -1884,6 +1910,11 @@ p, li { white-space: pre-wrap; }
                      <string>1</string>
                     </property>
                    </item>
+                   <item row="4" column="3">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
                    <item row="5" column="0">
                     <property name="text">
                      <string>1</string>
@@ -1895,6 +1926,11 @@ p, li { white-space: pre-wrap; }
                     </property>
                    </item>
                    <item row="5" column="2">
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
+                   <item row="5" column="3">
                     <property name="text">
                      <string>1</string>
                     </property>
@@ -1942,7 +1978,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-366</y>
+                  <y>-165</y>
                   <width>606</width>
                   <height>693</height>
                  </rect>
@@ -2113,7 +2149,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QCheckBox" name="cb_wait_for_engine_to_stop">
                       <property name="text">
-                       <string>Wait for engine to y</string>
+                       <string>Wait for engine to stop to render</string>
                       </property>
                      </widget>
                     </item>

@@ -21,6 +21,23 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             }
             last_mouse_x_pos = mouse_event->x();
             last_mouse_y_pos = mouse_event->y();
+
+            //TODO ok, i don't get why this isn't working
+//            if (ee._ui.editor_graphicsView->underMouse()) {
+//                ee.actual_cursor.show();
+//                auto pos = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+//
+//                std::cout << pos.x << " " << pos.y << "\n";
+//                pos.x = ((double(pos.x) - ee.center_x) / ee.scaling_zoom) + ee._ui.editor_graphicsView->viewport()->width() /2. + ee._ui.editor_graphicsView->x() + 6 + 1;
+//                pos.y = ((double(pos.y) - ee.center_y) / ee.scaling_zoom) + ee._ui.editor_graphicsView->viewport()->height()/2. + ee._ui.editor_graphicsView->y() + 6 + 1;
+//
+//                std::cout << pos.x << " " << pos.y << "\n";
+//
+//                ee.actual_cursor.setGeometry(pos.x,
+//                                             pos.y, 5, 5);
+//            } else {
+//                ee.actual_cursor.hide();
+//            }
         } break;
         case QEvent::MouseButtonPress: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);
