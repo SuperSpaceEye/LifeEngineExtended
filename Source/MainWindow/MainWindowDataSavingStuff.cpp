@@ -9,7 +9,7 @@
 #include "MainWindow.h"
 
 //TODO increment every time saving logic changes
-uint32_t SAVE_VERSION = 3;
+uint32_t SAVE_VERSION = 4;
 
 void MainWindow::write_data(std::ofstream &os) {
     write_version(os);
