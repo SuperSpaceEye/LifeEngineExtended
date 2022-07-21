@@ -22,14 +22,20 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             last_mouse_x_pos = mouse_event->x();
             last_mouse_y_pos = mouse_event->y();
 
-            //TODO ok, i don't get why this isn't working
+//            //TODO ok, i don't get why this isn't working
 //            if (ee._ui.editor_graphicsView->underMouse()) {
 //                ee.actual_cursor.show();
-//                auto pos = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+//                auto pos = ee.calculate_cursor_pos_on_grid(ee._ui.editor_graphicsView->viewport()->width(),
+//                                                                    ee._ui.editor_graphicsView->viewport()->width());
+//
+//                double x_modif = double(ee._ui.editor_graphicsView->viewport()->width())  / pos.x;
+//                double y_modif = double(ee._ui.editor_graphicsView->viewport()->height()) / pos.y;
+//
+//                pos = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //
 //                std::cout << pos.x << " " << pos.y << "\n";
-//                pos.x = ((double(pos.x) - ee.center_x) / ee.scaling_zoom) + ee._ui.editor_graphicsView->viewport()->width() /2. + ee._ui.editor_graphicsView->x() + 6 + 1;
-//                pos.y = ((double(pos.y) - ee.center_y) / ee.scaling_zoom) + ee._ui.editor_graphicsView->viewport()->height()/2. + ee._ui.editor_graphicsView->y() + 6 + 1;
+//                pos.x = (pos.x * x_modif) + ee._ui.editor_graphicsView->x() + 6 + 1;
+//                pos.y = (pos.y * y_modif) + ee._ui.editor_graphicsView->y() + 6 + 1;
 //
 //                std::cout << pos.x << " " << pos.y << "\n";
 //

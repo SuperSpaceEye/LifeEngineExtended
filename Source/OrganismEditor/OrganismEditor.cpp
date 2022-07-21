@@ -104,7 +104,7 @@ void OrganismEditor::reset_scale_view() {
     if (editor_width < editor_height) {
         exp = log((float) (editor_height+4) / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
     } else {
-        exp = log((float) (editor_width+4) / (float) _ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
+        exp = log((float) (editor_width+ 4) / (float) _ui.editor_graphicsView->viewport()->width())  / log(scaling_coefficient);
     }
 
     scaling_zoom = pow(scaling_coefficient, exp);
@@ -115,6 +115,24 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
     editor_height = height;
     edit_grid.clear();
     edit_grid.resize(width, std::vector<EditBlock>(height, EditBlock{}));
+
+    editor_organism->x = editor_width / 2;
+    editor_organism->y = editor_height / 2;
+
+    int x = editor_organism->x;
+    int y = editor_organism->y;
+
+    for (int i = 0; i < editor_organism->anatomy->_organism_blocks.size(); i++) {
+        auto & block = editor_organism->anatomy->_organism_blocks[i];
+
+        if (block.get_pos(Rotation::UP).x + x >= editor_width  || block.get_pos(Rotation::UP).x + x < 0 ||
+            block.get_pos(Rotation::UP).y + y >= editor_height || block.get_pos(Rotation::UP).y + y < 0) {
+            editor_organism->anatomy->_organism_blocks.erase(editor_organism->anatomy->_organism_blocks.begin()+i);
+            i--;
+        }
+    }
+
+    editor_organism->anatomy->set_many_blocks(editor_organism->anatomy->_organism_blocks);
 
     place_organism_on_a_grid();
 }
@@ -286,14 +304,19 @@ void OrganismEditor::place_organism_on_a_grid() {
     for (auto & block: editor_organism->anatomy->_organism_blocks) {
         auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
         auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
-        edit_grid[x][y].type = block.type;
-        edit_grid[x][y].rotation = block.rotation;
+//        edit_grid[x][y].type = block.type;
+//        edit_grid[x][y].rotation = block.rotation;
+        edit_grid.at(x).at(y).type = block.type;
+        edit_grid.at(x).at(y).rotation = block.rotation;
     }
 }
 
 Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
     x -= (_ui.editor_graphicsView->x() + 6 + 1);
     y -= (_ui.editor_graphicsView->y() + 6 + 1);
+
+//    std::cout << (x - _ui.editor_graphicsView->viewport()->width() /2.)*scaling_zoom + center_x + 0.75 << " " <<
+//                 (y - _ui.editor_graphicsView->viewport()->height()/2.)*scaling_zoom + center_y + 0.75 << "\n";
 
     //TODO for some reason it becomes less accurate when coordinates go away from 0,0
     auto c_pos = Vector2<int>{};

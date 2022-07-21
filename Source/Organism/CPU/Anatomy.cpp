@@ -545,8 +545,9 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
         reset_organism_center(_organism_blocks, organism_blocks, x, y);
     } else {
         for (auto &block: _organism_blocks) {
-            organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-            organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
+            organism_blocks[block.relative_x][block.relative_y] = BaseGridBlock{block.type, block.rotation};
+//            organism_blocks[block.relative_x][block.relative_y].type     = block.type;
+//            organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
         }
     }
 

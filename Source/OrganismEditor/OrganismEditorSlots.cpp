@@ -17,9 +17,33 @@ void OrganismEditor::b_reset_editing_view_slot() {
 
 void OrganismEditor::b_resize_editing_grid_slot() {
     resize_editing_grid(new_editor_width, new_editor_height);
+//
+//    editor_organism->x = new_editor_width  / 2;
+//    editor_organism->y = new_editor_height / 2;
 
-    editor_organism->x = new_editor_width  / 2;
-    editor_organism->y = new_editor_height / 2;
+//    auto anatomy = std::make_shared<Anatomy>();
+//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+//
+//    auto brain = std::make_shared<Brain>(editor_organism->brain);
+//
+//    auto * _editor_organism = new Organism(editor_width  / 2,
+//                                           editor_height / 2,
+//                                           Rotation::UP,
+//                                           anatomy,
+//                                           brain,
+//                                           editor_organism->sp,
+//                                           editor_organism->bp,
+//                                           editor_organism->move_range);
+//
+//    _editor_organism->anatomy_mutation_rate = editor_organism->anatomy_mutation_rate;
+//    _editor_organism->brain_mutation_rate = editor_organism->brain_mutation_rate;
+//    _editor_organism->max_do_nothing_lifetime = editor_organism->max_do_nothing_lifetime;
+//    _editor_organism->max_decision_lifetime = editor_organism->max_decision_lifetime;
+//    _editor_organism->rotation = editor_organism->rotation;
+//
+//    std::swap(editor_organism, _editor_organism);
+//
+//    delete _editor_organism;
 
     reset_scale_view();
     clear_grid();
@@ -51,7 +75,7 @@ void OrganismEditor::le_grid_width_slot() {
     int fallback = new_editor_width;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_grid_width, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 10) {display_message("Input cannot be less than 10."); return;}
+    if (result.result < 5) {display_message("Input cannot be less than 10."); return;}
     new_editor_width = result.result;
 }
 
@@ -59,7 +83,7 @@ void OrganismEditor::le_grid_height_slot() {
     int fallback = new_editor_height;
     auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_grid_height, fallback);
     if (!result.is_valid) {return;}
-    if (result.result < 10) {display_message("Input cannot be less than 10."); return;}
+    if (result.result < 5) {display_message("Input cannot be less than 10."); return;}
     new_editor_height = result.result;
 }
 
