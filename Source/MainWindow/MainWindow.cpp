@@ -1003,10 +1003,9 @@ void MainWindow::change_main_grid_left_click() {
 
     ecp.pause_processing_user_action = false;
 
-//    if (cursor_mode == CursorMode::ChooseOrganism) {
-//        ee.update_chosen_organism();
-//        unpause_engine();
-//    }
+    if (cursor_mode == CursorMode::ChooseOrganism) {
+        ee.update_chosen_organism();
+    }
 }
 
 void MainWindow::change_main_grid_right_click() {

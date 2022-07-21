@@ -609,7 +609,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     int num_block = 0;
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
-            if (type != BlockTypes::EmptyBlock) {
+//            if (type != BlockTypes::EmptyBlock) {
             switch (item.type) {
                 case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
                 case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
@@ -621,7 +621,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
                 case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
                     break;
-            }
+//            }
             }
 
             switch (type) {
@@ -710,6 +710,13 @@ void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blo
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
     std::vector<int> num_producing_space;
+
+    _mouth_blocks    = 0;
+    _producer_blocks = 0;
+    _mover_blocks    = 0;
+    _killer_blocks   = 0;
+    _armor_blocks    = 0;
+    _eye_blocks      = 0;
 
     for (auto & block: blocks) {
         switch (block.type) {
