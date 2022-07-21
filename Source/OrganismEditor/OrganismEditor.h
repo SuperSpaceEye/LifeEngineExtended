@@ -103,11 +103,6 @@ public:
               SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode,
               Organism ** chosen_organism);
 
-    void set_block(int x, int y, BaseGridBlock block);
-    BaseGridBlock get_block(int x, int y);
-    void set_organism(Organism organism);
-    Organism get_organism();
-
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void resize_editing_grid(int width, int height);
@@ -132,7 +127,13 @@ public:
     void read_organism_brain(std::ifstream& is, Brain * brain);
     void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
 
+    void write_organism(std::ofstream & of);
+    void write_organism_data(std::ofstream& os, Organism * organism);
+    void write_organism_brain(std::ofstream& os, Brain * brain);
+    void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
+
     void read_json_organism(std::string & full_path);
+    void write_json_organism(std::string &full_path);
 
 private slots:
     void b_load_organism_slot();

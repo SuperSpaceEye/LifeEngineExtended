@@ -26,10 +26,10 @@ void OrganismEditor::b_resize_editing_grid_slot() {
 void OrganismEditor::b_load_organism_slot() {
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism"), "",
-                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
+                                                  tr("Custom save type (*.lfeo);;JSON (*.json)"), &selected_filter);
     std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
-        filetype = ".tlfcpp";
+    if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
+        filetype = ".lfeo";
     } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
     } else {
@@ -38,20 +38,55 @@ void OrganismEditor::b_load_organism_slot() {
 
     std::string full_path = file_name.toStdString();
 
-    if (filetype == ".tlfcpp") {
-        std::ifstream in(full_path, std::ios::in | std::ios::binary);
-        read_organism(in);
-        in.close();
+    try {
+        if (filetype == ".lfeo") {
+            std::ifstream in(full_path, std::ios::in | std::ios::binary);
+            read_organism(in);
+            in.close();
 
-    } else if (filetype == ".json") {
-        read_json_organism(full_path);
+        } else if (filetype == ".json") {
+            read_json_organism(full_path);
+        }
+    } catch (std::string & _) {
+        display_message("Loading of organism was unsuccessful.");
     }
 
     update_chosen_organism();
 }
 
 void OrganismEditor::b_save_organism_slot() {
+    QString selected_filter;
+    QFileDialog file_dialog{};
 
+    auto file_name = file_dialog.getSaveFileName(this, tr("Save organism"), "",
+                                                 "Custom save type (*.lfeo);;JSON (*.json)", &selected_filter);
+#ifndef __WIN32
+    bool file_exists = std::filesystem::exists(file_name.toStdString());
+#endif
+    std::string filetype;
+    if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
+        filetype = ".lfeo";
+    } else if (selected_filter.toStdString() == "JSON (*.json)") {
+        filetype = ".json";
+    } else {
+        return;
+    }
+    std::string full_path = file_name.toStdString();
+
+#ifndef __WIN32
+    if (!file_exists) {
+        full_path = file_name.toStdString() + filetype;
+    }
+#endif
+
+    if (filetype == ".lfeo") {
+        std::ofstream out(full_path, std::ios::out | std::ios::binary);
+        write_organism(out);
+        out.close();
+
+    } else {
+        write_json_organism(full_path);
+    }
 }
 
 //==================== Line edits ====================

@@ -69,6 +69,7 @@ public:
     QPushButton *b_resize_editing_grid;
     QSpacerItem *verticalSpacer;
     QWidget *brain_edit_page;
+    QLabel *label_6;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_6;
     QRadioButton *rb_place_organism;
@@ -79,8 +80,8 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
-    QButtonGroup *edit_group;
     QButtonGroup *organism_action_group;
+    QButtonGroup *edit_group;
     QButtonGroup *cells_group;
 
     void setupUi(QWidget *Editor)
@@ -302,6 +303,12 @@ public:
         stackedWidget->addWidget(anatomy_edit_page);
         brain_edit_page = new QWidget();
         brain_edit_page->setObjectName(QString::fromUtf8("brain_edit_page"));
+        label_6 = new QLabel(brain_edit_page);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setGeometry(QRect(210, 130, 331, 141));
+        label_6->setTextFormat(Qt::AutoText);
+        label_6->setScaledContents(false);
+        label_6->setWordWrap(false);
         stackedWidget->addWidget(brain_edit_page);
 
         verticalLayout->addWidget(stackedWidget);
@@ -421,6 +428,7 @@ public:
         label_4->setText(QApplication::translate("Editor", "Grid width:", nullptr));
         label_5->setText(QApplication::translate("Editor", "Grid height:", nullptr));
         b_resize_editing_grid->setText(QApplication::translate("Editor", "Resize editing grid", nullptr));
+        label_6->setText(QApplication::translate("Editor", "Work in progress", nullptr));
         rb_place_organism->setText(QApplication::translate("Editor", "Place Organism", nullptr));
         rb_chose_organism->setText(QApplication::translate("Editor", "Choose organism", nullptr));
         rb_null_button->setText(QString());

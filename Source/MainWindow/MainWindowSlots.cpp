@@ -95,13 +95,13 @@ void MainWindow::b_save_world_slot() {
     QFileDialog file_dialog{};
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
-                                                 "Custom save type (*.tlfcpp);;JSON (*.json)", &selected_filter);
+                                                 "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
 #ifndef __WIN32
     bool file_exists = std::filesystem::exists(file_name.toStdString());
 #endif
     std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
-        filetype = ".tlfcpp";
+    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
+        filetype = ".lfew";
     } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
@@ -118,7 +118,7 @@ void MainWindow::b_save_world_slot() {
     }
 #endif
 
-    if (filetype == ".tlfcpp") {
+    if (filetype == ".lfew") {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
         write_data(out);
         out.close();
