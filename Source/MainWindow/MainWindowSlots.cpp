@@ -197,8 +197,6 @@ void MainWindow::b_kill_all_organisms_slot() {
 
 //==================== Line edits ====================
 
-//There should be a better way of doing this, but I don't see one
-
 void MainWindow::le_max_sps_slot() {
     int fallback = int(1 / edc.simulation_interval);
     if (fallback < 0) {fallback = -1;}
@@ -348,7 +346,7 @@ void MainWindow::le_font_size_slot() {
 
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1.
     //so the program needs to understand which mode it is
-    int font_size = 0;
+    int font_size;
     bool point_size_m;
     if (font().pixelSize() < 0) {
         font_size = font().pointSize();
@@ -369,6 +367,8 @@ void MainWindow::le_font_size_slot() {
         _font.setPixelSize(result.result);
     }
     setFont(_font);
+    ee.setFont(_font);
+    s.setFont(_font);
 }
 
 void MainWindow::le_max_move_range_slot() {

@@ -354,7 +354,30 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="brain_edit_page"/>
+            <widget class="QWidget" name="brain_edit_page">
+             <widget class="QLabel" name="label_6">
+              <property name="geometry">
+               <rect>
+                <x>210</x>
+                <y>130</y>
+                <width>331</width>
+                <height>141</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Work in progress</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </widget>
            </widget>
           </item>
           <item>
@@ -772,8 +795,8 @@
   <slot>rb_eye_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="edit_group"/>
   <buttongroup name="organism_action_group"/>
+  <buttongroup name="edit_group"/>
   <buttongroup name="cells_group"/>
  </buttongroups>
 </ui>

@@ -333,12 +333,13 @@ Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
     return c_pos;
 }
 
-//TODO it's kinda stupid right now
+//TODO
 void OrganismEditor::finalize_chosen_organism() {
     delete *chosen_organism;
     *chosen_organism = new Organism(editor_organism);
 }
 
+//TODO
 void OrganismEditor::update_chosen_organism() {
     editor_organism = new Organism(*chosen_organism);
 
@@ -356,4 +357,154 @@ void OrganismEditor::update_chosen_organism() {
     if (std::abs(min.y) + max.y >= new_editor_height) {new_editor_height = std::abs(min.y) + max.y;}
 
     resize_editing_grid(new_editor_width, new_editor_height);
+    create_image();
+}
+
+void OrganismEditor::read_organism(std::ifstream &is) {
+    OrganismData data{};
+    auto brain = std::make_shared<Brain>();
+    auto anatomy = std::make_shared<Anatomy>();
+
+    read_organism_data(is, data);
+    read_organism_brain(is, brain.get());
+    read_organism_anatomy(is, anatomy.get());
+
+    auto * organism = new Organism(data.x,
+                                   data.y,
+                                   data.rotation,
+                                   anatomy,
+                                   brain,
+                                   editor_organism->sp,
+                                   editor_organism->bp,
+                                   data.move_range,
+                                   data.anatomy_mutation_rate,
+                                   data.brain_mutation_rate);
+
+    organism->bp                      = editor_organism->bp;
+    organism->sp                      = editor_organism->sp;
+    organism->child_pattern           = nullptr;
+    organism->max_decision_lifetime   = data.max_decision_lifetime;
+    organism->max_do_nothing_lifetime = data.max_do_nothing_lifetime;
+
+    delete editor_organism;
+    *chosen_organism = organism;
+    update_chosen_organism();
+}
+
+void OrganismEditor::read_organism_data(std::ifstream& is, OrganismData & data) {
+    is.read((char*)&data, sizeof(OrganismData));
+}
+
+void OrganismEditor::read_organism_brain(std::ifstream& is, Brain * brain) {
+    is.read((char*)brain, sizeof(Brain));
+}
+
+void OrganismEditor::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
+    uint32_t organism_blocks_size                = 0;
+    uint32_t producing_space_size                = 0;
+    uint32_t eating_space_size                   = 0;
+    uint32_t killing_space_size                  = 0;
+
+    is.read((char*)&organism_blocks_size,                sizeof(uint32_t));
+    is.read((char*)&producing_space_size,                sizeof(uint32_t));
+    is.read((char*)&eating_space_size,                   sizeof(uint32_t));
+    is.read((char*)&killing_space_size,                  sizeof(uint32_t));
+
+    anatomy->_organism_blocks.resize(organism_blocks_size);
+    anatomy->_producing_space.resize(producing_space_size);
+    anatomy->_eating_space   .resize(eating_space_size);
+    anatomy->_killing_space  .resize(killing_space_size);
+
+    is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
+    is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
+    is.read((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
+    is.read((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
+    is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
+    is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+
+    is.read((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    is.read((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    is.read((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+
+    for (auto & space: anatomy->_producing_space) {
+        uint32_t space_size;
+        is.read((char*)&space_size, sizeof(uint32_t));
+        space.resize(space_size);
+        is.read((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+    }
+}
+
+namespace pt = boost::property_tree;
+
+void OrganismEditor::read_json_organism(std::string &full_path) {
+    pt::ptree root;
+    pt::read_json(full_path, root);
+
+    auto brain = std::make_shared<Brain>();
+    auto anatomy = std::make_shared<Anatomy>();
+
+    int y              = root.get<int>("r")+1;
+    int x              = root.get<int>("c")+1;
+    int lifetime       = root.get<int>("lifetime");
+    int food_collected = root.get<int>("food_collected");
+    int rotation       = root.get<int>("rotation");
+    int move_range     = root.get<int>("move_range");
+    float mutability   = float(root.get<float>("mutability"))/100;
+    int damage         = root.get<int>("damage");
+    bool is_mover      = root.get<bool>("anatomy.is_mover");
+    bool has_eyes      = root.get<bool>("anatomy.has_eyes");
+
+    auto block_data = std::vector<SerializedOrganismBlockContainer>{};
+
+    for (auto & cell: root.get_child("anatomy.cells")) {
+        int l_y = cell.second.get<int>("loc_row");
+        int l_x = cell.second.get<int>("loc_col");
+        auto state = cell.second.get<std::string>("state.name");
+
+        Rotation _rotation = Rotation::UP;
+        BlockTypes type = BlockTypes::ProducerBlock;
+
+        if        (state == "producer") {
+            type = BlockTypes::ProducerBlock;
+        } else if (state == "mouth") {
+            type = BlockTypes::MouthBlock;
+        } else if (state == "killer") {
+            type = BlockTypes::KillerBlock;
+        } else if (state == "mover") {
+            type = BlockTypes::MoverBlock;
+        } else if (state == "eye") {
+            type = BlockTypes::EyeBlock;
+            _rotation = static_cast<Rotation>(cell.second.get<int>("direction"));
+        } else if (state == "armor") {
+            type = BlockTypes::ArmorBlock;
+        }
+
+        block_data.emplace_back(type, _rotation, l_x, l_y);
+    }
+    anatomy->set_many_blocks(block_data);
+
+    if (is_mover && has_eyes) {
+        auto & table = brain->simple_action_table;
+        table.FoodBlock     = static_cast<SimpleDecision>(root.get<int>("brain.decisions.food"));
+        table.WallBlock     = static_cast<SimpleDecision>(root.get<int>("brain.decisions.wall"));
+        table.MouthBlock    = static_cast<SimpleDecision>(root.get<int>("brain.decisions.mouth"));
+        table.ProducerBlock = static_cast<SimpleDecision>(root.get<int>("brain.decisions.producer"));
+        table.MoverBlock    = static_cast<SimpleDecision>(root.get<int>("brain.decisions.mover"));
+        table.KillerBlock   = static_cast<SimpleDecision>(root.get<int>("brain.decisions.killer"));
+        table.ArmorBlock    = static_cast<SimpleDecision>(root.get<int>("brain.decisions.armor"));
+        table.EyeBlock      = static_cast<SimpleDecision>(root.get<int>("brain.decisions.eye"));
+    }
+
+    auto * new_organism = new Organism(x,
+                                       y,
+                                       static_cast<Rotation>(rotation),
+                                       anatomy,
+                                       brain,
+                                       editor_organism->sp,
+                                       editor_organism->bp,
+                                       move_range,
+                                       mutability);
+    delete editor_organism;
+    *chosen_organism = new_organism;
+    update_chosen_organism();
 }

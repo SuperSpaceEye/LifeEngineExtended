@@ -7,6 +7,7 @@
 //
 
 #include "MainWindow.h"
+#include "../Stuff/OrganismData.h"
 
 //TODO increment every time saving logic changes
 uint32_t SAVE_VERSION = 4;

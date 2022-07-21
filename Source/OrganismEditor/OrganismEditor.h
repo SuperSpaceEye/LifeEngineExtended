@@ -13,10 +13,14 @@
 #include <cmath>
 #include <thread>
 #include <chrono>
+#include <fstream>
+#include <boost/property_tree/ptree.hpp>
+#include "../CustomJsonParser/json_parser.hpp"
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
 #include <QWheelEvent>
+#include <QFileDialog>
 
 #include "../Stuff/Linspace.h"
 #include "../Organism/CPU/Organism.h"
@@ -31,6 +35,7 @@
 #include "../Stuff/textures.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/MiscFuncs.h"
+#include "../Stuff/OrganismData.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -121,6 +126,13 @@ public:
 
     void finalize_chosen_organism();
     void update_chosen_organism();
+
+    void read_organism(std::ifstream & is);
+    void read_organism_data(std::ifstream& is, OrganismData & data);
+    void read_organism_brain(std::ifstream& is, Brain * brain);
+    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+
+    void read_json_organism(std::string & full_path);
 
 private slots:
     void b_load_organism_slot();

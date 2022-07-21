@@ -66,30 +66,13 @@
 #if __CUDA_USED__
 #include "../Stuff/cuda_image_creator.cuh"
 #include "../Stuff/get_device_count.cuh"
+#include "../Stuff/OrganismData.h"
+
 #endif
 
 #if defined(__WIN32)
 #include <windows.h>
 #endif
-
-struct OrganismData {
-    int x = 0;
-    int y = 0;
-    int max_lifetime = 0;
-    int lifetime = 0;
-    int move_range = 1;
-    int move_counter = 0;
-    int max_decision_lifetime = 2;
-    int max_do_nothing_lifetime = 4;
-    float anatomy_mutation_rate = 0.05;
-    float brain_mutation_rate = 0.1;
-    float food_collected = 0;
-    float food_needed = 0;
-    float life_points = 0;
-    float damage = 0;
-    Rotation rotation = Rotation::UP;
-    DecisionObservation last_decision = DecisionObservation{};
-};
 
 struct OrganismInfoHolder {
     double size = 0;

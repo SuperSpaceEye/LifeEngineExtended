@@ -24,7 +24,30 @@ void OrganismEditor::b_resize_editing_grid_slot() {
 }
 
 void OrganismEditor::b_load_organism_slot() {
+    QString selected_filter;
+    auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism"), "",
+                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
+    std::string filetype;
+    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
+        filetype = ".tlfcpp";
+    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+        filetype = ".json";
+    } else {
+        return;
+    }
 
+    std::string full_path = file_name.toStdString();
+
+    if (filetype == ".tlfcpp") {
+        std::ifstream in(full_path, std::ios::in | std::ios::binary);
+        read_organism(in);
+        in.close();
+
+    } else if (filetype == ".json") {
+        read_json_organism(full_path);
+    }
+
+    update_chosen_organism();
 }
 
 void OrganismEditor::b_save_organism_slot() {
@@ -90,6 +113,7 @@ void OrganismEditor::rb_place_organism_slot() {
 }
 
 void OrganismEditor::rb_choose_organism_slot() {
+    display_message("This function is buggy right now and can crash program.");
     *c_mode = CursorMode::ChooseOrganism;
     _parent_ui->rb_null_button->setChecked(true);
 }
