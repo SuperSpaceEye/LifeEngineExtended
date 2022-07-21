@@ -167,7 +167,52 @@ void SimulationEngine::process_user_action_pool() {
                 if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::WallBlock) {continue;}
                 dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::EmptyBlock;
                 break;
-            case ActionType::TryAddOrganism:
+            case ActionType::TryAddOrganism: {
+                bool continue_flag = false;
+
+                for (auto &block: dc.chosen_organism->anatomy->_organism_blocks) {
+                    continue_flag = check_if_out_of_bounds(&dc,
+                                                           block.get_pos(dc.chosen_organism->rotation).x + action.x,
+                                                           block.get_pos(dc.chosen_organism->rotation).y + action.y);
+                    if (continue_flag) { break; }
+
+                    int x = block.get_pos(dc.chosen_organism->rotation).x + action.x;
+                    int y = block.get_pos(dc.chosen_organism->rotation).y + action.y;
+
+                    auto & _block = dc.CPU_simulation_grid[x][y];
+
+                    if (sp.food_blocks_reproduction) {
+                        if (_block.type != BlockTypes::EmptyBlock) {
+                            continue_flag = true;
+                            break;
+                        }
+                    } else {
+                        if (_block.type != BlockTypes::EmptyBlock && _block.type != BlockTypes::FoodBlock) {
+                            continue_flag = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (continue_flag) { continue; }
+
+                auto * new_organism = new Organism(dc.chosen_organism);
+
+                new_organism->x = action.x;
+                new_organism->y = action.y;
+
+                for (auto &block: new_organism->anatomy->_organism_blocks) {
+                    int x = block.get_pos(dc.chosen_organism->rotation).x + new_organism->x;
+                    int y = block.get_pos(dc.chosen_organism->rotation).y + new_organism->y;
+
+                    dc.CPU_simulation_grid[x][y].type = block.type;
+                    dc.CPU_simulation_grid[x][y].organism = new_organism;
+                    dc.CPU_simulation_grid[x][y].rotation = block.rotation;
+                }
+
+                dc.organisms.emplace_back(new_organism);
+
+            }
                 break;
             case ActionType::TryKillOrganism: {
                 try_kill_organism(action.x, action.y, temp);
@@ -182,6 +227,16 @@ void SimulationEngine::process_user_action_pool() {
                 break;
         }
     }
+
+    for (auto & action: dc.user_actions_pool) {
+        if (action.type == ActionType::TrySelectOrganism && dc.selected_organims != nullptr) {
+            int a = 10;
+            delete dc.chosen_organism;
+            dc.chosen_organism = new Organism(dc.selected_organims);
+            break;
+        }
+    }
+
     dc.user_actions_pool.clear();
 }
 

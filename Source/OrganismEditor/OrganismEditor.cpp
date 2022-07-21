@@ -10,7 +10,7 @@
 #include "../Stuff/textures.h"
 
 void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-                          SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode) {
+                          SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode, Organism ** _chosen_organism) {
     _ui.setupUi(this);
     _parent_ui = parent_ui;
 
@@ -30,6 +30,8 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
 
     auto brain = std::make_shared<Brain>();
+
+    chosen_organism = _chosen_organism;
 
     editor_organism = new Organism(editor_width  / 2,
                                    editor_height / 2,
@@ -51,6 +53,11 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     actual_cursor.setGeometry(50, 50, 5, 5);
     actual_cursor.setStyleSheet("background-color:red;");
     actual_cursor.hide();
+
+    auto timer = new QTimer(parent());
+    timer->setInterval(200);
+    connect(timer, &QTimer::timeout, [&]{update_chosen_organism(); create_image();});
+
 }
 
 void OrganismEditor::initialize_gui() {
@@ -304,11 +311,10 @@ void OrganismEditor::place_organism_on_a_grid() {
     for (auto & block: editor_organism->anatomy->_organism_blocks) {
         auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
         auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
-//        edit_grid[x][y].type = block.type;
-//        edit_grid[x][y].rotation = block.rotation;
-        edit_grid.at(x).at(y).type = block.type;
-        edit_grid.at(x).at(y).rotation = block.rotation;
+        edit_grid[x][y].type = block.type;
+        edit_grid[x][y].rotation = block.rotation;
     }
+    finalize_chosen_organism();
 }
 
 Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
@@ -323,4 +329,14 @@ Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
     c_pos.x = static_cast<int>((x - _ui.editor_graphicsView->viewport()->width() /2.)*scaling_zoom + center_x);
     c_pos.y = static_cast<int>((y - _ui.editor_graphicsView->viewport()->height()/2.)*scaling_zoom + center_y);
     return c_pos;
+}
+
+//TODO it's kinda stupid right now
+void OrganismEditor::finalize_chosen_organism() {
+    delete *chosen_organism;
+    *chosen_organism = new Organism(editor_organism);
+}
+
+void OrganismEditor::update_chosen_organism() {
+    editor_organism = *chosen_organism;
 }

@@ -87,6 +87,7 @@ public:
     double scaling_zoom = 1;
 
     Organism * editor_organism;
+    Organism ** chosen_organism;
 
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
     Rotation chosen_rotation = Rotation::UP;
@@ -94,7 +95,8 @@ public:
     OrganismEditor()=default;
 
     void init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-              SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode);
+              SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode,
+              Organism ** chosen_organism);
 
     void set_block(int x, int y, BaseGridBlock block);
     BaseGridBlock get_block(int x, int y);
@@ -116,6 +118,9 @@ public:
     void set_image_pixel(int x, int y, color &color);
 
     color &get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
+
+    void finalize_chosen_organism();
+    void update_chosen_organism();
 
 private slots:
     void b_load_organism_slot();

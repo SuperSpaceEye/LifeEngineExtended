@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QCoreApplication::instance()->installEventFilter(this);
 
     s.init(&_ui);
-    ee.init(15, 15, &_ui, &cc, &sp, &bp, &cursor_mode);
+    ee.init(15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism);
 
     edc.simulation_width = 200;
     edc.simulation_height = 200;
@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
     edc.base_organism->last_decision = DecisionObservation{};
     edc.chosen_organism->last_decision = DecisionObservation{};
 
-    edc.to_place_organisms.push_back(new Organism(edc.chosen_organism));
+    edc.to_place_organisms.push_back(new Organism(edc.base_organism));
 
     resize_image();
     reset_scale_view();
@@ -992,10 +992,15 @@ void MainWindow::change_main_grid_left_click() {
                     edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::PlaceOrganism:
+                    edc.user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
+                    //TODO remove
+                    goto endfor;
                     break;
             }
         }
     }
+    endfor:
+
     ecp.pause_processing_user_action = false;
 }
 
@@ -1016,8 +1021,10 @@ void MainWindow::change_main_grid_right_click() {
                     edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
+//                    edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::PlaceOrganism:
+//                    edc.user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x + x, cpg.y + y);
                     break;
             }
         }

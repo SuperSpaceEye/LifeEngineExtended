@@ -17,33 +17,6 @@ void OrganismEditor::b_reset_editing_view_slot() {
 
 void OrganismEditor::b_resize_editing_grid_slot() {
     resize_editing_grid(new_editor_width, new_editor_height);
-//
-//    editor_organism->x = new_editor_width  / 2;
-//    editor_organism->y = new_editor_height / 2;
-
-//    auto anatomy = std::make_shared<Anatomy>();
-//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-//
-//    auto brain = std::make_shared<Brain>(editor_organism->brain);
-//
-//    auto * _editor_organism = new Organism(editor_width  / 2,
-//                                           editor_height / 2,
-//                                           Rotation::UP,
-//                                           anatomy,
-//                                           brain,
-//                                           editor_organism->sp,
-//                                           editor_organism->bp,
-//                                           editor_organism->move_range);
-//
-//    _editor_organism->anatomy_mutation_rate = editor_organism->anatomy_mutation_rate;
-//    _editor_organism->brain_mutation_rate = editor_organism->brain_mutation_rate;
-//    _editor_organism->max_do_nothing_lifetime = editor_organism->max_do_nothing_lifetime;
-//    _editor_organism->max_decision_lifetime = editor_organism->max_decision_lifetime;
-//    _editor_organism->rotation = editor_organism->rotation;
-//
-//    std::swap(editor_organism, _editor_organism);
-//
-//    delete _editor_organism;
 
     reset_scale_view();
     clear_grid();
@@ -112,6 +85,7 @@ void OrganismEditor::rb_producer_slot () { chosen_block_type = BlockTypes::Produ
 
 void OrganismEditor::rb_place_organism_slot() {
     *c_mode = CursorMode::PlaceOrganism;
+    finalize_chosen_organism();
     _parent_ui->rb_null_button->setChecked(true);
 }
 
