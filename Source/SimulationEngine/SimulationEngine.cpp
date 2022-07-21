@@ -211,7 +211,6 @@ void SimulationEngine::process_user_action_pool() {
                 }
 
                 dc.organisms.emplace_back(new_organism);
-
             }
                 break;
             case ActionType::TryKillOrganism: {
@@ -222,16 +221,19 @@ void SimulationEngine::process_user_action_pool() {
                     if (dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
                         dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
                         dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
-                    dc.selected_organims = dc.CPU_simulation_grid[action.x][action.y].organism;
+                    dc.selected_organism = dc.CPU_simulation_grid[action.x][action.y].organism;
+                    goto endfor;
                 }
                 break;
         }
     }
+    endfor:
 
     for (auto & action: dc.user_actions_pool) {
-        if (action.type == ActionType::TrySelectOrganism && dc.selected_organims != nullptr) {
+        if (action.type == ActionType::TrySelectOrganism && dc.selected_organism != nullptr) {
             delete dc.chosen_organism;
-            dc.chosen_organism = new Organism(dc.selected_organims);
+            dc.chosen_organism = new Organism(dc.selected_organism);
+            dc.selected_organism = nullptr;
             break;
         }
     }

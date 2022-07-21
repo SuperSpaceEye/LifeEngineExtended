@@ -65,7 +65,7 @@ struct EngineDataContainer {
 
     uint32_t multithread_change_every_n_ticks = 1;
 
-    Organism * selected_organims = nullptr;
+    Organism * selected_organism = nullptr;
 };
 
 struct pool_changes_info {
