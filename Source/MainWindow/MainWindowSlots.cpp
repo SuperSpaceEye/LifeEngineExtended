@@ -142,10 +142,10 @@ void MainWindow::b_load_world_slot() {
 
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
-                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
+                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
     std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
-        filetype = ".tlfcpp";
+    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
+        filetype = ".lfew";
     } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
     } else {
@@ -157,7 +157,7 @@ void MainWindow::b_load_world_slot() {
 
     std::string full_path = file_name.toStdString();
 
-    if (filetype == ".tlfcpp") {
+    if (filetype == ".lfew") {
         std::ifstream in(full_path, std::ios::in | std::ios::binary);
         read_data(in);
         in.close();
