@@ -230,7 +230,6 @@ void SimulationEngine::process_user_action_pool() {
 
     for (auto & action: dc.user_actions_pool) {
         if (action.type == ActionType::TrySelectOrganism && dc.selected_organims != nullptr) {
-            int a = 10;
             delete dc.chosen_organism;
             dc.chosen_organism = new Organism(dc.selected_organims);
             break;

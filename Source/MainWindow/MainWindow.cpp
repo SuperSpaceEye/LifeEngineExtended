@@ -989,6 +989,7 @@ void MainWindow::change_main_grid_left_click() {
                     edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
+                    pause_engine();
                     edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::PlaceOrganism:
@@ -1002,6 +1003,11 @@ void MainWindow::change_main_grid_left_click() {
     endfor:
 
     ecp.pause_processing_user_action = false;
+
+    if (cursor_mode == CursorMode::ChooseOrganism) {
+        ee.update_chosen_organism();
+        unpause_engine();
+    }
 }
 
 void MainWindow::change_main_grid_right_click() {

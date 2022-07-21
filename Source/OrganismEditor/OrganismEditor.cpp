@@ -54,9 +54,9 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     actual_cursor.setStyleSheet("background-color:red;");
     actual_cursor.hide();
 
-    auto timer = new QTimer(parent());
-    timer->setInterval(200);
-    connect(timer, &QTimer::timeout, [&]{update_chosen_organism(); create_image();});
+//    auto timer = new QTimer(parent());
+//    timer->setInterval(200);
+//    connect(timer, &QTimer::timeout, [&]{update_chosen_organism(); create_image();});
 
 }
 
@@ -115,6 +115,8 @@ void OrganismEditor::reset_scale_view() {
     }
 
     scaling_zoom = pow(scaling_coefficient, exp);
+
+    update_chosen_organism();
 }
 
 void OrganismEditor::resize_editing_grid(int width, int height) {
@@ -338,5 +340,20 @@ void OrganismEditor::finalize_chosen_organism() {
 }
 
 void OrganismEditor::update_chosen_organism() {
-    editor_organism = *chosen_organism;
+    editor_organism = new Organism(*chosen_organism);
+
+    Vector2 min{0, 0};
+    Vector2 max{0, 0};
+
+    for (auto & block: editor_organism->anatomy->_organism_blocks) {
+        if (block.relative_x < min.x) {min.x = block.relative_x;}
+        if (block.relative_y < min.y) {min.y = block.relative_y;}
+        if (block.relative_x > max.x) {max.x = block.relative_x;}
+        if (block.relative_y > max.y) {max.y = block.relative_y;}
+    }
+
+    if (std::abs(min.x) + max.x >= new_editor_width)  {new_editor_width  = std::abs(min.x) + max.x;}
+    if (std::abs(min.y) + max.y >= new_editor_height) {new_editor_height = std::abs(min.y) + max.y;}
+
+    resize_editing_grid(new_editor_width, new_editor_height);
 }
