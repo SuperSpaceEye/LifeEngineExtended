@@ -70,7 +70,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
                         x = y;
                         y = temp;
 
-                        y = -y;
+                        x = -x;
                         x += 2;
                         y += 2;
                         break;
@@ -90,7 +90,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
                         x = y;
                         y = temp;
 
-                        x = -x;
+                        y = -y;
                         x += 2;
                         y += 2;
                         break;
@@ -111,7 +111,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
 
 __global__ void create_image_kernel(int image_width, int simulation_width, int simulation_height, int width_img_size, int height_img_size,
                                            int * d_lin_width, int * d_lin_height,
-                                           pix_pos * d_width_img_boundaries, pix_pos * d_height_img_boundaries,
+                                           Vector2<int> * d_width_img_boundaries, Vector2<int> * d_height_img_boundaries,
                                            unsigned char * d_image_vector,
                                            BaseGridBlock * d_second_simulation_grid
                                            ) {
@@ -122,11 +122,13 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
 
     color pixel_color;
 
+    //x - start, y - stop
+
     auto w_b = d_width_img_boundaries[x_pos];
     auto h_b = d_height_img_boundaries[y_pos];
 
-    for (int x = w_b.start; x < w_b.stop; x++) {
-        for (int y = h_b.start; y < h_b.stop; y++) {
+    for (int x = w_b.x; x < w_b.y; x++) {
+        for (int y = h_b.x; y < h_b.y; y++) {
             auto &block = d_second_simulation_grid[d_lin_width[x] + d_lin_height[y] * simulation_width];
 
             if (d_lin_width[x] < 0 ||
@@ -137,8 +139,8 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
             } else {
                 pixel_color = get_texture_color(block.type,
                                                 block.rotation,
-                                                float(x - w_b.start) / (w_b.stop - w_b.start),
-                                                float(y - h_b.start) / (h_b.stop - h_b.start)
+                                                float(x - w_b.x) / (w_b.y - w_b.x),
+                                                float(y - h_b.x) / (h_b.y - h_b.x)
                                                 );
             }
             set_image_pixel(x, y, image_width, pixel_color, d_image_vector);
@@ -178,8 +180,8 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
                                          std::vector<unsigned char> &image_vector, ColorContainer &color_container,
                                          EngineDataContainer &dc, int block_size, std::vector<int> &truncated_lin_width,
                                          std::vector<int> &truncated_lin_height) {
-    std::vector<pix_pos> width_img_boundaries;
-    std::vector<pix_pos> height_img_boundaries;
+    std::vector<Vector2<int>> width_img_boundaries;
+    std::vector<Vector2<int>> height_img_boundaries;
 
     auto last = INT32_MIN;
     auto count = 0;
@@ -277,7 +279,7 @@ void CUDAImageCreator::copy_result_image(std::vector<unsigned char> &image_vecto
 }
 
 void CUDAImageCreator::copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
-                                      std::vector<pix_pos> &width_img_boundaries, std::vector<pix_pos> &height_img_boundaries,
+                                      std::vector<Vector2<int>> &width_img_boundaries, std::vector<Vector2<int>> &height_img_boundaries,
                                       std::vector<int> & truncated_lin_width,
                                       std::vector<int> & truncated_lin_height,
                                       std::vector<Differences> &host_differences) {
@@ -293,12 +295,12 @@ void CUDAImageCreator::copy_to_device(std::vector<int> &lin_width, std::vector<i
 
     gpuErrchk(cudaMemcpy(d_width_img_boundaries,
                          width_img_boundaries.data(),
-                         sizeof (pix_pos)*width_img_boundaries.size(),
+                         sizeof (Vector2<int>)*width_img_boundaries.size(),
                          cudaMemcpyHostToDevice));
 
     gpuErrchk(cudaMemcpy(d_height_img_boundaries,
                          height_img_boundaries.data(),
-                         sizeof (pix_pos)*height_img_boundaries.size(),
+                         sizeof (Vector2<int>)*height_img_boundaries.size(),
                          cudaMemcpyHostToDevice));
 
     gpuErrchk(cudaMemcpy(d_differences,
@@ -350,8 +352,8 @@ void CUDAImageCreator::simulation_dimensions_changed(int simulation_width, int s
 void CUDAImageCreator::img_boundaries_changed(int width_img_boundaries_size, int height_img_boundaries_size) {
     gpuErrchk(cudaFree(d_width_img_boundaries));
     gpuErrchk(cudaFree(d_height_img_boundaries));
-    gpuErrchk(cudaMalloc((pix_pos**)&d_width_img_boundaries,  sizeof(pix_pos) * width_img_boundaries_size));
-    gpuErrchk(cudaMalloc((pix_pos**)&d_height_img_boundaries, sizeof(pix_pos) * height_img_boundaries_size));
+    gpuErrchk(cudaMalloc((Vector2<int>**)&d_width_img_boundaries,  sizeof(Vector2<int>) * width_img_boundaries_size));
+    gpuErrchk(cudaMalloc((Vector2<int>**)&d_height_img_boundaries, sizeof(Vector2<int>) * height_img_boundaries_size));
 }
 
 void CUDAImageCreator::lin_size_changed(int lin_width_size, int lin_height_size) {

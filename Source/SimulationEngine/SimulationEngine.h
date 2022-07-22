@@ -14,6 +14,7 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
+#include <algorithm>
 
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
@@ -21,15 +22,16 @@
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
 #include "../Stuff/BlockTypes.hpp"
+#include "../Stuff/Vector2.h"
 #include "../Containers/CPU/EngineControlContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Stuff/Linspace.h"
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
+#include "../OrganismEditor/OrganismEditor.h"
 #include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
-
 
 //TODO move simulation grid translation to here
 class SimulationEngine {
@@ -37,6 +39,9 @@ class SimulationEngine {
     EngineDataContainer& dc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
+
+    uint32_t auto_food_drop_index = 0;
+    std::vector<Vector2<int>> auto_food_drop_coordinates_shuffled{};
 
     siv::PerlinNoise perlin;
 
@@ -58,15 +63,9 @@ class SimulationEngine {
 
     void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
     void try_remove_food(int x, int y);
-
-    void reset_world();
-    void partial_clear_world();
-    void clear_organisms();
-    void make_walls();
-
 public:
-    SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                     OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters);
+    SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
+                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters);
     void threaded_mainloop();
 
     void make_random_walls();
@@ -76,6 +75,13 @@ public:
 
     //TODO make getters and setters for it.
     void reinit_organisms();
+
+    void reset_world();
+    void partial_clear_world();
+    void clear_organisms();
+    void make_walls();
+
+    void init_auto_food_drop(int width, int height);
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

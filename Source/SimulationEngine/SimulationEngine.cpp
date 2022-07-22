@@ -8,17 +8,20 @@
 
 #include "SimulationEngine.h"
 
-SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                                   OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters):
+SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
+                                   EngineControlParameters &engine_control_parameters,
+                                   OrganismBlockParameters &organism_block_parameters,
+                                   SimulationParameters &simulation_parameters) :
     dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
 
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
+    //TODO only do if enabled?
+    init_auto_food_drop(dc.simulation_width, dc.simulation_height);
 }
 
-//TODO refactor pausing/pass_tick/synchronise_tick
-//TODO takes 4.644% to 1% of processing time
+//TODO it's kind of a mess right now
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
 
@@ -43,11 +46,12 @@ void SimulationEngine::threaded_mainloop() {
         if (cp.pause_processing_user_action) {cp.processing_user_actions = false;} else {cp.processing_user_actions = true;}
         if (cp.processing_user_actions) {process_user_action_pool();}
         if ((!cp.engine_paused || cp.engine_pass_tick) && (!cp.pause_button_pause || cp.pass_tick)) {
+            //TODO the cause of rare segfault could be here
+            simulation_tick();
             cp.engine_paused = false;
             cp.engine_pass_tick = false;
             cp.pass_tick = false;
             cp.synchronise_simulation_tick = false;
-            simulation_tick();
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
             if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}
@@ -164,7 +168,51 @@ void SimulationEngine::process_user_action_pool() {
                 if (dc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::WallBlock) {continue;}
                 dc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::EmptyBlock;
                 break;
-            case ActionType::TryAddOrganism:
+            case ActionType::TryAddOrganism: {
+                bool continue_flag = false;
+
+                for (auto &block: dc.chosen_organism->anatomy->_organism_blocks) {
+                    continue_flag = check_if_out_of_bounds(&dc,
+                                                           block.get_pos(dc.chosen_organism->rotation).x + action.x,
+                                                           block.get_pos(dc.chosen_organism->rotation).y + action.y);
+                    if (continue_flag) { break; }
+
+                    int x = block.get_pos(dc.chosen_organism->rotation).x + action.x;
+                    int y = block.get_pos(dc.chosen_organism->rotation).y + action.y;
+
+                    auto & _block = dc.CPU_simulation_grid[x][y];
+
+                    if (sp.food_blocks_reproduction) {
+                        if (_block.type != BlockTypes::EmptyBlock) {
+                            continue_flag = true;
+                            break;
+                        }
+                    } else {
+                        if (_block.type != BlockTypes::EmptyBlock && _block.type != BlockTypes::FoodBlock) {
+                            continue_flag = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (continue_flag) { continue; }
+
+                auto * new_organism = new Organism(dc.chosen_organism);
+
+                new_organism->x = action.x;
+                new_organism->y = action.y;
+
+                for (auto &block: new_organism->anatomy->_organism_blocks) {
+                    int x = block.get_pos(dc.chosen_organism->rotation).x + new_organism->x;
+                    int y = block.get_pos(dc.chosen_organism->rotation).y + new_organism->y;
+
+                    dc.CPU_simulation_grid[x][y].type = block.type;
+                    dc.CPU_simulation_grid[x][y].organism = new_organism;
+                    dc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, dc.chosen_organism->rotation);
+                }
+
+                dc.organisms.emplace_back(new_organism);
+            }
                 break;
             case ActionType::TryKillOrganism: {
                 try_kill_organism(action.x, action.y, temp);
@@ -174,11 +222,24 @@ void SimulationEngine::process_user_action_pool() {
                     if (dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
                         dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
                         dc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
-                    dc.selected_organims = dc.CPU_simulation_grid[action.x][action.y].organism;
+                    dc.selected_organism = dc.CPU_simulation_grid[action.x][action.y].organism;
+                    goto endfor;
                 }
                 break;
         }
     }
+    endfor:
+
+    for (auto & action: dc.user_actions_pool) {
+        if (action.type == ActionType::TrySelectOrganism && dc.selected_organism != nullptr) {
+            delete dc.chosen_organism;
+            dc.chosen_organism = new Organism(dc.selected_organism);
+            dc.selected_organism = nullptr;
+            cp.update_editor_organism = true;
+            break;
+        }
+    }
+
     dc.user_actions_pool.clear();
 }
 
@@ -202,9 +263,9 @@ void SimulationEngine::random_food_drop() {
     if (sp.auto_produce_food_every_n_ticks <= 0) {return;}
     if (dc.total_engine_ticks % sp.auto_produce_food_every_n_ticks == 0) {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
-            int x = std::uniform_int_distribution<int>(1, dc.simulation_width - 2)(gen);
-            int y = std::uniform_int_distribution<int>(1, dc.simulation_height - 2)(gen);
-            dc.user_actions_pool.emplace_back(ActionType::TryAddFood, x, y);
+            auto & vec = auto_food_drop_coordinates_shuffled[auto_food_drop_index % auto_food_drop_coordinates_shuffled.size()];
+            auto_food_drop_index++;
+            dc.user_actions_pool.emplace_back(ActionType::TryAddFood, vec.x, vec.y);
         }
     }
 }
@@ -265,7 +326,7 @@ void SimulationEngine::reset_world() {
     dc.chosen_organism->x = dc.simulation_width / 2;
     dc.chosen_organism->y = dc.simulation_height / 2;
 
-    if (cp.reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
+    if (cp.reset_with_editor_organism) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
     else                      {dc.to_place_organisms.push_back(new Organism(dc.base_organism));}
 
     //Just in case
@@ -335,6 +396,7 @@ void SimulationEngine::make_random_walls() {
     }
 }
 
+//DO NOT USE IN SimulationEngine
 void SimulationEngine::reinit_organisms() {
     cp.engine_pause = true;
     while(!cp.engine_paused) {}
@@ -361,4 +423,15 @@ void SimulationEngine::reinit_organisms() {
     }
 
     cp.engine_pause = false;
+}
+
+void SimulationEngine::init_auto_food_drop(int width, int height) {
+    auto_food_drop_coordinates_shuffled.reserve((width-2)*(height-2));
+    for (int x = 1; x < width-1; x++) {
+        for (int y = 1; y < height-1; y++) {
+            auto_food_drop_coordinates_shuffled.emplace_back(Vector2<int>{x, y});
+        }
+    }
+
+    std::shuffle(auto_food_drop_coordinates_shuffled.begin(), auto_food_drop_coordinates_shuffled.end(), gen);
 }

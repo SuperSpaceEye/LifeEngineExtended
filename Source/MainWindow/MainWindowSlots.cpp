@@ -34,8 +34,11 @@ void MainWindow::tb_open_statistics_slot(bool state) {
 void MainWindow::tb_open_organism_editor_slot(bool state) {
     if (state) {
         ee.show();
-        ee.resize_image();
-        ee.create_image();
+        QTimer::singleShot(100, [&]{
+            ee.reset_scale_view();
+            ee.resize_image();
+            ee.create_image();
+        });
     } else {
         ee.close();
     }
@@ -45,13 +48,21 @@ void MainWindow::tb_open_organism_editor_slot(bool state) {
 
 void MainWindow::b_clear_slot() {
     if (display_dialog_message("All organisms and simulation grid will be cleared.", disable_warnings)) {
+        bool flag = sp.clear_walls_on_reset;
+        sp.clear_walls_on_reset = true;
+        pause_engine();
         clear_world();
+        unpause_engine();
+        sp.clear_walls_on_reset = flag;
     }
 }
 
 void MainWindow::b_reset_slot() {
     if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
-        reset_world();
+        pause_engine();
+        if (ecp.reset_with_editor_organism) {ee.load_chosen_organism();}
+        engine->reset_world();
+        unpause_engine();
     }
 }
 
@@ -60,19 +71,14 @@ void MainWindow::b_resize_and_reset_slot() {
 }
 
 void MainWindow::b_generate_random_walls_slot() {
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    pause_engine();
     engine->make_random_walls();
-
     unpause_engine();
 }
 
 void MainWindow::b_clear_all_walls_slot() {
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause();
-
+    pause_engine();
     engine->clear_walls();
-
     unpause_engine();
 }
 
@@ -88,13 +94,13 @@ void MainWindow::b_save_world_slot() {
     QFileDialog file_dialog{};
 
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
-                                                 "Custom save type (*.tlfcpp);;JSON (*.json)", &selected_filter);
+                                                 "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
 #ifndef __WIN32
     bool file_exists = std::filesystem::exists(file_name.toStdString());
 #endif
     std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
-        filetype = ".tlfcpp";
+    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
+        filetype = ".lfew";
     } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
@@ -111,7 +117,7 @@ void MainWindow::b_save_world_slot() {
     }
 #endif
 
-    if (filetype == ".tlfcpp") {
+    if (filetype == ".lfew") {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
         write_data(out);
         out.close();
@@ -135,10 +141,10 @@ void MainWindow::b_load_world_slot() {
 
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
-                                                  tr("Custom save type (*.tlfcpp);;JSON (*.json)"), &selected_filter);
+                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
     std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.tlfcpp)") {
-        filetype = ".tlfcpp";
+    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
+        filetype = ".lfew";
     } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
     } else {
@@ -150,7 +156,7 @@ void MainWindow::b_load_world_slot() {
 
     std::string full_path = file_name.toStdString();
 
-    if (filetype == ".tlfcpp") {
+    if (filetype == ".lfew") {
         std::ifstream in(full_path, std::ios::in | std::ios::binary);
         read_data(in);
         in.close();
@@ -162,7 +168,7 @@ void MainWindow::b_load_world_slot() {
     synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     ecp.pause_processing_user_action = false;
-    initialize_gui_settings();
+    initialize_gui();
     update_table_values();
 }
 
@@ -176,8 +182,7 @@ void MainWindow::b_reset_view_slot() {
 
 void MainWindow::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
-    ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    pause_engine();
 
     for (auto & organism: edc.organisms) {
         organism->lifetime = organism->max_lifetime*2;
@@ -190,8 +195,6 @@ void MainWindow::b_kill_all_organisms_slot() {
 }
 
 //==================== Line edits ====================
-
-//There should be a better way of doing this, but I don't see one
 
 void MainWindow::le_max_sps_slot() {
     int fallback = int(1 / edc.simulation_interval);
@@ -227,8 +230,8 @@ void MainWindow::le_num_threads_slot() {
 }
 
 void MainWindow::le_cell_size_slot() {
-    le_slot_lower_bound(starting_cell_size_on_resize, starting_cell_size_on_resize, "int",
-                        _ui.le_cell_size, 1, "1");
+    le_slot_lower_bound<int>(starting_cell_size_on_resize, starting_cell_size_on_resize, "int",
+                             _ui.le_cell_size, 1, "1");
 }
 
 void MainWindow::le_simulation_width_slot() {
@@ -253,22 +256,22 @@ void MainWindow::le_lifespan_multiplier_slot() {
 }
 
 void MainWindow::le_look_range_slot() {
-    le_slot_lower_bound(sp.look_range, sp.look_range, "int",
-                        _ui.le_look_range, 1, "1");
+    le_slot_lower_bound<int>(sp.look_range, sp.look_range, "int",
+                             _ui.le_look_range, 1, "1");
 }
 
 void MainWindow::le_auto_food_drop_rate_slot() {
-    le_slot_lower_bound(sp.auto_produce_n_food, sp.auto_produce_n_food, "int",
-                        _ui.le_auto_produce_n_food, 0, "0");
+    le_slot_lower_bound<int>(sp.auto_produce_n_food, sp.auto_produce_n_food, "int",
+                             _ui.le_auto_produce_n_food, 0, "0");
 }
 
 void MainWindow::le_auto_produce_food_every_n_tick_slot() {
-    le_slot_lower_bound(sp.auto_produce_food_every_n_ticks, sp.auto_produce_food_every_n_ticks, "int",
-                        _ui.le_auto_produce_food_every_n_tick, 0, "0");
+    le_slot_lower_bound<int>(sp.auto_produce_food_every_n_ticks, sp.auto_produce_food_every_n_ticks, "int",
+                             _ui.le_auto_produce_food_every_n_tick, 0, "0");
 }
 
 void MainWindow::le_extra_reproduction_cost_slot() {
-    le_slot_no_bound(sp.extra_reproduction_cost, sp.extra_reproduction_cost, "float", _ui.le_extra_reproduction_cost);
+    le_slot_no_bound<float>(sp.extra_reproduction_cost, sp.extra_reproduction_cost, "float", _ui.le_extra_reproduction_cost);
 }
 
 void MainWindow::le_global_anatomy_mutation_rate_slot() {
@@ -282,18 +285,18 @@ void MainWindow::le_global_brain_mutation_rate_slot() {
 }
 
 void MainWindow::le_add_cell_slot() {
-    le_slot_lower_bound(sp.add_cell, sp.add_cell, "int",
-                        _ui.le_add, 0, "0");
+    le_slot_lower_bound<int>(sp.add_cell, sp.add_cell, "int",
+                             _ui.le_add, 0, "0");
 }
 
 void MainWindow::le_change_cell_slot() {
-    le_slot_lower_bound(sp.change_cell, sp.change_cell, "int",
-                        _ui.le_change, 0, "0");
+    le_slot_lower_bound<int>(sp.change_cell, sp.change_cell, "int",
+                             _ui.le_change, 0, "0");
 }
 
 void MainWindow::le_remove_cell_slot() {
-    le_slot_lower_bound(sp.remove_cell, sp.remove_cell, "int",
-                        _ui.le_remove, 0, "0");
+    le_slot_lower_bound<int>(sp.remove_cell, sp.remove_cell, "int",
+                             _ui.le_remove, 0, "0");
 }
 
 void MainWindow::le_min_reproducing_distance_slot() {
@@ -303,18 +306,18 @@ void MainWindow::le_min_reproducing_distance_slot() {
 }
 
 void MainWindow::le_max_reproducing_distance_slot() {
-    le_slot_lower_lower_bound(sp.max_reproducing_distance, sp.max_reproducing_distance, "int",
-                              _ui.le_max_reproduction_distance, 1, "1",
-                              sp.min_reproducing_distance, "min reproducing distance");
+    le_slot_lower_lower_bound<int>(sp.max_reproducing_distance, sp.max_reproducing_distance, "int",
+                                   _ui.le_max_reproduction_distance, 1, "1",
+                                   sp.min_reproducing_distance, "min reproducing distance");
 }
 
 void MainWindow::le_max_organisms_slot() {
-    le_slot_no_bound(edc.max_organisms, edc.max_organisms, "int", _ui.le_max_organisms);
+    le_slot_no_bound<int>(edc.max_organisms, edc.max_organisms, "int", _ui.le_max_organisms);
 }
 
 void MainWindow::le_float_number_precision_slot() {
-    le_slot_lower_bound(float_precision, float_precision, "int",
-                        _ui.le_float_number_precision, 0, "0");
+    le_slot_lower_bound<int>(float_precision, float_precision, "int",
+                             _ui.le_float_number_precision, 0, "0");
 }
 
 void MainWindow::le_killer_damage_amount_slot() {
@@ -322,8 +325,8 @@ void MainWindow::le_killer_damage_amount_slot() {
                                _ui.le_killer_damage_amount, 0, "0");
 }
 void MainWindow::le_produce_food_every_n_slot() {
-    le_slot_lower_bound(sp.produce_food_every_n_life_ticks, sp.produce_food_every_n_life_ticks, "int",
-                        _ui.le_produce_food_every_n_tick, 1, "1");
+    le_slot_lower_bound<int>(sp.produce_food_every_n_life_ticks, sp.produce_food_every_n_life_ticks, "int",
+                             _ui.le_produce_food_every_n_tick, 1, "1");
 }
 
 void MainWindow::le_anatomy_mutation_rate_delimiter_slot() {
@@ -342,7 +345,7 @@ void MainWindow::le_font_size_slot() {
 
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1.
     //so the program needs to understand which mode it is
-    int font_size = 0;
+    int font_size;
     bool point_size_m;
     if (font().pixelSize() < 0) {
         font_size = font().pointSize();
@@ -363,12 +366,14 @@ void MainWindow::le_font_size_slot() {
         _font.setPixelSize(result.result);
     }
     setFont(_font);
+    ee.setFont(_font);
+    s.setFont(_font);
 }
 
 void MainWindow::le_max_move_range_slot() {
-    le_slot_lower_lower_bound(sp.max_move_range, sp.max_move_range, "int",
-                              _ui.le_max_move_range, 1, "1",
-                              sp.min_move_range, "min move distance");
+    le_slot_lower_lower_bound<int>(sp.max_move_range, sp.max_move_range, "int",
+                                   _ui.le_max_move_range, 1, "1",
+                                   sp.min_move_range, "min move distance");
 }
 
 void MainWindow::le_min_move_range_slot() {
@@ -384,13 +389,13 @@ void MainWindow::le_move_range_delimiter_slot() {
 }
 
 void MainWindow::le_brush_size_slot() {
-    le_slot_lower_bound(brush_size, brush_size, "int",
-                        _ui.le_brush_size, 1, "1");
+    le_slot_lower_bound<int>(brush_size, brush_size, "int",
+                             _ui.le_brush_size, 1, "1");
 }
 
 void MainWindow::le_update_info_every_n_milliseconds_slot() {
-    le_slot_lower_bound(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
-                        _ui.le_update_info_every_n_milliseconds, 1, "1");
+    le_slot_lower_bound<int>(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
+                             _ui.le_update_info_every_n_milliseconds, 1, "1");
 }
 
 void MainWindow::le_menu_height_slot() {
@@ -401,8 +406,8 @@ void MainWindow::le_menu_height_slot() {
     _ui.menu_frame->setFixedHeight(result.result);}
 
 void MainWindow::le_perlin_octaves_slot() {
-    le_slot_lower_bound(sp.perlin_octaves, sp.perlin_octaves, "int",
-                        _ui.le_perlin_octaves, 1, "1");
+    le_slot_lower_bound<int>(sp.perlin_octaves, sp.perlin_octaves, "int",
+                             _ui.le_perlin_octaves, 1, "1");
 }
 
 void MainWindow::le_perlin_persistence_slot() {
@@ -434,7 +439,7 @@ void MainWindow::le_perlin_y_modifier_slot() {
 }
 
 void MainWindow::le_extra_mover_reproduction_cost_slot() {
-    le_slot_no_bound(sp.extra_mover_reproductive_cost, sp.extra_mover_reproductive_cost, "float", _ui.le_extra_mover_reproduction_cost);
+    le_slot_no_bound<float>(sp.extra_mover_reproductive_cost, sp.extra_mover_reproductive_cost, "float", _ui.le_extra_mover_reproduction_cost);
 }
 
 void MainWindow::le_anatomy_min_possible_mutation_rate_slot() {
@@ -447,6 +452,28 @@ void MainWindow::le_brain_min_possible_mutation_rate_slot() {
     le_slot_lower_upper_bound<float>(sp.brain_min_possible_mutation_rate, sp.brain_min_possible_mutation_rate, "float",
                                      _ui.le_brain_min_possible_mutation_rate, 0, "0",
                                      1, "1");
+}
+
+void MainWindow::le_anatomy_mutation_rate_step_slot() {
+    le_slot_lower_upper_bound<float>(sp.anatomy_mutations_rate_mutation_step, sp.anatomy_mutations_rate_mutation_step, "float",
+                                     _ui.le_anatomy_mutation_rate_step, 0, "0",
+                                     1, "1");
+}
+
+void MainWindow::le_brain_mutation_rate_step_slot() {
+    le_slot_lower_upper_bound<float>(sp.brain_mutation_rate_mutation_step, sp.brain_mutation_rate_mutation_step, "float",
+                                     _ui.le_brain_mutation_rate_step, 0, "0",
+                                     1, "1");
+}
+
+void MainWindow::le_keyboard_movement_amount_slot() {
+    le_slot_lower_bound<float>(keyboard_movement_amount, keyboard_movement_amount, "float",
+                               _ui.le_keyboard_movement_amount, 0, "0");
+}
+
+void MainWindow::le_scaling_coefficient_slot() {
+    le_slot_lower_bound<float>(scaling_coefficient, scaling_coefficient, "float",
+                               _ui.le_scaling_coefficient, 1, "1");
 }
 
 //==================== Radio button ====================
@@ -603,6 +630,8 @@ void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check
 
 void MainWindow::cb_really_stop_render_slot              (bool state) { really_stop_render = state;}
 
+void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
+
 //==================== Table ====================
 
 void MainWindow::table_cell_changed_slot(int row, int col) {
@@ -628,10 +657,11 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     switch (static_cast<ParametersNames>(col)) {
         case ParametersNames::FoodCostModifier: value = &type->food_cost_modifier; break;
         case ParametersNames::LifePointAmount:  value = &type->life_point_amount;  break;
+        case ParametersNames::LifetimeWeight:   value = &type->lifetime_weight;    break;
         case ParametersNames::ChanceWeight:     value = &type->chance_weight;      break;
     }
 
-    if(set_result) {*value = result; return;}
+    if(set_result) {*value = result; engine->reinit_organisms(); return;}
 
     _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
     _ui.table_organism_block_parameters->update();

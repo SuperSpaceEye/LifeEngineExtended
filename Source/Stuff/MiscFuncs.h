@@ -22,7 +22,6 @@
 #include <QMessageBox>
 #include <QLineEdit>
 
-
 template<typename T>
 struct result_struct {
     bool is_valid;

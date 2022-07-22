@@ -12,7 +12,7 @@
 struct BParameters {
     // food_cost_modifier - how much food does organism have to spend on one block when creating a child
     // life_point_amount - how much organism gains life points from this block
-    float food_cost_modifier = 1; float life_point_amount = 1; float chance_weight = 1;
+    float food_cost_modifier = 1; float life_point_amount = 1; float lifetime_weight; float chance_weight = 1;
 };
 
 struct OrganismBlockParameters {
@@ -36,6 +36,7 @@ enum class BlocksNames {
 enum class ParametersNames {
     FoodCostModifier,
     LifePointAmount,
+    LifetimeWeight,
     ChanceWeight,
 };
 

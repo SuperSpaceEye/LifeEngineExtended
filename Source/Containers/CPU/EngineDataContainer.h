@@ -9,11 +9,11 @@
 #ifndef THELIFEENGINECPP_ENGINEDATACONTAINER_H
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
-//#include "../../Organism/CPU/Organism.h"
 #include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../GridBlocks/AtomicGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
+
 
 struct eager_worker_partial;
 class Organism;
@@ -65,7 +65,7 @@ struct EngineDataContainer {
 
     uint32_t multithread_change_every_n_ticks = 1;
 
-    Organism * selected_organims = nullptr;
+    Organism * selected_organism = nullptr;
 };
 
 struct pool_changes_info {

@@ -50,11 +50,6 @@ inline void smart_reserve(std::vector<T> &input_vec, uint32_t new_size, uint32_t
     input_vec.reserve(new_size);
 }
 
-inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
-    uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(rotation1) + static_cast<uint_fast8_t>(rotation2);
-    return static_cast<Rotation>(new_int_rotation%4);
-}
-
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
     for (auto &block: organism->anatomy->_organism_blocks) {
         auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];

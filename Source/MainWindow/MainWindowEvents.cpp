@@ -21,6 +21,29 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             }
             last_mouse_x_pos = mouse_event->x();
             last_mouse_y_pos = mouse_event->y();
+
+//            //TODO ok, i don't get why this isn't working
+//            if (ee._ui.editor_graphicsView->underMouse()) {
+//                ee.actual_cursor.show();
+//                auto pos = ee.calculate_cursor_pos_on_grid(ee._ui.editor_graphicsView->viewport()->width(),
+//                                                                    ee._ui.editor_graphicsView->viewport()->width());
+//
+//                double x_modif = double(ee._ui.editor_graphicsView->viewport()->width())  / pos.x;
+//                double y_modif = double(ee._ui.editor_graphicsView->viewport()->height()) / pos.y;
+//
+//                pos = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
+//
+//                std::cout << pos.x << " " << pos.y << "\n";
+//                pos.x = (pos.x * x_modif) + ee._ui.editor_graphicsView->x() + 6 + 1;
+//                pos.y = (pos.y * y_modif) + ee._ui.editor_graphicsView->y() + 6 + 1;
+//
+//                std::cout << pos.x << " " << pos.y << "\n";
+//
+//                ee.actual_cursor.setGeometry(pos.x,
+//                                             pos.y, 5, 5);
+//            } else {
+//                ee.actual_cursor.hide();
+//            }
         } break;
         case QEvent::MouseButtonPress: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);
@@ -37,6 +60,9 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
             change_main_simulation_grid = _ui.simulation_graphicsView->underMouse();
             change_editing_grid = ee._ui.editor_graphicsView->underMouse();
+
+            //Removes focus from line edits, buttons, etc. so that user can use keyboard buttons without problems.
+            if (_ui.simulation_graphicsView->underMouse()) {setFocus();}
         } break;
         case QEvent::MouseButtonRelease: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);
@@ -67,7 +93,21 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         } break;
         default: break;
     }
+
+    process_keyboard_events();
+    last_event_execution = clock_now();
+
     return false;
+}
+
+void MainWindow::process_keyboard_events() {
+    float mult;
+    if (SHIFT_pressed) { mult = SHIFT_keyboard_movement_multiplier;} else { mult = 1;}
+    mult *= std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - last_event_execution).count()/1000.;
+    if (W_pressed) { center_y -= keyboard_movement_amount * scaling_zoom * mult;}
+    if (S_pressed) { center_y += keyboard_movement_amount * scaling_zoom * mult;}
+    if (D_pressed) { center_x += keyboard_movement_amount * scaling_zoom * mult;}
+    if (A_pressed) { center_x -= keyboard_movement_amount * scaling_zoom * mult;}
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
@@ -81,25 +121,64 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent * event) {
-    if (event->key() == Qt::Key_M) {
-        if (_ui.simulation_graphicsView->underMouse()) {
-            if (allow_menu_hidden_change) {
-                if (!menu_hidden) {
-                    _ui.menu_frame->hide();
-                    menu_hidden = true;
-                    allow_menu_hidden_change = false;
-                } else {
-                    _ui.menu_frame->show();
-                    menu_hidden = false;
-                    allow_menu_hidden_change = false;
+    switch (event->key()) {
+        case Qt::Key_M: {
+            if (_ui.simulation_graphicsView->underMouse()) {
+                if (allow_menu_hidden_change) {
+                    if (!menu_hidden) {
+                        _ui.menu_frame->hide();
+                        menu_hidden = true;
+                        allow_menu_hidden_change = false;
+                    } else {
+                        _ui.menu_frame->show();
+                        menu_hidden = false;
+                        allow_menu_hidden_change = false;
+                    }
                 }
             }
-        }
+        } break;
+
+        //TODO refactor?
+        case Qt::Key_Up:
+        case Qt::Key_W: W_pressed = true;break;
+        case Qt::Key_Down:
+        case Qt::Key_S: S_pressed = true;break;
+        case Qt::Key_Left:
+        case Qt::Key_A: A_pressed = true;break;
+        case Qt::Key_Right:
+        case Qt::Key_D: D_pressed = true;break;
+
+        case Qt::Key_Shift: SHIFT_pressed = true;break;
+
+        case Qt::Key_R: reset_scale_view();break;
+        case Qt::Key_Space: _ui.tb_pause->setChecked(!ecp.tb_paused);break;
+        case Qt::Key_Period: b_pass_one_tick_slot();break;
+
+        case Qt::Key_Plus: scaling_zoom /= scaling_coefficient;break;
+        case Qt::Key_Minus: scaling_zoom *= scaling_coefficient;break;
+
+        case Qt::Key_1: rb_food_slot();_ui.rb_food->setChecked(true);break;
+        case Qt::Key_2: rb_kill_slot();_ui.rb_kill->setChecked(true);break;
+        case Qt::Key_3: rb_wall_slot();_ui.rb_wall->setChecked(true);break;
+        case Qt::Key_4: ee.rb_place_organism_slot();ee._ui.rb_place_organism->setChecked(true);break;
+        case Qt::Key_5: ee.rb_choose_organism_slot();ee._ui.rb_chose_organism->setChecked(true);break;
+
     }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent * event) {
-    if (event->key() == Qt::Key_M) {
-        allow_menu_hidden_change = true;
+    switch (event->key()) {
+        case Qt::Key_M: allow_menu_hidden_change = true;break;
+
+        case Qt::Key_Up:
+        case Qt::Key_W: W_pressed = false;break;
+        case Qt::Key_Down:
+        case Qt::Key_S: S_pressed = false;break;
+        case Qt::Key_Left:
+        case Qt::Key_A: A_pressed = false;break;
+        case Qt::Key_Right:
+        case Qt::Key_D: D_pressed = false;break;
+
+        case Qt::Key_Shift: SHIFT_pressed = false;break;
     }
 }

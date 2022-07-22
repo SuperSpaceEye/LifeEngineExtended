@@ -10,7 +10,7 @@
 #include "ObservationStuff.h"
 
 Brain::Brain(std::shared_ptr<Brain> & brain): brain_type(brain->brain_type){
-    brain->simple_action_table = copy_parents_table(brain->simple_action_table);
+    simple_action_table = copy_parents_table(brain->simple_action_table);
 }
 
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}

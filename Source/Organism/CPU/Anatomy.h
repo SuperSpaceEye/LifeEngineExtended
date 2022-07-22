@@ -18,11 +18,7 @@
 #include "../../Stuff/BlockTypes.hpp"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../PRNGS/lehmer64.h"
-
-struct pos {
-    int x;
-    int y;
-};
+#include "../../Stuff/Vector2.h"
 
 struct ProducerAdjacent {
     int producer = -1;
@@ -37,13 +33,13 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
-    inline pos get_pos(Rotation rotation) {
+    inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
-            case Rotation::UP:    return pos{ relative_x,  relative_y};
-            case Rotation::LEFT:  return pos{-relative_y,  relative_x};
-            case Rotation::DOWN:  return pos{ -relative_x, -relative_y};
-            case Rotation::RIGHT: return pos{relative_y, -relative_x};
-            default: return pos{relative_x, relative_y};
+            case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
+            case Rotation::LEFT:  return Vector2<int>{-relative_y, relative_x};
+            case Rotation::DOWN:  return Vector2<int>{-relative_x, -relative_y};
+            case Rotation::RIGHT: return Vector2<int>{relative_y, -relative_x};
+            default: return Vector2<int>{relative_x, relative_y};
         }
     }
 };

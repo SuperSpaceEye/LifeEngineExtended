@@ -16,18 +16,24 @@ Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> ana
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-        x(x), y(y), rotation(rotation), anatomy(anatomy), sp(sp),
-        bp(block_parameters), brain(brain), anatomy_mutation_rate(anatomy_mutation_rate),
-        brain_mutation_rate(brain_mutation_rate), move_range(move_range) {
+                   anatomy(std::make_shared<Anatomy>(anatomy)), sp(sp), bp(block_parameters), brain(std::make_shared<Brain>(brain)),
+                   OrganismData(x,
+                                y,
+                                rotation,
+                                move_range,
+                                anatomy_mutation_rate,
+                                brain_mutation_rate) {
     init_values();
 }
 
-Organism::Organism(Organism *organism): x(organism->x), y(organism->y),
-                                        rotation(organism->rotation), anatomy(organism->anatomy), sp(organism->sp),
-                                        bp(organism->bp), brain(organism->brain),
-                                        anatomy_mutation_rate(organism->anatomy_mutation_rate),
-                                        brain_mutation_rate(organism->brain_mutation_rate),
-                                        move_range(organism->move_range){
+Organism::Organism(Organism *organism): anatomy(std::make_shared<Anatomy>(organism->anatomy)), sp(organism->sp),
+                                        bp(organism->bp), brain(std::make_shared<Brain>(organism->brain)),
+                                        OrganismData(organism->x,
+                                                     organism->y,
+                                                     organism->rotation,
+                                                     organism->move_range,
+                                                     organism->anatomy_mutation_rate,
+                                                     organism->brain_mutation_rate) {
     init_values();
 }
 
@@ -48,6 +54,7 @@ void Organism::init_values() {
     }
 }
 
+//TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
 float Organism::calculate_max_life() {
     life_points = 0;
     for (auto& item: anatomy->_organism_blocks) {
@@ -65,7 +72,19 @@ float Organism::calculate_max_life() {
 }
 
 int Organism::calculate_organism_lifetime() {
-    max_lifetime = anatomy->_organism_blocks.size() * sp->lifespan_multiplier;
+    float lifetime_weights = 0;
+    for (auto & block: anatomy->_organism_blocks) {
+        switch (block.type) {
+            case BlockTypes::MouthBlock:    lifetime_weights += bp->MouthBlock.   lifetime_weight; break;
+            case BlockTypes::ProducerBlock: lifetime_weights += bp->ProducerBlock.lifetime_weight; break;
+            case BlockTypes::MoverBlock:    lifetime_weights += bp->MoverBlock.   lifetime_weight; break;
+            case BlockTypes::KillerBlock:   lifetime_weights += bp->KillerBlock.  lifetime_weight; break;
+            case BlockTypes::ArmorBlock:    lifetime_weights += bp->ArmorBlock.   lifetime_weight; break;
+            case BlockTypes::EyeBlock:      lifetime_weights += bp->EyeBlock.     lifetime_weight; break;
+            default: throw std::runtime_error("Unknown block");
+        }
+    }
+    max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
 }
 

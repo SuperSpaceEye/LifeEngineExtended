@@ -54,10 +54,10 @@
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../PRNGS/lehmer64.h"
-#include "../Stuff/pix_pos.h"
 #include "../Stuff/textures.h"
 #include "../Stuff/MiscFuncs.h"
 #include "../Stuff/CursorMode.h"
+#include "../Stuff/Vector2.h"
 
 #include "WindowUI.h"
 #include "../Statistics/StatisticsCore.h"
@@ -66,35 +66,12 @@
 #if __CUDA_USED__
 #include "../Stuff/cuda_image_creator.cuh"
 #include "../Stuff/get_device_count.cuh"
+
 #endif
 
 #if defined(__WIN32)
 #include <windows.h>
 #endif
-
-struct OrganismData {
-    int x = 0;
-    int y = 0;
-    int max_lifetime = 0;
-    int lifetime = 0;
-    int move_range = 1;
-    int move_counter = 0;
-    int max_decision_lifetime = 2;
-    int max_do_nothing_lifetime = 4;
-    float anatomy_mutation_rate = 0.05;
-    float brain_mutation_rate = 0.1;
-    float food_collected = 0;
-    float food_needed = 0;
-    float life_points = 0;
-    float damage = 0;
-    Rotation rotation = Rotation::UP;
-    DecisionObservation last_decision = DecisionObservation{};
-};
-
-struct pos_on_grid {
-    int x;
-    int y;
-};
 
 struct OrganismInfoHolder {
     double size = 0;
@@ -155,12 +132,11 @@ private:
 
     Ui::MainWindow _ui{};
     QTimer * timer;
-    std::chrono::time_point<std::chrono::high_resolution_clock> start;
-    std::chrono::time_point<std::chrono::high_resolution_clock> end;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine* engine;
     OrganismEditor ee;
@@ -173,6 +149,8 @@ private:
     float center_x = 0;
     float center_y = 0;
     float window_interval = 0.;
+    float keyboard_movement_amount = 0.5;
+    float SHIFT_keyboard_movement_multiplier = 2;
 
     bool wheel_mouse_button_pressed = false;
     bool right_mouse_button_pressed = false;
@@ -193,20 +171,22 @@ private:
     bool disable_warnings = false;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
-    bool reset_with_chosen = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
-    //TODO remove?
-    bool stop_console_output = true;
     bool synchronise_simulation_and_window = false;
     bool really_stop_render = false;
+
+    bool W_pressed = false;
+    bool A_pressed = false;
+    bool S_pressed = false;
+    bool D_pressed = false;
+    bool SHIFT_pressed = false;
 
     int last_mouse_x_pos = 0;
     int last_mouse_y_pos = 0;
     int window_frames = 0;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
-    // TODO redundant?
     uint32_t new_simulation_width = 200;
     uint32_t new_simulation_height = 200;
     // visual only. Controls precision of floats in labels
@@ -276,7 +256,6 @@ private:
     void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
     void update_table_values();
 
-
     bool cuda_is_available();
 
     void mainloop_tick();
@@ -289,8 +268,9 @@ private:
 
     // for fill_view
     void calculate_new_simulation_size();
-    pos_on_grid calculate_cursor_pos_on_grid(int x, int y);
+    Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
+    void pause_engine();
     void unpause_engine();
 
     void create_image();
@@ -305,12 +285,12 @@ private:
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
     void parse_full_simulation_grid(bool parse);
-    // clears all organisms
-    void clear_organisms();
-    void make_border_walls();
 
     void change_main_grid_left_click();
     void change_main_grid_right_click();
+
+    void change_editing_grid_left_click();
+    void change_editing_grid_right_click();
 
     void set_simulation_num_threads(uint8_t num_threads);
 
@@ -337,14 +317,12 @@ private:
                                              std::vector<int> & truncated_lin_width,
                                              std::vector<int> & truncated_lin_height);
 
-    void partial_clear_world();
-    void reset_world();
     void clear_world();
 
     void update_simulation_size_label();
 
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
-    void initialize_gui_settings();
+    void initialize_gui();
 
     // converts num bytes to string of shortened number with postfix (like 14 KiB)
     static std::string convert_num_bytes(uint64_t num_bytes);
@@ -405,6 +383,9 @@ private slots:
     void le_anatomy_min_possible_mutation_rate_slot();
     void le_brain_min_possible_mutation_rate_slot();
     void le_extra_mover_reproduction_cost_slot();
+    void le_anatomy_mutation_rate_step_slot();
+    void le_brain_mutation_rate_step_slot();
+    void le_keyboard_movement_amount_slot();
     //Settings
     void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
@@ -417,6 +398,7 @@ private slots:
     void le_perlin_y_modifier_slot();
     void le_font_size_slot();
     void le_float_number_precision_slot();
+    void le_scaling_coefficient_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();
@@ -453,6 +435,7 @@ private slots:
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
+    void cb_reset_with_editor_organism_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);
@@ -468,6 +451,8 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
+
+    void process_keyboard_events();
 };
 
 

@@ -20,7 +20,7 @@ enum class SimulationModes {
 };
 
 struct EngineControlParameters {
-    // if false then engine will stop
+    // if false then engine will y
     volatile bool engine_working = true;
 
     volatile bool stop_engine = false;
@@ -49,11 +49,13 @@ struct EngineControlParameters {
     volatile bool organisms_extinct = false;
 
     volatile bool tb_paused = false;
-    volatile bool reset_with_chosen = false;
+    volatile bool reset_with_editor_organism = false;
 
     SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;
     volatile bool change_simulation_mode = false;
+
+    volatile bool update_editor_organism = false;
 
     uint8_t num_threads = 2;
 

@@ -91,6 +91,7 @@ public:
     QLabel *label_14;
     QLineEdit *le_simulation_height;
     QPushButton *b_resize_and_reset;
+    QCheckBox *cb_reset_with_editor_organism;
     QCheckBox *cb_reset_on_total_extinction;
     QCheckBox *cb_pause_on_total_extinction;
     QHBoxLayout *horizontalLayout_11;
@@ -158,6 +159,9 @@ public:
     QHBoxLayout *horizontalLayout_12;
     QLabel *lb_mutation_rate;
     QLineEdit *le_global_anatomy_mutation_rate;
+    QHBoxLayout *horizontalLayout_46;
+    QLabel *label;
+    QLineEdit *le_anatomy_mutation_rate_step;
     QHBoxLayout *horizontalLayout_43;
     QLabel *label_33;
     QLineEdit *le_anatomy_min_possible_mutation_rate;
@@ -168,6 +172,9 @@ public:
     QHBoxLayout *horizontalLayout_27;
     QLabel *label_20;
     QLineEdit *le_global_brain_mutation_rate;
+    QHBoxLayout *horizontalLayout_47;
+    QLabel *label_35;
+    QLineEdit *le_brain_mutation_rate_step;
     QHBoxLayout *horizontalLayout_44;
     QLabel *label_34;
     QLineEdit *le_brain_min_possible_mutation_rate;
@@ -255,6 +262,12 @@ public:
     QLabel *label_47;
     QLineEdit *le_menu_height;
     QCheckBox *cb_really_stop_render;
+    QHBoxLayout *horizontalLayout_48;
+    QLabel *label_36;
+    QLineEdit *le_keyboard_movement_amount;
+    QHBoxLayout *horizontalLayout_49;
+    QLabel *label_37;
+    QLineEdit *le_scaling_coefficient;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -527,7 +540,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 620, 217));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 606, 233));
         QSizePolicy sizePolicy3(QSizePolicy::Ignored, QSizePolicy::Minimum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -601,6 +614,11 @@ public:
         b_resize_and_reset->setObjectName(QString::fromUtf8("b_resize_and_reset"));
 
         verticalLayout_21->addWidget(b_resize_and_reset);
+
+        cb_reset_with_editor_organism = new QCheckBox(widget_3);
+        cb_reset_with_editor_organism->setObjectName(QString::fromUtf8("cb_reset_with_editor_organism"));
+
+        verticalLayout_21->addWidget(cb_reset_with_editor_organism);
 
         cb_reset_on_total_extinction = new QCheckBox(widget_3);
         cb_reset_on_total_extinction->setObjectName(QString::fromUtf8("cb_reset_on_total_extinction"));
@@ -800,7 +818,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1467));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1533));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -986,6 +1004,21 @@ public:
 
         verticalLayout_20->addLayout(mutation_rate_layout);
 
+        horizontalLayout_46 = new QHBoxLayout();
+        horizontalLayout_46->setObjectName(QString::fromUtf8("horizontalLayout_46"));
+        label = new QLabel(widget);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout_46->addWidget(label);
+
+        le_anatomy_mutation_rate_step = new QLineEdit(widget);
+        le_anatomy_mutation_rate_step->setObjectName(QString::fromUtf8("le_anatomy_mutation_rate_step"));
+
+        horizontalLayout_46->addWidget(le_anatomy_mutation_rate_step);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_46);
+
         horizontalLayout_43 = new QHBoxLayout();
         horizontalLayout_43->setObjectName(QString::fromUtf8("horizontalLayout_43"));
         label_33 = new QLabel(widget);
@@ -1035,6 +1068,21 @@ public:
 
 
         verticalLayout_20->addLayout(horizontalLayout_27);
+
+        horizontalLayout_47 = new QHBoxLayout();
+        horizontalLayout_47->setObjectName(QString::fromUtf8("horizontalLayout_47"));
+        label_35 = new QLabel(widget);
+        label_35->setObjectName(QString::fromUtf8("label_35"));
+
+        horizontalLayout_47->addWidget(label_35);
+
+        le_brain_mutation_rate_step = new QLineEdit(widget);
+        le_brain_mutation_rate_step->setObjectName(QString::fromUtf8("le_brain_mutation_rate_step"));
+
+        horizontalLayout_47->addWidget(le_brain_mutation_rate_step);
+
+
+        verticalLayout_20->addLayout(horizontalLayout_47);
 
         horizontalLayout_44 = new QHBoxLayout();
         horizontalLayout_44->setObjectName(QString::fromUtf8("horizontalLayout_44"));
@@ -1314,65 +1362,79 @@ public:
         verticalLayout_9->addWidget(widget);
 
         table_organism_block_parameters = new QTableWidget(scrollAreaWidgetContents_2);
-        if (table_organism_block_parameters->columnCount() < 3)
-            table_organism_block_parameters->setColumnCount(3);
+        if (table_organism_block_parameters->columnCount() < 4)
+            table_organism_block_parameters->setColumnCount(4);
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
         table_organism_block_parameters->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         table_organism_block_parameters->setHorizontalHeaderItem(1, __qtablewidgetitem1);
         QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
         table_organism_block_parameters->setHorizontalHeaderItem(2, __qtablewidgetitem2);
+        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+        table_organism_block_parameters->setHorizontalHeaderItem(3, __qtablewidgetitem3);
         if (table_organism_block_parameters->rowCount() < 6)
             table_organism_block_parameters->setRowCount(6);
-        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
-        table_organism_block_parameters->setVerticalHeaderItem(0, __qtablewidgetitem3);
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        table_organism_block_parameters->setVerticalHeaderItem(1, __qtablewidgetitem4);
+        table_organism_block_parameters->setVerticalHeaderItem(0, __qtablewidgetitem4);
         QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
-        table_organism_block_parameters->setVerticalHeaderItem(2, __qtablewidgetitem5);
+        table_organism_block_parameters->setVerticalHeaderItem(1, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
-        table_organism_block_parameters->setVerticalHeaderItem(3, __qtablewidgetitem6);
+        table_organism_block_parameters->setVerticalHeaderItem(2, __qtablewidgetitem6);
         QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
-        table_organism_block_parameters->setVerticalHeaderItem(4, __qtablewidgetitem7);
+        table_organism_block_parameters->setVerticalHeaderItem(3, __qtablewidgetitem7);
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
-        table_organism_block_parameters->setVerticalHeaderItem(5, __qtablewidgetitem8);
+        table_organism_block_parameters->setVerticalHeaderItem(4, __qtablewidgetitem8);
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
-        __qtablewidgetitem9->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsTristate);
-        table_organism_block_parameters->setItem(0, 0, __qtablewidgetitem9);
+        table_organism_block_parameters->setVerticalHeaderItem(5, __qtablewidgetitem9);
         QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(0, 1, __qtablewidgetitem10);
+        __qtablewidgetitem10->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsTristate);
+        table_organism_block_parameters->setItem(0, 0, __qtablewidgetitem10);
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(0, 2, __qtablewidgetitem11);
+        table_organism_block_parameters->setItem(0, 1, __qtablewidgetitem11);
         QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(1, 0, __qtablewidgetitem12);
+        table_organism_block_parameters->setItem(0, 2, __qtablewidgetitem12);
         QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(1, 1, __qtablewidgetitem13);
+        table_organism_block_parameters->setItem(0, 3, __qtablewidgetitem13);
         QTableWidgetItem *__qtablewidgetitem14 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(1, 2, __qtablewidgetitem14);
+        table_organism_block_parameters->setItem(1, 0, __qtablewidgetitem14);
         QTableWidgetItem *__qtablewidgetitem15 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(2, 0, __qtablewidgetitem15);
+        table_organism_block_parameters->setItem(1, 1, __qtablewidgetitem15);
         QTableWidgetItem *__qtablewidgetitem16 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(2, 1, __qtablewidgetitem16);
+        table_organism_block_parameters->setItem(1, 2, __qtablewidgetitem16);
         QTableWidgetItem *__qtablewidgetitem17 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(2, 2, __qtablewidgetitem17);
+        table_organism_block_parameters->setItem(1, 3, __qtablewidgetitem17);
         QTableWidgetItem *__qtablewidgetitem18 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(3, 0, __qtablewidgetitem18);
+        table_organism_block_parameters->setItem(2, 0, __qtablewidgetitem18);
         QTableWidgetItem *__qtablewidgetitem19 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(3, 1, __qtablewidgetitem19);
+        table_organism_block_parameters->setItem(2, 1, __qtablewidgetitem19);
         QTableWidgetItem *__qtablewidgetitem20 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(3, 2, __qtablewidgetitem20);
+        table_organism_block_parameters->setItem(2, 2, __qtablewidgetitem20);
         QTableWidgetItem *__qtablewidgetitem21 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(4, 0, __qtablewidgetitem21);
+        table_organism_block_parameters->setItem(2, 3, __qtablewidgetitem21);
         QTableWidgetItem *__qtablewidgetitem22 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(4, 1, __qtablewidgetitem22);
+        table_organism_block_parameters->setItem(3, 0, __qtablewidgetitem22);
         QTableWidgetItem *__qtablewidgetitem23 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(4, 2, __qtablewidgetitem23);
+        table_organism_block_parameters->setItem(3, 1, __qtablewidgetitem23);
         QTableWidgetItem *__qtablewidgetitem24 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(5, 0, __qtablewidgetitem24);
+        table_organism_block_parameters->setItem(3, 2, __qtablewidgetitem24);
         QTableWidgetItem *__qtablewidgetitem25 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(5, 1, __qtablewidgetitem25);
+        table_organism_block_parameters->setItem(3, 3, __qtablewidgetitem25);
         QTableWidgetItem *__qtablewidgetitem26 = new QTableWidgetItem();
-        table_organism_block_parameters->setItem(5, 2, __qtablewidgetitem26);
+        table_organism_block_parameters->setItem(4, 0, __qtablewidgetitem26);
+        QTableWidgetItem *__qtablewidgetitem27 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(4, 1, __qtablewidgetitem27);
+        QTableWidgetItem *__qtablewidgetitem28 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(4, 2, __qtablewidgetitem28);
+        QTableWidgetItem *__qtablewidgetitem29 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(4, 3, __qtablewidgetitem29);
+        QTableWidgetItem *__qtablewidgetitem30 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(5, 0, __qtablewidgetitem30);
+        QTableWidgetItem *__qtablewidgetitem31 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(5, 1, __qtablewidgetitem31);
+        QTableWidgetItem *__qtablewidgetitem32 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(5, 2, __qtablewidgetitem32);
+        QTableWidgetItem *__qtablewidgetitem33 = new QTableWidgetItem();
+        table_organism_block_parameters->setItem(5, 3, __qtablewidgetitem33);
         table_organism_block_parameters->setObjectName(QString::fromUtf8("table_organism_block_parameters"));
         sizePolicy.setHeightForWidth(table_organism_block_parameters->sizePolicy().hasHeightForWidth());
         table_organism_block_parameters->setSizePolicy(sizePolicy);
@@ -1417,7 +1479,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 635));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 693));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1578,6 +1640,36 @@ public:
         cb_really_stop_render->setObjectName(QString::fromUtf8("cb_really_stop_render"));
 
         verticalLayout_19->addWidget(cb_really_stop_render);
+
+        horizontalLayout_48 = new QHBoxLayout();
+        horizontalLayout_48->setObjectName(QString::fromUtf8("horizontalLayout_48"));
+        label_36 = new QLabel(widget_2);
+        label_36->setObjectName(QString::fromUtf8("label_36"));
+
+        horizontalLayout_48->addWidget(label_36);
+
+        le_keyboard_movement_amount = new QLineEdit(widget_2);
+        le_keyboard_movement_amount->setObjectName(QString::fromUtf8("le_keyboard_movement_amount"));
+
+        horizontalLayout_48->addWidget(le_keyboard_movement_amount);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_48);
+
+        horizontalLayout_49 = new QHBoxLayout();
+        horizontalLayout_49->setObjectName(QString::fromUtf8("horizontalLayout_49"));
+        label_37 = new QLabel(widget_2);
+        label_37->setObjectName(QString::fromUtf8("label_37"));
+
+        horizontalLayout_49->addWidget(label_37);
+
+        le_scaling_coefficient = new QLineEdit(widget_2);
+        le_scaling_coefficient->setObjectName(QString::fromUtf8("le_scaling_coefficient"));
+
+        horizontalLayout_49->addWidget(le_scaling_coefficient);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_49);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1802,6 +1894,11 @@ public:
         QObject::connect(le_anatomy_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_min_possible_mutation_rate_slot()));
         QObject::connect(le_brain_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_min_possible_mutation_rate_slot()));
         QObject::connect(cb_really_stop_render, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_really_stop_render_slot(bool)));
+        QObject::connect(le_brain_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_brain_mutation_rate_step_slot()));
+        QObject::connect(le_anatomy_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_step_slot()));
+        QObject::connect(le_keyboard_movement_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_keyboard_movement_amount_slot()));
+        QObject::connect(le_scaling_coefficient, SIGNAL(returnPressed()), MainWindow, SLOT(le_scaling_coefficient_slot()));
+        QObject::connect(cb_reset_with_editor_organism, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reset_with_editor_organism_slot(bool)));
 
         Tabs->setCurrentIndex(1);
 
@@ -1846,6 +1943,7 @@ public:
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*checking &quot;Fix reproducing distance&quot; will set reproducing distance to min value.</p>\n"
 "<p style=\" margin-top:0px; margi"
                         "n-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*To finilize changes in line edits you should press Enter.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This project's Github: https://github.com/SuperSpaceEye/LifeEngineExtended</p></body></html>", nullptr));
         Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
@@ -1857,6 +1955,7 @@ public:
         label_14->setText(QApplication::translate("MainWindow", "Height:", nullptr));
         le_simulation_height->setText(QApplication::translate("MainWindow", "600", nullptr));
         b_resize_and_reset->setText(QApplication::translate("MainWindow", "Resize and Reset", nullptr));
+        cb_reset_with_editor_organism->setText(QApplication::translate("MainWindow", "Reset with editor organism", nullptr));
         cb_reset_on_total_extinction->setText(QApplication::translate("MainWindow", "Reset on total extinction", nullptr));
         cb_pause_on_total_extinction->setText(QApplication::translate("MainWindow", "Pause on total extinction", nullptr));
         label_18->setText(QApplication::translate("MainWindow", "Max organisms:", nullptr));
@@ -1890,12 +1989,14 @@ public:
         cb_use_evolved_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved anatomy mutation rate", nullptr));
         lb_mutation_rate->setText(QApplication::translate("MainWindow", "Global anatomy mutation rate:", nullptr));
         le_global_anatomy_mutation_rate->setText(QApplication::translate("MainWindow", "0.05", nullptr));
+        label->setText(QApplication::translate("MainWindow", "Anatomy mutation rate mutation step:", nullptr));
         label_33->setText(QApplication::translate("MainWindow", "Anatomy min possible mutation rate:", nullptr));
         label_23->setText(QApplication::translate("MainWindow", "Anatomy mutation rate delimiter:", nullptr));
         le_anatomy_mutation_rate_delimiter->setText(QApplication::translate("MainWindow", "0.5", nullptr));
         cb_use_evolved_brain_mutation_rate->setText(QApplication::translate("MainWindow", "Use evolved brain mutation rate", nullptr));
         label_20->setText(QApplication::translate("MainWindow", "Global brain mutation rate:", nullptr));
         le_global_brain_mutation_rate->setText(QApplication::translate("MainWindow", "0.1", nullptr));
+        label_35->setText(QApplication::translate("MainWindow", "Brain mutation rate mutation step:", nullptr));
         label_34->setText(QApplication::translate("MainWindow", "Brain min possible mutation rate:", nullptr));
         label_24->setText(QApplication::translate("MainWindow", "Brain mutation rate delimiter:", nullptr));
         label_21->setText(QApplication::translate("MainWindow", "Killer damage amount:", nullptr));
@@ -1921,7 +2022,7 @@ public:
         cb_set_fixed_move_range->setText(QApplication::translate("MainWindow", "Set fixed move range", nullptr));
         label_41->setText(QApplication::translate("MainWindow", "Min move range:", nullptr));
         label_40->setText(QApplication::translate("MainWindow", "Max move range:", nullptr));
-        label_42->setText(QApplication::translate("MainWindow", "Move range delimiter", nullptr));
+        label_42->setText(QApplication::translate("MainWindow", "Move range delimiter:", nullptr));
         cb_failed_reproduction_eats_food->setText(QApplication::translate("MainWindow", "Failed reproduction eats food", nullptr));
         cb_rotate_every_move_tick->setText(QApplication::translate("MainWindow", "Rotate every move tick", nullptr));
         cb_multiply_food_production_prob->setText(QApplication::translate("MainWindow", "Multiply food production probability by number of producers", nullptr));
@@ -1936,58 +2037,72 @@ public:
         QTableWidgetItem *___qtablewidgetitem1 = table_organism_block_parameters->horizontalHeaderItem(1);
         ___qtablewidgetitem1->setText(QApplication::translate("MainWindow", "Life Point", nullptr));
         QTableWidgetItem *___qtablewidgetitem2 = table_organism_block_parameters->horizontalHeaderItem(2);
-        ___qtablewidgetitem2->setText(QApplication::translate("MainWindow", "Chance Weight", nullptr));
-        QTableWidgetItem *___qtablewidgetitem3 = table_organism_block_parameters->verticalHeaderItem(0);
-        ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Mouth Cell", nullptr));
-        QTableWidgetItem *___qtablewidgetitem4 = table_organism_block_parameters->verticalHeaderItem(1);
-        ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Producer Cell", nullptr));
-        QTableWidgetItem *___qtablewidgetitem5 = table_organism_block_parameters->verticalHeaderItem(2);
-        ___qtablewidgetitem5->setText(QApplication::translate("MainWindow", "Mover Cell", nullptr));
-        QTableWidgetItem *___qtablewidgetitem6 = table_organism_block_parameters->verticalHeaderItem(3);
-        ___qtablewidgetitem6->setText(QApplication::translate("MainWindow", "Killer Cell", nullptr));
-        QTableWidgetItem *___qtablewidgetitem7 = table_organism_block_parameters->verticalHeaderItem(4);
-        ___qtablewidgetitem7->setText(QApplication::translate("MainWindow", "Armor Cell", nullptr));
-        QTableWidgetItem *___qtablewidgetitem8 = table_organism_block_parameters->verticalHeaderItem(5);
-        ___qtablewidgetitem8->setText(QApplication::translate("MainWindow", "Eye Cell", nullptr));
+        ___qtablewidgetitem2->setText(QApplication::translate("MainWindow", "Lifetime Weight", nullptr));
+        QTableWidgetItem *___qtablewidgetitem3 = table_organism_block_parameters->horizontalHeaderItem(3);
+        ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Chance Weight", nullptr));
+        QTableWidgetItem *___qtablewidgetitem4 = table_organism_block_parameters->verticalHeaderItem(0);
+        ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Mouth Cell", nullptr));
+        QTableWidgetItem *___qtablewidgetitem5 = table_organism_block_parameters->verticalHeaderItem(1);
+        ___qtablewidgetitem5->setText(QApplication::translate("MainWindow", "Producer Cell", nullptr));
+        QTableWidgetItem *___qtablewidgetitem6 = table_organism_block_parameters->verticalHeaderItem(2);
+        ___qtablewidgetitem6->setText(QApplication::translate("MainWindow", "Mover Cell", nullptr));
+        QTableWidgetItem *___qtablewidgetitem7 = table_organism_block_parameters->verticalHeaderItem(3);
+        ___qtablewidgetitem7->setText(QApplication::translate("MainWindow", "Killer Cell", nullptr));
+        QTableWidgetItem *___qtablewidgetitem8 = table_organism_block_parameters->verticalHeaderItem(4);
+        ___qtablewidgetitem8->setText(QApplication::translate("MainWindow", "Armor Cell", nullptr));
+        QTableWidgetItem *___qtablewidgetitem9 = table_organism_block_parameters->verticalHeaderItem(5);
+        ___qtablewidgetitem9->setText(QApplication::translate("MainWindow", "Eye Cell", nullptr));
 
         const bool __sortingEnabled = table_organism_block_parameters->isSortingEnabled();
         table_organism_block_parameters->setSortingEnabled(false);
-        QTableWidgetItem *___qtablewidgetitem9 = table_organism_block_parameters->item(0, 0);
-        ___qtablewidgetitem9->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem10 = table_organism_block_parameters->item(0, 1);
+        QTableWidgetItem *___qtablewidgetitem10 = table_organism_block_parameters->item(0, 0);
         ___qtablewidgetitem10->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem11 = table_organism_block_parameters->item(0, 2);
+        QTableWidgetItem *___qtablewidgetitem11 = table_organism_block_parameters->item(0, 1);
         ___qtablewidgetitem11->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem12 = table_organism_block_parameters->item(1, 0);
+        QTableWidgetItem *___qtablewidgetitem12 = table_organism_block_parameters->item(0, 2);
         ___qtablewidgetitem12->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem13 = table_organism_block_parameters->item(1, 1);
+        QTableWidgetItem *___qtablewidgetitem13 = table_organism_block_parameters->item(0, 3);
         ___qtablewidgetitem13->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem14 = table_organism_block_parameters->item(1, 2);
+        QTableWidgetItem *___qtablewidgetitem14 = table_organism_block_parameters->item(1, 0);
         ___qtablewidgetitem14->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem15 = table_organism_block_parameters->item(2, 0);
+        QTableWidgetItem *___qtablewidgetitem15 = table_organism_block_parameters->item(1, 1);
         ___qtablewidgetitem15->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem16 = table_organism_block_parameters->item(2, 1);
+        QTableWidgetItem *___qtablewidgetitem16 = table_organism_block_parameters->item(1, 2);
         ___qtablewidgetitem16->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem17 = table_organism_block_parameters->item(2, 2);
+        QTableWidgetItem *___qtablewidgetitem17 = table_organism_block_parameters->item(1, 3);
         ___qtablewidgetitem17->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem18 = table_organism_block_parameters->item(3, 0);
+        QTableWidgetItem *___qtablewidgetitem18 = table_organism_block_parameters->item(2, 0);
         ___qtablewidgetitem18->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem19 = table_organism_block_parameters->item(3, 1);
+        QTableWidgetItem *___qtablewidgetitem19 = table_organism_block_parameters->item(2, 1);
         ___qtablewidgetitem19->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem20 = table_organism_block_parameters->item(3, 2);
+        QTableWidgetItem *___qtablewidgetitem20 = table_organism_block_parameters->item(2, 2);
         ___qtablewidgetitem20->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem21 = table_organism_block_parameters->item(4, 0);
+        QTableWidgetItem *___qtablewidgetitem21 = table_organism_block_parameters->item(2, 3);
         ___qtablewidgetitem21->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem22 = table_organism_block_parameters->item(4, 1);
+        QTableWidgetItem *___qtablewidgetitem22 = table_organism_block_parameters->item(3, 0);
         ___qtablewidgetitem22->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem23 = table_organism_block_parameters->item(4, 2);
+        QTableWidgetItem *___qtablewidgetitem23 = table_organism_block_parameters->item(3, 1);
         ___qtablewidgetitem23->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem24 = table_organism_block_parameters->item(5, 0);
+        QTableWidgetItem *___qtablewidgetitem24 = table_organism_block_parameters->item(3, 2);
         ___qtablewidgetitem24->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem25 = table_organism_block_parameters->item(5, 1);
+        QTableWidgetItem *___qtablewidgetitem25 = table_organism_block_parameters->item(3, 3);
         ___qtablewidgetitem25->setText(QApplication::translate("MainWindow", "1", nullptr));
-        QTableWidgetItem *___qtablewidgetitem26 = table_organism_block_parameters->item(5, 2);
+        QTableWidgetItem *___qtablewidgetitem26 = table_organism_block_parameters->item(4, 0);
         ___qtablewidgetitem26->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem27 = table_organism_block_parameters->item(4, 1);
+        ___qtablewidgetitem27->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem28 = table_organism_block_parameters->item(4, 2);
+        ___qtablewidgetitem28->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem29 = table_organism_block_parameters->item(4, 3);
+        ___qtablewidgetitem29->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem30 = table_organism_block_parameters->item(5, 0);
+        ___qtablewidgetitem30->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem31 = table_organism_block_parameters->item(5, 1);
+        ___qtablewidgetitem31->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem32 = table_organism_block_parameters->item(5, 2);
+        ___qtablewidgetitem32->setText(QApplication::translate("MainWindow", "1", nullptr));
+        QTableWidgetItem *___qtablewidgetitem33 = table_organism_block_parameters->item(5, 3);
+        ___qtablewidgetitem33->setText(QApplication::translate("MainWindow", "1", nullptr));
         table_organism_block_parameters->setSortingEnabled(__sortingEnabled);
 
         Tabs->setTabText(Tabs->indexOf(evolution_controls_tab), QApplication::translate("MainWindow", "Evolution Controls", nullptr));
@@ -2000,14 +2115,16 @@ public:
         label_19->setText(QApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QApplication::translate("MainWindow", "2", nullptr));
         cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", nullptr));
-        cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to stop", nullptr));
+        cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to stop to render", nullptr));
         label_25->setText(QApplication::translate("MainWindow", "Font size:", nullptr));
         cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", nullptr));
         label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", nullptr));
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", nullptr));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", nullptr));
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", nullptr));
-        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
+        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really y render", nullptr));
+        label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
+        label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));
