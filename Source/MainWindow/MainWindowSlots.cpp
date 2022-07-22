@@ -39,8 +39,6 @@ void MainWindow::tb_open_organism_editor_slot(bool state) {
             ee.resize_image();
             ee.create_image();
         });
-//        ee.resize_image();
-//        ee.create_image();
     } else {
         ee.close();
     }

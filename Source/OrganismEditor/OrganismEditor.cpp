@@ -60,10 +60,12 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
 }
 
 void OrganismEditor::update_gui() {
-    _ui.le_move_range->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
+    _ui.le_move_range           ->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
     _ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism->anatomy_mutation_rate)));
-    _ui.le_grid_width->setText(QString::fromStdString(std::to_string(editor_width)));
-    _ui.le_grid_height->setText(QString::fromStdString(std::to_string(editor_height)));
+    _ui.le_grid_width           ->setText(QString::fromStdString(std::to_string(editor_width)));
+    _ui.le_grid_height          ->setText(QString::fromStdString(std::to_string(editor_height)));
+    _ui.le_brain_mutation_rate  ->setText(QString::fromStdString(std::to_string(editor_organism->brain_mutation_rate)));
+    _ui.label_cell_count        ->setText(QString::fromStdString(std::to_string(editor_organism->anatomy->_organism_blocks.size())));
 }
 
 void OrganismEditor::initialize_gui() {

@@ -113,6 +113,8 @@ void MainWindow::mainloop_tick() {
         ecp.engine_pass_tick = true;
         ecp.synchronise_simulation_tick = true;
     }
+    if (ecp.update_editor_organism) {ee.update_chosen_organism(), ecp.update_editor_organism = false;}
+
     window_tick();
     window_frames++;
 
@@ -990,7 +992,7 @@ void MainWindow::change_main_grid_left_click() {
                     break;
                 case CursorMode::ChooseOrganism:
                     edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
-                    goto endfor;
+                    break;
                 case CursorMode::PlaceOrganism:
                     edc.user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
                     goto endfor;
@@ -1000,10 +1002,6 @@ void MainWindow::change_main_grid_left_click() {
     endfor:
 
     ecp.pause_processing_user_action = false;
-
-    if (cursor_mode == CursorMode::ChooseOrganism) {
-        ee.update_chosen_organism();
-    }
 }
 
 void MainWindow::change_main_grid_right_click() {

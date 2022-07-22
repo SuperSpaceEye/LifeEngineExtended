@@ -106,37 +106,28 @@ void OrganismEditor::b_reset_organism_slot() {
 
 
 void OrganismEditor::le_anatomy_mutation_rate_slot() {
-    float fallback = editor_organism->anatomy_mutation_rate;
-    auto result = try_convert_message_box_template<float>("Inputted text is not a float", _ui.le_anatomy_mutation_rate,
-                                                          fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 0) {display_message("Input cannot be less than 0."); return;}
-    if (result.result > 1) {display_message("Input cannot be more than 1."); return;}
-    editor_organism->anatomy_mutation_rate = result.result;
+    le_slot_lower_upper_bound<float>(editor_organism->anatomy_mutation_rate, editor_organism->anatomy_mutation_rate, "float",
+                                     _ui.le_anatomy_mutation_rate, 0, "0", 1, "1");
+}
+
+void OrganismEditor::le_brain_mutation_rate_slot() {
+    le_slot_lower_upper_bound<float>(editor_organism->brain_mutation_rate, editor_organism->brain_mutation_rate, "float",
+                                     _ui.le_brain_mutation_rate, 0, "0", 1, "1");
 }
 
 void OrganismEditor::le_grid_width_slot() {
-    int fallback = new_editor_width;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_grid_width, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 5) {display_message("Input cannot be less than 10."); return;}
-    new_editor_width = result.result;
+    le_slot_lower_bound<int>(new_editor_width, new_editor_width, "int",
+                             _ui.le_grid_width, 5, "5");
 }
 
 void OrganismEditor::le_grid_height_slot() {
-    int fallback = new_editor_height;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int.", _ui.le_grid_height, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 5) {display_message("Input cannot be less than 10."); return;}
-    new_editor_height = result.result;
+    le_slot_lower_bound<int>(new_editor_height, new_editor_height, "int",
+                             _ui.le_grid_height, 5, "5");
 }
 
 void OrganismEditor::le_move_range_slot() {
-    int fallback = editor_organism->move_range;
-    auto result = try_convert_message_box_template<int>("Inputted text is not an int", _ui.le_move_range, fallback);
-    if (!result.is_valid) {return;}
-    if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
-    editor_organism->move_range = result.result;
+    le_slot_lower_bound<int>(editor_organism->move_range, editor_organism->move_range, "int",
+                             _ui.le_move_range, 1, "1");
 }
 
 //==================== Radio buttons ====================
@@ -161,7 +152,6 @@ void OrganismEditor::rb_place_organism_slot() {
 }
 
 void OrganismEditor::rb_choose_organism_slot() {
-    display_message("This function is buggy right now and can crash program.");
     *c_mode = CursorMode::ChooseOrganism;
     _parent_ui->rb_null_button->setChecked(true);
 }

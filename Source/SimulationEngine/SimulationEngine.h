@@ -29,6 +29,7 @@
 #include "../Stuff/Linspace.h"
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
+#include "../OrganismEditor/OrganismEditor.h"
 #include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 
@@ -63,8 +64,8 @@ class SimulationEngine {
     void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
     void try_remove_food(int x, int y);
 public:
-    SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                     OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters);
+    SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
+                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters);
     void threaded_mainloop();
 
     void make_random_walls();

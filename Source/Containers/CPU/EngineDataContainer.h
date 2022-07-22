@@ -9,11 +9,11 @@
 #ifndef THELIFEENGINECPP_ENGINEDATACONTAINER_H
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
-//#include "../../Organism/CPU/Organism.h"
 #include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../GridBlocks/AtomicGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
+
 
 struct eager_worker_partial;
 class Organism;

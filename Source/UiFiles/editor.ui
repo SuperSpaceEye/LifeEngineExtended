@@ -39,8 +39,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>924</width>
-        <height>592</height>
+        <width>938</width>
+        <height>552</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -105,7 +105,7 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1">
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
                   <item>
                    <widget class="QGraphicsView" name="editor_graphicsView">
                     <property name="sizePolicy">
@@ -132,7 +132,7 @@
                    </widget>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <item>
                      <spacer name="verticalSpacer_2">
                       <property name="orientation">
@@ -141,7 +141,7 @@
                       <property name="sizeHint" stdset="0">
                        <size>
                         <width>20</width>
-                        <height>40</height>
+                        <height>0</height>
                        </size>
                       </property>
                      </spacer>
@@ -253,7 +253,7 @@
                      </layout>
                     </item>
                     <item>
-                     <widget class="QLabel" name="label">
+                     <widget class="QLabel" name="label_cell_count">
                       <property name="text">
                        <string>Cell count:</string>
                       </property>
@@ -297,7 +297,7 @@
                          </sizepolicy>
                         </property>
                         <property name="text">
-                         <string>Anatomy Mutation rate:</string>
+                         <string>Anatomy mutation rate:</string>
                         </property>
                        </widget>
                       </item>
@@ -310,6 +310,20 @@
                          </sizepolicy>
                         </property>
                        </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_15">
+                      <item>
+                       <widget class="QLabel" name="label_6">
+                        <property name="text">
+                         <string>Brain mutation rate:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_brain_mutation_rate"/>
                       </item>
                      </layout>
                     </item>
@@ -349,14 +363,14 @@
                      </layout>
                     </item>
                     <item>
-                     <spacer name="verticalSpacer_3">
+                     <spacer name="verticalSpacer">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
                       <property name="sizeHint" stdset="0">
                        <size>
                         <width>20</width>
-                        <height>40</height>
+                        <height>0</height>
                        </size>
                       </property>
                      </spacer>
@@ -411,14 +425,14 @@
                      </widget>
                     </item>
                     <item>
-                     <spacer name="verticalSpacer">
+                     <spacer name="verticalSpacer_3">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
                       <property name="sizeHint" stdset="0">
                        <size>
                         <width>20</width>
-                        <height>40</height>
+                        <height>0</height>
                        </size>
                       </property>
                      </spacer>
@@ -928,6 +942,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_brain_mutation_rate</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Editor</receiver>
+   <slot>le_brain_mutation_rate_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>744</x>
+     <y>229</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_reset_editing_view_slot()</slot>
@@ -951,6 +981,7 @@
   <slot>b_reset_organism_slot()</slot>
   <slot>cmd_block_rotation_slot(QString)</slot>
   <slot>cmd_organism_rotation_slot(QString)</slot>
+  <slot>le_brain_mutation_rate_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="edit_group"/>

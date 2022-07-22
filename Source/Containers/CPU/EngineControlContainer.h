@@ -55,6 +55,8 @@ struct EngineControlParameters {
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;
     volatile bool change_simulation_mode = false;
 
+    volatile bool update_editor_organism = false;
+
     uint8_t num_threads = 2;
 
 };

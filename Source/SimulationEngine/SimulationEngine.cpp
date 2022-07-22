@@ -8,8 +8,10 @@
 
 #include "SimulationEngine.h"
 
-SimulationEngine::SimulationEngine(EngineDataContainer& engine_data_container, EngineControlParameters& engine_control_parameters,
-                                   OrganismBlockParameters& organism_block_parameters, SimulationParameters& simulation_parameters):
+SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
+                                   EngineControlParameters &engine_control_parameters,
+                                   OrganismBlockParameters &organism_block_parameters,
+                                   SimulationParameters &simulation_parameters) :
     dc(engine_data_container), cp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
 
     boost::random_device rd;
@@ -233,6 +235,7 @@ void SimulationEngine::process_user_action_pool() {
             delete dc.chosen_organism;
             dc.chosen_organism = new Organism(dc.selected_organism);
             dc.selected_organism = nullptr;
+            cp.update_editor_organism = true;
             break;
         }
     }

@@ -160,6 +160,7 @@ private slots:
     void le_grid_height_slot();
     void le_grid_width_slot();
     void le_move_range_slot();
+    void le_brain_mutation_rate_slot();
 
     void rb_armor_slot();
     void rb_eye_slot();
