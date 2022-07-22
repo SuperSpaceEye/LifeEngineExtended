@@ -38,7 +38,7 @@ void OrganismEditor::read_organism(std::ifstream &is) {
 
     delete editor_organism;
     *chosen_organism = organism;
-    update_chosen_organism();
+    load_chosen_organism();
 }
 
 void OrganismEditor::read_organism_data(std::ifstream& is, OrganismData & data) {
@@ -194,7 +194,7 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
                                        mutability);
     delete editor_organism;
     *chosen_organism = new_organism;
-    update_chosen_organism();
+    load_chosen_organism();
 }
 
 void OrganismEditor::write_json_organism(std::string &full_path) {

@@ -171,7 +171,6 @@ private:
     bool disable_warnings = false;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;
-    bool reset_with_chosen = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
     bool synchronise_simulation_and_window = false;
@@ -436,6 +435,7 @@ private slots:
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
+    void cb_reset_with_editor_organism_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);

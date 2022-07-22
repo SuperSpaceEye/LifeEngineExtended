@@ -609,7 +609,8 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     int num_block = 0;
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
-//            if (type != BlockTypes::EmptyBlock) {
+            //If delete block, then the decrementing logic will be configured by remove_block
+            if (type != BlockTypes::EmptyBlock) {
             switch (item.type) {
                 case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
                 case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
@@ -621,7 +622,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
                 case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
                     break;
-//            }
+            }
             }
 
             switch (type) {
@@ -647,6 +648,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
         num_block++;
     }
 
+    //if tried to delete an empty space
     if (type == BlockTypes::EmptyBlock && num_block == _organism_blocks.size()) { return;}
 
     SerializedOrganismStructureContainer *new_structure;

@@ -8,6 +8,8 @@
 
 #include "OrganismEditor.h"
 
+//TODO the code is interconnected mess and needs refactoring
+
 void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                           SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode, Organism ** _chosen_organism) {
     _ui.setupUi(this);
@@ -29,6 +31,7 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
 
     auto brain = std::make_shared<Brain>();
+    brain->brain_type = BrainTypes::SimpleBrain;
 
     chosen_organism = _chosen_organism;
 
@@ -55,8 +58,12 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
 
 //    auto timer = new QTimer(parent());
 //    timer->setInterval(200);
-//    connect(timer, &QTimer::timeout, [&]{update_chosen_organism(); create_image();});
+//    connect(timer, &QTimer::timeout, [&]{load_chosen_organism(); create_image();});
 
+}
+
+void OrganismEditor::update_cell_count_label() {
+    _ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism->anatomy->_organism_blocks.size())));
 }
 
 void OrganismEditor::update_gui() {
@@ -65,7 +72,7 @@ void OrganismEditor::update_gui() {
     _ui.le_grid_width           ->setText(QString::fromStdString(std::to_string(editor_width)));
     _ui.le_grid_height          ->setText(QString::fromStdString(std::to_string(editor_height)));
     _ui.le_brain_mutation_rate  ->setText(QString::fromStdString(std::to_string(editor_organism->brain_mutation_rate)));
-    _ui.label_cell_count        ->setText(QString::fromStdString(std::to_string(editor_organism->anatomy->_organism_blocks.size())));
+    update_cell_count_label();
 }
 
 void OrganismEditor::initialize_gui() {
@@ -184,7 +191,6 @@ void OrganismEditor::reset_scale_view() {
     scaling_zoom = pow(scaling_coefficient, exp);
 
     finalize_chosen_organism();
-    create_image();
 }
 
 void OrganismEditor::resize_editing_grid(int width, int height) {
@@ -221,6 +227,7 @@ void OrganismEditor::resize_image() {
 
 void OrganismEditor::create_image() {
     place_organism_on_a_grid();
+    update_cell_count_label();
 
     resize_image();
     auto image_width = _ui.editor_graphicsView->viewport()->width();
@@ -338,7 +345,7 @@ color & OrganismEditor::get_texture_color(BlockTypes type, Rotation rotation, fl
                         x -= 2;
                         y -= 2;
                         std::swap(x, y);
-                        y = -y;
+                        x = -x;
                         x += 2;
                         y += 2;
                         break;
@@ -354,7 +361,7 @@ color & OrganismEditor::get_texture_color(BlockTypes type, Rotation rotation, fl
                         x -= 2;
                         y -= 2;
                         std::swap(x, y);
-                        x = -x;
+                        y = -y;
                         x += 2;
                         y += 2;
                         break;
@@ -401,14 +408,13 @@ Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
     return c_pos;
 }
 
-//TODO
 void OrganismEditor::finalize_chosen_organism() {
     delete *chosen_organism;
     *chosen_organism = new Organism(editor_organism);
 }
 
-//TODO
-void OrganismEditor::update_chosen_organism() {
+void OrganismEditor::load_chosen_organism() {
+    delete editor_organism;
     editor_organism = new Organism(*chosen_organism);
 
     Vector2 min{0, 0};

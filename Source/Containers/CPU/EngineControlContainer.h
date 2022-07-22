@@ -49,7 +49,7 @@ struct EngineControlParameters {
     volatile bool organisms_extinct = false;
 
     volatile bool tb_paused = false;
-    volatile bool reset_with_chosen = false;
+    volatile bool reset_with_editor_organism = false;
 
     SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;

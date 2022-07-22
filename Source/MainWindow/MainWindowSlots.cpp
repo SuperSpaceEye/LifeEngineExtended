@@ -60,6 +60,7 @@ void MainWindow::b_clear_slot() {
 void MainWindow::b_reset_slot() {
     if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
         pause_engine();
+        if (ecp.reset_with_editor_organism) {ee.load_chosen_organism();}
         engine->reset_world();
         unpause_engine();
     }
@@ -628,6 +629,8 @@ void MainWindow::cb_use_new_child_pos_calculator_slot    (bool state) { sp.use_n
 void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check_if_path_is_clear = state;}
 
 void MainWindow::cb_really_stop_render_slot              (bool state) { really_stop_render = state;}
+
+void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
 //==================== Table ====================
 

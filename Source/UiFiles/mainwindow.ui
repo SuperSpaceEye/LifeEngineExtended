@@ -490,8 +490,8 @@ p, li { white-space: pre-wrap; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>620</width>
-                  <height>217</height>
+                  <width>606</width>
+                  <height>233</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -617,6 +617,13 @@ p, li { white-space: pre-wrap; }
                          <widget class="QPushButton" name="b_resize_and_reset">
                           <property name="text">
                            <string>Resize and Reset</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QCheckBox" name="cb_reset_with_editor_organism">
+                          <property name="text">
+                           <string>Reset with editor organism</string>
                           </property>
                          </widget>
                         </item>
@@ -1978,7 +1985,7 @@ p, li { white-space: pre-wrap; }
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-165</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>693</height>
                  </rect>
@@ -3981,6 +3988,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_reset_with_editor_organism</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_reset_with_editor_organism_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>531</x>
+     <y>797</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4084,6 +4107,7 @@ p, li { white-space: pre-wrap; }
   <slot>le_brain_mutation_rate_step_slot()</slot>
   <slot>le_keyboard_movement_amount_slot()</slot>
   <slot>le_scaling_coefficient_slot()</slot>
+  <slot>cb_reset_with_editor_organism_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

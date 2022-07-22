@@ -16,7 +16,7 @@ Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> ana
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-                   anatomy(std::move(anatomy)), sp(sp), bp(block_parameters), brain(std::move(brain)),
+                   anatomy(std::make_shared<Anatomy>(anatomy)), sp(sp), bp(block_parameters), brain(std::make_shared<Brain>(brain)),
                    OrganismData(x,
                                 y,
                                 rotation,
@@ -26,8 +26,8 @@ Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> ana
     init_values();
 }
 
-Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism->sp),
-                                        bp(organism->bp), brain(organism->brain),
+Organism::Organism(Organism *organism): anatomy(std::make_shared<Anatomy>(organism->anatomy)), sp(organism->sp),
+                                        bp(organism->bp), brain(std::make_shared<Brain>(organism->brain)),
                                         OrganismData(organism->x,
                                                      organism->y,
                                                      organism->rotation,

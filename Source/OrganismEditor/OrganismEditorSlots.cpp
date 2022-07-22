@@ -50,8 +50,7 @@ void OrganismEditor::b_load_organism_slot() {
     } catch (std::string & _) {
         display_message("Loading of organism was unsuccessful.");
     }
-
-    update_chosen_organism();
+    finalize_chosen_organism();
 }
 
 void OrganismEditor::b_save_organism_slot() {
@@ -99,7 +98,7 @@ void OrganismEditor::b_reset_organism_slot() {
     }
 
     editor_organism->anatomy->set_many_blocks(editor_organism->anatomy->_organism_blocks);
-    update_chosen_organism();
+    finalize_chosen_organism();
 }
 
 //==================== Line edits ====================
@@ -149,6 +148,7 @@ void OrganismEditor::rb_place_organism_slot() {
     *c_mode = CursorMode::PlaceOrganism;
     finalize_chosen_organism();
     _parent_ui->rb_null_button->setChecked(true);
+    create_image();
 }
 
 void OrganismEditor::rb_choose_organism_slot() {
@@ -170,9 +170,9 @@ void OrganismEditor::rb_edit_brain_slot() {
 //TODO i don't fkn know why left and right is switched
 void OrganismEditor::cmd_block_rotation_slot(QString name) {
     if (name.toStdString() == "Up")    {chosen_block_rotation = Rotation::UP;}
-    if (name.toStdString() == "Left")  {chosen_block_rotation = Rotation::RIGHT;}
+    if (name.toStdString() == "Left")  {chosen_block_rotation = Rotation::LEFT;}
     if (name.toStdString() == "Down")  {chosen_block_rotation = Rotation::DOWN;}
-    if (name.toStdString() == "Right") {chosen_block_rotation = Rotation::LEFT;}
+    if (name.toStdString() == "Right") {chosen_block_rotation = Rotation::RIGHT;}
 }
 
 void OrganismEditor::cmd_organism_rotation_slot(QString name) {

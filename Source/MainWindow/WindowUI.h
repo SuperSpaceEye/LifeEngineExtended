@@ -91,6 +91,7 @@ public:
     QLabel *label_14;
     QLineEdit *le_simulation_height;
     QPushButton *b_resize_and_reset;
+    QCheckBox *cb_reset_with_editor_organism;
     QCheckBox *cb_reset_on_total_extinction;
     QCheckBox *cb_pause_on_total_extinction;
     QHBoxLayout *horizontalLayout_11;
@@ -539,7 +540,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 620, 217));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 606, 233));
         QSizePolicy sizePolicy3(QSizePolicy::Ignored, QSizePolicy::Minimum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -613,6 +614,11 @@ public:
         b_resize_and_reset->setObjectName(QString::fromUtf8("b_resize_and_reset"));
 
         verticalLayout_21->addWidget(b_resize_and_reset);
+
+        cb_reset_with_editor_organism = new QCheckBox(widget_3);
+        cb_reset_with_editor_organism->setObjectName(QString::fromUtf8("cb_reset_with_editor_organism"));
+
+        verticalLayout_21->addWidget(cb_reset_with_editor_organism);
 
         cb_reset_on_total_extinction = new QCheckBox(widget_3);
         cb_reset_on_total_extinction->setObjectName(QString::fromUtf8("cb_reset_on_total_extinction"));
@@ -1473,7 +1479,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -165, 606, 693));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 693));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1892,6 +1898,7 @@ public:
         QObject::connect(le_anatomy_mutation_rate_step, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_step_slot()));
         QObject::connect(le_keyboard_movement_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_keyboard_movement_amount_slot()));
         QObject::connect(le_scaling_coefficient, SIGNAL(returnPressed()), MainWindow, SLOT(le_scaling_coefficient_slot()));
+        QObject::connect(cb_reset_with_editor_organism, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reset_with_editor_organism_slot(bool)));
 
         Tabs->setCurrentIndex(1);
 
@@ -1948,6 +1955,7 @@ public:
         label_14->setText(QApplication::translate("MainWindow", "Height:", nullptr));
         le_simulation_height->setText(QApplication::translate("MainWindow", "600", nullptr));
         b_resize_and_reset->setText(QApplication::translate("MainWindow", "Resize and Reset", nullptr));
+        cb_reset_with_editor_organism->setText(QApplication::translate("MainWindow", "Reset with editor organism", nullptr));
         cb_reset_on_total_extinction->setText(QApplication::translate("MainWindow", "Reset on total extinction", nullptr));
         cb_pause_on_total_extinction->setText(QApplication::translate("MainWindow", "Pause on total extinction", nullptr));
         label_18->setText(QApplication::translate("MainWindow", "Max organisms:", nullptr));

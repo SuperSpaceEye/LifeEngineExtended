@@ -92,6 +92,7 @@ public:
     void clear_grid();
 
     void update_gui();
+    void update_cell_count_label();
     void initialize_gui();
 
     void brain_cb_chooser(std::string observation, std::string action);
@@ -134,7 +135,7 @@ public:
     color &get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     void finalize_chosen_organism();
-    void update_chosen_organism();
+    void load_chosen_organism();
 
     void read_organism(std::ifstream & is);
     void read_organism_data(std::ifstream& is, OrganismData & data);

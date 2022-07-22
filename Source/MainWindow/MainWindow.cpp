@@ -113,7 +113,7 @@ void MainWindow::mainloop_tick() {
         ecp.engine_pass_tick = true;
         ecp.synchronise_simulation_tick = true;
     }
-    if (ecp.update_editor_organism) {ee.update_chosen_organism(), ecp.update_editor_organism = false;}
+    if (ecp.update_editor_organism) { ee.load_chosen_organism(), ecp.update_editor_organism = false;}
 
     window_tick();
     window_frames++;
@@ -243,7 +243,7 @@ color & MainWindow::get_texture_color(BlockTypes type, Rotation rotation, float 
                         x -= 2;
                         y -= 2;
                         std::swap(x, y);
-                        y = -y;
+                        x = -x;
                         x += 2;
                         y += 2;
                         break;
@@ -259,7 +259,7 @@ color & MainWindow::get_texture_color(BlockTypes type, Rotation rotation, float 
                         x -= 2;
                         y -= 2;
                         std::swap(x, y);
-                        x = -x;
+                        y = -y;
                         x += 2;
                         y += 2;
                         break;
@@ -1032,8 +1032,6 @@ void MainWindow::change_main_grid_right_click() {
 
 void MainWindow::change_editing_grid_left_click() {
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-    cpg.x -= 0;
-    cpg.y -= 0;
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
 
     //relative position

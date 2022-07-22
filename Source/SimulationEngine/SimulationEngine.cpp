@@ -326,7 +326,7 @@ void SimulationEngine::reset_world() {
     dc.chosen_organism->x = dc.simulation_width / 2;
     dc.chosen_organism->y = dc.simulation_height / 2;
 
-    if (cp.reset_with_chosen) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
+    if (cp.reset_with_editor_organism) {dc.to_place_organisms.push_back(new Organism(dc.chosen_organism));}
     else                      {dc.to_place_organisms.push_back(new Organism(dc.base_organism));}
 
     //Just in case
