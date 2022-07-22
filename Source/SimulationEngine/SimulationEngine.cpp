@@ -50,7 +50,6 @@ void SimulationEngine::threaded_mainloop() {
             cp.engine_pass_tick = false;
             cp.pass_tick = false;
             cp.synchronise_simulation_tick = false;
-            //TODO shuffle a 1d vector of sim_width*sim_height coordinates and then just iterate
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (cp.calculate_simulation_tick_delta_time) {dc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
             if (!dc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(dc.simulation_interval * 1000000 - dc.delta_time)));}

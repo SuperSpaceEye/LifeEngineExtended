@@ -16,18 +16,24 @@ Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> ana
                    std::shared_ptr<Brain> brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-        x(x), y(y), rotation(rotation), anatomy(anatomy), sp(sp),
-        bp(block_parameters), brain(brain), anatomy_mutation_rate(anatomy_mutation_rate),
-        brain_mutation_rate(brain_mutation_rate), move_range(move_range) {
+                   anatomy(std::move(anatomy)), sp(sp), bp(block_parameters), brain(std::move(brain)),
+                   OrganismData(x,
+                                y,
+                                rotation,
+                                move_range,
+                                anatomy_mutation_rate,
+                                brain_mutation_rate) {
     init_values();
 }
 
-Organism::Organism(Organism *organism): x(organism->x), y(organism->y),
-                                        rotation(organism->rotation), anatomy(organism->anatomy), sp(organism->sp),
+Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism->sp),
                                         bp(organism->bp), brain(organism->brain),
-                                        anatomy_mutation_rate(organism->anatomy_mutation_rate),
-                                        brain_mutation_rate(organism->brain_mutation_rate),
-                                        move_range(organism->move_range){
+                                        OrganismData(organism->x,
+                                                     organism->y,
+                                                     organism->rotation,
+                                                     organism->move_range,
+                                                     organism->anatomy_mutation_rate,
+                                                     organism->brain_mutation_rate) {
     init_values();
 }
 

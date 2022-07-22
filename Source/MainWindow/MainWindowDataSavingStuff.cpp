@@ -47,32 +47,14 @@ void MainWindow::write_organisms(std::ofstream& os) {
     uint32_t size = edc.organisms.size();
     os.write((char*)&size, sizeof(uint32_t));
     for (auto & organism: edc.organisms) {
-        write_organism_data(os,    organism);
         write_organism_brain(os,   organism->brain.get());
         write_organism_anatomy(os, organism->anatomy.get());
+        write_organism_data(os,    organism);
     }
 }
 
 void MainWindow::write_organism_data(std::ofstream& os, Organism * organism) {
-    OrganismData data{};
-    data.x                       = organism->x;
-    data.y                       = organism->y;
-    data.life_points             = organism->life_points;
-    data.damage                  = organism->damage;
-    data.max_lifetime            = organism->max_lifetime;
-    data.lifetime                = organism->lifetime;
-    data.anatomy_mutation_rate   = organism->anatomy_mutation_rate;
-    data.brain_mutation_rate     = organism->brain_mutation_rate;
-    data.food_collected          = organism->food_collected;
-    data.food_needed             = organism->food_needed;
-    data.move_range              = organism->move_range;
-    data.rotation                = organism->rotation;
-    data.move_counter            = organism->move_counter;
-    data.max_decision_lifetime   = organism->max_decision_lifetime;
-    data.max_do_nothing_lifetime = organism->max_do_nothing_lifetime;
-    data.last_decision           = organism->last_decision;
-
-    os.write((char*)&data, sizeof(OrganismData));
+    os.write((char*)static_cast<OrganismData*>(organism), sizeof(OrganismData));
 }
 
 void MainWindow::write_organism_brain(std::ofstream& os, Brain * brain) {
@@ -82,15 +64,15 @@ void MainWindow::write_organism_brain(std::ofstream& os, Brain * brain) {
 //TODO do i need to save spaces?
 
 void MainWindow::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
-    uint32_t organism_blocks_size                = anatomy->_organism_blocks.size();
-    uint32_t producing_space_size                = anatomy->_producing_space.size();
-    uint32_t eating_space_size                   = anatomy->_eating_space.size();
-    uint32_t killing_space_size                  = anatomy->_killing_space.size();
+    uint32_t organism_blocks_size = anatomy->_organism_blocks.size();
+    uint32_t producing_space_size = anatomy->_producing_space.size();
+    uint32_t eating_space_size    = anatomy->_eating_space.size();
+    uint32_t killing_space_size   = anatomy->_killing_space.size();
 
-    os.write((char*)&organism_blocks_size,                sizeof(uint32_t));
-    os.write((char*)&producing_space_size,                sizeof(uint32_t));
-    os.write((char*)&eating_space_size,                   sizeof(uint32_t));
-    os.write((char*)&killing_space_size,                  sizeof(uint32_t));
+    os.write((char*)&organism_blocks_size, sizeof(uint32_t));
+    os.write((char*)&producing_space_size, sizeof(uint32_t));
+    os.write((char*)&eating_space_size,    sizeof(uint32_t));
+    os.write((char*)&killing_space_size,   sizeof(uint32_t));
 
     os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -99,9 +81,9 @@ void MainWindow::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
     os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    os.write((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.write((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.write((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    os.write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    os.write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
@@ -114,9 +96,9 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
                                uint32_t recovery_simulation_width, uint32_t recovery_simulation_height) {
     sp = recovery_sp;
     bp = recovery_bp;
-    edc.simulation_width = recovery_simulation_width;
+    edc.simulation_width  = recovery_simulation_width;
     edc.simulation_height = recovery_simulation_height;
-    new_simulation_width = recovery_simulation_width;
+    new_simulation_width  = recovery_simulation_width;
     new_simulation_height = recovery_simulation_height;
 
     engine->reset_world();
@@ -233,38 +215,24 @@ bool MainWindow::read_organisms(std::ifstream& is) {
 
     edc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
-        OrganismData data{};
         auto brain = std::make_shared<Brain>();
         auto anatomy = std::make_shared<Anatomy>();
 
-        read_organism_data(is, data);
         read_organism_brain(is, brain.get());
         read_organism_anatomy(is, anatomy.get());
 
-        auto * organism = new Organism(data.x,
-                                       data.y,
-                                       data.rotation,
+        auto * organism = new Organism(0,
+                                       0,
+                                       Rotation::UP,
                                        anatomy,
                                        brain,
                                        &sp,
                                        &bp,
-                                       data.move_range,
-                                       data.anatomy_mutation_rate,
-                                       data.brain_mutation_rate);
+                                       0,
+                                       0,
+                                       0);
 
-        organism->bp                      = &bp;
-        organism->sp                      = &sp;
-        organism->child_pattern           = nullptr;
-        organism->life_points             = data.life_points;
-        organism->damage                  = data.damage;
-        organism->max_lifetime            = data.max_lifetime;
-        organism->lifetime                = data.lifetime;
-        organism->food_collected          = data.food_collected;
-        organism->food_needed             = data.food_needed;
-        organism->move_counter            = data.move_counter;
-        organism->max_decision_lifetime   = data.max_decision_lifetime;
-        organism->max_do_nothing_lifetime = data.max_do_nothing_lifetime;
-        organism->last_decision           = data.last_decision;
+        read_organism_data(is, *static_cast<OrganismData*>(organism));
 
         edc.organisms.emplace_back(organism);
         SimulationEngineSingleThread::place_organism(&edc, organism);
@@ -282,15 +250,15 @@ void MainWindow::read_organism_brain(std::ifstream& is, Brain * brain) {
 }
 
 void MainWindow::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
-    uint32_t organism_blocks_size                = 0;
-    uint32_t producing_space_size                = 0;
-    uint32_t eating_space_size                   = 0;
-    uint32_t killing_space_size                  = 0;
+    uint32_t organism_blocks_size = 0;
+    uint32_t producing_space_size = 0;
+    uint32_t eating_space_size    = 0;
+    uint32_t killing_space_size   = 0;
 
-    is.read((char*)&organism_blocks_size,                sizeof(uint32_t));
-    is.read((char*)&producing_space_size,                sizeof(uint32_t));
-    is.read((char*)&eating_space_size,                   sizeof(uint32_t));
-    is.read((char*)&killing_space_size,                  sizeof(uint32_t));
+    is.read((char*)&organism_blocks_size, sizeof(uint32_t));
+    is.read((char*)&producing_space_size, sizeof(uint32_t));
+    is.read((char*)&eating_space_size,    sizeof(uint32_t));
+    is.read((char*)&killing_space_size,   sizeof(uint32_t));
 
     anatomy->_organism_blocks.resize(organism_blocks_size);
     anatomy->_producing_space.resize(producing_space_size);
@@ -304,9 +272,9 @@ void MainWindow::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
     is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    is.read((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.read((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.read((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.read((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    is.read((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    is.read((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;

@@ -4,6 +4,8 @@
 
 #include "OrganismEditor.h"
 
+//TODO remove duplicate code.
+
 template <typename T>
 struct my_id_translator
 {
@@ -15,30 +17,24 @@ struct my_id_translator
 };
 
 void OrganismEditor::read_organism(std::ifstream &is) {
-    OrganismData data{};
     auto brain = std::make_shared<Brain>();
     auto anatomy = std::make_shared<Anatomy>();
 
-    read_organism_data(is, data);
     read_organism_brain(is, brain.get());
     read_organism_anatomy(is, anatomy.get());
 
-    auto * organism = new Organism(data.x,
-                                   data.y,
-                                   data.rotation,
+    auto * organism = new Organism(0,
+                                   0,
+                                   Rotation::UP,
                                    anatomy,
                                    brain,
                                    editor_organism->sp,
                                    editor_organism->bp,
-                                   data.move_range,
-                                   data.anatomy_mutation_rate,
-                                   data.brain_mutation_rate);
+                                   0,
+                                   0,
+                                   0);
 
-    organism->bp                      = editor_organism->bp;
-    organism->sp                      = editor_organism->sp;
-    organism->child_pattern           = nullptr;
-    organism->max_decision_lifetime   = data.max_decision_lifetime;
-    organism->max_do_nothing_lifetime = data.max_do_nothing_lifetime;
+    read_organism_data(is, *static_cast<OrganismData*>(organism));
 
     delete editor_organism;
     *chosen_organism = organism;
@@ -54,15 +50,15 @@ void OrganismEditor::read_organism_brain(std::ifstream& is, Brain * brain) {
 }
 
 void OrganismEditor::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
-    uint32_t organism_blocks_size                = 0;
-    uint32_t producing_space_size                = 0;
-    uint32_t eating_space_size                   = 0;
-    uint32_t killing_space_size                  = 0;
+    uint32_t organism_blocks_size = 0;
+    uint32_t producing_space_size = 0;
+    uint32_t eating_space_size    = 0;
+    uint32_t killing_space_size   = 0;
 
-    is.read((char*)&organism_blocks_size,                sizeof(uint32_t));
-    is.read((char*)&producing_space_size,                sizeof(uint32_t));
-    is.read((char*)&eating_space_size,                   sizeof(uint32_t));
-    is.read((char*)&killing_space_size,                  sizeof(uint32_t));
+    is.read((char*)&organism_blocks_size, sizeof(uint32_t));
+    is.read((char*)&producing_space_size, sizeof(uint32_t));
+    is.read((char*)&eating_space_size,    sizeof(uint32_t));
+    is.read((char*)&killing_space_size,   sizeof(uint32_t));
 
     anatomy->_organism_blocks.resize(organism_blocks_size);
     anatomy->_producing_space.resize(producing_space_size);
@@ -76,9 +72,9 @@ void OrganismEditor::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy)
     is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    is.read((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.read((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.read((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.read((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    is.read((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    is.read((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;
@@ -89,31 +85,13 @@ void OrganismEditor::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy)
 }
 
 void OrganismEditor::write_organism(std::ofstream& os) {
-    write_organism_data(os,    editor_organism);
     write_organism_brain(os,   editor_organism->brain.get());
     write_organism_anatomy(os, editor_organism->anatomy.get());
+    write_organism_data(os,    editor_organism);
 }
 
 void OrganismEditor::write_organism_data(std::ofstream& os, Organism * organism) {
-    OrganismData data{};
-    data.x                       = organism->x;
-    data.y                       = organism->y;
-    data.life_points             = organism->life_points;
-    data.damage                  = organism->damage;
-    data.max_lifetime            = organism->max_lifetime;
-    data.lifetime                = organism->lifetime;
-    data.anatomy_mutation_rate   = organism->anatomy_mutation_rate;
-    data.brain_mutation_rate     = organism->brain_mutation_rate;
-    data.food_collected          = organism->food_collected;
-    data.food_needed             = organism->food_needed;
-    data.move_range              = organism->move_range;
-    data.rotation                = organism->rotation;
-    data.move_counter            = organism->move_counter;
-    data.max_decision_lifetime   = organism->max_decision_lifetime;
-    data.max_do_nothing_lifetime = organism->max_do_nothing_lifetime;
-    data.last_decision           = organism->last_decision;
-
-    os.write((char*)&data, sizeof(OrganismData));
+    os.write((char*)static_cast<OrganismData*>(organism), sizeof(OrganismData));
 }
 
 void OrganismEditor::write_organism_brain(std::ofstream& os, Brain * brain) {
@@ -121,15 +99,15 @@ void OrganismEditor::write_organism_brain(std::ofstream& os, Brain * brain) {
 }
 
 void OrganismEditor::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
-    uint32_t organism_blocks_size                = anatomy->_organism_blocks.size();
-    uint32_t producing_space_size                = anatomy->_producing_space.size();
-    uint32_t eating_space_size                   = anatomy->_eating_space.size();
-    uint32_t killing_space_size                  = anatomy->_killing_space.size();
+    uint32_t organism_blocks_size = anatomy->_organism_blocks.size();
+    uint32_t producing_space_size = anatomy->_producing_space.size();
+    uint32_t eating_space_size    = anatomy->_eating_space.size();
+    uint32_t killing_space_size   = anatomy->_killing_space.size();
 
-    os.write((char*)&organism_blocks_size,                sizeof(uint32_t));
-    os.write((char*)&producing_space_size,                sizeof(uint32_t));
-    os.write((char*)&eating_space_size,                   sizeof(uint32_t));
-    os.write((char*)&killing_space_size,                  sizeof(uint32_t));
+    os.write((char*)&organism_blocks_size, sizeof(uint32_t));
+    os.write((char*)&producing_space_size, sizeof(uint32_t));
+    os.write((char*)&eating_space_size,    sizeof(uint32_t));
+    os.write((char*)&killing_space_size,   sizeof(uint32_t));
 
     os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -138,9 +116,9 @@ void OrganismEditor::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy
     os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    os.write((char*)&anatomy->_organism_blocks[0],                sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.write((char*)&anatomy->_eating_space[0],                   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.write((char*)&anatomy->_killing_space[0],                  sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    os.write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    os.write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();

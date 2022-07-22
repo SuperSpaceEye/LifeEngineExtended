@@ -66,7 +66,6 @@
 #if __CUDA_USED__
 #include "../Stuff/cuda_image_creator.cuh"
 #include "../Stuff/get_device_count.cuh"
-#include "../Stuff/OrganismData.h"
 
 #endif
 

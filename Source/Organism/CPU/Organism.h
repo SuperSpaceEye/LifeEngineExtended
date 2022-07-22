@@ -20,8 +20,7 @@
 #include "../../PRNGS/lehmer64.h"
 #include "ObservationStuff.h"
 
-class Organism {
-//private:
+struct OrganismData {
 public:
     //coordinates of a central block of an organism
     int x = 0;
@@ -55,6 +54,14 @@ public:
 
     DecisionObservation last_decision = DecisionObservation{};
 
+    OrganismData()=default;
+    OrganismData(int x, int y, Rotation rotation, int move_range, float anatomy_mutation_rate,
+                 float brain_mutation_rate): x(x), y(y), rotation(rotation), anatomy_mutation_rate(anatomy_mutation_rate),
+                                             brain_mutation_rate(brain_mutation_rate), move_range(move_range) {};
+};
+
+class Organism: public OrganismData {
+public:
     std::shared_ptr<Anatomy> anatomy = nullptr;
     std::shared_ptr<Brain> brain = nullptr;
     SimulationParameters* sp = nullptr;

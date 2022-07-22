@@ -16,6 +16,9 @@
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
 #include "../CustomJsonParser/json_parser.hpp"
+#ifndef __WIN32
+#include <filesystem>
+#endif
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
@@ -35,7 +38,6 @@
 #include "../Stuff/textures.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/MiscFuncs.h"
-#include "../Stuff/OrganismData.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -48,6 +50,14 @@ struct EditBlock : BaseGridBlock {
 class OrganismEditor: public QWidget {
     Q_OBJECT
 public:
+    std::vector<std::string> decisions{"Do Nothing", "Go Away", "Go Towards"};
+    std::vector<std::string> observations{"Mouth Cell", "Producer Cell", "Mover Cell", "Killer Cell", "Armor Cell", "Eye Cell", "Food", "Wall"};
+    std::map<std::string, std::map<std::string, QCheckBox*>> brain_checkboxes;
+    std::map<std::string, BlockTypes>     mapped_block_types_s_to_type;
+    std::map<std::string, SimpleDecision> mapped_decisions_s_to_type;
+    std::map<BlockTypes,     std::string> mapped_block_types_type_to_s;
+    std::map<SimpleDecision, std::string> mapped_decisions_type_to_s;
+
     Ui::MainWindow * _parent_ui = nullptr;
 
     std::vector<std::vector<EditBlock>> edit_grid;
@@ -81,7 +91,11 @@ public:
     void place_organism_on_a_grid();
     void clear_grid();
 
+    void update_gui();
     void initialize_gui();
+
+    void brain_cb_chooser(std::string observation, std::string action);
+    void update_brain_checkboxes();
 
     QLabel actual_cursor;
 

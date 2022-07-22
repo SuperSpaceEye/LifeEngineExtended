@@ -43,10 +43,10 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
 
     resize_editing_grid(width, height);
     resize_image();
-    reset_scale_view();
     create_image();
 
     initialize_gui();
+    reset_scale_view();
 
     actual_cursor.setParent(this);
     actual_cursor.setGeometry(50, 50, 5, 5);
@@ -59,11 +59,86 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
 
 }
 
-void OrganismEditor::initialize_gui() {
+void OrganismEditor::update_gui() {
     _ui.le_move_range->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
     _ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism->anatomy_mutation_rate)));
     _ui.le_grid_width->setText(QString::fromStdString(std::to_string(editor_width)));
     _ui.le_grid_height->setText(QString::fromStdString(std::to_string(editor_height)));
+}
+
+void OrganismEditor::initialize_gui() {
+    update_gui();
+
+    for (auto & observation: observations) {
+        auto * horizontal_layout = new QHBoxLayout{};
+        auto * b_group = new QButtonGroup(this);
+
+        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation), _ui.widget_2));
+        for (auto & decision: decisions) {
+            auto * cb = new QCheckBox(QString::fromStdString(decision), _ui.widget_2);
+            connect(cb, &QCheckBox::clicked, [&, decision, observation](){brain_cb_chooser(observation, decision);});
+
+            horizontal_layout->addWidget(cb);
+            b_group->addButton(cb);
+
+            brain_checkboxes[observation][decision] = cb;
+        }
+
+        _ui.brain_vertical_layout->addItem(horizontal_layout);
+    }
+
+    mapped_decisions_s_to_type["Do Nothing"] = SimpleDecision::DoNothing;
+    mapped_decisions_s_to_type["Go Away"]    = SimpleDecision::GoAway;
+    mapped_decisions_s_to_type["Go Towards"] = SimpleDecision::GoTowards;
+
+    mapped_block_types_s_to_type["Mouth Cell"]    = BlockTypes::MouthBlock;
+    mapped_block_types_s_to_type["Producer Cell"] = BlockTypes::ProducerBlock;
+    mapped_block_types_s_to_type["Mover Cell"]    = BlockTypes::MoverBlock;
+    mapped_block_types_s_to_type["Killer Cell"]   = BlockTypes::KillerBlock;
+    mapped_block_types_s_to_type["Armor Cell"]    = BlockTypes::ArmorBlock;
+    mapped_block_types_s_to_type["Eye Cell"]      = BlockTypes::EyeBlock;
+    mapped_block_types_s_to_type["Food Cell"]     = BlockTypes::FoodBlock;
+    mapped_block_types_s_to_type["Wall"]          = BlockTypes::WallBlock;
+
+    for (auto & pair: mapped_decisions_s_to_type)   {mapped_decisions_type_to_s  [pair.second] = pair.first;}
+    for (auto & pair: mapped_block_types_s_to_type) {mapped_block_types_type_to_s[pair.second] = pair.first;}
+
+    update_brain_checkboxes();
+}
+
+void OrganismEditor::brain_cb_chooser(std::string observation, std::string action) {
+    auto observation_type = mapped_block_types_s_to_type[observation];
+    auto decision = mapped_decisions_s_to_type[action];
+
+    SimpleDecision * brain_decision;
+
+    switch (observation_type) {
+        case BlockTypes::MouthBlock:    brain_decision = &editor_organism->brain->simple_action_table.MouthBlock;    break;
+        case BlockTypes::ProducerBlock: brain_decision = &editor_organism->brain->simple_action_table.ProducerBlock; break;
+        case BlockTypes::MoverBlock:    brain_decision = &editor_organism->brain->simple_action_table.MoverBlock;    break;
+        case BlockTypes::KillerBlock:   brain_decision = &editor_organism->brain->simple_action_table.KillerBlock;   break;
+        case BlockTypes::ArmorBlock:    brain_decision = &editor_organism->brain->simple_action_table.ArmorBlock;    break;
+        case BlockTypes::EyeBlock:      brain_decision = &editor_organism->brain->simple_action_table.EyeBlock;      break;
+        case BlockTypes::FoodBlock:     brain_decision = &editor_organism->brain->simple_action_table.FoodBlock;     break;
+        case BlockTypes::WallBlock:     brain_decision = &editor_organism->brain->simple_action_table.WallBlock;     break;
+    }
+
+    switch (decision) {
+        case SimpleDecision::DoNothing: *brain_decision = SimpleDecision::DoNothing;break;
+        case SimpleDecision::GoAway:    *brain_decision = SimpleDecision::GoAway;   break;
+        case SimpleDecision::GoTowards: *brain_decision = SimpleDecision::GoTowards;break;
+    }
+}
+
+void OrganismEditor::update_brain_checkboxes() {
+    brain_checkboxes["Mouth Cell"]   [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.MouthBlock]]   ->setChecked(true);
+    brain_checkboxes["Producer Cell"][mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.ProducerBlock]]->setChecked(true);
+    brain_checkboxes["Mover Cell"]   [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.MoverBlock]]   ->setChecked(true);
+    brain_checkboxes["Killer Cell"]  [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.KillerBlock]]  ->setChecked(true);
+    brain_checkboxes["Armor Cell"]   [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.ArmorBlock]]   ->setChecked(true);
+    brain_checkboxes["Eye Cell"]     [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.EyeBlock]]     ->setChecked(true);
+    brain_checkboxes["Food"]         [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.FoodBlock]]    ->setChecked(true);
+    brain_checkboxes["Wall"]         [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.WallBlock]]    ->setChecked(true);
 }
 
 void OrganismEditor::closeEvent(QCloseEvent * event) {
@@ -357,6 +432,7 @@ void OrganismEditor::update_chosen_organism() {
 
     resize_editing_grid(new_editor_width, new_editor_height);
     create_image();
-    initialize_gui();
+    update_gui();
+    update_brain_checkboxes();
 }
 
