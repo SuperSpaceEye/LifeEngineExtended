@@ -414,7 +414,6 @@ void OrganismEditor::finalize_chosen_organism() {
 }
 
 void OrganismEditor::load_chosen_organism() {
-    delete editor_organism;
     editor_organism = new Organism(*chosen_organism);
 
     Vector2 min{0, 0};

@@ -99,6 +99,7 @@ void OrganismEditor::b_reset_organism_slot() {
 
     editor_organism->anatomy->set_many_blocks(editor_organism->anatomy->_organism_blocks);
     finalize_chosen_organism();
+    create_image();
 }
 
 //==================== Line edits ====================
