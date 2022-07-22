@@ -89,6 +89,19 @@ void OrganismEditor::b_save_organism_slot() {
     }
 }
 
+void OrganismEditor::b_reset_organism_slot() {
+    for (int i = 0; i < editor_organism->anatomy->_organism_blocks.size(); i++) {
+        if (editor_organism->anatomy->_organism_blocks[i].relative_x == 0 && editor_organism->anatomy->_organism_blocks[i].relative_y == 0) {
+            continue;
+        }
+        editor_organism->anatomy->_organism_blocks.erase(editor_organism->anatomy->_organism_blocks.begin() + i);
+        i--;
+    }
+
+    editor_organism->anatomy->set_many_blocks(editor_organism->anatomy->_organism_blocks);
+    update_chosen_organism();
+}
+
 //==================== Line edits ====================
 
 
@@ -159,4 +172,23 @@ void OrganismEditor::rb_edit_anatomy_slot() {
 
 void OrganismEditor::rb_edit_brain_slot() {
     _ui.stackedWidget->setCurrentIndex(1);
+}
+
+//==================== Combo boxes ====================
+
+
+//TODO i don't fkn know why left and right is switched
+void OrganismEditor::cmd_block_rotation_slot(QString name) {
+    if (name.toStdString() == "Up")    {chosen_block_rotation = Rotation::UP;}
+    if (name.toStdString() == "Left")  {chosen_block_rotation = Rotation::RIGHT;}
+    if (name.toStdString() == "Down")  {chosen_block_rotation = Rotation::DOWN;}
+    if (name.toStdString() == "Right") {chosen_block_rotation = Rotation::LEFT;}
+}
+
+void OrganismEditor::cmd_organism_rotation_slot(QString name) {
+    if (name.toStdString() == "Up")    {editor_organism->rotation = Rotation::UP;}
+    if (name.toStdString() == "Left")  {editor_organism->rotation = Rotation::RIGHT;}
+    if (name.toStdString() == "Down")  {editor_organism->rotation = Rotation::DOWN;}
+    if (name.toStdString() == "Right") {editor_organism->rotation = Rotation::LEFT;}
+    finalize_chosen_organism();
 }

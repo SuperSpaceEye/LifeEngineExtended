@@ -991,11 +991,9 @@ void MainWindow::change_main_grid_left_click() {
                 case CursorMode::ChooseOrganism:
                     edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     goto endfor;
-                    break;
                 case CursorMode::PlaceOrganism:
                     edc.user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
                     goto endfor;
-                    break;
             }
         }
     }
@@ -1042,7 +1040,7 @@ void MainWindow::change_editing_grid_left_click() {
 
     //relative position
     auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy->set_block(ee.chosen_block_type, ee.chosen_rotation, r_pos.x, r_pos.y);
+    ee.editor_organism->anatomy->set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
     ee.create_image();
 }
 

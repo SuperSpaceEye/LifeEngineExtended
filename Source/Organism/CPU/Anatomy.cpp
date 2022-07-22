@@ -638,6 +638,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
             }
             if (type != BlockTypes::EmptyBlock) {
                 item.type = type;
+                item.rotation = rotation;
                 return;
             } else {
                 break;

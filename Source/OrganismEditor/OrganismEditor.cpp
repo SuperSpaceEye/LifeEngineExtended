@@ -97,7 +97,7 @@ void OrganismEditor::initialize_gui() {
     mapped_block_types_s_to_type["Killer Cell"]   = BlockTypes::KillerBlock;
     mapped_block_types_s_to_type["Armor Cell"]    = BlockTypes::ArmorBlock;
     mapped_block_types_s_to_type["Eye Cell"]      = BlockTypes::EyeBlock;
-    mapped_block_types_s_to_type["Food Cell"]     = BlockTypes::FoodBlock;
+    mapped_block_types_s_to_type["Food"]     = BlockTypes::FoodBlock;
     mapped_block_types_s_to_type["Wall"]          = BlockTypes::WallBlock;
 
     for (auto & pair: mapped_decisions_s_to_type)   {mapped_decisions_type_to_s  [pair.second] = pair.first;}
@@ -170,16 +170,7 @@ void OrganismEditor::move_center(int delta_x, int delta_y) {
 
 void OrganismEditor::reset_scale_view() {
     center_x = (float)editor_width/2;
-//    if (editor_width%2 != 0) {
-//        center_x++;
-//    }
-
     center_y = (float)editor_height/2;
-//    if (editor_height%2 != 0) {
-//        center_y++;
-//    }
-
-    //I don't care anymore
 
     float exp;
     if (editor_width < editor_height) {
@@ -190,7 +181,8 @@ void OrganismEditor::reset_scale_view() {
 
     scaling_zoom = pow(scaling_coefficient, exp);
 
-    update_chosen_organism();
+    finalize_chosen_organism();
+    create_image();
 }
 
 void OrganismEditor::resize_editing_grid(int width, int height) {
@@ -302,7 +294,7 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
                         continue;
                     }
 
-                    auto &block = edit_grid.at(lin_width[x]).at(lin_height[y]);
+                    auto &block = edit_grid[lin_width[x]][lin_height[y]];
 
                     pixel_color = get_texture_color(block.type,
                                                     block.rotation,

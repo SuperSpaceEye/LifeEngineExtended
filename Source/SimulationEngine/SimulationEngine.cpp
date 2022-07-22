@@ -206,7 +206,7 @@ void SimulationEngine::process_user_action_pool() {
 
                     dc.CPU_simulation_grid[x][y].type = block.type;
                     dc.CPU_simulation_grid[x][y].organism = new_organism;
-                    dc.CPU_simulation_grid[x][y].rotation = block.rotation;
+                    dc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, dc.chosen_organism->rotation);
                 }
 
                 dc.organisms.emplace_back(new_organism);

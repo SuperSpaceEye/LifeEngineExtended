@@ -22,6 +22,11 @@
 #include "../../Stuff/Linspace.h"
 #include "../../Organism/CPU/ObservationStuff.h"
 
+inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
+    uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(rotation1) + static_cast<uint_fast8_t>(rotation2);
+    return static_cast<Rotation>(new_int_rotation%4);
+}
+
 class SimulationEngineSingleThread {
 public:
     static void place_organism  (EngineDataContainer * dc, Organism * organism);

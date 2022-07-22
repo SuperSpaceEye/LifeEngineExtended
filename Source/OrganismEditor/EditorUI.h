@@ -43,6 +43,7 @@ public:
     QHBoxLayout *horizontalLayout_3;
     QGraphicsView *editor_graphicsView;
     QVBoxLayout *verticalLayout_5;
+    QSpacerItem *verticalSpacer_2;
     QHBoxLayout *horizontalLayout_5;
     QRadioButton *rb_mouth;
     QRadioButton *rb_producer;
@@ -54,7 +55,6 @@ public:
     QHBoxLayout *horizontalLayout_12;
     QLabel *label_7;
     QComboBox *cmb_block_rotation;
-    QSpacerItem *verticalSpacer_2;
     QLabel *label;
     QHBoxLayout *horizontalLayout_9;
     QLabel *label_2;
@@ -64,7 +64,7 @@ public:
     QLineEdit *le_anatomy_mutation_rate;
     QHBoxLayout *horizontalLayout_13;
     QLabel *label_8;
-    QComboBox *cmb_organims_rotation;
+    QComboBox *cmb_organism_rotation;
     QSpacerItem *verticalSpacer_3;
     QPushButton *b_reset_editing_view;
     QPushButton *b_reset_organism;
@@ -101,7 +101,7 @@ public:
     {
         if (Editor->objectName().isEmpty())
             Editor->setObjectName(QString::fromUtf8("Editor"));
-        Editor->resize(936, 554);
+        Editor->resize(940, 554);
         horizontalLayout = new QHBoxLayout(Editor);
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -111,7 +111,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 920, 592));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 924, 592));
         horizontalLayout_2 = new QHBoxLayout(scrollAreaWidgetContents);
         horizontalLayout_2->setSpacing(0);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
@@ -154,6 +154,10 @@ public:
 
         verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_5->addItem(verticalSpacer_2);
+
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         rb_mouth = new QRadioButton(anatomy_edit_page);
@@ -222,10 +226,6 @@ public:
 
         verticalLayout_5->addLayout(horizontalLayout_12);
 
-        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_5->addItem(verticalSpacer_2);
-
         label = new QLabel(anatomy_edit_page);
         label->setObjectName(QString::fromUtf8("label"));
 
@@ -279,14 +279,14 @@ public:
 
         horizontalLayout_13->addWidget(label_8);
 
-        cmb_organims_rotation = new QComboBox(anatomy_edit_page);
-        cmb_organims_rotation->addItem(QString());
-        cmb_organims_rotation->addItem(QString());
-        cmb_organims_rotation->addItem(QString());
-        cmb_organims_rotation->addItem(QString());
-        cmb_organims_rotation->setObjectName(QString::fromUtf8("cmb_organims_rotation"));
+        cmb_organism_rotation = new QComboBox(anatomy_edit_page);
+        cmb_organism_rotation->addItem(QString());
+        cmb_organism_rotation->addItem(QString());
+        cmb_organism_rotation->addItem(QString());
+        cmb_organism_rotation->addItem(QString());
+        cmb_organism_rotation->setObjectName(QString::fromUtf8("cmb_organism_rotation"));
 
-        horizontalLayout_13->addWidget(cmb_organims_rotation);
+        horizontalLayout_13->addWidget(cmb_organism_rotation);
 
 
         verticalLayout_5->addLayout(horizontalLayout_13);
@@ -451,7 +451,6 @@ public:
 
         verticalLayout->addLayout(verticalLayout_4);
 
-        verticalLayout->setStretch(0, 1);
 
         horizontalLayout_2->addWidget(widget);
 
@@ -479,6 +478,9 @@ public:
         QObject::connect(rb_mover, SIGNAL(clicked()), Editor, SLOT(rb_mover_slot()));
         QObject::connect(rb_place_organism, SIGNAL(clicked()), Editor, SLOT(rb_place_organism_slot()));
         QObject::connect(rb_producer, SIGNAL(clicked()), Editor, SLOT(rb_producer_slot()));
+        QObject::connect(b_reset_organism, SIGNAL(clicked()), Editor, SLOT(b_reset_organism_slot()));
+        QObject::connect(cmb_block_rotation, SIGNAL(currentTextChanged(QString)), Editor, SLOT(cmd_block_rotation_slot(QString)));
+        QObject::connect(cmb_organism_rotation, SIGNAL(currentTextChanged(QString)), Editor, SLOT(cmd_organism_rotation_slot(QString)));
 
         stackedWidget->setCurrentIndex(0);
 
@@ -505,10 +507,10 @@ public:
         label_2->setText(QApplication::translate("Editor", "Move range:", nullptr));
         label_3->setText(QApplication::translate("Editor", "Anatomy Mutation rate:", nullptr));
         label_8->setText(QApplication::translate("Editor", "Starting organism rotation:", nullptr));
-        cmb_organims_rotation->setItemText(0, QApplication::translate("Editor", "Up", nullptr));
-        cmb_organims_rotation->setItemText(1, QApplication::translate("Editor", "Left", nullptr));
-        cmb_organims_rotation->setItemText(2, QApplication::translate("Editor", "Down", nullptr));
-        cmb_organims_rotation->setItemText(3, QApplication::translate("Editor", "Right", nullptr));
+        cmb_organism_rotation->setItemText(0, QApplication::translate("Editor", "Up", nullptr));
+        cmb_organism_rotation->setItemText(1, QApplication::translate("Editor", "Left", nullptr));
+        cmb_organism_rotation->setItemText(2, QApplication::translate("Editor", "Down", nullptr));
+        cmb_organism_rotation->setItemText(3, QApplication::translate("Editor", "Right", nullptr));
 
         b_reset_editing_view->setText(QApplication::translate("Editor", "Reset View", nullptr));
         b_reset_organism->setText(QApplication::translate("Editor", "Reset organism", nullptr));

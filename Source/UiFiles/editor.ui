@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>936</width>
+    <width>940</width>
     <height>554</height>
    </rect>
   </property>
@@ -39,7 +39,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>920</width>
+        <width>924</width>
         <height>592</height>
        </rect>
       </property>
@@ -61,7 +61,7 @@
        </property>
        <item>
         <widget class="QWidget" name="widget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
           <property name="leftMargin">
            <number>6</number>
           </property>
@@ -133,6 +133,19 @@
                   </item>
                   <item>
                    <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                    <item>
+                     <spacer name="verticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
                     <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_5">
                       <item>
@@ -240,19 +253,6 @@
                      </layout>
                     </item>
                     <item>
-                     <spacer name="verticalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
                      <widget class="QLabel" name="label">
                       <property name="text">
                        <string>Cell count:</string>
@@ -323,7 +323,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QComboBox" name="cmb_organims_rotation">
+                       <widget class="QComboBox" name="cmb_organism_rotation">
                         <item>
                          <property name="text">
                           <string>Up</string>
@@ -880,6 +880,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_reset_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_reset_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>663</x>
+     <y>362</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>467</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmb_block_rotation</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>Editor</receiver>
+   <slot>cmd_block_rotation_slot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>788</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmb_organism_rotation</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>Editor</receiver>
+   <slot>cmd_organism_rotation_slot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>791</x>
+     <y>253</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_reset_editing_view_slot()</slot>
@@ -900,7 +948,9 @@
   <slot>rb_killer_slot()</slot>
   <slot>rb_armor_slot()</slot>
   <slot>rb_eye_slot()</slot>
-  <slot>brain_cb_chooser_slot(string,string)</slot>
+  <slot>b_reset_organism_slot()</slot>
+  <slot>cmd_block_rotation_slot(QString)</slot>
+  <slot>cmd_organism_rotation_slot(QString)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="edit_group"/>

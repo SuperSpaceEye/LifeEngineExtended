@@ -109,7 +109,7 @@ public:
     Organism ** chosen_organism;
 
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
-    Rotation chosen_rotation = Rotation::UP;
+    Rotation chosen_block_rotation = Rotation::UP;
 
     OrganismEditor()=default;
 
@@ -154,6 +154,8 @@ private slots:
     void b_reset_editing_view_slot();
     void b_resize_editing_grid_slot();
     void b_save_organism_slot();
+    void b_reset_organism_slot();
+
     void le_anatomy_mutation_rate_slot();
     void le_grid_height_slot();
     void le_grid_width_slot();
@@ -167,6 +169,9 @@ private slots:
     void rb_producer_slot();
     void rb_edit_anatomy_slot();
     void rb_edit_brain_slot();
+
+    void cmd_block_rotation_slot(QString name);
+    void cmd_organism_rotation_slot(QString name);
 public slots:
     void rb_place_organism_slot();
     void rb_choose_organism_slot();
