@@ -24,6 +24,7 @@ This version is work in progress.
 - "D" or "Right" - move view right.
 - "Shift" - hold to make movement using keys 2 times as fast.
 - "R" - reset view.
+- "M" - hide/show menu.
 - "Space bar" - pause simulation,
 - "." - pass one simulation tick.
 - "numpad +" - zoom in.
