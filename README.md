@@ -12,7 +12,7 @@ This version is work in progress.
 - Keyboard actions do not work in editor.
 
 # Mouse actions:
-- Hold left button to place.
+- Hold left button to place/kill.
 - Hold right button to delete/kill
 - Hold scroll button to move the view.
 - Scroll to zoom in/out.
