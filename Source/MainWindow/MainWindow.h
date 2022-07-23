@@ -26,8 +26,6 @@
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include "../CustomJsonParser/json_parser.hpp"
 
 
 #include <QApplication>
@@ -58,6 +56,11 @@
 #include "../Stuff/MiscFuncs.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/Vector2.h"
+
+#include "../Stuff/rapidjson/document.h"
+#include "../Stuff/rapidjson/writer.h"
+#include "../Stuff/rapidjson/stringbuffer.h"
+
 
 #include "WindowUI.h"
 #include "../Statistics/StatisticsCore.h"
@@ -204,39 +207,30 @@ private:
     void reset_scale_view();
 
     void write_json_data(const std::string &path);
-    void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
-                             boost::property_tree::ptree &edible_neighbors,
-                             boost::property_tree::ptree &growableNeighbors,
-                             boost::property_tree::ptree &cell, boost::property_tree::ptree &value) const;
 
-    void json_write_fossil_record(boost::property_tree::ptree &fossil_record) const;
+    void json_write_grid(rapidjson::Document & d);
+    void json_write_organisms(rapidjson::Document & d);
+    void json_write_fossil_record(rapidjson::Document & d);
+    void json_write_controls(rapidjson::Document & d) const ;
 
-    void json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
-                              boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
-                              boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain);
+    void json_read_grid_data(rapidjson::Document & d);
+    void json_read_organisms_data(rapidjson::Document & d);
+    void json_read_simulation_parameters(rapidjson::Document & d);
 
-    void json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
-                         boost::property_tree::ptree &food, boost::property_tree::ptree &walls);
-
-    void json_read_organism_data(boost::property_tree::ptree &root);
-
-    void json_read_simulation_parameters(const boost::property_tree::ptree &root);
-
-    void json_read_grid_data(boost::property_tree::ptree &root);
     void read_json_data(const std::string &path);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
-    void write_version(std::ofstream& os);
+    static void write_version(std::ofstream& os);
     void write_simulation_parameters(std::ofstream& os);
     void write_organisms_block_parameters(std::ofstream& os);
     void write_data_container_data(std::ofstream& os);
     //    void write_color_container(); TODO: ?
     void write_simulation_grid(std::ofstream& os);
     void write_organisms(std::ofstream& os);
-    void write_organism_data(std::ofstream& os, Organism * organism);
-    void write_organism_brain(std::ofstream& os, Brain * brain);
-    void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
+    static void write_organism_data(std::ofstream& os, Organism * organism);
+    static void write_organism_brain(std::ofstream& os, Brain * brain);
+    static void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void recover_state(const SimulationParameters &recovery_sp,
                        const OrganismBlockParameters &recovery_bp,
@@ -244,16 +238,16 @@ private:
                        uint32_t recovery_simulation_height);
 
     void read_data(std::ifstream& is);
-    bool read_version(std::ifstream& is);
+    static bool read_version(std::ifstream& is);
     void read_simulation_parameters(std::ifstream& is);
     void read_organisms_block_parameters(std::ifstream& is);
     bool read_data_container_data(std::ifstream& is);
     //    void read_color_container(); TODO: ?
     void read_simulation_grid(std::ifstream& is);
     bool read_organisms(std::ifstream& is);
-    void read_organism_data(std::ifstream& is, OrganismData & data);
-    void read_organism_brain(std::ifstream& is, Brain * brain);
-    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+    static void read_organism_data(std::ifstream& is, OrganismData & data);
+    static void read_organism_brain(std::ifstream& is, Brain * brain);
+    static void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
     void update_table_values();
 
     bool cuda_is_available();
@@ -453,6 +447,8 @@ public:
     MainWindow(QWidget *parent);
 
     void process_keyboard_events();
+
+    void write_json_organism(rapidjson::Document &d, Organism *&organism, rapidjson::Value &j_organism) const;
 };
 
 
