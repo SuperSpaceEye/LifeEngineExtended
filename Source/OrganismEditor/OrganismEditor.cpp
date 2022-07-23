@@ -426,8 +426,8 @@ void OrganismEditor::load_chosen_organism() {
         if (block.relative_y > max.y) {max.y = block.relative_y;}
     }
 
-    if (std::abs(min.x) + max.x >= new_editor_width)  {new_editor_width  = std::abs(min.x) + max.x;}
-    if (std::abs(min.y) + max.y >= new_editor_height) {new_editor_height = std::abs(min.y) + max.y;}
+    if (std::abs(min.x) + max.x >= new_editor_width)  {new_editor_width  = std::max(std::abs(min.x), max.x)*2+1;}
+    if (std::abs(min.y) + max.y >= new_editor_height) {new_editor_height = std::max(std::abs(min.y), max.y)*2+1;}
 
     resize_editing_grid(new_editor_width, new_editor_height);
     create_image();
