@@ -320,6 +320,9 @@ void MainWindow::update_table_values() {
                 case ParametersNames::ChanceWeight:
                     value = &type->chance_weight;
                     break;
+                case ParametersNames::LifetimeWeight:
+                    value = &type->lifetime_weight;
+                    break;
             }
             _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
         }
@@ -330,9 +333,6 @@ void MainWindow::update_table_values() {
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
 void MainWindow::read_json_data(const std::string &path) {
-    engine->partial_clear_world();
-    engine->make_walls();
-
     std::string json;
     auto ss = std::ostringstream();
     std::ifstream file;
@@ -344,8 +344,18 @@ void MainWindow::read_json_data(const std::string &path) {
     ss << file.rdbuf();
     json = ss.str();
 
+    file.close();
+
     Document document;
     document.Parse(json.c_str());
+
+    if (!document.HasMember("num_rows")) {
+        display_message("Failed to load world");
+        return;
+    }
+
+    engine->partial_clear_world();
+    engine->make_walls();
 
     json_read_grid_data(document);
     json_read_simulation_parameters(document);
@@ -486,7 +496,7 @@ void MainWindow::write_json_data(const std::string &path) {
 
     d.AddMember("num_rows", Value(edc.simulation_height - 2), d.GetAllocator());
     d.AddMember("num_cols", Value(edc.simulation_width - 2), d.GetAllocator());
-    d.AddMember("total_mutability", Value(info.total_total_mutation_rate*100), d.GetAllocator());
+    d.AddMember("total_mutability", Value(int(info.total_total_mutation_rate*100)), d.GetAllocator());
     d.AddMember("largest_cell_count", Value(0), d.GetAllocator());
     d.AddMember("reset_count", Value(0), d.GetAllocator());
     d.AddMember("total_ticks", Value(edc.total_engine_ticks), d.GetAllocator());

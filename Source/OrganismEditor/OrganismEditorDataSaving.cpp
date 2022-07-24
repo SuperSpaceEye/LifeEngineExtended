@@ -131,8 +131,15 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
     ss << file.rdbuf();
     json = ss.str();
 
+    file.close();
+
     Document organism;
     organism.Parse(json.c_str());
+
+    if (!organism.HasMember("r")) {
+        display_message("Failed to load organism");
+        return;
+    }
 
     auto brain = std::make_shared<Brain>();
     auto anatomy = std::make_shared<Anatomy>();

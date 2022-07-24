@@ -396,7 +396,7 @@
             <enum>QTabWidget::Rounded</enum>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <property name="iconSize">
             <size>
@@ -422,44 +422,6 @@
            <property name="tabBarAutoHide">
             <bool>true</bool>
            </property>
-           <widget class="QWidget" name="about_tab">
-            <attribute name="title">
-             <string>About</string>
-            </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QTextEdit" name="textEdit">
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="html">
-                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This version is in alpha stage, so many things are not implemeted and will probably change.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Important Information:&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*sps is the number of simulation ticks per second.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*setting max fps/sps/num organisms to &amp;lt;0 will enable unlimited mode.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*checking &amp;quot;Fix reproducing distance&amp;quot; will set reproducing distance to min value.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &amp;quot;M&amp;quot;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;*To finilize changes in line edits you should press Enter.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This project's Github: https://github.com/SuperSpaceEye/LifeEngineExtended&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="overwriteMode">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
            <widget class="QWidget" name="world_controls_tab">
             <attribute name="title">
              <string>World Controls</string>
@@ -852,7 +814,7 @@ p, li { white-space: pre-wrap; }
                      <number>6</number>
                     </property>
                     <item>
-                     <spacer name="verticalSpacer_3">
+                     <spacer name="verticalSpacer_4">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -869,7 +831,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QPushButton" name="tb_open_statisctics">
                         <property name="text">
-                         <string>Open Statistics Window</string>
+                         <string>Statistics Window</string>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -890,7 +852,7 @@ p, li { white-space: pre-wrap; }
                       <item>
                        <widget class="QPushButton" name="tb_open_organism_editor">
                         <property name="text">
-                         <string>Open Organism Editor Window</string>
+                         <string>Organism Editor Window</string>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -907,7 +869,28 @@ p, li { white-space: pre-wrap; }
                      </layout>
                     </item>
                     <item>
-                     <spacer name="verticalSpacer_4">
+                     <layout class="QHBoxLayout" name="horizontalLayout_50">
+                      <item>
+                       <widget class="QPushButton" name="tb_open_info_window">
+                        <property name="text">
+                         <string>Info Window</string>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_info_window_always_on_top">
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_3">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
                       </property>
@@ -2226,7 +2209,7 @@ p, li { white-space: pre-wrap; }
                     <item>
                      <widget class="QCheckBox" name="cb_really_stop_render">
                       <property name="text">
-                       <string>Really y render</string>
+                       <string>Really stop render</string>
                       </property>
                      </widget>
                     </item>
@@ -4004,6 +3987,38 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_info_window_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_info_window_always_on_top(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>840</x>
+     <y>859</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tb_open_info_window</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_info_window(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>534</x>
+     <y>859</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4108,6 +4123,8 @@ p, li { white-space: pre-wrap; }
   <slot>le_keyboard_movement_amount_slot()</slot>
   <slot>le_scaling_coefficient_slot()</slot>
   <slot>cb_reset_with_editor_organism_slot(bool)</slot>
+  <slot>cb_info_window_always_on_top(bool)</slot>
+  <slot>tb_open_info_window(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

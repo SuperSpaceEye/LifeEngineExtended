@@ -940,8 +940,6 @@ void MainWindow::initialize_gui() {
     _ui.rb_single_thread_mode->hide();
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.le_num_threads->hide();
-//    _ui.tb_open_organism_editor->setEnabled(false);
-//    _ui.cb_editor_always_on_top->setEnabled(false);
     _ui.lb_set_num_threads->hide();
 }
 

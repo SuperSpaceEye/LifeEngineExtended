@@ -18,7 +18,9 @@ void MainWindow::tb_pause_slot(bool state) {
 
 void MainWindow::tb_stoprender_slot(bool state) {
     pause_grid_parsing = state;
-    parse_full_simulation_grid(pause_grid_parsing);
+    if (!really_stop_render) {
+        parse_full_simulation_grid(pause_grid_parsing);
+    }
     // calculating delta time is not needed when no image is being created.
     ecp.calculate_simulation_tick_delta_time = !ecp.calculate_simulation_tick_delta_time;
 }
@@ -578,6 +580,14 @@ void MainWindow::cb_editor_always_on_top_slot(bool state) {
     }
 }
 
+void MainWindow::cb_really_stop_render_slot(bool state) {
+    really_stop_render = state;
+    if (!state && pause_grid_parsing) {
+        parse_full_simulation_grid(true);
+    }
+}
+
+
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void MainWindow::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -627,8 +637,6 @@ void MainWindow::cb_food_blocks_movement_slot            (bool state) { sp.food_
 void MainWindow::cb_use_new_child_pos_calculator_slot    (bool state) { sp.use_new_child_pos_calculator = state;}
 
 void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check_if_path_is_clear = state;}
-
-void MainWindow::cb_really_stop_render_slot              (bool state) { really_stop_render = state;}
 
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
