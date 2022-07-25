@@ -232,7 +232,7 @@ bool MainWindow::read_organisms(std::ifstream& is) {
 
     if (num_organisms > max_loaded_num_organisms) {
         if (!display_dialog_message("The loaded number of organisms is " + std::to_string(num_organisms) +
-        ". The save file may be corrupted and could crash your computer, continue?", false)) {
+        ". Continue?", false)) {
             return true;
         }
     }
@@ -595,7 +595,7 @@ void MainWindow::write_json_organism(Document &d, Organism *&organism, Value &j_
     j_organism.AddMember("living",           Value(true), d.GetAllocator());
     j_organism.AddMember("direction",        Value(2), d.GetAllocator());
     j_organism.AddMember("rotation",         Value(static_cast<int>(organism->rotation)), d.GetAllocator());
-    j_organism.AddMember("can_rotate", Value(sp.runtime_rotation_enabled), d.GetAllocator());
+    j_organism.AddMember("can_rotate",       Value(sp.runtime_rotation_enabled), d.GetAllocator());
     j_organism.AddMember("move_count",       Value(0), d.GetAllocator());
     j_organism.AddMember("move_range",       Value(organism->move_range), d.GetAllocator());
     j_organism.AddMember("ignore_brain_for", Value(0), d.GetAllocator());
@@ -615,13 +615,12 @@ void MainWindow::write_json_organism(Document &d, Organism *&organism, Value &j_
         cell.AddMember("loc_row", Value(block.relative_y), d.GetAllocator());
 
         switch (block.type) {
-            case BlockTypes::MouthBlock: state_name    = "mouth";    break;
+            case BlockTypes::MouthBlock:    state_name = "mouth";    break;
             case BlockTypes::ProducerBlock: state_name = "producer"; break;
-            case BlockTypes::MoverBlock: state_name    = "mover";    break;
-            case BlockTypes::KillerBlock: state_name   = "killer";   break;
-            case BlockTypes::ArmorBlock: state_name    = "armor";    break;
-            case BlockTypes::EyeBlock: state_name      = "eye";      break;
-//                default: state_name = "producer";
+            case BlockTypes::MoverBlock:    state_name = "mover";    break;
+            case BlockTypes::KillerBlock:   state_name = "killer";   break;
+            case BlockTypes::ArmorBlock:    state_name = "armor";    break;
+            case BlockTypes::EyeBlock:      state_name = "eye";      break;
             default: continue;
         }
 
