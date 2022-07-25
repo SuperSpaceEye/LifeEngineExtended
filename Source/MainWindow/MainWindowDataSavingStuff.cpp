@@ -9,7 +9,15 @@
 #include "MainWindow.h"
 
 //TODO increment every time saving logic changes
-uint32_t SAVE_VERSION = 4;
+uint32_t SAVE_VERSION = 5;
+
+struct WorldBlocks {
+    uint32_t x;
+    uint32_t y;
+    BlockTypes type;
+    WorldBlocks()=default;
+    WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type) {}
+};
 
 void MainWindow::write_data(std::ofstream &os) {
     write_version(os);
@@ -39,9 +47,25 @@ void MainWindow::write_data_container_data(std::ofstream& os) {
 }
 //    void MainWindow::write_color_container(){}
 void MainWindow::write_simulation_grid(std::ofstream& os) {
-    for (auto & col: edc.CPU_simulation_grid) {
-        os.write((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
+    std::vector<WorldBlocks> blocks{};
+
+    for (uint32_t x = 0; x < edc.simulation_width; x++) {
+        for (uint32_t y = 0; y < edc.simulation_height; y++) {
+            auto & block = edc.CPU_simulation_grid[x][y];
+
+            switch (block.type) {
+                case BlockTypes::FoodBlock:
+                case BlockTypes::WallBlock:
+                    blocks.emplace_back(x, y, block.type);
+                default: break;
+            }
+        }
     }
+
+    auto size = blocks.size();
+
+    os.write((char*)&size, sizeof(std::size_t));
+    os.write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
 }
 void MainWindow::write_organisms(std::ofstream& os) {
     uint32_t size = edc.organisms.size();
@@ -183,21 +207,21 @@ bool MainWindow::read_data_container_data(std::ifstream& is) {
 
 //TODO only save food/walls ?
 void MainWindow::read_simulation_grid(std::ifstream& is) {
+    auto flag = disable_warnings;
     disable_warnings = true;
     resize_simulation_grid();
-    disable_warnings = false;
+    disable_warnings = flag;
 
-    for (auto & col: edc.CPU_simulation_grid) {
-        is.read((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
-    }
+    std::vector<WorldBlocks> blocks{};
+    std::size_t size;
 
-    for (auto & column: edc.CPU_simulation_grid) {
-        for (auto &block: column) {
-            if (block.type == BlockTypes::WallBlock ||
-                block.type == BlockTypes::EmptyBlock ||
-                block.type == BlockTypes::FoodBlock) { continue; }
-            block = AtomicGridBlock();
-        }
+    is.read((char*)&size, sizeof(std::size_t));
+    blocks.resize(size);
+
+    is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
+
+    for (auto & block: blocks) {
+        edc.CPU_simulation_grid[block.x][block.y].type = block.type;
     }
 }
 

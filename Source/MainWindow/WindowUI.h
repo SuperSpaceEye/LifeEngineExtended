@@ -41,8 +41,6 @@ public:
     QFrame *frame_2;
     QVBoxLayout *verticalLayout_6;
     QLabel *lb_fps;
-    QSpacerItem *verticalSpacer_3;
-    QSpacerItem *verticalSpacer_4;
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_2;
     QLineEdit *le_fps;
@@ -361,14 +359,6 @@ public:
         lb_fps->setObjectName(QString::fromUtf8("lb_fps"));
 
         verticalLayout_6->addWidget(lb_fps);
-
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_6->addItem(verticalSpacer_3);
-
-        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_6->addItem(verticalSpacer_4);
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
