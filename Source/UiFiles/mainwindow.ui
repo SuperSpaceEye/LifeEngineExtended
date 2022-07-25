@@ -167,6 +167,32 @@
           </widget>
          </item>
          <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QLabel" name="label_2">
@@ -814,24 +840,11 @@
                      <number>6</number>
                     </property>
                     <item>
-                     <spacer name="verticalSpacer_4">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_35">
                       <item>
                        <widget class="QPushButton" name="tb_open_statisctics">
                         <property name="text">
-                         <string>Statistics Window</string>
+                         <string>Statistics</string>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -852,7 +865,7 @@
                       <item>
                        <widget class="QPushButton" name="tb_open_organism_editor">
                         <property name="text">
-                         <string>Organism Editor Window</string>
+                         <string>Organism Editor</string>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -873,7 +886,7 @@
                       <item>
                        <widget class="QPushButton" name="tb_open_info_window">
                         <property name="text">
-                         <string>Info Window</string>
+                         <string>Info</string>
                         </property>
                         <property name="checkable">
                          <bool>true</bool>
@@ -890,17 +903,52 @@
                      </layout>
                     </item>
                     <item>
-                     <spacer name="verticalSpacer_3">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
+                     <layout class="QHBoxLayout" name="horizontalLayout_51">
+                      <item>
+                       <widget class="QPushButton" name="pushButton">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Recorder</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="checkBox">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_52">
+                      <item>
+                       <widget class="QPushButton" name="pushButton_2">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>World Events</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="checkBox_2">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
                     </item>
                    </layout>
                   </widget>
@@ -3991,7 +4039,7 @@
    <sender>cb_info_window_always_on_top</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>cb_info_window_always_on_top(bool)</slot>
+   <slot>cb_info_window_always_on_top_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>840</x>
@@ -4007,7 +4055,7 @@
    <sender>tb_open_info_window</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>tb_open_info_window(bool)</slot>
+   <slot>tb_open_info_window_slot(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>534</x>
@@ -4123,8 +4171,8 @@
   <slot>le_keyboard_movement_amount_slot()</slot>
   <slot>le_scaling_coefficient_slot()</slot>
   <slot>cb_reset_with_editor_organism_slot(bool)</slot>
-  <slot>cb_info_window_always_on_top(bool)</slot>
-  <slot>tb_open_info_window(bool)</slot>
+  <slot>cb_info_window_always_on_top_slot(bool)</slot>
+  <slot>tb_open_info_window_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

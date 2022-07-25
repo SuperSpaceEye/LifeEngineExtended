@@ -46,6 +46,14 @@ void MainWindow::tb_open_organism_editor_slot(bool state) {
     }
 }
 
+void MainWindow::tb_open_info_window_slot(bool state) {
+    if (state) {
+        iw.show();
+    } else {
+        iw.close();
+    }
+}
+
 //==================== Buttons ====================
 
 void MainWindow::b_clear_slot() {
@@ -579,6 +587,19 @@ void MainWindow::cb_editor_always_on_top_slot(bool state) {
         ee.show();
     }
 }
+
+void MainWindow::cb_info_window_always_on_top_slot(bool state) {
+    auto hidden = iw.isHidden();
+
+    iw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        iw.show();
+    }
+}
+
 
 void MainWindow::cb_really_stop_render_slot(bool state) {
     really_stop_render = state;

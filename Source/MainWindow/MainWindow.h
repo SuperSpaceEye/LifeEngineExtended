@@ -43,14 +43,13 @@
 #include <QWheelEvent>
 //#include <QtCharts>
 
-
+#include "WindowUI.h"
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Containers/CPU/ColorContainer.h"
 #include "../Containers/CPU/SimulationParameters.h"
 #include "../Containers/CPU/EngineControlContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../OrganismEditor/OrganismEditor.h"
 #include "../PRNGS/lehmer64.h"
 #include "../Stuff/textures.h"
 #include "../Stuff/MiscFuncs.h"
@@ -61,9 +60,9 @@
 #include "../Stuff/rapidjson/writer.h"
 #include "../Stuff/rapidjson/stringbuffer.h"
 
-
-#include "WindowUI.h"
 #include "../Statistics/StatisticsCore.h"
+#include "../OrganismEditor/OrganismEditor.h"
+#include "../InfoWindow/InfoWindow.h"
 
 
 #if __CUDA_USED__
@@ -144,6 +143,7 @@ private:
     SimulationEngine* engine;
     OrganismEditor ee;
     StatisticsCore s;
+    InfoWindow iw{&_ui};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -333,6 +333,7 @@ private slots:
     void tb_stoprender_slot(bool state);
     void tb_open_statistics_slot(bool state);
     void tb_open_organism_editor_slot(bool state);
+    void tb_open_info_window_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -440,6 +441,7 @@ private slots:
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
+    void cb_info_window_always_on_top_slot(bool state);
 
     //Evolution Controls
     void table_cell_changed_slot(int row, int col);
