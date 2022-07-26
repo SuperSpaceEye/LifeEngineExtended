@@ -85,8 +85,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         case QEvent::Close: {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
             if (watched->objectName().toStdString() == "QWidgetClassWindow") {
-                ecp.stop_engine = true;
-                while (!wait_for_engine_to_pause_force()) {}
+                engine->pause();
                 exit(0);
             }
             close_event->accept();

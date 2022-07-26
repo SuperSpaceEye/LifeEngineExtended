@@ -6,16 +6,6 @@
 
 //TODO remove duplicate code.
 
-template <typename T>
-struct my_id_translator
-{
-    typedef T internal_type;
-    typedef T external_type;
-
-    boost::optional<T> get_value(const T &v) { return  v.substr(1, v.size() - 2) ; }
-    boost::optional<T> put_value(const T &v) { return '"' + v +'"'; }
-};
-
 void OrganismEditor::read_organism(std::ifstream &is) {
     auto brain = std::make_shared<Brain>();
     auto anatomy = std::make_shared<Anatomy>();
@@ -127,27 +117,47 @@ void OrganismEditor::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy
     }
 }
 
+using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
+
 void OrganismEditor::read_json_organism(std::string &full_path) {
-    boost::property_tree::ptree root;
-    boost::property_tree::json_parser::read_json(full_path, root);
+    std::string json;
+    auto ss = std::ostringstream();
+    std::ifstream file;
+    file.open(full_path);
+    if (!file.is_open()) {
+        return;
+    }
+
+    ss << file.rdbuf();
+    json = ss.str();
+
+    file.close();
+
+    Document organism;
+    organism.Parse(json.c_str());
+
+    if (!organism.HasMember("r")) {
+        display_message("Failed to load organism");
+        return;
+    }
 
     auto brain = std::make_shared<Brain>();
     auto anatomy = std::make_shared<Anatomy>();
 
-    int y              = root.get<int>("r")+1;
-    int x              = root.get<int>("c")+1;
-    int rotation       = root.get<int>("rotation");
-    int move_range     = root.get<int>("move_range");
-    float mutability   = float(root.get<float>("mutability"))/100;
-    bool is_mover      = root.get<bool>("anatomy.is_mover");
-    bool has_eyes      = root.get<bool>("anatomy.has_eyes");
+    int y                = organism["r"].GetInt()+1;
+    int x                = organism["c"].GetInt()+1;
+    int rotation         = organism["rotation"].GetInt();
+    int move_range       = organism["move_range"].GetInt();
+    float mutability     = organism["mutability"].GetFloat()/100;
+    bool is_mover        = organism["anatomy"]["is_mover"].GetBool();
+    bool has_eyes        = organism["anatomy"]["has_eyes"].GetBool();
 
     auto block_data = std::vector<SerializedOrganismBlockContainer>{};
 
-    for (auto & cell: root.get_child("anatomy.cells")) {
-        int l_y = cell.second.get<int>("loc_row");
-        int l_x = cell.second.get<int>("loc_col");
-        auto state = cell.second.get<std::string>("state.name");
+    for (auto & cell: organism["anatomy"]["cells"].GetArray()) {
+        int l_x = cell["loc_col"].GetInt();
+        int l_y = cell["loc_row"].GetInt();
+        auto state = std::string(cell["state"]["name"].GetString());
 
         Rotation _rotation = Rotation::UP;
         BlockTypes type = BlockTypes::ProducerBlock;
@@ -162,7 +172,7 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
             type = BlockTypes::MoverBlock;
         } else if (state == "eye") {
             type = BlockTypes::EyeBlock;
-            _rotation = static_cast<Rotation>(cell.second.get<int>("direction"));
+            _rotation = static_cast<Rotation>(cell["direction"].GetInt());
         } else if (state == "armor") {
             type = BlockTypes::ArmorBlock;
         }
@@ -173,14 +183,14 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
 
     if (is_mover && has_eyes) {
         auto & table = brain->simple_action_table;
-        table.FoodBlock     = static_cast<SimpleDecision>(root.get<int>("brain.decisions.food"));
-        table.WallBlock     = static_cast<SimpleDecision>(root.get<int>("brain.decisions.wall"));
-        table.MouthBlock    = static_cast<SimpleDecision>(root.get<int>("brain.decisions.mouth"));
-        table.ProducerBlock = static_cast<SimpleDecision>(root.get<int>("brain.decisions.producer"));
-        table.MoverBlock    = static_cast<SimpleDecision>(root.get<int>("brain.decisions.mover"));
-        table.KillerBlock   = static_cast<SimpleDecision>(root.get<int>("brain.decisions.killer"));
-        table.ArmorBlock    = static_cast<SimpleDecision>(root.get<int>("brain.decisions.armor"));
-        table.EyeBlock      = static_cast<SimpleDecision>(root.get<int>("brain.decisions.eye"));
+        table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
+        table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
+        table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
+        table.ProducerBlock = static_cast<SimpleDecision>(organism["brain"]["decisions"]["producer"].GetInt());
+        table.MoverBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mover"]   .GetInt());
+        table.KillerBlock   = static_cast<SimpleDecision>(organism["brain"]["decisions"]["killer"]  .GetInt());
+        table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
+        table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
     }
 
     auto * new_organism = new Organism(x,
@@ -198,38 +208,38 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
 }
 
 void OrganismEditor::write_json_organism(std::string &full_path) {
-    boost::property_tree::ptree cell, anatomy, cells, j_organism, brain;
+    Document j_organism;
+    j_organism.SetObject();
 
-    j_organism = boost::property_tree::ptree{};
-    anatomy = boost::property_tree::ptree{};
-    cells = boost::property_tree::ptree{};
-    brain = boost::property_tree::ptree{};
+    Value j_anatomy(kObjectType);
+    Value j_brain(kObjectType);
+    Value cells(kArrayType);
 
-    j_organism.put("c", editor_organism->x-1);
-    j_organism.put("r", editor_organism->y-1);
-    j_organism.put("lifetime", editor_organism->lifetime);
-    j_organism.put("food_collected", static_cast<int>(editor_organism->food_collected));
-    j_organism.put("living", true);
-    j_organism.put("direction", 2);
-    j_organism.put("rotation", static_cast<int>(editor_organism->rotation));
-    j_organism.put("can_rotate", editor_organism->sp->runtime_rotation_enabled);
-    j_organism.put("move_count", 0);
-    j_organism.put("move_range", editor_organism->move_range);
-    j_organism.put("ignore_brain_for", 0);
-    j_organism.put("mutability", static_cast<int>(editor_organism->anatomy_mutation_rate*100));
-    j_organism.put("damage", editor_organism->damage);
+    j_organism.AddMember("c",                Value(editor_organism->x-1), j_organism.GetAllocator());
+    j_organism.AddMember("r",                Value(editor_organism->y-1), j_organism.GetAllocator());
+    j_organism.AddMember("lifetime",         Value(editor_organism->lifetime), j_organism.GetAllocator());
+    j_organism.AddMember("food_collected",   Value(editor_organism->food_collected), j_organism.GetAllocator());
+    j_organism.AddMember("living",           Value(true), j_organism.GetAllocator());
+    j_organism.AddMember("direction",        Value(2), j_organism.GetAllocator());
+    j_organism.AddMember("rotation",         Value(static_cast<int>(editor_organism->rotation)), j_organism.GetAllocator());
+    j_organism.AddMember("can_rotate",             Value(editor_organism->sp->runtime_rotation_enabled), j_organism.GetAllocator());
+    j_organism.AddMember("move_count",       Value(0), j_organism.GetAllocator());
+    j_organism.AddMember("move_range",       Value(editor_organism->move_range), j_organism.GetAllocator());
+    j_organism.AddMember("ignore_brain_for", Value(0), j_organism.GetAllocator());
+    j_organism.AddMember("mutability",       Value(editor_organism->anatomy_mutation_rate*100), j_organism.GetAllocator());
+    j_organism.AddMember("damage",           Value(editor_organism->damage), j_organism.GetAllocator());
 
-    anatomy.put("birth_distance", 6);
-    anatomy.put("is_producer", static_cast<bool>(editor_organism->anatomy->_producer_blocks));
-    anatomy.put("is_mover", static_cast<bool>(editor_organism->anatomy->_mover_blocks));
-    anatomy.put("has_eyes", static_cast<bool>(editor_organism->anatomy->_eye_blocks));
+    j_anatomy.AddMember("birth_distance", Value(6), j_organism.GetAllocator());
+    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(editor_organism->anatomy->_producer_blocks)), j_organism.GetAllocator());
+    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(editor_organism->anatomy->_mover_blocks)), j_organism.GetAllocator());
+    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(editor_organism->anatomy->_eye_blocks)), j_organism.GetAllocator());
 
     for (auto & block: editor_organism->anatomy->_organism_blocks) {
-        cell = boost::property_tree::ptree{};
+        Value cell(kObjectType);
         std::string state_name;
 
-        cell.put("loc_col", block.relative_x);
-        cell.put("loc_row", block.relative_y);
+        cell.AddMember("loc_col", Value(block.relative_x), j_organism.GetAllocator());
+        cell.AddMember("loc_row", Value(block.relative_y), j_organism.GetAllocator());
 
         switch (block.type) {
             case BlockTypes::MouthBlock: state_name    = "mouth";    break;
@@ -238,42 +248,51 @@ void OrganismEditor::write_json_organism(std::string &full_path) {
             case BlockTypes::KillerBlock: state_name   = "killer";   break;
             case BlockTypes::ArmorBlock: state_name    = "armor";    break;
             case BlockTypes::EyeBlock: state_name      = "eye";      break;
-            default: state_name = "producer";
+//                default: state_name = "producer";
+            default: continue;
         }
 
         if (block.type == BlockTypes::EyeBlock) {
-            cell.put("direction", static_cast<int>(block.rotation));
+            cell.AddMember("direction", Value(static_cast<int>(block.rotation)), j_organism.GetAllocator());
         }
 
-        cell.put("state.name", state_name, my_id_translator<std::string>());
+        Value state(kObjectType);
+        state.AddMember("name", Value(state_name.c_str(), state_name.length(), j_organism.GetAllocator()), j_organism.GetAllocator());
 
-        cells.push_back(std::make_pair("", cell));
+        cell.AddMember("state", state, j_organism.GetAllocator());
+
+        cells.PushBack(cell, j_organism.GetAllocator());
     }
+    j_anatomy.AddMember("cells", cells, j_organism.GetAllocator());
 
-    anatomy.put_child("cells", cells);
-
-    j_organism.put_child("anatomy", anatomy);
+    j_organism.AddMember("anatomy", j_anatomy, j_organism.GetAllocator());
 
     auto & table = editor_organism->brain->simple_action_table;
 
-    brain.put("decisions.empty", 0);
-    brain.put("decisions.food",     static_cast<int>(table.FoodBlock));
-    brain.put("decisions.wall",     static_cast<int>(table.WallBlock));
-    brain.put("decisions.mouth",    static_cast<int>(table.MouthBlock));
-    brain.put("decisions.producer", static_cast<int>(table.ProducerBlock));
-    brain.put("decisions.mover",    static_cast<int>(table.MoverBlock));
-    brain.put("decisions.killer",   static_cast<int>(table.KillerBlock));
-    brain.put("decisions.armor",    static_cast<int>(table.ArmorBlock));
-    brain.put("decisions.eye",      static_cast<int>(table.EyeBlock));
+    Value decisions(kObjectType);
 
-    j_organism.put_child("brain", brain);
+    decisions.AddMember("empty",    Value(0), j_organism.GetAllocator());
+    decisions.AddMember("food",     Value(static_cast<int>(table.FoodBlock)),     j_organism.GetAllocator());
+    decisions.AddMember("wall",     Value(static_cast<int>(table.WallBlock)),     j_organism.GetAllocator());
+    decisions.AddMember("mouth",    Value(static_cast<int>(table.MouthBlock)),    j_organism.GetAllocator());
+    decisions.AddMember("producer", Value(static_cast<int>(table.ProducerBlock)), j_organism.GetAllocator());
+    decisions.AddMember("mover",    Value(static_cast<int>(table.MoverBlock)),    j_organism.GetAllocator());
+    decisions.AddMember("killer",   Value(static_cast<int>(table.KillerBlock)),   j_organism.GetAllocator());
+    decisions.AddMember("armor",    Value(static_cast<int>(table.ArmorBlock)),    j_organism.GetAllocator());
+    decisions.AddMember("eye",      Value(static_cast<int>(table.EyeBlock)),      j_organism.GetAllocator());
 
-    j_organism.put("species_name", "0000000000", my_id_translator<std::string>());
+    j_brain.AddMember("decisions", decisions, j_organism.GetAllocator());
+
+    j_organism.AddMember("brain", j_brain, j_organism.GetAllocator());
+
+    j_organism.AddMember("species_name", Value("0000000000"), j_organism.GetAllocator());
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    j_organism.Accept(writer);
 
     std::fstream file;
     file.open(full_path, std::ios_base::out);
-    boost::property_tree::json_parser::write_json(file, j_organism);
+    file << buffer.GetString();
     file.close();
 }
-
-namespace pt = boost::property_tree;namespace pt = boost::property_tree;

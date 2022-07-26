@@ -26,7 +26,6 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -69,9 +68,6 @@ public:
     QFrame *frame_3;
     QVBoxLayout *verticalLayout_4;
     QTabWidget *Tabs;
-    QWidget *about_tab;
-    QVBoxLayout *verticalLayout_8;
-    QTextEdit *textEdit;
     QWidget *world_controls_tab;
     QVBoxLayout *verticalLayout;
     QScrollArea *scrollArea_3;
@@ -113,14 +109,21 @@ public:
     QVBoxLayout *verticalLayout_24;
     QWidget *widget_5;
     QVBoxLayout *verticalLayout_37;
-    QSpacerItem *verticalSpacer_3;
     QHBoxLayout *horizontalLayout_35;
     QPushButton *tb_open_statisctics;
     QCheckBox *cb_statistics_always_on_top;
     QHBoxLayout *horizontalLayout_36;
     QPushButton *tb_open_organism_editor;
     QCheckBox *cb_editor_always_on_top;
-    QSpacerItem *verticalSpacer_4;
+    QHBoxLayout *horizontalLayout_50;
+    QPushButton *tb_open_info_window;
+    QCheckBox *cb_info_window_always_on_top;
+    QHBoxLayout *horizontalLayout_51;
+    QPushButton *tb_open_recorder_window;
+    QCheckBox *cb_recorder_window_always_on_top;
+    QHBoxLayout *horizontalLayout_52;
+    QPushButton *pushButton_2;
+    QCheckBox *checkBox_2;
     QWidget *evolution_controls_tab;
     QHBoxLayout *horizontalLayout_7;
     QScrollArea *scrollArea_2;
@@ -288,8 +291,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -516,19 +519,6 @@ public:
         Tabs->setTabsClosable(false);
         Tabs->setMovable(false);
         Tabs->setTabBarAutoHide(true);
-        about_tab = new QWidget();
-        about_tab->setObjectName(QString::fromUtf8("about_tab"));
-        verticalLayout_8 = new QVBoxLayout(about_tab);
-        verticalLayout_8->setSpacing(0);
-        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
-        textEdit = new QTextEdit(about_tab);
-        textEdit->setObjectName(QString::fromUtf8("textEdit"));
-        textEdit->setReadOnly(true);
-        textEdit->setOverwriteMode(false);
-
-        verticalLayout_8->addWidget(textEdit);
-
-        Tabs->addTab(about_tab, QString());
         world_controls_tab = new QWidget();
         world_controls_tab->setObjectName(QString::fromUtf8("world_controls_tab"));
         verticalLayout = new QVBoxLayout(world_controls_tab);
@@ -748,10 +738,6 @@ public:
         verticalLayout_37 = new QVBoxLayout(widget_5);
         verticalLayout_37->setObjectName(QString::fromUtf8("verticalLayout_37"));
         verticalLayout_37->setContentsMargins(6, 6, 6, 6);
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_37->addItem(verticalSpacer_3);
-
         horizontalLayout_35 = new QHBoxLayout();
         horizontalLayout_35->setObjectName(QString::fromUtf8("horizontalLayout_35"));
         tb_open_statisctics = new QPushButton(widget_5);
@@ -784,9 +770,57 @@ public:
 
         verticalLayout_37->addLayout(horizontalLayout_36);
 
-        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        horizontalLayout_50 = new QHBoxLayout();
+        horizontalLayout_50->setObjectName(QString::fromUtf8("horizontalLayout_50"));
+        tb_open_info_window = new QPushButton(widget_5);
+        tb_open_info_window->setObjectName(QString::fromUtf8("tb_open_info_window"));
+        tb_open_info_window->setCheckable(true);
 
-        verticalLayout_37->addItem(verticalSpacer_4);
+        horizontalLayout_50->addWidget(tb_open_info_window);
+
+        cb_info_window_always_on_top = new QCheckBox(widget_5);
+        cb_info_window_always_on_top->setObjectName(QString::fromUtf8("cb_info_window_always_on_top"));
+
+        horizontalLayout_50->addWidget(cb_info_window_always_on_top);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_50);
+
+        horizontalLayout_51 = new QHBoxLayout();
+        horizontalLayout_51->setObjectName(QString::fromUtf8("horizontalLayout_51"));
+        tb_open_recorder_window = new QPushButton(widget_5);
+        tb_open_recorder_window->setObjectName(QString::fromUtf8("tb_open_recorder_window"));
+        tb_open_recorder_window->setEnabled(true);
+        tb_open_recorder_window->setCheckable(true);
+
+        horizontalLayout_51->addWidget(tb_open_recorder_window);
+
+        cb_recorder_window_always_on_top = new QCheckBox(widget_5);
+        cb_recorder_window_always_on_top->setObjectName(QString::fromUtf8("cb_recorder_window_always_on_top"));
+        cb_recorder_window_always_on_top->setEnabled(true);
+
+        horizontalLayout_51->addWidget(cb_recorder_window_always_on_top);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_51);
+
+        horizontalLayout_52 = new QHBoxLayout();
+        horizontalLayout_52->setObjectName(QString::fromUtf8("horizontalLayout_52"));
+        pushButton_2 = new QPushButton(widget_5);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        pushButton_2->setEnabled(false);
+        pushButton_2->setCheckable(true);
+
+        horizontalLayout_52->addWidget(pushButton_2);
+
+        checkBox_2 = new QCheckBox(widget_5);
+        checkBox_2->setObjectName(QString::fromUtf8("checkBox_2"));
+        checkBox_2->setEnabled(false);
+
+        horizontalLayout_52->addWidget(checkBox_2);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_52);
 
 
         verticalLayout_24->addWidget(widget_5);
@@ -1899,8 +1933,12 @@ public:
         QObject::connect(le_keyboard_movement_amount, SIGNAL(returnPressed()), MainWindow, SLOT(le_keyboard_movement_amount_slot()));
         QObject::connect(le_scaling_coefficient, SIGNAL(returnPressed()), MainWindow, SLOT(le_scaling_coefficient_slot()));
         QObject::connect(cb_reset_with_editor_organism, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reset_with_editor_organism_slot(bool)));
+        QObject::connect(cb_info_window_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_info_window_always_on_top_slot(bool)));
+        QObject::connect(tb_open_info_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_info_window_slot(bool)));
+        QObject::connect(cb_recorder_window_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_recorder_window_always_on_top_slot(bool)));
+        QObject::connect(tb_open_recorder_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_recorder_window_slot(bool)));
 
-        Tabs->setCurrentIndex(1);
+        Tabs->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1928,25 +1966,6 @@ public:
         rb_null_button->setText(QString());
         label_43->setText(QApplication::translate("MainWindow", "Brush size:", nullptr));
         cb_synchronise_sim_and_win->setText(QApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
-        textEdit->setHtml(QApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This is c++ implementation of an original The Life Engine (https://thelifeengine.net/) made in javascript (https://github.com/MaxRobinsonTheGreat/LifeEngine).</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version will (in the future) feature everything that the original version has, but I (maybe) will also add some new features.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This version is in alp"
-                        "ha stage, so many things are not implemeted and will probably change.</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Important Information:</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*sps is the number of simulation ticks per second.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*setting max fps/sps/num organisms to &lt;0 will enable unlimited mode.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*checking &quot;Fix reproducing distance&quot; will set reproducing distance to min value.</p>\n"
-"<p style=\" margin-top:0px; margi"
-                        "n-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*to hide menu, make sure that you don't enter text, put cursor on simulation grid, and press the keyboard button &quot;M&quot;</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">*To finilize changes in line edits you should press Enter.</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This project's Github: https://github.com/SuperSpaceEye/LifeEngineExtended</p></body></html>", nullptr));
-        Tabs->setTabText(Tabs->indexOf(about_tab), QApplication::translate("MainWindow", "About", nullptr));
         label_8->setText(QApplication::translate("MainWindow", "Starting cell size:", nullptr));
         le_cell_size->setText(QApplication::translate("MainWindow", "1", nullptr));
         cb_fill_window->setText(QApplication::translate("MainWindow", "Fill window", nullptr));
@@ -1967,10 +1986,16 @@ public:
         b_save_world->setText(QApplication::translate("MainWindow", "Save world", nullptr));
         b_load_world->setText(QApplication::translate("MainWindow", "Load world", nullptr));
         Tabs->setTabText(Tabs->indexOf(world_controls_tab), QApplication::translate("MainWindow", "World Controls", nullptr));
-        tb_open_statisctics->setText(QApplication::translate("MainWindow", "Open Statistics Window", nullptr));
+        tb_open_statisctics->setText(QApplication::translate("MainWindow", "Statistics", nullptr));
         cb_statistics_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
-        tb_open_organism_editor->setText(QApplication::translate("MainWindow", "Open Organism Editor Window", nullptr));
+        tb_open_organism_editor->setText(QApplication::translate("MainWindow", "Organism Editor", nullptr));
         cb_editor_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_info_window->setText(QApplication::translate("MainWindow", "Info", nullptr));
+        cb_info_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_recorder_window->setText(QApplication::translate("MainWindow", "Recorder", nullptr));
+        cb_recorder_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        pushButton_2->setText(QApplication::translate("MainWindow", "World Events", nullptr));
+        checkBox_2->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         Tabs->setTabText(Tabs->indexOf(windows_tab), QApplication::translate("MainWindow", "Windows", nullptr));
         label_4->setText(QApplication::translate("MainWindow", "Food production probability:", nullptr));
         le_food_production_probability->setText(QApplication::translate("MainWindow", "0.5", nullptr));
@@ -2122,7 +2147,7 @@ public:
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", nullptr));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", nullptr));
         label_47->setText(QApplication::translate("MainWindow", "Menu minimum pixel height:", nullptr));
-        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really y render", nullptr));
+        cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
         label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
         label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));

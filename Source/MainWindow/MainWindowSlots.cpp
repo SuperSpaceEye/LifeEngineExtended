@@ -18,7 +18,9 @@ void MainWindow::tb_pause_slot(bool state) {
 
 void MainWindow::tb_stoprender_slot(bool state) {
     pause_grid_parsing = state;
-    parse_full_simulation_grid(pause_grid_parsing);
+    if (!really_stop_render) {
+        parse_full_simulation_grid(pause_grid_parsing);
+    }
     // calculating delta time is not needed when no image is being created.
     ecp.calculate_simulation_tick_delta_time = !ecp.calculate_simulation_tick_delta_time;
 }
@@ -44,25 +46,42 @@ void MainWindow::tb_open_organism_editor_slot(bool state) {
     }
 }
 
+void MainWindow::tb_open_info_window_slot(bool state) {
+    if (state) {
+        iw.show();
+    } else {
+        iw.close();
+    }
+}
+
+void MainWindow::tb_open_recorder_window_slot(bool state) {
+    if (state) {
+        rec.show();
+    } else {
+        rec.close();
+    }
+}
+
+
 //==================== Buttons ====================
 
 void MainWindow::b_clear_slot() {
     if (display_dialog_message("All organisms and simulation grid will be cleared.", disable_warnings)) {
         bool flag = sp.clear_walls_on_reset;
         sp.clear_walls_on_reset = true;
-        pause_engine();
+        engine->pause();
         clear_world();
-        unpause_engine();
+         engine->unpause();
         sp.clear_walls_on_reset = flag;
     }
 }
 
 void MainWindow::b_reset_slot() {
     if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
-        pause_engine();
+        engine->pause();
         if (ecp.reset_with_editor_organism) {ee.load_chosen_organism();}
         engine->reset_world();
-        unpause_engine();
+         engine->unpause();
     }
 }
 
@@ -71,23 +90,23 @@ void MainWindow::b_resize_and_reset_slot() {
 }
 
 void MainWindow::b_generate_random_walls_slot() {
-    pause_engine();
+    engine->pause();
     engine->make_random_walls();
-    unpause_engine();
+    engine->unpause();
 }
 
 void MainWindow::b_clear_all_walls_slot() {
-    pause_engine();
+    engine->pause();
     engine->clear_walls();
-    unpause_engine();
+    engine->unpause();
 }
 
 void MainWindow::b_save_world_slot() {
-    bool flag = synchronise_simulation_and_window;
-    synchronise_simulation_and_window = false;
+    bool flag = ecp.synchronise_simulation_and_window;
+    ecp.synchronise_simulation_and_window = false;
     ecp.engine_global_pause = true;
     ecp.pause_processing_user_action = true;
-    wait_for_engine_to_pause_force();
+    engine->wait_for_engine_to_pause_force();
     wait_for_engine_to_pause_processing_user_actions();
 
     QString selected_filter;
@@ -104,7 +123,7 @@ void MainWindow::b_save_world_slot() {
     } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
-        synchronise_simulation_and_window = flag;
+        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         ecp.pause_processing_user_action = false;
         return;
@@ -126,17 +145,17 @@ void MainWindow::b_save_world_slot() {
         write_json_data(full_path);
     }
 
-    synchronise_simulation_and_window = flag;
+    ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::b_load_world_slot() {
-    bool flag = synchronise_simulation_and_window;
-    synchronise_simulation_and_window = false;
+    bool flag = ecp.synchronise_simulation_and_window;
+    ecp.synchronise_simulation_and_window = false;
     ecp.engine_global_pause = true;
     ecp.pause_processing_user_action = true;
-    wait_for_engine_to_pause_force();
+    engine->wait_for_engine_to_pause_force();
     wait_for_engine_to_pause_processing_user_actions();
 
     QString selected_filter;
@@ -148,7 +167,7 @@ void MainWindow::b_load_world_slot() {
     } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
     } else {
-        synchronise_simulation_and_window = flag;
+        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         ecp.pause_processing_user_action = false;
         return;
@@ -165,7 +184,7 @@ void MainWindow::b_load_world_slot() {
         read_json_data(full_path);
     }
 
-    synchronise_simulation_and_window = flag;
+    ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     ecp.pause_processing_user_action = false;
     initialize_gui();
@@ -182,7 +201,7 @@ void MainWindow::b_reset_view_slot() {
 
 void MainWindow::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
-    pause_engine();
+    engine->pause();
 
     for (auto & organism: edc.organisms) {
         organism->lifetime = organism->max_lifetime*2;
@@ -191,7 +210,7 @@ void MainWindow::b_kill_all_organisms_slot() {
         organism->lifetime = organism->max_lifetime*2;
     }
 
-    unpause_engine();
+     engine->unpause();
 }
 
 //==================== Line edits ====================
@@ -512,7 +531,7 @@ void MainWindow::rb_cuda_slot() {
 //==================== Check buttons ====================
 
 void MainWindow::cb_synchronise_simulation_and_window_slot(bool state) {
-    synchronise_simulation_and_window = state;
+    ecp.synchronise_simulation_and_window = state;
     ecp.engine_pause = state;
 }
 
@@ -578,6 +597,38 @@ void MainWindow::cb_editor_always_on_top_slot(bool state) {
     }
 }
 
+void MainWindow::cb_info_window_always_on_top_slot(bool state) {
+    auto hidden = iw.isHidden();
+
+    iw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        iw.show();
+    }
+}
+
+void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
+    auto hidden = rec.isHidden();
+
+    rec.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        rec.show();
+    }
+}
+
+void MainWindow::cb_really_stop_render_slot(bool state) {
+    really_stop_render = state;
+    if (!state && pause_grid_parsing) {
+        parse_full_simulation_grid(true);
+    }
+}
+
+
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void MainWindow::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -627,8 +678,6 @@ void MainWindow::cb_food_blocks_movement_slot            (bool state) { sp.food_
 void MainWindow::cb_use_new_child_pos_calculator_slot    (bool state) { sp.use_new_child_pos_calculator = state;}
 
 void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check_if_path_is_clear = state;}
-
-void MainWindow::cb_really_stop_render_slot              (bool state) { really_stop_render = state;}
 
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 

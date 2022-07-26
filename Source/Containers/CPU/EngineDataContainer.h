@@ -14,7 +14,6 @@
 #include "../../GridBlocks/AtomicGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
 
-
 struct eager_worker_partial;
 class Organism;
 struct pool_changes_info;
@@ -47,7 +46,7 @@ struct EngineDataContainer {
 
     std::vector<BaseGridBlock> second_simulation_grid;
 
-    std::vector<eager_worker_partial> threads;
+//    std::vector<eager_worker_partial> threads;
     std::vector<std::vector<int>> threaded_to_erase;
     std::vector<std::vector<std::vector<Observation>>> pooled_organisms_observations;
     std::vector<std::vector<pool_changes_info>> sorted_organisms_by_x_position;

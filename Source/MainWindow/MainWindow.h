@@ -26,8 +26,6 @@
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include "../CustomJsonParser/json_parser.hpp"
 
 
 #include <QApplication>
@@ -45,68 +43,37 @@
 #include <QWheelEvent>
 //#include <QtCharts>
 
-
+#include "WindowUI.h"
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Containers/CPU/ColorContainer.h"
 #include "../Containers/CPU/SimulationParameters.h"
 #include "../Containers/CPU/EngineControlContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../OrganismEditor/OrganismEditor.h"
 #include "../PRNGS/lehmer64.h"
 #include "../Stuff/textures.h"
 #include "../Stuff/MiscFuncs.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/Vector2.h"
 
-#include "WindowUI.h"
+#include "../Stuff/rapidjson/document.h"
+#include "../Stuff/rapidjson/writer.h"
+#include "../Stuff/rapidjson/stringbuffer.h"
+
 #include "../Statistics/StatisticsCore.h"
+#include "../OrganismEditor/OrganismEditor.h"
+#include "../InfoWindow/InfoWindow.h"
+#include "../Recorder/Recorder.h"
 
 
 #if __CUDA_USED__
 #include "../Stuff/cuda_image_creator.cuh"
 #include "../Stuff/get_device_count.cuh"
-
 #endif
 
 #if defined(__WIN32)
 #include <windows.h>
 #endif
-
-struct OrganismInfoHolder {
-    double size = 0;
-    double _organism_lifetime = 0;
-    double _organism_age    = 0;
-    double _mouth_blocks    = 0;
-    double _producer_blocks = 0;
-    double _mover_blocks    = 0;
-    double _killer_blocks   = 0;
-    double _armor_blocks    = 0;
-    double _eye_blocks      = 0;
-    double brain_mutation_rate = 0;
-    double anatomy_mutation_rate = 0;
-    int total = 0;
-};
-
-struct OrganismAvgBlockInformation {
-
-    uint64_t total_size_organism_blocks = 0;
-    uint64_t total_size_producing_space = 0;
-    uint64_t total_size_eating_space    = 0;
-    uint64_t total_size_single_adjacent_space = 0;
-    uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size = 0;
-
-    OrganismInfoHolder total_avg{};
-    OrganismInfoHolder station_avg{};
-    OrganismInfoHolder moving_avg{};
-
-    double move_range = 0;
-    int moving_organisms = 0;
-    int organisms_with_eyes = 0;
-
-    double total_total_mutation_rate = 0;
-};
 
 class MainWindow: public QWidget {
         Q_OBJECT
@@ -138,9 +105,11 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
-    SimulationEngine* engine;
+    SimulationEngine* engine = nullptr;
     OrganismEditor ee;
     StatisticsCore s;
+    InfoWindow iw{&_ui};
+    Recorder rec{&_ui, &edc, &ecp, &cc, &textures};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -173,7 +142,6 @@ private:
     bool fill_window = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
-    bool synchronise_simulation_and_window = false;
     bool really_stop_render = false;
 
     bool W_pressed = false;
@@ -204,39 +172,30 @@ private:
     void reset_scale_view();
 
     void write_json_data(const std::string &path);
-    void json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
-                             boost::property_tree::ptree &edible_neighbors,
-                             boost::property_tree::ptree &growableNeighbors,
-                             boost::property_tree::ptree &cell, boost::property_tree::ptree &value) const;
 
-    void json_write_fossil_record(boost::property_tree::ptree &fossil_record) const;
+    void json_write_grid(rapidjson::Document & d);
+    void json_write_organisms(rapidjson::Document & d);
+    void json_write_fossil_record(rapidjson::Document & d);
+    void json_write_controls(rapidjson::Document & d) const ;
 
-    void json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
-                              boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
-                              boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain);
+    void json_read_grid_data(rapidjson::Document & d);
+    void json_read_organisms_data(rapidjson::Document & d);
+    void json_read_simulation_parameters(rapidjson::Document & d);
 
-    void json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
-                         boost::property_tree::ptree &food, boost::property_tree::ptree &walls);
-
-    void json_read_organism_data(boost::property_tree::ptree &root);
-
-    void json_read_simulation_parameters(const boost::property_tree::ptree &root);
-
-    void json_read_grid_data(boost::property_tree::ptree &root);
     void read_json_data(const std::string &path);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
-    void write_version(std::ofstream& os);
+    static void write_version(std::ofstream& os);
     void write_simulation_parameters(std::ofstream& os);
     void write_organisms_block_parameters(std::ofstream& os);
     void write_data_container_data(std::ofstream& os);
     //    void write_color_container(); TODO: ?
     void write_simulation_grid(std::ofstream& os);
     void write_organisms(std::ofstream& os);
-    void write_organism_data(std::ofstream& os, Organism * organism);
-    void write_organism_brain(std::ofstream& os, Brain * brain);
-    void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
+    static void write_organism_data(std::ofstream& os, Organism * organism);
+    static void write_organism_brain(std::ofstream& os, Brain * brain);
+    static void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void recover_state(const SimulationParameters &recovery_sp,
                        const OrganismBlockParameters &recovery_bp,
@@ -244,16 +203,16 @@ private:
                        uint32_t recovery_simulation_height);
 
     void read_data(std::ifstream& is);
-    bool read_version(std::ifstream& is);
+    static bool read_version(std::ifstream& is);
     void read_simulation_parameters(std::ifstream& is);
     void read_organisms_block_parameters(std::ifstream& is);
     bool read_data_container_data(std::ifstream& is);
     //    void read_color_container(); TODO: ?
     void read_simulation_grid(std::ifstream& is);
     bool read_organisms(std::ifstream& is);
-    void read_organism_data(std::ifstream& is, OrganismData & data);
-    void read_organism_brain(std::ifstream& is, Brain * brain);
-    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+    static void read_organism_data(std::ifstream& is, OrganismData & data);
+    static void read_organism_brain(std::ifstream& is, Brain * brain);
+    static void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
     void update_table_values();
 
     bool cuda_is_available();
@@ -270,9 +229,6 @@ private:
     void calculate_new_simulation_size();
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
-    void pause_engine();
-    void unpause_engine();
-
     void create_image();
 
     color & get_color_simplified(BlockTypes type);
@@ -280,7 +236,6 @@ private:
 
     bool wait_for_engine_to_pause();
     bool wait_for_engine_to_pause_processing_user_actions();
-    bool wait_for_engine_to_pause_force();
 
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
@@ -327,8 +282,6 @@ private:
     // converts num bytes to string of shortened number with postfix (like 14 KiB)
     static std::string convert_num_bytes(uint64_t num_bytes);
 
-    OrganismAvgBlockInformation parse_organisms_info();
-
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
     void keyPressEvent(QKeyEvent * event) override;
@@ -339,6 +292,8 @@ private slots:
     void tb_stoprender_slot(bool state);
     void tb_open_statistics_slot(bool state);
     void tb_open_organism_editor_slot(bool state);
+    void tb_open_info_window_slot(bool state);
+    void tb_open_recorder_window_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -436,6 +391,7 @@ private slots:
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
+    void cb_recorder_window_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);
@@ -446,6 +402,7 @@ private slots:
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
+    void cb_info_window_always_on_top_slot(bool state);
 
     //Evolution Controls
     void table_cell_changed_slot(int row, int col);
@@ -453,6 +410,8 @@ public:
     MainWindow(QWidget *parent);
 
     void process_keyboard_events();
+
+    void write_json_organism(rapidjson::Document &d, Organism *&organism, rapidjson::Value &j_organism) const;
 };
 
 
