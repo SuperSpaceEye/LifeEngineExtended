@@ -230,6 +230,16 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data) {
     lin_width  = linspace<int>(start_x, end_x, image_width);
     lin_height = linspace<int>(start_y, end_y, image_height);
 
+    int max_x = lin_width[lin_width.size()-1];
+    int max_y = lin_height[lin_height.size()-1];
+    int del_x = 0;
+    int del_y = 0;
+    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
+    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
+
+    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
+    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
+
     std::vector<int> truncated_lin_width;
     truncated_lin_width.reserve(image_width);
     std::vector<int> truncated_lin_height;

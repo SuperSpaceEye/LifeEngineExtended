@@ -33,7 +33,7 @@
      </property>
      <widget class="QWidget" name="full_image_creator">
       <attribute name="title">
-       <string>Full Image creator</string>
+       <string>Full grid Image creator</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -84,11 +84,6 @@
         </spacer>
        </item>
       </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>Tab 2</string>
-      </attribute>
      </widget>
     </widget>
    </item>

@@ -35,7 +35,6 @@ public:
     QLineEdit *le_number_or_pixels_per_block;
     QPushButton *b_create_image;
     QSpacerItem *verticalSpacer_2;
-    QWidget *tab_2;
 
     void setupUi(QWidget *Recorder)
     {
@@ -80,9 +79,6 @@ public:
         verticalLayout_2->addItem(verticalSpacer_2);
 
         tabWidget->addTab(full_image_creator, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        tabWidget->addTab(tab_2, QString());
 
         verticalLayout->addWidget(tabWidget);
 
@@ -102,8 +98,7 @@ public:
         Recorder->setWindowTitle(QApplication::translate("Recorder", "Recorder", nullptr));
         label->setText(QApplication::translate("Recorder", "Number of pixels per world block", nullptr));
         b_create_image->setText(QApplication::translate("Recorder", "Create image", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(full_image_creator), QApplication::translate("Recorder", "Full Image creator", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("Recorder", "Tab 2", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(full_image_creator), QApplication::translate("Recorder", "Full grid Image creator", nullptr));
     } // retranslateUi
 
 };
