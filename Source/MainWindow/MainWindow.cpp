@@ -51,10 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     cc = ColorContainer{};
     sp = SimulationParameters{};
 
-    auto anatomy = std::make_shared<Anatomy>();
-    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
-    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
+    auto anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
+    anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
 //    anatomy->set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
 //    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 2);
@@ -63,12 +63,12 @@ MainWindow::MainWindow(QWidget *parent) :
 //    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, 2);
 //    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 3);
 
-    auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
+    auto brain = Brain(BrainTypes::RandomActions);
 
     edc.base_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                      Rotation::UP, anatomy, brain, &sp, &bp, 1);
     edc.chosen_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
-                                       Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
+                                       Rotation::UP, Anatomy(anatomy), Brain(),
                                        &sp, &bp, 1);
 
     edc.base_organism->last_decision = DecisionObservation{};
@@ -814,7 +814,7 @@ void MainWindow::change_editing_grid_left_click() {
 
     //relative position
     auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy->set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
+    ee.editor_organism->anatomy.set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
     ee.create_image();
 }
 
@@ -822,11 +822,11 @@ void MainWindow::change_editing_grid_right_click() {
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
     if (cpg.x == ee.editor_organism->x && cpg.y == ee.editor_organism->y) {return;}
-    if (ee.editor_organism->anatomy->_organism_blocks.size() == 1) { return;}
+    if (ee.editor_organism->anatomy._organism_blocks.size() == 1) { return;}
 
     //relative position
     auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy->set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
+    ee.editor_organism->anatomy.set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
     ee.create_image();
 }
 

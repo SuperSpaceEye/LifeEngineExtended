@@ -200,7 +200,7 @@ public:
     int32_t _eye_blocks      = 0;
 
     explicit Anatomy(SerializedOrganismStructureContainer *structure);
-    explicit Anatomy(const std::shared_ptr<Anatomy>& anatomy);
+    Anatomy(const Anatomy& anatomy);
     Anatomy()=default;
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt);

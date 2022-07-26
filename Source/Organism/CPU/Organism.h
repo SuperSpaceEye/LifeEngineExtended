@@ -62,8 +62,8 @@ public:
 
 class Organism: public OrganismData {
 public:
-    std::shared_ptr<Anatomy> anatomy = nullptr;
-    std::shared_ptr<Brain> brain = nullptr;
+    Anatomy anatomy;
+    Brain brain;
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
     Organism * child_pattern = nullptr;
@@ -72,16 +72,16 @@ public:
     int calculate_organism_lifetime();
     float calculate_food_needed();
 
-    void mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen);
-    void mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain, float &_brain_mutation_rate, lehmer64 *gen);
+    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen);
+    void mutate_brain(Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 *gen);
     static int mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range);
 
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
 
     void init_values();
     //public:
-    Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
-             std::shared_ptr<Brain> brain, SimulationParameters *sp,
+    Organism(int x, int y, Rotation rotation, Anatomy anatomy,
+             Brain brain, SimulationParameters *sp,
              OrganismBlockParameters *block_parameters, int move_range,
              float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
     Organism(Organism *organism);

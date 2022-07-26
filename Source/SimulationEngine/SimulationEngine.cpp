@@ -172,7 +172,7 @@ void SimulationEngine::process_user_action_pool() {
             case ActionType::TryAddOrganism: {
                 bool continue_flag = false;
 
-                for (auto &block: edc.chosen_organism->anatomy->_organism_blocks) {
+                for (auto &block: edc.chosen_organism->anatomy._organism_blocks) {
                     continue_flag = check_if_out_of_bounds(&edc,
                                                            block.get_pos(edc.chosen_organism->rotation).x + action.x,
                                                            block.get_pos(edc.chosen_organism->rotation).y + action.y);
@@ -203,7 +203,7 @@ void SimulationEngine::process_user_action_pool() {
                 new_organism->x = action.x;
                 new_organism->y = action.y;
 
-                for (auto &block: new_organism->anatomy->_organism_blocks) {
+                for (auto &block: new_organism->anatomy._organism_blocks) {
                     int x = block.get_pos(edc.chosen_organism->rotation).x + new_organism->x;
                     int y = block.get_pos(edc.chosen_organism->rotation).y + new_organism->y;
 
@@ -285,7 +285,7 @@ void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & 
     for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
     if (continue_flag) { return;}
     temp.push_back(organism_ptr);
-    for (auto & block: organism_ptr->anatomy->_organism_blocks) {
+    for (auto & block: organism_ptr->anatomy._organism_blocks) {
         edc.CPU_simulation_grid
         [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
         [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;

@@ -27,11 +27,11 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     scene.addItem(&pixmap_item);
     _ui.editor_graphicsView->setScene(&scene);
 
-    auto anatomy = std::make_shared<Anatomy>();
-    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    auto anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
 
-    auto brain = std::make_shared<Brain>();
-    brain->brain_type = BrainTypes::SimpleBrain;
+    auto brain = Brain();
+    brain.brain_type = BrainTypes::SimpleBrain;
 
     chosen_organism = _chosen_organism;
 
@@ -63,7 +63,7 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
 }
 
 void OrganismEditor::update_cell_count_label() {
-    _ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism->anatomy->_organism_blocks.size())));
+    _ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism->anatomy._organism_blocks.size())));
 }
 
 void OrganismEditor::update_gui() {
@@ -122,14 +122,14 @@ void OrganismEditor::brain_cb_chooser(std::string observation, std::string actio
     SimpleDecision * brain_decision;
 
     switch (observation_type) {
-        case BlockTypes::MouthBlock:    brain_decision = &editor_organism->brain->simple_action_table.MouthBlock;    break;
-        case BlockTypes::ProducerBlock: brain_decision = &editor_organism->brain->simple_action_table.ProducerBlock; break;
-        case BlockTypes::MoverBlock:    brain_decision = &editor_organism->brain->simple_action_table.MoverBlock;    break;
-        case BlockTypes::KillerBlock:   brain_decision = &editor_organism->brain->simple_action_table.KillerBlock;   break;
-        case BlockTypes::ArmorBlock:    brain_decision = &editor_organism->brain->simple_action_table.ArmorBlock;    break;
-        case BlockTypes::EyeBlock:      brain_decision = &editor_organism->brain->simple_action_table.EyeBlock;      break;
-        case BlockTypes::FoodBlock:     brain_decision = &editor_organism->brain->simple_action_table.FoodBlock;     break;
-        case BlockTypes::WallBlock:     brain_decision = &editor_organism->brain->simple_action_table.WallBlock;     break;
+        case BlockTypes::MouthBlock:    brain_decision = &editor_organism->brain.simple_action_table.MouthBlock;    break;
+        case BlockTypes::ProducerBlock: brain_decision = &editor_organism->brain.simple_action_table.ProducerBlock; break;
+        case BlockTypes::MoverBlock:    brain_decision = &editor_organism->brain.simple_action_table.MoverBlock;    break;
+        case BlockTypes::KillerBlock:   brain_decision = &editor_organism->brain.simple_action_table.KillerBlock;   break;
+        case BlockTypes::ArmorBlock:    brain_decision = &editor_organism->brain.simple_action_table.ArmorBlock;    break;
+        case BlockTypes::EyeBlock:      brain_decision = &editor_organism->brain.simple_action_table.EyeBlock;      break;
+        case BlockTypes::FoodBlock:     brain_decision = &editor_organism->brain.simple_action_table.FoodBlock;     break;
+        case BlockTypes::WallBlock:     brain_decision = &editor_organism->brain.simple_action_table.WallBlock;     break;
     }
 
     switch (decision) {
@@ -140,14 +140,14 @@ void OrganismEditor::brain_cb_chooser(std::string observation, std::string actio
 }
 
 void OrganismEditor::update_brain_checkboxes() {
-    brain_checkboxes["Mouth Cell"]   [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.MouthBlock]]   ->setChecked(true);
-    brain_checkboxes["Producer Cell"][mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.ProducerBlock]]->setChecked(true);
-    brain_checkboxes["Mover Cell"]   [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.MoverBlock]]   ->setChecked(true);
-    brain_checkboxes["Killer Cell"]  [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.KillerBlock]]  ->setChecked(true);
-    brain_checkboxes["Armor Cell"]   [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.ArmorBlock]]   ->setChecked(true);
-    brain_checkboxes["Eye Cell"]     [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.EyeBlock]]     ->setChecked(true);
-    brain_checkboxes["Food"]         [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.FoodBlock]]    ->setChecked(true);
-    brain_checkboxes["Wall"]         [mapped_decisions_type_to_s[editor_organism->brain->simple_action_table.WallBlock]]    ->setChecked(true);
+    brain_checkboxes["Mouth Cell"]   [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.MouthBlock]]   ->setChecked(true);
+    brain_checkboxes["Producer Cell"][mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.ProducerBlock]]->setChecked(true);
+    brain_checkboxes["Mover Cell"]   [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.MoverBlock]]   ->setChecked(true);
+    brain_checkboxes["Killer Cell"]  [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.KillerBlock]]  ->setChecked(true);
+    brain_checkboxes["Armor Cell"]   [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.ArmorBlock]]   ->setChecked(true);
+    brain_checkboxes["Eye Cell"]     [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.EyeBlock]]     ->setChecked(true);
+    brain_checkboxes["Food"]         [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.FoodBlock]]    ->setChecked(true);
+    brain_checkboxes["Wall"]         [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.WallBlock]]    ->setChecked(true);
 }
 
 void OrganismEditor::closeEvent(QCloseEvent * event) {
@@ -205,17 +205,17 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
     int x = editor_organism->x;
     int y = editor_organism->y;
 
-    for (int i = 0; i < editor_organism->anatomy->_organism_blocks.size(); i++) {
-        auto & block = editor_organism->anatomy->_organism_blocks[i];
+    for (int i = 0; i < editor_organism->anatomy._organism_blocks.size(); i++) {
+        auto & block = editor_organism->anatomy._organism_blocks[i];
 
         if (block.get_pos(Rotation::UP).x + x >= editor_width  || block.get_pos(Rotation::UP).x + x < 0 ||
             block.get_pos(Rotation::UP).y + y >= editor_height || block.get_pos(Rotation::UP).y + y < 0) {
-            editor_organism->anatomy->_organism_blocks.erase(editor_organism->anatomy->_organism_blocks.begin()+i);
+            editor_organism->anatomy._organism_blocks.erase(editor_organism->anatomy._organism_blocks.begin()+i);
             i--;
         }
     }
 
-    editor_organism->anatomy->set_many_blocks(editor_organism->anatomy->_organism_blocks);
+    editor_organism->anatomy.set_many_blocks(editor_organism->anatomy._organism_blocks);
 
     place_organism_on_a_grid();
 }
@@ -385,7 +385,7 @@ void OrganismEditor::clear_grid() {
 void OrganismEditor::place_organism_on_a_grid() {
     clear_grid();
 
-    for (auto & block: editor_organism->anatomy->_organism_blocks) {
+    for (auto & block: editor_organism->anatomy._organism_blocks) {
         auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
         auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
         edit_grid[x][y].type = block.type;
@@ -419,7 +419,7 @@ void OrganismEditor::load_chosen_organism() {
     Vector2 min{0, 0};
     Vector2 max{0, 0};
 
-    for (auto & block: editor_organism->anatomy->_organism_blocks) {
+    for (auto & block: editor_organism->anatomy._organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
         if (block.relative_y < min.y) {min.y = block.relative_y;}
         if (block.relative_x > max.x) {max.x = block.relative_x;}
