@@ -14,8 +14,6 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
-#include <boost/property_tree/ptree.hpp>
-#include "../CustomJsonParser/json_parser.hpp"
 #ifndef __WIN32
 #include <filesystem>
 #endif
@@ -24,6 +22,10 @@
 #include <QTimer>
 #include <QWheelEvent>
 #include <QFileDialog>
+
+#include "../Stuff/rapidjson/document.h"
+#include "../Stuff/rapidjson/writer.h"
+#include "../Stuff/rapidjson/stringbuffer.h"
 
 #include "../Stuff/Linspace.h"
 #include "../Organism/CPU/Organism.h"

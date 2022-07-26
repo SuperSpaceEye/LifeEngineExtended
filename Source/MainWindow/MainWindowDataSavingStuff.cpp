@@ -9,7 +9,15 @@
 #include "MainWindow.h"
 
 //TODO increment every time saving logic changes
-uint32_t SAVE_VERSION = 4;
+uint32_t SAVE_VERSION = 5;
+
+struct WorldBlocks {
+    uint32_t x;
+    uint32_t y;
+    BlockTypes type;
+    WorldBlocks()=default;
+    WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type) {}
+};
 
 void MainWindow::write_data(std::ofstream &os) {
     write_version(os);
@@ -39,9 +47,25 @@ void MainWindow::write_data_container_data(std::ofstream& os) {
 }
 //    void MainWindow::write_color_container(){}
 void MainWindow::write_simulation_grid(std::ofstream& os) {
-    for (auto & col: edc.CPU_simulation_grid) {
-        os.write((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
+    std::vector<WorldBlocks> blocks{};
+
+    for (uint32_t x = 0; x < edc.simulation_width; x++) {
+        for (uint32_t y = 0; y < edc.simulation_height; y++) {
+            auto & block = edc.CPU_simulation_grid[x][y];
+
+            switch (block.type) {
+                case BlockTypes::FoodBlock:
+                case BlockTypes::WallBlock:
+                    blocks.emplace_back(x, y, block.type);
+                default: break;
+            }
+        }
     }
+
+    auto size = blocks.size();
+
+    os.write((char*)&size, sizeof(std::size_t));
+    os.write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
 }
 void MainWindow::write_organisms(std::ofstream& os) {
     uint32_t size = edc.organisms.size();
@@ -102,7 +126,7 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     new_simulation_height = recovery_simulation_height;
 
     engine->reset_world();
-    unpause_engine();
+    engine->unpause();
 }
 
 void MainWindow::read_data(std::ifstream &is) {
@@ -183,21 +207,21 @@ bool MainWindow::read_data_container_data(std::ifstream& is) {
 
 //TODO only save food/walls ?
 void MainWindow::read_simulation_grid(std::ifstream& is) {
+    auto flag = disable_warnings;
     disable_warnings = true;
     resize_simulation_grid();
-    disable_warnings = false;
+    disable_warnings = flag;
 
-    for (auto & col: edc.CPU_simulation_grid) {
-        is.read((char*)&col[0], sizeof(AtomicGridBlock)*col.size());
-    }
+    std::vector<WorldBlocks> blocks{};
+    std::size_t size;
 
-    for (auto & column: edc.CPU_simulation_grid) {
-        for (auto &block: column) {
-            if (block.type == BlockTypes::WallBlock ||
-                block.type == BlockTypes::EmptyBlock ||
-                block.type == BlockTypes::FoodBlock) { continue; }
-            block = AtomicGridBlock();
-        }
+    is.read((char*)&size, sizeof(std::size_t));
+    blocks.resize(size);
+
+    is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
+
+    for (auto & block: blocks) {
+        edc.CPU_simulation_grid[block.x][block.y].type = block.type;
     }
 }
 
@@ -208,7 +232,7 @@ bool MainWindow::read_organisms(std::ifstream& is) {
 
     if (num_organisms > max_loaded_num_organisms) {
         if (!display_dialog_message("The loaded number of organisms is " + std::to_string(num_organisms) +
-        ". The save file may be corrupted and could crash your computer, continue?", false)) {
+        ". Continue?", false)) {
             return true;
         }
     }
@@ -320,6 +344,9 @@ void MainWindow::update_table_values() {
                 case ParametersNames::ChanceWeight:
                     value = &type->chance_weight;
                     break;
+                case ParametersNames::LifetimeWeight:
+                    value = &type->lifetime_weight;
+                    break;
             }
             _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
         }
@@ -327,30 +354,43 @@ void MainWindow::update_table_values() {
     _ui.table_organism_block_parameters->update();
 }
 
-namespace pt = boost::property_tree;
+using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
-//TODO https://github.com/Tencent/rapidjson ?
-
-//https://www.cochoy.fr/boost-property-tree/
 void MainWindow::read_json_data(const std::string &path) {
+    std::string json;
+    auto ss = std::ostringstream();
+    std::ifstream file;
+    file.open(path);
+    if (!file.is_open()) {
+        return;
+    }
+
+    ss << file.rdbuf();
+    json = ss.str();
+
+    file.close();
+
+    Document document;
+    document.Parse(json.c_str());
+
+    if (!document.HasMember("num_rows")) {
+        display_message("Failed to load world");
+        return;
+    }
+
     engine->partial_clear_world();
     engine->make_walls();
 
-    pt::ptree root;
-    pt::read_json(path, root);
-
-    json_read_grid_data(root);
-
-    json_read_simulation_parameters(root);
-
-    json_read_organism_data(root);
+    json_read_grid_data(document);
+    json_read_simulation_parameters(document);
+    json_read_organisms_data(document);
 
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-void MainWindow::json_read_grid_data(boost::property_tree::ptree &root) {
-    edc.simulation_height  = root.get<int>("num_rows") + 2;
-    edc.simulation_width   = root.get<int>("num_cols") + 2;
+void MainWindow::json_read_grid_data(rapidjson::Document & d) {
+    edc.simulation_height = d["num_rows"].GetInt() + 2;
+    edc.simulation_width  = d["num_cols"].GetInt() + 2;
 
     new_simulation_width = edc.simulation_width;
     new_simulation_height = edc.simulation_height;
@@ -365,59 +405,61 @@ void MainWindow::json_read_grid_data(boost::property_tree::ptree &root) {
     engine->make_walls();
     disable_warnings = false;
 
-    edc.loaded_engine_ticks = root.get<int>("total_ticks");
+    edc.loaded_engine_ticks = d["total_ticks"].GetInt64();
 
-    for (auto & pair: root.get_child("grid.food")) {
-        int y = pair.second.get<int>("r")+1;
-        int x = pair.second.get<int>("c")+1;
+    for (auto & pos: d["grid"]["food"].GetArray()) {
+        int x = pos["c"].GetInt() + 1;
+        int y = pos["r"].GetInt() + 1;
+
         edc.CPU_simulation_grid[x][y].type = BlockTypes::FoodBlock;
     }
 
-    for (auto & pair: root.get_child("grid.walls")) {
-        int y = pair.second.get<int>("r")+1;
-        int x = pair.second.get<int>("c")+1;
+    for (auto & pos: d["grid"]["walls"].GetArray()) {
+        int x = pos["c"].GetInt() + 1;
+        int y = pos["r"].GetInt() + 1;
+
         edc.CPU_simulation_grid[x][y].type = BlockTypes::WallBlock;
     }
 }
 
-void MainWindow::json_read_simulation_parameters(const boost::property_tree::ptree &root) {
-    sp.lifespan_multiplier               = root.get<int>("controls.lifespanMultiplier");
-    sp.food_production_probability       = float(root.get<int>("controls.foodProdProb")) / 100;
-    sp.use_anatomy_evolved_mutation_rate = !root.get<bool>("controls.useGlobalMutability");
-    sp.global_anatomy_mutation_rate      = float(root.get<int>("controls.globalMutability")) / 100;
-    sp.add_cell                          = root.get<int>("controls.addProb");
-    sp.change_cell                       = root.get<int>("controls.changeProb");
-    sp.remove_cell                       = root.get<int>("controls.removeProb");
-    sp.runtime_rotation_enabled          = root.get<bool>("controls.rotationEnabled");
-    sp.food_blocks_reproduction          = root.get<bool>("controls.foodBlocksReproduction");
-    sp.movers_can_produce_food           = root.get<bool>("controls.moversCanProduce");
-    sp.on_touch_kill                     = root.get<bool>("controls.instaKill");
-    sp.look_range                        = root.get<int>("controls.lookRange");
-    sp.extra_mover_reproductive_cost     = root.get<int>("controls.extraMoverFoodCost");
+void MainWindow::json_read_simulation_parameters(rapidjson::Document & d) {
+    sp.lifespan_multiplier               = d["controls"]["lifespanMultiplier"].GetFloat();
+    sp.food_production_probability       = d["controls"]["foodProdProb"].GetFloat() / 100;
+    sp.use_anatomy_evolved_mutation_rate =!d["controls"]["useGlobalMutability"].GetBool();
+    sp.global_anatomy_mutation_rate      = d["controls"]["globalMutability"].GetFloat() / 100;
+    sp.add_cell                          = d["controls"]["addProb"].GetInt();
+    sp.change_cell                       = d["controls"]["changeProb"].GetInt();
+    sp.remove_cell                       = d["controls"]["removeProb"].GetInt();
+    sp.runtime_rotation_enabled          = d["controls"]["rotationEnabled"].GetBool();
+    sp.food_blocks_reproduction          = d["controls"]["foodBlocksReproduction"].GetBool();
+    sp.movers_can_produce_food           = d["controls"]["moversCanProduce"].GetBool();
+    sp.on_touch_kill                     = d["controls"]["instaKill"].GetBool();
+    sp.look_range                        = d["controls"]["lookRange"].GetInt();
+    sp.extra_mover_reproductive_cost     = d["controls"]["extraMoverFoodCost"].GetFloat();
 }
 
-void MainWindow::json_read_organism_data(boost::property_tree::ptree &root) {
-    for (auto & organism: root.get_child("organisms")) {
+void MainWindow::json_read_organisms_data(rapidjson::Document & d) {
+    for (auto & organism: d["organisms"].GetArray()) {
         auto brain = std::make_shared<Brain>();
         auto anatomy = std::make_shared<Anatomy>();
 
-        int y              = organism.second.get<int>("r")+1;
-        int x              = organism.second.get<int>("c")+1;
-        int lifetime       = organism.second.get<int>("lifetime");
-        int food_collected = organism.second.get<int>("food_collected");
-        int rotation       = organism.second.get<int>("rotation");
-        int move_range     = organism.second.get<int>("move_range");
-        float mutability   = float(organism.second.get<float>("mutability"))/100;
-        int damage         = organism.second.get<int>("damage");
-        bool is_mover      = organism.second.get<bool>("anatomy.is_mover");
-        bool has_eyes      = organism.second.get<bool>("anatomy.has_eyes");
+        int y                = organism["r"].GetInt()+1;
+        int x                = organism["c"].GetInt()+1;
+        int lifetime         = organism["lifetime"].GetInt();
+        float food_collected = organism["food_collected"].GetFloat();
+        int rotation         = organism["rotation"].GetInt();
+        int move_range       = organism["move_range"].GetInt();
+        float mutability     = organism["mutability"].GetFloat()/100;
+        float damage         = organism["damage"].GetFloat();
+        bool is_mover        = organism["anatomy"]["is_mover"].GetBool();
+        bool has_eyes        = organism["anatomy"]["has_eyes"].GetBool();
 
         auto block_data = std::vector<SerializedOrganismBlockContainer>{};
 
-        for (auto & cell: organism.second.get_child("anatomy.cells")) {
-            int l_y = cell.second.get<int>("loc_row");
-            int l_x = cell.second.get<int>("loc_col");
-            auto state = cell.second.get<std::string>("state.name");
+        for (auto & cell: organism["anatomy"]["cells"].GetArray()) {
+            int l_x = cell["loc_col"].GetInt();
+            int l_y = cell["loc_row"].GetInt();
+            auto state = std::string(cell["state"]["name"].GetString());
 
             Rotation _rotation = Rotation::UP;
             BlockTypes type = BlockTypes::ProducerBlock;
@@ -432,7 +474,7 @@ void MainWindow::json_read_organism_data(boost::property_tree::ptree &root) {
                 type = BlockTypes::MoverBlock;
             } else if (state == "eye") {
                 type = BlockTypes::EyeBlock;
-                _rotation = static_cast<Rotation>(cell.second.get<int>("direction"));
+                _rotation = static_cast<Rotation>(cell["direction"].GetInt());
             } else if (state == "armor") {
                 type = BlockTypes::ArmorBlock;
             }
@@ -443,14 +485,14 @@ void MainWindow::json_read_organism_data(boost::property_tree::ptree &root) {
 
         if (is_mover && has_eyes) {
             auto & table = brain->simple_action_table;
-            table.FoodBlock     = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.food"));
-            table.WallBlock     = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.wall"));
-            table.MouthBlock    = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.mouth"));
-            table.ProducerBlock = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.producer"));
-            table.MoverBlock    = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.mover"));
-            table.KillerBlock   = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.killer"));
-            table.ArmorBlock    = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.armor"));
-            table.EyeBlock      = static_cast<SimpleDecision>(organism.second.get<int>("brain.decisions.eye"));
+            table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
+            table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
+            table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
+            table.ProducerBlock = static_cast<SimpleDecision>(organism["brain"]["decisions"]["producer"].GetInt());
+            table.MoverBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mover"]   .GetInt());
+            table.KillerBlock   = static_cast<SimpleDecision>(organism["brain"]["decisions"]["killer"]  .GetInt());
+            table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
+            table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
         }
 
         auto * new_organism = new Organism(x,
@@ -470,234 +512,224 @@ void MainWindow::json_read_organism_data(boost::property_tree::ptree &root) {
     }
 }
 
-//#include "CustomJsonParser/json_parser.hpp"
-
-template <typename T>
-struct my_id_translator
-{
-    typedef T internal_type;
-    typedef T external_type;
-
-    boost::optional<T> get_value(const T &v) { return  v.substr(1, v.size() - 2) ; }
-    boost::optional<T> put_value(const T &v) { return '"' + v +'"'; }
-};
-
 void MainWindow::write_json_data(const std::string &path) {
-    pt::ptree root, grid, organisms, fossil_record, controls, killable_neighbors, edible_neighbors, growableNeighbors, cell, value, anatomy, cells, j_organism, food, walls, brain;
+    Document d;
+    d.SetObject();
 
-    auto info = parse_organisms_info();
+    auto info = rec.parse_organisms_info();
 
-    root.put("num_rows", edc.simulation_height - 2);
-    root.put("num_cols", edc.simulation_width - 2);
-    root.put("total_mutability", static_cast<int>(info.total_total_mutation_rate*100));
-    root.put("largest_cell_count", 0);
-    root.put("reset_count", 0);
-    root.put("total_ticks", edc.total_engine_ticks);
-    root.put("data_update_rate", 100);
+    d.AddMember("num_rows", Value(edc.simulation_height - 2), d.GetAllocator());
+    d.AddMember("num_cols", Value(edc.simulation_width - 2), d.GetAllocator());
+    d.AddMember("total_mutability", Value(int(info.total_total_mutation_rate*100)), d.GetAllocator());
+    d.AddMember("largest_cell_count", Value(0), d.GetAllocator());
+    d.AddMember("reset_count", Value(0), d.GetAllocator());
+    d.AddMember("total_ticks", Value(edc.total_engine_ticks), d.GetAllocator());
+    d.AddMember("data_update_rate", Value(100), d.GetAllocator());
 
-    json_write_grid(grid, cell, food, walls);
-    json_write_organisms(organisms, cell, anatomy, cells, j_organism, brain);
-    json_write_fossil_record(fossil_record);
-    json_write_controls(controls, killable_neighbors, edible_neighbors, growableNeighbors, cell, value);
+    json_write_grid(d);
+    json_write_organisms(d);
+    json_write_fossil_record(d);
+    json_write_controls(d);
 
-    root.put_child("grid", grid);
-    root.put_child("organisms", organisms);
-    root.put_child("fossil_record", fossil_record);
-    root.put_child("controls", controls);
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
 
     std::fstream file;
     file.open(path, std::ios_base::out);
-    pt::write_json(file, root);
+    file << buffer.GetString();
     file.close();
 }
 
-void MainWindow::json_write_grid(boost::property_tree::ptree &grid, boost::property_tree::ptree &cell,
-                                 boost::property_tree::ptree &food, boost::property_tree::ptree &walls) {
-    grid.put("cols", edc.simulation_width - 2);
-    grid.put("rows", edc.simulation_height - 2);
+void MainWindow::json_write_grid(rapidjson::Document & d) {
+    Value j_grid(kObjectType);
+    j_grid.AddMember("cols", Value(edc.simulation_width  - 2), d.GetAllocator());
+    j_grid.AddMember("rows", Value(edc.simulation_height - 2), d.GetAllocator());
 
-    bool no_food = true;
-    bool no_wall = true;
+    Value food(kArrayType);
+    Value walls(kArrayType);
 
     for (int x = 1; x < edc.simulation_width - 1; x++) {
         for (int y = 1; y < edc.simulation_height - 1; y++) {
             if (edc.CPU_simulation_grid[x][y].type != BlockTypes::WallBlock &&
                 edc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) {continue;}
-            cell = pt::ptree{};
+            Value cell(kObjectType);
 
-            cell.put("c", x-1);
-            cell.put("r", y-1);
+            cell.AddMember("c", Value(x-1), d.GetAllocator());
+            cell.AddMember("r", Value(y-1), d.GetAllocator());
+
             if (edc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) {
-                food.push_back(std::make_pair("", cell));
-                no_food = false;
+                food.PushBack(cell, d.GetAllocator());
             } else {
-                walls.push_back(std::make_pair("", cell));
-                no_wall = false;
+                walls.PushBack(cell, d.GetAllocator());
             }
         }
     }
 
-    cell = pt::ptree{};
+    j_grid.AddMember("food", food, d.GetAllocator());
+    j_grid.AddMember("walls", walls, d.GetAllocator());
 
-    if (no_food) {
-        walls.push_back(std::make_pair("", cell));
-    }
-
-    if (no_wall) {
-        walls.push_back(std::make_pair("", cell));
-    }
-
-    grid.put_child("food", food);
-    grid.put_child("walls", walls);
+    d.AddMember("grid", j_grid, d.GetAllocator());
 }
 
-void MainWindow::json_write_organisms(boost::property_tree::ptree &organisms, boost::property_tree::ptree &cell,
-                                      boost::property_tree::ptree &anatomy, boost::property_tree::ptree &cells,
-                                      boost::property_tree::ptree &j_organism, boost::property_tree::ptree &brain) {
+void MainWindow::json_write_organisms(rapidjson::Document & d) {
+    Value j_organisms(kArrayType);
+
     for (auto & organism: edc.organisms) {
-        j_organism = pt::ptree{};
-        anatomy = pt::ptree{};
-        cells = pt::ptree{};
-        brain = pt::ptree{};
+        Value j_organism(kObjectType);
+        write_json_organism(d, organism, j_organism);
+        j_organisms.PushBack(j_organism, d.GetAllocator());
+    }
+    d.AddMember("organisms", j_organisms, d.GetAllocator());
+}
 
-        j_organism.put("c", organism->x-1);
-        j_organism.put("r", organism->y-1);
-        j_organism.put("lifetime", organism->lifetime);
-        j_organism.put("food_collected", static_cast<int>(organism->food_collected));
-        j_organism.put("living", true);
-        j_organism.put("direction", 2);
-        j_organism.put("rotation", static_cast<int>(organism->rotation));
-        j_organism.put("can_rotate", sp.runtime_rotation_enabled);
-        j_organism.put("move_count", 0);
-        j_organism.put("move_range", organism->move_range);
-        j_organism.put("ignore_brain_for", 0);
-        j_organism.put("mutability", static_cast<int>(organism->anatomy_mutation_rate*100));
-        j_organism.put("damage", organism->damage);
+void MainWindow::write_json_organism(Document &d, Organism *&organism, Value &j_organism) const {
+    Value j_anatomy(kObjectType);
+    Value j_brain(kObjectType);
+    Value cells(kArrayType);
 
-        anatomy.put("birth_distance", 6);
-        anatomy.put("is_producer", static_cast<bool>(organism->anatomy->_producer_blocks));
-        anatomy.put("is_mover", static_cast<bool>(organism->anatomy->_mover_blocks));
-        anatomy.put("has_eyes", static_cast<bool>(organism->anatomy->_eye_blocks));
+    j_organism.AddMember("c",                Value(organism->x-1), d.GetAllocator());
+    j_organism.AddMember("r",                Value(organism->y-1), d.GetAllocator());
+    j_organism.AddMember("lifetime",         Value(organism->lifetime), d.GetAllocator());
+    j_organism.AddMember("food_collected",   Value(organism->food_collected), d.GetAllocator());
+    j_organism.AddMember("living",           Value(true), d.GetAllocator());
+    j_organism.AddMember("direction",        Value(2), d.GetAllocator());
+    j_organism.AddMember("rotation",         Value(static_cast<int>(organism->rotation)), d.GetAllocator());
+    j_organism.AddMember("can_rotate",       Value(sp.runtime_rotation_enabled), d.GetAllocator());
+    j_organism.AddMember("move_count",       Value(0), d.GetAllocator());
+    j_organism.AddMember("move_range",       Value(organism->move_range), d.GetAllocator());
+    j_organism.AddMember("ignore_brain_for", Value(0), d.GetAllocator());
+    j_organism.AddMember("mutability",       Value(organism->anatomy_mutation_rate*100), d.GetAllocator());
+    j_organism.AddMember("damage",           Value(organism->damage), d.GetAllocator());
 
-        for (auto & block: organism->anatomy->_organism_blocks) {
-            cell = pt::ptree{};
-            std::string state_name;
+    j_anatomy.AddMember("birth_distance", Value(6), d.GetAllocator());
+    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy->_producer_blocks)), d.GetAllocator());
+    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy->_mover_blocks)), d.GetAllocator());
+    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy->_eye_blocks)), d.GetAllocator());
 
-            cell.put("loc_col", block.relative_x);
-            cell.put("loc_row", block.relative_y);
+    for (auto & block: organism->anatomy->_organism_blocks) {
+        Value cell(kObjectType);
+        std::string state_name;
 
-            switch (block.type) {
-                case BlockTypes::MouthBlock: state_name    = "mouth";    break;
-                case BlockTypes::ProducerBlock: state_name = "producer"; break;
-                case BlockTypes::MoverBlock: state_name    = "mover";    break;
-                case BlockTypes::KillerBlock: state_name   = "killer";   break;
-                case BlockTypes::ArmorBlock: state_name    = "armor";    break;
-                case BlockTypes::EyeBlock: state_name      = "eye";      break;
-                default: state_name = "producer";
-            }
+        cell.AddMember("loc_col", Value(block.relative_x), d.GetAllocator());
+        cell.AddMember("loc_row", Value(block.relative_y), d.GetAllocator());
 
-            if (block.type == BlockTypes::EyeBlock) {
-                cell.put("direction", static_cast<int>(block.rotation));
-            }
-
-            cell.put("state.name", state_name, my_id_translator<std::string>());
-
-            cells.push_back(std::make_pair("", cell));
+        switch (block.type) {
+            case BlockTypes::MouthBlock:    state_name = "mouth";    break;
+            case BlockTypes::ProducerBlock: state_name = "producer"; break;
+            case BlockTypes::MoverBlock:    state_name = "mover";    break;
+            case BlockTypes::KillerBlock:   state_name = "killer";   break;
+            case BlockTypes::ArmorBlock:    state_name = "armor";    break;
+            case BlockTypes::EyeBlock:      state_name = "eye";      break;
+            default: continue;
         }
 
-        anatomy.put_child("cells", cells);
+        if (block.type == BlockTypes::EyeBlock) {
+            cell.AddMember("direction", Value(static_cast<int>(block.rotation)), d.GetAllocator());
+        }
 
-        j_organism.put_child("anatomy", anatomy);
+        Value state(kObjectType);
+        state.AddMember("name", Value(state_name.c_str(), state_name.length(), d.GetAllocator()), d.GetAllocator());
 
-        auto & table = organism->brain->simple_action_table;
+        cell.AddMember("state", state, d.GetAllocator());
 
-        brain.put("decisions.empty", 0);
-        brain.put("decisions.food",     static_cast<int>(table.FoodBlock));
-        brain.put("decisions.wall",     static_cast<int>(table.WallBlock));
-        brain.put("decisions.mouth",    static_cast<int>(table.MouthBlock));
-        brain.put("decisions.producer", static_cast<int>(table.ProducerBlock));
-        brain.put("decisions.mover",    static_cast<int>(table.MoverBlock));
-        brain.put("decisions.killer",   static_cast<int>(table.KillerBlock));
-        brain.put("decisions.armor",    static_cast<int>(table.ArmorBlock));
-        brain.put("decisions.eye",      static_cast<int>(table.EyeBlock));
-
-        j_organism.put_child("brain", brain);
-
-        j_organism.put("species_name", "0000000000", my_id_translator<std::string>());
-
-        organisms.push_back(std::make_pair("", j_organism));
+        cells.PushBack(cell, d.GetAllocator());
     }
+    j_anatomy.AddMember("cells", cells, d.GetAllocator());
+
+    j_organism.AddMember("anatomy", j_anatomy, d.GetAllocator());
+
+    auto & table = organism->brain->simple_action_table;
+
+    Value decisions(kObjectType);
+
+    decisions.AddMember("empty",    Value(0), d.GetAllocator());
+    decisions.AddMember("food",     Value(static_cast<int>(table.FoodBlock)),     d.GetAllocator());
+    decisions.AddMember("wall",     Value(static_cast<int>(table.WallBlock)),     d.GetAllocator());
+    decisions.AddMember("mouth",    Value(static_cast<int>(table.MouthBlock)),    d.GetAllocator());
+    decisions.AddMember("producer", Value(static_cast<int>(table.ProducerBlock)), d.GetAllocator());
+    decisions.AddMember("mover",    Value(static_cast<int>(table.MoverBlock)),    d.GetAllocator());
+    decisions.AddMember("killer",   Value(static_cast<int>(table.KillerBlock)),   d.GetAllocator());
+    decisions.AddMember("armor",    Value(static_cast<int>(table.ArmorBlock)),    d.GetAllocator());
+    decisions.AddMember("eye",      Value(static_cast<int>(table.EyeBlock)),      d.GetAllocator());
+
+    j_brain.AddMember("decisions", decisions, d.GetAllocator());
+
+    j_organism.AddMember("brain", j_brain, d.GetAllocator());
+
+    j_organism.AddMember("species_name", Value("0000000000"), d.GetAllocator());
 }
 
-void MainWindow::json_write_fossil_record(boost::property_tree::ptree &fossil_record) const {
-    fossil_record.put("min_discard", 10);
-    fossil_record.put("record_size_limit", 500);
-    fossil_record.put("records", "{}");
-    fossil_record.put("species", "{}");
+void MainWindow::json_write_fossil_record(rapidjson::Document & d) {
+    Value j_fossil_record(kObjectType);
+
+    j_fossil_record.AddMember("min_discard",       Value(10), d.GetAllocator());
+    j_fossil_record.AddMember("record_size_limit", Value(500), d.GetAllocator());
+    j_fossil_record.AddMember("records",           Value(kObjectType), d.GetAllocator());
+    j_fossil_record.AddMember("species",           Value(kObjectType), d.GetAllocator());
+
+    d.AddMember("fossil_record", j_fossil_record, d.GetAllocator());
 }
 
-void
-MainWindow::json_write_controls(boost::property_tree::ptree &controls, boost::property_tree::ptree &killable_neighbors,
-                                boost::property_tree::ptree &edible_neighbors,
-                                boost::property_tree::ptree &growableNeighbors, boost::property_tree::ptree &cell,
-                                boost::property_tree::ptree &value) const {
-    controls.put("lifespanMultiplier", static_cast<float>(sp.lifespan_multiplier));
-    controls.put("foodProdProb", static_cast<int>(sp.food_production_probability*100));
+void MainWindow::json_write_controls(rapidjson::Document & d) const {
+    Value j_controls(kObjectType);
 
-    cell = pt::ptree{};
-    value.put_value(0);
-    cell.push_back(std::make_pair("", value));
-    value.put_value(1);
-    cell.push_back(std::make_pair("", value));
+    j_controls.AddMember("lifespanMultiplier", Value(sp.lifespan_multiplier), d.GetAllocator());
+    j_controls.AddMember("foodProdProb", Value(sp.food_production_probability*100), d.GetAllocator());
 
-    killable_neighbors.push_back(std::make_pair("", cell));
-    edible_neighbors.push_back(std::make_pair("", cell));
-    growableNeighbors.push_back(std::make_pair("", cell));
+    Value j_killable_neighbors(kArrayType);
+    Value j_edible_neighbors(kArrayType);
+    Value j_growableNeighbors(kArrayType);
 
-    cell = pt::ptree{};
-    value.put_value(0);
-    cell.push_back(std::make_pair("", value));
-    value.put_value(-1);
-    cell.push_back(std::make_pair("", value));
+    Value cell(kArrayType);
+    cell.PushBack(Value(0), d.GetAllocator());
+    cell.PushBack(Value(1), d.GetAllocator());
 
-    killable_neighbors.push_back(std::make_pair("", cell));
-    edible_neighbors.push_back(std::make_pair("", cell));
-    growableNeighbors.push_back(std::make_pair("", cell));
+    j_killable_neighbors.PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_edible_neighbors  .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_growableNeighbors .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
 
-    cell = pt::ptree{};
-    value.put_value(1);
-    cell.push_back(std::make_pair("", value));
-    value.put_value(0);
-    cell.push_back(std::make_pair("", value));
+    cell = Value(kArrayType);
+    cell.PushBack(Value(0), d.GetAllocator());
+    cell.PushBack(Value(-1), d.GetAllocator());
 
-    killable_neighbors.push_back(std::make_pair("", cell));
-    edible_neighbors.push_back(std::make_pair("", cell));
-    growableNeighbors.push_back(std::make_pair("", cell));
+    j_killable_neighbors.PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_edible_neighbors  .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_growableNeighbors .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
 
-    cell = pt::ptree{};
-    value.put_value(-1);
-    cell.push_back(std::make_pair("", value));
-    value.put_value(0);
-    cell.push_back(std::make_pair("", value));
+    cell = Value(kArrayType);
+    cell.PushBack(Value(1), d.GetAllocator());
+    cell.PushBack(Value(0), d.GetAllocator());
 
-    killable_neighbors.push_back(std::make_pair("", cell));
-    edible_neighbors.push_back(std::make_pair("", cell));
-    growableNeighbors.push_back(std::make_pair("", cell));
+    j_killable_neighbors.PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_edible_neighbors  .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_growableNeighbors .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
 
-    controls.put_child("killableNeighbors", killable_neighbors);
-    controls.put_child("edibleNeighbors", edible_neighbors);
-    controls.put_child("growableNeighbors", growableNeighbors);
+    cell = Value(kArrayType);
+    cell.PushBack(Value(-1), d.GetAllocator());
+    cell.PushBack(Value(0), d.GetAllocator());
 
-    controls.put("useGlobalMutability", !sp.use_anatomy_evolved_mutation_rate);
-    controls.put("globalMutability", static_cast<int>(sp.global_anatomy_mutation_rate*100));
-    controls.put("addProb", sp.add_cell);
-    controls.put("changeProb", sp.change_cell);
-    controls.put("removeProb", sp.remove_cell);
-    controls.put("rotationEnabled", sp.runtime_rotation_enabled);
-    controls.put("foodBlocksReproduction", sp.food_blocks_reproduction);
-    controls.put("moversCanProduce", sp.movers_can_produce_food);
-    controls.put("instaKill", sp.on_touch_kill);
-    controls.put("lookRange", sp.look_range);
-    controls.put("foodDropProb", sp.auto_produce_n_food);
-    controls.put("extraMoverFoodCost", 0);
+    j_killable_neighbors.PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_edible_neighbors  .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+    j_growableNeighbors .PushBack(Value().CopyFrom(cell, d.GetAllocator()), d.GetAllocator());
+
+    j_controls.AddMember("killableNeighbors", j_killable_neighbors, d.GetAllocator());
+    j_controls.AddMember("edibleNeighbors",   j_edible_neighbors,   d.GetAllocator());
+    j_controls.AddMember("growableNeighbors", j_growableNeighbors,  d.GetAllocator());
+
+    j_controls.AddMember("useGlobalMutability",    Value(!sp.use_anatomy_evolved_mutation_rate), d.GetAllocator());
+    j_controls.AddMember("globalMutability",       Value(sp.global_anatomy_mutation_rate*100), d.GetAllocator());
+    j_controls.AddMember("addProb",                Value(sp.add_cell), d.GetAllocator());
+    j_controls.AddMember("changeProb",             Value(sp.change_cell), d.GetAllocator());
+    j_controls.AddMember("removeProb",             Value(sp.remove_cell), d.GetAllocator());
+    j_controls.AddMember("rotationEnabled",        Value(sp.runtime_rotation_enabled), d.GetAllocator());
+    j_controls.AddMember("foodBlocksReproduction", Value(sp.food_blocks_reproduction), d.GetAllocator());
+    j_controls.AddMember("moversCanProduce",       Value(sp.movers_can_produce_food), d.GetAllocator());
+    j_controls.AddMember("instaKill",              Value(sp.on_touch_kill), d.GetAllocator());
+    j_controls.AddMember("lookRange",              Value(sp.look_range), d.GetAllocator());
+    j_controls.AddMember("foodDropProb",           Value(sp.auto_produce_n_food), d.GetAllocator());
+    j_controls.AddMember("extraMoverFoodCost",     Value(sp.extra_mover_reproductive_cost), d.GetAllocator());
+
+    d.AddMember("controls", j_controls, d.GetAllocator());
 }
+

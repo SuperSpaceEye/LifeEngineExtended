@@ -82,15 +82,14 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
             observation_i = i;
         }
     }
-    //if there is no meaningful observations, then return random action;
-//    if (observation_i < 0) {return get_random_action(mt);}
+    //if there is no meaningful observations, then do nothing;
     if (observation_i < 0) {return DecisionObservation{BrainDecision::DoNothing, Observation{}};}
 
     return DecisionObservation{calculate_simple_action(observations_vector[observation_i]), observations_vector[observation_i]};
 }
 
 BrainDecision Brain::calculate_simple_action(Observation &observation) const {
-    auto action = SimpleDecision{};
+    SimpleDecision action;
     switch (observation.type) {
         case BlockTypes::MouthBlock:    action = simple_action_table.MouthBlock;    break;
         case BlockTypes::ProducerBlock: action = simple_action_table.ProducerBlock; break;
@@ -106,7 +105,6 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
 
     switch (action) {
         case SimpleDecision::DoNothing:
-            //return get_random_action(gen);
             return BrainDecision::DoNothing;
         case SimpleDecision::GoAway:
             switch (observation.eye_rotation)
@@ -125,7 +123,6 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
             }
     }
     throw "bad";
-    //return get_random_action(gen).decision;
 }
 
 DecisionObservation Brain::get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt) {
