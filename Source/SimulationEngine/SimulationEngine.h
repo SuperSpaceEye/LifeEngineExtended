@@ -35,8 +35,8 @@
 
 //TODO move simulation grid translation to here
 class SimulationEngine {
-    EngineControlParameters& cp;
-    EngineDataContainer& dc;
+    EngineControlParameters& ecp;
+    EngineDataContainer& edc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
 
@@ -82,6 +82,12 @@ public:
     void make_walls();
 
     void init_auto_food_drop(int width, int height);
+
+    void pause();
+    void unpause();
+
+    //Will always wait for engine to pause
+    bool wait_for_engine_to_pause_force();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

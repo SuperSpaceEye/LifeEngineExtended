@@ -63,52 +63,17 @@
 #include "../Statistics/StatisticsCore.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
+#include "../Recorder/Recorder.h"
 
 
 #if __CUDA_USED__
 #include "../Stuff/cuda_image_creator.cuh"
 #include "../Stuff/get_device_count.cuh"
-
 #endif
 
 #if defined(__WIN32)
 #include <windows.h>
 #endif
-
-struct OrganismInfoHolder {
-    double size = 0;
-    double _organism_lifetime = 0;
-    double _organism_age    = 0;
-    double _mouth_blocks    = 0;
-    double _producer_blocks = 0;
-    double _mover_blocks    = 0;
-    double _killer_blocks   = 0;
-    double _armor_blocks    = 0;
-    double _eye_blocks      = 0;
-    double brain_mutation_rate = 0;
-    double anatomy_mutation_rate = 0;
-    int total = 0;
-};
-
-struct OrganismAvgBlockInformation {
-
-    uint64_t total_size_organism_blocks = 0;
-    uint64_t total_size_producing_space = 0;
-    uint64_t total_size_eating_space    = 0;
-    uint64_t total_size_single_adjacent_space = 0;
-    uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size = 0;
-
-    OrganismInfoHolder total_avg{};
-    OrganismInfoHolder station_avg{};
-    OrganismInfoHolder moving_avg{};
-
-    double move_range = 0;
-    int moving_organisms = 0;
-    int organisms_with_eyes = 0;
-
-    double total_total_mutation_rate = 0;
-};
 
 class MainWindow: public QWidget {
         Q_OBJECT
@@ -144,6 +109,7 @@ private:
     OrganismEditor ee;
     StatisticsCore s;
     InfoWindow iw{&_ui};
+    Recorder rec{&_ui, &edc, &ecp};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -176,7 +142,6 @@ private:
     bool fill_window = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
-    bool synchronise_simulation_and_window = false;
     bool really_stop_render = false;
 
     bool W_pressed = false;
@@ -264,9 +229,6 @@ private:
     void calculate_new_simulation_size();
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
-    void pause_engine();
-    void unpause_engine();
-
     void create_image();
 
     color & get_color_simplified(BlockTypes type);
@@ -274,7 +236,6 @@ private:
 
     bool wait_for_engine_to_pause();
     bool wait_for_engine_to_pause_processing_user_actions();
-    bool wait_for_engine_to_pause_force();
 
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
@@ -321,8 +282,6 @@ private:
     // converts num bytes to string of shortened number with postfix (like 14 KiB)
     static std::string convert_num_bytes(uint64_t num_bytes);
 
-    OrganismAvgBlockInformation parse_organisms_info();
-
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
     void keyPressEvent(QKeyEvent * event) override;
@@ -334,6 +293,7 @@ private slots:
     void tb_open_statistics_slot(bool state);
     void tb_open_organism_editor_slot(bool state);
     void tb_open_info_window_slot(bool state);
+    void tb_open_recorder_window_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -431,6 +391,7 @@ private slots:
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
+    void cb_recorder_window_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);

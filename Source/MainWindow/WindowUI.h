@@ -119,8 +119,8 @@ public:
     QPushButton *tb_open_info_window;
     QCheckBox *cb_info_window_always_on_top;
     QHBoxLayout *horizontalLayout_51;
-    QPushButton *pushButton;
-    QCheckBox *checkBox;
+    QPushButton *tb_open_recorder_window;
+    QCheckBox *cb_recorder_window_always_on_top;
     QHBoxLayout *horizontalLayout_52;
     QPushButton *pushButton_2;
     QCheckBox *checkBox_2;
@@ -291,8 +291,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -788,17 +788,18 @@ public:
 
         horizontalLayout_51 = new QHBoxLayout();
         horizontalLayout_51->setObjectName(QString::fromUtf8("horizontalLayout_51"));
-        pushButton = new QPushButton(widget_5);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        pushButton->setEnabled(false);
+        tb_open_recorder_window = new QPushButton(widget_5);
+        tb_open_recorder_window->setObjectName(QString::fromUtf8("tb_open_recorder_window"));
+        tb_open_recorder_window->setEnabled(true);
+        tb_open_recorder_window->setCheckable(true);
 
-        horizontalLayout_51->addWidget(pushButton);
+        horizontalLayout_51->addWidget(tb_open_recorder_window);
 
-        checkBox = new QCheckBox(widget_5);
-        checkBox->setObjectName(QString::fromUtf8("checkBox"));
-        checkBox->setEnabled(false);
+        cb_recorder_window_always_on_top = new QCheckBox(widget_5);
+        cb_recorder_window_always_on_top->setObjectName(QString::fromUtf8("cb_recorder_window_always_on_top"));
+        cb_recorder_window_always_on_top->setEnabled(true);
 
-        horizontalLayout_51->addWidget(checkBox);
+        horizontalLayout_51->addWidget(cb_recorder_window_always_on_top);
 
 
         verticalLayout_37->addLayout(horizontalLayout_51);
@@ -808,6 +809,7 @@ public:
         pushButton_2 = new QPushButton(widget_5);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
         pushButton_2->setEnabled(false);
+        pushButton_2->setCheckable(true);
 
         horizontalLayout_52->addWidget(pushButton_2);
 
@@ -1933,6 +1935,8 @@ public:
         QObject::connect(cb_reset_with_editor_organism, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_reset_with_editor_organism_slot(bool)));
         QObject::connect(cb_info_window_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_info_window_always_on_top_slot(bool)));
         QObject::connect(tb_open_info_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_info_window_slot(bool)));
+        QObject::connect(cb_recorder_window_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_recorder_window_always_on_top_slot(bool)));
+        QObject::connect(tb_open_recorder_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_recorder_window_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -1988,8 +1992,8 @@ public:
         cb_editor_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         tb_open_info_window->setText(QApplication::translate("MainWindow", "Info", nullptr));
         cb_info_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
-        pushButton->setText(QApplication::translate("MainWindow", "Recorder", nullptr));
-        checkBox->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_recorder_window->setText(QApplication::translate("MainWindow", "Recorder", nullptr));
+        cb_recorder_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         pushButton_2->setText(QApplication::translate("MainWindow", "World Events", nullptr));
         checkBox_2->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         Tabs->setTabText(Tabs->indexOf(windows_tab), QApplication::translate("MainWindow", "Windows", nullptr));

@@ -126,7 +126,7 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     new_simulation_height = recovery_simulation_height;
 
     engine->reset_world();
-    unpause_engine();
+    engine->unpause();
 }
 
 void MainWindow::read_data(std::ifstream &is) {
@@ -516,7 +516,7 @@ void MainWindow::write_json_data(const std::string &path) {
     Document d;
     d.SetObject();
 
-    auto info = parse_organisms_info();
+    auto info = rec.parse_organisms_info();
 
     d.AddMember("num_rows", Value(edc.simulation_height - 2), d.GetAllocator());
     d.AddMember("num_cols", Value(edc.simulation_width - 2), d.GetAllocator());
