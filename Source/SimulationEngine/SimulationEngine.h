@@ -88,6 +88,7 @@ public:
 
     //Will always wait for engine to pause
     bool wait_for_engine_to_pause_force();
+    void parse_full_simulation_grid();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

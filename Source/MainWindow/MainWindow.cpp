@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     engine->make_walls();
 
+    rec.set_engine(engine);
+
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
 //    boost::random_device rd;
@@ -480,15 +482,8 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
 void MainWindow::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
     engine->pause();
-
-    for (int x = 0; x < edc.simulation_width; x++) {
-        for (int y = 0; y < edc.simulation_height; y++) {
-            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
-        }
-    }
-
-     engine->unpause();
+    engine->parse_full_simulation_grid();
+    engine->unpause();
 }
 
 void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
@@ -499,7 +494,7 @@ void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
         ecp.build_threads = true;
     }
 
-     engine->unpause();
+    engine->unpause();
 }
 
 void MainWindow::set_cursor_mode(CursorMode mode) {
@@ -563,7 +558,7 @@ void MainWindow::resize_simulation_grid() {
     engine->init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 
     engine->reset_world();
-     engine->unpause();
+    engine->unpause();
 
     reset_scale_view();
 }
@@ -571,7 +566,7 @@ void MainWindow::resize_simulation_grid() {
 void MainWindow::clear_world() {
     engine->partial_clear_world();
     engine->make_walls();
-     engine->unpause();
+    engine->unpause();
 }
 
 void MainWindow::update_statistics_info(const OrganismAvgBlockInformation &info) {

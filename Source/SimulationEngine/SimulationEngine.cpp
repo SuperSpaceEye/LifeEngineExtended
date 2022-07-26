@@ -452,3 +452,12 @@ void SimulationEngine::unpause() {
         ecp.engine_pause = false;
     }
 }
+
+void SimulationEngine::parse_full_simulation_grid() {
+    for (int x = 0; x < edc.simulation_width; x++) {
+        for (int y = 0; y < edc.simulation_height; y++) {
+            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+        }
+    }
+}

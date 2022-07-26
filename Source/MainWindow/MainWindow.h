@@ -105,11 +105,11 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
-    SimulationEngine* engine;
+    SimulationEngine* engine = nullptr;
     OrganismEditor ee;
     StatisticsCore s;
     InfoWindow iw{&_ui};
-    Recorder rec{&_ui, &edc, &ecp};
+    Recorder rec{&_ui, &edc, &ecp, &cc, &textures};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
