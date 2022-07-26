@@ -31,7 +31,7 @@ void SimulationEngine::threaded_mainloop() {
     while (cp.engine_working) {
         if (!dc.unlimited_simulation_fps && cp.calculate_simulation_tick_delta_time) {point = std::chrono::high_resolution_clock::now();}
         if (cp.stop_engine) {
-            SimulationEnginePartialMultiThread::kill_threads(dc);
+//            SimulationEnginePartialMultiThread::kill_threads(dc);
             cp.engine_working = false;
             cp.engine_paused = true;
             cp.stop_engine = false;
@@ -39,7 +39,7 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (cp.change_simulation_mode) { change_mode(); }
         if (cp.build_threads) {
-            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
+//            SimulationEnginePartialMultiThread::build_threads(dc, cp, sp);
             cp.build_threads = false;
         }
         if (cp.engine_pause || cp.engine_global_pause) { cp.engine_paused = true; } else {cp.engine_paused = false;}
@@ -69,7 +69,7 @@ void SimulationEngine::change_mode() {
         case SimulationModes::CPU_Single_Threaded:
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:
-            SimulationEnginePartialMultiThread::stop(dc, cp, sp);
+//            SimulationEnginePartialMultiThread::stop(dc, cp, sp);
             break;
         case SimulationModes::CPU_Multi_Threaded:
             break;
@@ -82,7 +82,7 @@ void SimulationEngine::change_mode() {
         case SimulationModes::CPU_Single_Threaded:
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:
-            SimulationEnginePartialMultiThread::init(dc, cp, sp);
+//            SimulationEnginePartialMultiThread::init(dc, cp, sp);
             break;
         case SimulationModes::CPU_Multi_Threaded:
             break;
@@ -138,7 +138,7 @@ void SimulationEngine::simulation_tick() {
             SimulationEngineSingleThread::single_threaded_tick(&dc, &sp, &gen);
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:
-            SimulationEnginePartialMultiThread::partial_multi_thread_tick(&dc, &cp, &op, &sp, &gen);
+//            SimulationEnginePartialMultiThread::partial_multi_thread_tick(&dc, &cp, &op, &sp, &gen);
             break;
         case SimulationModes::CPU_Multi_Threaded:
             break;

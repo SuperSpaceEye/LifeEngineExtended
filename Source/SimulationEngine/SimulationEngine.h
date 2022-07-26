@@ -30,7 +30,7 @@
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
 #include "../OrganismEditor/OrganismEditor.h"
-#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
+//#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 
 //TODO move simulation grid translation to here
