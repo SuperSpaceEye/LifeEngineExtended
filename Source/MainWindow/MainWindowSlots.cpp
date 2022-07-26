@@ -105,9 +105,7 @@ void MainWindow::b_save_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
     ecp.engine_global_pause = true;
-    ecp.pause_processing_user_action = true;
     engine->wait_for_engine_to_pause_force();
-    wait_for_engine_to_pause_processing_user_actions();
 
     QString selected_filter;
     QFileDialog file_dialog{};
@@ -125,7 +123,6 @@ void MainWindow::b_save_world_slot() {
     } else {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
-        ecp.pause_processing_user_action = false;
         return;
     }
     std::string full_path = file_name.toStdString();
@@ -147,16 +144,13 @@ void MainWindow::b_save_world_slot() {
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
-    ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::b_load_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
     ecp.engine_global_pause = true;
-    ecp.pause_processing_user_action = true;
     engine->wait_for_engine_to_pause_force();
-    wait_for_engine_to_pause_processing_user_actions();
 
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
@@ -169,7 +163,6 @@ void MainWindow::b_load_world_slot() {
     } else {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
-        ecp.pause_processing_user_action = false;
         return;
     }
 
@@ -186,7 +179,6 @@ void MainWindow::b_load_world_slot() {
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
-    ecp.pause_processing_user_action = false;
     initialize_gui();
     update_table_values();
 }
@@ -204,9 +196,6 @@ void MainWindow::b_kill_all_organisms_slot() {
     engine->pause();
 
     for (auto & organism: edc.organisms) {
-        organism->lifetime = organism->max_lifetime*2;
-    }
-    for (auto & organism: edc.to_place_organisms) {
         organism->lifetime = organism->max_lifetime*2;
     }
 
@@ -387,6 +376,8 @@ void MainWindow::le_font_size_slot() {
     setFont(_font);
     ee.setFont(_font);
     s.setFont(_font);
+    iw.setFont(_font);
+    rec.setFont(_font);
 }
 
 void MainWindow::le_max_move_range_slot() {

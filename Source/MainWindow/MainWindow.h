@@ -235,7 +235,6 @@ private:
     color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     bool wait_for_engine_to_pause();
-    bool wait_for_engine_to_pause_processing_user_actions();
 
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);

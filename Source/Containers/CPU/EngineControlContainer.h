@@ -39,9 +39,6 @@ struct EngineControlParameters {
     // if true, will build the threads
     volatile bool build_threads = false;
 
-    volatile bool pause_processing_user_action = false;
-    volatile bool processing_user_actions = true;
-
     volatile bool pause_button_pause = false;
 
     volatile bool pass_tick = false;

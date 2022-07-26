@@ -43,8 +43,7 @@ void SimulationEngine::threaded_mainloop() {
             ecp.build_threads = false;
         }
         if (ecp.engine_pause || ecp.engine_global_pause) { ecp.engine_paused = true; } else { ecp.engine_paused = false;}
-        if (ecp.pause_processing_user_action) { ecp.processing_user_actions = false;} else { ecp.processing_user_actions = true;}
-        if (ecp.processing_user_actions) {process_user_action_pool();}
+        process_user_action_pool();
         if ((!ecp.engine_paused || ecp.engine_pass_tick) && (!ecp.pause_button_pause || ecp.pass_tick)) {
             //TODO the cause of rare segfault could be here
             simulation_tick();
@@ -98,7 +97,7 @@ void SimulationEngine::simulation_tick() {
 
     switch (ecp.simulation_mode) {
         case SimulationModes::CPU_Single_Threaded:
-            if (edc.organisms.empty() && edc.to_place_organisms.empty()) {
+            if (edc.organisms.empty()) {
                 ecp.organisms_extinct = true;
             } else {
                 ecp.organisms_extinct = false;
@@ -107,7 +106,7 @@ void SimulationEngine::simulation_tick() {
         case SimulationModes::CPU_Partial_Multi_threaded:
             ecp.organisms_extinct = true;
             for (auto & pool: edc.organisms_pools) {
-                if (!pool.empty() || !edc.to_place_organisms.empty()) {
+                if (!pool.empty()) {
                     ecp.organisms_extinct = false;
                     break;
                 }
@@ -150,7 +149,9 @@ void SimulationEngine::simulation_tick() {
 //TODO refactor
 void SimulationEngine::process_user_action_pool() {
     auto temp = std::vector<Organism*>{};
-    for (auto & action: edc.user_actions_pool) {
+    //do not remake this as range or iterator for loop
+    for (int i = 0; i < edc.user_actions_pool.size(); i++) {
+        auto & action = edc.user_actions_pool[i];
         if (check_if_out_of_bounds(&edc, action.x, action.y)) {continue;}
         switch (action.type) {
             case ActionType::TryAddFood:
@@ -326,8 +327,16 @@ void SimulationEngine::reset_world() {
     edc.chosen_organism->x = edc.simulation_width / 2;
     edc.chosen_organism->y = edc.simulation_height / 2;
 
-    if (ecp.reset_with_editor_organism) {edc.to_place_organisms.push_back(new Organism(edc.chosen_organism));}
-    else                               {edc.to_place_organisms.push_back(new Organism(edc.base_organism));}
+    Organism * organism;
+
+    if (ecp.reset_with_editor_organism) {
+        organism = new Organism(edc.chosen_organism);
+    } else {
+        organism = new Organism(edc.base_organism);
+    }
+
+    edc.organisms.push_back(organism);
+    SimulationEngineSingleThread::place_organism(&edc, organism);
 
     //Just in case
     ecp.engine_pass_tick = true;
@@ -364,8 +373,6 @@ void SimulationEngine::clear_organisms() {
             pool.clear();
         }
     }
-    for (auto & organism: edc.to_place_organisms) {delete organism;}
-    edc.to_place_organisms.clear();
 }
 
 void SimulationEngine::make_walls() {
@@ -413,9 +420,6 @@ void SimulationEngine::reinit_organisms() {
                 for (auto & organism: pool) {
                     organism->init_values();
                 }
-            }
-            for (auto & organism: edc.to_place_organisms) {
-                organism->init_values();
             }
             break;
         case SimulationModes::GPU_CUDA_mode:

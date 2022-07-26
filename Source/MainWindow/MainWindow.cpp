@@ -74,7 +74,9 @@ MainWindow::MainWindow(QWidget *parent) :
     edc.base_organism->last_decision = DecisionObservation{};
     edc.chosen_organism->last_decision = DecisionObservation{};
 
-    edc.to_place_organisms.push_back(new Organism(edc.base_organism));
+    auto * organism = new Organism(edc.base_organism);
+    edc.organisms.push_back(organism);
+    SimulationEngineSingleThread::place_organism(&edc, organism);
 
     resize_image();
     reset_scale_view();
@@ -463,11 +465,6 @@ bool MainWindow::wait_for_engine_to_pause() {
     return engine->wait_for_engine_to_pause_force();
 }
 
-bool MainWindow::wait_for_engine_to_pause_processing_user_actions() {
-    while (ecp.processing_user_actions) {}
-    return !ecp.processing_user_actions;
-}
-
 void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= edc.simulation_width) { continue; }
@@ -757,8 +754,8 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
 void MainWindow::change_main_grid_left_click() {
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-    ecp.pause_processing_user_action = true;
-    wait_for_engine_to_pause_processing_user_actions();
+//    ecp.pause_processing_user_action = true;
+//    wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
@@ -781,14 +778,14 @@ void MainWindow::change_main_grid_left_click() {
         }
     }
     endfor:
-
-    ecp.pause_processing_user_action = false;
+    return;
+//    ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::change_main_grid_right_click() {
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-    ecp.pause_processing_user_action = true;
-    wait_for_engine_to_pause_processing_user_actions();
+//    ecp.pause_processing_user_action = true;
+//    wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {
@@ -808,7 +805,7 @@ void MainWindow::change_main_grid_right_click() {
             }
         }
     }
-    ecp.pause_processing_user_action = false;
+//    ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::change_editing_grid_left_click() {

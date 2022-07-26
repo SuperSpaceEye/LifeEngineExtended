@@ -9,9 +9,6 @@
 #include "SimulationEngineSingleThread.h"
 
 void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc, SimulationParameters * sp, lehmer64 *gen) {
-    for (auto & organism: dc->to_place_organisms) {place_organism(dc, organism); dc->organisms.emplace_back(organism);}
-    dc->to_place_organisms.clear();
-
     if (sp->eat_then_produce) {
         for (auto &organism: dc->organisms) { eat_food(dc, sp, organism); }
         for (auto &organism: dc->organisms) { produce_food(dc, sp, organism, *gen); }
@@ -37,7 +34,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i < dc->organisms.size(); i++)  {dc->organisms[i]->think_decision(dc->single_thread_organisms_observations[i], gen);}
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], gen);}
 
-    for (auto & organism: dc->organisms) {try_make_child(dc, sp, organism, dc->to_place_organisms, gen);}
+    for (int i = 0; i < dc->organisms.size(); i++) {try_make_child(dc, sp, dc->organisms[i], gen);}
 }
 
 //Is it faster? idk. maybe.
@@ -369,18 +366,18 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
 }
 
 void SimulationEngineSingleThread::try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                                                  std::vector<Organism *> &child_organisms, lehmer64 *gen) {
+                                                  lehmer64 *gen) {
     if (organism->child_pattern == nullptr) {organism->child_pattern = organism->create_child(gen);}
     // if max_organisms < 0, then unlimited.
-    if (dc->max_organisms >= 0 && dc->organisms.size() + dc->to_place_organisms.size() >= dc->max_organisms) {return;}
+    if (dc->max_organisms >= 0 && dc->organisms.size() >= dc->max_organisms) {return;}
     if (organism->food_collected < organism->child_pattern->food_needed) { return;}
     if (sp->failed_reproduction_eats_food) {organism->food_collected -= organism->child_pattern->food_needed;}
-    place_child(dc, sp, organism, child_organisms, gen);
+    place_child(dc, sp, organism, gen);
 }
 
 //TODO refactor
 void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                                               std::vector<Organism *> &child_organisms, lehmer64 *gen) {
+                                               lehmer64 *gen) {
     auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*gen));
     Rotation rotation;
     if (sp->reproduction_rotation_enabled) {
@@ -403,7 +400,6 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
         old_child_pos_calculator(organism, to_place, distance);
     }
 
-    //TODO this is probably wrong and broken
     if (sp->check_if_path_is_clear) {
         int c_distance = std::abs(organism->x - organism->child_pattern->x) + std::abs(organism->y - organism->child_pattern->y);
 
@@ -431,7 +427,9 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
         {return;}
     }
 
-    child_organisms.emplace_back(organism->child_pattern);
+    dc->organisms.emplace_back(organism->child_pattern);
+    place_organism(dc, organism->child_pattern);
+
     //only deduct food when reproduction is successful and flag is false
     if (!sp->failed_reproduction_eats_food) {
         organism->food_collected -= organism->child_pattern->food_needed;
