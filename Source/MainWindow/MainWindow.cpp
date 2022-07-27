@@ -721,6 +721,7 @@ void MainWindow::initialize_gui() {
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.le_num_threads->hide();
     _ui.lb_set_num_threads->hide();
+    s._ui.lb_organisms_memory_consumption->hide();
 }
 
 void MainWindow::update_simulation_size_label() {

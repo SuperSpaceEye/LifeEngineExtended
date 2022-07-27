@@ -31,9 +31,9 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="full_image_creator">
+     <widget class="QWidget" name="full_video_image_creator">
       <attribute name="title">
-       <string>Full grid Image creator</string>
+       <string>Full grid video/Image creator</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -67,6 +67,110 @@
         <widget class="QPushButton" name="b_create_image">
          <property name="text">
           <string>Create image</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>First grid buffer size</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_first_grid_buffer_size"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="b_start_recording">
+           <property name="text">
+            <string>Start recording</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="b_stop_recording">
+           <property name="text">
+            <string>Stop recording</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="lb_recording_information">
+         <property name="text">
+          <string>Status: Recording ||| Recorded n ticks ||| Total memory consumption n</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Second grid buffer size</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_second_grid_buffer_size"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="b_load_intermediate_data_location">
+           <property name="text">
+            <string>Load intermediate data location</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="b_compile_intermediate_data_into_video">
+         <property name="text">
+          <string>Compile intermediate data into video</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="b_clear_intermediate_data">
+         <property name="text">
+          <string>Clear intermediate data</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="b_delete_all_intermediate_data_from_disk">
+         <property name="text">
+          <string>Delete all intermediate data from disk</string>
          </property>
         </widget>
        </item>
@@ -123,9 +227,145 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_first_grid_buffer_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_first_grid_buffer_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>521</x>
+     <y>200</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_start_recording</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_start_recording_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_stop_recording</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_stop_recording_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>670</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_load_intermediate_data_location</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_load_intermediate_data_location_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>558</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_second_grid_buffer_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_second_grid_buffer_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_compile_intermediate_data_into_video</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_compile_intermediate_data_into_video_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>619</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_clear_intermediate_data</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_clear_intermediate_data_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_delete_all_intermediate_data_from_disk</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_delete_all_intermediate_data_from_disk_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>650</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>le_number_of_pixels_per_block_slot()</slot>
   <slot>b_create_image_slot()</slot>
+  <slot>le_first_grid_buffer_size_slot()</slot>
+  <slot>b_start_recording_slot()</slot>
+  <slot>b_stop_recording_slot()</slot>
+  <slot>le_second_grid_buffer_size_slot()</slot>
+  <slot>b_load_intermediate_data_location_slot()</slot>
+  <slot>b_compile_intermediate_data_into_video_slot()</slot>
+  <slot>b_clear_intermediate_data_slot()</slot>
+  <slot>b_delete_all_intermediate_data_from_disk_slot()</slot>
  </slots>
 </ui>

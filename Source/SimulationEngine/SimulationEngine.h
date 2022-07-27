@@ -23,7 +23,7 @@
 #include "../Organism/CPU/Organism.h"
 #include "../Stuff/BlockTypes.hpp"
 #include "../Stuff/Vector2.h"
-#include "../Containers/CPU/EngineControlContainer.h"
+#include "../Containers/CPU/EngineControlParametersContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Stuff/Linspace.h"
@@ -89,6 +89,7 @@ public:
     //Will always wait for engine to pause
     bool wait_for_engine_to_pause_force();
     void parse_full_simulation_grid();
+    void parse_full_simulation_grid_to_buffer();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

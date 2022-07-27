@@ -21,8 +21,6 @@ void MainWindow::tb_stoprender_slot(bool state) {
     if (!really_stop_render) {
         parse_full_simulation_grid(pause_grid_parsing);
     }
-    // calculating delta time is not needed when no image is being created.
-    ecp.calculate_simulation_tick_delta_time = !ecp.calculate_simulation_tick_delta_time;
 }
 
 void MainWindow::tb_open_statistics_slot(bool state) {

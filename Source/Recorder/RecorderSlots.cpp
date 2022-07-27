@@ -4,6 +4,8 @@
 
 #include "Recorder.h"
 
+//ffmpeg -framerate 60 -pattern_type glob -i "../images/*.png" -c:v libx264 out.mp4 -y
+
 void Recorder::le_number_of_pixels_per_block_slot() {
     le_slot_lower_bound<int>(num_pixels_per_block, num_pixels_per_block, "int", _ui.le_number_or_pixels_per_block, 1, "1");
 }

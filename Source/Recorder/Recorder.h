@@ -17,7 +17,7 @@
 #include "../MainWindow/WindowUI.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Stuff/MiscFuncs.h"
-#include "../Containers/CPU/EngineControlContainer.h"
+#include "../Containers/CPU/EngineControlParametersContainer.h"
 #include "../Organism/CPU/Organism.h"
 #include "../Organism/CPU/Brain.h"
 #include "../Organism/CPU/Anatomy.h"
@@ -89,8 +89,16 @@ public:
 
 private slots:
     void le_number_of_pixels_per_block_slot();
+    void le_first_grid_buffer_size_slot(){};
+    void le_second_grid_buffer_size_slot(){};
 
     void b_create_image_slot();
+    void b_start_recording_slot(){};
+    void b_stop_recording_slot(){};
+    void b_load_intermediate_data_location_slot(){};
+    void b_compile_intermediate_data_into_video_slot(){};
+    void b_clear_intermediate_data_slot(){};
+    void b_delete_all_intermediate_data_from_disk_slot(){};
 };
 
 #endif //LIFEENGINEEXTENDED_RECORDER_H

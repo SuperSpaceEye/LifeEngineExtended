@@ -25,9 +25,6 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
 
-    edc.single_thread_to_erase.reserve(edc.minimum_fixed_capacity);
-    edc.single_thread_organisms_observations.reserve(edc.minimum_fixed_capacity);
-
     while (ecp.engine_working) {
         if (!edc.unlimited_simulation_fps && ecp.calculate_simulation_tick_delta_time) { point = std::chrono::high_resolution_clock::now();}
         if (ecp.stop_engine) {
@@ -44,6 +41,7 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (ecp.engine_pause || ecp.engine_global_pause) { ecp.engine_paused = true; } else { ecp.engine_paused = false;}
         process_user_action_pool();
+        if (ecp.parse_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
         if ((!ecp.engine_paused || ecp.engine_pass_tick) && (!ecp.pause_button_pause || ecp.pass_tick)) {
             //TODO the cause of rare segfault could be here
             simulation_tick();
@@ -463,5 +461,19 @@ void SimulationEngine::parse_full_simulation_grid() {
             edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
             edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
+    }
+}
+
+void SimulationEngine::parse_full_simulation_grid_to_buffer() {
+    while (ecp.pause_buffer_filling) {}
+    for (int x = 0; x < edc.simulation_width; x++) {
+        for (int y = 0; y < edc.simulation_height; y++) {
+            edc.second_simulation_grid_buffer[edc.buffer_pos][x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.second_simulation_grid_buffer[edc.buffer_pos][x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+        }
+    }
+    edc.buffer_pos++;
+    if (edc.buffer_pos == edc.buffer_size) {
+        ecp.pause_buffer_filling = true;
     }
 }

@@ -17,13 +17,11 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
         for (auto &organism: dc->organisms) { eat_food(dc, sp, organism); }
     }
 
-    if (sp->killer_damage_amount > 0) {
-        for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
-    }
+    for (auto &organism: dc->organisms) { apply_damage(dc, sp, organism); }
 
     dc->single_thread_to_erase.clear();
 
-    for (int i = 0; i < dc->organisms.size(); i++)  {tick_lifetime(dc, dc->single_thread_to_erase, dc->organisms[i], i);}
+    for (int i = 0; i < dc->organisms.size(); i++) {tick_lifetime(dc, dc->single_thread_to_erase, dc->organisms[i], i);}
     for (int i = 0; i < dc->single_thread_to_erase.size(); ++i) {erase_organisms(dc, dc->single_thread_to_erase, i);}
 
     dc->single_thread_organisms_observations.clear();
@@ -35,16 +33,6 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i < dc->organisms.size(); i++)  {make_decision(dc, sp, dc->organisms[i], gen);}
 
     for (int i = 0; i < dc->organisms.size(); i++) {try_make_child(dc, sp, dc->organisms[i], gen);}
-}
-
-//Is it faster? idk. maybe.
-template <typename T>
-inline void smart_reserve(std::vector<T> &input_vec, uint32_t new_size, uint32_t minimum_fixed_size) {
-    if (new_size < minimum_fixed_size) {
-        return;
-    }
-
-    input_vec.reserve(new_size);
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
@@ -157,7 +145,7 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
                                                         std::vector<Organism *> &organisms,
                                                         SimulationParameters *sp, EngineDataContainer *dc) {
-    smart_reserve(observations, organisms.size(), dc->minimum_fixed_capacity);
+    observations.reserve(organisms.size());
     for (auto & organism: organisms) {
         // if organism is moving, then do not observe.
         if (organism->move_counter == 0 && organism->anatomy._mover_blocks > 0 && organism->anatomy._eye_blocks > 0) {
@@ -439,15 +427,15 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
 
 void
 SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const Rotation to_place, int distance) {
-    auto o_min_y = INT32_MAX;
-    auto o_min_x = INT32_MAX;
-    auto o_max_y = INT32_MIN;
-    auto o_max_x = INT32_MIN;
+    auto o_min_y = 0;
+    auto o_min_x = 0;
+    auto o_max_y = 0;
+    auto o_max_x = 0;
 
-    auto c_min_y = INT32_MAX;
-    auto c_min_x = INT32_MAX;
-    auto c_max_y = INT32_MIN;
-    auto c_max_x = INT32_MIN;
+    auto c_min_y = 0;
+    auto c_min_x = 0;
+    auto c_max_y = 0;
+    auto c_max_x = 0;
 
     //To get the position of a child on an axis you need to know the largest/smallest position of organism blocks on an axis
     // and smallest/largest position of a child organism block + -1/+1 to compensate for organism center and + -/+ distance.
@@ -457,6 +445,8 @@ SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const
 
     switch (to_place) {
         case Rotation::UP:
+            o_min_y = INT32_MAX;
+            c_max_y = INT32_MIN;
             for (auto & block: organism->anatomy._organism_blocks) {
                 auto pos = block.get_pos(organism->rotation);
                 if (pos.y < o_min_y) { o_min_y = pos.y;}
@@ -467,16 +457,10 @@ SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const
             }
             o_min_y -= distance;
             c_max_y = -abs(c_max_y) - 1;
-
-            o_min_x = 0;
-            o_max_y = 0;
-            o_max_x = 0;
-
-            c_min_y = 0;
-            c_min_x = 0;
-            c_max_x = 0;
             break;
         case Rotation::LEFT:
+            o_min_x = INT32_MAX;
+            c_max_x = INT32_MIN;
             for (auto & block: organism->anatomy._organism_blocks) {
                 auto pos = block.get_pos(organism->rotation);
                 if (pos.x < o_min_x) { o_min_x = pos.x;}
@@ -487,16 +471,10 @@ SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const
             }
             o_min_x -= distance;
             c_max_x = -abs(c_max_x) - 1;
-
-            o_min_y = 0;
-            o_max_y = 0;
-            o_max_x = 0;
-
-            c_min_y = 0;
-            c_min_x = 0;
-            c_max_y = 0;
             break;
         case Rotation::DOWN:
+            o_max_y = INT32_MIN;
+            c_min_y = INT32_MAX;
             for (auto & block: organism->anatomy._organism_blocks) {
                 auto pos = block.get_pos(organism->rotation);
                 if (pos.y > o_max_y) { o_max_y = pos.y;}
@@ -507,16 +485,10 @@ SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const
             }
             o_max_y += distance;
             c_min_y = abs(c_min_y) + 1;
-
-            o_min_y = 0;
-            o_min_x = 0;
-            o_max_x = 0;
-
-            c_min_x = 0;
-            c_max_y = 0;
-            c_max_x = 0;
             break;
         case Rotation::RIGHT:
+            o_max_x = INT32_MIN;
+            c_min_x = INT32_MAX;
             for (auto & block: organism->anatomy._organism_blocks){
                 auto pos = block.get_pos(organism->rotation);
                 if (pos.x > o_max_x) { o_max_x = pos.x;}
@@ -527,14 +499,6 @@ SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, const
             }
             o_max_x += distance;
             c_min_x = abs(c_min_x) + 1;
-
-            o_min_y = 0;
-            o_min_x = 0;
-            o_max_y = 0;
-
-            c_min_y = 0;
-            c_max_y = 0;
-            c_max_x = 0;
             break;
     }
 
@@ -551,45 +515,32 @@ void SimulationEngineSingleThread::old_child_pos_calculator(Organism *organism, 
 
     switch (to_place) {
         case Rotation::UP:
+            min_y = INT32_MAX;
             for (auto & block: organism->anatomy._organism_blocks) {
                 if (block.get_pos(organism->rotation).y < min_y) {min_y = block.get_pos(organism->rotation).y;}
             }
             min_y -= distance;
-
-            min_x = 0;
-            max_y = 0;
-            max_x = 0;
-
             break;
         case Rotation::LEFT:
+            min_x = INT32_MAX;
             for (auto & block: organism->anatomy._organism_blocks) {
                 if (block.get_pos(organism->rotation).x < min_x) {min_x = block.get_pos(organism->rotation).x;}
             }
             min_x -= distance;
-
-            min_y = 0;
-            max_y = 0;
-            max_x = 0;
             break;
         case Rotation::DOWN:
+            max_y = INT32_MIN;
             for (auto & block: organism->anatomy._organism_blocks) {
                 if (block.get_pos(organism->rotation).y > max_y) {max_y = block.get_pos(organism->rotation).y;}
             }
             max_y += distance;
-
-            min_y = 0;
-            min_x = 0;
-            max_x = 0;
             break;
         case Rotation::RIGHT:
+            max_x = INT32_MIN;
             for (auto & block: organism->anatomy._organism_blocks){
                 if (block.get_pos(organism->rotation).x > max_x) {max_x = block.get_pos(organism->rotation).x;}
             }
             max_x += distance;
-
-            min_y = 0;
-            min_x = 0;
-            max_y = 0;
             break;
     }
 

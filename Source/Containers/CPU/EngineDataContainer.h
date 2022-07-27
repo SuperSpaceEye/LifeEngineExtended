@@ -59,11 +59,11 @@ struct EngineDataContainer {
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> user_actions_pool;
 
-    uint32_t minimum_fixed_capacity = 100'000;
-
-    uint32_t multithread_change_every_n_ticks = 1;
-
     Organism * selected_organism = nullptr;
+
+    std::vector<std::vector<BaseGridBlock>> second_simulation_grid_buffer;
+    int buffer_size = 500;
+    int buffer_pos = 0;
 };
 
 struct pool_changes_info {

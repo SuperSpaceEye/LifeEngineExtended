@@ -119,8 +119,7 @@ OrganismAvgBlockInformation Recorder::parse_organisms_info() {
                       info.total_size_single_diagonal_adjacent_space +
                       (sizeof(Brain) * info.total_avg.total) +
                       (sizeof(Anatomy) * info.total_avg.total) +
-                      (sizeof(Organism) * info.total_avg.total)
-            ;
+                      (sizeof(Organism) * info.total_avg.total);
 
     info.total_total_mutation_rate = info.total_avg.anatomy_mutation_rate;
 
