@@ -110,6 +110,15 @@ MainWindow::MainWindow(QWidget *parent) :
     cb_synchronise_simulation_and_window_slot(false);
     _ui.cb_synchronise_sim_and_win->setChecked(false);
 #endif
+
+    auto executable_path = QCoreApplication::applicationDirPath().toStdString();
+    if (!std::filesystem::exists(executable_path + "/temp")) {
+        std::filesystem::create_directory(executable_path + "/temp");
+    }
+    if (!std::filesystem::exists(executable_path + "/videos")) {
+        std::filesystem::create_directory(executable_path + "/videos");
+    }
+
 }
 
 void MainWindow::mainloop_tick() {

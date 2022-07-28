@@ -103,6 +103,13 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
+          <widget class="QPushButton" name="b_new_recording">
+           <property name="text">
+            <string>New recording</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="b_start_recording">
            <property name="text">
             <string>Start recording</string>
@@ -355,6 +362,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_new_recording</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_new_recording_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>155</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>le_number_of_pixels_per_block_slot()</slot>
@@ -367,5 +390,6 @@
   <slot>b_compile_intermediate_data_into_video_slot()</slot>
   <slot>b_clear_intermediate_data_slot()</slot>
   <slot>b_delete_all_intermediate_data_from_disk_slot()</slot>
+  <slot>b_new_recording_slot()</slot>
  </slots>
 </ui>

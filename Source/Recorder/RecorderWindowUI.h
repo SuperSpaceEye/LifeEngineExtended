@@ -39,6 +39,7 @@ public:
     QLabel *label_2;
     QLineEdit *le_first_grid_buffer_size;
     QHBoxLayout *horizontalLayout_3;
+    QPushButton *b_new_recording;
     QPushButton *b_start_recording;
     QPushButton *b_stop_recording;
     QLabel *lb_recording_information;
@@ -111,6 +112,11 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        b_new_recording = new QPushButton(full_video_image_creator);
+        b_new_recording->setObjectName(QString::fromUtf8("b_new_recording"));
+
+        horizontalLayout_3->addWidget(b_new_recording);
+
         b_start_recording = new QPushButton(full_video_image_creator);
         b_start_recording->setObjectName(QString::fromUtf8("b_start_recording"));
 
@@ -190,6 +196,7 @@ public:
         QObject::connect(b_compile_intermediate_data_into_video, SIGNAL(clicked()), Recorder, SLOT(b_compile_intermediate_data_into_video_slot()));
         QObject::connect(b_clear_intermediate_data, SIGNAL(clicked()), Recorder, SLOT(b_clear_intermediate_data_slot()));
         QObject::connect(b_delete_all_intermediate_data_from_disk, SIGNAL(clicked()), Recorder, SLOT(b_delete_all_intermediate_data_from_disk_slot()));
+        QObject::connect(b_new_recording, SIGNAL(clicked()), Recorder, SLOT(b_new_recording_slot()));
 
         tabWidget->setCurrentIndex(0);
 
@@ -203,6 +210,7 @@ public:
         label->setText(QApplication::translate("Recorder", "Number of pixels per world block", nullptr));
         b_create_image->setText(QApplication::translate("Recorder", "Create image", nullptr));
         label_2->setText(QApplication::translate("Recorder", "First grid buffer size", nullptr));
+        b_new_recording->setText(QApplication::translate("Recorder", "New recording", nullptr));
         b_start_recording->setText(QApplication::translate("Recorder", "Start recording", nullptr));
         b_stop_recording->setText(QApplication::translate("Recorder", "Stop recording", nullptr));
         lb_recording_information->setText(QApplication::translate("Recorder", "Status: Recording ||| Recorded n ticks ||| Total memory consumption n", nullptr));

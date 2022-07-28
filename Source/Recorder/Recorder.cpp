@@ -375,3 +375,31 @@ color & Recorder::get_texture_color(BlockTypes type, Rotation rotation, float re
 void Recorder::init_gui() {
     _ui.le_number_or_pixels_per_block->setText(QString::fromStdString(std::to_string(num_pixels_per_block)));
 }
+
+std::string Recorder::new_recording(std::string path) {
+    auto new_path = path + "/temp/" + get_string_date();
+    std::filesystem::create_directory(new_path);
+    return new_path;
+}
+
+std::string Recorder::get_string_date() {
+    time_t t = time(nullptr);
+    auto my_time = localtime(&t);
+    std::string date = std::to_string(my_time->tm_year + 1900) +
+                 "_" + std::to_string(my_time->tm_mon+1) +
+                 "_" + std::to_string(my_time->tm_mday)  +
+                 "_" + std::to_string(my_time->tm_hour)  +
+                 "_" + std::to_string(my_time->tm_min)   +
+                 "_" + std::to_string(my_time->tm_sec);
+    return date;
+}
+
+
+
+
+
+
+
+
+
+

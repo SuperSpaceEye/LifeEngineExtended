@@ -18,9 +18,7 @@
 #include <thread>
 #include <random>
 #include <fstream>
-#ifndef __WIN32
 #include <filesystem>
-#endif
 
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
