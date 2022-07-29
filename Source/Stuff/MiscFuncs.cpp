@@ -32,3 +32,12 @@ std::string convert_num_bytes(uint64_t num_bytes) {
     d_num_bytes /= 1024;
     return to_str(d_num_bytes, 1) + "TiB";
 }
+
+void clear_console() {
+#if defined _WIN32
+    system("cls");
+    //clrscr(); // including header file : conio.h
+#elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
+    system("clear");
+#endif
+}

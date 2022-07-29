@@ -23,6 +23,10 @@
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Stuff/textures.h"
 
+#if defined(__WIN32)
+#include <windows.h>
+#endif
+
 struct OrganismInfoHolder {
     double size = 0;
     double _organism_lifetime = 0;
@@ -77,10 +81,10 @@ private:
 
     void closeEvent(QCloseEvent * event) override;
 
-    void create_image(std::vector<unsigned char> &raw_image_data);
+    void create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid);
 
     void complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
-                                std::vector<unsigned char> &raw_image_vector);
+                                std::vector<unsigned char> &raw_image_vector, std::vector<BaseGridBlock> &grid);
     void set_image_pixel(int x, int y, const color &color, std::vector<unsigned char> &image_vector);
     color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 

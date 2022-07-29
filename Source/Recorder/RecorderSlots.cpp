@@ -4,8 +4,6 @@
 
 #include "Recorder.h"
 
-//ffmpeg -framerate 60 -pattern_type glob -i "../images/*.png" -c:v libx264 out.mp4 -y
-
 //==================== Line edits ====================
 
 void Recorder::le_number_of_pixels_per_block_slot() {
@@ -72,7 +70,9 @@ void Recorder::b_create_image_slot() {
 
     std::vector<unsigned char> raw_image_data(edc->simulation_width*edc->simulation_height*num_pixels_per_block*num_pixels_per_block*4);
 
-    create_image(raw_image_data);
+    engine->parse_full_simulation_grid();
+
+    create_image(raw_image_data, edc->second_simulation_grid);
 
     QImage image(raw_image_data.data(),
                  edc->simulation_width*num_pixels_per_block,
@@ -132,33 +132,120 @@ void Recorder::b_load_intermediate_data_location_slot() {
         return;
     }
 
-    recd->second_simulation_grid_buffer.clear();
-
     int number_of_files = 0;
     int total_recorded = 0;
+    int largest_buffer = 0;
 
-    for (auto & file: std::filesystem::directory_iterator(recd->path_to_save)) {
+    for (auto & file: std::filesystem::directory_iterator(dir_name.toStdString())) {
         int width;
         int height;
         int pos;
         auto path = file.path().string();
         recd->load_info_buffer_data(path, width, height, pos);
         if (width != edc->simulation_width || height != edc->simulation_height) {
+            display_message("Loaded recording has dimensions: " + std::to_string(width) + "x" +
+            std::to_string(height) + ". Resize simulation grid to load this recording.");
             return;
         }
 
+        if (largest_buffer < pos) {largest_buffer = pos;}
         number_of_files++;
         total_recorded+=pos;
     }
 
+    recd->buffer_size = largest_buffer;
+    recd->buffer_pos = 0;
+
+    recd->second_simulation_grid_buffer.clear();
+    recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));
     recd->path_to_save = dir_name.toStdString();
+    recd->saved_buffers = number_of_files;
+
+    recd->recorded_states = total_recorded;
+    recording_paused = true;
 }
 
 void Recorder::b_compile_intermediate_data_into_video_slot() {
-    if (ecp->record_full_grid && !recording_paused) {
-        display_message("Program is still recording. Stop the recording first to compile intermediate data into video.");
+    if (!recording_paused) {
+        display_message("Program is still recording. Pause the recording first to compile intermediate data into video.");
         return;
     }
+
+    if (recd->path_to_save.empty()) {
+        display_message("No recording is loaded.");
+        return;
+    }
+
+    ecp->record_full_grid = false;
+    while (ecp->recording_full_grid) {}
+
+    recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
+
+    std::vector<unsigned char> image_vec(edc->simulation_width*edc->simulation_height*num_pixels_per_block*num_pixels_per_block*4);
+
+    std::string images_path_to_save = recd->path_to_save + "_img";
+    std::filesystem::create_directory(images_path_to_save);
+
+    std::filesystem::path p(recd->path_to_save);
+    std::string dir_name = p.filename().string();
+
+    auto point = std::chrono::high_resolution_clock::now();
+#if defined(__WIN32)
+    ShowWindow(GetConsoleWindow(), SW_SHOW);
+#endif
+
+    engine->pause();
+
+    int nums = std::to_string(recd->recorded_states).length();
+
+    int frame_num = 0;
+    for (auto & file: std::filesystem::directory_iterator(recd->path_to_save)) {
+        int width;
+        int height;
+        int len;
+        auto path = file.path().string();
+        recd->load_info_buffer_data(path, width, height, len);
+        if (len > recd->buffer_size) {recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));}
+        recd->load_buffer_from_disk(path, width, height, recd->buffer_size, len, recd->second_simulation_grid_buffer);
+
+        for (int i = 0; i < len; i++) {
+            frame_num++;
+
+            std::string frame_str = std::to_string(frame_num);
+            std::string padding = "";
+            for (int i = 0; i < nums - frame_str.length(); i++) {padding += "0";}
+            frame_str = padding + frame_str;
+
+            if (std::filesystem::exists(images_path_to_save+"/"+frame_str+".png")) { continue;}
+
+            create_image(image_vec, recd->second_simulation_grid_buffer[i]);
+
+            QImage image(image_vec.data(),
+                         edc->simulation_width*num_pixels_per_block,
+                         edc->simulation_height*num_pixels_per_block,
+                         QImage::Format_RGB32);
+
+            image.save(QString::fromStdString(images_path_to_save+"/"+frame_str+".png"), "PNG");
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1./30) {
+                clear_console();
+                std::cout << "Compiled images " + std::to_string(frame_num) + "/" + std::to_string(recd->recorded_states) + ". Do not turn off program.\n";
+            }
+        }
+    }
+
+    auto program_root = QCoreApplication::applicationDirPath().toStdString();
+
+    std::string ffmpeg_command = "ffmpeg -framerate 60 -start_number 1 -i \"" + images_path_to_save + "/%"+ std::to_string(nums) +"d.png\" -c:v libx264 -pix_fmt yuv420p "+ program_root +"/videos/" + dir_name + ".mp4 -y";
+
+    std::cout << ffmpeg_command << "\n";
+
+    system(ffmpeg_command.c_str());
+
+    engine->unpause();
+
+#if defined(__WIN32)
+    ShowWindow(GetConsoleWindow(), SW_SHOW);
+#endif
 }
 
 void Recorder::b_clear_intermediate_data_slot() {

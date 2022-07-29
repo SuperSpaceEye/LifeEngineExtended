@@ -213,7 +213,7 @@ OrganismAvgBlockInformation Recorder::parse_organisms_info() {
     return info;
 }
 
-void Recorder::create_image(std::vector<unsigned char> &raw_image_data) {
+void Recorder::create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid) {
     auto image_width  = edc->simulation_width  * num_pixels_per_block;
     auto image_height = edc->simulation_height * num_pixels_per_block;
 
@@ -252,13 +252,11 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data) {
     for (int y = 0; y < image_height; y++) {if (lin_height[y] > min_val) {min_val = lin_height[y]; truncated_lin_height.push_back(min_val);}}
     truncated_lin_height.pop_back();
 
-    engine->parse_full_simulation_grid();
-
-    complex_image_creation(lin_width, lin_height, raw_image_data);
+    complex_image_creation(lin_width, lin_height, raw_image_data, grid);
 }
 
 void Recorder::complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
-                                      std::vector<unsigned char> &raw_image_vector) {
+                                      std::vector<unsigned char> &raw_image_vector, std::vector<BaseGridBlock> &grid) {
     //x - start, y - stop
     std::vector<Vector2<int>> width_img_boundaries;
     std::vector<Vector2<int>> height_img_boundaries;
@@ -293,7 +291,7 @@ void Recorder::complex_image_creation(const std::vector<int> &lin_width, const s
         for (auto &h_b: height_img_boundaries) {
             for (int x = w_b.x; x < w_b.y; x++) {
                 for (int y = h_b.x; y < h_b.y; y++) {
-                    auto &block = edc->second_simulation_grid[lin_width[x] + lin_height[y] * edc->simulation_width];
+                    auto &block = grid[lin_width[x] + lin_height[y] * edc->simulation_width];
 
                     if (lin_width[x] < 0 ||
                         lin_width[x] >= edc->simulation_width ||

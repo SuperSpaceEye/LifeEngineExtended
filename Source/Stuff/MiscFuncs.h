@@ -66,6 +66,28 @@ public:
     }
 };
 
+class MessageBox : public QWidget {
+Q_OBJECT
+
+private:
+    QVBoxLayout *vertical_layout;
+public:
+    QLabel *content_label;
+    MessageBox(const QString& title, QWidget* parent=0)
+            : QWidget(parent) {
+        content_label = new QLabel("", this);
+        vertical_layout = new QVBoxLayout();
+        vertical_layout->addWidget(content_label);
+
+        setLayout(vertical_layout);
+
+        vertical_layout->addWidget(content_label);
+
+        this->setWindowTitle(title);
+    }
+};
+
+
 bool display_dialog_message(const std::string &message, bool disable_warnings);
 
 void display_message(const std::string &message);
@@ -142,5 +164,7 @@ void le_slot_lower_lower_bound(T & _fallback,
 }
 
 std::string convert_num_bytes(uint64_t num_bytes);
+
+void clear_console();
 
 #endif //THELIFEENGINECPP_MISCFUNCS_H
