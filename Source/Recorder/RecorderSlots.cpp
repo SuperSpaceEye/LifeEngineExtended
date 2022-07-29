@@ -35,6 +35,10 @@ void Recorder::le_log_every_n_tick_slot() {
     ecp->parse_full_grid_every_n = temp;
 }
 
+void Recorder::le_video_fps_slot() {
+    le_slot_lower_bound<int>(video_fps, video_fps, "int", _ui.le_video_fps, 1, "1");
+}
+
 //==================== Buttons edits ====================
 
 void Recorder::b_create_image_slot() {
@@ -256,7 +260,7 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 
     auto program_root = QCoreApplication::applicationDirPath().toStdString();
 
-    std::string ffmpeg_command = ffmpeg_path + " -framerate 60 -start_number 1 -i \"" + images_path_to_save + "/%"+ std::to_string(nums) +"d.png\" -c:v libx264 -pix_fmt yuv420p "+ program_root +"/videos/" + dir_name + ".mp4 -y";
+    std::string ffmpeg_command = ffmpeg_path + " -framerate " + std::to_string(video_fps) + " -start_number 1 -i \"" + images_path_to_save + "/%"+ std::to_string(nums) +"d.png\" -c:v libx264 -pix_fmt yuv420p "+ program_root +"/videos/" + dir_name + ".mp4 -y";
 
     system(ffmpeg_command.c_str());
 

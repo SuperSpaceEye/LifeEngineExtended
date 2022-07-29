@@ -25,9 +25,6 @@
 
 #if defined(__WIN32)
 #include <windows.h>
-std::string ffmpeg_path = "";
-#elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
-std::string ffmpeg_path = "ffmpeg";
 #endif
 
 struct OrganismInfoHolder {
@@ -77,10 +74,17 @@ private:
 
     const std::vector<std::string> months{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
+    #if defined(__WIN32)
+    std::string ffmpeg_path = "";
+    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
+    std::string ffmpeg_path = "ffmpeg";
+    #endif
+
     std::string dir_path_of_new_recording;
 
     int num_pixels_per_block = 5;
     bool recording_paused = false;
+    int video_fps = 60;
 
     void closeEvent(QCloseEvent * event) override;
 
@@ -110,6 +114,7 @@ private slots:
     void le_number_of_pixels_per_block_slot();
     void le_first_grid_buffer_size_slot();
     void le_log_every_n_tick_slot();
+    void le_video_fps_slot();
 
     void b_create_image_slot();
     void b_start_recording_slot();

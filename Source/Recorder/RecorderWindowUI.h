@@ -41,6 +41,9 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QLabel *label_3;
     QLineEdit *le_log_every_n_tick;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *label_4;
+    QLineEdit *le_video_fps;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *b_new_recording;
     QPushButton *b_start_recording;
@@ -125,6 +128,21 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_4);
 
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        label_4 = new QLabel(full_video_image_creator);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        horizontalLayout_5->addWidget(label_4);
+
+        le_video_fps = new QLineEdit(full_video_image_creator);
+        le_video_fps->setObjectName(QString::fromUtf8("le_video_fps"));
+
+        horizontalLayout_5->addWidget(le_video_fps);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_5);
+
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         b_new_recording = new QPushButton(full_video_image_creator);
@@ -198,6 +216,7 @@ public:
         QObject::connect(b_new_recording, SIGNAL(clicked()), Recorder, SLOT(b_new_recording_slot()));
         QObject::connect(b_pause_recording, SIGNAL(clicked()), Recorder, SLOT(b_pause_recording_slot()));
         QObject::connect(le_log_every_n_tick, SIGNAL(returnPressed()), Recorder, SLOT(le_log_every_n_tick_slot()));
+        QObject::connect(le_video_fps, SIGNAL(returnPressed()), Recorder, SLOT(le_video_fps_slot()));
 
         tabWidget->setCurrentIndex(0);
 
@@ -211,7 +230,8 @@ public:
         label->setText(QApplication::translate("Recorder", "Number of pixels per world block", nullptr));
         b_create_image->setText(QApplication::translate("Recorder", "Create image", nullptr));
         label_2->setText(QApplication::translate("Recorder", "Grid buffer size", nullptr));
-        label_3->setText(QApplication::translate("Recorder", "Log every n tick: ", nullptr));
+        label_3->setText(QApplication::translate("Recorder", "Log every n tick", nullptr));
+        label_4->setText(QApplication::translate("Recorder", "Video output FPS", nullptr));
         b_new_recording->setText(QApplication::translate("Recorder", "New recording", nullptr));
         b_start_recording->setText(QApplication::translate("Recorder", "Start recording", nullptr));
         b_pause_recording->setText(QApplication::translate("Recorder", "Pause recording", nullptr));

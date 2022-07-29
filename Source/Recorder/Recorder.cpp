@@ -375,6 +375,7 @@ void Recorder::init_gui() {
     _ui.le_number_or_pixels_per_block->setText(QString::fromStdString(std::to_string(num_pixels_per_block)));
     _ui.le_log_every_n_tick->setText(QString::fromStdString(std::to_string(ecp->parse_full_grid_every_n)));
     _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(recd->buffer_size)));
+    _ui.le_video_fps->setText(QString::fromStdString(std::to_string(video_fps)));
 }
 
 std::string Recorder::new_recording(std::string path) {

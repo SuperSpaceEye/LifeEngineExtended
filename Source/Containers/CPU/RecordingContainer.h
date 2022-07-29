@@ -31,13 +31,14 @@ struct RecordingData {
     int recorded_states = 0;
     int saved_buffers = 1;
 
+    //For some reason during recording at some point the speed of saving drops significantly. Probably because I
+    //write it on hard drive and not an SSD.
     static void save_buffer_to_disk(std::string & path_to_save, int buffer_pos,
                              int & saved_buffers, int width, int height,
                              std::vector<std::vector<BaseGridBlock>> & second_simulation_grid_buffer) {
         if (buffer_pos == 0) {
             return;
         }
-
         saved_buffers++;
         auto path = path_to_save + "/" + std::to_string(saved_buffers);
         std::ofstream out(path, std::ios::out | std::ios::binary);
