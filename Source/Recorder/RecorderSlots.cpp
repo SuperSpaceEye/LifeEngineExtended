@@ -194,16 +194,27 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
     ShowWindow(GetConsoleWindow(), SW_SHOW);
 #endif
 
+    std::vector<std::pair<int, std::string>> directories;
+
+    for (auto & file: std::filesystem::directory_iterator(recd->path_to_save)) {
+        directories.emplace_back(std::stoi(file.path().filename().string()), file.path().string());
+    }
+
+    //file paths do not come out in order, so they need sorting
+    std::sort(directories.begin(), directories.end(), [](std::pair<int, std::string> & a, std::pair<int, std::string> & b){
+        return a.first < b.first;
+    });
+
     engine->pause();
 
     int nums = std::to_string(recd->recorded_states).length();
 
     int frame_num = 0;
-    for (auto & file: std::filesystem::directory_iterator(recd->path_to_save)) {
+    for (auto & [_, file]: directories) {
         int width;
         int height;
         int len;
-        auto path = file.path().string();
+        auto path = file;
         recd->load_info_buffer_data(path, width, height, len);
         if (len > recd->buffer_size) {recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));}
         recd->load_buffer_from_disk(path, width, height, recd->buffer_size, len, recd->second_simulation_grid_buffer);
