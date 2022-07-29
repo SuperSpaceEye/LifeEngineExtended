@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     update_simulation_size_label();
 
-    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp));
+    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
 
     engine->make_walls();
 
@@ -169,6 +169,8 @@ void MainWindow::window_tick() {
 
     if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
+
+    rec.update_label();
 
 #if __VALGRIND_MODE__ == 1
     return;
@@ -735,23 +737,6 @@ void MainWindow::initialize_gui() {
 
 void MainWindow::update_simulation_size_label() {
   s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
-}
-
-std::string MainWindow::convert_num_bytes(uint64_t num_bytes) {
-    uint64_t previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + " B";}
-    previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + "KiB";}
-    previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + "MiB";}
-    previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + "GiB";}
-
-    return std::to_string(num_bytes) + " TiB";
 }
 
 Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {

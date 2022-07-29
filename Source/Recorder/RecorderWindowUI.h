@@ -38,15 +38,15 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_2;
     QLineEdit *le_first_grid_buffer_size;
+    QHBoxLayout *horizontalLayout_4;
+    QLabel *label_3;
+    QLineEdit *le_log_every_n_tick;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *b_new_recording;
     QPushButton *b_start_recording;
+    QPushButton *b_pause_recording;
     QPushButton *b_stop_recording;
     QLabel *lb_recording_information;
-    QHBoxLayout *horizontalLayout_5;
-    QLabel *label_3;
-    QLineEdit *le_second_grid_buffer_size;
-    QHBoxLayout *horizontalLayout_4;
     QPushButton *b_load_intermediate_data_location;
     QPushButton *b_compile_intermediate_data_into_video;
     QPushButton *b_clear_intermediate_data;
@@ -110,6 +110,21 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_2);
 
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label_3 = new QLabel(full_video_image_creator);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        horizontalLayout_4->addWidget(label_3);
+
+        le_log_every_n_tick = new QLineEdit(full_video_image_creator);
+        le_log_every_n_tick->setObjectName(QString::fromUtf8("le_log_every_n_tick"));
+
+        horizontalLayout_4->addWidget(le_log_every_n_tick);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_4);
+
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         b_new_recording = new QPushButton(full_video_image_creator);
@@ -121,6 +136,11 @@ public:
         b_start_recording->setObjectName(QString::fromUtf8("b_start_recording"));
 
         horizontalLayout_3->addWidget(b_start_recording);
+
+        b_pause_recording = new QPushButton(full_video_image_creator);
+        b_pause_recording->setObjectName(QString::fromUtf8("b_pause_recording"));
+
+        horizontalLayout_3->addWidget(b_pause_recording);
 
         b_stop_recording = new QPushButton(full_video_image_creator);
         b_stop_recording->setObjectName(QString::fromUtf8("b_stop_recording"));
@@ -136,30 +156,10 @@ public:
 
         verticalLayout_2->addWidget(lb_recording_information);
 
-        horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
-        label_3 = new QLabel(full_video_image_creator);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-
-        horizontalLayout_5->addWidget(label_3);
-
-        le_second_grid_buffer_size = new QLineEdit(full_video_image_creator);
-        le_second_grid_buffer_size->setObjectName(QString::fromUtf8("le_second_grid_buffer_size"));
-
-        horizontalLayout_5->addWidget(le_second_grid_buffer_size);
-
-
-        verticalLayout_2->addLayout(horizontalLayout_5);
-
-        horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         b_load_intermediate_data_location = new QPushButton(full_video_image_creator);
         b_load_intermediate_data_location->setObjectName(QString::fromUtf8("b_load_intermediate_data_location"));
 
-        horizontalLayout_4->addWidget(b_load_intermediate_data_location);
-
-
-        verticalLayout_2->addLayout(horizontalLayout_4);
+        verticalLayout_2->addWidget(b_load_intermediate_data_location);
 
         b_compile_intermediate_data_into_video = new QPushButton(full_video_image_creator);
         b_compile_intermediate_data_into_video->setObjectName(QString::fromUtf8("b_compile_intermediate_data_into_video"));
@@ -192,11 +192,12 @@ public:
         QObject::connect(b_start_recording, SIGNAL(clicked()), Recorder, SLOT(b_start_recording_slot()));
         QObject::connect(b_stop_recording, SIGNAL(clicked()), Recorder, SLOT(b_stop_recording_slot()));
         QObject::connect(b_load_intermediate_data_location, SIGNAL(clicked()), Recorder, SLOT(b_load_intermediate_data_location_slot()));
-        QObject::connect(le_second_grid_buffer_size, SIGNAL(returnPressed()), Recorder, SLOT(le_second_grid_buffer_size_slot()));
         QObject::connect(b_compile_intermediate_data_into_video, SIGNAL(clicked()), Recorder, SLOT(b_compile_intermediate_data_into_video_slot()));
         QObject::connect(b_clear_intermediate_data, SIGNAL(clicked()), Recorder, SLOT(b_clear_intermediate_data_slot()));
         QObject::connect(b_delete_all_intermediate_data_from_disk, SIGNAL(clicked()), Recorder, SLOT(b_delete_all_intermediate_data_from_disk_slot()));
         QObject::connect(b_new_recording, SIGNAL(clicked()), Recorder, SLOT(b_new_recording_slot()));
+        QObject::connect(b_pause_recording, SIGNAL(clicked()), Recorder, SLOT(b_pause_recording_slot()));
+        QObject::connect(le_log_every_n_tick, SIGNAL(returnPressed()), Recorder, SLOT(le_log_every_n_tick_slot()));
 
         tabWidget->setCurrentIndex(0);
 
@@ -209,12 +210,13 @@ public:
         Recorder->setWindowTitle(QApplication::translate("Recorder", "Recorder", nullptr));
         label->setText(QApplication::translate("Recorder", "Number of pixels per world block", nullptr));
         b_create_image->setText(QApplication::translate("Recorder", "Create image", nullptr));
-        label_2->setText(QApplication::translate("Recorder", "First grid buffer size", nullptr));
+        label_2->setText(QApplication::translate("Recorder", "Grid buffer size", nullptr));
+        label_3->setText(QApplication::translate("Recorder", "Log every n tick: ", nullptr));
         b_new_recording->setText(QApplication::translate("Recorder", "New recording", nullptr));
         b_start_recording->setText(QApplication::translate("Recorder", "Start recording", nullptr));
+        b_pause_recording->setText(QApplication::translate("Recorder", "Pause recording", nullptr));
         b_stop_recording->setText(QApplication::translate("Recorder", "Stop recording", nullptr));
-        lb_recording_information->setText(QApplication::translate("Recorder", "Status: Recording ||| Recorded n ticks ||| Total memory consumption n", nullptr));
-        label_3->setText(QApplication::translate("Recorder", "Second grid buffer size", nullptr));
+        lb_recording_information->setText(QApplication::translate("Recorder", "Status: Stopped ||| Recorded 0 ticks", nullptr));
         b_load_intermediate_data_location->setText(QApplication::translate("Recorder", "Load intermediate data location", nullptr));
         b_compile_intermediate_data_into_video->setText(QApplication::translate("Recorder", "Compile intermediate data into video", nullptr));
         b_clear_intermediate_data->setText(QApplication::translate("Recorder", "Clear intermediate data", nullptr));

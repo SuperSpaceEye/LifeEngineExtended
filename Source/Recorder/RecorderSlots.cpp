@@ -13,11 +13,28 @@ void Recorder::le_number_of_pixels_per_block_slot() {
 }
 
 void Recorder::le_first_grid_buffer_size_slot() {
+    int temp;
+    le_slot_lower_bound<int>(temp, temp, "int", _ui.le_first_grid_buffer_size, 1, "1");
 
+    if (temp == recd->buffer_pos) { return;}
+
+    ecp->pause_buffer_filling = true;
+    while (ecp->recording_full_grid) {}
+
+    if (temp <= recd->buffer_pos) {
+        recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
+    }
+    recd->buffer_pos = 0;
+    recd->buffer_size = temp;
+    recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));
+    recd->second_simulation_grid_buffer.shrink_to_fit();
+    ecp->pause_buffer_filling = false;
 }
 
-void Recorder::le_second_grid_buffer_size_slot() {
-
+void Recorder::le_log_every_n_tick_slot() {
+    int temp = ecp->parse_full_grid_every_n;
+    le_slot_lower_bound<int>(temp, temp, "int", _ui.le_log_every_n_tick, 1, "1");
+    ecp->parse_full_grid_every_n = temp;
 }
 
 //==================== Buttons edits ====================
@@ -68,10 +85,42 @@ void Recorder::b_create_image_slot() {
     engine->unpause();
 }
 
-void Recorder::b_start_recording_slot(){}
-void Recorder::b_stop_recording_slot(){}
+void Recorder::b_start_recording_slot() {
+    //if already recording
+    if (ecp->record_full_grid) { return;}
+    if (recd->path_to_save.empty()) {
+        display_message("Make new recording to start.");
+        return;
+    }
+
+    if (!recording_paused) {
+        recd->buffer_pos = 0;
+        recd->recorded_states = 0;
+        recd->saved_buffers = 0;
+        recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));
+    }
+
+    recording_paused = false;
+    ecp->record_full_grid = true;
+}
+
+void Recorder::b_stop_recording_slot() {
+    ecp->record_full_grid = false;
+    while (ecp->recording_full_grid) {}
+
+    recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
+
+    b_clear_intermediate_data_slot();
+}
+
+void Recorder::b_pause_recording_slot() {
+    ecp->record_full_grid = false;
+    recording_paused = true;
+    while (ecp->recording_full_grid) {}
+}
+
 void Recorder::b_load_intermediate_data_location_slot() {
-    if (ecp->parse_full_grid) {
+    if (ecp->record_full_grid && !recording_paused) {
         display_message("Program is still recording. Stop the recording first to load intermediate data.");
         return;
     }
@@ -83,31 +132,55 @@ void Recorder::b_load_intermediate_data_location_slot() {
         return;
     }
 
-    edc->second_simulation_grid_buffer.clear();
-    second_buffer.clear();
+    recd->second_simulation_grid_buffer.clear();
 
-    dir_path_of_new_recording = dir_name.toStdString();
+    int number_of_files = 0;
+    int total_recorded = 0;
+
+    for (auto & file: std::filesystem::directory_iterator(recd->path_to_save)) {
+        int width;
+        int height;
+        int pos;
+        auto path = file.path().string();
+        recd->load_info_buffer_data(path, width, height, pos);
+        if (width != edc->simulation_width || height != edc->simulation_height) {
+            return;
+        }
+
+        number_of_files++;
+        total_recorded+=pos;
+    }
+
+    recd->path_to_save = dir_name.toStdString();
 }
 
-void Recorder::b_compile_intermediate_data_into_video_slot(){}
+void Recorder::b_compile_intermediate_data_into_video_slot() {
+    if (ecp->record_full_grid && !recording_paused) {
+        display_message("Program is still recording. Stop the recording first to compile intermediate data into video.");
+        return;
+    }
+}
 
 void Recorder::b_clear_intermediate_data_slot() {
-    if (ecp->parse_full_grid) {
+    if (ecp->record_full_grid && !recording_paused) {
         display_message("Program is still recording. Stop the recording first to clear intermediate data.");
         return;
     }
+    recd->buffer_pos = 0;
+    recd->recorded_states = 0;
+    recd->path_to_save = "";
+    recording_paused = false;
 
-    edc->second_simulation_grid_buffer.clear();
-    second_buffer.clear();
+    recd->second_simulation_grid_buffer.clear();
+    recd->second_simulation_grid_buffer.shrink_to_fit();
 }
 
 void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
-    if (ecp->parse_full_grid) {
+    if (ecp->record_full_grid && !recording_paused) {
         display_message("Program is still recording. Stop the recording first to delete intermediate data.");
         return;
     }
-    edc->second_simulation_grid_buffer.clear();
-    second_buffer.clear();
+    b_clear_intermediate_data_slot();
 
     auto path = QCoreApplication::applicationDirPath().toStdString() + "/temp";
 
@@ -122,6 +195,11 @@ void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
 }
 
 void Recorder::b_new_recording_slot() {
+    if (ecp->record_full_grid && !recording_paused) {
+        display_message("Program is still recording. Stop the recording first to start new recording.");
+        return;
+    }
+    b_clear_intermediate_data_slot();
     auto path = QCoreApplication::applicationDirPath().toStdString();
-    dir_path_of_new_recording = new_recording(path);
+    recd->path_to_save = new_recording(path);
 }

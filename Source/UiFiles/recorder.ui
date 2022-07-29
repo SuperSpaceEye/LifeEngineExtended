@@ -91,12 +91,26 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>First grid buffer size</string>
+            <string>Grid buffer size</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="le_first_grid_buffer_size"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Log every n tick: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_log_every_n_tick"/>
          </item>
         </layout>
        </item>
@@ -117,6 +131,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="b_pause_recording">
+           <property name="text">
+            <string>Pause recording</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="b_stop_recording">
            <property name="text">
             <string>Stop recording</string>
@@ -128,7 +149,7 @@
        <item>
         <widget class="QLabel" name="lb_recording_information">
          <property name="text">
-          <string>Status: Recording ||| Recorded n ticks ||| Total memory consumption n</string>
+          <string>Status: Stopped ||| Recorded 0 ticks</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -136,29 +157,11 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Second grid buffer size</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="le_second_grid_buffer_size"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QPushButton" name="b_load_intermediate_data_location">
-           <property name="text">
-            <string>Load intermediate data location</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QPushButton" name="b_load_intermediate_data_location">
+         <property name="text">
+          <string>Load intermediate data location</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="b_compile_intermediate_data_into_video">
@@ -299,22 +302,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>le_second_grid_buffer_size</sender>
-   <signal>returnPressed()</signal>
-   <receiver>Recorder</receiver>
-   <slot>le_second_grid_buffer_size_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>530</x>
-     <y>469</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>449</x>
-     <y>336</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>b_compile_intermediate_data_into_video</sender>
    <signal>clicked()</signal>
    <receiver>Recorder</receiver>
@@ -378,6 +365,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_pause_recording</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_pause_recording_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_log_every_n_tick</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_log_every_n_tick_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>509</x>
+     <y>332</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>le_number_of_pixels_per_block_slot()</slot>
@@ -385,11 +404,12 @@
   <slot>le_first_grid_buffer_size_slot()</slot>
   <slot>b_start_recording_slot()</slot>
   <slot>b_stop_recording_slot()</slot>
-  <slot>le_second_grid_buffer_size_slot()</slot>
   <slot>b_load_intermediate_data_location_slot()</slot>
   <slot>b_compile_intermediate_data_into_video_slot()</slot>
   <slot>b_clear_intermediate_data_slot()</slot>
   <slot>b_delete_all_intermediate_data_from_disk_slot()</slot>
   <slot>b_new_recording_slot()</slot>
+  <slot>b_pause_recording_slot()</slot>
+  <slot>le_log_every_n_tick_slot()</slot>
  </slots>
 </ui>

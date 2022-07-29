@@ -56,8 +56,9 @@ struct EngineControlParameters {
 
     volatile bool update_editor_organism = false;
 
-    volatile bool parse_full_grid = false;
-    volatile bool pause_buffer_filling = true;
+    volatile bool record_full_grid = false;
+    volatile bool recording_full_grid = false;
+    volatile bool pause_buffer_filling = false;
     volatile int  parse_full_grid_every_n = 1;
 
     uint8_t num_threads = 2;

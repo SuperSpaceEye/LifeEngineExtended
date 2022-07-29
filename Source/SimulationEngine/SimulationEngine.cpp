@@ -11,8 +11,10 @@
 SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
                                    EngineControlParameters &engine_control_parameters,
                                    OrganismBlockParameters &organism_block_parameters,
-                                   SimulationParameters &simulation_parameters) :
-        edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters){
+                                   SimulationParameters &simulation_parameters,
+                                   RecordingData * recording_data) :
+        edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters),
+        recd(recording_data){
 
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -41,7 +43,6 @@ void SimulationEngine::threaded_mainloop() {
         }
         if (ecp.engine_pause || ecp.engine_global_pause) { ecp.engine_paused = true; } else { ecp.engine_paused = false;}
         process_user_action_pool();
-        if (ecp.parse_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
         if ((!ecp.engine_paused || ecp.engine_pass_tick) && (!ecp.pause_button_pause || ecp.pass_tick)) {
             //TODO the cause of rare segfault could be here
             simulation_tick();
@@ -49,6 +50,7 @@ void SimulationEngine::threaded_mainloop() {
             ecp.engine_pass_tick = false;
             ecp.pass_tick = false;
             ecp.synchronise_simulation_tick = false;
+            if (ecp.record_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (ecp.calculate_simulation_tick_delta_time) { edc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
             if (!edc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(edc.simulation_interval * 1000000 - edc.delta_time)));}
@@ -466,14 +468,18 @@ void SimulationEngine::parse_full_simulation_grid() {
 
 void SimulationEngine::parse_full_simulation_grid_to_buffer() {
     while (ecp.pause_buffer_filling) {}
+    ecp.recording_full_grid = true;
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
-            edc.second_simulation_grid_buffer[edc.buffer_pos][x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid_buffer[edc.buffer_pos][x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+            recd->second_simulation_grid_buffer[recd->buffer_pos][x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            recd->second_simulation_grid_buffer[recd->buffer_pos][x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
-    edc.buffer_pos++;
-    if (edc.buffer_pos == edc.buffer_size) {
-        ecp.pause_buffer_filling = true;
+    recd->buffer_pos++;
+    recd->recorded_states++;
+    if (recd->buffer_pos >= recd->buffer_size) {
+        recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc.simulation_width, edc.simulation_height, recd->second_simulation_grid_buffer);
+        recd->buffer_pos = 0;
     }
+    ecp.recording_full_grid = false;
 }

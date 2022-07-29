@@ -49,6 +49,7 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
 void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
     if (organism->anatomy._producer_blocks == 0) {return;}
     if (organism->anatomy._mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
+    //TODO delete?
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp->simplified_food_production) {

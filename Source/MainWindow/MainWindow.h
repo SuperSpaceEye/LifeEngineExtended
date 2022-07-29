@@ -53,6 +53,7 @@
 #include "../Stuff/MiscFuncs.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/Vector2.h"
+#include "../Containers/CPU/RecordingContainer.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -94,6 +95,7 @@ private:
     EngineControlParameters ecp;
     EngineDataContainer edc;
     OrganismBlockParameters bp;
+    RecordingData recd;
 
     Ui::MainWindow _ui{};
     QTimer * timer;
@@ -107,7 +109,7 @@ private:
     OrganismEditor ee;
     StatisticsCore s;
     InfoWindow iw{&_ui};
-    Recorder rec{&_ui, &edc, &ecp, &cc, &textures};
+    Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -275,9 +277,6 @@ private:
 
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
     void initialize_gui();
-
-    // converts num bytes to string of shortened number with postfix (like 14 KiB)
-    static std::string convert_num_bytes(uint64_t num_bytes);
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;

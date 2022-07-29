@@ -66,14 +66,14 @@ private:
     SimulationEngine * engine = nullptr;
     ColorContainer * cc = nullptr;
     Textures * textures = nullptr;
-
-    std::vector<std::vector<BaseGridBlock>> second_buffer;
+    RecordingData * recd;
 
     const std::vector<std::string> months{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
     std::string dir_path_of_new_recording;
 
     int num_pixels_per_block = 5;
+    bool recording_paused = false;
 
     void closeEvent(QCloseEvent * event) override;
 
@@ -87,17 +87,22 @@ private:
     void init_gui();
 
     std::string new_recording(std::string path);
+
+    void write_intermediate_data(){};
+    static std::string get_string_date();
 public:
-    Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures);
+    Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures,
+             RecordingData * recording_data);
 
     OrganismAvgBlockInformation parse_organisms_info();
 
     void set_engine(SimulationEngine * engine);
 
+    void update_label();
 private slots:
     void le_number_of_pixels_per_block_slot();
     void le_first_grid_buffer_size_slot();
-    void le_second_grid_buffer_size_slot();
+    void le_log_every_n_tick_slot();
 
     void b_create_image_slot();
     void b_start_recording_slot();
@@ -107,8 +112,7 @@ private slots:
     void b_clear_intermediate_data_slot();
     void b_delete_all_intermediate_data_from_disk_slot();
     void b_new_recording_slot();
-
-    static std::string get_string_date() ;
+    void b_pause_recording_slot();
 };
 
 #endif //LIFEENGINEEXTENDED_RECORDER_H

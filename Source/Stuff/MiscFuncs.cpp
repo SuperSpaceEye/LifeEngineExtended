@@ -20,3 +20,15 @@ void display_message(const std::string &message) {
     msg.setWindowTitle("Warning");
     msg.exec();
 }
+
+std::string convert_num_bytes(uint64_t num_bytes) {
+    if (!(num_bytes/1024)) {return std::to_string(num_bytes) + " B";}
+    double d_num_bytes = num_bytes/1024;
+    if(!uint64_t(d_num_bytes/1024)) {return to_str(d_num_bytes, 1) + "KiB";}
+    d_num_bytes /= 1024;
+    if(!uint64_t(d_num_bytes/1024)) {return to_str(d_num_bytes, 1) + "MiB";}
+    d_num_bytes /= 1024;
+    if(!uint64_t(d_num_bytes/1024)) {return to_str(d_num_bytes, 1) + "GiB";}
+    d_num_bytes /= 1024;
+    return to_str(d_num_bytes, 1) + "TiB";
+}

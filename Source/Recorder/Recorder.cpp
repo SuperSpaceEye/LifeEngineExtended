@@ -4,8 +4,9 @@
 
 #include "Recorder.h"
 
-Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures):
-    parent_ui(_parent_ui), edc(edc), ecp(ecp), cc(cc), textures(textures) {
+Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures,
+                   RecordingData * recording_data):
+    parent_ui(_parent_ui), edc(edc), ecp(ecp), cc(cc), textures(textures), recd(recording_data) {
     _ui.setupUi(this);
     init_gui();
 }
@@ -374,6 +375,8 @@ color & Recorder::get_texture_color(BlockTypes type, Rotation rotation, float re
 
 void Recorder::init_gui() {
     _ui.le_number_or_pixels_per_block->setText(QString::fromStdString(std::to_string(num_pixels_per_block)));
+    _ui.le_log_every_n_tick->setText(QString::fromStdString(std::to_string(ecp->parse_full_grid_every_n)));
+    _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(recd->buffer_size)));
 }
 
 std::string Recorder::new_recording(std::string path) {
@@ -394,7 +397,34 @@ std::string Recorder::get_string_date() {
     return date;
 }
 
-
+void Recorder::update_label() {
+    std::string status;
+    if (ecp->record_full_grid) {
+        status = "Recording";
+    } else {
+        if (recording_paused) {
+            status = "Paused";
+        } else {
+            if (recd->path_to_save.empty()) {
+                status = "No recording";
+            } else {
+                status = "Stopped";
+            }
+        }
+    }
+    std::string rec_states = std::to_string(recd->recorded_states);
+    std::string size_of_recording = "0 B";
+    if (ecp->record_full_grid || recording_paused) {
+        uint64_t size = 0;
+        for (auto & entry: std::filesystem::directory_iterator(recd->path_to_save)) {
+            size += entry.file_size();
+        }
+        size_of_recording = convert_num_bytes(size);
+    }
+    std::string buffer_filling = std::to_string(recd->buffer_pos) + "/" + std::to_string(recd->buffer_size);
+    std::string str = "Status: " + status + " ||| Recorded " + rec_states + " ticks ||| Buffer filling: " + buffer_filling  + " ||| Recording size on disk: " + size_of_recording;
+    _ui.lb_recording_information->setText(QString::fromStdString(str));
+}
 
 
 

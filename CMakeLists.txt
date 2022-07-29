@@ -23,8 +23,8 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
-set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Organism/CUDA/CUDA_Anatomy.cuh Source/Organism/CUDA/CUDA_Brain.cuh Source/Organism/CUDA/CUDA_Organism.cuh Source/Containers/CUDA/CUDAEngineDataContainer.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
-set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Organism/CUDA/CUDA_Anatomy.cu Source/Organism/CUDA/CUDA_Brain.cu Source/Organism/CUDA/CUDA_Organism.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
+set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
+set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
 set(WIN_COMPILATION 0)
 
@@ -61,7 +61,7 @@ find_package(Qt5 COMPONENTS
 #        Charts
         REQUIRED)
 
-find_package(Boost COMPONENTS random filesystem REQUIRED)
+find_package(Boost COMPONENTS random REQUIRED)
 
 message(STATUS ${Boost_VERSION})
 
@@ -83,7 +83,7 @@ endif()
 
 #Source/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp Source/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.h
 
-set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/SimulationEngine/SimulationEngine.h Source/MainWindow/MainWindow.cpp Source/MainWindow/MainWindow.h Source/Organism/CPU/Organism.cpp Source/Organism/CPU/Organism.h Source/GridBlocks/BaseGridBlock.h Source/Containers/CPU/ColorContainer.h Source/Organism/CPU/Anatomy.cpp Source/Organism/CPU/Anatomy.h Source/Stuff/BlockTypes.hpp Source/Containers/CPU/SimulationParameters.h Source/Containers/CPU/EngineControlParametersContainer.h Source/Containers/CPU/OrganismBlockParameters.h Source/Stuff/Linspace.h Source/MainWindow/WindowUI.h Source/MainWindow/MainWindowSlots.cpp Source/MainWindow/MainWindowEvents.cpp Source/Organism/CPU/Brain.cpp Source/Organism/CPU/Brain.h Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp Source/Stuff/Actions.h Source/PRNGS/xorshf96.h Source/PRNGS/RandomGenerator.h Source/Stuff/textures.h Source/Organism/CPU/ObservationStuff.h Source/GridBlocks/AtomicGridBlock.h Source/MainWindow/MainWindowDataSavingStuff.cpp Source/Statistics/StatisticsCore.h Source/OrganismEditor/OrganismEditor.h Source/OrganismEditor/OrganismEditor.cpp Source/OrganismEditor/OrganismEditorSlots.cpp Source/Stuff/MiscFuncs.h Source/Stuff/MiscFuncs.cpp Source/Stuff/PerlinNoise.hpp Source/OrganismEditor/OrganismEditorDataSaving.cpp Source/InfoWindow/InfoWindowUI.h Source/InfoWindow/InfoWindow.cpp Source/InfoWindow/InfoWindow.h Source/Recorder/RecorderWindowUI.h Source/Recorder/Recorder.cpp Source/Recorder/Recorder.h Source/Recorder/RecorderSlots.cpp)
+set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/SimulationEngine/SimulationEngine.h Source/MainWindow/MainWindow.cpp Source/MainWindow/MainWindow.h Source/Organism/CPU/Organism.cpp Source/Organism/CPU/Organism.h Source/GridBlocks/BaseGridBlock.h Source/Containers/CPU/ColorContainer.h Source/Organism/CPU/Anatomy.cpp Source/Organism/CPU/Anatomy.h Source/Stuff/BlockTypes.hpp Source/Containers/CPU/SimulationParameters.h Source/Containers/CPU/EngineControlParametersContainer.h Source/Containers/CPU/OrganismBlockParameters.h Source/Stuff/Linspace.h Source/MainWindow/WindowUI.h Source/MainWindow/MainWindowSlots.cpp Source/MainWindow/MainWindowEvents.cpp Source/Organism/CPU/Brain.cpp Source/Organism/CPU/Brain.h Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp Source/Stuff/Actions.h Source/PRNGS/xorshf96.h Source/PRNGS/RandomGenerator.h Source/Stuff/textures.h Source/Organism/CPU/ObservationStuff.h Source/GridBlocks/AtomicGridBlock.h Source/MainWindow/MainWindowDataSavingStuff.cpp Source/Statistics/StatisticsCore.h Source/OrganismEditor/OrganismEditor.h Source/OrganismEditor/OrganismEditor.cpp Source/OrganismEditor/OrganismEditorSlots.cpp Source/Stuff/MiscFuncs.h Source/Stuff/MiscFuncs.cpp Source/Stuff/PerlinNoise.hpp Source/OrganismEditor/OrganismEditorDataSaving.cpp Source/InfoWindow/InfoWindowUI.h Source/InfoWindow/InfoWindow.cpp Source/InfoWindow/InfoWindow.h Source/Recorder/RecorderWindowUI.h Source/Recorder/Recorder.cpp Source/Recorder/Recorder.h Source/Recorder/RecorderSlots.cpp Source/Containers/CPU/RecordingContainer.h)
 
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES})
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)

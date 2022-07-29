@@ -60,10 +60,6 @@ struct EngineDataContainer {
     std::vector<Action> user_actions_pool;
 
     Organism * selected_organism = nullptr;
-
-    std::vector<std::vector<BaseGridBlock>> second_simulation_grid_buffer;
-    int buffer_size = 500;
-    int buffer_pos = 0;
 };
 
 struct pool_changes_info {
