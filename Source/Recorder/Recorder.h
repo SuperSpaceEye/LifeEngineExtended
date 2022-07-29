@@ -25,6 +25,9 @@
 
 #if defined(__WIN32)
 #include <windows.h>
+std::string ffmpeg_path = "";
+#elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
+std::string ffmpeg_path = "ffmpeg";
 #endif
 
 struct OrganismInfoHolder {

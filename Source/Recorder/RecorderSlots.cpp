@@ -175,10 +175,11 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         display_message("No recording is loaded.");
         return;
     }
-
     ecp->record_full_grid = false;
     while (ecp->recording_full_grid) {}
+    engine->pause();
 
+    //Will be loaded from disk
     recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
 
     std::vector<unsigned char> image_vec(edc->simulation_width*edc->simulation_height*num_pixels_per_block*num_pixels_per_block*4);
@@ -200,12 +201,10 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         directories.emplace_back(std::stoi(file.path().filename().string()), file.path().string());
     }
 
-    //file paths do not come out in order, so they need sorting
+    //file paths do not come out in order, so they need to be sorted first
     std::sort(directories.begin(), directories.end(), [](std::pair<int, std::string> & a, std::pair<int, std::string> & b){
         return a.first < b.first;
     });
-
-    engine->pause();
 
     int nums = std::to_string(recd->recorded_states).length();
 
@@ -216,18 +215,29 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         int len;
         auto path = file;
         recd->load_info_buffer_data(path, width, height, len);
+        //Extending buffer if needed
         if (len > recd->buffer_size) {recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));}
         recd->load_buffer_from_disk(path, width, height, recd->buffer_size, len, recd->second_simulation_grid_buffer);
 
         for (int i = 0; i < len; i++) {
             frame_num++;
 
-            std::string frame_str = std::to_string(frame_num);
-            std::string padding = "";
-            for (int i = 0; i < nums - frame_str.length(); i++) {padding += "0";}
-            frame_str = padding + frame_str;
+            //Constructing filepath.
+            //Because windows has no glob, I need to use %nd thing. To use %nd thing every picture should be
+            //n num long. For example if I want to use %4d files need to be 0001.png, 0002.png ...
+            //It also needs to be consistent, so I am first creating padding, and add it to the string num.
+            std::string padding = std::to_string(frame_num);
+            std::string frame_str;
+            for (int i = 0; i < nums - frame_str.length(); i++) {frame_str += "0";}
+            frame_str += padding;
+            std::string image_path;
+            image_path.append(images_path_to_save);
+            image_path.append("/");
+            image_path.append(frame_str);
+            image_path.append(".png");
+//            image_path = image_path+images_path_to_save+"/"+frame_str+".png";
 
-            if (std::filesystem::exists(images_path_to_save+"/"+frame_str+".png")) { continue;}
+            if (std::filesystem::exists(image_path)) { continue;}
 
             create_image(image_vec, recd->second_simulation_grid_buffer[i]);
 
@@ -236,19 +246,17 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                          edc->simulation_height*num_pixels_per_block,
                          QImage::Format_RGB32);
 
-            image.save(QString::fromStdString(images_path_to_save+"/"+frame_str+".png"), "PNG");
+            image.save(QString::fromStdString(image_path), "PNG");
             if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1./30) {
                 clear_console();
-                std::cout << "Compiled images " + std::to_string(frame_num) + "/" + std::to_string(recd->recorded_states) + ". Do not turn off program.\n";
+                std::cout << "Compiled images " << frame_num <<  "/" << recd->recorded_states << ". Do not turn off program.\n";
             }
         }
     }
 
     auto program_root = QCoreApplication::applicationDirPath().toStdString();
 
-    std::string ffmpeg_command = "ffmpeg -framerate 60 -start_number 1 -i \"" + images_path_to_save + "/%"+ std::to_string(nums) +"d.png\" -c:v libx264 -pix_fmt yuv420p "+ program_root +"/videos/" + dir_name + ".mp4 -y";
-
-    std::cout << ffmpeg_command << "\n";
+    std::string ffmpeg_command = ffmpeg_path + " -framerate 60 -start_number 1 -i \"" + images_path_to_save + "/%"+ std::to_string(nums) +"d.png\" -c:v libx264 -pix_fmt yuv420p "+ program_root +"/videos/" + dir_name + ".mp4 -y";
 
     system(ffmpeg_command.c_str());
 
