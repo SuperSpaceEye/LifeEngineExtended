@@ -29,14 +29,13 @@ struct EngineDataContainer {
     // if -1, then unlimited
     int32_t max_organisms = -1;
     // dimensions of the simulation
-    uint32_t simulation_width = 600;
-    uint32_t simulation_height = 600;
+    uint32_t simulation_width = 200;
+    uint32_t simulation_height = 200;
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
 
     std::vector<std::vector<AtomicGridBlock>> CPU_simulation_grid;
     std::vector<Organism*> organisms;
-    std::vector<Organism*> to_place_organisms;
 
     std::vector<int> single_thread_to_erase{};
     std::vector<int> single_thread_observation_count{};
@@ -59,10 +58,6 @@ struct EngineDataContainer {
 
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> user_actions_pool;
-
-    uint32_t minimum_fixed_capacity = 100'000;
-
-    uint32_t multithread_change_every_n_ticks = 1;
 
     Organism * selected_organism = nullptr;
 };

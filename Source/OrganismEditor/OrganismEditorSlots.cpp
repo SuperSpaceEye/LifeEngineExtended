@@ -89,15 +89,15 @@ void OrganismEditor::b_save_organism_slot() {
 }
 
 void OrganismEditor::b_reset_organism_slot() {
-    for (int i = 0; i < editor_organism->anatomy->_organism_blocks.size(); i++) {
-        if (editor_organism->anatomy->_organism_blocks[i].relative_x == 0 && editor_organism->anatomy->_organism_blocks[i].relative_y == 0) {
+    for (int i = 0; i < editor_organism->anatomy._organism_blocks.size(); i++) {
+        if (editor_organism->anatomy._organism_blocks[i].relative_x == 0 && editor_organism->anatomy._organism_blocks[i].relative_y == 0) {
             continue;
         }
-        editor_organism->anatomy->_organism_blocks.erase(editor_organism->anatomy->_organism_blocks.begin() + i);
+        editor_organism->anatomy._organism_blocks.erase(editor_organism->anatomy._organism_blocks.begin() + i);
         i--;
     }
 
-    editor_organism->anatomy->set_many_blocks(editor_organism->anatomy->_organism_blocks);
+    editor_organism->anatomy.set_many_blocks(editor_organism->anatomy._organism_blocks);
     finalize_chosen_organism();
     create_image();
 }

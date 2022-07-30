@@ -1,3 +1,4 @@
+# Settings
 - **“Float number precision”** - A decorative parameter that control how many zeros after the decimal point of floats will be displayed in labels
 - **“Wait for engine to stop to render”** - If enabled, will send an engine a signal to stop before rendering simulation grid.
 - **“Simplified rendering”** - If enabled, will not render eyes. Will be removed soon.

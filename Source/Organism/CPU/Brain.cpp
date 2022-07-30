@@ -9,12 +9,14 @@
 #include "Brain.h"
 #include "ObservationStuff.h"
 
-Brain::Brain(std::shared_ptr<Brain> & brain): brain_type(brain->brain_type){
-    simple_action_table = copy_parents_table(brain->simple_action_table);
-}
+Brain::Brain(Brain & brain): brain_type(brain.brain_type), simple_action_table(copy_parents_table(brain.simple_action_table)) {}
 
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
+void Brain::set_simple_action_table(Brain brain) {
+    brain_type = brain.brain_type;
+    simple_action_table = brain.simple_action_table;
+}
 
 DecisionObservation Brain::get_random_action(lehmer64 &mt) {
 //    return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(gen));
@@ -149,8 +151,8 @@ DecisionObservation Brain::get_decision(std::vector<Observation> &observation_ve
     return action;
 }
 
-Brain * Brain::mutate(lehmer64 &mt) {
-    auto new_brain = new Brain(brain_type);
-    new_brain->simple_action_table = mutate_action_table(simple_action_table, mt);
+Brain Brain::mutate(lehmer64 &mt) {
+    auto new_brain = Brain(brain_type);
+    new_brain.simple_action_table = mutate_action_table(simple_action_table, mt);
     return new_brain;
 }

@@ -141,5 +141,10 @@ void le_slot_lower_lower_bound(T & _fallback,
     to_change = result.result;
 }
 
+std::string convert_num_bytes(uint64_t num_bytes);
+
+void clear_console();
+
+std::string convert_seconds(uint64_t num_seconds);
 
 #endif //THELIFEENGINECPP_MISCFUNCS_H

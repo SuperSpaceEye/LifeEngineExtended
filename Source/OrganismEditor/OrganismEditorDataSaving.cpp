@@ -7,11 +7,11 @@
 //TODO remove duplicate code.
 
 void OrganismEditor::read_organism(std::ifstream &is) {
-    auto brain = std::make_shared<Brain>();
-    auto anatomy = std::make_shared<Anatomy>();
+    auto brain = Brain();
+    auto anatomy = Anatomy();
 
-    read_organism_brain(is, brain.get());
-    read_organism_anatomy(is, anatomy.get());
+    read_organism_brain(is, &brain);
+    read_organism_anatomy(is, &anatomy);
 
     auto * organism = new Organism(0,
                                    0,
@@ -75,8 +75,8 @@ void OrganismEditor::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy)
 }
 
 void OrganismEditor::write_organism(std::ofstream& os) {
-    write_organism_brain(os,   editor_organism->brain.get());
-    write_organism_anatomy(os, editor_organism->anatomy.get());
+    write_organism_brain(os,   &editor_organism->brain);
+    write_organism_anatomy(os, &editor_organism->anatomy);
     write_organism_data(os,    editor_organism);
 }
 
@@ -141,8 +141,8 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
         return;
     }
 
-    auto brain = std::make_shared<Brain>();
-    auto anatomy = std::make_shared<Anatomy>();
+    auto brain = Brain();
+    auto anatomy = Anatomy();
 
     int y                = organism["r"].GetInt()+1;
     int x                = organism["c"].GetInt()+1;
@@ -179,10 +179,10 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
 
         block_data.emplace_back(type, _rotation, l_x, l_y);
     }
-    anatomy->set_many_blocks(block_data);
+    anatomy.set_many_blocks(block_data);
 
     if (is_mover && has_eyes) {
-        auto & table = brain->simple_action_table;
+        auto & table = brain.simple_action_table;
         table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
         table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
         table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
@@ -230,11 +230,11 @@ void OrganismEditor::write_json_organism(std::string &full_path) {
     j_organism.AddMember("damage",           Value(editor_organism->damage), j_organism.GetAllocator());
 
     j_anatomy.AddMember("birth_distance", Value(6), j_organism.GetAllocator());
-    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(editor_organism->anatomy->_producer_blocks)), j_organism.GetAllocator());
-    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(editor_organism->anatomy->_mover_blocks)), j_organism.GetAllocator());
-    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(editor_organism->anatomy->_eye_blocks)), j_organism.GetAllocator());
+    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(editor_organism->anatomy._producer_blocks)), j_organism.GetAllocator());
+    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(editor_organism->anatomy._mover_blocks)), j_organism.GetAllocator());
+    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(editor_organism->anatomy._eye_blocks)), j_organism.GetAllocator());
 
-    for (auto & block: editor_organism->anatomy->_organism_blocks) {
+    for (auto & block: editor_organism->anatomy._organism_blocks) {
         Value cell(kObjectType);
         std::string state_name;
 
@@ -267,7 +267,7 @@ void OrganismEditor::write_json_organism(std::string &full_path) {
 
     j_organism.AddMember("anatomy", j_anatomy, j_organism.GetAllocator());
 
-    auto & table = editor_organism->brain->simple_action_table;
+    auto & table = editor_organism->brain.simple_action_table;
 
     Value decisions(kObjectType);
 

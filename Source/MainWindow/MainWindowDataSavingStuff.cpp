@@ -71,8 +71,8 @@ void MainWindow::write_organisms(std::ofstream& os) {
     uint32_t size = edc.organisms.size();
     os.write((char*)&size, sizeof(uint32_t));
     for (auto & organism: edc.organisms) {
-        write_organism_brain(os,   organism->brain.get());
-        write_organism_anatomy(os, organism->anatomy.get());
+        write_organism_brain(os,   &organism->brain);
+        write_organism_anatomy(os, &organism->anatomy);
         write_organism_data(os,    organism);
     }
 }
@@ -239,11 +239,11 @@ bool MainWindow::read_organisms(std::ifstream& is) {
 
     edc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
-        auto brain = std::make_shared<Brain>();
-        auto anatomy = std::make_shared<Anatomy>();
+        auto brain = Brain();
+        auto anatomy = Anatomy();
 
-        read_organism_brain(is, brain.get());
-        read_organism_anatomy(is, anatomy.get());
+        read_organism_brain(is, &brain);
+        read_organism_anatomy(is, &anatomy);
 
         auto * organism = new Organism(0,
                                        0,
@@ -440,8 +440,8 @@ void MainWindow::json_read_simulation_parameters(rapidjson::Document & d) {
 
 void MainWindow::json_read_organisms_data(rapidjson::Document & d) {
     for (auto & organism: d["organisms"].GetArray()) {
-        auto brain = std::make_shared<Brain>();
-        auto anatomy = std::make_shared<Anatomy>();
+        auto brain = Brain();
+        auto anatomy = Anatomy();
 
         int y                = organism["r"].GetInt()+1;
         int x                = organism["c"].GetInt()+1;
@@ -481,10 +481,10 @@ void MainWindow::json_read_organisms_data(rapidjson::Document & d) {
 
             block_data.emplace_back(type, _rotation, l_x, l_y);
         }
-        anatomy->set_many_blocks(block_data);
+        anatomy.set_many_blocks(block_data);
 
         if (is_mover && has_eyes) {
-            auto & table = brain->simple_action_table;
+            auto & table = brain.simple_action_table;
             table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
             table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
             table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
@@ -603,11 +603,11 @@ void MainWindow::write_json_organism(Document &d, Organism *&organism, Value &j_
     j_organism.AddMember("damage",           Value(organism->damage), d.GetAllocator());
 
     j_anatomy.AddMember("birth_distance", Value(6), d.GetAllocator());
-    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy->_producer_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy->_mover_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy->_eye_blocks)), d.GetAllocator());
+    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
+    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
+    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
 
-    for (auto & block: organism->anatomy->_organism_blocks) {
+    for (auto & block: organism->anatomy._organism_blocks) {
         Value cell(kObjectType);
         std::string state_name;
 
@@ -639,7 +639,7 @@ void MainWindow::write_json_organism(Document &d, Organism *&organism, Value &j_
 
     j_organism.AddMember("anatomy", j_anatomy, d.GetAllocator());
 
-    auto & table = organism->brain->simple_action_table;
+    auto & table = organism->brain.simple_action_table;
 
     Value decisions(kObjectType);
 
