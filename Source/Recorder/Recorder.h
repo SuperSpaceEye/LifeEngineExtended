@@ -25,6 +25,7 @@
 
 #if defined(__WIN32)
 #include <windows.h>
+#include <cwchar>
 #endif
 
 struct OrganismInfoHolder {
@@ -75,7 +76,7 @@ private:
     const std::vector<std::string> months{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
     #if defined(__WIN32)
-    std::string ffmpeg_path = "";
+    std::string ffmpeg_path = "ffmpeg";
     #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
     std::string ffmpeg_path = "ffmpeg";
     #endif

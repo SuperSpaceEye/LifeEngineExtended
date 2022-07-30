@@ -197,6 +197,21 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
     auto point = std::chrono::high_resolution_clock::now();
 #if defined(__WIN32)
     ShowWindow(GetConsoleWindow(), SW_SHOW);
+    auto console = GetConsoleWindow();
+    RECT r;
+    GetWindowRect(console, &r);
+
+    MoveWindow(console, r.left, r.top, 200, 100, TRUE);
+
+    CONSOLE_FONT_INFOEX cfi;
+    cfi.cbSize = sizeof(cfi);
+    cfi.nFont = 0;
+    cfi.dwFontSize.X = 0;                   // Width of each character in the font
+    cfi.dwFontSize.Y = 24;                  // Height
+    cfi.FontFamily = FF_DONTCARE;
+    cfi.FontWeight = FW_NORMAL;
+    std::wcscpy(cfi.FaceName, L"Consolas"); // Choose your font
+    SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);
 #endif
 
     std::vector<std::pair<int, std::string>> directories;
@@ -232,7 +247,7 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
             //It also needs to be consistent, so I am first creating padding, and add it to the string num.
             std::string padding = std::to_string(frame_num);
             std::string frame_str;
-            for (int i = 0; i < nums - frame_str.length(); i++) {frame_str += "0";}
+            for (int i = 0; i < nums - padding.length(); i++) {frame_str += "0";}
             frame_str += padding;
             std::string image_path;
             image_path.append(images_path_to_save);
@@ -258,16 +273,23 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         }
     }
 
+    clear_console();
+    std::cout << "Video is being created. Do not turn off the program.\n";
+
     auto program_root = QCoreApplication::applicationDirPath().toStdString();
 
     std::string ffmpeg_command = ffmpeg_path + " -framerate " + std::to_string(video_fps) + " -start_number 1 -i \"" + images_path_to_save + "/%"+ std::to_string(nums) +"d.png\" -c:v libx264 -pix_fmt yuv420p "+ program_root +"/videos/" + dir_name + ".mp4 -y";
 
+    #ifdef __WIN32
+    _popen(ffmpeg_command.c_str(), "rt");
+    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
     system(ffmpeg_command.c_str());
+    #endif
 
     engine->unpause();
 
 #if defined(__WIN32)
-    ShowWindow(GetConsoleWindow(), SW_SHOW);
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
 #endif
 }
 
@@ -296,7 +318,7 @@ void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
 
     std::vector<std::string> subdirectories;
     for (const auto & entry: std::filesystem::directory_iterator(path)) {
-        subdirectories.emplace_back(entry.path());
+        subdirectories.emplace_back(entry.path().string());
     }
 
     for (auto & dir: subdirectories) {
