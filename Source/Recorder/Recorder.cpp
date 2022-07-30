@@ -427,7 +427,15 @@ void Recorder::update_label() {
     _ui.lb_recording_information->setText(QString::fromStdString(str));
 }
 
+void Recorder::clear_data() {
+    recd->buffer_pos = 0;
+    recd->recorded_states = 0;
+    recd->path_to_save = "";
+    recording_paused = false;
 
+    recd->second_simulation_grid_buffer.clear();
+    recd->second_simulation_grid_buffer.shrink_to_fit();
+}
 
 
 

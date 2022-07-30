@@ -141,7 +141,7 @@ void Recorder::b_stop_recording_slot() {
 
     recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
 
-    b_clear_intermediate_data_slot();
+    clear_data();
 }
 
 void Recorder::b_pause_recording_slot() {
@@ -213,6 +213,8 @@ void Recorder::b_load_intermediate_data_location_slot() {
 }
 
 void Recorder::b_compile_intermediate_data_into_video_slot() {
+    if (!display_dialog_message("Compile recording into video?", false)) {return;}
+
     if (lock_recording) {
         display_message("Cannot be done until program finishes compiling recording.");
         return;
@@ -386,6 +388,8 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 }
 
 void Recorder::b_clear_intermediate_data_slot() {
+    if (!display_dialog_message("Clear intermediate data?", false)) {return;}
+
     if (lock_recording) {
         display_message("Cannot be done until program finishes compiling recording.");
         return;
@@ -395,16 +399,13 @@ void Recorder::b_clear_intermediate_data_slot() {
         display_message("Program is still recording. Stop the recording first to clear intermediate data.");
         return;
     }
-    recd->buffer_pos = 0;
-    recd->recorded_states = 0;
-    recd->path_to_save = "";
-    recording_paused = false;
-
-    recd->second_simulation_grid_buffer.clear();
-    recd->second_simulation_grid_buffer.shrink_to_fit();
+    clear_data();
 }
 
 void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
+    if (!display_dialog_message("Delete intermediate data from disk?", false)) {return;}
+    if (!display_dialog_message("Are you sure? It will delete all recording and partially compiled videos.", false)) {return;}
+
     if (lock_recording) {
         display_message("Cannot be done until program finishes compiling recording.");
         return;
@@ -414,7 +415,7 @@ void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
         display_message("Program is still recording. Stop the recording first to delete intermediate data.");
         return;
     }
-    b_clear_intermediate_data_slot();
+    clear_data();
 
     auto path = QCoreApplication::applicationDirPath().toStdString() + "/temp";
 
@@ -441,7 +442,8 @@ void Recorder::b_new_recording_slot() {
         display_message("Program is still recording. Stop the recording first to start new recording.");
         return;
     }
-    b_clear_intermediate_data_slot();
+
+    clear_data();
     auto path = QCoreApplication::applicationDirPath().toStdString();
     recd->path_to_save = new_recording(path);
 }

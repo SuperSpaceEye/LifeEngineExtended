@@ -104,6 +104,8 @@ private:
 
     void write_intermediate_data(){};
     static std::string get_string_date();
+
+    void clear_data();
 public:
     Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures,
              RecordingData * recording_data);
