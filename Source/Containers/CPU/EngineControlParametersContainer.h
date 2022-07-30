@@ -39,9 +39,6 @@ struct EngineControlParameters {
     // if true, will build the threads
     volatile bool build_threads = false;
 
-    volatile bool pause_processing_user_action = false;
-    volatile bool processing_user_actions = true;
-
     volatile bool pause_button_pause = false;
 
     volatile bool pass_tick = false;
@@ -58,6 +55,11 @@ struct EngineControlParameters {
     volatile bool change_simulation_mode = false;
 
     volatile bool update_editor_organism = false;
+
+    volatile bool record_full_grid = false;
+    volatile bool recording_full_grid = false;
+    volatile bool pause_buffer_filling = false;
+    volatile int  parse_full_grid_every_n = 1;
 
     uint8_t num_threads = 2;
 

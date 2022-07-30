@@ -21,8 +21,6 @@ void MainWindow::tb_stoprender_slot(bool state) {
     if (!really_stop_render) {
         parse_full_simulation_grid(pause_grid_parsing);
     }
-    // calculating delta time is not needed when no image is being created.
-    ecp.calculate_simulation_tick_delta_time = !ecp.calculate_simulation_tick_delta_time;
 }
 
 void MainWindow::tb_open_statistics_slot(bool state) {
@@ -105,9 +103,7 @@ void MainWindow::b_save_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
     ecp.engine_global_pause = true;
-    ecp.pause_processing_user_action = true;
     engine->wait_for_engine_to_pause_force();
-    wait_for_engine_to_pause_processing_user_actions();
 
     QString selected_filter;
     QFileDialog file_dialog{};
@@ -125,7 +121,6 @@ void MainWindow::b_save_world_slot() {
     } else {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
-        ecp.pause_processing_user_action = false;
         return;
     }
     std::string full_path = file_name.toStdString();
@@ -147,16 +142,13 @@ void MainWindow::b_save_world_slot() {
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
-    ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::b_load_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
     ecp.engine_global_pause = true;
-    ecp.pause_processing_user_action = true;
     engine->wait_for_engine_to_pause_force();
-    wait_for_engine_to_pause_processing_user_actions();
 
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
@@ -169,7 +161,6 @@ void MainWindow::b_load_world_slot() {
     } else {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
-        ecp.pause_processing_user_action = false;
         return;
     }
 
@@ -186,7 +177,6 @@ void MainWindow::b_load_world_slot() {
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
-    ecp.pause_processing_user_action = false;
     initialize_gui();
     update_table_values();
 }
@@ -204,9 +194,6 @@ void MainWindow::b_kill_all_organisms_slot() {
     engine->pause();
 
     for (auto & organism: edc.organisms) {
-        organism->lifetime = organism->max_lifetime*2;
-    }
-    for (auto & organism: edc.to_place_organisms) {
         organism->lifetime = organism->max_lifetime*2;
     }
 

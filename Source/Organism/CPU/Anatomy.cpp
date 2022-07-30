@@ -24,19 +24,19 @@ Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
     delete structure;
 }
 
-Anatomy::Anatomy(const std::shared_ptr<Anatomy>& anatomy) {
-    _organism_blocks = std::vector(anatomy->_organism_blocks);
+Anatomy::Anatomy(const Anatomy & anatomy) {
+    _organism_blocks = std::vector(anatomy._organism_blocks);
 
-    _producing_space = std::vector(anatomy->_producing_space);
-    _eating_space    = std::vector(anatomy->_eating_space);
-    _killing_space   = std::vector(anatomy->_killing_space);
+    _producing_space = std::vector(anatomy._producing_space);
+    _eating_space    = std::vector(anatomy._eating_space);
+    _killing_space   = std::vector(anatomy._killing_space);
 
-    _mouth_blocks    = anatomy->_mouth_blocks;
-    _producer_blocks = anatomy->_producer_blocks;
-    _mover_blocks    = anatomy->_mover_blocks;
-    _killer_blocks   = anatomy->_killer_blocks;
-    _armor_blocks    = anatomy->_armor_blocks;
-    _eye_blocks      = anatomy->_eye_blocks;
+    _mouth_blocks    = anatomy._mouth_blocks;
+    _producer_blocks = anatomy._producer_blocks;
+    _mover_blocks    = anatomy._mover_blocks;
+    _killer_blocks   = anatomy._killer_blocks;
+    _armor_blocks    = anatomy._armor_blocks;
+    _eye_blocks      = anatomy._eye_blocks;
 }
 
 void Anatomy::set_single_adjacent(int x, int y, int x_offset, int y_offset,

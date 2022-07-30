@@ -15,15 +15,13 @@
 #include <thrust/device_vector.h>
 #include <thrust/copy.h>
 
-#include "../../Organism/CUDA/CUDA_Organism.cuh"
-
 class SimulationEngineCuda {
 public:
     SimulationEngineCuda(int block_dim=32);
 
     int block_dim = 32;
 
-    thrust::device_vector<CUDA_Organism> cuda_organisms;
+//    thrust::device_vector<CUDA_Organism> cuda_organisms;
 
     void cuda_tick(int n=150);
 };

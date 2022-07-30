@@ -16,7 +16,7 @@
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../Organism/CPU/Organism.h"
 #include "../../Stuff/BlockTypes.hpp"
-#include "../../Containers/CPU/EngineControlContainer.h"
+#include "../../Containers/CPU/EngineControlParametersContainer.h"
 #include "../../Containers/CPU/EngineDataContainer.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "../../Stuff/Linspace.h"
@@ -61,9 +61,11 @@ public:
 
     static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen);
 
-    static void try_make_child  (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, lehmer64 *gen);
+    static void try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
+                               lehmer64 *gen);
 
-    static void place_child     (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, std::vector<Organism *> &child_organisms, lehmer64 *gen);
+    static void place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
+                            lehmer64 *gen);
 
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
 

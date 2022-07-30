@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     update_simulation_size_label();
 
-    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp));
+    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
 
     engine->make_walls();
 
@@ -51,10 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     cc = ColorContainer{};
     sp = SimulationParameters{};
 
-    auto anatomy = std::make_shared<Anatomy>();
-    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
-    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
+    auto anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
+    anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
 //    anatomy->set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
 //    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 2);
@@ -63,18 +63,20 @@ MainWindow::MainWindow(QWidget *parent) :
 //    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, 2);
 //    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 3);
 
-    auto brain = std::make_shared<Brain>(BrainTypes::SimpleBrain);
+    auto brain = Brain(BrainTypes::RandomActions);
 
     edc.base_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                      Rotation::UP, anatomy, brain, &sp, &bp, 1);
     edc.chosen_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
-                                       Rotation::UP, std::make_shared<Anatomy>(anatomy), std::make_shared<Brain>(brain),
+                                       Rotation::UP, Anatomy(anatomy), Brain(),
                                        &sp, &bp, 1);
 
     edc.base_organism->last_decision = DecisionObservation{};
     edc.chosen_organism->last_decision = DecisionObservation{};
 
-    edc.to_place_organisms.push_back(new Organism(edc.base_organism));
+    auto * organism = new Organism(edc.base_organism);
+    edc.organisms.push_back(organism);
+    SimulationEngineSingleThread::place_organism(&edc, organism);
 
     resize_image();
     reset_scale_view();
@@ -108,6 +110,15 @@ MainWindow::MainWindow(QWidget *parent) :
     cb_synchronise_simulation_and_window_slot(false);
     _ui.cb_synchronise_sim_and_win->setChecked(false);
 #endif
+
+    auto executable_path = QCoreApplication::applicationDirPath().toStdString();
+    if (!std::filesystem::exists(executable_path + "/temp")) {
+        std::filesystem::create_directory(executable_path + "/temp");
+    }
+    if (!std::filesystem::exists(executable_path + "/videos")) {
+        std::filesystem::create_directory(executable_path + "/videos");
+    }
+
 }
 
 void MainWindow::mainloop_tick() {
@@ -158,6 +169,8 @@ void MainWindow::window_tick() {
 
     if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
+
+    rec.update_label();
 
 #if __VALGRIND_MODE__ == 1
     return;
@@ -463,11 +476,6 @@ bool MainWindow::wait_for_engine_to_pause() {
     return engine->wait_for_engine_to_pause_force();
 }
 
-bool MainWindow::wait_for_engine_to_pause_processing_user_actions() {
-    while (ecp.processing_user_actions) {}
-    return !ecp.processing_user_actions;
-}
-
 void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
     for (int x: lin_width) {
         if (x < 0 || x >= edc.simulation_width) { continue; }
@@ -724,27 +732,11 @@ void MainWindow::initialize_gui() {
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.le_num_threads->hide();
     _ui.lb_set_num_threads->hide();
+    s._ui.lb_organisms_memory_consumption->hide();
 }
 
 void MainWindow::update_simulation_size_label() {
   s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
-}
-
-std::string MainWindow::convert_num_bytes(uint64_t num_bytes) {
-    uint64_t previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + " B";}
-    previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + "KiB";}
-    previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + "MiB";}
-    previous = num_bytes;
-    num_bytes /= 1024;
-    if (!num_bytes) {return std::to_string(previous) + "GiB";}
-
-    return std::to_string(num_bytes) + " TiB";
 }
 
 Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
@@ -757,8 +749,8 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
 void MainWindow::change_main_grid_left_click() {
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-    ecp.pause_processing_user_action = true;
-    wait_for_engine_to_pause_processing_user_actions();
+//    ecp.pause_processing_user_action = true;
+//    wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
@@ -781,14 +773,14 @@ void MainWindow::change_main_grid_left_click() {
         }
     }
     endfor:
-
-    ecp.pause_processing_user_action = false;
+    return;
+//    ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::change_main_grid_right_click() {
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-    ecp.pause_processing_user_action = true;
-    wait_for_engine_to_pause_processing_user_actions();
+//    ecp.pause_processing_user_action = true;
+//    wait_for_engine_to_pause_processing_user_actions();
     for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {
@@ -808,7 +800,7 @@ void MainWindow::change_main_grid_right_click() {
             }
         }
     }
-    ecp.pause_processing_user_action = false;
+//    ecp.pause_processing_user_action = false;
 }
 
 void MainWindow::change_editing_grid_left_click() {
@@ -817,7 +809,7 @@ void MainWindow::change_editing_grid_left_click() {
 
     //relative position
     auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy->set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
+    ee.editor_organism->anatomy.set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
     ee.create_image();
 }
 
@@ -825,11 +817,11 @@ void MainWindow::change_editing_grid_right_click() {
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
     if (cpg.x == ee.editor_organism->x && cpg.y == ee.editor_organism->y) {return;}
-    if (ee.editor_organism->anatomy->_organism_blocks.size() == 1) { return;}
+    if (ee.editor_organism->anatomy._organism_blocks.size() == 1) { return;}
 
     //relative position
     auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy->set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
+    ee.editor_organism->anatomy.set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
     ee.create_image();
 }
 

@@ -18,9 +18,7 @@
 #include <thread>
 #include <random>
 #include <fstream>
-#ifndef __WIN32
 #include <filesystem>
-#endif
 
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
@@ -47,7 +45,7 @@
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Containers/CPU/ColorContainer.h"
 #include "../Containers/CPU/SimulationParameters.h"
-#include "../Containers/CPU/EngineControlContainer.h"
+#include "../Containers/CPU/EngineControlParametersContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../PRNGS/lehmer64.h"
@@ -55,6 +53,7 @@
 #include "../Stuff/MiscFuncs.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/Vector2.h"
+#include "../Containers/CPU/RecordingContainer.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -96,6 +95,7 @@ private:
     EngineControlParameters ecp;
     EngineDataContainer edc;
     OrganismBlockParameters bp;
+    RecordingData recd;
 
     Ui::MainWindow _ui{};
     QTimer * timer;
@@ -109,7 +109,7 @@ private:
     OrganismEditor ee;
     StatisticsCore s;
     InfoWindow iw{&_ui};
-    Recorder rec{&_ui, &edc, &ecp, &cc, &textures};
+    Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -235,7 +235,6 @@ private:
     color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     bool wait_for_engine_to_pause();
-    bool wait_for_engine_to_pause_processing_user_actions();
 
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
@@ -278,9 +277,6 @@ private:
 
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
     void initialize_gui();
-
-    // converts num bytes to string of shortened number with postfix (like 14 KiB)
-    static std::string convert_num_bytes(uint64_t num_bytes);
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;

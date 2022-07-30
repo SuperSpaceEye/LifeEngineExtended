@@ -12,11 +12,11 @@
 #include "Rotation.h"
 #include "ObservationStuff.h"
 
-Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> anatomy,
-                   std::shared_ptr<Brain> brain, SimulationParameters *sp,
+Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy,
+                   Brain brain, SimulationParameters *sp,
                    OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
                    float brain_mutation_rate) :
-                   anatomy(std::make_shared<Anatomy>(anatomy)), sp(sp), bp(block_parameters), brain(std::make_shared<Brain>(brain)),
+                   anatomy(anatomy), sp(sp), bp(block_parameters), brain(brain),
                    OrganismData(x,
                                 y,
                                 rotation,
@@ -26,8 +26,8 @@ Organism::Organism(int x, int y, Rotation rotation, std::shared_ptr<Anatomy> ana
     init_values();
 }
 
-Organism::Organism(Organism *organism): anatomy(std::make_shared<Anatomy>(organism->anatomy)), sp(organism->sp),
-                                        bp(organism->bp), brain(std::make_shared<Brain>(organism->brain)),
+Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism->sp),
+                                        bp(organism->bp), brain(organism->brain),
                                         OrganismData(organism->x,
                                                      organism->y,
                                                      organism->rotation,
@@ -50,14 +50,14 @@ void Organism::init_values() {
     multiplier = 1;
 
     if (sp->multiply_food_production_prob) {
-        multiplier *= anatomy->_producer_blocks;
+        multiplier *= anatomy._producer_blocks;
     }
 }
 
 //TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
 float Organism::calculate_max_life() {
     life_points = 0;
-    for (auto& item: anatomy->_organism_blocks) {
+    for (auto& item: anatomy._organism_blocks) {
         switch (item.type) {
             case BlockTypes::MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
             case BlockTypes::ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
@@ -73,7 +73,7 @@ float Organism::calculate_max_life() {
 
 int Organism::calculate_organism_lifetime() {
     float lifetime_weights = 0;
-    for (auto & block: anatomy->_organism_blocks) {
+    for (auto & block: anatomy._organism_blocks) {
         switch (block.type) {
             case BlockTypes::MouthBlock:    lifetime_weights += bp->MouthBlock.   lifetime_weight; break;
             case BlockTypes::ProducerBlock: lifetime_weights += bp->ProducerBlock.lifetime_weight; break;
@@ -89,8 +89,8 @@ int Organism::calculate_organism_lifetime() {
 }
 
 float Organism::calculate_food_needed() {
-    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy->_mover_blocks > 0);
-    for (auto & block: anatomy->_organism_blocks) {
+    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._mover_blocks > 0);
+    for (auto & block: anatomy._organism_blocks) {
         switch (block.type) {
             case BlockTypes::MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
             case BlockTypes::ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
@@ -104,7 +104,7 @@ float Organism::calculate_food_needed() {
     return food_needed;
 }
 
-void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen) {
+void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen) {
     bool mutate_anatomy;
     _anatomy_mutation_rate = anatomy_mutation_rate;
 
@@ -131,18 +131,22 @@ void Organism::mutate_anatomy(std::shared_ptr<Anatomy> &new_anatomy, float &_ana
 
         int choice = std::uniform_int_distribution<int>(0, total_chance)(*gen);
 
-        if (choice < sp->add_cell) {new_anatomy.reset(new Anatomy(anatomy->add_random_block(*bp, *gen)));return;}
+        if (choice < sp->add_cell) {new_anatomy = Anatomy(anatomy.add_random_block(*bp, *gen));return;}
         choice -= sp->add_cell;
-        if (choice < sp->change_cell) {new_anatomy.reset(new Anatomy(anatomy->change_random_block(*bp, *gen)));return;}
+        if (choice < sp->change_cell) {new_anatomy = Anatomy(anatomy.change_random_block(*bp, *gen));return;}
         choice -= sp->change_cell;
-        if (choice < sp->remove_cell && anatomy->_organism_blocks.size() > sp->min_organism_size) {new_anatomy.reset(new Anatomy(anatomy->remove_random_block(*gen)));return;}
+        if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(*gen));return;}
     }
     //if not mutated.
-    new_anatomy.reset(new Anatomy(anatomy));
+    new_anatomy = Anatomy(anatomy);
 }
 
-void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_ptr<Brain> &new_brain,
+void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 *gen) {
+    if (new_anatomy._eye_blocks == 0 && new_anatomy._mover_blocks == 0) {
+        new_brain.set_simple_action_table(brain);
+    }
+
     bool mutate_brain;
     _brain_mutation_rate = brain_mutation_rate;
 
@@ -162,11 +166,11 @@ void Organism::mutate_brain(std::shared_ptr<Anatomy> &new_anatomy, std::shared_p
     }
 
     // if mutate brain
-    if (mutate_brain && new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {
-        new_brain.reset(brain->mutate(*gen));
+    if (mutate_brain) {
+        new_brain.set_simple_action_table(brain.mutate(*gen));
     } else {
         // just copy brain from parent
-        new_brain.reset(new Brain(brain));
+        new_brain.set_simple_action_table(brain);
     }
 }
 
@@ -186,8 +190,8 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
 }
 
 Organism * Organism::create_child(lehmer64 *gen) {
-    std::shared_ptr<Anatomy> new_anatomy;
-    std::shared_ptr<Brain>   new_brain;
+    Anatomy new_anatomy;
+    Brain new_brain;
 
     float _anatomy_mutation_rate = 0;
     float _brain_mutation_rate = 0;
@@ -196,8 +200,8 @@ Organism * Organism::create_child(lehmer64 *gen) {
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
     auto child_move_range = mutate_move_range(sp, gen, move_range);
 
-    if (new_anatomy->_eye_blocks > 0 && new_anatomy->_mover_blocks > 0) {new_brain->brain_type = BrainTypes::SimpleBrain;}
-    else {new_brain->brain_type = BrainTypes::RandomActions;}
+    if (new_anatomy._eye_blocks > 0 && new_anatomy._mover_blocks > 0) {new_brain.brain_type = BrainTypes::SimpleBrain;}
+    else {new_brain.brain_type = BrainTypes::RandomActions;}
 
     return new Organism(0,
                         0,
@@ -213,7 +217,7 @@ Organism * Organism::create_child(lehmer64 *gen) {
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
     if (move_counter == 0) { //if organism can make new move
-        auto new_decision = brain->get_decision(organism_observations, rotation, *mt);
+        auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
         if (new_decision.decision != BrainDecision::DoNothing
             && new_decision.observation.distance > last_decision.observation.distance) {
             last_decision = new_decision;
@@ -227,7 +231,7 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
         }
 
         if (last_decision.time > max_do_nothing_lifetime) {
-            last_decision = brain->get_random_action(*mt);
+            last_decision = brain.get_random_action(*mt);
             return;
         }
 
