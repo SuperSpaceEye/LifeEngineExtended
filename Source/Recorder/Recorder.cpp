@@ -213,16 +213,17 @@ OrganismAvgBlockInformation Recorder::parse_organisms_info() {
     return info;
 }
 
-void Recorder::create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid) {
-    auto image_width  = edc->simulation_width  * num_pixels_per_block;
-    auto image_height = edc->simulation_height * num_pixels_per_block;
+void Recorder::create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid,
+                            int simulation_width, int simulation_height, int num_pixels_per_block) {
+    auto image_width  = simulation_width  * num_pixels_per_block;
+    auto image_height = simulation_height * num_pixels_per_block;
 
     // start and y coordinates on simulation grid
     auto start_x = 0;
-    auto end_x = edc->simulation_width;
+    auto end_x = simulation_width;
 
     auto start_y = 0;
-    auto end_y = edc->simulation_height;
+    auto end_y = simulation_height;
 
     std::vector<int> lin_width;
     std::vector<int> lin_height;
@@ -412,6 +413,7 @@ void Recorder::update_label() {
         }
     }
     std::string rec_states = std::to_string(recd->recorded_states);
+    std::string buffer_filling = std::to_string(recd->buffer_pos) + "/" + std::to_string(recd->buffer_size);
     std::string size_of_recording = "0 B";
     if (ecp->record_full_grid || recording_paused) {
         uint64_t size = 0;
@@ -420,8 +422,8 @@ void Recorder::update_label() {
         }
         size_of_recording = convert_num_bytes(size);
     }
-    std::string buffer_filling = std::to_string(recd->buffer_pos) + "/" + std::to_string(recd->buffer_size);
-    std::string str = "Status: " + status + " ||| Recorded " + rec_states + " ticks ||| Buffer filling: " + buffer_filling  + " ||| Recording size on disk: " + size_of_recording;
+    std::string time_length_of_recording = convert_seconds(recd->recorded_states / video_fps);
+    std::string str = "Status: " + status + " ||| Recorded " + rec_states + " ticks ||| Buffer filling: " + buffer_filling  + " ||| Recording size on disk: " + size_of_recording + " ||| Time length of recording with " + std::to_string(video_fps) + " fps: " + time_length_of_recording;
     _ui.lb_recording_information->setText(QString::fromStdString(str));
 }
 

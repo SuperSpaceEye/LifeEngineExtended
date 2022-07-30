@@ -60,6 +60,7 @@ struct EngineControlParameters {
     volatile bool recording_full_grid = false;
     volatile bool pause_buffer_filling = false;
     volatile int  parse_full_grid_every_n = 1;
+    volatile bool lock_resizing = false;
 
     uint8_t num_threads = 2;
 

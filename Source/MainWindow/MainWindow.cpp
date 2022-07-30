@@ -131,9 +131,9 @@ void MainWindow::mainloop_tick() {
     window_tick();
     window_frames++;
 
-    auto info_update = std::chrono::duration_cast<std::chrono::milliseconds>(clock_now() - fps_timer).count();
+    auto info_update = std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - fps_timer).count();
 
-    if (synchronise_info_update_with_window_update || info_update > update_info_every_n_milliseconds) {
+    if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
         auto start_timer = clock_now();
         engine->pause();
         uint32_t simulation_frames = edc.engine_ticks;
@@ -141,7 +141,7 @@ void MainWindow::mainloop_tick() {
 
         if (info_update == 0) {info_update = 1;}
 
-        auto scale = (info_update/1000.);
+        auto scale = (info_update/1000000.);
 
         auto info = rec.parse_organisms_info();
 
@@ -522,6 +522,10 @@ void MainWindow::calculate_new_simulation_size() {
 }
 
 void MainWindow::resize_simulation_grid() {
+    if (ecp.lock_resizing) {
+        display_message("Grid cannot be resized until recording is stopped.");
+        return;
+    }
     if (fill_window) {calculate_new_simulation_size();}
 
     if (!disable_warnings) {

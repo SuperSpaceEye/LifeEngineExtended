@@ -145,4 +145,6 @@ std::string convert_num_bytes(uint64_t num_bytes);
 
 void clear_console();
 
+std::string convert_seconds(uint64_t num_seconds);
+
 #endif //THELIFEENGINECPP_MISCFUNCS_H

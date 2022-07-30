@@ -41,3 +41,29 @@ void clear_console() {
     system("clear");
 #endif
 }
+
+std::string convert_seconds(uint64_t num_seconds) {
+    std::string return_str;
+
+    std::string seconds;
+    std::string minutes;
+    std::string hours;
+
+    if (num_seconds/60/24 > 0) {
+        auto result = num_seconds/60/24;
+        hours += std::to_string(result) + "h ";
+        num_seconds -= result * 60 * 24;
+    }
+
+    if (num_seconds/60 > 0) {
+        auto result = num_seconds/60;
+        minutes += std::to_string(result) + "m ";
+        num_seconds -= result * 60;
+    }
+
+    seconds += std::to_string(num_seconds) + "s ";
+
+    return_str += hours + minutes + seconds;
+
+    return return_str;
+}

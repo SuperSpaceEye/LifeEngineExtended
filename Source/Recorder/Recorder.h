@@ -86,10 +86,12 @@ private:
     int num_pixels_per_block = 5;
     bool recording_paused = false;
     int video_fps = 60;
+    bool lock_recording = false;
 
     void closeEvent(QCloseEvent * event) override;
 
-    void create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid);
+    void create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid,
+                      int simulation_width, int simulation_height, int num_pixels_per_block);
 
     void complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
                                 std::vector<unsigned char> &raw_image_vector, std::vector<BaseGridBlock> &grid);
