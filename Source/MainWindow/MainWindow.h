@@ -55,6 +55,7 @@
 #include "../Stuff/Vector2.h"
 #include "../Containers/CPU/RecordingContainer.h"
 #include "../Stuff/ImageCreation.h"
+#include "../Stuff/DataSavingFunctions.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -187,16 +188,6 @@ private:
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
-    static void write_version(std::ofstream& os);
-    void write_simulation_parameters(std::ofstream& os);
-    void write_organisms_block_parameters(std::ofstream& os);
-    void write_data_container_data(std::ofstream& os);
-    //    void write_color_container(); TODO: ?
-    void write_simulation_grid(std::ofstream& os);
-    void write_organisms(std::ofstream& os);
-    static void write_organism_data(std::ofstream& os, Organism * organism);
-    static void write_organism_brain(std::ofstream& os, Brain * brain);
-    static void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void recover_state(const SimulationParameters &recovery_sp,
                        const OrganismBlockParameters &recovery_bp,
@@ -204,16 +195,10 @@ private:
                        uint32_t recovery_simulation_height);
 
     void read_data(std::ifstream& is);
-    static bool read_version(std::ifstream& is);
-    void read_simulation_parameters(std::ifstream& is);
-    void read_organisms_block_parameters(std::ifstream& is);
-    bool read_data_container_data(std::ifstream& is);
-    //    void read_color_container(); TODO: ?
+    bool read_data_container_data(std::ifstream &is);
     void read_simulation_grid(std::ifstream& is);
     bool read_organisms(std::ifstream& is);
-    static void read_organism_data(std::ifstream& is, OrganismData & data);
-    static void read_organism_brain(std::ifstream& is, Brain * brain);
-    static void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+
     void update_table_values();
 
     bool cuda_is_available();

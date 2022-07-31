@@ -8,113 +8,16 @@
 
 #include "MainWindow.h"
 
-//TODO increment every time saving logic changes
-uint32_t SAVE_VERSION = 5;
-
-struct WorldBlocks {
-    uint32_t x;
-    uint32_t y;
-    BlockTypes type;
-    WorldBlocks()=default;
-    WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type) {}
-};
-
 void MainWindow::write_data(std::ofstream &os) {
-    write_version(os);
-    write_simulation_parameters(os);
-    write_organisms_block_parameters(os);
-    write_data_container_data(os);
-    write_simulation_grid(os);
-    write_organisms(os);
-}
-
-void MainWindow::write_version(std::ofstream &os) {
-    os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
-}
-
-void MainWindow::write_simulation_parameters(std::ofstream& os) {
-    os.write((char*)&sp, sizeof(SimulationParameters));
-}
-
-void MainWindow::write_organisms_block_parameters(std::ofstream& os) {
-    os.write((char*)&bp, sizeof(OrganismBlockParameters));
-}
-
-void MainWindow::write_data_container_data(std::ofstream& os) {
-    os.write((char*)&edc.total_engine_ticks, sizeof(uint32_t));
-    os.write((char*)&edc.simulation_width,   sizeof(uint32_t));
-    os.write((char*)&edc.simulation_height,  sizeof(uint32_t));
-}
-//    void MainWindow::write_color_container(){}
-void MainWindow::write_simulation_grid(std::ofstream& os) {
-    std::vector<WorldBlocks> blocks{};
-
-    for (uint32_t x = 0; x < edc.simulation_width; x++) {
-        for (uint32_t y = 0; y < edc.simulation_height; y++) {
-            auto & block = edc.CPU_simulation_grid[x][y];
-
-            switch (block.type) {
-                case BlockTypes::FoodBlock:
-                case BlockTypes::WallBlock:
-                    blocks.emplace_back(x, y, block.type);
-                default: break;
-            }
-        }
-    }
-
-    auto size = blocks.size();
-
-    os.write((char*)&size, sizeof(std::size_t));
-    os.write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
-}
-void MainWindow::write_organisms(std::ofstream& os) {
-    uint32_t size = edc.organisms.size();
-    os.write((char*)&size, sizeof(uint32_t));
-    for (auto & organism: edc.organisms) {
-        write_organism_brain(os,   &organism->brain);
-        write_organism_anatomy(os, &organism->anatomy);
-        write_organism_data(os,    organism);
-    }
-}
-
-void MainWindow::write_organism_data(std::ofstream& os, Organism * organism) {
-    os.write((char*)static_cast<OrganismData*>(organism), sizeof(OrganismData));
-}
-
-void MainWindow::write_organism_brain(std::ofstream& os, Brain * brain) {
-    os.write((char*)brain, sizeof(Brain));
+    DataSavingFunctions::write_version(os);
+    DataSavingFunctions::write_simulation_parameters(os, sp);
+    DataSavingFunctions::write_organisms_block_parameters(os, bp);
+    DataSavingFunctions::write_data_container_data(os, edc);
+    DataSavingFunctions::write_simulation_grid(os, edc);
+    DataSavingFunctions::write_organisms(os, edc);
 }
 
 //TODO do i need to save spaces?
-
-void MainWindow::write_organism_anatomy(std::ofstream& os, Anatomy * anatomy) {
-    uint32_t organism_blocks_size = anatomy->_organism_blocks.size();
-    uint32_t producing_space_size = anatomy->_producing_space.size();
-    uint32_t eating_space_size    = anatomy->_eating_space.size();
-    uint32_t killing_space_size   = anatomy->_killing_space.size();
-
-    os.write((char*)&organism_blocks_size, sizeof(uint32_t));
-    os.write((char*)&producing_space_size, sizeof(uint32_t));
-    os.write((char*)&eating_space_size,    sizeof(uint32_t));
-    os.write((char*)&killing_space_size,   sizeof(uint32_t));
-
-    os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    os.write((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
-
-    os.write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-
-    for (auto & space: anatomy->_producing_space) {
-        auto space_size = space.size();
-        os.write((char*)&space_size, sizeof(uint32_t));
-        os.write((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
-    }
-}
 
 void MainWindow::recover_state(const SimulationParameters &recovery_sp, const OrganismBlockParameters &recovery_bp,
                                uint32_t recovery_simulation_width, uint32_t recovery_simulation_height) {
@@ -131,7 +34,7 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
 
 void MainWindow::read_data(std::ifstream &is) {
     //If save version is incompatible
-    if (!read_version(is)) {
+    if (!DataSavingFunctions::read_version(is)) {
         display_message("Save version is incompatible with current program version.");
         return;
     }
@@ -145,8 +48,8 @@ void MainWindow::read_data(std::ifstream &is) {
     uint32_t recovery_simulation_height = edc.simulation_height;
 
     try {
-        read_simulation_parameters(is);
-        read_organisms_block_parameters(is);
+        DataSavingFunctions::read_simulation_parameters(is, sp);
+        DataSavingFunctions::read_organisms_block_parameters(is, bp);
         if (read_data_container_data(is)) {
             recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
         }
@@ -159,27 +62,11 @@ void MainWindow::read_data(std::ifstream &is) {
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-bool MainWindow::read_version(std::ifstream &is) {
-    int save_version;
-    is.read((char*)&save_version, sizeof(int));
-    return save_version == SAVE_VERSION;
-}
-
-void MainWindow::read_simulation_parameters(std::ifstream& is) {
-    is.read((char*)&sp, sizeof(SimulationParameters));
-}
-
-void MainWindow::read_organisms_block_parameters(std::ifstream& is) {
-    is.read((char*)&bp, sizeof(OrganismBlockParameters));
-}
-
-bool MainWindow::read_data_container_data(std::ifstream& is) {
+bool MainWindow::read_data_container_data(std::ifstream &is) {
     uint32_t sim_width;
     uint32_t sim_height;
 
-    is.read((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&sim_width,    sizeof(uint32_t));
-    is.read((char*)&sim_height,   sizeof(uint32_t));
+    DataSavingFunctions::read_data_container_data(is, edc, sim_width, sim_height);
 
     if (sim_width > max_loaded_world_side) {
         if (!display_dialog_message("The loaded side of a simulation width is " + std::to_string(sim_width) + ". Continue?", false)) {
@@ -203,114 +90,34 @@ bool MainWindow::read_data_container_data(std::ifstream& is) {
     update_simulation_size_label();
     return false;
 }
-//    void MainWindow::read_color_container(){}
 
-//TODO only save food/walls ?
-void MainWindow::read_simulation_grid(std::ifstream& is) {
+void MainWindow::read_simulation_grid(std::ifstream &is) {
     auto flag = disable_warnings;
     disable_warnings = true;
     resize_simulation_grid();
     disable_warnings = flag;
 
-    std::vector<WorldBlocks> blocks{};
-    std::size_t size;
-
-    is.read((char*)&size, sizeof(std::size_t));
-    blocks.resize(size);
-
-    is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
-
-    for (auto & block: blocks) {
-        edc.CPU_simulation_grid[block.x][block.y].type = block.type;
-    }
+    DataSavingFunctions::read_simulation_grid(is, edc);
 }
 
-//TODO save child patterns?
-bool MainWindow::read_organisms(std::ifstream& is) {
+bool MainWindow::read_organisms(std::ifstream &is) {
     uint32_t num_organisms;
     is.read((char*)&num_organisms, sizeof(uint32_t));
 
     if (num_organisms > max_loaded_num_organisms) {
         if (!display_dialog_message("The loaded number of organisms is " + std::to_string(num_organisms) +
-        ". Continue?", false)) {
+                                    ". Continue?", false)) {
             return true;
         }
     }
 
-    edc.organisms.reserve(num_organisms);
-    for (int i = 0; i < num_organisms; i++) {
-        auto brain = Brain();
-        auto anatomy = Anatomy();
-
-        read_organism_brain(is, &brain);
-        read_organism_anatomy(is, &anatomy);
-
-        auto * organism = new Organism(0,
-                                       0,
-                                       Rotation::UP,
-                                       anatomy,
-                                       brain,
-                                       &sp,
-                                       &bp,
-                                       0,
-                                       0,
-                                       0);
-
-        read_organism_data(is, *static_cast<OrganismData*>(organism));
-
-        edc.organisms.emplace_back(organism);
-        SimulationEngineSingleThread::place_organism(&edc, organism);
-    }
-
+    DataSavingFunctions::read_organisms(is, edc, sp, bp, num_organisms);
     return false;
-}
-
-void MainWindow::read_organism_data(std::ifstream& is, OrganismData & data) {
-    is.read((char*)&data, sizeof(OrganismData));
-}
-
-void MainWindow::read_organism_brain(std::ifstream& is, Brain * brain) {
-    is.read((char*)brain, sizeof(Brain));
-}
-
-void MainWindow::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
-    uint32_t organism_blocks_size = 0;
-    uint32_t producing_space_size = 0;
-    uint32_t eating_space_size    = 0;
-    uint32_t killing_space_size   = 0;
-
-    is.read((char*)&organism_blocks_size, sizeof(uint32_t));
-    is.read((char*)&producing_space_size, sizeof(uint32_t));
-    is.read((char*)&eating_space_size,    sizeof(uint32_t));
-    is.read((char*)&killing_space_size,   sizeof(uint32_t));
-
-    anatomy->_organism_blocks.resize(organism_blocks_size);
-    anatomy->_producing_space.resize(producing_space_size);
-    anatomy->_eating_space   .resize(eating_space_size);
-    anatomy->_killing_space  .resize(killing_space_size);
-
-    is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    is.read((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
-
-    is.read((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.read((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.read((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-
-    for (auto & space: anatomy->_producing_space) {
-        uint32_t space_size;
-        is.read((char*)&space_size, sizeof(uint32_t));
-        space.resize(space_size);
-        is.read((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
-    }
 }
 
 void MainWindow::update_table_values() {
     for (int row = 0; row < 6; row++) {
-        for (int col = 0; col < 3; col++) {
+        for (int col = 0; col < 4; col++) {
             BParameters *type;
             switch (static_cast<BlocksNames>(row)) {
                 case BlocksNames::MouthBlock:
