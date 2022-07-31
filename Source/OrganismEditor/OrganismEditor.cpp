@@ -246,17 +246,11 @@ void OrganismEditor::create_image() {
     std::vector<int> lin_width;
     std::vector<int> lin_height;
 
-    calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
+    ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
 
     complex_for_loop(lin_width, lin_height);
 
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(edit_image.data(), image_width, image_height, QImage::Format_RGB32)));
-}
-
-void OrganismEditor::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                                    int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
-    lin_width  = linspace<int>(start_x, end_x, image_width);
-    lin_height = linspace<int>(start_y, end_y, image_height);
 }
 
 void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {
@@ -299,78 +293,20 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
                         lin_height[y] < 0 ||
                         lin_height[y] >= editor_height) {
                         pixel_color = color_container->simulation_background_color;
-                        set_image_pixel(x, y, pixel_color);
-                        continue;
+                    } else {
+                        auto &block = edit_grid[lin_width[x]][lin_height[y]];
+
+                        pixel_color = ImageCreation::ImageCreationTools::get_texture_color(block.type,
+                                                        block.rotation,
+                                                        float(x - w_b.x) / (w_b.y - w_b.x),
+                                                        float(y - h_b.x) / (h_b.y - h_b.x),
+                                                        *color_container,
+                                                        textures);
                     }
-
-                    auto &block = edit_grid[lin_width[x]][lin_height[y]];
-
-                    pixel_color = get_texture_color(block.type,
-                                                    block.rotation,
-                                                    float(x - w_b.x) / (w_b.y - w_b.x),
-                                                    float(y - h_b.x) / (h_b.y - h_b.x));
-                    set_image_pixel(x, y, pixel_color);
+                    ImageCreation::ImageCreationTools::set_image_pixel(x, y, _ui.editor_graphicsView->viewport()->width(), pixel_color, edit_image);
                 }
             }
         }
-    }
-}
-
-void OrganismEditor::set_image_pixel(int x, int y, color &color) {
-    auto index = 4 * (y * _ui.editor_graphicsView->viewport()->width() + x);
-    edit_image[index+2] = color.r;
-    edit_image[index+1] = color.g;
-    edit_image[index  ] = color.b;
-}
-
-color & OrganismEditor::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
-    int x;
-    int y;
-
-    switch (type) {
-        case BlockTypes::EmptyBlock :   return color_container->empty_block;
-        case BlockTypes::MouthBlock:    return color_container->mouth;
-        case BlockTypes::ProducerBlock: return color_container->producer;
-        case BlockTypes::MoverBlock:    return color_container->mover;
-        case BlockTypes::KillerBlock:   return color_container->killer;
-        case BlockTypes::ArmorBlock:    return color_container->armor;
-        case BlockTypes::EyeBlock:
-            x = relative_x_scale * 5;
-            y = relative_y_scale * 5;
-            {
-                switch (rotation) {
-                    case Rotation::UP:
-                        break;
-                    case Rotation::LEFT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        x = -x;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::DOWN:
-                        x -= 2;
-                        y -= 2;
-                        x = -x;
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::RIGHT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                }
-            }
-            return textures.rawEyeTexture[x + y * 5];
-        case BlockTypes::FoodBlock:     return color_container->food;
-        case BlockTypes::WallBlock:     return color_container->wall;
-        default: return color_container->empty_block;
     }
 }
 

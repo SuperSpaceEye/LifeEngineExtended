@@ -22,6 +22,7 @@
 #include "../Organism/CPU/Anatomy.h"
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Stuff/textures.h"
+#include "../Stuff/ImageCreation.h"
 
 #if defined(__WIN32)
 #include <windows.h>
@@ -73,36 +74,21 @@ private:
     Textures * textures = nullptr;
     RecordingData * recd;
 
-    const std::vector<std::string> months{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-
-    #if defined(__WIN32)
     std::string ffmpeg_path = "ffmpeg";
-    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
-    std::string ffmpeg_path = "ffmpeg";
-    #endif
-
-    std::string dir_path_of_new_recording;
 
     int num_pixels_per_block = 5;
     bool recording_paused = false;
     int video_fps = 60;
-    bool lock_recording = false;
 
     void closeEvent(QCloseEvent * event) override;
 
     void create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid,
                       int simulation_width, int simulation_height, int num_pixels_per_block);
 
-    void complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
-                                std::vector<unsigned char> &raw_image_vector, std::vector<BaseGridBlock> &grid);
-    void set_image_pixel(int x, int y, const color &color, std::vector<unsigned char> &image_vector);
-    color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
-
     void init_gui();
 
     std::string new_recording(std::string path);
 
-    void write_intermediate_data(){};
     static std::string get_string_date();
 
     void clear_data();

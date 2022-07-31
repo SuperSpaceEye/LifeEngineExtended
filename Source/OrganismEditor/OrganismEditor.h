@@ -14,9 +14,7 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
-#ifndef __WIN32
 #include <filesystem>
-#endif
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
@@ -40,6 +38,7 @@
 #include "../Stuff/textures.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/MiscFuncs.h"
+#include "../Stuff/ImageCreation.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -131,10 +130,6 @@ public:
     void create_image();
 
     void complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height);
-
-    void set_image_pixel(int x, int y, color &color);
-
-    color &get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     void finalize_chosen_organism();
     void load_chosen_organism();

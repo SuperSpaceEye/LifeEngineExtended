@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     edc.simulation_height = 50;
 #endif
 
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
     edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
@@ -126,7 +126,7 @@ void MainWindow::mainloop_tick() {
         ecp.engine_pass_tick = true;
         ecp.synchronise_simulation_tick = true;
     }
-    if (ecp.update_editor_organism) { ee.load_chosen_organism(), ecp.update_editor_organism = false;}
+    if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
     window_tick();
     window_frames++;
@@ -221,71 +221,6 @@ void MainWindow::reset_scale_view() {
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
-color &MainWindow::get_color_simplified(BlockTypes type) {
-    switch (type) {
-        case BlockTypes::EmptyBlock :   return cc.empty_block;
-        case BlockTypes::MouthBlock:    return cc.mouth;
-        case BlockTypes::ProducerBlock: return cc.producer;
-        case BlockTypes::MoverBlock:    return cc.mover;
-        case BlockTypes::KillerBlock:   return cc.killer;
-        case BlockTypes::ArmorBlock:    return cc.armor;
-        case BlockTypes::EyeBlock:      return cc.eye;
-        case BlockTypes::FoodBlock:     return cc.food;
-        case BlockTypes::WallBlock:     return cc.wall;
-        default: return cc.empty_block;
-    }
-}
-
-color & MainWindow::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
-    int x;
-    int y;
-
-    switch (type) {
-        case BlockTypes::EmptyBlock :   return cc.empty_block;
-        case BlockTypes::MouthBlock:    return cc.mouth;
-        case BlockTypes::ProducerBlock: return cc.producer;
-        case BlockTypes::MoverBlock:    return cc.mover;
-        case BlockTypes::KillerBlock:   return cc.killer;
-        case BlockTypes::ArmorBlock:    return cc.armor;
-        case BlockTypes::EyeBlock:
-            x = relative_x_scale * 5;
-            y = relative_y_scale * 5;
-            {
-                switch (rotation) {
-                    case Rotation::UP:
-                        break;
-                    case Rotation::LEFT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        x = -x;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::DOWN:
-                        x -= 2;
-                        y -= 2;
-                        x = -x;
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::RIGHT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                }
-            }
-            return textures.rawEyeTexture[x + y * 5];
-        case BlockTypes::FoodBlock:     return cc.food;
-        case BlockTypes::WallBlock:     return cc.wall;
-        default: return cc.empty_block;
-    }
-}
 
 void MainWindow::create_image() {
     resize_image();
@@ -305,12 +240,12 @@ void MainWindow::create_image() {
     std::vector<int> lin_width;
     std::vector<int> lin_height;
 
-    calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
+    ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
 
     std::vector<int> truncated_lin_width;  truncated_lin_width .reserve(image_width);
     std::vector<int> truncated_lin_height; truncated_lin_height.reserve(image_height);
 
-    calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 
     if ((!pause_grid_parsing && !ecp.engine_global_pause) || ecp.synchronise_simulation_and_window) {
         ecp.engine_pause = true;
@@ -319,134 +254,29 @@ void MainWindow::create_image() {
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
         if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine->unpause();}
     }
-    if (simplified_rendering) {
-        simplified_image_creation(image_width, image_height, lin_width, lin_height);
+
+    if (!use_cuda) {
+        ImageCreation::ImageCreationTools::complex_image_creation(lin_width,
+                                                                  lin_height,
+                                                                  edc.simulation_width,
+                                                                  edc.simulation_height,
+                                                                  cc,
+                                                                  textures,
+                                                                  _ui.simulation_graphicsView->width(),
+                                                                  image_vector,
+                                                                  edc.second_simulation_grid);
     } else {
-        if (!use_cuda) {
-            complex_image_creation(lin_width, lin_height);
-        } else {
 #if __CUDA_USED__
-            cuda_creator.cuda_create_image(image_width,
-                                           image_height,
-                                           lin_width,
-                                           lin_height,
-                                           image_vector,
-                                           cc,
-                                           edc, 32, truncated_lin_width, truncated_lin_height);
+        cuda_creator.cuda_create_image(image_width,
+                                       image_height,
+                                       lin_width,
+                                       lin_height,
+                                       image_vector,
+                                       cc,
+                                       edc, 32, truncated_lin_width, truncated_lin_height);
 #endif
-        }
     }
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
-}
-
-void MainWindow::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                                    int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
-    lin_width  = linspace<int>(start_x, end_x, image_width);
-    lin_height = linspace<int>(start_y, end_y, image_height);
-
-    //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
-    // n pixels
-    int max_x = lin_width[lin_width.size()-1];
-    int max_y = lin_height[lin_height.size()-1];
-    int del_x = 0;
-    int del_y = 0;
-    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
-    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
-
-    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
-    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
-}
-
-void MainWindow::calculate_truncated_linspace(
-        int image_width, int image_height,
-        const std::vector<int> &lin_width,
-        const std::vector<int> &lin_height,
-        std::vector<int> & truncated_lin_width,
-        std::vector<int> & truncated_lin_height) {
-
-    int min_val = INT32_MIN;
-    for (int x = 0; x < image_width; x++) {if (lin_width[x] > min_val) {min_val = lin_width[x]; truncated_lin_width.push_back(min_val);}}
-    truncated_lin_width.pop_back();
-    min_val = INT32_MIN;
-    for (int y = 0; y < image_height; y++) {if (lin_height[y] > min_val) {min_val = lin_height[y]; truncated_lin_height.push_back(min_val);}}
-    truncated_lin_height.pop_back();
-}
-
-void MainWindow::simplified_image_creation(int image_width, int image_height,
-                                           const std::vector<int> &lin_width,
-                                           const std::vector<int> &lin_height) {
-    color pixel_color;
-    for (int x = 0; x < image_width; x++) {
-        for (int y = 0; y < image_height; y++) {
-            if (lin_width[x] < 0 || lin_width[x] >= edc.simulation_width || lin_height[y] < 0 || lin_height[y] >= edc.simulation_height) { pixel_color = cc.simulation_background_color;}
-            else {pixel_color = get_color_simplified(edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width].type);}
-            set_image_pixel(x, y, pixel_color);
-        }
-    }
-}
-
-void MainWindow::complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
-    //x - start, y - stop
-    std::vector<Vector2<int>> width_img_boundaries;
-    std::vector<Vector2<int>> height_img_boundaries;
-
-    auto last = INT32_MIN;
-    auto count = 0;
-    for (int x = 0; x < lin_width.size(); x++) {
-        if (last < lin_width[x]) {
-            width_img_boundaries.emplace_back(count, x);
-            last = lin_width[x];
-            count = x;
-        }
-    }
-    width_img_boundaries.emplace_back(count, lin_width.size());
-
-    last = INT32_MIN;
-    count = 0;
-    for (int x = 0; x < lin_height.size(); x++) {
-        if (last < lin_height[x]) {
-            height_img_boundaries.emplace_back(count, x);
-            last = lin_height[x];
-            count = x;
-        }
-    }
-    height_img_boundaries.emplace_back(count, lin_height.size());
-
-    color pixel_color;
-    //width of boundaries of an organisms
-
-    //width bound, height bound
-    for (auto &w_b: width_img_boundaries) {
-        for (auto &h_b: height_img_boundaries) {
-            for (int x = w_b.x; x < w_b.y; x++) {
-                for (int y = h_b.x; y < h_b.y; y++) {
-                    auto &block = edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width];
-
-                    if (lin_width[x] < 0 ||
-                        lin_width[x] >= edc.simulation_width ||
-                        lin_height[y] < 0 ||
-                        lin_height[y] >= edc.simulation_height) {
-                        pixel_color = cc.simulation_background_color;
-                    } else {
-                        pixel_color = get_texture_color(block.type,
-                                                        block.rotation,
-                                                        float(x - w_b.x) / (w_b.y - w_b.x),
-                                                        float(y - h_b.x) / (h_b.y - h_b.x));
-                    }
-                    set_image_pixel(x, y, pixel_color);
-                }
-            }
-        }
-    }
-}
-
-// depth * ( y * width + x) + z
-// depth * width * y + depth * x + z
-void MainWindow::set_image_pixel(int x, int y, const color &color) {
-    auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
-    image_vector[index+2] = color.r;
-    image_vector[index+1] = color.g;
-    image_vector[index  ] = color.b;
 }
 
 void MainWindow::set_window_interval(int max_window_fps) {
@@ -532,7 +362,7 @@ void MainWindow::resize_simulation_grid() {
         if (!use_cuda) {
             auto msg = DescisionMessageBox("Warning",
                                        QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(AtomicGridBlock))*new_simulation_height*new_simulation_width)),
+                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(SingleThreadGridBlock)) * new_simulation_height * new_simulation_width)),
                                        "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
@@ -541,7 +371,7 @@ void MainWindow::resize_simulation_grid() {
         } else {
             auto msg = DescisionMessageBox("Warning",
                                            QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(AtomicGridBlock))*new_simulation_height*new_simulation_width)
+                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(SingleThreadGridBlock)) * new_simulation_height * new_simulation_width)
                                                                   + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width))
                                                                   + " GPU's VRAM",
                                            "OK", "Cancel", this);
@@ -560,7 +390,7 @@ void MainWindow::resize_simulation_grid() {
     edc.CPU_simulation_grid.clear();
     edc.second_simulation_grid.clear();
 
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
     edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {

@@ -54,6 +54,7 @@
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/Vector2.h"
 #include "../Containers/CPU/RecordingContainer.h"
+#include "../Stuff/ImageCreation.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -223,16 +224,12 @@ private:
     void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);
     void resize_image();
-    void inline set_image_pixel(int x, int y, const color &color);
 
     // for fill_view
     void calculate_new_simulation_size();
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void create_image();
-
-    color & get_color_simplified(BlockTypes type);
-    color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     bool wait_for_engine_to_pause();
 
@@ -254,22 +251,6 @@ private:
     void update_statistics_info(const OrganismAvgBlockInformation &info);
 
     void resize_simulation_grid();
-
-    // creates simple colored cells
-    void simplified_image_creation(int image_width, int image_height,
-                                   const std::vector<int> &lin_width,
-                                   const std::vector<int> &lin_height);
-
-    // creates cells with textures (right now only eye)
-    void complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
-
-    static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                            int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
-    static void calculate_truncated_linspace(int image_width, int image_height,
-                                             const std::vector<int> &lin_width,
-                                             const std::vector<int> &lin_height,
-                                             std::vector<int> & truncated_lin_width,
-                                             std::vector<int> & truncated_lin_height);
 
     void clear_world();
 
