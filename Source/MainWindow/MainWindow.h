@@ -65,6 +65,7 @@
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
 #include "../Recorder/Recorder.h"
+#include "../WorldEvents/WorldEvents.h"
 
 
 #if __CUDA_USED__
@@ -112,6 +113,7 @@ private:
     StatisticsCore s;
     InfoWindow iw{&_ui};
     Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
+    WorldEvents we{&_ui};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -246,6 +248,7 @@ private slots:
     void tb_open_organism_editor_slot(bool state);
     void tb_open_info_window_slot(bool state);
     void tb_open_recorder_window_slot(bool state);
+    void tb_open_world_events_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -344,6 +347,7 @@ private slots:
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
     void cb_recorder_window_always_on_top_slot(bool state);
+    void cb_world_events_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);

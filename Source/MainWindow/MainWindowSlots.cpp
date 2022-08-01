@@ -60,6 +60,13 @@ void MainWindow::tb_open_recorder_window_slot(bool state) {
     }
 }
 
+void MainWindow::tb_open_world_events_slot(bool state) {
+    if (state) {
+        we.show();
+    } else {
+        we.close();
+    }
+}
 
 //==================== Buttons ====================
 
@@ -567,6 +574,7 @@ void MainWindow::cb_statistics_always_on_top_slot(bool state) {
 
     s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
+    //Why sleep? For some reason changes are not applied instantly and main process needs to wait for some time.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
@@ -607,6 +615,18 @@ void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
 
     if (!hidden) {
         rec.show();
+    }
+}
+
+void MainWindow::cb_world_events_always_on_top_slot(bool state) {
+    auto hidden = we.isHidden();
+
+    we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        we.show();
     }
 }
 

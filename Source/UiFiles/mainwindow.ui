@@ -906,9 +906,9 @@
                     <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_52">
                       <item>
-                       <widget class="QPushButton" name="pushButton_2">
+                       <widget class="QPushButton" name="tb_open_world_events">
                         <property name="enabled">
-                         <bool>false</bool>
+                         <bool>true</bool>
                         </property>
                         <property name="text">
                          <string>World Events</string>
@@ -919,9 +919,9 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QCheckBox" name="checkBox_2">
+                       <widget class="QCheckBox" name="cb_world_events_always_on_top">
                         <property name="enabled">
-                         <bool>false</bool>
+                         <bool>true</bool>
                         </property>
                         <property name="text">
                          <string>Always on top</string>
@@ -4079,6 +4079,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_world_events_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_world_events_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>840</x>
+     <y>873</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tb_open_world_events</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_world_events_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>534</x>
+     <y>873</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4187,6 +4219,8 @@
   <slot>tb_open_info_window_slot(bool)</slot>
   <slot>tb_open_recorder_window_slot(bool)</slot>
   <slot>cb_recorder_window_always_on_top_slot(bool)</slot>
+  <slot>tb_open_world_events_slot(bool)</slot>
+  <slot>cb_world_events_always_on_top_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="cursor_modes">
