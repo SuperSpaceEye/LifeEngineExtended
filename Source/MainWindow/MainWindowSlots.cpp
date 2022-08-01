@@ -102,8 +102,7 @@ void MainWindow::b_clear_all_walls_slot() {
 void MainWindow::b_save_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
-    ecp.engine_global_pause = true;
-    engine->wait_for_engine_to_pause_force();
+    engine->pause();
 
     QString selected_filter;
     QFileDialog file_dialog{};
@@ -137,7 +136,8 @@ void MainWindow::b_save_world_slot() {
         out.close();
 
     } else {
-        write_json_data(full_path);
+        auto info = rec.parse_organisms_info();
+        DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
     }
 
     ecp.synchronise_simulation_and_window = flag;

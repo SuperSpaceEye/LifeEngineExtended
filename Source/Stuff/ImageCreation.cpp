@@ -58,7 +58,7 @@ const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes typ
                         x -= 2;
                         y -= 2;
                         std::swap(x, y);
-                        x = -x;
+                        y = -y;
                         x += 2;
                         y += 2;
                         break;
@@ -74,7 +74,7 @@ const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes typ
                         x -= 2;
                         y -= 2;
                         std::swap(x, y);
-                        y = -y;
+                        x = -x;
                         x += 2;
                         y += 2;
                         break;

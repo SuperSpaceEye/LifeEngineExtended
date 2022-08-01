@@ -80,10 +80,13 @@ void OrganismEditor::b_save_organism_slot() {
 
     if (filetype == ".lfeo") {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
-        write_organism(out);
+        DataSavingFunctions::write_organism(out, editor_organism);
         out.close();
 
     } else {
+        rapidjson::Document j_organism;
+        j_organism.SetObject();
+
         write_json_organism(full_path);
     }
 }
@@ -167,16 +170,14 @@ void OrganismEditor::rb_edit_brain_slot() {
 
 //==================== Combo boxes ====================
 
-
-//TODO i don't fkn know why left and right is switched
-void OrganismEditor::cmd_block_rotation_slot(QString name) {
+void OrganismEditor::cmd_block_rotation_slot(const QString& name) {
     if (name.toStdString() == "Up")    {chosen_block_rotation = Rotation::UP;}
     if (name.toStdString() == "Left")  {chosen_block_rotation = Rotation::LEFT;}
     if (name.toStdString() == "Down")  {chosen_block_rotation = Rotation::DOWN;}
     if (name.toStdString() == "Right") {chosen_block_rotation = Rotation::RIGHT;}
 }
 
-void OrganismEditor::cmd_organism_rotation_slot(QString name) {
+void OrganismEditor::cmd_organism_rotation_slot(const QString& name) {
     if (name.toStdString() == "Up")    {editor_organism->rotation = Rotation::UP;}
     if (name.toStdString() == "Left")  {editor_organism->rotation = Rotation::RIGHT;}
     if (name.toStdString() == "Down")  {editor_organism->rotation = Rotation::DOWN;}

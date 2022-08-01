@@ -70,7 +70,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
                         x = y;
                         y = temp;
 
-                        x = -x;
+                        y = -y;
                         x += 2;
                         y += 2;
                         break;
@@ -90,7 +90,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rel
                         x = y;
                         y = temp;
 
-                        y = -y;
+                        x = -x;
                         x += 2;
                         y += 2;
                         break;

@@ -173,18 +173,8 @@ private:
     void move_center(int delta_x, int delta_y);
     void reset_scale_view();
 
-    void write_json_data(const std::string &path);
-
-    void json_write_grid(rapidjson::Document & d);
-    void json_write_organisms(rapidjson::Document & d);
-    void json_write_fossil_record(rapidjson::Document & d);
-    void json_write_controls(rapidjson::Document & d) const ;
-
-    void json_read_grid_data(rapidjson::Document & d);
-    void json_read_organisms_data(rapidjson::Document & d);
-    void json_read_simulation_parameters(rapidjson::Document & d);
-
     void read_json_data(const std::string &path);
+    void json_read_grid_data(rapidjson::Document & d);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
