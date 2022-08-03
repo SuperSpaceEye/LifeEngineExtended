@@ -5,7 +5,7 @@
 #include "OrganismEditor.h"
 
 void OrganismEditor::read_organism(std::ifstream &is) {
-    auto * organism = DataSavingFunctions::read_organism(is, *editor_organism->sp, *editor_organism->bp);
+    auto * organism = DataSavingFunctions::read_organism(is, *sp, *editor_organism->bp);
 
     delete editor_organism;
     *chosen_organism = organism;
@@ -36,7 +36,7 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
         return;
     }
 
-    auto * new_organism = DataSavingFunctions::json_read_organism(organism, *editor_organism->sp, *editor_organism->bp);
+    auto * new_organism = DataSavingFunctions::json_read_organism(organism, *sp, *editor_organism->bp);
 
     delete editor_organism;
     *chosen_organism = new_organism;
@@ -47,7 +47,7 @@ void OrganismEditor::write_json_organism(std::string &full_path) {
     Document j_organism;
     j_organism.SetObject();
 
-    DataSavingFunctions::write_json_organism(j_organism, editor_organism, j_organism, *editor_organism->sp);
+    DataSavingFunctions::write_json_organism(j_organism, editor_organism, j_organism, *sp);
 
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);

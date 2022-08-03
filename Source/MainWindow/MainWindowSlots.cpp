@@ -495,17 +495,17 @@ void MainWindow::le_scaling_coefficient_slot() {
 
 void MainWindow::rb_food_slot() {
     set_cursor_mode(CursorMode::ModifyFood);
-    ee._ui.rb_null_button->setChecked(true);
+    ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_wall_slot() {
     set_cursor_mode(CursorMode::ModifyWall);
-    ee._ui.rb_null_button->setChecked(true);
+    ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_kill_slot() {
     set_cursor_mode(CursorMode::KillOrganism);
-    ee._ui.rb_null_button->setChecked(true);
+    ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_single_thread_slot() {

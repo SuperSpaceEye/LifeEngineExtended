@@ -11,7 +11,7 @@
 class WorldEvents: public QWidget {
     Q_OBJECT
 private:
-    Ui::WorldEvents _ui{};
+    Ui::WorldEvents ui{};
     Ui::MainWindow * parent_ui = nullptr;
 
     void closeEvent(QCloseEvent * event) override;

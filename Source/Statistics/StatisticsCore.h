@@ -14,16 +14,15 @@
 class StatisticsCore: public QWidget {
     Q_OBJECT
 public:
-    Ui::Statistics _ui;
-    Ui::MainWindow * _parent_ui = nullptr;
+    Ui::Statistics ui;
+    Ui::MainWindow * parent_ui = nullptr;
     StatisticsCore()=default;
-    void init(Ui::MainWindow * parent_ui) {
-        _ui.setupUi(this);
-        _parent_ui = parent_ui;
-    }
+    StatisticsCore(Ui::MainWindow * parent_ui): parent_ui(parent_ui) {
+        ui.setupUi(this);
+    };
 
     void closeEvent(QCloseEvent * event) override {
-        _parent_ui->tb_open_statisctics->setChecked(false);
+        parent_ui->tb_open_statisctics->setChecked(false);
         QWidget::closeEvent(event);
     }
 };

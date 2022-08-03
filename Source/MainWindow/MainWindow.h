@@ -109,8 +109,8 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine* engine = nullptr;
-    OrganismEditor ee;
-    StatisticsCore s;
+    OrganismEditor ee{15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
+    StatisticsCore s{&_ui};
     InfoWindow iw{&_ui};
     Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
     WorldEvents we{&_ui};

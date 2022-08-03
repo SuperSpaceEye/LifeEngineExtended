@@ -5,7 +5,7 @@
 #include "WorldEvents.h"
 
 WorldEvents::WorldEvents(Ui::MainWindow *parent_ui): parent_ui(parent_ui) {
-    _ui.setupUi(this);
+    ui.setupUi(this);
 }
 
 void WorldEvents::closeEvent(QCloseEvent *event) {

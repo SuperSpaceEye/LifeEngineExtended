@@ -60,13 +60,16 @@ public:
     std::map<BlockTypes,     std::string> mapped_block_types_type_to_s;
     std::map<SimpleDecision, std::string> mapped_decisions_type_to_s;
 
-    Ui::MainWindow * _parent_ui = nullptr;
+    Ui::MainWindow * parent_ui = nullptr;
 
     std::vector<std::vector<EditBlock>> edit_grid;
     std::vector<unsigned char> edit_image;
     CursorMode * c_mode = nullptr;
 
-    Textures textures{};
+    Textures & textures;
+
+    SimulationParameters * sp;
+    OrganismBlockParameters * bp;
 
     ColorContainer * color_container;
 
@@ -99,7 +102,7 @@ public:
 
     QLabel actual_cursor;
 
-    Ui::Editor _ui{};
+    Ui::Editor ui{};
 
     int editor_width = 15;
     int editor_height = 15;
@@ -111,11 +114,9 @@ public:
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
     Rotation chosen_block_rotation = Rotation::UP;
 
-    OrganismEditor()=default;
-
-    void init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-              SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode,
-              Organism ** chosen_organism);
+    OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
+                   SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
+                   Organism **chosen_organism, Textures &textures);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 

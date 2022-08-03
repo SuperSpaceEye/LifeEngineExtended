@@ -8,32 +8,24 @@
 
 #include "OrganismEditor.h"
 
-//TODO the code is interconnected mess and needs refactoring
+OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
+                               SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
+                               Organism **chosen_organism, Textures &textures) : editor_width(width), editor_height(height),
+                                parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
+                                chosen_organism(chosen_organism), textures(textures) {
+    ui.setupUi(this);
 
-void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-                          SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode, Organism ** _chosen_organism) {
-    _ui.setupUi(this);
-    _parent_ui = parent_ui;
-
-    editor_width  = width;
-    editor_height = height;
-
-    this->color_container = color_container;
-    c_mode = cursor_mode;
-
-    _ui.editor_graphicsView->show();
-    _ui.editor_graphicsView->setEnabled(false);
+    ui.editor_graphicsView->show();
+    ui.editor_graphicsView->setEnabled(false);
 
     scene.addItem(&pixmap_item);
-    _ui.editor_graphicsView->setScene(&scene);
+    ui.editor_graphicsView->setScene(&scene);
 
     auto anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
 
     auto brain = Brain();
     brain.brain_type = BrainTypes::SimpleBrain;
-
-    chosen_organism = _chosen_organism;
 
     editor_organism = new Organism(editor_width  / 2,
                                    editor_height / 2,
@@ -55,23 +47,18 @@ void OrganismEditor::init(int width, int height, Ui::MainWindow *parent_ui, Colo
     actual_cursor.setGeometry(50, 50, 5, 5);
     actual_cursor.setStyleSheet("background-color:red;");
     actual_cursor.hide();
-
-//    auto timer = new QTimer(parent());
-//    timer->setInterval(200);
-//    connect(timer, &QTimer::timeout, [&]{load_chosen_organism(); create_image();});
-
 }
 
 void OrganismEditor::update_cell_count_label() {
-    _ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism->anatomy._organism_blocks.size())));
+    ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism->anatomy._organism_blocks.size())));
 }
 
 void OrganismEditor::update_gui() {
-    _ui.le_move_range           ->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
-    _ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism->anatomy_mutation_rate)));
-    _ui.le_grid_width           ->setText(QString::fromStdString(std::to_string(editor_width)));
-    _ui.le_grid_height          ->setText(QString::fromStdString(std::to_string(editor_height)));
-    _ui.le_brain_mutation_rate  ->setText(QString::fromStdString(std::to_string(editor_organism->brain_mutation_rate)));
+    ui.le_move_range           ->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
+    ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism->anatomy_mutation_rate)));
+    ui.le_grid_width           ->setText(QString::fromStdString(std::to_string(editor_width)));
+    ui.le_grid_height          ->setText(QString::fromStdString(std::to_string(editor_height)));
+    ui.le_brain_mutation_rate  ->setText(QString::fromStdString(std::to_string(editor_organism->brain_mutation_rate)));
     update_cell_count_label();
 }
 
@@ -82,9 +69,9 @@ void OrganismEditor::initialize_gui() {
         auto * horizontal_layout = new QHBoxLayout{};
         auto * b_group = new QButtonGroup(this);
 
-        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation), _ui.widget_2));
+        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation), ui.widget_2));
         for (auto & decision: decisions) {
-            auto * cb = new QCheckBox(QString::fromStdString(decision), _ui.widget_2);
+            auto * cb = new QCheckBox(QString::fromStdString(decision), ui.widget_2);
             connect(cb, &QCheckBox::clicked, [&, decision, observation](){brain_cb_chooser(observation, decision);});
 
             horizontal_layout->addWidget(cb);
@@ -93,7 +80,7 @@ void OrganismEditor::initialize_gui() {
             brain_checkboxes[observation][decision] = cb;
         }
 
-        _ui.brain_vertical_layout->addItem(horizontal_layout);
+        ui.brain_vertical_layout->addItem(horizontal_layout);
     }
 
     mapped_decisions_s_to_type["Do Nothing"] = SimpleDecision::DoNothing;
@@ -151,7 +138,7 @@ void OrganismEditor::update_brain_checkboxes() {
 }
 
 void OrganismEditor::closeEvent(QCloseEvent * event) {
-    _parent_ui->tb_open_organism_editor->setChecked(false);
+    parent_ui->tb_open_organism_editor->setChecked(false);
     QWidget::closeEvent(event);
 }
 
@@ -160,7 +147,7 @@ void OrganismEditor::resizeEvent(QResizeEvent *event) {
 }
 
 void OrganismEditor::wheelEvent(QWheelEvent *event) {
-    if (_ui.editor_graphicsView->underMouse()) {
+    if (ui.editor_graphicsView->underMouse()) {
         if (event->delta() > 0) {
             scaling_zoom /= scaling_coefficient;
         } else {
@@ -183,9 +170,9 @@ void OrganismEditor::reset_scale_view() {
 
     float exp;
     if (editor_width < editor_height) {
-        exp = log((float) (editor_height+4) / (float) _ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
+        exp = log((float) (editor_height+4) / (float) ui.editor_graphicsView->viewport()->height()) / log(scaling_coefficient);
     } else {
-        exp = log((float) (editor_width+ 4) / (float) _ui.editor_graphicsView->viewport()->width())  / log(scaling_coefficient);
+        exp = log((float) (editor_width+ 4) / (float) ui.editor_graphicsView->viewport()->width()) / log(scaling_coefficient);
     }
 
     scaling_zoom = pow(scaling_coefficient, exp);
@@ -222,7 +209,7 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
 
 void OrganismEditor::resize_image() {
     edit_image.clear();
-    edit_image.reserve(4 * _ui.editor_graphicsView->viewport()->width() * _ui.editor_graphicsView->viewport()->height());
+    edit_image.reserve(4 * ui.editor_graphicsView->viewport()->width() * ui.editor_graphicsView->viewport()->height());
 }
 
 void OrganismEditor::create_image() {
@@ -230,8 +217,8 @@ void OrganismEditor::create_image() {
     update_cell_count_label();
 
     resize_image();
-    auto image_width = _ui.editor_graphicsView->viewport()->width();
-    auto image_height = _ui.editor_graphicsView->viewport()->height();
+    auto image_width = ui.editor_graphicsView->viewport()->width();
+    auto image_height = ui.editor_graphicsView->viewport()->height();
 
     int scaled_width = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
@@ -303,7 +290,7 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
                                                         *color_container,
                                                         textures);
                     }
-                    ImageCreation::ImageCreationTools::set_image_pixel(x, y, _ui.editor_graphicsView->viewport()->width(), pixel_color, edit_image);
+                    ImageCreation::ImageCreationTools::set_image_pixel(x, y, ui.editor_graphicsView->viewport()->width(), pixel_color, edit_image);
                 }
             }
         }
@@ -331,16 +318,16 @@ void OrganismEditor::place_organism_on_a_grid() {
 }
 
 Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
-    x -= (_ui.editor_graphicsView->x() + 6 + 1);
-    y -= (_ui.editor_graphicsView->y() + 6 + 1);
+    x -= (ui.editor_graphicsView->x() + 6 + 1);
+    y -= (ui.editor_graphicsView->y() + 6 + 1);
 
-//    std::cout << (x - _ui.editor_graphicsView->viewport()->width() /2.)*scaling_zoom + center_x + 0.75 << " " <<
-//                 (y - _ui.editor_graphicsView->viewport()->height()/2.)*scaling_zoom + center_y + 0.75 << "\n";
+//    std::cout << (x - ui.editor_graphicsView->viewport()->width() /2.)*scaling_zoom + center_x + 0.75 << " " <<
+//                 (y - ui.editor_graphicsView->viewport()->height()/2.)*scaling_zoom + center_y + 0.75 << "\n";
 
     //TODO for some reason it becomes less accurate when coordinates go away from 0,0
     auto c_pos = Vector2<int>{};
-    c_pos.x = static_cast<int>((x - _ui.editor_graphicsView->viewport()->width() /2.)*scaling_zoom + center_x);
-    c_pos.y = static_cast<int>((y - _ui.editor_graphicsView->viewport()->height()/2.)*scaling_zoom + center_y);
+    c_pos.x = static_cast<int>((x - ui.editor_graphicsView->viewport()->width() / 2.) * scaling_zoom + center_x);
+    c_pos.y = static_cast<int>((y - ui.editor_graphicsView->viewport()->height() / 2.) * scaling_zoom + center_y);
     return c_pos;
 }
 

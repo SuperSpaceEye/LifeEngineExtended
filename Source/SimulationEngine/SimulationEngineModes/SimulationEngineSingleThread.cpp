@@ -590,9 +590,10 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
             case BlockTypes::WallBlock:
                 return false;
             case BlockTypes::FoodBlock:
-                if (sp->food_blocks_reproduction) {
-                    return false;
-                }
+                //Big producers will not evolve if uncommented.
+//                if (sp->food_blocks_reproduction) {
+//                    return false;
+//                }
                 continue;
             default:
                 if (block->organism == allow_organism) { continue;}
