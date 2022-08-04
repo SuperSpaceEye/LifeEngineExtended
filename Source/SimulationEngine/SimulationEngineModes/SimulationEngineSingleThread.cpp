@@ -364,7 +364,6 @@ void SimulationEngineSingleThread::try_make_child(EngineDataContainer *dc, Simul
     place_child(dc, sp, organism, gen);
 }
 
-//TODO refactor
 void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
                                                lehmer64 *gen) {
     auto to_place = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*gen));
@@ -566,7 +565,8 @@ bool SimulationEngineSingleThread::check_if_block_out_of_bounds(EngineDataContai
 
 bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation direction, int steps, Organism *allow_organism, EngineDataContainer *dc,
                    SimulationParameters *sp) {
-    for (int i = 0; i < steps; i++) {
+    //"steps-1" because the final position will be checked either way
+    for (int i = 0; i < steps-1; i++) {
         switch (direction) {
             case Rotation::UP:
                 y -= 1;
