@@ -56,6 +56,7 @@
 #include "../Containers/CPU/RecordingContainer.h"
 #include "../Stuff/ImageCreation.h"
 #include "../Stuff/DataSavingFunctions.h"
+#include "../Containers/CPU/OrganismInfoContainer.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -225,7 +226,7 @@ private:
     void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
-    void update_statistics_info(const OrganismAvgBlockInformation &info);
+    void update_statistics_info(const OrganismInfoContainer &info);
 
     void resize_simulation_grid();
 

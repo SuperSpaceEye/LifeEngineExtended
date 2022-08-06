@@ -33,6 +33,7 @@
 #include "../OrganismEditor/OrganismEditor.h"
 //#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
+#include "../Containers/CPU/OrganismInfoContainer.h"
 
 //TODO move simulation grid translation to here
 class SimulationEngine {
@@ -41,6 +42,7 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
     RecordingData * recd;
+    OrganismInfoContainer info;
 
     uint32_t auto_food_drop_index = 0;
     std::vector<Vector2<int>> auto_food_drop_coordinates_shuffled{};
@@ -93,6 +95,9 @@ public:
     bool wait_for_engine_to_pause_force();
     void parse_full_simulation_grid();
     void parse_full_simulation_grid_to_buffer();
+
+    void update_info();
+    const OrganismInfoContainer & get_info();
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

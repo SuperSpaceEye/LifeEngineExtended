@@ -42,7 +42,7 @@ public:
     {
         if (ChangeValueEventNodeWidget->objectName().isEmpty())
             ChangeValueEventNodeWidget->setObjectName(QString::fromUtf8("ChangeValueEventNodeWidget"));
-        ChangeValueEventNodeWidget->resize(512, 301);
+        ChangeValueEventNodeWidget->resize(400, 200);
         verticalLayout = new QVBoxLayout(ChangeValueEventNodeWidget);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         label = new QLabel(ChangeValueEventNodeWidget);

@@ -19,7 +19,13 @@ private:
     Ui::ChangeValueEventNodeWidget ui{};
 
 private slots:
+    void le_time_horizon_slot();
+    void le_target_value_slot();
+    void le_update_every_n_ticks_slot();
 
+    void cmb_change_value_slot(QString str);
+    //should hide time_horizon_layout, time_horizon_label, le_time_horizon
+    void cmb_change_mode_slot(QString str);
 };
 
 

@@ -23,44 +23,12 @@
 #include "../SimulationEngine/SimulationEngine.h"
 #include "../Stuff/textures.h"
 #include "../Stuff/ImageCreation.h"
+#include "../Containers/CPU/OrganismInfoContainer.h"
 
 #if defined(__WIN32)
 #include <windows.h>
 #include <cwchar>
 #endif
-
-struct OrganismInfoHolder {
-    double size = 0;
-    double _organism_lifetime = 0;
-    double _organism_age    = 0;
-    double _mouth_blocks    = 0;
-    double _producer_blocks = 0;
-    double _mover_blocks    = 0;
-    double _killer_blocks   = 0;
-    double _armor_blocks    = 0;
-    double _eye_blocks      = 0;
-    double brain_mutation_rate = 0;
-    double anatomy_mutation_rate = 0;
-    int total = 0;
-};
-struct OrganismAvgBlockInformation {
-    uint64_t total_size_organism_blocks = 0;
-    uint64_t total_size_producing_space = 0;
-    uint64_t total_size_eating_space    = 0;
-    uint64_t total_size_single_adjacent_space = 0;
-    uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size = 0;
-
-    OrganismInfoHolder total_avg{};
-    OrganismInfoHolder station_avg{};
-    OrganismInfoHolder moving_avg{};
-
-    double move_range = 0;
-    int moving_organisms = 0;
-    int organisms_with_eyes = 0;
-
-    double total_total_mutation_rate = 0;
-};
 
 class Recorder: public QWidget {
     Q_OBJECT
@@ -92,11 +60,10 @@ private:
     static std::string get_string_date();
 
     void clear_data();
+
 public:
     Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures,
              RecordingData * recording_data);
-
-    OrganismAvgBlockInformation parse_organisms_info();
 
     void set_engine(SimulationEngine * engine);
 

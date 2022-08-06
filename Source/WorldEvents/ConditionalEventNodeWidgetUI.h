@@ -32,7 +32,7 @@ public:
     QLabel *label_2;
     QComboBox *cmb_condition_value;
     QLabel *label_condition;
-    QLineEdit *lineEdit;
+    QLineEdit *le_value_to_compare_against;
     QLabel *label_4;
     QLabel *label_5;
 
@@ -40,7 +40,7 @@ public:
     {
         if (ConditionalEventNode->objectName().isEmpty())
             ConditionalEventNode->setObjectName(QString::fromUtf8("ConditionalEventNode"));
-        ConditionalEventNode->resize(444, 205);
+        ConditionalEventNode->resize(400, 200);
         verticalLayout = new QVBoxLayout(ConditionalEventNode);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         label = new QLabel(ConditionalEventNode);
@@ -90,10 +90,10 @@ public:
 
         horizontalLayout->addWidget(label_condition);
 
-        lineEdit = new QLineEdit(ConditionalEventNode);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
+        le_value_to_compare_against = new QLineEdit(ConditionalEventNode);
+        le_value_to_compare_against->setObjectName(QString::fromUtf8("le_value_to_compare_against"));
 
-        horizontalLayout->addWidget(lineEdit);
+        horizontalLayout->addWidget(le_value_to_compare_against);
 
         label_4 = new QLabel(ConditionalEventNode);
         label_4->setObjectName(QString::fromUtf8("label_4"));
@@ -111,6 +111,9 @@ public:
 
 
         retranslateUi(ConditionalEventNode);
+        QObject::connect(cmb_condition_mode, SIGNAL(currentTextChanged(QString)), ConditionalEventNode, SLOT(cmb_condition_mode_slot(QString)));
+        QObject::connect(cmb_condition_value, SIGNAL(currentTextChanged(QString)), ConditionalEventNode, SLOT(cmb_condition_value_slot(QString)));
+        QObject::connect(le_value_to_compare_against, SIGNAL(returnPressed()), ConditionalEventNode, SLOT(le_value_to_compare_against_slot()));
 
         QMetaObject::connectSlotsByName(ConditionalEventNode);
     } // setupUi

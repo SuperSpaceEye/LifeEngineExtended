@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>444</width>
-    <height>205</height>
+    <width>400</width>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,20 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Update every n ticks </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_update_every_n_ticks"/>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -82,7 +96,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="le_value_to_compare_against"/>
      </item>
      <item>
       <widget class="QLabel" name="label_4">
@@ -108,5 +122,76 @@ V</string>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cmb_condition_mode</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>ConditionalEventNode</receiver>
+   <slot>cmb_condition_mode_slot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>279</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmb_condition_value</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>ConditionalEventNode</receiver>
+   <slot>cmb_condition_value_slot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>108</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_value_to_compare_against</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ConditionalEventNode</receiver>
+   <slot>le_value_to_compare_against_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>294</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>102</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_update_every_n_ticks</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ConditionalEventNode</receiver>
+   <slot>le_update_every_n_ticks_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>273</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>cmb_condition_mode_slot(QString)</slot>
+  <slot>cmb_condition_value_slot(QString)</slot>
+  <slot>le_value_to_compare_against_slot()</slot>
+  <slot>le_update_every_n_ticks_slot()</slot>
+ </slots>
 </ui>

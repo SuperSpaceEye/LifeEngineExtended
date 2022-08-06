@@ -140,7 +140,8 @@ void MainWindow::mainloop_tick() {
 
         auto scale = (info_update/1000000.);
 
-        auto info = rec.parse_organisms_info();
+        engine->update_info();
+        auto info = engine->get_info();
 
         engine->unpause();
 
@@ -408,7 +409,7 @@ void MainWindow::clear_world() {
     engine->unpause();
 }
 
-void MainWindow::update_statistics_info(const OrganismAvgBlockInformation &info) {
+void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     s.ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: " + std::to_string(edc.total_engine_ticks)));
     s.ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                          convert_num_bytes(info.total_size)));

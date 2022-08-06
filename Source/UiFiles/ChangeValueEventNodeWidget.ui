@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>512</width>
-    <height>301</height>
+    <width>400</width>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,20 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Update every n ticks</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="le_update_every_n_ticks"/>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -172,11 +186,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_update_every_n_ticks</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>le_update_every_n_ticks_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>271</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>le_target_value_slot()</slot>
   <slot>le_time_horizon_slot()</slot>
   <slot>cmb_change_value_slot(QString)</slot>
   <slot>cmb_change_mode_slot(QString)</slot>
+  <slot>le_update_every_n_ticks_slot()</slot>
  </slots>
 </ui>

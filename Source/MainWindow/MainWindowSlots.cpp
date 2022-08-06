@@ -143,7 +143,7 @@ void MainWindow::b_save_world_slot() {
         out.close();
 
     } else {
-        auto info = rec.parse_organisms_info();
+        auto info = engine->get_info();
         DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
     }
 
