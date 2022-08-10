@@ -1,7 +1,7 @@
 # LifeEngine Extended
 C++ implementation of https://github.com/MaxRobinsonTheGreat/LifeEngine that extends the original version with new features.
 
-This version is work in progress.
+**The program needs to be placed in path with only english letters.**
 
 # Important information:
 - You should press enter after inputing text in line edits or it will not register.
