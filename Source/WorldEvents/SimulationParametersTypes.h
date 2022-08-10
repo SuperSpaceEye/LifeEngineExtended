@@ -10,5 +10,7 @@ enum class ValueType {
     NONE,
     INT,
     FLOAT,
+    DOUBLE,
+    INT64
 };
 #endif //LIFEENGINEEXTENDED_SIMULATIONPARAMETERSTYPES_H

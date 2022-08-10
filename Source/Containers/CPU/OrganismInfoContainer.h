@@ -6,6 +6,8 @@
 #define LIFEENGINEEXTENDED_ORGANISMINFOCONTAINER_H
 
 #include "EngineDataContainer.h"
+#include "EngineControlParametersContainer.h"
+#include "../../Organism/CPU/Organism.h"
 
 struct OrganismInfoHolder {
     double size = 0;
@@ -19,23 +21,23 @@ struct OrganismInfoHolder {
     double _eye_blocks      = 0;
     double brain_mutation_rate = 0;
     double anatomy_mutation_rate = 0;
-    int total = 0;
+    int64_t total = 0;
 };
 struct OrganismInfoContainer {
-    uint64_t total_size_organism_blocks = 0;
-    uint64_t total_size_producing_space = 0;
-    uint64_t total_size_eating_space    = 0;
-    uint64_t total_size_single_adjacent_space = 0;
-    uint64_t total_size_single_diagonal_adjacent_space = 0;
-    uint64_t total_size = 0;
+    int64_t total_size_organism_blocks = 0;
+    int64_t total_size_producing_space = 0;
+    int64_t total_size_eating_space    = 0;
+    int64_t total_size_single_adjacent_space = 0;
+    int64_t total_size_single_diagonal_adjacent_space = 0;
+    int64_t total_size = 0;
 
     OrganismInfoHolder total_avg{};
     OrganismInfoHolder station_avg{};
     OrganismInfoHolder moving_avg{};
 
     double move_range = 0;
-    int moving_organisms = 0;
-    int organisms_with_eyes = 0;
+    int64_t moving_organisms = 0;
+    int64_t organisms_with_eyes = 0;
 
     double total_total_mutation_rate = 0;
 

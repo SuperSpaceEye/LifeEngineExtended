@@ -28,8 +28,8 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     new_simulation_width  = recovery_simulation_width;
     new_simulation_height = recovery_simulation_height;
 
-    engine->reset_world();
-    engine->unpause();
+    engine.reset_world();
+    engine.unpause();
 }
 
 void MainWindow::read_data(std::ifstream &is) {
@@ -39,8 +39,8 @@ void MainWindow::read_data(std::ifstream &is) {
         return;
     }
 
-    engine->partial_clear_world();
-    engine->make_walls();
+    engine.partial_clear_world();
+    engine.make_walls();
 
     SimulationParameters recovery_sp = sp;
     OrganismBlockParameters recovery_bp = bp;
@@ -185,8 +185,8 @@ void MainWindow::read_json_data(const std::string &path) {
         return;
     }
 
-    engine->partial_clear_world();
-    engine->make_walls();
+    engine.partial_clear_world();
+    engine.make_walls();
 
     json_read_grid_data(document);
     DataSavingFunctions::json_read_simulation_parameters(document, sp);
@@ -209,7 +209,7 @@ void MainWindow::json_read_grid_data(rapidjson::Document & d) {
     update_simulation_size_label();
 
     resize_simulation_grid();
-    engine->make_walls();
+    engine.make_walls();
     disable_warnings = false;
 
     edc.loaded_engine_ticks = d["total_ticks"].GetInt64();

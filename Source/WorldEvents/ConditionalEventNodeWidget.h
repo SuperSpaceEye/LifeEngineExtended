@@ -8,24 +8,24 @@
 #include "ConditionalEventNodeWidgetUI.h"
 #include "EventNodes.h"
 #include "SimulationParametersTypes.h"
+#include "../Stuff/MiscFuncs.h"
+#include "ParametersList.h"
 
 class ConditionalEventNodeWidget: public QWidget {
     Q_OBJECT
 public:
-    ConditionalEventNodeWidget(QWidget * parent);
-    BaseEventNode * compile_node();
+    ConditionalEventNodeWidget(QWidget * parent,
+                               BaseEventNode * previous_node,
+                               ParametersList & parameters_list,
+                               QHBoxLayout * layout,
+                               std::vector<BaseEventNode*> & starting_nodes);
 
+    BaseEventNode * node = nullptr;
 private:
     Ui::ConditionalEventNode ui{};
-
-    ValueType value_type = ValueType::NONE;
-    //values needed to compile node
-    int update_every_n_ticks = 1;
-    ConditionalMode mode = ConditionalMode::MoreOrEqual;
-    int   i_value_to_compare_against = 1;
-    float f_value_to_compare_against = 1;
-
-
+    ParametersList & pl;
+    QHBoxLayout * layout;
+    std::vector<BaseEventNode*> & starting_nodes;
 
     void init_gui();
 private slots:
@@ -34,6 +34,10 @@ private slots:
 
     void cmb_condition_value_slot(QString str);
     void cmb_condition_mode_slot(QString str);
+
+    void b_new_event_left_slot();
+    void b_new_event_right_slot();
+    void b_delete_event_slot();
 };
 
 

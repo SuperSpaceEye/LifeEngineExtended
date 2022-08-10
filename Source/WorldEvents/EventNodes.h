@@ -12,12 +12,18 @@ enum class NodeType {
 
 //
 
+template <typename T>
+struct ConditionalEventNode;
+
 struct BaseEventNode {
     NodeType type;
     BaseEventNode * next_node = nullptr;
+    BaseEventNode * previous_node = nullptr;
+    BaseEventNode * alternative_node = nullptr;
     uint32_t execute_every_n_tick = 1;
+    bool alternative_from_conditional = false;
 
-    BaseEventNode()=delete;
+    BaseEventNode()= default;
 
     BaseEventNode * update(uint32_t current_time) {
         if (current_time - last_execution_time >= execute_every_n_tick) {
@@ -26,6 +32,31 @@ struct BaseEventNode {
         }
         return this;
     }
+
+    void delete_node() {
+        if (previous_node != nullptr && !alternative_from_conditional) {
+            previous_node->next_node = next_node;
+        } else if (previous_node != nullptr) {
+            previous_node->alternative_node = next_node;
+        }
+        if (next_node != nullptr) {next_node->previous_node = previous_node;}
+
+        delete this;
+    }
+
+    void delete_from_this() {
+        if (next_node != nullptr) {
+            next_node->delete_from_this();
+        }
+        if (alternative_node != nullptr) {
+            alternative_node->delete_from_this();
+        }
+
+        previous_node->next_node = nullptr;
+        delete this;
+    }
+
+    virtual ~BaseEventNode()=default;
 
 private:
     uint32_t last_execution_time = 0;
@@ -39,30 +70,41 @@ enum class ChangeValueMode {
 //    Logarithmic
 };
 
+enum class ChangeTypes {
+    INT32,
+    FLOAT
+};
+
 //Will update the selected value every time update() is called. When it's finished updating, will return pointer to the next node, otherwise to itself.
 template <typename T>
 struct ChangeValueEventNode: public BaseEventNode {
-    T * change_value;
-    T target_value;
-    T start_value;
+    ChangeTypes value_type;
     ChangeValueMode change_mode;
-    uint32_t time_horizon;
+    uint32_t time_horizon = 1;
     uint32_t last_updated = 0;
     uint32_t total_updated = 0;
     bool execution_started = false;
+    T * change_value;
+    T target_value;
+    T start_value;
     ChangeValueEventNode(BaseEventNode * _next_node,
+                         BaseEventNode * _previous_node,
                          T * value_to_change,
-                         T _target_value,
-                         uint32_t _time_horizon,
+                         T target_value,
+                         uint32_t time_horizon,
                          uint32_t _execute_every_n_tick,
-                         ChangeValueMode mode) {
+                         ChangeValueMode mode,
+                         ChangeTypes value_type):
+                         value_type(value_type),
+                         change_mode(mode),
+                         time_horizon(time_horizon),
+                         target_value(target_value),
+                         change_value(value_to_change)
+                         {
         type = NodeType::ChangeValue;
         next_node = _next_node;
-        change_value = value_to_change;
-        target_value = _target_value;
-        time_horizon = _time_horizon;
+        previous_node = _previous_node;
         execute_every_n_tick = _execute_every_n_tick;
-        change_mode = mode;
     }
 
     BaseEventNode * _update(uint32_t current_time) override {
@@ -95,11 +137,18 @@ struct ChangeValueEventNode: public BaseEventNode {
         execution_started = false;
         total_updated = 0;
     }
+
+    ~ChangeValueEventNode() override =default;
 };
 
 enum class ConditionalMode {
     MoreOrEqual,
     LessOrEqual,
+};
+
+enum class ConditionalTypes {
+    DOUBLE,
+    INT64,
 };
 
 //If no alternative node, will repeatedly check the condition, and only return next node if it is true.
@@ -108,11 +157,11 @@ enum class ConditionalMode {
 //(Not for now.) If another_value is nullptr, will check against fixed, else will check against another value
 template<typename T>
 struct ConditionalEventNode: public BaseEventNode {
-    BaseEventNode * alternative_node = nullptr;
+    ConditionalTypes value_type;
+    ConditionalMode mode;
     T * check_value;
 //    T * another_value;
     T fixed_value;
-    ConditionalMode mode;
 
 //    bool check_against_fixed = false;
 
@@ -122,9 +171,14 @@ struct ConditionalEventNode: public BaseEventNode {
 //        type = NodeType::Conditional;
 //    }
 
-    ConditionalEventNode(T * check_value, T fixed_value, ConditionalMode mode):
-            check_value(check_value), fixed_value(fixed_value), mode(mode) {
+    ConditionalEventNode(T * check_value, T fixed_value, ConditionalMode mode, ConditionalTypes value_type, BaseEventNode * _next_node,
+                         BaseEventNode * _previous_node, BaseEventNode * _alternative_node, uint32_t _execute_every_n_tick):
+            check_value(check_value), fixed_value(fixed_value), mode(mode), value_type(value_type) {
         type = NodeType::Conditional;
+        next_node = _next_node;
+        previous_node = _previous_node;
+        alternative_node = _alternative_node;
+        execute_every_n_tick = _execute_every_n_tick;
     }
 
     BaseEventNode * _update(uint32_t current_time) override {
@@ -153,6 +207,16 @@ struct ConditionalEventNode: public BaseEventNode {
         }
         return this;
     }
+
+    void delete_node() {
+        if (previous_node != nullptr) {previous_node->next_node = next_node;}
+        if (next_node != nullptr)     {next_node->previous_node = previous_node;}
+        if (alternative_node != nullptr) {alternative_node->delete_from_this();}
+
+        delete this;
+    }
+
+    ~ConditionalEventNode() override =default;
 };
 
 #endif //LIFEENGINEEXTENDED_EVENTNODES_H

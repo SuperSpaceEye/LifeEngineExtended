@@ -11,36 +11,46 @@
 
 #include "../Containers/CPU/SimulationParameters.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
+#include "../Containers/CPU/OrganismInfoContainer.h"
 
 #include "SimulationParametersTypes.h"
 
-struct ReturnValue {
+struct ChangeableReturn {
     ValueType type = ValueType::NONE;
     float * float_val = nullptr;
     int   * int_val   = nullptr;
+};
+
+struct ChangingReturn {
+    ValueType type = ValueType::NONE;
+    double  * double_val = nullptr;
+    int64_t * int64_val  = nullptr;
 };
 
 class ParametersList {
 private:
     SimulationParameters * sp = nullptr;
     OrganismBlockParameters * bp = nullptr;
+    OrganismInfoContainer * ic = nullptr;
 
     //changeable parameters (simulation parameters, block parameters)
-    boost::unordered_map<std::string, ReturnValue> changeable_pm;
+    std::vector<std::string> changeable_pm_list;
+    boost::unordered_map<std::string, ChangeableReturn> changeable_pm;
     //changing parameters (simulation parameters, block parameters)
-    boost::unordered_map<std::string, ReturnValue> changing_pm;
+    std::vector<std::string> changing_pm_list;
+    boost::unordered_map<std::string, ChangingReturn> changing_pm;
 
 public:
-    explicit ParametersList(SimulationParameters * sp, OrganismBlockParameters * bp);
+    explicit ParametersList(SimulationParameters * sp, OrganismBlockParameters * bp, OrganismInfoContainer * ic);
 
     //Returns vector containing a pair of name and type of parameter that can be changed (some simulation parameters).
-    std::vector<std::pair<std::string, std::string>> get_changeable_parameters_list();
+    const std::vector<std::string> & get_changeable_parameters_list();
 
     //Returns vector containing a pair of name and type of parameters that are changing in simulation (info).
-    std::vector<std::pair<std::string, std::string>> get_changing_parameters_list();
+    const std::vector<std::string> & get_changing_parameters_list();
 
-    ReturnValue get_changeable_value_address_from_name(std::string & name);
-    ReturnValue get_changing_value_address_from_name(std::string & name);
+    ChangeableReturn get_changeable_value_address_from_name(std::string & name);
+    ChangingReturn get_changing_value_address_from_name(std::string & name);
 
 
 };

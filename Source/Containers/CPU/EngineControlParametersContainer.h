@@ -62,7 +62,9 @@ struct EngineControlParameters {
     volatile int  parse_full_grid_every_n = 1;
     volatile bool lock_resizing = false;
 
-    volatile int update_info_every_n_tick = 100;
+    volatile int  update_info_every_n_tick = 100;
+    volatile int  update_world_events_every_n_tick = 1;
+    volatile bool execute_events = false;
 
     volatile uint8_t num_threads = 2;
 

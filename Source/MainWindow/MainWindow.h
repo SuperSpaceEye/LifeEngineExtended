@@ -109,12 +109,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
-    SimulationEngine* engine = nullptr;
+    SimulationEngine engine{edc, ecp, bp, sp, &recd};
     OrganismEditor ee{15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
     StatisticsCore s{&_ui};
     InfoWindow iw{&_ui};
     Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
-    WorldEvents we{&_ui};
+    WorldEvents we{&_ui, &sp, &bp, &engine.info, &ecp, &engine};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -197,7 +197,7 @@ private:
     bool cuda_is_available();
 
     void mainloop_tick();
-    void window_tick();
+    void ui_tick();
     void set_simulation_interval(int max_simulation_fps);
     void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);

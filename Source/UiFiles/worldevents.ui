@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="world_events_viewer_tab">
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -53,6 +53,9 @@
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -83,12 +86,81 @@
            </property>
            <item>
             <widget class="QFrame" name="world_events_window">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Raised</enum>
              </property>
+             <property name="lineWidth">
+              <number>0</number>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="world_events_widget" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <layout class="QVBoxLayout" name="world_events_layout">
+                   <property name="spacing">
+                    <number>9</number>
+                   </property>
+                   <property name="sizeConstraint">
+                    <enum>QLayout::SetDefaultConstraint</enum>
+                   </property>
+                   <property name="leftMargin">
+                    <number>6</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>6</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>6</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>6</number>
+                   </property>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -97,6 +169,13 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="b_apply_events">
+           <property name="text">
+            <string>Apply events</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QPushButton" name="pushButton">
            <property name="text">
@@ -115,6 +194,59 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="current_world_events">
+      <attribute name="title">
+       <string>Current World Events Viewer</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QLabel" name="world_events_status_label">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="b_pause_events">
+              <property name="text">
+               <string>Pause Events</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_resume_events">
+              <property name="text">
+               <string>Resume events</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="settings_tab">
       <attribute name="title">
        <string>Settings</string>
@@ -125,5 +257,59 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>b_apply_events</sender>
+   <signal>clicked()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>b_apply_events_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>175</x>
+     <y>579</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_pause_events</sender>
+   <signal>clicked()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>b_pause_events_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>268</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_resume_events</sender>
+   <signal>clicked()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>b_resume_events_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>786</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>b_apply_events_slot()</slot>
+  <slot>b_pause_events_slot()</slot>
+  <slot>b_resume_events_slot()</slot>
+ </slots>
 </ui>

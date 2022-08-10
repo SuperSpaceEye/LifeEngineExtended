@@ -33,11 +33,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     update_simulation_size_label();
 
-    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
+//    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
 
-    engine->make_walls();
+    engine.make_walls();
 
-    rec.set_engine(engine);
+    rec.set_engine(&engine);
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
@@ -125,14 +125,14 @@ void MainWindow::mainloop_tick() {
     }
     if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
-    window_tick();
+    ui_tick();
     window_frames++;
 
     auto info_update = std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - fps_timer).count();
 
     if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
         auto start_timer = clock_now();
-        engine->pause();
+        engine.pause();
         uint32_t simulation_frames = edc.engine_ticks;
         edc.engine_ticks = 0;
 
@@ -140,10 +140,10 @@ void MainWindow::mainloop_tick() {
 
         auto scale = (info_update/1000000.);
 
-        engine->update_info();
-        auto info = engine->get_info();
+        engine.update_info();
+        auto info = engine.get_info();
 
-        engine->unpause();
+        engine.unpause();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
@@ -158,7 +158,7 @@ void MainWindow::update_fps_labels(int fps, int sps) {
     _ui.lb_sps->setText(QString::fromStdString("sps: "+std::to_string(sps)));
 }
 
-void MainWindow::window_tick() {
+void MainWindow::ui_tick() {
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
     if (ecp.tb_paused) {_ui.tb_pause->setChecked(true);}
 
@@ -167,6 +167,9 @@ void MainWindow::window_tick() {
 
     if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
+
+    //TODO
+    if (ecp.execute_events) {initialize_gui();}
 
     rec.update_label();
 
@@ -250,7 +253,7 @@ void MainWindow::create_image() {
         // pausing engine to parse data from engine.
         auto paused = wait_for_engine_to_pause();
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
-        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine->unpause();}
+        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine.unpause();}
     }
 
     if (!use_cuda) {
@@ -301,7 +304,7 @@ void MainWindow::set_simulation_interval(int max_simulation_fps) {
 //Can wait, or it can not.
 bool MainWindow::wait_for_engine_to_pause() {
     if (!wait_for_engine_to_stop_to_render || ecp.engine_global_pause) {return true;}
-    return engine->wait_for_engine_to_pause_force();
+    return engine.wait_for_engine_to_pause_force();
 }
 
 void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
@@ -317,20 +320,20 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
 
 void MainWindow::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
-    engine->pause();
-    engine->parse_full_simulation_grid();
-    engine->unpause();
+    engine.pause();
+    engine.parse_full_simulation_grid();
+    engine.unpause();
 }
 
 void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
-    engine->pause();
+    engine.pause();
 
     ecp.num_threads = num_threads;
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
         ecp.build_threads = true;
     }
 
-    engine->unpause();
+    engine.unpause();
 }
 
 void MainWindow::set_cursor_mode(CursorMode mode) {
@@ -380,7 +383,7 @@ void MainWindow::resize_simulation_grid() {
         }
     }
 
-    engine->pause();
+    engine.pause();
 
     edc.simulation_width = new_simulation_width;
     edc.simulation_height = new_simulation_height;
@@ -395,18 +398,18 @@ void MainWindow::resize_simulation_grid() {
         ecp.build_threads = true;
     }
 
-    engine->init_auto_food_drop(edc.simulation_width, edc.simulation_height);
+    engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 
-    engine->reset_world();
-    engine->unpause();
+    engine.reset_world();
+    engine.unpause();
 
     reset_scale_view();
 }
 
 void MainWindow::clear_world() {
-    engine->partial_clear_world();
-    engine->make_walls();
-    engine->unpause();
+    engine.partial_clear_world();
+    engine.make_walls();
+    engine.unpause();
 }
 
 void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
