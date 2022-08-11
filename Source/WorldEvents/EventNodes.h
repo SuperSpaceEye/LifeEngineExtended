@@ -113,7 +113,6 @@ struct ChangeValueEventNode: public BaseEventNode {
     BaseEventNode * _update(uint32_t current_time) override {
         if (!execution_started) {last_updated = current_time; start_value = *change_value; execution_started = true;}
 
-        //if (change_mode == ChangeValueMode::Step) {
         switch (change_mode) {
             case ChangeValueMode::Step:
                 *change_value = target_value;
