@@ -8,8 +8,6 @@
 
 #include "SimulationEngine.h"
 
-#include <utility>
-
 SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
                                    EngineControlParameters &engine_control_parameters,
                                    OrganismBlockParameters &organism_block_parameters,
@@ -54,7 +52,9 @@ void SimulationEngine::threaded_mainloop() {
             if (ecp.record_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (edc.total_engine_ticks % ecp.update_info_every_n_tick == 0) {info.parse_info(&edc, &ecp);}
-            if (ecp.execute_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {world_events_controller.tick_events(edc.total_engine_ticks);}
+            if (ecp.execute_world_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {
+                world_events_controller.tick_events(edc.total_engine_ticks, ecp.pause_world_events);
+            }
         }
         if (ecp.calculate_simulation_tick_delta_time) { edc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
         if (!edc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(edc.simulation_interval * 1000000 - edc.delta_time)));}
@@ -341,6 +341,8 @@ void SimulationEngine::reset_world() {
     edc.organisms.push_back(organism);
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
+    if (ecp.execute_world_events) {stop_world_events(); start_world_events();}
+
     //Just in case
     ecp.engine_pass_tick = true;
     ecp.synchronise_simulation_tick = true;
@@ -500,5 +502,30 @@ void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nod
                                           std::vector<BaseEventNode *> node_storage) {
     pause();
     world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
+    unpause();
+}
+
+void SimulationEngine::start_world_events() {
+    pause();
+    sp_copy = SimulationParameters{sp};
+    ecp.execute_world_events = true;
+    ecp.pause_world_events = false;
+    unpause();
+}
+
+void SimulationEngine::resume_world_events() {
+    ecp.pause_world_events = true;
+}
+
+void SimulationEngine::pause_world_events() {
+    ecp.pause_world_events = false;
+}
+
+void SimulationEngine::stop_world_events() {
+    pause();
+    sp = SimulationParameters{sp_copy};
+    ecp.execute_world_events = false;
+    ecp.pause_world_events = false;
+    world_events_controller.reset();
     unpause();
 }

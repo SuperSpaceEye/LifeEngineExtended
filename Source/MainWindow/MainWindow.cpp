@@ -168,8 +168,7 @@ void MainWindow::ui_tick() {
     if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
 
-    //TODO
-    if (ecp.execute_events) {initialize_gui();}
+    if (ecp.execute_world_events && (!ecp.tb_paused || ecp.pause_world_events)) {update_world_event_values_ui();}
 
     rec.update_label();
 
@@ -568,6 +567,25 @@ void MainWindow::initialize_gui() {
     _ui.le_num_threads->hide();
     _ui.lb_set_num_threads->hide();
     s.ui.lb_organisms_memory_consumption->hide();
+}
+
+void MainWindow::update_world_event_values_ui() {
+    _ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability,          4)));
+    _ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate,         2)));
+    _ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate,           2)));
+    _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter,      2)));
+    _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,        2)));
+    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,                  3)));
+    _ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost,        0)));
+    _ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost,              0)));
+    _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
+    _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
+    _ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));
+    _ui.le_add                               ->setText(QString::fromStdString(std::to_string(sp.add_cell)));
+    _ui.le_change                            ->setText(QString::fromStdString(std::to_string(sp.change_cell)));
+    _ui.le_remove                            ->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
+
+    update_table_values();
 }
 
 void MainWindow::update_simulation_size_label() {

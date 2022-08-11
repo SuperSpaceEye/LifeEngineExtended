@@ -234,6 +234,8 @@ private:
 
     void update_simulation_size_label();
 
+    void update_world_event_values_ui();
+
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
     void initialize_gui();
 

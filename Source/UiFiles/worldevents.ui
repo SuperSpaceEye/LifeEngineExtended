@@ -220,12 +220,19 @@
           <item>
            <widget class="QLabel" name="world_events_status_label">
             <property name="text">
-             <string>TextLabel</string>
+             <string>Events stopped.</string>
             </property>
            </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="b_start_events">
+              <property name="text">
+               <string>Start Events</string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QPushButton" name="b_pause_events">
               <property name="text">
@@ -237,6 +244,13 @@
              <widget class="QPushButton" name="b_resume_events">
               <property name="text">
                <string>Resume events</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_stop_events">
+              <property name="text">
+               <string>Stop Events</string>
               </property>
              </widget>
             </item>
@@ -306,10 +320,44 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_start_events</sender>
+   <signal>clicked()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>b_start_events_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_stop_events</sender>
+   <signal>clicked()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>b_stop_events_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>916</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_apply_events_slot()</slot>
   <slot>b_pause_events_slot()</slot>
   <slot>b_resume_events_slot()</slot>
+  <slot>b_start_events_slot()</slot>
+  <slot>b_stop_events_slot()</slot>
  </slots>
 </ui>

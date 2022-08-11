@@ -25,11 +25,13 @@ private:
 public:
     WorldEventsController()=default;
 
-    void tick_events(uint64_t time_point);
+    void tick_events(uint64_t time_point, bool pause_events);
 
     void reset_events(std::vector<BaseEventNode *> _start_nodes,
                       std::vector<char> _repeating_branch,
                       std::vector<BaseEventNode *> _node_storage);
+
+    void reset();
 };
 
 

@@ -45,6 +45,7 @@ class SimulationEngine {
     RecordingData * recd;
 //    OrganismInfoContainer info{};
     WorldEventsController world_events_controller{};
+    SimulationParameters sp_copy;
 
     uint32_t auto_food_drop_index = 0;
     std::vector<Vector2<int>> auto_food_drop_coordinates_shuffled{};
@@ -102,6 +103,11 @@ public:
 
     void update_info();
     const OrganismInfoContainer & get_info();
+
+    void start_world_events();
+    void resume_world_events();
+    void pause_world_events();
+    void stop_world_events();
 
     void reset_world_events(std::vector<BaseEventNode *> start_nodes,
                             std::vector<char> repeating_branch,

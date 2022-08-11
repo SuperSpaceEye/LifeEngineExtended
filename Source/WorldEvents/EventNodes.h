@@ -25,10 +25,10 @@ struct BaseEventNode {
 
     BaseEventNode()= default;
 
-    BaseEventNode * update(uint32_t current_time) {
+    BaseEventNode *update(uint32_t current_time, bool pause_events) {
         if (current_time - last_execution_time >= execute_every_n_tick) {
             last_execution_time = current_time;
-            return _update(current_time);
+            if (!pause_events) {return _update(current_time);}
         }
         return this;
     }

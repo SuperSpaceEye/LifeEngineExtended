@@ -36,7 +36,7 @@ private:
     QWidget * node_chooser(QHBoxLayout * widget_layout);
 
     bool verify_nodes();
-    bool check_conditional_node(BaseEventNode * node);
+    static bool check_conditional_node(BaseEventNode * node);
     static bool check_change_value_node(BaseEventNode * node);
     BaseEventNode *copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage);
     void copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage);
@@ -52,6 +52,8 @@ private slots:
     void b_apply_events_slot();
     void b_pause_events_slot();
     void b_resume_events_slot();
+    void b_start_events_slot();
+    void b_stop_events_slot();
 };
 
 

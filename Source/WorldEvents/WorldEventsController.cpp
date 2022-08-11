@@ -26,7 +26,7 @@ void WorldEventsController::reset_events(std::vector<BaseEventNode *> _start_nod
     node_storage = std::move(_node_storage);
 }
 
-void WorldEventsController::tick_events(uint64_t time_point) {
+void WorldEventsController::tick_events(uint64_t time_point, bool pause_events) {
     //choosing events in reverse because events should be applied in reverse order of importance.
     for (int i = node_cursors.size()-1; i >= 0; i--) {
         auto & node = node_cursors[i];
@@ -36,6 +36,17 @@ void WorldEventsController::tick_events(uint64_t time_point) {
             }
             node = start_nodes[i];
         }
-        node = node->update(time_point);
+        node = node->update(time_point, pause_events);
     }
+}
+
+void WorldEventsController::reset() {
+    for (auto & node: node_cursors) {
+        //If execution of event stopped abruptly.
+        if (node != nullptr && node->type == NodeType::ChangeValue) {
+            reinterpret_cast<ChangeValueEventNode<float>*>(node)->reset_node();
+        }
+    }
+
+    node_cursors = std::vector(start_nodes);
 }

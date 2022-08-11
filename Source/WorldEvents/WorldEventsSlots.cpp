@@ -23,15 +23,28 @@ void WorldEvents::b_apply_events_slot() {
     copy_nodes(start_nodes, node_storage);
 
     engine->reset_world_events(std::move(start_nodes), std::move(_repeating_branch), std::move(node_storage));
+    engine->start_world_events();
     b_resume_events_slot();
 }
 
 void WorldEvents::b_pause_events_slot() {
-    ecp->execute_events = false;
-    ui.world_events_status_label->setText(QString("Events stopped."));
+    ecp->pause_world_events = true;
+    ui.world_events_status_label->setText(QString("Events paused."));
 }
 
 void WorldEvents::b_resume_events_slot() {
-    ecp->execute_events = true;
+    ecp->pause_world_events = false;
     ui.world_events_status_label->setText(QString("Events running."));
+}
+
+void WorldEvents::b_start_events_slot() {
+    if (ecp->execute_world_events) { return;}
+    engine->start_world_events();
+    ui.world_events_status_label->setText(QString("Events running."));
+}
+
+void WorldEvents::b_stop_events_slot() {
+    if (!ecp->execute_world_events) { return;}
+    engine->stop_world_events();
+    ui.world_events_status_label->setText(QString("Events stopped."));
 }
