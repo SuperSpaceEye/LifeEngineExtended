@@ -23,6 +23,8 @@
 #include <QLineEdit>
 #include <QObject>
 #include <QDialogButtonBox>
+#include <QGuiApplication>
+#include <QScreen>
 
 #include "../WorldEvents/EventNodes.h"
 

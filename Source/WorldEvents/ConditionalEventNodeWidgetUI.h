@@ -69,7 +69,7 @@ public:
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(ConditionalEventNode);
         frame->setObjectName(QString::fromUtf8("frame"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
@@ -87,7 +87,7 @@ public:
         horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         b_new_event_left = new QPushButton(frame);
         b_new_event_left->setObjectName(QString::fromUtf8("b_new_event_left"));
-        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(b_new_event_left->sizePolicy().hasHeightForWidth());
@@ -120,8 +120,11 @@ public:
 
         label = new QLabel(frame);
         label->setObjectName(QString::fromUtf8("label"));
-        sizePolicy2.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy3);
         label->setAlignment(Qt::AlignCenter);
 
         verticalLayout_2->addWidget(label);
@@ -130,13 +133,18 @@ public:
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         label_6 = new QLabel(frame);
         label_6->setObjectName(QString::fromUtf8("label_6"));
-        sizePolicy2.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
-        label_6->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
+        label_6->setSizePolicy(sizePolicy3);
 
         horizontalLayout_3->addWidget(label_6);
 
         le_update_every_n_ticks = new QLineEdit(frame);
         le_update_every_n_ticks->setObjectName(QString::fromUtf8("le_update_every_n_ticks"));
+        QSizePolicy sizePolicy4(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(le_update_every_n_ticks->sizePolicy().hasHeightForWidth());
+        le_update_every_n_ticks->setSizePolicy(sizePolicy4);
 
         horizontalLayout_3->addWidget(le_update_every_n_ticks);
 
@@ -147,8 +155,8 @@ public:
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         label_3 = new QLabel(frame);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        sizePolicy2.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
-        label_3->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
+        label_3->setSizePolicy(sizePolicy3);
 
         horizontalLayout_2->addWidget(label_3);
 
@@ -156,11 +164,8 @@ public:
         cmb_condition_mode->addItem(QString());
         cmb_condition_mode->addItem(QString());
         cmb_condition_mode->setObjectName(QString::fromUtf8("cmb_condition_mode"));
-        QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(cmb_condition_mode->sizePolicy().hasHeightForWidth());
-        cmb_condition_mode->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(cmb_condition_mode->sizePolicy().hasHeightForWidth());
+        cmb_condition_mode->setSizePolicy(sizePolicy4);
 
         horizontalLayout_2->addWidget(cmb_condition_mode);
 
@@ -176,20 +181,22 @@ public:
 
         cmb_condition_value = new QComboBox(frame);
         cmb_condition_value->setObjectName(QString::fromUtf8("cmb_condition_value"));
-        sizePolicy3.setHeightForWidth(cmb_condition_value->sizePolicy().hasHeightForWidth());
-        cmb_condition_value->setSizePolicy(sizePolicy3);
+        sizePolicy4.setHeightForWidth(cmb_condition_value->sizePolicy().hasHeightForWidth());
+        cmb_condition_value->setSizePolicy(sizePolicy4);
 
         horizontalLayout->addWidget(cmb_condition_value);
 
         label_condition = new QLabel(frame);
         label_condition->setObjectName(QString::fromUtf8("label_condition"));
-        sizePolicy2.setHeightForWidth(label_condition->sizePolicy().hasHeightForWidth());
-        label_condition->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(label_condition->sizePolicy().hasHeightForWidth());
+        label_condition->setSizePolicy(sizePolicy3);
 
         horizontalLayout->addWidget(label_condition);
 
         le_value_to_compare_against = new QLineEdit(frame);
         le_value_to_compare_against->setObjectName(QString::fromUtf8("le_value_to_compare_against"));
+        sizePolicy4.setHeightForWidth(le_value_to_compare_against->sizePolicy().hasHeightForWidth());
+        le_value_to_compare_against->setSizePolicy(sizePolicy4);
 
         horizontalLayout->addWidget(le_value_to_compare_against);
 
@@ -204,8 +211,8 @@ public:
         label_5 = new QLabel(frame);
         label_5->setObjectName(QString::fromUtf8("label_5"));
         label_5->setEnabled(false);
-        sizePolicy2.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy2);
+        sizePolicy3.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
+        label_5->setSizePolicy(sizePolicy3);
         label_5->setAlignment(Qt::AlignCenter);
 
         verticalLayout_2->addWidget(label_5);

@@ -248,12 +248,12 @@ void MainWindow::le_cell_size_slot() {
 }
 
 void MainWindow::le_simulation_width_slot() {
-    le_slot_lower_bound<uint32_t>(edc.simulation_width, new_simulation_width, "int",
+    le_slot_lower_bound<int32_t>(edc.simulation_width, new_simulation_width, "int",
                                   _ui.le_simulation_width, 10, "10");
 }
 
 void MainWindow::le_simulation_height_slot() {
-    le_slot_lower_bound<uint32_t>(edc.simulation_height, new_simulation_height, "int",
+    le_slot_lower_bound<int32_t>(edc.simulation_height, new_simulation_height, "int",
                                   _ui.le_simulation_height, 10, "10");
 }
 

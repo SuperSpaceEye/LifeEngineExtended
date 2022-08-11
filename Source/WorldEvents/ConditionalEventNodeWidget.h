@@ -10,6 +10,7 @@
 #include "SimulationParametersTypes.h"
 #include "../Stuff/MiscFuncs.h"
 #include "ParametersList.h"
+#include "ChangeValueEventNodeWidget.h"
 
 class ConditionalEventNodeWidget: public QWidget {
     Q_OBJECT

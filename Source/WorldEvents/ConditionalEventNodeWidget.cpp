@@ -12,6 +12,9 @@ ConditionalEventNodeWidget::ConditionalEventNodeWidget(QWidget *parent,
     pl(parameters_list), layout(layout), starting_nodes(starting_nodes) {
     ui.setupUi(this);
     setParent(parent);
+    this->setMinimumSize(400, 200);
+    this->setMaximumSize(400, 200);
+
     node = new ConditionalEventNode<int64_t>(nullptr, 0, ConditionalMode::MoreOrEqual, ConditionalTypes::INT64, nullptr, previous_node,
                                              nullptr, 10);
 

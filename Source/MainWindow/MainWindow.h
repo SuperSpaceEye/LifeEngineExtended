@@ -160,8 +160,8 @@ private:
     int window_frames = 0;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
-    uint32_t new_simulation_width = 200;
-    uint32_t new_simulation_height = 200;
+    int32_t new_simulation_width = 200;
+    int32_t new_simulation_height = 200;
     // visual only. Controls precision of floats in labels
     int float_precision = 4;
     int brush_size = 2;

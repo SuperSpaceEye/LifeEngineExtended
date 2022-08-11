@@ -8,6 +8,8 @@ ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent, BaseEve
     pl(parameter_list), layout(layout), starting_nodes(starting_nodes) {
     ui.setupUi(this);
     setParent(parent);
+    this->setMinimumSize(400, 200);
+    this->setMaximumSize(400, 200);
 
     node = new ChangeValueEventNode<int32_t>(nullptr, previous_node, nullptr, 0, 20, 1, ChangeValueMode::Linear, ChangeTypes::INT32);
     init_gui();

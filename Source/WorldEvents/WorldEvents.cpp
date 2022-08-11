@@ -30,7 +30,7 @@ void WorldEvents::button_add_new_branch() {
     connect(button, &QPushButton::clicked, [&, button](){
         auto * layout = new QHBoxLayout{};
         auto * widget = node_chooser(layout);
-        if (widget == nullptr || widget == NULL) {
+        if (widget == nullptr) {
             delete layout;
             return;
         }
@@ -39,9 +39,6 @@ void WorldEvents::button_add_new_branch() {
         delete spacer_item;
 
         layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-        widget->setMinimumSize(400, 200);
-        widget->setMaximumSize(400, 200);
 
         layout->addWidget(widget);
 
@@ -99,7 +96,7 @@ bool WorldEvents::verify_nodes() {
                         if (node->alternative_node != nullptr) {branch_stack.push_back(node->alternative_node);}
                         break;
                     default:
-                        throw "";
+                        return false;
                 }
                 node = node->next_node;
             }

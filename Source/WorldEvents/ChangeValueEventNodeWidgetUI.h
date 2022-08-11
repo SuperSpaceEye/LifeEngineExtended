@@ -79,24 +79,33 @@ public:
         horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
         b_new_event_left = new QPushButton(frame);
         b_new_event_left->setObjectName(QString::fromUtf8("b_new_event_left"));
+        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(b_new_event_left->sizePolicy().hasHeightForWidth());
+        b_new_event_left->setSizePolicy(sizePolicy1);
 
         horizontalLayout_5->addWidget(b_new_event_left);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_5->addItem(horizontalSpacer);
 
         b_delete_event = new QPushButton(frame);
         b_delete_event->setObjectName(QString::fromUtf8("b_delete_event"));
+        sizePolicy1.setHeightForWidth(b_delete_event->sizePolicy().hasHeightForWidth());
+        b_delete_event->setSizePolicy(sizePolicy1);
 
         horizontalLayout_5->addWidget(b_delete_event);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_5->addItem(horizontalSpacer_2);
 
         b_new_event_right = new QPushButton(frame);
         b_new_event_right->setObjectName(QString::fromUtf8("b_new_event_right"));
+        sizePolicy1.setHeightForWidth(b_new_event_right->sizePolicy().hasHeightForWidth());
+        b_new_event_right->setSizePolicy(sizePolicy1);
 
         horizontalLayout_5->addWidget(b_new_event_right);
 
@@ -118,6 +127,11 @@ public:
 
         le_update_every_n_ticks = new QLineEdit(frame);
         le_update_every_n_ticks->setObjectName(QString::fromUtf8("le_update_every_n_ticks"));
+        QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(le_update_every_n_ticks->sizePolicy().hasHeightForWidth());
+        le_update_every_n_ticks->setSizePolicy(sizePolicy2);
 
         horizontalLayout_4->addWidget(le_update_every_n_ticks);
 
@@ -133,11 +147,8 @@ public:
 
         cmb_change_value = new QComboBox(frame);
         cmb_change_value->setObjectName(QString::fromUtf8("cmb_change_value"));
-        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(cmb_change_value->sizePolicy().hasHeightForWidth());
-        cmb_change_value->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(cmb_change_value->sizePolicy().hasHeightForWidth());
+        cmb_change_value->setSizePolicy(sizePolicy2);
 
         horizontalLayout_2->addWidget(cmb_change_value);
 
@@ -153,6 +164,8 @@ public:
 
         le_target_value = new QLineEdit(frame);
         le_target_value->setObjectName(QString::fromUtf8("le_target_value"));
+        sizePolicy2.setHeightForWidth(le_target_value->sizePolicy().hasHeightForWidth());
+        le_target_value->setSizePolicy(sizePolicy2);
 
         horizontalLayout->addWidget(le_target_value);
 
@@ -170,8 +183,8 @@ public:
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
         cmb_change_mode->setObjectName(QString::fromUtf8("cmb_change_mode"));
-        sizePolicy1.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
-        cmb_change_mode->setSizePolicy(sizePolicy1);
+        sizePolicy2.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
+        cmb_change_mode->setSizePolicy(sizePolicy2);
 
         horizontalLayout_3->addWidget(cmb_change_mode);
 
@@ -187,6 +200,8 @@ public:
 
         le_time_horizon = new QLineEdit(frame);
         le_time_horizon->setObjectName(QString::fromUtf8("le_time_horizon"));
+        sizePolicy2.setHeightForWidth(le_time_horizon->sizePolicy().hasHeightForWidth());
+        le_time_horizon->setSizePolicy(sizePolicy2);
 
         time_horizon_layout->addWidget(le_time_horizon);
 

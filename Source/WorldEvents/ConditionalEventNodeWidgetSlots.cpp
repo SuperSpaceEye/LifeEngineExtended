@@ -38,45 +38,13 @@ void ConditionalEventNodeWidget::cmb_condition_value_slot(QString str) {
     switch (value.type) {
         case ValueType::NONE:
             reinterpret_cast<ConditionalEventNode<double>*>(node)->value_type = ConditionalTypes::NONE;
-//            display_message("Choose variable");
             return;
         case ValueType::DOUBLE: {
             auto _node = reinterpret_cast<ConditionalEventNode<double>*>(node);
 
             if (_node->value_type == ConditionalTypes::DOUBLE) {
                 _node->check_value = value.double_val;
-            } else if (_node->value_type == ConditionalTypes::INT64) {
-                auto * new_node = new ConditionalEventNode<int64_t>(value.int64_val,
-                                                                    static_cast<int64_t>(_node->fixed_value),
-                                                                    _node->mode,
-                                                                    ConditionalTypes::INT64,
-                                                                    _node->next_node,
-                                                                    _node->previous_node,
-                                                                    _node->alternative_node,
-                                                                    _node->execute_every_n_tick);
-
-                int index_of_node = 0;
-                for (; index_of_node < starting_nodes.size(); index_of_node++) {
-                    if (starting_nodes[index_of_node] == node) {
-                        break;
-                    }
-                }
-                starting_nodes[index_of_node] = new_node;
-
-                delete node;
-                node = new_node;
-
-                if (node->previous_node != nullptr)        {node->previous_node->next_node = node;}
-                if (node->next_node != nullptr)            {node->next_node->previous_node = node;}
-                if (new_node->alternative_node != nullptr) {new_node->alternative_node->previous_node = node;}
-            }
-        }
-            break;
-        case ValueType::INT64: {
-            auto _node = reinterpret_cast<ConditionalEventNode<int64_t>*>(node);
-            if (_node->value_type == ConditionalTypes::INT64) {
-                _node->check_value = value.int64_val;
-            } else if (_node->value_type == ConditionalTypes::DOUBLE) {
+            } else {
                 auto * new_node = new ConditionalEventNode<double>(value.double_val,
                                                                    static_cast<double>(_node->fixed_value),
                                                                    _node->mode,
@@ -94,10 +62,42 @@ void ConditionalEventNodeWidget::cmb_condition_value_slot(QString str) {
                 }
                 starting_nodes[index_of_node] = new_node;
 
-                delete node;
-                if (node->previous_node != nullptr)        {node->previous_node->next_node = node;}
-                if (node->next_node != nullptr)            {node->next_node->previous_node = node;}
+                if (node->previous_node != nullptr)        {new_node->previous_node->next_node = node;}
+                if (node->next_node != nullptr)            {new_node->next_node->previous_node = node;}
                 if (new_node->alternative_node != nullptr) {new_node->alternative_node->previous_node = node;}
+
+                delete node;
+                node = new_node;}
+        }
+            break;
+        case ValueType::INT64: {
+            auto _node = reinterpret_cast<ConditionalEventNode<int64_t>*>(node);
+            if (_node->value_type == ConditionalTypes::INT64) {
+                _node->check_value = value.int64_val;
+            } else {
+                auto * new_node = new ConditionalEventNode<int64_t>(value.int64_val,
+                                                                    static_cast<double>(_node->fixed_value),
+                                                                    _node->mode,
+                                                                    ConditionalTypes::INT64,
+                                                                    _node->next_node,
+                                                                    _node->previous_node,
+                                                                    _node->alternative_node,
+                                                                    _node->execute_every_n_tick);
+
+                int index_of_node = 0;
+                for (; index_of_node < starting_nodes.size(); index_of_node++) {
+                    if (starting_nodes[index_of_node] == node) {
+                        break;
+                    }
+                }
+                starting_nodes[index_of_node] = new_node;
+
+
+                if (node->previous_node != nullptr)        {new_node->previous_node->next_node = node;}
+                if (node->next_node != nullptr)            {new_node->next_node->previous_node = node;}
+                if (new_node->alternative_node != nullptr) {new_node->alternative_node->previous_node = node;}
+
+                delete node;
                 node = new_node;
             }
         }
@@ -118,11 +118,94 @@ void ConditionalEventNodeWidget::cmb_condition_mode_slot(QString str) {
 // ==================== Buttons ====================
 
 void ConditionalEventNodeWidget::b_new_event_left_slot() {
+    NodeType new_node_type;
+    if (!choose_node_window(new_node_type)) { return;}
 
+    BaseEventNode * new_node;
+
+    QWidget * new_widget;
+
+    switch (new_node_type) {
+        case NodeType::ChangeValue:
+            new_widget = new ChangeValueEventNodeWidget(this,
+                                                        node,
+                                                        pl,
+                                                        layout,
+                                                        starting_nodes);
+
+            new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
+            break;
+        case NodeType::Conditional:
+            new_widget = new ConditionalEventNodeWidget(this,
+                                                        node,
+                                                        pl,
+                                                        layout,
+                                                        starting_nodes);
+
+            new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
+            break;
+    }
+
+    new_node->next_node = node;
+
+    if (node->previous_node == nullptr) {
+        for (auto & snode: starting_nodes) {
+            if (snode == node) {
+                snode = new_node;
+            }
+        }
+
+        node->previous_node = nullptr;
+    } else {
+        new_node->previous_node = node->previous_node;
+        node->previous_node->next_node = new_node;
+        node->previous_node = new_node;
+    }
+
+    layout->insertWidget(layout->indexOf(this), new_widget);
 }
 
 void ConditionalEventNodeWidget::b_new_event_right_slot() {
+    NodeType new_node_type;
+    if (!choose_node_window(new_node_type)) { return;}
 
+    BaseEventNode * new_node;
+
+    QWidget * new_widget;
+
+    switch (new_node_type) {
+        case NodeType::ChangeValue:
+            new_widget = new ChangeValueEventNodeWidget(this,
+                                                        node,
+                                                        pl,
+                                                        layout,
+                                                        starting_nodes);
+
+            new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
+            break;
+        case NodeType::Conditional:
+            new_widget = new ConditionalEventNodeWidget(this,
+                                                        node,
+                                                        pl,
+                                                        layout,
+                                                        starting_nodes);
+
+            new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
+            break;
+    }
+
+    new_node->previous_node = node;
+
+    if (node->next_node == nullptr) {
+        node->next_node = new_node;
+    } else {
+        new_node->next_node = node->next_node;
+        new_node->previous_node = node;
+        node->next_node->previous_node = new_node;
+        node->next_node = new_node;
+    }
+
+    layout->insertWidget(layout->indexOf(this)+1, new_widget);
 }
 
 //TODO how tf will I delete widgets for alternative path?

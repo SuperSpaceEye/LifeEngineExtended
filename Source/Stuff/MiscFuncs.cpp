@@ -6,6 +6,7 @@
 // Created by spaceeye on 27.06.22.
 //
 
+#include <iostream>
 #include "MiscFuncs.h"
 
 bool display_dialog_message(const std::string &message, bool disable_warnings) {
@@ -88,7 +89,18 @@ bool choose_node_window(NodeType &new_node_type) {
     dialog.addButton(change_value_button, QDialogButtonBox::AcceptRole);
     dialog.addButton(conditional_button, QDialogButtonBox::AcceptRole);
 
+    dialog.setCenterButtons(true);
+
     dialog.setMinimumSize(400, 100);
+
+    main_dialog.setFixedSize(400, 100);
+
+    auto * screen = QGuiApplication::primaryScreen();
+    auto screen_geometry = screen->geometry();
+    int width = screen_geometry.width();
+    int height = screen_geometry.height();
+
+    main_dialog.move(width/2-200, height/2-50-20);
 
     return main_dialog.exec();
 }
