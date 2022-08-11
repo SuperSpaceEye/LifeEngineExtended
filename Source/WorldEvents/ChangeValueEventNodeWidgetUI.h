@@ -57,6 +57,11 @@ public:
         if (ChangeValueEventNodeWidget->objectName().isEmpty())
             ChangeValueEventNodeWidget->setObjectName(QString::fromUtf8("ChangeValueEventNodeWidget"));
         ChangeValueEventNodeWidget->resize(400, 200);
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(ChangeValueEventNodeWidget->sizePolicy().hasHeightForWidth());
+        ChangeValueEventNodeWidget->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(ChangeValueEventNodeWidget);
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -128,11 +133,11 @@ public:
 
         cmb_change_value = new QComboBox(frame);
         cmb_change_value->setObjectName(QString::fromUtf8("cmb_change_value"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(cmb_change_value->sizePolicy().hasHeightForWidth());
-        cmb_change_value->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(cmb_change_value->sizePolicy().hasHeightForWidth());
+        cmb_change_value->setSizePolicy(sizePolicy1);
 
         horizontalLayout_2->addWidget(cmb_change_value);
 
@@ -165,8 +170,8 @@ public:
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
         cmb_change_mode->setObjectName(QString::fromUtf8("cmb_change_mode"));
-        sizePolicy.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
-        cmb_change_mode->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
+        cmb_change_mode->setSizePolicy(sizePolicy1);
 
         horizontalLayout_3->addWidget(cmb_change_mode);
 

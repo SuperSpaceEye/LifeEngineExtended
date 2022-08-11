@@ -38,15 +38,14 @@ void SimulationEngine::threaded_mainloop() {
             ecp.stop_engine = false;
             return;
         }
-        if (ecp.change_simulation_mode) { change_mode(); }
-        if (ecp.build_threads) {
-//            SimulationEnginePartialMultiThread::build_threads(edc, ecp, sp);
-            ecp.build_threads = false;
-        }
+//        if (ecp.change_simulation_mode) { change_mode(); }
+//        if (ecp.build_threads) {
+////            SimulationEnginePartialMultiThread::build_threads(edc, ecp, sp);
+//            ecp.build_threads = false;
+//        }
         if (ecp.engine_pause || ecp.engine_global_pause) { ecp.engine_paused = true; } else { ecp.engine_paused = false;}
         process_user_action_pool();
         if ((!ecp.engine_paused || ecp.engine_pass_tick) && (!ecp.pause_button_pause || ecp.pass_tick)) {
-            //TODO the cause of rare segfault could be here
             simulation_tick();
             ecp.engine_paused = false;
             ecp.engine_pass_tick = false;

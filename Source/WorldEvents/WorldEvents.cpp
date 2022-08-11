@@ -58,29 +58,9 @@ void WorldEvents::button_add_new_branch() {
 }
 
 QWidget * WorldEvents::node_chooser(QHBoxLayout * widget_layout) {
-    NodeType new_node_type = NodeType::Conditional;
+    NodeType new_node_type;
 
-    QDialog main_dialog(this);
-
-    auto change_value_button = new QPushButton("Change Value Node");
-    connect(change_value_button, &QPushButton::clicked, [&new_node_type, &main_dialog](){
-       new_node_type = NodeType::ChangeValue;
-       main_dialog.accept();
-    });
-
-    auto conditional_button = new QPushButton("Conditional Node");
-    connect(conditional_button, &QPushButton::clicked, [&new_node_type, &main_dialog](){
-        new_node_type = NodeType::Conditional;
-        main_dialog.accept();
-    });
-
-    QDialogButtonBox dialog(&main_dialog);
-    dialog.addButton(change_value_button, QDialogButtonBox::ButtonRole::AcceptRole);
-    dialog.addButton(conditional_button, QDialogButtonBox::ButtonRole::AcceptRole);
-
-    dialog.setMinimumSize(400, 100);
-
-    if (!main_dialog.exec()) {return nullptr;}
+    if (!choose_node_window(new_node_type)) {return nullptr;}
 
     QWidget * new_widget = nullptr;
 
@@ -131,13 +111,97 @@ bool WorldEvents::verify_nodes() {
 bool WorldEvents::check_change_value_node(BaseEventNode *node) {
     auto * _node = reinterpret_cast<ChangeValueEventNode<float>*>(node);
     if (_node->change_value == nullptr) {return false;}
+    if (_node->value_type   == ChangeTypes::NONE) {return false;}
     return true;
 }
 
 bool WorldEvents::check_conditional_node(BaseEventNode *node) {
     auto * _node = reinterpret_cast<ConditionalEventNode<double>*>(node);
     if (_node->check_value == nullptr) {return false;}
+    if (_node->value_type  == ConditionalTypes::NONE) {return false;}
     return true;
 }
 
+BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage) {
+    if (node == nullptr) {return nullptr;}
+    BaseEventNode * new_node;
 
+    switch (node->type) {
+        case NodeType::ChangeValue: {
+            switch (reinterpret_cast<ChangeValueEventNode<float> *>(node)->value_type) {
+                case ChangeTypes::INT32: {
+                    auto * _node = reinterpret_cast<ChangeValueEventNode<int32_t> *>(node);
+                    new_node = new ChangeValueEventNode<int32_t>(nullptr,
+                                                                 nullptr,
+                                                                 _node->change_value,
+                                                                 _node->target_value,
+                                                                 _node->time_horizon,
+                                                                 _node->execute_every_n_tick,
+                                                                 _node->change_mode,
+                                                                 _node->value_type);
+                }
+                    break;
+                case ChangeTypes::FLOAT: {
+                    auto * _node = reinterpret_cast<ChangeValueEventNode<float> *>(node);
+                    new_node = new ChangeValueEventNode<float>(nullptr,
+                                                               nullptr,
+                                                               _node->change_value,
+                                                               _node->target_value,
+                                                               _node->time_horizon,
+                                                               _node->execute_every_n_tick,
+                                                               _node->change_mode,
+                                                               _node->value_type);
+                }
+                    break;
+            }
+        }
+            break;
+        case NodeType::Conditional: {
+            switch (reinterpret_cast<ConditionalEventNode<double> *>(node)->value_type) {
+                case ConditionalTypes::DOUBLE: {
+                    auto * _node = reinterpret_cast<ConditionalEventNode<double>*>(node);
+                    new_node = new ConditionalEventNode<double>(_node->check_value,
+                                                                _node->fixed_value,
+                                                                _node->mode,
+                                                                _node->value_type,
+                                                                nullptr,
+                                                                nullptr,
+                                                                nullptr,
+                                                                _node->execute_every_n_tick);
+                }
+                    break;
+                case ConditionalTypes::INT64: {
+                    auto * _node = reinterpret_cast<ConditionalEventNode<int64_t>*>(node);
+                    new_node = new ConditionalEventNode<int64_t>(_node->check_value,
+                                                                 _node->fixed_value,
+                                                                 _node->mode,
+                                                                 _node->value_type,
+                                                                 nullptr,
+                                                                 nullptr,
+                                                                 nullptr,
+                                                                 _node->execute_every_n_tick);
+                }
+                    break;
+            }
+        }
+            break;
+    }
+
+    new_node->next_node = copy_node(node->next_node, node_storage);
+    new_node->alternative_node = copy_node(node->alternative_node, node_storage);
+
+    node_storage.emplace_back(new_node);
+
+    return new_node;
+}
+
+void WorldEvents::copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage) {
+    for (auto * starting_node: event_node_branch_starting_node_container) {
+        auto * copied_root_node = copy_node(starting_node, node_storage);
+        start_nodes.emplace_back(copied_root_node);
+    }
+
+    //TODO make reserve
+    start_nodes.shrink_to_fit();
+    node_storage.shrink_to_fit();
+}

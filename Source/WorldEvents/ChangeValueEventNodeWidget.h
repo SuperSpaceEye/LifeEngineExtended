@@ -9,6 +9,7 @@
 #include "EventNodes.h"
 #include "../Stuff/MiscFuncs.h"
 #include "ParametersList.h"
+#include "ConditionalEventNodeWidget.h"
 
 class ChangeValueEventNodeWidget: public QWidget {
     Q_OBJECT

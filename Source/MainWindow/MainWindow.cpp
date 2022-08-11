@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Will execute on first QT show event
     QTimer::singleShot(0, [&]{
-        engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
+        engine_thread = std::thread{&SimulationEngine::threaded_mainloop, std::ref(engine)};
         engine_thread.detach();
 
         fps_timer = clock_now();

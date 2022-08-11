@@ -9,10 +9,10 @@ void WorldEventsController::delete_all_nodes() {
         delete node;
     }
 
-//    start_nodes.clear();
-//    node_cursors.clear();
-//    repeating_branch.clear();
-//    node_storage.clear();
+    start_nodes.clear();
+    node_cursors.clear();
+    repeating_branch.clear();
+    node_storage.clear();
 }
 
 void WorldEventsController::reset_events(std::vector<BaseEventNode *> _start_nodes,
@@ -36,7 +36,6 @@ void WorldEventsController::tick_events(uint64_t time_point) {
             }
             node = start_nodes[i];
         }
-
-        node->update(time_point);
+        node = node->update(time_point);
     }
 }

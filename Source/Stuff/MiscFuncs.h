@@ -21,6 +21,10 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QLineEdit>
+#include <QObject>
+#include <QDialogButtonBox>
+
+#include "../WorldEvents/EventNodes.h"
 
 template<typename T>
 struct result_struct {
@@ -146,5 +150,7 @@ std::string convert_num_bytes(uint64_t num_bytes);
 void clear_console();
 
 std::string convert_seconds(uint64_t num_seconds);
+
+bool choose_node_window(NodeType &new_node_type);
 
 #endif //THELIFEENGINECPP_MISCFUNCS_H

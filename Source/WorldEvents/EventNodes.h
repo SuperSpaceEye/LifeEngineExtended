@@ -27,7 +27,7 @@ struct BaseEventNode {
 
     BaseEventNode * update(uint32_t current_time) {
         if (current_time - last_execution_time >= execute_every_n_tick) {
-            last_execution_time = execute_every_n_tick;
+            last_execution_time = current_time;
             return _update(current_time);
         }
         return this;
@@ -71,6 +71,7 @@ enum class ChangeValueMode {
 };
 
 enum class ChangeTypes {
+    NONE,
     INT32,
     FLOAT
 };
@@ -108,7 +109,7 @@ struct ChangeValueEventNode: public BaseEventNode {
     }
 
     BaseEventNode * _update(uint32_t current_time) override {
-        if (!execution_started) {last_updated = current_time; start_value = *change_value;}
+        if (!execution_started) {last_updated = current_time; start_value = *change_value; execution_started = true;}
 
         if (change_mode == ChangeValueMode::Step) {
             *change_value = target_value;
@@ -147,6 +148,7 @@ enum class ConditionalMode {
 };
 
 enum class ConditionalTypes {
+    NONE,
     DOUBLE,
     INT64,
 };

@@ -37,7 +37,7 @@ private:
     bool verify_nodes();
     bool check_conditional_node(BaseEventNode * node);
     static bool check_change_value_node(BaseEventNode * node);
-    BaseEventNode * copy_node(BaseEventNode * node);
+    BaseEventNode *copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage);
     void copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage);
 public:
     WorldEvents(Ui::MainWindow * parent_ui,

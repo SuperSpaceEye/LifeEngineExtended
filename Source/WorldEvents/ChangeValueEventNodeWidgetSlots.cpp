@@ -39,6 +39,7 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
 
     switch (value.type) {
         case ValueType::NONE:
+            reinterpret_cast<ChangeValueEventNode<int32_t> *>(node)->value_type = ChangeTypes::NONE;
 //            display_message("Choose variable");
             break;
         case ValueType::INT: {
@@ -124,7 +125,47 @@ void ChangeValueEventNodeWidget::b_new_event_left_slot() {
 }
 
 void ChangeValueEventNodeWidget::b_new_event_right_slot() {
+    NodeType new_node_type;
+    if (!choose_node_window(new_node_type)) { return;}
 
+    BaseEventNode * new_node;
+
+    QWidget * new_widget;
+
+    switch (new_node_type) {
+        case NodeType::ChangeValue:
+            new_widget = new ChangeValueEventNodeWidget(this,
+                                                        node,
+                                                        pl,
+                                                        layout,
+                                                        starting_nodes);
+
+            new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
+            break;
+        case NodeType::Conditional:
+            new_widget = new ConditionalEventNodeWidget(this,
+                                                        node,
+                                                        pl,
+                                                        layout,
+                                                        starting_nodes);
+
+            new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
+            break;
+    }
+
+    new_node->previous_node = node;
+
+    if (node->next_node == nullptr) {
+        node->next_node = new_node;
+    } else {
+        auto * next_node = node->next_node;
+        node->next_node = new_node;
+        new_node->next_node = new_node;
+        next_node->previous_node = new_node;
+    }
+
+    auto this_layout_index = layout->indexOf(this);
+    layout->insertWidget(this_layout_index+1, new_widget);
 }
 
 void ChangeValueEventNodeWidget::b_delete_event_slot() {

@@ -37,6 +37,7 @@ void ConditionalEventNodeWidget::cmb_condition_value_slot(QString str) {
     //If the types are different, rebuild node with new value type and reconnect it with tree.
     switch (value.type) {
         case ValueType::NONE:
+            reinterpret_cast<ConditionalEventNode<double>*>(node)->value_type = ConditionalTypes::NONE;
 //            display_message("Choose variable");
             return;
         case ValueType::DOUBLE: {

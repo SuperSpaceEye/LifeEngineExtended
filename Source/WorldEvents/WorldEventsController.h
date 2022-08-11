@@ -13,13 +13,13 @@
 class WorldEventsController {
 private:
     //holds starting nodes for each event branch
-    std::vector<BaseEventNode*> start_nodes;
+    std::vector<BaseEventNode*> start_nodes{};
     //holds cursors for each event branch.
-    std::vector<BaseEventNode*> node_cursors;
+    std::vector<BaseEventNode*> node_cursors{};
     //corresponds to cursors. If true, when cursor hits nullptr will return to start node. If false, will stop execution.
-    std::vector<char> repeating_branch;
+    std::vector<char> repeating_branch{};
     //holds pointers to each node.
-    std::vector<BaseEventNode*> node_storage;
+    std::vector<BaseEventNode*> node_storage{};
 
     void delete_all_nodes();
 public:

@@ -11,7 +11,7 @@ void WorldEvents::b_apply_events_slot() {
 
     //TODO
     for (auto & _: event_node_branch_starting_node_container) {
-        repeating_branch.push_back(true);
+        repeating_branch.push_back(false);
     }
 
     if (!verify_nodes()) {

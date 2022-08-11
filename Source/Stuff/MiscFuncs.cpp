@@ -67,3 +67,28 @@ std::string convert_seconds(uint64_t num_seconds) {
 
     return return_str;
 }
+
+bool choose_node_window(NodeType &new_node_type) {
+    QDialog main_dialog;
+
+    new_node_type = NodeType::Conditional;
+    auto change_value_button = new QPushButton("Change Value Node");
+    QObject::connect(change_value_button, &QPushButton::clicked, [&new_node_type, &main_dialog](){
+        new_node_type = NodeType::ChangeValue;
+        main_dialog.accept();
+    });
+
+    auto conditional_button = new QPushButton("Conditional Node");
+    QObject::connect(conditional_button, &QPushButton::clicked, [&new_node_type, &main_dialog](){
+        new_node_type = NodeType::Conditional;
+        main_dialog.accept();
+    });
+
+    QDialogButtonBox dialog(&main_dialog);
+    dialog.addButton(change_value_button, QDialogButtonBox::AcceptRole);
+    dialog.addButton(conditional_button, QDialogButtonBox::AcceptRole);
+
+    dialog.setMinimumSize(400, 100);
+
+    return main_dialog.exec();
+}
