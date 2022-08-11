@@ -238,6 +238,8 @@ public:
         label_4->setText(QApplication::translate("ChangeValueEventNodeWidget", "Change mode", nullptr));
         cmb_change_mode->setItemText(0, QApplication::translate("ChangeValueEventNodeWidget", "Linear", nullptr));
         cmb_change_mode->setItemText(1, QApplication::translate("ChangeValueEventNodeWidget", "Step", nullptr));
+        cmb_change_mode->setItemText(2, QApplication::translate("ChangeValueEventNodeWidget", "Increase By", nullptr));
+        cmb_change_mode->setItemText(3, QApplication::translate("ChangeValueEventNodeWidget", "Decrease By", nullptr));
 
         time_horizon_label->setText(QApplication::translate("ChangeValueEventNodeWidget", "Time horizon", nullptr));
     } // retranslateUi
