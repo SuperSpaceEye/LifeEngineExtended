@@ -554,7 +554,7 @@ void MainWindow::initialize_gui() {
     _ui.le_menu_height->setText(QString::fromStdString(std::to_string(_ui.menu_frame->frameSize().height())));
     _ui.cb_really_stop_render->setChecked(really_stop_render);
 #if __CUDA_USED__ == 0
-    ui.cb_use_nvidia_for_image_generation->hide();
+    _ui.cb_use_nvidia_for_image_generation->hide();
 #endif
 
     //So that when user clicks on rbs in organism editors, rbs in main window would be unchecked and vice versa
