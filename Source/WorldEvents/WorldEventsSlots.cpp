@@ -6,12 +6,13 @@
 
 void WorldEvents::b_apply_events_slot() {
     std::vector<BaseEventNode*> start_nodes;
-    std::vector<char> repeating_branch;
+    std::vector<char> _repeating_branch;
     std::vector<BaseEventNode*> node_storage;
 
-    //TODO
-    for (auto & _: event_node_branch_starting_node_container) {
-        repeating_branch.push_back(true);
+    _repeating_branch.reserve(repeating_branch.size());
+
+    for (int i = 0; i < repeating_branch.size(); i++) {
+        _repeating_branch[i] = *repeating_branch[i];
     }
 
     if (!verify_nodes()) {
@@ -19,10 +20,9 @@ void WorldEvents::b_apply_events_slot() {
         return;
     }
 
-    //TODO
     copy_nodes(start_nodes, node_storage);
 
-    engine->reset_world_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
+    engine->reset_world_events(std::move(start_nodes), std::move(_repeating_branch), std::move(node_storage));
     b_resume_events_slot();
 }
 

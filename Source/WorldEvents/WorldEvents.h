@@ -27,7 +27,8 @@ private:
     EngineControlParameters * ecp = nullptr;
     SimulationEngine * engine = nullptr;
 
-    std::vector<BaseEventNode*> event_node_branch_starting_node_container;
+    std::vector<BaseEventNode*> starting_nodes_container;
+    std::vector<char*> repeating_branch;
 
     void closeEvent(QCloseEvent * event) override;
 

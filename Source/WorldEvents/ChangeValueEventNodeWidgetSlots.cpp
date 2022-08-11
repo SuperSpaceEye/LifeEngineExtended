@@ -97,7 +97,7 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
                 delete node;
                 node = new_node;
                 if (node->previous_node != nullptr) {node->previous_node->next_node = node;}
-                if (node->next_node != nullptr) {node->next_node->previous_node = node;}
+                if (node->next_node     != nullptr) {node->next_node->previous_node = node;}
             }
             break;
     }
@@ -133,7 +133,8 @@ void ChangeValueEventNodeWidget::b_new_event_left_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
             break;
@@ -142,7 +143,8 @@ void ChangeValueEventNodeWidget::b_new_event_left_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
             break;
@@ -181,7 +183,8 @@ void ChangeValueEventNodeWidget::b_new_event_right_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
             break;
@@ -190,7 +193,8 @@ void ChangeValueEventNodeWidget::b_new_event_right_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
             break;
@@ -212,14 +216,22 @@ void ChangeValueEventNodeWidget::b_new_event_right_slot() {
 
 void ChangeValueEventNodeWidget::b_delete_event_slot() {
     //if it's the last event in branch
-    if (layout->count() == 1) {
-        layout->deleteLater();
+    if (layout->count() == 2) {
         for (int i = 0; i < starting_nodes.size(); i++) {
             if (starting_nodes[i] == node) {
                 starting_nodes.erase(starting_nodes.begin() + i);
+                delete repeating_branch[i];
+                repeating_branch.erase(repeating_branch.begin() + i);
                 break;
             }
         }
+
+        for (int i = 0; i < layout->count(); i++) {
+            if (layout->itemAt(i)->widget() != this) {
+                layout->itemAt(i)->widget()->deleteLater();
+            }
+        }
+        layout->deleteLater();
     }
 
     node->delete_node();

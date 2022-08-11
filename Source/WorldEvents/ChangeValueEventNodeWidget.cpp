@@ -4,8 +4,13 @@
 
 #include "ChangeValueEventNodeWidget.h"
 
-ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent, BaseEventNode * previous_node, ParametersList & parameter_list, QHBoxLayout * layout, std::vector<BaseEventNode*> & starting_nodes):
-    pl(parameter_list), layout(layout), starting_nodes(starting_nodes) {
+ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent,
+                                                       BaseEventNode * previous_node,
+                                                       ParametersList & parameter_list,
+                                                       QHBoxLayout * layout,
+                                                       std::vector<BaseEventNode*> & starting_nodes,
+                                                       std::vector<char*> & repeating_branch):
+    pl(parameter_list), layout(layout), starting_nodes(starting_nodes), repeating_branch(repeating_branch) {
     ui.setupUi(this);
     setParent(parent);
     this->setMinimumSize(400, 200);

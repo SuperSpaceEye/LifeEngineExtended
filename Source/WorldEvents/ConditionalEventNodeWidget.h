@@ -19,7 +19,8 @@ public:
                                BaseEventNode * previous_node,
                                ParametersList & parameters_list,
                                QHBoxLayout * layout,
-                               std::vector<BaseEventNode*> & starting_nodes);
+                               std::vector<BaseEventNode*> & starting_nodes,
+                               std::vector<char*> & repeating_branch);
 
     BaseEventNode * node = nullptr;
 private:
@@ -27,6 +28,7 @@ private:
     ParametersList & pl;
     QHBoxLayout * layout;
     std::vector<BaseEventNode*> & starting_nodes;
+    std::vector<char*> & repeating_branch;
 
     void init_gui();
 private slots:

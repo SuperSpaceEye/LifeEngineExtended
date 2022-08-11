@@ -38,8 +38,19 @@ void WorldEvents::button_add_new_branch() {
         ui.world_events_layout->removeItem(spacer_item);
         delete spacer_item;
 
+        auto repeating_branch_pointer = new char(true);
+
+        repeating_branch.emplace_back(repeating_branch_pointer);
+
+        auto * check_box = new QCheckBox("Repeat branch", this);
+        check_box->setChecked(true);
+        connect(check_box, &QCheckBox::clicked, [&, repeating_branch_pointer](){
+            *repeating_branch_pointer = !*repeating_branch_pointer;
+        });
+
         layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
+        layout->addWidget(check_box);
         layout->addWidget(widget);
 
         ui.world_events_layout->addLayout(layout);
@@ -63,12 +74,12 @@ QWidget * WorldEvents::node_chooser(QHBoxLayout * widget_layout) {
 
     switch (new_node_type) {
         case NodeType::ChangeValue:
-            new_widget = new ChangeValueEventNodeWidget(ui.world_events_widget, nullptr, pl, widget_layout, event_node_branch_starting_node_container);
-            event_node_branch_starting_node_container.push_back(reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node);
+            new_widget = new ChangeValueEventNodeWidget(ui.world_events_widget, nullptr, pl, widget_layout, starting_nodes_container, repeating_branch);
+            starting_nodes_container.push_back(reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node);
             break;
         case NodeType::Conditional:
-            new_widget = new ConditionalEventNodeWidget(ui.world_events_widget, nullptr, pl, widget_layout, event_node_branch_starting_node_container);
-            event_node_branch_starting_node_container.push_back(reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node);
+            new_widget = new ConditionalEventNodeWidget(ui.world_events_widget, nullptr, pl, widget_layout, starting_nodes_container, repeating_branch);
+            starting_nodes_container.push_back(reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node);
             break;
     }
 
@@ -78,8 +89,8 @@ QWidget * WorldEvents::node_chooser(QHBoxLayout * widget_layout) {
 }
 
 bool WorldEvents::verify_nodes() {
-    if (event_node_branch_starting_node_container.empty()) {return false;}
-    for (auto * starting_node: event_node_branch_starting_node_container) {
+    if (starting_nodes_container.empty()) {return false;}
+    for (auto * starting_node: starting_nodes_container) {
         std::vector<BaseEventNode*> branch_stack;
         branch_stack.push_back(starting_node);
         while (!branch_stack.empty()) {
@@ -193,7 +204,7 @@ BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEven
 }
 
 void WorldEvents::copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage) {
-    for (auto * starting_node: event_node_branch_starting_node_container) {
+    for (auto * starting_node: starting_nodes_container) {
         auto * copied_root_node = copy_node(starting_node, node_storage);
         start_nodes.emplace_back(copied_root_node);
     }

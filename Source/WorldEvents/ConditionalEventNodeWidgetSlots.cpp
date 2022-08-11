@@ -62,12 +62,13 @@ void ConditionalEventNodeWidget::cmb_condition_value_slot(QString str) {
                 }
                 starting_nodes[index_of_node] = new_node;
 
-                if (node->previous_node != nullptr)        {new_node->previous_node->next_node = node;}
-                if (node->next_node != nullptr)            {new_node->next_node->previous_node = node;}
-                if (new_node->alternative_node != nullptr) {new_node->alternative_node->previous_node = node;}
-
                 delete node;
-                node = new_node;}
+                node = new_node;
+                if (node->previous_node != nullptr)        {node->previous_node->next_node = node;}
+                if (node->next_node != nullptr)            {node->next_node->previous_node = node;}
+                if (node->alternative_node != nullptr)     {node->alternative_node->previous_node = node;}
+
+            }
         }
             break;
         case ValueType::INT64: {
@@ -76,7 +77,7 @@ void ConditionalEventNodeWidget::cmb_condition_value_slot(QString str) {
                 _node->check_value = value.int64_val;
             } else {
                 auto * new_node = new ConditionalEventNode<int64_t>(value.int64_val,
-                                                                    static_cast<double>(_node->fixed_value),
+                                                                    static_cast<int64_t>(_node->fixed_value),
                                                                     _node->mode,
                                                                     ConditionalTypes::INT64,
                                                                     _node->next_node,
@@ -92,13 +93,12 @@ void ConditionalEventNodeWidget::cmb_condition_value_slot(QString str) {
                 }
                 starting_nodes[index_of_node] = new_node;
 
-
-                if (node->previous_node != nullptr)        {new_node->previous_node->next_node = node;}
-                if (node->next_node != nullptr)            {new_node->next_node->previous_node = node;}
-                if (new_node->alternative_node != nullptr) {new_node->alternative_node->previous_node = node;}
-
                 delete node;
                 node = new_node;
+                if (node->previous_node != nullptr)        {node->previous_node->next_node = node;}
+                if (node->next_node != nullptr)            {node->next_node->previous_node = node;}
+                if (node->alternative_node != nullptr)     {node->alternative_node->previous_node = node;}
+
             }
         }
             break;
@@ -131,7 +131,8 @@ void ConditionalEventNodeWidget::b_new_event_left_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
             break;
@@ -140,7 +141,8 @@ void ConditionalEventNodeWidget::b_new_event_left_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
             break;
@@ -179,7 +181,8 @@ void ConditionalEventNodeWidget::b_new_event_right_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ChangeValueEventNodeWidget*>(new_widget)->node;
             break;
@@ -188,7 +191,8 @@ void ConditionalEventNodeWidget::b_new_event_right_slot() {
                                                         node,
                                                         pl,
                                                         layout,
-                                                        starting_nodes);
+                                                        starting_nodes,
+                                                        repeating_branch);
 
             new_node = reinterpret_cast<ConditionalEventNodeWidget*>(new_widget)->node;
             break;
@@ -219,14 +223,22 @@ void ConditionalEventNodeWidget::b_delete_event_slot() {
     }
 
     //if it's the last event in branch
-    if (layout->count() == 1) {
-        layout->deleteLater();
+    if (layout->count() == 2) {
         for (int i = 0; i < starting_nodes.size(); i++) {
             if (starting_nodes[i] == node) {
                 starting_nodes.erase(starting_nodes.begin() + i);
+                delete repeating_branch[i];
+                repeating_branch.erase(repeating_branch.begin() + i);
                 break;
             }
         }
+
+        for (int i = 0; i < layout->count(); i++) {
+            if (layout->itemAt(i)->widget() != this) {
+                layout->itemAt(i)->widget()->deleteLater();
+            }
+        }
+        layout->deleteLater();
     }
 
     node->delete_node();

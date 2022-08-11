@@ -8,8 +8,9 @@ ConditionalEventNodeWidget::ConditionalEventNodeWidget(QWidget *parent,
                                                        BaseEventNode * previous_node,
                                                        ParametersList & parameters_list,
                                                        QHBoxLayout * layout,
-                                                       std::vector<BaseEventNode*> & starting_nodes):
-    pl(parameters_list), layout(layout), starting_nodes(starting_nodes) {
+                                                       std::vector<BaseEventNode*> & starting_nodes,
+                                                       std::vector<char*> & repeating_branch):
+    pl(parameters_list), layout(layout), starting_nodes(starting_nodes), repeating_branch(repeating_branch) {
     ui.setupUi(this);
     setParent(parent);
     this->setMinimumSize(400, 200);
