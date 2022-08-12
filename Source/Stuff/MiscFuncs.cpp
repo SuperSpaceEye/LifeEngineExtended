@@ -6,7 +6,6 @@
 // Created by spaceeye on 27.06.22.
 //
 
-#include <iostream>
 #include "MiscFuncs.h"
 
 bool display_dialog_message(const std::string &message, bool disable_warnings) {

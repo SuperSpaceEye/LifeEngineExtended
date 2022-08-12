@@ -3,6 +3,7 @@
 //
 
 #include "ChangeValueEventNodeWidget.h"
+#include "WorldEventsEnums.h"
 
 // ==================== Line Edits ====================
 
@@ -45,7 +46,10 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
             auto _node = reinterpret_cast<ChangeValueEventNode<int32_t> *>(node);
 
             if (_node->value_type == ChangeTypes::INT32) {
-                _node->change_value = value.int_val;
+                _node->change_value    = value.int_val;
+                _node->clamp_mode      = value.clamp_mode;
+                _node->min_clamp_value = value.min_int_clamp;
+                _node->max_clamp_value = value.max_int_clamp;
             } else {
                 auto * new_node = new ChangeValueEventNode<int32_t>(node->next_node,
                                                                     node->previous_node,
@@ -54,7 +58,10 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
                                                                     _node->time_horizon,
                                                                     node->execute_every_n_tick,
                                                                     _node->change_mode,
-                                                                    ChangeTypes::INT32);
+                                                                    ChangeTypes::INT32,
+                                                                    value.clamp_mode,
+                                                                    value.min_int_clamp,
+                                                                    value.max_int_clamp);
 
                 int index_of_node = 0;
                 for (; index_of_node < starting_nodes.size(); index_of_node++) {
@@ -75,7 +82,10 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
             auto _node = reinterpret_cast<ChangeValueEventNode<float> *>(node);
 
             if (_node->value_type == ChangeTypes::FLOAT) {
-                _node->change_value = value.float_val;
+                _node->change_value    = value.float_val;
+                _node->clamp_mode      = value.clamp_mode;
+                _node->min_clamp_value = value.min_float_clamp;
+                _node->max_clamp_value = value.min_float_clamp;
             } else {
                 auto * new_node = new ChangeValueEventNode<float>(node->next_node,
                                                                   node->previous_node,
@@ -84,7 +94,10 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
                                                                   _node->time_horizon,
                                                                   node->execute_every_n_tick,
                                                                   _node->change_mode,
-                                                                  ChangeTypes::FLOAT);
+                                                                  ChangeTypes::FLOAT,
+                                                                  value.clamp_mode,
+                                                                  value.min_float_clamp,
+                                                                  value.max_float_clamp);
 
                 int index_of_node = 0;
                 for (; index_of_node < starting_nodes.size(); index_of_node++) {

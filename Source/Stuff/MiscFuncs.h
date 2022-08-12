@@ -27,6 +27,7 @@
 #include <QScreen>
 
 #include "../WorldEvents/EventNodes.h"
+#include "../WorldEvents/WorldEventsEnums.h"
 
 template<typename T>
 struct result_struct {

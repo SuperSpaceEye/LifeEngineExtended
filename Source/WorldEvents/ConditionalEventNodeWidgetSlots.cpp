@@ -3,6 +3,7 @@
 //
 
 #include "ConditionalEventNodeWidget.h"
+#include "WorldEventsEnums.h"
 
 // ==================== Line Edits ====================
 

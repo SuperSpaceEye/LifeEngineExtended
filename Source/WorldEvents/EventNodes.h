@@ -5,10 +5,7 @@
 #ifndef LIFEENGINEEXTENDED_EVENTNODES_H
 #define LIFEENGINEEXTENDED_EVENTNODES_H
 
-enum class NodeType {
-    ChangeValue,
-    Conditional,
-};
+#include "WorldEventsEnums.h"
 
 //
 
@@ -63,26 +60,12 @@ private:
     virtual BaseEventNode * _update(uint32_t current_time)=0;
 };
 
-enum class ChangeValueMode {
-    Step,
-    Linear,
-    IncreaseBy,
-    DecreaseBy,
-//    Exponential
-//    Logarithmic
-};
-
-enum class ChangeTypes {
-    NONE,
-    INT32,
-    FLOAT
-};
-
 //Will update the selected value every time update() is called. When it's finished updating, will return pointer to the next node, otherwise to itself.
 template <typename T>
 struct ChangeValueEventNode: public BaseEventNode {
     ChangeTypes value_type;
     ChangeValueMode change_mode;
+    ClampModes clamp_mode;
     uint32_t time_horizon = 1;
     uint32_t last_updated = 0;
     uint32_t total_updated = 0;
@@ -90,19 +73,13 @@ struct ChangeValueEventNode: public BaseEventNode {
     T * change_value;
     T target_value;
     T start_value;
-    ChangeValueEventNode(BaseEventNode * _next_node,
-                         BaseEventNode * _previous_node,
-                         T * value_to_change,
-                         T target_value,
-                         uint32_t time_horizon,
-                         uint32_t _execute_every_n_tick,
-                         ChangeValueMode mode,
-                         ChangeTypes value_type):
-                         value_type(value_type),
-                         change_mode(mode),
-                         time_horizon(time_horizon),
-                         target_value(target_value),
-                         change_value(value_to_change)
+    T min_clamp_value;
+    T max_clamp_value;
+    ChangeValueEventNode(BaseEventNode *_next_node, BaseEventNode *_previous_node, T *value_to_change, T target_value,
+                         uint32_t time_horizon, uint32_t _execute_every_n_tick, ChangeValueMode mode,
+                         ChangeTypes value_type, ClampModes clamp_mode, T min_clamp_value, T max_clamp_value) :
+                         value_type(value_type), change_mode(mode), time_horizon(time_horizon), target_value(target_value),
+                         change_value(value_to_change), clamp_mode(clamp_mode), min_clamp_value(min_clamp_value), max_clamp_value(max_clamp_value)
                          {
         type = NodeType::ChangeValue;
         next_node = _next_node;
@@ -111,6 +88,27 @@ struct ChangeValueEventNode: public BaseEventNode {
     }
 
     BaseEventNode * _update(uint32_t current_time) override {
+        auto * node = __update(current_time);
+
+        switch (clamp_mode) {
+            case ClampModes::NoClamp:
+                break;
+            case ClampModes::ClampMinValue:
+                if (*change_value < min_clamp_value) {*change_value = min_clamp_value;}
+                break;
+            case ClampModes::ClampMaxValue:
+                if (*change_value > max_clamp_value) {*change_value = max_clamp_value;}
+                break;
+            case ClampModes::ClampMinMaxValues:
+                if (*change_value < min_clamp_value) {*change_value = min_clamp_value; break;}
+                if (*change_value > max_clamp_value) {*change_value = max_clamp_value; break;}
+                break;
+        }
+
+        return node;
+    }
+
+    BaseEventNode * __update(uint32_t current_time) {
         if (!execution_started) {last_updated = current_time; start_value = *change_value; execution_started = true;}
 
         switch (change_mode) {
@@ -118,10 +116,10 @@ struct ChangeValueEventNode: public BaseEventNode {
                 *change_value = target_value;
                 return next_node;
             case ChangeValueMode::IncreaseBy:
-                *change_value = *change_value + target_value;
+                *change_value += target_value;
                 return next_node;
             case ChangeValueMode::DecreaseBy:
-                *change_value = *change_value - target_value;
+                *change_value -= target_value;
                 return next_node;
             default:
                 break;
@@ -151,17 +149,6 @@ struct ChangeValueEventNode: public BaseEventNode {
     }
 
     ~ChangeValueEventNode() override =default;
-};
-
-enum class ConditionalMode {
-    MoreOrEqual,
-    LessOrEqual,
-};
-
-enum class ConditionalTypes {
-    NONE,
-    DOUBLE,
-    INT64,
 };
 
 //If no alternative node, will repeatedly check the condition, and only return next node if it is true.

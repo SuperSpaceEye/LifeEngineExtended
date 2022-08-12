@@ -3,6 +3,7 @@
 //
 
 #include "ChangeValueEventNodeWidget.h"
+#include "WorldEventsEnums.h"
 
 ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent,
                                                        BaseEventNode * previous_node,
@@ -16,7 +17,8 @@ ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent,
     this->setMinimumSize(400, 200);
     this->setMaximumSize(400, 200);
 
-    node = new ChangeValueEventNode<int32_t>(nullptr, previous_node, nullptr, 0, 20, 1, ChangeValueMode::Linear, ChangeTypes::INT32);
+    node = new ChangeValueEventNode<int32_t>(nullptr, previous_node, nullptr, 0, 20, 1, ChangeValueMode::Linear,
+                                             ChangeTypes::INT32, ClampModes::NoClamp, 0, 0);
     init_gui();
 }
 

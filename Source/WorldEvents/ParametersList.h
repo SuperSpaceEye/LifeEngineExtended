@@ -12,6 +12,7 @@
 #include "../Containers/CPU/SimulationParameters.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
+#include "WorldEventsEnums.h"
 
 #include "SimulationParametersTypes.h"
 
@@ -19,6 +20,11 @@ struct ChangeableReturn {
     ValueType type = ValueType::NONE;
     float * float_val = nullptr;
     int   * int_val   = nullptr;
+    ClampModes clamp_mode = ClampModes::NoClamp;
+    float min_float_clamp = 0;
+    float max_float_clamp = 0;
+    int   min_int_clamp   = 0;
+    int   max_int_clamp   = 0;
 };
 
 struct ChangingReturn {

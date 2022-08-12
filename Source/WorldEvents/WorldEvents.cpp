@@ -3,6 +3,7 @@
 //
 
 #include "WorldEvents.h"
+#include "WorldEventsEnums.h"
 
 WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
                          SimulationParameters * sp,
@@ -146,7 +147,10 @@ BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEven
                                                                  _node->time_horizon,
                                                                  _node->execute_every_n_tick,
                                                                  _node->change_mode,
-                                                                 _node->value_type);
+                                                                 _node->value_type,
+                                                                 _node->clamp_mode,
+                                                                 _node->min_clamp_value,
+                                                                 _node->max_clamp_value);
                 }
                     break;
                 case ChangeTypes::FLOAT: {
@@ -158,7 +162,10 @@ BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEven
                                                                _node->time_horizon,
                                                                _node->execute_every_n_tick,
                                                                _node->change_mode,
-                                                               _node->value_type);
+                                                               _node->value_type,
+                                                               _node->clamp_mode,
+                                                               _node->min_clamp_value,
+                                                               _node->max_clamp_value);
                 }
                     break;
             }

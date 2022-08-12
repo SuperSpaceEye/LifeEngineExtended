@@ -3,6 +3,7 @@
 //
 
 #include "ConditionalEventNodeWidget.h"
+#include "WorldEventsEnums.h"
 
 ConditionalEventNodeWidget::ConditionalEventNodeWidget(QWidget *parent,
                                                        BaseEventNode * previous_node,
