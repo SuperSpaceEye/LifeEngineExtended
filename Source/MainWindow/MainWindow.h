@@ -239,6 +239,10 @@ private:
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
     void initialize_gui();
 
+    void just_resize_simulation_grid();
+
+    void process_keyboard_events();
+
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
     void keyPressEvent(QKeyEvent * event) override;
@@ -367,10 +371,6 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
-
-    void process_keyboard_events();
-
-    void write_json_organism(rapidjson::Document &d, Organism *&organism, rapidjson::Value &j_organism) const;
 };
 
 

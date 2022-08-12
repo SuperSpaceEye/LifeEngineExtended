@@ -123,14 +123,13 @@ void SimulationEngine::simulation_tick() {
         if (sp.reset_on_total_extinction) {
             reset_world();
             edc.auto_reset_counter++;
+            if (sp.generate_random_walls_on_reset) {
+                clear_walls();
+                make_random_walls();
+            }
         }
         if (sp.pause_on_total_extinction) {
             ecp.tb_paused = true ;
-            ecp.organisms_extinct = false;
-        }
-        if (sp.generate_random_walls_on_reset) {
-            clear_walls();
-            make_random_walls();
         }
         return;
     }

@@ -351,6 +351,19 @@ void MainWindow::calculate_new_simulation_size() {
     new_simulation_height = window_size.height() / starting_cell_size_on_resize;
 }
 
+void MainWindow::just_resize_simulation_grid() {
+    edc.simulation_width = new_simulation_width;
+    edc.simulation_height = new_simulation_height;
+
+    edc.CPU_simulation_grid.clear();
+    edc.second_simulation_grid.clear();
+
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
+    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+
+    engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
+}
+
 void MainWindow::resize_simulation_grid() {
     if (ecp.lock_resizing) {
         display_message("Grid cannot be resized until recording is stopped.");
@@ -384,20 +397,11 @@ void MainWindow::resize_simulation_grid() {
 
     engine.pause();
 
-    edc.simulation_width = new_simulation_width;
-    edc.simulation_height = new_simulation_height;
-
-    edc.CPU_simulation_grid.clear();
-    edc.second_simulation_grid.clear();
-
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
-    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+    just_resize_simulation_grid();
 
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
         ecp.build_threads = true;
     }
-
-    engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 
     engine.reset_world();
     engine.unpause();

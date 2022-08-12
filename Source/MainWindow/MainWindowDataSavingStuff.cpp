@@ -47,17 +47,15 @@ void MainWindow::read_data(std::ifstream &is) {
     uint32_t recovery_simulation_width = edc.simulation_width;
     uint32_t recovery_simulation_height = edc.simulation_height;
 
-    try {
-        DataSavingFunctions::read_simulation_parameters(is, sp);
-        DataSavingFunctions::read_organisms_block_parameters(is, bp);
-        if (read_data_container_data(is)) {
-            recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
-        }
-        read_simulation_grid(is);
-        if (read_organisms(is)) {
-            recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
-        }
-    } catch (std::string & e1) { recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);}
+    DataSavingFunctions::read_simulation_parameters(is, sp);
+    DataSavingFunctions::read_organisms_block_parameters(is, bp);
+    if (read_data_container_data(is)) {
+        recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+    }
+    read_simulation_grid(is);
+    if (read_organisms(is)) {
+        recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+    }
 
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
@@ -92,10 +90,7 @@ bool MainWindow::read_data_container_data(std::ifstream &is) {
 }
 
 void MainWindow::read_simulation_grid(std::ifstream &is) {
-    auto flag = disable_warnings;
-    disable_warnings = true;
-    resize_simulation_grid();
-    disable_warnings = flag;
+    just_resize_simulation_grid();
 
     DataSavingFunctions::read_simulation_grid(is, edc);
 }
@@ -208,7 +203,8 @@ void MainWindow::json_read_grid_data(rapidjson::Document & d) {
 
     update_simulation_size_label();
 
-    resize_simulation_grid();
+    just_resize_simulation_grid();
+
     engine.make_walls();
     disable_warnings = false;
 

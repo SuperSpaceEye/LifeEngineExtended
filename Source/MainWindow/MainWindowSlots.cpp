@@ -153,7 +153,10 @@ void MainWindow::b_save_world_slot() {
 
 void MainWindow::b_load_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
+    bool flag2 = sp.reset_on_total_extinction;
     ecp.synchronise_simulation_and_window = false;
+    sp.reset_on_total_extinction = false;
+    engine.pause();
     ecp.engine_global_pause = true;
     engine.wait_for_engine_to_pause_force();
 
@@ -183,7 +186,9 @@ void MainWindow::b_load_world_slot() {
     }
 
     ecp.synchronise_simulation_and_window = flag;
+    sp.reset_on_total_extinction = flag;
     ecp.engine_global_pause = false;
+    engine.unpause();
     initialize_gui();
     update_table_values();
 }
