@@ -182,6 +182,8 @@ public:
         cmb_change_mode = new QComboBox(frame);
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
+        cmb_change_mode->addItem(QString());
+        cmb_change_mode->addItem(QString());
         cmb_change_mode->setObjectName(QString::fromUtf8("cmb_change_mode"));
         sizePolicy2.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
         cmb_change_mode->setSizePolicy(sizePolicy2);
