@@ -58,7 +58,7 @@ void ChangeValueEventNodeWidget::le_target_value_slot() {
                 case ChangeValueMode::MultiplyBy:
                 case ChangeValueMode::DivideBy:
                     //divide by zero is not possible
-                    le_slot_lower_bound(_node->target_value, _node->target_value, "float", ui.le_target_value, 0.00000001, "0.00000001");
+                    le_slot_lower_bound(_node->target_value, _node->target_value, "float", ui.le_target_value, 0.00000001f, "0.00000001");
                     break;
             }
         }
