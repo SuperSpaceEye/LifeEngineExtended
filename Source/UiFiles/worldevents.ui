@@ -178,6 +178,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Load Events</string>
            </property>
@@ -185,6 +188,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Save Events</string>
            </property>
@@ -243,7 +249,7 @@
             <item>
              <widget class="QPushButton" name="b_resume_events">
               <property name="text">
-               <string>Resume events</string>
+               <string>Resume Events</string>
               </property>
              </widget>
             </item>
@@ -251,6 +257,13 @@
              <widget class="QPushButton" name="b_stop_events">
               <property name="text">
                <string>Stop Events</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="b_stop_events_no_settings_reset">
+              <property name="text">
+               <string>Stop Events No Settings Reset</string>
               </property>
              </widget>
             </item>
@@ -498,6 +511,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_stop_events_no_settings_reset</sender>
+   <signal>clicked()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>b_stop_events_no_setting_reset_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>935</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_apply_events_slot()</slot>
@@ -507,5 +536,6 @@
   <slot>b_stop_events_slot()</slot>
   <slot>le_update_world_events_every_n_slot()</slot>
   <slot>le_collect_info_every_n_slot()</slot>
+  <slot>b_stop_events_no_setting_reset_slot()</slot>
  </slots>
 </ui>

@@ -528,3 +528,11 @@ void SimulationEngine::stop_world_events() {
     world_events_controller.reset();
     unpause();
 }
+
+void SimulationEngine::stop_world_events_no_setting_reset() {
+    pause();
+    ecp.execute_world_events = false;
+    ecp.pause_world_events = false;
+    world_events_controller.reset();
+    unpause();
+}

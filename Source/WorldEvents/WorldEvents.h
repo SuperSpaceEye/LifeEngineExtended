@@ -54,6 +54,7 @@ private slots:
     void b_resume_events_slot();
     void b_start_events_slot();
     void b_stop_events_slot();
+    void b_stop_events_no_setting_reset_slot();
 
     void le_collect_info_every_n_slot();
     void le_update_world_events_every_n_slot();

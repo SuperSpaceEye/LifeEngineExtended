@@ -108,6 +108,7 @@ public:
     void resume_world_events();
     void pause_world_events();
     void stop_world_events();
+    void stop_world_events_no_setting_reset();
 
     void reset_world_events(std::vector<BaseEventNode *> start_nodes,
                             std::vector<char> repeating_branch,

@@ -53,6 +53,7 @@ public:
     QPushButton *b_pause_events;
     QPushButton *b_resume_events;
     QPushButton *b_stop_events;
+    QPushButton *b_stop_events_no_settings_reset;
     QWidget *settings_tab;
     QVBoxLayout *verticalLayout_8;
     QScrollArea *scrollArea_2;
@@ -143,11 +144,13 @@ public:
 
         pushButton = new QPushButton(world_events_tab);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setEnabled(false);
 
         horizontalLayout->addWidget(pushButton);
 
         pushButton_2 = new QPushButton(world_events_tab);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        pushButton_2->setEnabled(false);
 
         horizontalLayout->addWidget(pushButton_2);
 
@@ -191,6 +194,11 @@ public:
         b_stop_events->setObjectName(QString::fromUtf8("b_stop_events"));
 
         horizontalLayout_2->addWidget(b_stop_events);
+
+        b_stop_events_no_settings_reset = new QPushButton(widget);
+        b_stop_events_no_settings_reset->setObjectName(QString::fromUtf8("b_stop_events_no_settings_reset"));
+
+        horizontalLayout_2->addWidget(b_stop_events_no_settings_reset);
 
 
         verticalLayout_5->addLayout(horizontalLayout_2);
@@ -278,6 +286,7 @@ public:
         QObject::connect(b_stop_events, SIGNAL(clicked()), WorldEvents, SLOT(b_stop_events_slot()));
         QObject::connect(le_collect_info_every_n, SIGNAL(returnPressed()), WorldEvents, SLOT(le_collect_info_every_n_slot()));
         QObject::connect(le_update_world_events_every_n, SIGNAL(returnPressed()), WorldEvents, SLOT(le_update_world_events_every_n_slot()));
+        QObject::connect(b_stop_events_no_settings_reset, SIGNAL(clicked()), WorldEvents, SLOT(b_stop_events_no_setting_reset_slot()));
 
         world_events_viewer_tab->setCurrentIndex(0);
 
@@ -295,8 +304,9 @@ public:
         world_events_status_label->setText(QApplication::translate("WorldEvents", "Events stopped.", nullptr));
         b_start_events->setText(QApplication::translate("WorldEvents", "Start Events", nullptr));
         b_pause_events->setText(QApplication::translate("WorldEvents", "Pause Events", nullptr));
-        b_resume_events->setText(QApplication::translate("WorldEvents", "Resume events", nullptr));
+        b_resume_events->setText(QApplication::translate("WorldEvents", "Resume Events", nullptr));
         b_stop_events->setText(QApplication::translate("WorldEvents", "Stop Events", nullptr));
+        b_stop_events_no_settings_reset->setText(QApplication::translate("WorldEvents", "Stop Events No Settings Reset", nullptr));
         world_events_viewer_tab->setTabText(world_events_viewer_tab->indexOf(current_world_events), QApplication::translate("WorldEvents", "Current World Events Viewer", nullptr));
         label->setText(QApplication::translate("WorldEvents", "Update World Events every n ticks", nullptr));
         label_2->setText(QApplication::translate("WorldEvents", "Collect Info every n ticks", nullptr));

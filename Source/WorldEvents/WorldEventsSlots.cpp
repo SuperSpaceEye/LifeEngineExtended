@@ -50,6 +50,13 @@ void WorldEvents::b_stop_events_slot() {
     ui.world_events_status_label->setText(QString("Events stopped."));
 }
 
+void WorldEvents::b_stop_events_no_setting_reset_slot() {
+    if (!ecp->execute_world_events) { return;}
+    engine->stop_world_events_no_setting_reset();
+    ecp->update_world_events_ui_once = true;
+    ui.world_events_status_label->setText(QString("Events stopped."));
+}
+
 void WorldEvents::le_collect_info_every_n_slot() {
     int temp = ecp->update_info_every_n_tick;
     le_slot_lower_bound<int>(temp, temp, "int", ui.le_collect_info_every_n, 1, "1");
