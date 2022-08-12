@@ -80,10 +80,13 @@ void OrganismEditor::b_save_organism_slot() {
 
     if (filetype == ".lfeo") {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
-        write_organism(out);
+        DataSavingFunctions::write_organism(out, editor_organism);
         out.close();
 
     } else {
+        rapidjson::Document j_organism;
+        j_organism.SetObject();
+
         write_json_organism(full_path);
     }
 }
@@ -107,27 +110,27 @@ void OrganismEditor::b_reset_organism_slot() {
 
 void OrganismEditor::le_anatomy_mutation_rate_slot() {
     le_slot_lower_upper_bound<float>(editor_organism->anatomy_mutation_rate, editor_organism->anatomy_mutation_rate, "float",
-                                     _ui.le_anatomy_mutation_rate, 0, "0", 1, "1");
+                                     ui.le_anatomy_mutation_rate, 0, "0", 1, "1");
 }
 
 void OrganismEditor::le_brain_mutation_rate_slot() {
     le_slot_lower_upper_bound<float>(editor_organism->brain_mutation_rate, editor_organism->brain_mutation_rate, "float",
-                                     _ui.le_brain_mutation_rate, 0, "0", 1, "1");
+                                     ui.le_brain_mutation_rate, 0, "0", 1, "1");
 }
 
 void OrganismEditor::le_grid_width_slot() {
     le_slot_lower_bound<int>(new_editor_width, new_editor_width, "int",
-                             _ui.le_grid_width, 5, "5");
+                             ui.le_grid_width, 5, "5");
 }
 
 void OrganismEditor::le_grid_height_slot() {
     le_slot_lower_bound<int>(new_editor_height, new_editor_height, "int",
-                             _ui.le_grid_height, 5, "5");
+                             ui.le_grid_height, 5, "5");
 }
 
 void OrganismEditor::le_move_range_slot() {
     le_slot_lower_bound<int>(editor_organism->move_range, editor_organism->move_range, "int",
-                             _ui.le_move_range, 1, "1");
+                             ui.le_move_range, 1, "1");
 }
 
 //==================== Radio buttons ====================
@@ -148,35 +151,33 @@ void OrganismEditor::rb_producer_slot () { chosen_block_type = BlockTypes::Produ
 void OrganismEditor::rb_place_organism_slot() {
     *c_mode = CursorMode::PlaceOrganism;
     finalize_chosen_organism();
-    _parent_ui->rb_null_button->setChecked(true);
+    parent_ui->rb_null_button->setChecked(true);
     create_image();
 }
 
 void OrganismEditor::rb_choose_organism_slot() {
     *c_mode = CursorMode::ChooseOrganism;
-    _parent_ui->rb_null_button->setChecked(true);
+    parent_ui->rb_null_button->setChecked(true);
 }
 
 void OrganismEditor::rb_edit_anatomy_slot() {
-    _ui.stackedWidget->setCurrentIndex(0);
+    ui.stackedWidget->setCurrentIndex(0);
 }
 
 void OrganismEditor::rb_edit_brain_slot() {
-    _ui.stackedWidget->setCurrentIndex(1);
+    ui.stackedWidget->setCurrentIndex(1);
 }
 
 //==================== Combo boxes ====================
 
-
-//TODO i don't fkn know why left and right is switched
-void OrganismEditor::cmd_block_rotation_slot(QString name) {
+void OrganismEditor::cmd_block_rotation_slot(const QString& name) {
     if (name.toStdString() == "Up")    {chosen_block_rotation = Rotation::UP;}
     if (name.toStdString() == "Left")  {chosen_block_rotation = Rotation::LEFT;}
     if (name.toStdString() == "Down")  {chosen_block_rotation = Rotation::DOWN;}
     if (name.toStdString() == "Right") {chosen_block_rotation = Rotation::RIGHT;}
 }
 
-void OrganismEditor::cmd_organism_rotation_slot(QString name) {
+void OrganismEditor::cmd_organism_rotation_slot(const QString& name) {
     if (name.toStdString() == "Up")    {editor_organism->rotation = Rotation::UP;}
     if (name.toStdString() == "Left")  {editor_organism->rotation = Rotation::RIGHT;}
     if (name.toStdString() == "Down")  {editor_organism->rotation = Rotation::DOWN;}

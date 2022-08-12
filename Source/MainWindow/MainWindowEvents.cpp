@@ -23,19 +23,19 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             last_mouse_y_pos = mouse_event->y();
 
 //            //TODO ok, i don't get why this isn't working
-//            if (ee._ui.editor_graphicsView->underMouse()) {
+//            if (ee.ui.editor_graphicsView->underMouse()) {
 //                ee.actual_cursor.show();
-//                auto pos = ee.calculate_cursor_pos_on_grid(ee._ui.editor_graphicsView->viewport()->width(),
-//                                                                    ee._ui.editor_graphicsView->viewport()->width());
+//                auto pos = ee.calculate_cursor_pos_on_grid(ee.ui.editor_graphicsView->viewport()->width(),
+//                                                                    ee.ui.editor_graphicsView->viewport()->width());
 //
-//                double x_modif = double(ee._ui.editor_graphicsView->viewport()->width())  / pos.x;
-//                double y_modif = double(ee._ui.editor_graphicsView->viewport()->height()) / pos.y;
+//                double x_modif = double(ee.ui.editor_graphicsView->viewport()->width())  / pos.x;
+//                double y_modif = double(ee.ui.editor_graphicsView->viewport()->height()) / pos.y;
 //
 //                pos = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //
 //                std::cout << pos.x << " " << pos.y << "\n";
-//                pos.x = (pos.x * x_modif) + ee._ui.editor_graphicsView->x() + 6 + 1;
-//                pos.y = (pos.y * y_modif) + ee._ui.editor_graphicsView->y() + 6 + 1;
+//                pos.x = (pos.x * x_modif) + ee.ui.editor_graphicsView->x() + 6 + 1;
+//                pos.y = (pos.y * y_modif) + ee.ui.editor_graphicsView->y() + 6 + 1;
 //
 //                std::cout << pos.x << " " << pos.y << "\n";
 //
@@ -59,7 +59,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             last_mouse_y_pos = position.y();
 
             change_main_simulation_grid = _ui.simulation_graphicsView->underMouse();
-            change_editing_grid = ee._ui.editor_graphicsView->underMouse();
+            change_editing_grid = ee.ui.editor_graphicsView->underMouse();
 
             //Removes focus from line edits, buttons, etc. so that user can use keyboard buttons without problems.
             if (_ui.simulation_graphicsView->underMouse()) {setFocus();}
@@ -85,7 +85,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         case QEvent::Close: {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
             if (watched->objectName().toStdString() == "QWidgetClassWindow") {
-                engine->pause();
+                engine.pause();
                 exit(0);
             }
             close_event->accept();
@@ -159,8 +159,8 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
         case Qt::Key_1: rb_food_slot();_ui.rb_food->setChecked(true);break;
         case Qt::Key_2: rb_kill_slot();_ui.rb_kill->setChecked(true);break;
         case Qt::Key_3: rb_wall_slot();_ui.rb_wall->setChecked(true);break;
-        case Qt::Key_4: ee.rb_place_organism_slot();ee._ui.rb_place_organism->setChecked(true);break;
-        case Qt::Key_5: ee.rb_choose_organism_slot();ee._ui.rb_chose_organism->setChecked(true);break;
+        case Qt::Key_4: ee.rb_place_organism_slot();ee.ui.rb_place_organism->setChecked(true);break;
+        case Qt::Key_5: ee.rb_choose_organism_slot();ee.ui.rb_chose_organism->setChecked(true);break;
 
     }
 }

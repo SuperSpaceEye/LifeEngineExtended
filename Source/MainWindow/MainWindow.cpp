@@ -20,9 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //https://stackoverflow.com/questions/32714105/mousemoveevent-is-not-called
     QCoreApplication::instance()->installEventFilter(this);
 
-    s.init(&_ui);
-    ee.init(15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism);
-
     edc.simulation_width = 200;
     edc.simulation_height = 200;
 
@@ -31,16 +28,16 @@ MainWindow::MainWindow(QWidget *parent) :
     edc.simulation_height = 50;
 #endif
 
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
     edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
-    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
+//    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
 
-    engine->make_walls();
+    engine.make_walls();
 
-    rec.set_engine(engine);
+    rec.set_engine(&engine);
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
@@ -83,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Will execute on first QT show event
     QTimer::singleShot(0, [&]{
-        engine_thread = std::thread{&SimulationEngine::threaded_mainloop, engine};
+        engine_thread = std::thread{&SimulationEngine::threaded_mainloop, std::ref(engine)};
         engine_thread.detach();
 
         fps_timer = clock_now();
@@ -108,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start();
 #if __VALGRIND_MODE__ == 1
     cb_synchronise_simulation_and_window_slot(false);
-    _ui.cb_synchronise_sim_and_win->setChecked(false);
+    ui.cb_synchronise_sim_and_win->setChecked(false);
 #endif
 
     auto executable_path = QCoreApplication::applicationDirPath().toStdString();
@@ -126,16 +123,16 @@ void MainWindow::mainloop_tick() {
         ecp.engine_pass_tick = true;
         ecp.synchronise_simulation_tick = true;
     }
-    if (ecp.update_editor_organism) { ee.load_chosen_organism(), ecp.update_editor_organism = false;}
+    if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
-    window_tick();
+    ui_tick();
     window_frames++;
 
     auto info_update = std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - fps_timer).count();
 
     if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
         auto start_timer = clock_now();
-        engine->pause();
+        engine.pause();
         uint32_t simulation_frames = edc.engine_ticks;
         edc.engine_ticks = 0;
 
@@ -143,9 +140,10 @@ void MainWindow::mainloop_tick() {
 
         auto scale = (info_update/1000000.);
 
-        auto info = rec.parse_organisms_info();
+        engine.update_info();
+        auto info = engine.get_info();
 
-        engine->unpause();
+        engine.unpause();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
@@ -160,7 +158,7 @@ void MainWindow::update_fps_labels(int fps, int sps) {
     _ui.lb_sps->setText(QString::fromStdString("sps: "+std::to_string(sps)));
 }
 
-void MainWindow::window_tick() {
+void MainWindow::ui_tick() {
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
     if (ecp.tb_paused) {_ui.tb_pause->setChecked(true);}
 
@@ -169,6 +167,8 @@ void MainWindow::window_tick() {
 
     if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
+
+    if (ecp.execute_world_events && (!ecp.tb_paused && !ecp.pause_world_events) || ecp.update_world_events_ui_once) {update_world_event_values_ui(); ecp.update_world_events_ui_once = false;}
 
     rec.update_label();
 
@@ -221,71 +221,6 @@ void MainWindow::reset_scale_view() {
     scaling_zoom = pow(scaling_coefficient, exp);
 }
 
-color &MainWindow::get_color_simplified(BlockTypes type) {
-    switch (type) {
-        case BlockTypes::EmptyBlock :   return cc.empty_block;
-        case BlockTypes::MouthBlock:    return cc.mouth;
-        case BlockTypes::ProducerBlock: return cc.producer;
-        case BlockTypes::MoverBlock:    return cc.mover;
-        case BlockTypes::KillerBlock:   return cc.killer;
-        case BlockTypes::ArmorBlock:    return cc.armor;
-        case BlockTypes::EyeBlock:      return cc.eye;
-        case BlockTypes::FoodBlock:     return cc.food;
-        case BlockTypes::WallBlock:     return cc.wall;
-        default: return cc.empty_block;
-    }
-}
-
-color & MainWindow::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
-    int x;
-    int y;
-
-    switch (type) {
-        case BlockTypes::EmptyBlock :   return cc.empty_block;
-        case BlockTypes::MouthBlock:    return cc.mouth;
-        case BlockTypes::ProducerBlock: return cc.producer;
-        case BlockTypes::MoverBlock:    return cc.mover;
-        case BlockTypes::KillerBlock:   return cc.killer;
-        case BlockTypes::ArmorBlock:    return cc.armor;
-        case BlockTypes::EyeBlock:
-            x = relative_x_scale * 5;
-            y = relative_y_scale * 5;
-            {
-                switch (rotation) {
-                    case Rotation::UP:
-                        break;
-                    case Rotation::LEFT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        x = -x;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::DOWN:
-                        x -= 2;
-                        y -= 2;
-                        x = -x;
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::RIGHT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                }
-            }
-            return textures.rawEyeTexture[x + y * 5];
-        case BlockTypes::FoodBlock:     return cc.food;
-        case BlockTypes::WallBlock:     return cc.wall;
-        default: return cc.empty_block;
-    }
-}
 
 void MainWindow::create_image() {
     resize_image();
@@ -305,148 +240,43 @@ void MainWindow::create_image() {
     std::vector<int> lin_width;
     std::vector<int> lin_height;
 
-    calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
+    ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
 
     std::vector<int> truncated_lin_width;  truncated_lin_width .reserve(image_width);
     std::vector<int> truncated_lin_height; truncated_lin_height.reserve(image_height);
 
-    calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 
     if ((!pause_grid_parsing && !ecp.engine_global_pause) || ecp.synchronise_simulation_and_window) {
         ecp.engine_pause = true;
         // pausing engine to parse data from engine.
         auto paused = wait_for_engine_to_pause();
         // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
-        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine->unpause();}
+        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine.unpause();}
     }
-    if (simplified_rendering) {
-        simplified_image_creation(image_width, image_height, lin_width, lin_height);
+
+    if (!use_cuda) {
+        ImageCreation::ImageCreationTools::complex_image_creation(lin_width,
+                                                                  lin_height,
+                                                                  edc.simulation_width,
+                                                                  edc.simulation_height,
+                                                                  cc,
+                                                                  textures,
+                                                                  _ui.simulation_graphicsView->width(),
+                                                                  image_vector,
+                                                                  edc.second_simulation_grid);
     } else {
-        if (!use_cuda) {
-            complex_image_creation(lin_width, lin_height);
-        } else {
 #if __CUDA_USED__
-            cuda_creator.cuda_create_image(image_width,
-                                           image_height,
-                                           lin_width,
-                                           lin_height,
-                                           image_vector,
-                                           cc,
-                                           edc, 32, truncated_lin_width, truncated_lin_height);
+        cuda_creator.cuda_create_image(image_width,
+                                       image_height,
+                                       lin_width,
+                                       lin_height,
+                                       image_vector,
+                                       cc,
+                                       edc, 32, truncated_lin_width, truncated_lin_height);
 #endif
-        }
     }
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
-}
-
-void MainWindow::calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                                    int start_x, int end_x, int start_y, int end_y, int image_width, int image_height) {
-    lin_width  = linspace<int>(start_x, end_x, image_width);
-    lin_height = linspace<int>(start_y, end_y, image_height);
-
-    //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
-    // n pixels
-    int max_x = lin_width[lin_width.size()-1];
-    int max_y = lin_height[lin_height.size()-1];
-    int del_x = 0;
-    int del_y = 0;
-    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
-    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
-
-    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
-    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
-}
-
-void MainWindow::calculate_truncated_linspace(
-        int image_width, int image_height,
-        const std::vector<int> &lin_width,
-        const std::vector<int> &lin_height,
-        std::vector<int> & truncated_lin_width,
-        std::vector<int> & truncated_lin_height) {
-
-    int min_val = INT32_MIN;
-    for (int x = 0; x < image_width; x++) {if (lin_width[x] > min_val) {min_val = lin_width[x]; truncated_lin_width.push_back(min_val);}}
-    truncated_lin_width.pop_back();
-    min_val = INT32_MIN;
-    for (int y = 0; y < image_height; y++) {if (lin_height[y] > min_val) {min_val = lin_height[y]; truncated_lin_height.push_back(min_val);}}
-    truncated_lin_height.pop_back();
-}
-
-void MainWindow::simplified_image_creation(int image_width, int image_height,
-                                           const std::vector<int> &lin_width,
-                                           const std::vector<int> &lin_height) {
-    color pixel_color;
-    for (int x = 0; x < image_width; x++) {
-        for (int y = 0; y < image_height; y++) {
-            if (lin_width[x] < 0 || lin_width[x] >= edc.simulation_width || lin_height[y] < 0 || lin_height[y] >= edc.simulation_height) { pixel_color = cc.simulation_background_color;}
-            else {pixel_color = get_color_simplified(edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width].type);}
-            set_image_pixel(x, y, pixel_color);
-        }
-    }
-}
-
-void MainWindow::complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
-    //x - start, y - stop
-    std::vector<Vector2<int>> width_img_boundaries;
-    std::vector<Vector2<int>> height_img_boundaries;
-
-    auto last = INT32_MIN;
-    auto count = 0;
-    for (int x = 0; x < lin_width.size(); x++) {
-        if (last < lin_width[x]) {
-            width_img_boundaries.emplace_back(count, x);
-            last = lin_width[x];
-            count = x;
-        }
-    }
-    width_img_boundaries.emplace_back(count, lin_width.size());
-
-    last = INT32_MIN;
-    count = 0;
-    for (int x = 0; x < lin_height.size(); x++) {
-        if (last < lin_height[x]) {
-            height_img_boundaries.emplace_back(count, x);
-            last = lin_height[x];
-            count = x;
-        }
-    }
-    height_img_boundaries.emplace_back(count, lin_height.size());
-
-    color pixel_color;
-    //width of boundaries of an organisms
-
-    //width bound, height bound
-    for (auto &w_b: width_img_boundaries) {
-        for (auto &h_b: height_img_boundaries) {
-            for (int x = w_b.x; x < w_b.y; x++) {
-                for (int y = h_b.x; y < h_b.y; y++) {
-                    auto &block = edc.second_simulation_grid[lin_width[x] + lin_height[y] * edc.simulation_width];
-
-                    if (lin_width[x] < 0 ||
-                        lin_width[x] >= edc.simulation_width ||
-                        lin_height[y] < 0 ||
-                        lin_height[y] >= edc.simulation_height) {
-                        pixel_color = cc.simulation_background_color;
-                    } else {
-                        pixel_color = get_texture_color(block.type,
-                                                        block.rotation,
-                                                        float(x - w_b.x) / (w_b.y - w_b.x),
-                                                        float(y - h_b.x) / (h_b.y - h_b.x));
-                    }
-                    set_image_pixel(x, y, pixel_color);
-                }
-            }
-        }
-    }
-}
-
-// depth * ( y * width + x) + z
-// depth * width * y + depth * x + z
-void MainWindow::set_image_pixel(int x, int y, const color &color) {
-    auto index = 4 * (y * _ui.simulation_graphicsView->viewport()->width() + x);
-    image_vector[index+2] = color.r;
-    image_vector[index+1] = color.g;
-    image_vector[index  ] = color.b;
 }
 
 void MainWindow::set_window_interval(int max_window_fps) {
@@ -473,7 +303,7 @@ void MainWindow::set_simulation_interval(int max_simulation_fps) {
 //Can wait, or it can not.
 bool MainWindow::wait_for_engine_to_pause() {
     if (!wait_for_engine_to_stop_to_render || ecp.engine_global_pause) {return true;}
-    return engine->wait_for_engine_to_pause_force();
+    return engine.wait_for_engine_to_pause_force();
 }
 
 void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
@@ -489,20 +319,20 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
 
 void MainWindow::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
-    engine->pause();
-    engine->parse_full_simulation_grid();
-    engine->unpause();
+    engine.pause();
+    engine.parse_full_simulation_grid();
+    engine.unpause();
 }
 
 void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
-    engine->pause();
+    engine.pause();
 
     ecp.num_threads = num_threads;
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
         ecp.build_threads = true;
     }
 
-    engine->unpause();
+    engine.unpause();
 }
 
 void MainWindow::set_cursor_mode(CursorMode mode) {
@@ -521,6 +351,19 @@ void MainWindow::calculate_new_simulation_size() {
     new_simulation_height = window_size.height() / starting_cell_size_on_resize;
 }
 
+void MainWindow::just_resize_simulation_grid() {
+    edc.simulation_width = new_simulation_width;
+    edc.simulation_height = new_simulation_height;
+
+    edc.CPU_simulation_grid.clear();
+    edc.second_simulation_grid.clear();
+
+    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
+    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+
+    engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
+}
+
 void MainWindow::resize_simulation_grid() {
     if (ecp.lock_resizing) {
         display_message("Grid cannot be resized until recording is stopped.");
@@ -532,7 +375,7 @@ void MainWindow::resize_simulation_grid() {
         if (!use_cuda) {
             auto msg = DescisionMessageBox("Warning",
                                        QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(AtomicGridBlock))*new_simulation_height*new_simulation_width)),
+                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(SingleThreadGridBlock)) * new_simulation_height * new_simulation_width)),
                                        "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
@@ -541,7 +384,7 @@ void MainWindow::resize_simulation_grid() {
         } else {
             auto msg = DescisionMessageBox("Warning",
                                            QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(AtomicGridBlock))*new_simulation_height*new_simulation_width)
+                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(SingleThreadGridBlock)) * new_simulation_height * new_simulation_width)
                                                                   + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width))
                                                                   + " GPU's VRAM",
                                            "OK", "Cancel", this);
@@ -552,80 +395,71 @@ void MainWindow::resize_simulation_grid() {
         }
     }
 
-    engine->pause();
+    engine.pause();
 
-    edc.simulation_width = new_simulation_width;
-    edc.simulation_height = new_simulation_height;
-
-    edc.CPU_simulation_grid.clear();
-    edc.second_simulation_grid.clear();
-
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<AtomicGridBlock>(edc.simulation_height, AtomicGridBlock{}));
-    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+    just_resize_simulation_grid();
 
     if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
         ecp.build_threads = true;
     }
 
-    engine->init_auto_food_drop(edc.simulation_width, edc.simulation_height);
-
-    engine->reset_world();
-    engine->unpause();
+    engine.reset_world();
+    engine.unpause();
 
     reset_scale_view();
 }
 
 void MainWindow::clear_world() {
-    engine->partial_clear_world();
-    engine->make_walls();
-    engine->unpause();
+    engine.partial_clear_world();
+    engine.make_walls();
+    engine.unpause();
 }
 
-void MainWindow::update_statistics_info(const OrganismAvgBlockInformation &info) {
-    s._ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: "    + std::to_string(edc.total_engine_ticks)));
-    s._ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
-                                                                                convert_num_bytes(info.total_size)));
-    s._ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: "        + std::to_string(info.total_avg.total)));
-    s._ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: "     + to_str(info.total_avg.size,               float_precision)));
-    s._ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
-    s._ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism age: "      + to_str(info.total_avg._organism_age,      float_precision)));
-    s._ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: "         + to_str(info.total_avg._mouth_blocks,      float_precision)));
-    s._ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: "      + to_str(info.total_avg._producer_blocks,   float_precision)));
-    s._ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: "         + to_str(info.total_avg._mover_blocks,      float_precision)));
-    s._ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: "        + to_str(info.total_avg._killer_blocks,     float_precision)));
-    s._ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: "         + to_str(info.total_avg._armor_blocks,      float_precision)));
-    s._ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: "           + to_str(info.total_avg._eye_blocks,        float_precision)));
-    s._ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
-    s._ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.total_avg.brain_mutation_rate,   float_precision)));
+void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
+    s.ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: " + std::to_string(edc.total_engine_ticks)));
+    s.ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
+                                                                         convert_num_bytes(info.total_size)));
+    s.ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: " + std::to_string(info.total_avg.total)));
+    s.ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size, float_precision)));
+    s.ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
+    s.ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.total_avg._organism_age, float_precision)));
+    s.ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.total_avg._mouth_blocks, float_precision)));
+    s.ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.total_avg._producer_blocks, float_precision)));
+    s.ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.total_avg._mover_blocks, float_precision)));
+    s.ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.total_avg._killer_blocks, float_precision)));
+    s.ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.total_avg._armor_blocks, float_precision)));
+    s.ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.total_avg._eye_blocks, float_precision)));
+    s.ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
+    s.ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.total_avg.brain_mutation_rate, float_precision)));
 
 
-    s._ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: "      + std::to_string(info.moving_avg.total)));
-    s._ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: "   + std::to_string(info.organisms_with_eyes)));
-    s._ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
-    s._ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism age: "      + to_str(info.moving_avg._organism_age,      float_precision)));
-    s._ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: "      + to_str(info.move_range,                    float_precision)));
-    s._ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: "     + to_str(info.moving_avg.size,               float_precision)));
-    s._ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: "         + to_str(info.moving_avg._mouth_blocks,      float_precision)));
-    s._ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: "      + to_str(info.moving_avg._producer_blocks,   float_precision)));
-    s._ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: "         + to_str(info.moving_avg._mover_blocks,      float_precision)));
-    s._ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: "        + to_str(info.moving_avg._killer_blocks,     float_precision)));
-    s._ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: "         + to_str(info.moving_avg._armor_blocks,      float_precision)));
-    s._ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: "           + to_str(info.moving_avg._eye_blocks,        float_precision)));
-    s._ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
-    s._ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.moving_avg.brain_mutation_rate,   float_precision)));
+    s.ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: " + std::to_string(info.moving_avg.total)));
+    s.ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: " + std::to_string(info.organisms_with_eyes)));
+    s.ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
+    s.ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.moving_avg._organism_age, float_precision)));
+    s.ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: " + to_str(info.move_range, float_precision)));
+    s.ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size, float_precision)));
+    s.ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.moving_avg._mouth_blocks, float_precision)));
+    s.ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.moving_avg._producer_blocks, float_precision)));
+    s.ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.moving_avg._mover_blocks, float_precision)));
+    s.ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.moving_avg._killer_blocks, float_precision)));
+    s.ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.moving_avg._armor_blocks, float_precision)));
+    s.ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.moving_avg._eye_blocks, float_precision)));
+    s.ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
+    s.ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.moving_avg.brain_mutation_rate, float_precision)));
 
 
-    s._ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: "  + std::to_string(info.station_avg.total)));
-    s._ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: "     + to_str(info.station_avg.size,               float_precision)));
-    s._ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
-    s._ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism age: "      + to_str(info.station_avg._organism_age,      float_precision)));
-    s._ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: "         + to_str(info.station_avg._mouth_blocks,      float_precision)));
-    s._ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: "      + to_str(info.station_avg._producer_blocks,   float_precision)));
-    s._ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: "        + to_str(info.station_avg._killer_blocks,     float_precision)));
-    s._ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: "         + to_str(info.station_avg._armor_blocks,      float_precision)));
-    s._ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: "           + to_str(info.station_avg._eye_blocks,        float_precision)));
-    s._ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
-    s._ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: "   + to_str(info.station_avg.brain_mutation_rate,   float_precision)));
+    s.ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: " + std::to_string(info.station_avg.total)));
+    s.ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size, float_precision)));
+    s.ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
+    s.ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.station_avg._organism_age, float_precision)));
+    s.ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.station_avg._mouth_blocks, float_precision)));
+    s.ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.station_avg._producer_blocks, float_precision)));
+    s.ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.station_avg._killer_blocks, float_precision)));
+    s.ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.station_avg._armor_blocks, float_precision)));
+    s.ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.station_avg._eye_blocks, float_precision)));
+    s.ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
+    s.ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.station_avg.brain_mutation_rate, float_precision)));
 }
 
 // So that changes in code values would be set by default in gui.
@@ -707,7 +541,7 @@ void MainWindow::initialize_gui() {
     }
     _ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
-//    _ui.rb_partial_multi_thread_mode->hide();
+//    ui.rb_partial_multi_thread_mode->hide();
     _ui.rb_multi_thread_mode->hide();
     _ui.rb_cuda_mode->hide();
 
@@ -729,18 +563,37 @@ void MainWindow::initialize_gui() {
 
     //So that when user clicks on rbs in organism editors, rbs in main window would be unchecked and vice versa
     _ui.rb_null_button->hide();
-    ee._ui.rb_null_button->hide();
+    ee.ui.rb_null_button->hide();
 
     //TODO
     _ui.rb_single_thread_mode->hide();
     _ui.rb_partial_multi_thread_mode->hide();
     _ui.le_num_threads->hide();
     _ui.lb_set_num_threads->hide();
-    s._ui.lb_organisms_memory_consumption->hide();
+    s.ui.lb_organisms_memory_consumption->hide();
+}
+
+void MainWindow::update_world_event_values_ui() {
+    _ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability,          4)));
+    _ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate,         2)));
+    _ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate,           2)));
+    _ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter,      2)));
+    _ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter,        2)));
+    _ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier,                  3)));
+    _ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost,        0)));
+    _ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost,              0)));
+    _ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
+    _ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
+    _ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));
+    _ui.le_add                               ->setText(QString::fromStdString(std::to_string(sp.add_cell)));
+    _ui.le_change                            ->setText(QString::fromStdString(std::to_string(sp.change_cell)));
+    _ui.le_remove                            ->setText(QString::fromStdString(std::to_string(sp.remove_cell)));
+
+    update_table_values();
 }
 
 void MainWindow::update_simulation_size_label() {
-  s._ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
+  s.ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
 }
 
 Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {

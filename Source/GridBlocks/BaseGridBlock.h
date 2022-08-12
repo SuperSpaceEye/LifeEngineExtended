@@ -21,8 +21,7 @@ public:
     Rotation rotation = Rotation::UP;
 
     BaseGridBlock()=default;
-    BaseGridBlock(const BaseGridBlock & block): type(block.type),
-                                                rotation(block.rotation) {}
+    BaseGridBlock(const BaseGridBlock & block) = default;
     explicit BaseGridBlock(BlockTypes type, Rotation rotation = Rotation::UP): type(type),
                                                                                rotation(rotation) {}
     BaseGridBlock& operator=(const BaseGridBlock & block) = default;

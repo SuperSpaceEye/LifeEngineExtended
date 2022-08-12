@@ -122,8 +122,8 @@ public:
     QPushButton *tb_open_recorder_window;
     QCheckBox *cb_recorder_window_always_on_top;
     QHBoxLayout *horizontalLayout_52;
-    QPushButton *pushButton_2;
-    QCheckBox *checkBox_2;
+    QPushButton *tb_open_world_events;
+    QCheckBox *cb_world_events_always_on_top;
     QWidget *evolution_controls_tab;
     QHBoxLayout *horizontalLayout_7;
     QScrollArea *scrollArea_2;
@@ -806,18 +806,18 @@ public:
 
         horizontalLayout_52 = new QHBoxLayout();
         horizontalLayout_52->setObjectName(QString::fromUtf8("horizontalLayout_52"));
-        pushButton_2 = new QPushButton(widget_5);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
-        pushButton_2->setEnabled(false);
-        pushButton_2->setCheckable(true);
+        tb_open_world_events = new QPushButton(widget_5);
+        tb_open_world_events->setObjectName(QString::fromUtf8("tb_open_world_events"));
+        tb_open_world_events->setEnabled(true);
+        tb_open_world_events->setCheckable(true);
 
-        horizontalLayout_52->addWidget(pushButton_2);
+        horizontalLayout_52->addWidget(tb_open_world_events);
 
-        checkBox_2 = new QCheckBox(widget_5);
-        checkBox_2->setObjectName(QString::fromUtf8("checkBox_2"));
-        checkBox_2->setEnabled(false);
+        cb_world_events_always_on_top = new QCheckBox(widget_5);
+        cb_world_events_always_on_top->setObjectName(QString::fromUtf8("cb_world_events_always_on_top"));
+        cb_world_events_always_on_top->setEnabled(true);
 
-        horizontalLayout_52->addWidget(checkBox_2);
+        horizontalLayout_52->addWidget(cb_world_events_always_on_top);
 
 
         verticalLayout_37->addLayout(horizontalLayout_52);
@@ -1937,6 +1937,8 @@ public:
         QObject::connect(tb_open_info_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_info_window_slot(bool)));
         QObject::connect(cb_recorder_window_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_recorder_window_always_on_top_slot(bool)));
         QObject::connect(tb_open_recorder_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_recorder_window_slot(bool)));
+        QObject::connect(cb_world_events_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_world_events_always_on_top_slot(bool)));
+        QObject::connect(tb_open_world_events, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_world_events_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -1994,8 +1996,8 @@ public:
         cb_info_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         tb_open_recorder_window->setText(QApplication::translate("MainWindow", "Recorder", nullptr));
         cb_recorder_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
-        pushButton_2->setText(QApplication::translate("MainWindow", "World Events", nullptr));
-        checkBox_2->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_world_events->setText(QApplication::translate("MainWindow", "World Events", nullptr));
+        cb_world_events_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         Tabs->setTabText(Tabs->indexOf(windows_tab), QApplication::translate("MainWindow", "Windows", nullptr));
         label_4->setText(QApplication::translate("MainWindow", "Food production probability:", nullptr));
         le_food_production_probability->setText(QApplication::translate("MainWindow", "0.5", nullptr));

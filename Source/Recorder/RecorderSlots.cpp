@@ -11,11 +11,6 @@ void Recorder::le_number_of_pixels_per_block_slot() {
 }
 
 void Recorder::le_first_grid_buffer_size_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     int temp;
     le_slot_lower_bound<int>(temp, temp, "int", _ui.le_first_grid_buffer_size, 1, "1");
 
@@ -26,8 +21,8 @@ void Recorder::le_first_grid_buffer_size_slot() {
 
     if (temp <= recd->buffer_pos) {
         recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
+        recd->buffer_pos = 0;
     }
-    recd->buffer_pos = 0;
     recd->buffer_size = temp;
     recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));
     recd->second_simulation_grid_buffer.shrink_to_fit();
@@ -35,22 +30,12 @@ void Recorder::le_first_grid_buffer_size_slot() {
 }
 
 void Recorder::le_log_every_n_tick_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     int temp = ecp->parse_full_grid_every_n;
     le_slot_lower_bound<int>(temp, temp, "int", _ui.le_log_every_n_tick, 1, "1");
     ecp->parse_full_grid_every_n = temp;
 }
 
 void Recorder::le_video_fps_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     le_slot_lower_bound<int>(video_fps, video_fps, "int", _ui.le_video_fps, 1, "1");
 }
 
@@ -105,11 +90,6 @@ void Recorder::b_create_image_slot() {
 }
 
 void Recorder::b_start_recording_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     //if already recording
     if (ecp->record_full_grid) { return;}
     if (recd->path_to_save.empty()) {
@@ -130,26 +110,17 @@ void Recorder::b_start_recording_slot() {
 }
 
 void Recorder::b_stop_recording_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     ecp->record_full_grid = false;
     while (ecp->recording_full_grid) {}
     ecp->lock_resizing = false;
 
+    if (recd->path_to_save.empty()) { return;}
     recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
 
     clear_data();
 }
 
 void Recorder::b_pause_recording_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     if (!ecp->record_full_grid) {
         display_message("Start the recording first.");
         return;
@@ -161,11 +132,6 @@ void Recorder::b_pause_recording_slot() {
 }
 
 void Recorder::b_load_intermediate_data_location_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     if (ecp->record_full_grid && !recording_paused) {
         display_message("Program is still recording. Stop the recording first to load intermediate data.");
         return;
@@ -214,11 +180,6 @@ void Recorder::b_load_intermediate_data_location_slot() {
 
 void Recorder::b_compile_intermediate_data_into_video_slot() {
     if (!display_dialog_message("Compile recording into video?", false)) {return;}
-
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
 
     if (!recording_paused) {
         display_message("Program is still recording. Pause the recording first to compile intermediate data into video.");
@@ -390,11 +351,6 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 void Recorder::b_clear_intermediate_data_slot() {
     if (!display_dialog_message("Clear intermediate data?", false)) {return;}
 
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     if (ecp->record_full_grid && !recording_paused) {
         display_message("Program is still recording. Stop the recording first to clear intermediate data.");
         return;
@@ -405,11 +361,6 @@ void Recorder::b_clear_intermediate_data_slot() {
 void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
     if (!display_dialog_message("Delete intermediate data from disk?", false)) {return;}
     if (!display_dialog_message("Are you sure? It will delete all recording and partially compiled videos.", false)) {return;}
-
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
 
     if (ecp->record_full_grid && !recording_paused) {
         display_message("Program is still recording. Stop the recording first to delete intermediate data.");
@@ -433,11 +384,6 @@ void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
 }
 
 void Recorder::b_new_recording_slot() {
-    if (lock_recording) {
-        display_message("Cannot be done until program finishes compiling recording.");
-        return;
-    }
-
     if (ecp->record_full_grid || recording_paused) {
         display_message("Program is still recording. Stop the recording first to start new recording.");
         return;

@@ -54,6 +54,9 @@
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/Vector2.h"
 #include "../Containers/CPU/RecordingContainer.h"
+#include "../Stuff/ImageCreation.h"
+#include "../Stuff/DataSavingFunctions.h"
+#include "../Containers/CPU/OrganismInfoContainer.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -63,6 +66,7 @@
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
 #include "../Recorder/Recorder.h"
+#include "../WorldEvents/WorldEvents.h"
 
 
 #if __CUDA_USED__
@@ -105,11 +109,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
-    SimulationEngine* engine = nullptr;
-    OrganismEditor ee;
-    StatisticsCore s;
+    SimulationEngine engine{edc, ecp, bp, sp, &recd};
+    OrganismEditor ee{15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
+    StatisticsCore s{&_ui};
     InfoWindow iw{&_ui};
     Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
+    WorldEvents we{&_ui, &sp, &bp, &engine.info, &ecp, &engine};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -155,8 +160,8 @@ private:
     int window_frames = 0;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
-    uint32_t new_simulation_width = 200;
-    uint32_t new_simulation_height = 200;
+    int32_t new_simulation_width = 200;
+    int32_t new_simulation_height = 200;
     // visual only. Controls precision of floats in labels
     int float_precision = 4;
     int brush_size = 2;
@@ -171,31 +176,11 @@ private:
     void move_center(int delta_x, int delta_y);
     void reset_scale_view();
 
-    void write_json_data(const std::string &path);
-
-    void json_write_grid(rapidjson::Document & d);
-    void json_write_organisms(rapidjson::Document & d);
-    void json_write_fossil_record(rapidjson::Document & d);
-    void json_write_controls(rapidjson::Document & d) const ;
-
-    void json_read_grid_data(rapidjson::Document & d);
-    void json_read_organisms_data(rapidjson::Document & d);
-    void json_read_simulation_parameters(rapidjson::Document & d);
-
     void read_json_data(const std::string &path);
+    void json_read_grid_data(rapidjson::Document & d);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
-    static void write_version(std::ofstream& os);
-    void write_simulation_parameters(std::ofstream& os);
-    void write_organisms_block_parameters(std::ofstream& os);
-    void write_data_container_data(std::ofstream& os);
-    //    void write_color_container(); TODO: ?
-    void write_simulation_grid(std::ofstream& os);
-    void write_organisms(std::ofstream& os);
-    static void write_organism_data(std::ofstream& os, Organism * organism);
-    static void write_organism_brain(std::ofstream& os, Brain * brain);
-    static void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void recover_state(const SimulationParameters &recovery_sp,
                        const OrganismBlockParameters &recovery_bp,
@@ -203,36 +188,26 @@ private:
                        uint32_t recovery_simulation_height);
 
     void read_data(std::ifstream& is);
-    static bool read_version(std::ifstream& is);
-    void read_simulation_parameters(std::ifstream& is);
-    void read_organisms_block_parameters(std::ifstream& is);
-    bool read_data_container_data(std::ifstream& is);
-    //    void read_color_container(); TODO: ?
+    bool read_data_container_data(std::ifstream &is);
     void read_simulation_grid(std::ifstream& is);
     bool read_organisms(std::ifstream& is);
-    static void read_organism_data(std::ifstream& is, OrganismData & data);
-    static void read_organism_brain(std::ifstream& is, Brain * brain);
-    static void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+
     void update_table_values();
 
     bool cuda_is_available();
 
     void mainloop_tick();
-    void window_tick();
+    void ui_tick();
     void set_simulation_interval(int max_simulation_fps);
     void set_window_interval(int max_window_fps);
     void update_fps_labels(int fps, int sps);
     void resize_image();
-    void inline set_image_pixel(int x, int y, const color &color);
 
     // for fill_view
     void calculate_new_simulation_size();
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void create_image();
-
-    color & get_color_simplified(BlockTypes type);
-    color & get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
 
     bool wait_for_engine_to_pause();
 
@@ -251,32 +226,22 @@ private:
     void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
-    void update_statistics_info(const OrganismAvgBlockInformation &info);
+    void update_statistics_info(const OrganismInfoContainer &info);
 
     void resize_simulation_grid();
-
-    // creates simple colored cells
-    void simplified_image_creation(int image_width, int image_height,
-                                   const std::vector<int> &lin_width,
-                                   const std::vector<int> &lin_height);
-
-    // creates cells with textures (right now only eye)
-    void complex_image_creation(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
-
-    static void calculate_linspace(std::vector<int> & lin_width, std::vector<int> & lin_height,
-                            int start_x,  int end_x, int start_y, int end_y, int image_width, int image_height);
-    static void calculate_truncated_linspace(int image_width, int image_height,
-                                             const std::vector<int> &lin_width,
-                                             const std::vector<int> &lin_height,
-                                             std::vector<int> & truncated_lin_width,
-                                             std::vector<int> & truncated_lin_height);
 
     void clear_world();
 
     void update_simulation_size_label();
 
+    void update_world_event_values_ui();
+
     // fills ui line edits with values from code so that I don't need to manually change ui file when changing some values in code.
     void initialize_gui();
+
+    void just_resize_simulation_grid();
+
+    void process_keyboard_events();
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -290,6 +255,7 @@ private slots:
     void tb_open_organism_editor_slot(bool state);
     void tb_open_info_window_slot(bool state);
     void tb_open_recorder_window_slot(bool state);
+    void tb_open_world_events_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -388,6 +354,7 @@ private slots:
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
     void cb_recorder_window_always_on_top_slot(bool state);
+    void cb_world_events_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);
@@ -404,10 +371,6 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
-
-    void process_keyboard_events();
-
-    void write_json_organism(rapidjson::Document &d, Organism *&organism, rapidjson::Value &j_organism) const;
 };
 
 

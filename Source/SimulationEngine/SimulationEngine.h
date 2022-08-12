@@ -33,6 +33,8 @@
 #include "../OrganismEditor/OrganismEditor.h"
 //#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
+#include "../Containers/CPU/OrganismInfoContainer.h"
+#include "../WorldEvents/WorldEventsController.h"
 
 //TODO move simulation grid translation to here
 class SimulationEngine {
@@ -41,6 +43,9 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
     RecordingData * recd;
+//    OrganismInfoContainer info{};
+    WorldEventsController world_events_controller{};
+    SimulationParameters sp_copy;
 
     uint32_t auto_food_drop_index = 0;
     std::vector<Vector2<int>> auto_food_drop_coordinates_shuffled{};
@@ -66,6 +71,8 @@ class SimulationEngine {
     void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
     void try_remove_food(int x, int y);
 public:
+    OrganismInfoContainer info{};
+
     SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
                      OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters,
                      RecordingData * recording_data);
@@ -93,6 +100,19 @@ public:
     bool wait_for_engine_to_pause_force();
     void parse_full_simulation_grid();
     void parse_full_simulation_grid_to_buffer();
+
+    void update_info();
+    const OrganismInfoContainer & get_info();
+
+    void start_world_events();
+    void resume_world_events();
+    void pause_world_events();
+    void stop_world_events();
+    void stop_world_events_no_setting_reset();
+
+    void reset_world_events(std::vector<BaseEventNode *> start_nodes,
+                            std::vector<char> repeating_branch,
+                            std::vector<BaseEventNode *> node_storage);
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

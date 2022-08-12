@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ChangeValueEventNodeWidget</class>
+ <widget class="QWidget" name="ChangeValueEventNodeWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>200</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::WinPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="b_new_event_left">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>&lt;= New event</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="b_delete_event">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Delete Event</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="b_new_event_right">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>New event =&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Change Value</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Update every n ticks</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="le_update_every_n_ticks">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Change value</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmb_change_value">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Target value</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="le_target_value">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Change mode</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmb_change_mode">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <item>
+           <property name="text">
+            <string>Linear</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Step</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Increase By</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Decrease By</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Multiply By</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Divide By</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="time_horizon_layout">
+        <item>
+         <widget class="QLabel" name="time_horizon_label">
+          <property name="text">
+           <string>Time horizon</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="le_time_horizon">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cmb_change_mode</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>cmb_change_mode_slot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>305</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmb_change_value</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>cmb_change_value_slot(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>304</x>
+     <y>92</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_target_value</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>le_target_value_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_time_horizon</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>le_time_horizon_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>303</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_update_every_n_ticks</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>le_update_every_n_ticks_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>271</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_new_event_left</sender>
+   <signal>clicked()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>b_new_event_left_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_new_event_right</sender>
+   <signal>clicked()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>b_new_event_right_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>338</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_delete_event</sender>
+   <signal>clicked()</signal>
+   <receiver>ChangeValueEventNodeWidget</receiver>
+   <slot>b_delete_event_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>le_target_value_slot()</slot>
+  <slot>le_time_horizon_slot()</slot>
+  <slot>cmb_change_value_slot(QString)</slot>
+  <slot>cmb_change_mode_slot(QString)</slot>
+  <slot>le_update_every_n_ticks_slot()</slot>
+  <slot>b_new_event_left_slot()</slot>
+  <slot>b_new_event_right_slot()</slot>
+  <slot>b_delete_event_slot()</slot>
+ </slots>
+</ui>

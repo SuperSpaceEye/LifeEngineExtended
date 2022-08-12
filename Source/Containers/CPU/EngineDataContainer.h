@@ -9,9 +9,11 @@
 #ifndef THELIFEENGINECPP_ENGINEDATACONTAINER_H
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
+#include <vector>
+
 #include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
-#include "../../GridBlocks/AtomicGridBlock.h"
+#include "../../GridBlocks/SingleThreadGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
 
 struct eager_worker_partial;
@@ -29,12 +31,12 @@ struct EngineDataContainer {
     // if -1, then unlimited
     int32_t max_organisms = -1;
     // dimensions of the simulation
-    uint32_t simulation_width = 200;
-    uint32_t simulation_height = 200;
+    int32_t simulation_width = 200;
+    int32_t simulation_height = 200;
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
 
-    std::vector<std::vector<AtomicGridBlock>> CPU_simulation_grid;
+    std::vector<std::vector<SingleThreadGridBlock>> CPU_simulation_grid;
     std::vector<Organism*> organisms;
 
     std::vector<int> single_thread_to_erase{};

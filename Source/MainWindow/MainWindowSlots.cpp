@@ -60,6 +60,13 @@ void MainWindow::tb_open_recorder_window_slot(bool state) {
     }
 }
 
+void MainWindow::tb_open_world_events_slot(bool state) {
+    if (state) {
+        we.show();
+    } else {
+        we.close();
+    }
+}
 
 //==================== Buttons ====================
 
@@ -67,19 +74,19 @@ void MainWindow::b_clear_slot() {
     if (display_dialog_message("All organisms and simulation grid will be cleared.", disable_warnings)) {
         bool flag = sp.clear_walls_on_reset;
         sp.clear_walls_on_reset = true;
-        engine->pause();
+        engine.pause();
         clear_world();
-         engine->unpause();
+        engine.unpause();
         sp.clear_walls_on_reset = flag;
     }
 }
 
 void MainWindow::b_reset_slot() {
     if (display_dialog_message("All organisms and simulation grid will be reset.", disable_warnings)) {
-        engine->pause();
+        engine.pause();
         if (ecp.reset_with_editor_organism) {ee.load_chosen_organism();}
-        engine->reset_world();
-         engine->unpause();
+        engine.reset_world();
+        engine.unpause();
     }
 }
 
@@ -88,22 +95,21 @@ void MainWindow::b_resize_and_reset_slot() {
 }
 
 void MainWindow::b_generate_random_walls_slot() {
-    engine->pause();
-    engine->make_random_walls();
-    engine->unpause();
+    engine.pause();
+    engine.make_random_walls();
+    engine.unpause();
 }
 
 void MainWindow::b_clear_all_walls_slot() {
-    engine->pause();
-    engine->clear_walls();
-    engine->unpause();
+    engine.pause();
+    engine.clear_walls();
+    engine.unpause();
 }
 
 void MainWindow::b_save_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
-    ecp.engine_global_pause = true;
-    engine->wait_for_engine_to_pause_force();
+    engine.pause();
 
     QString selected_filter;
     QFileDialog file_dialog{};
@@ -137,7 +143,8 @@ void MainWindow::b_save_world_slot() {
         out.close();
 
     } else {
-        write_json_data(full_path);
+        auto info = engine.get_info();
+        DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
     }
 
     ecp.synchronise_simulation_and_window = flag;
@@ -146,9 +153,12 @@ void MainWindow::b_save_world_slot() {
 
 void MainWindow::b_load_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
+    bool flag2 = sp.reset_on_total_extinction;
     ecp.synchronise_simulation_and_window = false;
+    sp.reset_on_total_extinction = false;
+    engine.pause();
     ecp.engine_global_pause = true;
-    engine->wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause_force();
 
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
@@ -176,7 +186,9 @@ void MainWindow::b_load_world_slot() {
     }
 
     ecp.synchronise_simulation_and_window = flag;
+    sp.reset_on_total_extinction = flag;
     ecp.engine_global_pause = false;
+    engine.unpause();
     initialize_gui();
     update_table_values();
 }
@@ -191,13 +203,13 @@ void MainWindow::b_reset_view_slot() {
 
 void MainWindow::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
-    engine->pause();
+    engine.pause();
 
     for (auto & organism: edc.organisms) {
         organism->lifetime = organism->max_lifetime*2;
     }
 
-     engine->unpause();
+    engine.unpause();
 }
 
 //==================== Line edits ====================
@@ -241,12 +253,12 @@ void MainWindow::le_cell_size_slot() {
 }
 
 void MainWindow::le_simulation_width_slot() {
-    le_slot_lower_bound<uint32_t>(edc.simulation_width, new_simulation_width, "int",
+    le_slot_lower_bound<int32_t>(edc.simulation_width, new_simulation_width, "int",
                                   _ui.le_simulation_width, 10, "10");
 }
 
 void MainWindow::le_simulation_height_slot() {
-    le_slot_lower_bound<uint32_t>(edc.simulation_height, new_simulation_height, "int",
+    le_slot_lower_bound<int32_t>(edc.simulation_height, new_simulation_height, "int",
                                   _ui.le_simulation_height, 10, "10");
 }
 
@@ -258,7 +270,7 @@ void MainWindow::le_food_production_probability_slot() {
 void MainWindow::le_lifespan_multiplier_slot() {
     le_slot_lower_bound<float>(sp.lifespan_multiplier, sp.lifespan_multiplier, "float",
                                _ui.le_lifespan_multiplier, 0, "0");
-    engine->reinit_organisms();
+    engine.reinit_organisms();
 }
 
 void MainWindow::le_look_range_slot() {
@@ -488,17 +500,17 @@ void MainWindow::le_scaling_coefficient_slot() {
 
 void MainWindow::rb_food_slot() {
     set_cursor_mode(CursorMode::ModifyFood);
-    ee._ui.rb_null_button->setChecked(true);
+    ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_wall_slot() {
     set_cursor_mode(CursorMode::ModifyWall);
-    ee._ui.rb_null_button->setChecked(true);
+    ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_kill_slot() {
     set_cursor_mode(CursorMode::KillOrganism);
-    ee._ui.rb_null_button->setChecked(true);
+    ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_single_thread_slot() {
@@ -567,6 +579,7 @@ void MainWindow::cb_statistics_always_on_top_slot(bool state) {
 
     s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
+    //Why sleep? For some reason changes are not applied instantly and main process needs to wait for some time.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
@@ -607,6 +620,18 @@ void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
 
     if (!hidden) {
         rec.show();
+    }
+}
+
+void MainWindow::cb_world_events_always_on_top_slot(bool state) {
+    auto hidden = we.isHidden();
+
+    we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        we.show();
     }
 }
 
@@ -652,7 +677,7 @@ void MainWindow::cb_rotate_every_move_tick_slot          (bool state) { sp.rotat
 
 void MainWindow::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
 
-void MainWindow::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state; engine->reinit_organisms();}
+void MainWindow::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state; engine.reinit_organisms();}
 
 void MainWindow::cb_simplified_food_production_slot      (bool state) { sp.simplified_food_production = state;}
 
@@ -699,10 +724,10 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
         case ParametersNames::ChanceWeight:     value = &type->chance_weight;      break;
     }
 
-    if(set_result) {*value = result; engine->reinit_organisms(); return;}
+    if(set_result) {*value = result; engine.reinit_organisms(); return;}
 
     _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
     _ui.table_organism_block_parameters->update();
 
-    engine->reinit_organisms();
+    engine.reinit_organisms();
 }

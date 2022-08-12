@@ -14,9 +14,7 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
-#ifndef __WIN32
 #include <filesystem>
-#endif
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
@@ -40,6 +38,8 @@
 #include "../Stuff/textures.h"
 #include "../Stuff/CursorMode.h"
 #include "../Stuff/MiscFuncs.h"
+#include "../Stuff/ImageCreation.h"
+#include "../Stuff/DataSavingFunctions.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -60,13 +60,16 @@ public:
     std::map<BlockTypes,     std::string> mapped_block_types_type_to_s;
     std::map<SimpleDecision, std::string> mapped_decisions_type_to_s;
 
-    Ui::MainWindow * _parent_ui = nullptr;
+    Ui::MainWindow * parent_ui = nullptr;
 
     std::vector<std::vector<EditBlock>> edit_grid;
     std::vector<unsigned char> edit_image;
     CursorMode * c_mode = nullptr;
 
-    Textures textures{};
+    Textures & textures;
+
+    SimulationParameters * sp;
+    OrganismBlockParameters * bp;
 
     ColorContainer * color_container;
 
@@ -87,9 +90,6 @@ public:
     void resizeEvent(QResizeEvent * event) override;
     void wheelEvent(QWheelEvent *event) override;
 
-    void calculate_linspace(std::vector<int> &lin_width, std::vector<int> &lin_height, int start_x, int end_x, int start_y,
-                            int end_y, int image_width, int image_height);
-
     void place_organism_on_a_grid();
     void clear_grid();
 
@@ -102,7 +102,7 @@ public:
 
     QLabel actual_cursor;
 
-    Ui::Editor _ui{};
+    Ui::Editor ui{};
 
     int editor_width = 15;
     int editor_height = 15;
@@ -114,11 +114,9 @@ public:
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
     Rotation chosen_block_rotation = Rotation::UP;
 
-    OrganismEditor()=default;
-
-    void init(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
-              SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode * cursor_mode,
-              Organism ** chosen_organism);
+    OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
+                   SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
+                   Organism **chosen_organism, Textures &textures);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
@@ -132,22 +130,10 @@ public:
 
     void complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height);
 
-    void set_image_pixel(int x, int y, color &color);
-
-    color &get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale);
-
     void finalize_chosen_organism();
     void load_chosen_organism();
 
     void read_organism(std::ifstream & is);
-    void read_organism_data(std::ifstream& is, OrganismData & data);
-    void read_organism_brain(std::ifstream& is, Brain * brain);
-    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
-
-    void write_organism(std::ofstream & of);
-    void write_organism_data(std::ofstream& os, Organism * organism);
-    void write_organism_brain(std::ofstream& os, Brain * brain);
-    void write_organism_anatomy(std::ofstream& os, Anatomy * anatomy);
 
     void read_json_organism(std::string & full_path);
     void write_json_organism(std::string &full_path);
@@ -174,8 +160,8 @@ private slots:
     void rb_edit_anatomy_slot();
     void rb_edit_brain_slot();
 
-    void cmd_block_rotation_slot(QString name);
-    void cmd_organism_rotation_slot(QString name);
+    void cmd_block_rotation_slot(const QString& name);
+    void cmd_organism_rotation_slot(const QString& name);
 public slots:
     void rb_place_organism_slot();
     void rb_choose_organism_slot();

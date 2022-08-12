@@ -36,15 +36,14 @@ void SimulationEngine::threaded_mainloop() {
             ecp.stop_engine = false;
             return;
         }
-        if (ecp.change_simulation_mode) { change_mode(); }
-        if (ecp.build_threads) {
-//            SimulationEnginePartialMultiThread::build_threads(edc, ecp, sp);
-            ecp.build_threads = false;
-        }
+//        if (ecp.change_simulation_mode) { change_mode(); }
+//        if (ecp.build_threads) {
+////            SimulationEnginePartialMultiThread::build_threads(edc, ecp, sp);
+//            ecp.build_threads = false;
+//        }
         if (ecp.engine_pause || ecp.engine_global_pause) { ecp.engine_paused = true; } else { ecp.engine_paused = false;}
         process_user_action_pool();
         if ((!ecp.engine_paused || ecp.engine_pass_tick) && (!ecp.pause_button_pause || ecp.pass_tick)) {
-            //TODO the cause of rare segfault could be here
             simulation_tick();
             ecp.engine_paused = false;
             ecp.engine_pass_tick = false;
@@ -52,6 +51,10 @@ void SimulationEngine::threaded_mainloop() {
             ecp.synchronise_simulation_tick = false;
             if (ecp.record_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
+            if (edc.total_engine_ticks % ecp.update_info_every_n_tick == 0) {info.parse_info(&edc, &ecp);}
+            if (ecp.execute_world_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {
+                world_events_controller.tick_events(edc.total_engine_ticks, ecp.pause_world_events);
+            }
         }
         if (ecp.calculate_simulation_tick_delta_time) { edc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
         if (!edc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(edc.simulation_interval * 1000000 - edc.delta_time)));}
@@ -120,14 +123,13 @@ void SimulationEngine::simulation_tick() {
         if (sp.reset_on_total_extinction) {
             reset_world();
             edc.auto_reset_counter++;
+            if (sp.generate_random_walls_on_reset) {
+                clear_walls();
+                make_random_walls();
+            }
         }
         if (sp.pause_on_total_extinction) {
             ecp.tb_paused = true ;
-            ecp.organisms_extinct = false;
-        }
-        if (sp.generate_random_walls_on_reset) {
-            clear_walls();
-            make_random_walls();
         }
         return;
     }
@@ -338,6 +340,8 @@ void SimulationEngine::reset_world() {
     edc.organisms.push_back(organism);
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
+    if (ecp.execute_world_events) {stop_world_events(); start_world_events();}
+
     //Just in case
     ecp.engine_pass_tick = true;
     ecp.synchronise_simulation_tick = true;
@@ -482,4 +486,53 @@ void SimulationEngine::parse_full_simulation_grid_to_buffer() {
         recd->buffer_pos = 0;
     }
     ecp.recording_full_grid = false;
+}
+
+void SimulationEngine::update_info() {
+    info.parse_info(&edc, &ecp);
+}
+
+const OrganismInfoContainer & SimulationEngine::get_info() {
+    return info.get_info();
+}
+
+void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nodes,
+                                          std::vector<char> repeating_branch,
+                                          std::vector<BaseEventNode *> node_storage) {
+    pause();
+    world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
+    unpause();
+}
+
+void SimulationEngine::start_world_events() {
+    pause();
+    sp_copy = SimulationParameters{sp};
+    ecp.execute_world_events = true;
+    ecp.pause_world_events = false;
+    unpause();
+}
+
+void SimulationEngine::resume_world_events() {
+    ecp.pause_world_events = true;
+}
+
+void SimulationEngine::pause_world_events() {
+    ecp.pause_world_events = false;
+}
+
+void SimulationEngine::stop_world_events() {
+    pause();
+    sp = SimulationParameters{sp_copy};
+    ecp.execute_world_events = false;
+    ecp.pause_world_events = false;
+    world_events_controller.reset();
+    unpause();
+}
+
+void SimulationEngine::stop_world_events_no_setting_reset() {
+    pause();
+    ecp.execute_world_events = false;
+    ecp.pause_world_events = false;
+    world_events_controller.reset();
+    unpause();
 }

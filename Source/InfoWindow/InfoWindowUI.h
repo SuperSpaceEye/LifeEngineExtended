@@ -36,6 +36,9 @@ public:
     QWidget *recorder_tab;
     QVBoxLayout *verticalLayout_4;
     QTextEdit *textEdit_4;
+    QWidget *world_events_tab;
+    QVBoxLayout *verticalLayout_5;
+    QTextEdit *textEdit_5;
 
     void setupUi(QWidget *Info)
     {
@@ -54,6 +57,7 @@ public:
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         textEdit = new QTextEdit(about_tab);
         textEdit->setObjectName(QString::fromUtf8("textEdit"));
+        textEdit->setReadOnly(true);
 
         horizontalLayout->addWidget(textEdit);
 
@@ -64,6 +68,7 @@ public:
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         textEdit_2 = new QTextEdit(evolution_controls_tab);
         textEdit_2->setObjectName(QString::fromUtf8("textEdit_2"));
+        textEdit_2->setReadOnly(true);
 
         verticalLayout_2->addWidget(textEdit_2);
 
@@ -74,6 +79,7 @@ public:
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         textEdit_3 = new QTextEdit(settings_tab);
         textEdit_3->setObjectName(QString::fromUtf8("textEdit_3"));
+        textEdit_3->setReadOnly(true);
 
         verticalLayout_3->addWidget(textEdit_3);
 
@@ -84,10 +90,22 @@ public:
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         textEdit_4 = new QTextEdit(recorder_tab);
         textEdit_4->setObjectName(QString::fromUtf8("textEdit_4"));
+        textEdit_4->setReadOnly(true);
 
         verticalLayout_4->addWidget(textEdit_4);
 
         tabWidget->addTab(recorder_tab, QString());
+        world_events_tab = new QWidget();
+        world_events_tab->setObjectName(QString::fromUtf8("world_events_tab"));
+        verticalLayout_5 = new QVBoxLayout(world_events_tab);
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        textEdit_5 = new QTextEdit(world_events_tab);
+        textEdit_5->setObjectName(QString::fromUtf8("textEdit_5"));
+        textEdit_5->setReadOnly(true);
+
+        verticalLayout_5->addWidget(textEdit_5);
+
+        tabWidget->addTab(world_events_tab, QString());
 
         verticalLayout->addWidget(tabWidget);
 
@@ -177,10 +195,10 @@ public:
                         "\234Eat first, then produce food\342\200\235</span> - If disabled, will produce food first and only then eat.</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Use new child position calculator\342\200\235</span> - New child position calculator calculating position of a child by first calculating the coordinates of edges of parent and child + distance. For example, if the chosen reproduction direction is up, then calculator will calculate the uppermost y cell coordinate of a parent, the bottom y cell coordinate of a child + distance. That way, the child organism will never appear inside a parent organism. The old child position calculator however calculates only the edge coordinates of a parent organism + distance, allowing child organisms to appear inside parent, with the side effect of organisms being unable to reproduce if the reproducing distance is less than (height or width)/2 (d"
                         "epending on child organism rotation and chosen reproductive direction)</li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Check if path is clear\342\200\235</span> - If enabled, will check for each cell of a child organism if there is an obstruction in the way (except for parents cells), like a wall or a food if \342\200\234Food blocks reproduction\342\200\235 is enabled. If there is, then the parent organism will not reproduce. If disabled, the child will just check if there is a space for itself at the end coordinated, but it will introduce some behaviours such as child organisms hopping though walls if they are thin enough.</li></ul>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\342\200\234Organism cell parameters modifiers\342\200\235 - modifiers for each cell of all organisms.</p>\n"
-"<ul style=\"mar"
-                        "gin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Life point\342\200\235</span> - The amount of life points this cell will give to organism</li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Check if path is clear\342\200\235</span> - If enabled, will check for each cell of a child organism if there is an obstruction in the way (except for parents cells), like a wall (If &quot;food blocks reproduction&quot; is enabled, will only check for existance of food at the end of the path). If there is, then the parent organism will not reproduce. If disabled, the child will just check if there is a space for itself at the end coordinated, but it will introduce some behaviours such as child organisms hopping though walls if they are thin enough.</li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\342\200\234Organism cell parameters modifiers\342\200\235 - modifiers for each cell"
+                        " of all organisms.</p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Life point\342\200\235</span> - The amount of life points this cell will give to organism</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Lifetime weight\342\200\235</span> - The amount of lifetime this cell will give to organism</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Chance Weight\342\200\235</span> - Controls how likely this cell will be picked during reproduction compared to others. If 0, the cell will never get picked.</li></ul></body></html>", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(evolution_controls_tab), QApplication::translate("Info", "Evolution Controls", nullptr));
@@ -229,6 +247,43 @@ public:
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Convert series of images into video. This stage is magnitudes faster than the previous, but cannot be stopped without losing the progress.</li></ol>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Load intermediate data location\342\200\235</span> - Choose the folder with the recording.</li></ul></body></html>", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(recorder_tab), QApplication::translate("Info", "Recorder", nullptr));
+        textEdit_5->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"World_Events_0\"></a><span style=\" font-size:xx-large; font-weight:600;\">W</span><span style=\" font-size:xx-large; font-weight:600;\">orld Events</span></h1>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">World events are events that are executed after simulation tick.<br />Right now there is two types of events: \342\200\234Conditional\342\200\235, \342\200\234Change Value\342\200\235.<br />World events are divided into rows and nodes. First executed rows from the bott"
+                        "om, then inside rows  nodes are executed left to right.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">World events have two settings - \342\200\234Update World Events every n ticks\342\200\235 and \342\200\234Collect Info every n ticks\342\200\235.</p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Update World Events every n ticks\342\200\235</span> - Although world events are pretty lightweight in regard to performance, they are not free. So I made this parameter to control when nodes are updated.</li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Collect Info every n ti"
+                        "cks\342\200\235</span> - The conditional node needs info to make decision.<br />If the value of this parameter is too large the conditional node will use an outdated data.<br />However, if the value is too small it will hurt the performance, as gathering data of simulation is not free.<br />Be aware, that because world events and statistics share the same location of info, when UI part sends signal to update data, it will also update data for the world events.</li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Every node has \342\200\234Update every n tick\342\200\235. It works the same as \342\200\234Update World Events every n ticks\342\200\235. When last execution time exceeds this parameter, the node will execute.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Each world events branch also has \342\200\234Repeat branch\342\200\235. If even"
+                        "t branch reaches the end and parameter was toggled, the execution will begin from the start, else it will just stop.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">World events in \342\200\234World Events Editor\342\200\235 and simulation are separate, so changes in the editor will not affect world events in simulation, unless you apply them.</p>\n"
+"<h3 style=\" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"Conditional_Event_18\"></a><span style=\" font-size:large; font-weight:600;\">C</span><span style=\" font-size:large; font-weight:600;\">onditional Event</span></h3>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">When event branch reaches conditional node, it will continuously check if the statement is true. If it is, the execution of the next node will begin, otherwise i"
+                        "t will repeat the check.</p>\n"
+"<h3 style=\" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"Change_Value_21\"></a><span style=\" font-size:large; font-weight:600;\">C</span><span style=\" font-size:large; font-weight:600;\">hange Value</span></h3>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Change value node allows for World Events to actually influence the simulation.<br />With this node you can change \342\200\234some\342\200\235 simulation and block parameters.<br />This node has several modes with how it can change selected value.</p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Linear\342\200\235</span> - Will change t"
+                        "he value to target across time.<br />The parameter \342\200\234Time horizon\342\200\235 controls for how long the value is changed.<br />During the execution of this mode, any changes to the value will not be applied.<br />If two Linear nodes started executing at the same time, and have the same time horizon, the one in higher branch will set final target value, otherwise the one finishing last will set the value.</li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Step\342\200\235</span> - Will change the value to target value upon reaching.</li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The modes below were added by omgdev. All nodes are executed upon reaching.</p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-t"
+                        "op:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Increase by\342\200\235</span> - Will increase chosen variable by target amount.</li>\n"
+"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Decrease by\342\200\235</span> - Will decrease chosen variable by target amount.</li>\n"
+"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Multiply by\342\200\235</span> - Will multiply chosen variable by target amount.</li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Divide by\342\200\235</span> - Will divide chosen variable by target amount.</li></ul>\n"
+"<h3 style=\""
+                        " margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"Running_World_Events_37\"></a><span style=\" font-size:large; font-weight:600;\">R</span><span style=\" font-size:large; font-weight:600;\">unning World Events</span></h3>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">After creating World Events click \342\200\234Apply events\342\200\235.<br />World events will not be applied if there are nodes without set value.<br />If applying was successful, the world events will start execution.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">While the world events are running, you can\342\200\231t change some values.<br />To change the values, pause the simulation or pause execution of world events in the tab \342\200\234Current World Events Viewer\342\200\235 of world events window.</p>\n"
+""
+                        "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If simulation resets, world events will also automatically reset and start from the beginning. If execution of world events is stopped or the simulation resets, the simulation settings will be set to the state they were before the execution of world events started, unless you stop them with \342\200\234Stop Events No Setting Reset\342\200\235.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can pause/resume execution of world events with buttons \342\200\234Pause events\342\200\235/\342\200\234Resume events\342\200\235. These buttons will not reset world events.<br />If world events are already applied and were stopped, you can use \342\200\234Start Events\342\200\235 button to re-enable already applied world events.</p></body></html>", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(world_events_tab), QApplication::translate("Info", "World Events", nullptr));
     } // retranslateUi
 
 };
