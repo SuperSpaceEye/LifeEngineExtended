@@ -250,6 +250,16 @@
             <string>Decrease By</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Multiply By</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Divide By</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>

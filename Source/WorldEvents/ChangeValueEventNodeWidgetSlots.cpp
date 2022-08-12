@@ -31,6 +31,11 @@ void ChangeValueEventNodeWidget::le_target_value_slot() {
                 case ChangeValueMode::DecreaseBy:
                     le_slot_no_bound(_node->target_value, _node->target_value, "int", ui.le_target_value);
                     break;
+                case ChangeValueMode::MultiplyBy:
+                case ChangeValueMode::DivideBy:
+                    //divide by zero is not possible
+                    le_slot_lower_bound(_node->target_value, _node->target_value, "int", ui.le_target_value, 1, "1");
+                    break;
             }
         }
             break;
@@ -49,6 +54,11 @@ void ChangeValueEventNodeWidget::le_target_value_slot() {
                 case ChangeValueMode::IncreaseBy:
                 case ChangeValueMode::DecreaseBy:
                     le_slot_no_bound(_node->target_value, _node->target_value, "float", ui.le_target_value);
+                    break;
+                case ChangeValueMode::MultiplyBy:
+                case ChangeValueMode::DivideBy:
+                    //divide by zero is not possible
+                    le_slot_lower_bound(_node->target_value, _node->target_value, "float", ui.le_target_value, 0.00000001f, "0.00000001");
                     break;
             }
         }
@@ -165,8 +175,15 @@ void ChangeValueEventNodeWidget::cmb_change_mode_slot(QString str) {
         _node->change_mode = ChangeValueMode::DecreaseBy;
         ui.le_time_horizon->hide();
         ui.time_horizon_label->hide();
+    } else if (str == "Multiply By") {
+        _node->change_mode = ChangeValueMode::MultiplyBy;
+        ui.le_time_horizon->hide();
+        ui.time_horizon_label->hide();
+    } else if (str == "Divide By") {
+        _node->change_mode = ChangeValueMode::DivideBy;
+        ui.le_time_horizon->hide();
+        ui.time_horizon_label->hide();
     }
-
 }
 
 // ==================== Buttons ====================
