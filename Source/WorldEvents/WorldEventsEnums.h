@@ -14,6 +14,8 @@ enum class ChangeValueMode {
     Linear,
     IncreaseBy,
     DecreaseBy,
+    MultiplyBy,
+    DivideBy,
 //    Exponential
 //    Logarithmic
 };

@@ -184,6 +184,8 @@ public:
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
+        cmb_change_mode->addItem(QString());
+        cmb_change_mode->addItem(QString());
         cmb_change_mode->setObjectName(QString::fromUtf8("cmb_change_mode"));
         sizePolicy2.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
         cmb_change_mode->setSizePolicy(sizePolicy2);
@@ -242,6 +244,8 @@ public:
         cmb_change_mode->setItemText(1, QApplication::translate("ChangeValueEventNodeWidget", "Step", nullptr));
         cmb_change_mode->setItemText(2, QApplication::translate("ChangeValueEventNodeWidget", "Increase By", nullptr));
         cmb_change_mode->setItemText(3, QApplication::translate("ChangeValueEventNodeWidget", "Decrease By", nullptr));
+        cmb_change_mode->setItemText(4, QApplication::translate("ChangeValueEventNodeWidget", "Multiply By", nullptr));
+        cmb_change_mode->setItemText(5, QApplication::translate("ChangeValueEventNodeWidget", "Divide By", nullptr));
 
         time_horizon_label->setText(QApplication::translate("ChangeValueEventNodeWidget", "Time horizon", nullptr));
     } // retranslateUi
