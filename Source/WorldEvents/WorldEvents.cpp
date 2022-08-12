@@ -14,6 +14,9 @@ WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
     parent_ui(parent_ui), pl(sp, bp, ic), ecp(ecp), engine(engine) {
     ui.setupUi(this);
 
+    ui.le_update_world_events_every_n->setText(QString::fromStdString(std::to_string(ecp->update_world_events_every_n_tick)));
+    ui.le_collect_info_every_n->setText(QString::fromStdString(std::to_string(ecp->update_info_every_n_tick)));
+
     ui.world_events_layout->setAlignment(Qt::AlignLeft);
 
     button_add_new_branch();

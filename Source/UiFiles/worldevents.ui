@@ -265,6 +265,120 @@
       <attribute name="title">
        <string>Settings</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollArea_2">
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1049</width>
+            <height>562</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="widget_2" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <item>
+               <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Update World Events every n ticks</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="le_update_world_events_every_n"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>Collect Info every n ticks</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="le_collect_info_every_n"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -352,6 +466,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_collect_info_every_n</sender>
+   <signal>returnPressed()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>le_collect_info_every_n_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>613</x>
+     <y>448</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_update_world_events_every_n</sender>
+   <signal>returnPressed()</signal>
+   <receiver>WorldEvents</receiver>
+   <slot>le_update_world_events_every_n_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>646</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>527</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_apply_events_slot()</slot>
@@ -359,5 +505,7 @@
   <slot>b_resume_events_slot()</slot>
   <slot>b_start_events_slot()</slot>
   <slot>b_stop_events_slot()</slot>
+  <slot>le_update_world_events_every_n_slot()</slot>
+  <slot>le_collect_info_every_n_slot()</slot>
  </slots>
 </ui>

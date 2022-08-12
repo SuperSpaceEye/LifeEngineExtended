@@ -45,7 +45,7 @@ void WorldEventsController::reset() {
     for (auto & node: node_cursors) {
         //If execution of event stopped abruptly.
         if (node != nullptr && node->type == NodeType::ChangeValue) {
-            reinterpret_cast<ChangeValueEventNode<float>*>(node)->reset_node();
+            dynamic_cast<ChangeValueEventNode<float>*>(node)->reset_node();
         }
     }
 

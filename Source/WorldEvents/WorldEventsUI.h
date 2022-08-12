@@ -14,8 +14,10 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -52,6 +54,20 @@ public:
     QPushButton *b_resume_events;
     QPushButton *b_stop_events;
     QWidget *settings_tab;
+    QVBoxLayout *verticalLayout_8;
+    QScrollArea *scrollArea_2;
+    QWidget *scrollAreaWidgetContents_2;
+    QVBoxLayout *verticalLayout_9;
+    QWidget *widget_2;
+    QVBoxLayout *verticalLayout_10;
+    QSpacerItem *verticalSpacer_2;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label;
+    QLineEdit *le_update_world_events_every_n;
+    QHBoxLayout *horizontalLayout_4;
+    QLabel *label_2;
+    QLineEdit *le_collect_info_every_n;
+    QSpacerItem *verticalSpacer;
 
     void setupUi(QWidget *WorldEvents)
     {
@@ -185,6 +201,70 @@ public:
         world_events_viewer_tab->addTab(current_world_events, QString());
         settings_tab = new QWidget();
         settings_tab->setObjectName(QString::fromUtf8("settings_tab"));
+        verticalLayout_8 = new QVBoxLayout(settings_tab);
+        verticalLayout_8->setSpacing(0);
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
+        verticalLayout_8->setContentsMargins(0, 0, 0, 0);
+        scrollArea_2 = new QScrollArea(settings_tab);
+        scrollArea_2->setObjectName(QString::fromUtf8("scrollArea_2"));
+        scrollArea_2->setLineWidth(0);
+        scrollArea_2->setWidgetResizable(true);
+        scrollAreaWidgetContents_2 = new QWidget();
+        scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 1049, 562));
+        verticalLayout_9 = new QVBoxLayout(scrollAreaWidgetContents_2);
+        verticalLayout_9->setSpacing(0);
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
+        widget_2 = new QWidget(scrollAreaWidgetContents_2);
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
+        verticalLayout_10 = new QVBoxLayout(widget_2);
+        verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_10->addItem(verticalSpacer_2);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        label = new QLabel(widget_2);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout_3->addWidget(label);
+
+        le_update_world_events_every_n = new QLineEdit(widget_2);
+        le_update_world_events_every_n->setObjectName(QString::fromUtf8("le_update_world_events_every_n"));
+
+        horizontalLayout_3->addWidget(le_update_world_events_every_n);
+
+
+        verticalLayout_10->addLayout(horizontalLayout_3);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label_2 = new QLabel(widget_2);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout_4->addWidget(label_2);
+
+        le_collect_info_every_n = new QLineEdit(widget_2);
+        le_collect_info_every_n->setObjectName(QString::fromUtf8("le_collect_info_every_n"));
+
+        horizontalLayout_4->addWidget(le_collect_info_every_n);
+
+
+        verticalLayout_10->addLayout(horizontalLayout_4);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_10->addItem(verticalSpacer);
+
+
+        verticalLayout_9->addWidget(widget_2);
+
+        scrollArea_2->setWidget(scrollAreaWidgetContents_2);
+
+        verticalLayout_8->addWidget(scrollArea_2);
+
         world_events_viewer_tab->addTab(settings_tab, QString());
 
         verticalLayout->addWidget(world_events_viewer_tab);
@@ -196,6 +276,8 @@ public:
         QObject::connect(b_resume_events, SIGNAL(clicked()), WorldEvents, SLOT(b_resume_events_slot()));
         QObject::connect(b_start_events, SIGNAL(clicked()), WorldEvents, SLOT(b_start_events_slot()));
         QObject::connect(b_stop_events, SIGNAL(clicked()), WorldEvents, SLOT(b_stop_events_slot()));
+        QObject::connect(le_collect_info_every_n, SIGNAL(returnPressed()), WorldEvents, SLOT(le_collect_info_every_n_slot()));
+        QObject::connect(le_update_world_events_every_n, SIGNAL(returnPressed()), WorldEvents, SLOT(le_update_world_events_every_n_slot()));
 
         world_events_viewer_tab->setCurrentIndex(0);
 
@@ -216,6 +298,8 @@ public:
         b_resume_events->setText(QApplication::translate("WorldEvents", "Resume events", nullptr));
         b_stop_events->setText(QApplication::translate("WorldEvents", "Stop Events", nullptr));
         world_events_viewer_tab->setTabText(world_events_viewer_tab->indexOf(current_world_events), QApplication::translate("WorldEvents", "Current World Events Viewer", nullptr));
+        label->setText(QApplication::translate("WorldEvents", "Update World Events every n ticks", nullptr));
+        label_2->setText(QApplication::translate("WorldEvents", "Collect Info every n ticks", nullptr));
         world_events_viewer_tab->setTabText(world_events_viewer_tab->indexOf(settings_tab), QApplication::translate("WorldEvents", "Settings", nullptr));
     } // retranslateUi
 

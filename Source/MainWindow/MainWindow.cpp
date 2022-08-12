@@ -168,7 +168,7 @@ void MainWindow::ui_tick() {
     if (left_mouse_button_pressed  && change_editing_grid) {change_editing_grid_left_click();}
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
 
-    if (ecp.execute_world_events && (!ecp.tb_paused || ecp.pause_world_events)) {update_world_event_values_ui();}
+    if (ecp.execute_world_events && (!ecp.tb_paused && !ecp.pause_world_events) || ecp.update_world_events_ui_once) {update_world_event_values_ui(); ecp.update_world_events_ui_once = false;}
 
     rec.update_label();
 

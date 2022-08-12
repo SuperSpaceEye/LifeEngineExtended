@@ -66,6 +66,7 @@ struct EngineControlParameters {
     volatile int  update_world_events_every_n_tick = 1;
     volatile bool execute_world_events = false;
     volatile bool pause_world_events = false;
+    volatile bool update_world_events_ui_once = false;
 
     volatile uint8_t num_threads = 2;
 

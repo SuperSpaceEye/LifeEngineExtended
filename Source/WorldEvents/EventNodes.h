@@ -7,10 +7,6 @@
 
 #include "WorldEventsEnums.h"
 
-//
-
-template <typename T>
-struct ConditionalEventNode;
 
 struct BaseEventNode {
     NodeType type;
@@ -18,14 +14,17 @@ struct BaseEventNode {
     BaseEventNode * previous_node = nullptr;
     BaseEventNode * alternative_node = nullptr;
     uint32_t execute_every_n_tick = 1;
+    uint64_t last_execution_time = 0;
     bool alternative_from_conditional = false;
 
     BaseEventNode()= default;
 
-    BaseEventNode *update(uint32_t current_time, bool pause_events) {
+    BaseEventNode *update(uint64_t current_time, bool pause_events) {
+        BaseEventNode * node = this;
         if (current_time - last_execution_time >= execute_every_n_tick) {
+            if (!pause_events) {node = _update(current_time);}
             last_execution_time = current_time;
-            if (!pause_events) {return _update(current_time);}
+            return node;
         }
         return this;
     }
@@ -56,8 +55,7 @@ struct BaseEventNode {
     virtual ~BaseEventNode()=default;
 
 private:
-    uint32_t last_execution_time = 0;
-    virtual BaseEventNode * _update(uint32_t current_time)=0;
+    virtual BaseEventNode * _update(uint64_t current_time)=0;
 };
 
 //Will update the selected value every time update() is called. When it's finished updating, will return pointer to the next node, otherwise to itself.
@@ -67,8 +65,7 @@ struct ChangeValueEventNode: public BaseEventNode {
     ChangeValueMode change_mode;
     ClampModes clamp_mode;
     uint32_t time_horizon = 1;
-    uint32_t last_updated = 0;
-    uint32_t total_updated = 0;
+    uint64_t total_updated = 0;
     bool execution_started = false;
     T * change_value;
     T target_value;
@@ -76,7 +73,7 @@ struct ChangeValueEventNode: public BaseEventNode {
     T min_clamp_value;
     T max_clamp_value;
     ChangeValueEventNode(BaseEventNode *_next_node, BaseEventNode *_previous_node, T *value_to_change, T target_value,
-                         uint32_t time_horizon, uint32_t _execute_every_n_tick, ChangeValueMode mode,
+                         uint64_t time_horizon, uint32_t _execute_every_n_tick, ChangeValueMode mode,
                          ChangeTypes value_type, ClampModes clamp_mode, T min_clamp_value, T max_clamp_value) :
                          value_type(value_type), change_mode(mode), time_horizon(time_horizon), target_value(target_value),
                          change_value(value_to_change), clamp_mode(clamp_mode), min_clamp_value(min_clamp_value), max_clamp_value(max_clamp_value)
@@ -87,7 +84,7 @@ struct ChangeValueEventNode: public BaseEventNode {
         execute_every_n_tick = _execute_every_n_tick;
     }
 
-    BaseEventNode * _update(uint32_t current_time) override {
+    BaseEventNode * _update(uint64_t current_time) override {
         auto * node = __update(current_time);
 
         switch (clamp_mode) {
@@ -108,8 +105,8 @@ struct ChangeValueEventNode: public BaseEventNode {
         return node;
     }
 
-    BaseEventNode * __update(uint32_t current_time) {
-        if (!execution_started) {last_updated = current_time; start_value = *change_value; execution_started = true;}
+    BaseEventNode * __update(uint64_t current_time) {
+        if (!execution_started) {last_execution_time = current_time; start_value = *change_value; execution_started = true;}
 
         switch (change_mode) {
             case ChangeValueMode::Step:
@@ -125,9 +122,8 @@ struct ChangeValueEventNode: public BaseEventNode {
                 break;
         }
 
-        auto time_difference = current_time - last_updated;
+        auto time_difference = current_time - last_execution_time;
         total_updated += time_difference;
-        last_updated = current_time;
 
         if (time_horizon - total_updated <= 0) {
             *change_value = target_value;
@@ -172,7 +168,7 @@ struct ConditionalEventNode: public BaseEventNode {
 //    }
 
     ConditionalEventNode(T * check_value, T fixed_value, ConditionalMode mode, ConditionalTypes value_type, BaseEventNode * _next_node,
-                         BaseEventNode * _previous_node, BaseEventNode * _alternative_node, uint32_t _execute_every_n_tick):
+                         BaseEventNode * _previous_node, BaseEventNode * _alternative_node, uint64_t _execute_every_n_tick):
             check_value(check_value), fixed_value(fixed_value), mode(mode), value_type(value_type) {
         type = NodeType::Conditional;
         next_node = _next_node;
@@ -181,7 +177,7 @@ struct ConditionalEventNode: public BaseEventNode {
         execute_every_n_tick = _execute_every_n_tick;
     }
 
-    BaseEventNode * _update(uint32_t current_time) override {
+    BaseEventNode * _update(uint64_t current_time) override {
         bool condition_true = false;
 //        if (check_against_fixed) {
 //            if (*check_value >= fixed_value   ) {condition_true = true;}

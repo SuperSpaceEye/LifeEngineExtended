@@ -46,5 +46,18 @@ void WorldEvents::b_start_events_slot() {
 void WorldEvents::b_stop_events_slot() {
     if (!ecp->execute_world_events) { return;}
     engine->stop_world_events();
+    ecp->update_world_events_ui_once = true;
     ui.world_events_status_label->setText(QString("Events stopped."));
+}
+
+void WorldEvents::le_collect_info_every_n_slot() {
+    int temp = ecp->update_info_every_n_tick;
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_collect_info_every_n, 1, "1");
+    ecp->update_info_every_n_tick = temp;
+}
+
+void WorldEvents::le_update_world_events_every_n_slot() {
+    int temp = ecp->update_world_events_every_n_tick;
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_update_world_events_every_n, 1, "1");
+    ecp->update_world_events_every_n_tick = temp;
 }
