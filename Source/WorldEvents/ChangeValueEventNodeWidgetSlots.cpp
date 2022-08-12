@@ -17,13 +17,44 @@ void ChangeValueEventNodeWidget::le_target_value_slot() {
     auto _node = reinterpret_cast<ChangeValueEventNode<int32_t>*>(node);
     switch (_node->value_type) {
         case ChangeTypes::INT32: {
-            le_slot_no_bound(_node->target_value, _node->target_value, "int", ui.le_target_value);
+            switch (_node->change_mode) {
+                case ChangeValueMode::Step:
+                case ChangeValueMode::Linear:
+                    switch (_node->clamp_mode) {
+                        case ClampModes::NoClamp:           le_slot_no_bound(_node->target_value, _node->target_value, "int", ui.le_target_value); break;
+                        case ClampModes::ClampMinValue:     le_slot_lower_bound(_node->target_value, _node->target_value, "int", ui.le_target_value ,_node->min_clamp_value, std::to_string(_node->min_clamp_value)); break;
+                        case ClampModes::ClampMaxValue:     break;
+                        case ClampModes::ClampMinMaxValues: le_slot_lower_upper_bound(_node->target_value, _node->target_value, "int", ui.le_target_value, _node->min_clamp_value, std::to_string(_node->min_clamp_value), _node->max_clamp_value, std::to_string(_node->max_clamp_value)); break;
+                    }
+                    break;
+                case ChangeValueMode::IncreaseBy:
+                case ChangeValueMode::DecreaseBy:
+                    le_slot_no_bound(_node->target_value, _node->target_value, "int", ui.le_target_value);
+                    break;
+            }
         }
             break;
         case ChangeTypes::FLOAT: {
             auto _node = reinterpret_cast<ChangeValueEventNode<float>*>(node);
-            le_slot_no_bound(_node->target_value, _node->target_value, "float", ui.le_target_value);
+            switch (_node->change_mode) {
+                case ChangeValueMode::Step:
+                case ChangeValueMode::Linear:
+                    switch (_node->clamp_mode) {
+                        case ClampModes::NoClamp:           le_slot_no_bound(_node->target_value, _node->target_value, "float", ui.le_target_value); break;
+                        case ClampModes::ClampMinValue:     le_slot_lower_bound(_node->target_value, _node->target_value, "float", ui.le_target_value ,_node->min_clamp_value, std::to_string(_node->min_clamp_value)); break;
+                        case ClampModes::ClampMaxValue:     break;
+                        case ClampModes::ClampMinMaxValues: le_slot_lower_upper_bound(_node->target_value, _node->target_value, "float", ui.le_target_value, _node->min_clamp_value, std::to_string(_node->min_clamp_value), _node->max_clamp_value, std::to_string(_node->max_clamp_value)); break;
+                    }
+                    break;
+                case ChangeValueMode::IncreaseBy:
+                case ChangeValueMode::DecreaseBy:
+                    le_slot_no_bound(_node->target_value, _node->target_value, "float", ui.le_target_value);
+                    break;
+            }
         }
+            break;
+        case ChangeTypes::NONE:
+            display_message("Choose variable to change first");
             break;
     }
 }
