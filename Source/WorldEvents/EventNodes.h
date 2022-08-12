@@ -118,10 +118,10 @@ struct ChangeValueEventNode: public BaseEventNode {
                 *change_value = target_value;
                 return next_node;
             case ChangeValueMode::IncreaseBy:
-                *change_value = start_value + target_value;
+                *change_value = *change_value + target_value;
                 return next_node;
             case ChangeValueMode::DecreaseBy:
-                *change_value -= start_value - target_value;
+                *change_value = *change_value - target_value;
                 return next_node;
             default:
                 break;
