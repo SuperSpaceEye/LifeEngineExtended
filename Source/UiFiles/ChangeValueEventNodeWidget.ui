@@ -240,6 +240,16 @@
             <string>Step</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Increase By</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Decrease By</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>

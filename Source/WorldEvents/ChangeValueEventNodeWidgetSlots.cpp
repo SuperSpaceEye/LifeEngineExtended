@@ -113,6 +113,14 @@ void ChangeValueEventNodeWidget::cmb_change_mode_slot(QString str) {
         _node->change_mode = ChangeValueMode::Step;
         ui.le_time_horizon->hide();
         ui.time_horizon_label->hide();
+    } else if (str == "Increase By") {
+        _node->change_mode = ChangeValueMode::IncreaseBy;
+        ui.le_time_horizon->hide();
+        ui.time_horizon_label->hide();
+    } else if (str == "Decrease By") {
+        _node->change_mode = ChangeValueMode::DecreaseBy;
+        ui.le_time_horizon->hide();
+        ui.time_horizon_label->hide();
     }
 
 }
