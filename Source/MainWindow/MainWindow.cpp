@@ -708,26 +708,29 @@ void MainWindow::load_textures_from_disk() {
     auto executable_path = QCoreApplication::applicationDirPath().toStdString();
 
     std::vector<std::string> filenames{"empty", "mouth", "producer", "mover", "killer", "armor", "eye", "food", "wall"};
-//    std::vector<TextureHolder> default_holders{
-//            TextureHolder{1, 1, std::vector<color>{color{14, 19,  24}}}, //EmptyBlock
-//            TextureHolder{1, 1, std::vector<color>{color{222,177, 77}}}, //MouthBlock
-//            TextureHolder{1, 1, std::vector<color>{color{21, 222, 89}}}, //ProducerBlock
-//            TextureHolder{1, 1, std::vector<color>{color{96, 212,255}}}, //MoverBlock
-//            TextureHolder{1, 1, std::vector<color>{color{248,35, 128}}}, //KillerBlock
-//            TextureHolder{1, 1, std::vector<color>{color{114,48, 219}}}, //ArmorBlock
-//            TextureHolder{5, 5, std::vector<color>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
-//                                                   GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
-//                                                   GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
-//                                                   GRAY1, GRAY3, BLACK2, GRAY3, GRAY1,
-//                                                   GRAY1, GRAY1, GRAY1,  GRAY1, GRAY1}}, //EyeBlock
-//            TextureHolder{1, 1, std::vector<color>{color{47, 122,183}}}, //FoodBlock
-//            TextureHolder{1, 1, std::vector<color>{color{128,128,128}}}, //WallBlock
-//    };
 
     for (int i = 0; i < filenames.size(); i++) {
         std::string filename;
-        filename.append(executable_path).append("/textures/").append(filenames[i]).append(".png");
-        if (std::filesystem::exists(filename)) {
+        filename.append(executable_path).append("/textures/").append(filenames[i]);
+
+        bool exists = false;
+        if (std::filesystem::exists(filename + ".png")) {
+            filename.append(".png");
+            exists = true;
+        } else if (std::filesystem::exists(filename + ".jpg")) {
+            filename.append(".jpg");
+            exists = true;
+        } else if (std::filesystem::exists(filename + ".jpeg")) {
+            filename.append(".jpeg");
+            exists = true;
+        } else if (std::filesystem::exists(filename + ".bmp")) {
+            filename.append(".bmp");
+            exists = true;
+        } else if (std::filesystem::exists(filename + ".gif")) {
+            filename.append(".gif");
+            exists = true;
+        }
+        if (exists) {
             image.load(QString::fromStdString(filename));
 
             int width = image.width();
