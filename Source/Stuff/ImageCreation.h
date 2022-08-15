@@ -34,12 +34,18 @@ namespace ImageCreation {
             std::vector<int> & truncated_lin_height);
 
     namespace ImageCreationTools {
+//        const color &get_texture_color_old(BlockTypes type,
+//                                           Rotation rotation,
+//                                           float relative_x_scale,
+//                                           float relative_y_scale,
+//                                           const ColorContainer &cc,
+//                                           const Textures &textures);
+
         const color &get_texture_color(BlockTypes type,
                                        Rotation rotation,
-                                       float relative_x_scale,
-                                       float relative_y_scale,
-                                       const ColorContainer &cc,
-                                       const Textures &textures);
+                                       float rxs,
+                                       float rys,
+                                       const TexturesContainer &textures);
 
         void set_image_pixel(int x,
                              int y,
@@ -52,7 +58,7 @@ namespace ImageCreation {
                                     uint32_t simulation_width,
                                     uint32_t simulation_height,
                                     const ColorContainer &cc,
-                                    const Textures &textures,
+                                    const TexturesContainer &textures,
                                     int image_width,
                                     std::vector<unsigned char> &image_vector,
                                     const std::vector<BaseGridBlock> &second_grid);

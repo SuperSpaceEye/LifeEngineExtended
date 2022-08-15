@@ -212,6 +212,8 @@ void MainWindow::b_kill_all_organisms_slot() {
     engine.unpause();
 }
 
+void MainWindow::b_update_textures_slot() { update_textures = true; }
+
 //==================== Line edits ====================
 
 void MainWindow::le_max_sps_slot() {
@@ -572,6 +574,9 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
         return;
     }
     use_cuda = true;
+#if __CUDA_USED__
+    cuda_creator.copy_textures(textures);
+#endif
 }
 
 void MainWindow::cb_statistics_always_on_top_slot(bool state) {

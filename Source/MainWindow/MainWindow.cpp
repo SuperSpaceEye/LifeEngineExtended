@@ -112,10 +112,16 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!std::filesystem::exists(executable_path + "/temp")) {
         std::filesystem::create_directory(executable_path + "/temp");
     }
+
     if (!std::filesystem::exists(executable_path + "/videos")) {
         std::filesystem::create_directory(executable_path + "/videos");
     }
 
+    if (!std::filesystem::exists(executable_path + "/textures")) {
+        std::filesystem::create_directory(executable_path + "/textures");
+    }
+
+    load_textures_from_disk();
 }
 
 void MainWindow::mainloop_tick() {
@@ -169,6 +175,8 @@ void MainWindow::ui_tick() {
     if (right_mouse_button_pressed && change_editing_grid) {change_editing_grid_right_click();}
 
     if (ecp.execute_world_events && (!ecp.tb_paused && !ecp.pause_world_events) || ecp.update_world_events_ui_once) {update_world_event_values_ui(); ecp.update_world_events_ui_once = false;}
+
+    if (update_textures) {load_textures_from_disk(); update_textures = false;}
 
     rec.update_label();
 
@@ -692,5 +700,60 @@ bool MainWindow::cuda_is_available() {
     }
 #else
     return false;
+#endif
+}
+
+void MainWindow::load_textures_from_disk() {
+    QImage image;
+    auto executable_path = QCoreApplication::applicationDirPath().toStdString();
+
+    std::vector<std::string> filenames{"empty", "mouth", "producer", "mover", "killer", "armor", "eye", "food", "wall"};
+//    std::vector<TextureHolder> default_holders{
+//            TextureHolder{1, 1, std::vector<color>{color{14, 19,  24}}}, //EmptyBlock
+//            TextureHolder{1, 1, std::vector<color>{color{222,177, 77}}}, //MouthBlock
+//            TextureHolder{1, 1, std::vector<color>{color{21, 222, 89}}}, //ProducerBlock
+//            TextureHolder{1, 1, std::vector<color>{color{96, 212,255}}}, //MoverBlock
+//            TextureHolder{1, 1, std::vector<color>{color{248,35, 128}}}, //KillerBlock
+//            TextureHolder{1, 1, std::vector<color>{color{114,48, 219}}}, //ArmorBlock
+//            TextureHolder{5, 5, std::vector<color>{GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
+//                                                   GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
+//                                                   GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
+//                                                   GRAY1, GRAY3, BLACK2, GRAY3, GRAY1,
+//                                                   GRAY1, GRAY1, GRAY1,  GRAY1, GRAY1}}, //EyeBlock
+//            TextureHolder{1, 1, std::vector<color>{color{47, 122,183}}}, //FoodBlock
+//            TextureHolder{1, 1, std::vector<color>{color{128,128,128}}}, //WallBlock
+//    };
+
+    for (int i = 0; i < filenames.size(); i++) {
+        std::string filename;
+        filename.append(executable_path).append("/textures/").append(filenames[i]).append(".png");
+        if (std::filesystem::exists(filename)) {
+            image.load(QString::fromStdString(filename));
+
+            int width = image.width();
+            int height = image.height();
+            int total = width * height;
+
+            textures.textures[i].width  = width;
+            textures.textures[i].height = height;
+
+            textures.textures[i].texture.resize(total);
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    textures.textures[i].texture[x + y * width].r = qRed(image.pixel(x, y));
+                    textures.textures[i].texture[x + y * width].g = qGreen(image.pixel(x, y));
+                    textures.textures[i].texture[x + y * width].b = qBlue(image.pixel(x, y));
+                }
+            }
+        } else {
+            textures.textures[i] = default_holders[i];
+        }
+    }
+
+#if __CUDA_USED__
+    if (cuda_is_available() && use_cuda) {
+        cuda_creator.copy_textures(textures);
+    }
 #endif
 }

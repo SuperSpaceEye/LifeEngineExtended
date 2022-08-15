@@ -37,84 +37,63 @@ __device__ void set_image_pixel(int x, int y, int width, color color, unsigned c
     image_vector[index  ] = color.b;
 }
 
-__device__ color get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale, float relative_y_scale) {
-    int x;
-    int y;
-    int temp;
+__device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs, float rys, CudaTextureHolder * textures) {
+    auto & holder = textures[static_cast<int>(type)];
 
-    switch (type) {
-        case BlockTypes::EmptyBlock :
-            return const_color_container.empty_block;
-        case BlockTypes::MouthBlock:
-            return const_color_container.mouth;
-        case BlockTypes::ProducerBlock:
-            return const_color_container.producer;
-        case BlockTypes::MoverBlock:
-            return const_color_container.mover;
-        case BlockTypes::KillerBlock:
-            return const_color_container.killer;
-        case BlockTypes::ArmorBlock:
-            return const_color_container.armor;
-        case BlockTypes::EyeBlock: {
-            x = relative_x_scale * 5;
-            y = relative_y_scale * 5;
-            {
-                switch (rotation) {
-                    case Rotation::UP:
-                        break;
-                    case Rotation::LEFT:
-                        x -= 2;
-                        y -= 2;
+    if (holder.width == 1 && holder.height == 1) {return holder.texture[0];}
 
-                        temp = x;
-                        x = y;
-                        y = temp;
+    float temp;
 
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::DOWN:
-                        x -= 2;
-                        y -= 2;
-                        x = -x;
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::RIGHT:
-                        x -= 2;
-                        y -= 2;
+    switch (rotation) {
+        case Rotation::UP:
+            break;
+        case Rotation::LEFT:
+            rxs -= 0.5;
+            rys -= 0.5;
 
-                        temp = x;
-                        x = y;
-                        y = temp;
+            temp = rxs;
+            rxs = rys;
+            rys = temp;
 
-                        x = -x;
-                        x += 2;
-                        y += 2;
-                        break;
-                }
-            }
-            color rawEyeTexture[5 * 5] = {GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
-                                           GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
-                                           GRAY1, GRAY2, BLACK1, GRAY2, GRAY1,
-                                           GRAY1, GRAY3, BLACK2, GRAY3, GRAY1,
-                                           GRAY1, GRAY1, GRAY1, GRAY1, GRAY1};
-            return rawEyeTexture[x + y * 5];
-        }
-        case BlockTypes::FoodBlock:     return const_color_container.food;
-        case BlockTypes::WallBlock:     return const_color_container.wall;
-        default: return const_color_container.simulation_background_color;
+            rys = -rys;
+            rxs += 0.5;
+            rys += 0.5;
+            break;
+        case Rotation::DOWN:
+            rxs -= 0.5;
+            rys -= 0.5;
+
+            rxs = -rxs;
+            rys = -rys;
+
+            rxs += 0.5;
+            rys += 0.5;
+            break;
+        case Rotation::RIGHT:
+            rxs -= 0.5;
+            rys -= 0.5;
+
+            temp = rxs;
+            rxs = rys;
+            rys = temp;
+
+            rxs = -rxs;
+            rxs += 0.5;
+            rys += 0.5;
+            break;
     }
+
+    int x = rxs * holder.width;
+    int y = rys * holder.height;
+
+    return holder.texture[x + y * holder.width];
 }
 
-__global__ void create_image_kernel(int image_width, int simulation_width, int simulation_height, int width_img_size, int height_img_size,
-                                           int * d_lin_width, int * d_lin_height,
-                                           Vector2<int> * d_width_img_boundaries, Vector2<int> * d_height_img_boundaries,
-                                           unsigned char * d_image_vector,
-                                           BaseGridBlock * d_second_simulation_grid
-                                           ) {
+__global__ void create_image_kernel(int image_width, int simulation_width, int simulation_height, int width_img_size,
+                                    int height_img_size, int *d_lin_width, int *d_lin_height,
+                                    Vector2<int> *d_width_img_boundaries,
+                                    Vector2<int> *d_height_img_boundaries, unsigned char *d_image_vector,
+                                    BaseGridBlock *d_second_simulation_grid, CudaTextureHolder *textures) {
     auto x_pos = blockIdx.x * blockDim.x + threadIdx.x;
     auto y_pos = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -140,8 +119,9 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
                 pixel_color = get_texture_color(block.type,
                                                 block.rotation,
                                                 float(x - w_b.x) / (w_b.y - w_b.x),
-                                                float(y - h_b.x) / (h_b.y - h_b.x)
-                                                );
+                                                float(y - h_b.x) / (h_b.y - h_b.x),
+                                                textures
+                );
             }
             set_image_pixel(x, y, image_width, pixel_color, d_image_vector);
         }
@@ -231,11 +211,11 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
 //    dim3 block(block_size, block_size);
 
     create_image_kernel<<<grid, block_size>>>(image_width,
-                                                  dc.simulation_width, dc.simulation_height,
-                                                  width_img_boundaries.size(),height_img_boundaries.size(),
-                                                  d_lin_width, d_lin_height,
-                                                  d_width_img_boundaries, d_height_img_boundaries,
-                                                  d_image_vector, d_second_simulation_grid);
+                                              dc.simulation_width, dc.simulation_height,
+                                              width_img_boundaries.size(), height_img_boundaries.size(),
+                                              d_lin_width, d_lin_height,
+                                              d_width_img_boundaries, d_height_img_boundaries,
+                                              d_image_vector, d_second_simulation_grid, d_textures);
 
     gpuErrchk( cudaDeviceSynchronize() );
 
@@ -250,6 +230,7 @@ void CUDAImageCreator::free() {
     cudaFree(d_lin_width);
     cudaFree(d_lin_height);
     cudaFree(d_differences);
+    free_textures();
 
     d_lin_width = nullptr;
     d_lin_height = nullptr;
@@ -276,6 +257,47 @@ void CUDAImageCreator::copy_result_image(std::vector<unsigned char> &image_vecto
                              d_image_vector,
                              sizeof(unsigned char)*image_width*image_height*4,
                              cudaMemcpyDeviceToHost));
+}
+
+void CUDAImageCreator::copy_textures(TexturesContainer &container) {
+    free_textures();
+
+    std::vector<CudaTextureHolder> temp_container;
+
+    for (auto & texture: container.textures) {
+        auto temp_holder = CudaTextureHolder{texture.width, texture.height};
+
+        color * temp_d_texture_pointer = nullptr;
+
+        gpuErrchk(cudaMalloc((color**)&temp_d_texture_pointer, sizeof(color) * texture.width * texture.height));
+
+        gpuErrchk(cudaMemcpy(temp_d_texture_pointer,
+                             texture.texture.data(),
+                             sizeof(color) * texture.width * texture.height,
+                             cudaMemcpyHostToDevice));
+
+        d_textures_pointers.emplace_back(temp_d_texture_pointer);
+
+        temp_holder.texture = temp_d_texture_pointer;
+        temp_container.emplace_back(temp_holder);
+    }
+
+    gpuErrchk(cudaMalloc((CudaTextureHolder**)&d_textures, sizeof(CudaTextureHolder)*temp_container.size()));
+
+    gpuErrchk(cudaMemcpy(d_textures,
+                         temp_container.data(),
+                         sizeof(CudaTextureHolder)*temp_container.size(),
+                         cudaMemcpyHostToDevice));
+}
+
+void CUDAImageCreator::free_textures() {
+    for (auto texture_pointer: d_textures_pointers) {
+        cudaFree(texture_pointer);
+    }
+    d_textures_pointers.clear();
+
+    cudaFree(d_textures);
+    d_textures = nullptr;
 }
 
 void CUDAImageCreator::copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,

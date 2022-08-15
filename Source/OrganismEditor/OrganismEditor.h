@@ -66,7 +66,7 @@ public:
     std::vector<unsigned char> edit_image;
     CursorMode * c_mode = nullptr;
 
-    Textures & textures;
+    TexturesContainer & textures;
 
     SimulationParameters * sp;
     OrganismBlockParameters * bp;
@@ -116,7 +116,7 @@ public:
 
     OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                    SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                   Organism **chosen_organism, Textures &textures);
+                   Organism **chosen_organism, TexturesContainer &textures);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 

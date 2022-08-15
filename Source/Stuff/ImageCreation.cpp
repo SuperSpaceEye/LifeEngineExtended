@@ -34,57 +34,46 @@ void ImageCreation::calculate_truncated_linspace(int image_width, int image_heig
     truncated_lin_height.pop_back();
 }
 
-const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation, float relative_x_scale,
-                                                           float relative_y_scale,
-                                                           const ColorContainer &cc, const Textures &textures) {
-    int x;
-    int y;
+const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation, float rxs,
+                                                                  float rys,
+                                                                  const TexturesContainer &textures) {
+    auto & holder = textures.textures[static_cast<int>(type)];
 
-    switch (type) {
-        case BlockTypes::EmptyBlock :   return cc.empty_block;
-        case BlockTypes::MouthBlock:    return cc.mouth;
-        case BlockTypes::ProducerBlock: return cc.producer;
-        case BlockTypes::MoverBlock:    return cc.mover;
-        case BlockTypes::KillerBlock:   return cc.killer;
-        case BlockTypes::ArmorBlock:    return cc.armor;
-        case BlockTypes::EyeBlock:
-            x = relative_x_scale * 5;
-            y = relative_y_scale * 5;
-            {
-                switch (rotation) {
-                    case Rotation::UP:
-                        break;
-                    case Rotation::LEFT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::DOWN:
-                        x -= 2;
-                        y -= 2;
-                        x = -x;
-                        y = -y;
-                        x += 2;
-                        y += 2;
-                        break;
-                    case Rotation::RIGHT:
-                        x -= 2;
-                        y -= 2;
-                        std::swap(x, y);
-                        x = -x;
-                        x += 2;
-                        y += 2;
-                        break;
-                }
-            }
-            return textures.rawEyeTexture[x + y * 5];
-        case BlockTypes::FoodBlock:     return cc.food;
-        case BlockTypes::WallBlock:     return cc.wall;
-        default: return cc.empty_block;
+    if (holder.width == 1 && holder.height == 1) {return holder.texture[0];}
+
+    switch (rotation) {
+        case Rotation::UP:
+            break;
+        case Rotation::LEFT:
+            rxs -= 0.5;
+            rys -= 0.5;
+            std::swap(rxs, rys);
+            rys = -rys;
+            rxs += 0.5;
+            rys += 0.5;
+            break;
+        case Rotation::DOWN:
+            rxs -= 0.5;
+            rys -= 0.5;
+            rxs = -rxs;
+            rys = -rys;
+            rxs += 0.5;
+            rys += 0.5;
+            break;
+        case Rotation::RIGHT:
+            rxs -= 0.5;
+            rys -= 0.5;
+            std::swap(rxs, rys);
+            rxs = -rxs;
+            rxs += 0.5;
+            rys += 0.5;
+            break;
     }
+
+    int x = rxs * (holder.width-1);
+    int y = rys * (holder.height-1);
+
+    return holder.texture.at(x + y * holder.width);
 }
 
 // depth * ( y * width + x) + z
@@ -104,7 +93,7 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
                                                                const std::vector<int> &lin_height,
                                                                uint32_t simulation_width,
                                                                uint32_t simulation_height,
-                                                               const ColorContainer &cc, const Textures &textures,
+                                                               const ColorContainer &cc, const TexturesContainer &textures,
                                                                int image_width, std::vector<unsigned char> &image_vector,
                                                                const std::vector<BaseGridBlock> &second_grid) {
     //x - start, y - stop
@@ -141,19 +130,18 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
         for (auto &h_b: height_img_boundaries) {
             for (int x = w_b.x; x < w_b.y; x++) {
                 for (int y = h_b.x; y < h_b.y; y++) {
-                    auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
-
                     if (lin_width[x] < 0 ||
                         lin_width[x] >= simulation_width ||
                         lin_height[y] < 0 ||
                         lin_height[y] >= simulation_height) {
                         pixel_color = cc.simulation_background_color;
                     } else {
+                        auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
                         pixel_color = get_texture_color(block.type,
                                                         block.rotation,
                                                         float(x - w_b.x) / (w_b.y - w_b.x),
                                                         float(y - h_b.x) / (h_b.y - h_b.x),
-                                                        cc, textures);
+                                                        textures);
                     }
                     set_image_pixel(x, y, image_width, pixel_color, image_vector);
                 }

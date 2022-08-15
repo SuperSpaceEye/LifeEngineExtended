@@ -271,6 +271,7 @@ public:
     QHBoxLayout *horizontalLayout_49;
     QLabel *label_37;
     QLineEdit *le_scaling_coefficient;
+    QPushButton *b_update_textures;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -291,8 +292,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1513,7 +1514,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 693));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -344, 606, 720));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1704,6 +1705,11 @@ public:
 
 
         verticalLayout_19->addLayout(horizontalLayout_49);
+
+        b_update_textures = new QPushButton(widget_2);
+        b_update_textures->setObjectName(QString::fromUtf8("b_update_textures"));
+
+        verticalLayout_19->addWidget(b_update_textures);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1939,8 +1945,9 @@ public:
         QObject::connect(tb_open_recorder_window, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_recorder_window_slot(bool)));
         QObject::connect(cb_world_events_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_world_events_always_on_top_slot(bool)));
         QObject::connect(tb_open_world_events, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_world_events_slot(bool)));
+        QObject::connect(b_update_textures, SIGNAL(clicked()), MainWindow, SLOT(b_update_textures_slot()));
 
-        Tabs->setCurrentIndex(0);
+        Tabs->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -2152,6 +2159,7 @@ public:
         cb_really_stop_render->setText(QApplication::translate("MainWindow", "Really stop render", nullptr));
         label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
         label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
+        b_update_textures->setText(QApplication::translate("MainWindow", "Update textures", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

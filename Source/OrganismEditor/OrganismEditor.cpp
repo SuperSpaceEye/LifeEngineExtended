@@ -10,7 +10,7 @@
 
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                               Organism **chosen_organism, Textures &textures) : editor_width(width), editor_height(height),
+                               Organism **chosen_organism, TexturesContainer &textures) : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
                                 chosen_organism(chosen_organism), textures(textures) {
     ui.setupUi(this);
@@ -284,11 +284,10 @@ void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<i
                         auto &block = edit_grid[lin_width[x]][lin_height[y]];
 
                         pixel_color = ImageCreation::ImageCreationTools::get_texture_color(block.type,
-                                                        block.rotation,
-                                                        float(x - w_b.x) / (w_b.y - w_b.x),
-                                                        float(y - h_b.x) / (h_b.y - h_b.x),
-                                                        *color_container,
-                                                        textures);
+                                                                                           block.rotation,
+                                                                                           float(x - w_b.x) / (w_b.y - w_b.x),
+                                                                                           float(y - h_b.x) / (h_b.y - h_b.x),
+                                                                                           textures);
                     }
                     ImageCreation::ImageCreationTools::set_image_pixel(x, y, ui.editor_graphicsView->viewport()->width(), pixel_color, edit_image);
                 }
