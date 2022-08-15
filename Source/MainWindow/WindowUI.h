@@ -292,8 +292,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1514,7 +1514,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -344, 606, 720));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 720));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1947,7 +1947,7 @@ public:
         QObject::connect(tb_open_world_events, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_world_events_slot(bool)));
         QObject::connect(b_update_textures, SIGNAL(clicked()), MainWindow, SLOT(b_update_textures_slot()));
 
-        Tabs->setCurrentIndex(3);
+        Tabs->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
