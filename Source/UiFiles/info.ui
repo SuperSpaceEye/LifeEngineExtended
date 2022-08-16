@@ -241,6 +241,28 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="custom_textures_tab">
+      <attribute name="title">
+       <string>Custom Textures</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QTextEdit" name="textEdit_6">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="html">
+          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;h1 style=&quot; margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a name=&quot;Custom_Textures_0&quot;&gt;&lt;/a&gt;&lt;span style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;C&lt;/span&gt;&lt;span style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;ustom Textures&lt;/span&gt;&lt;/h1&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Life Engine Extended allows you to set arbitrary images as textures for organism cells, food, walls and empty space.&lt;br /&gt;For image to be usable by program, it needs to be renamed to one of these titles: &lt;span style=&quot; font-weight:600;&quot;&gt;(“empty”, “mouth”, “producer”, “mover”, “killer”, “armor”, “eye”, “food”, “wall”)&lt;/span&gt; and be placed into &lt;span style=&quot; font-weight:600;&quot;&gt;“/textures/”&lt;/span&gt; folder.&lt;br /&gt;These textures will be loaded upon program loading, or if you click &lt;span style=&quot; font-weight:600;&quot;&gt;“Update textures”&lt;/span&gt;.&lt;br /&gt;If there is no image with type in &lt;span style=&quot; font-weight:600;&quot;&gt;“/textures/”&lt;/span&gt; folder, the program will revert to base texture.&lt;br /&gt;The images can be of any size, but the program will stretch them to box shape.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

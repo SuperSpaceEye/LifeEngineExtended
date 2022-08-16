@@ -88,7 +88,7 @@ private:
 #endif
 
     std::thread engine_thread;
-    Textures textures{};
+    TexturesContainer textures{};
 
     std::vector<unsigned char> image_vector;
     QGraphicsScene scene;
@@ -148,6 +148,7 @@ private:
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
     bool really_stop_render = false;
+    bool update_textures = false;
 
     bool W_pressed = false;
     bool A_pressed = false;
@@ -241,6 +242,8 @@ private:
 
     void just_resize_simulation_grid();
 
+    void load_textures_from_disk();
+
     void process_keyboard_events();
 
     void wheelEvent(QWheelEvent *event) override;
@@ -267,6 +270,7 @@ private slots:
     void b_save_world_slot();
     void b_load_world_slot();
     void b_kill_all_organisms_slot();
+    void b_update_textures_slot();
 
     void rb_food_slot();
     void rb_wall_slot();

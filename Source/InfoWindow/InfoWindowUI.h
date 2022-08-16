@@ -39,6 +39,9 @@ public:
     QWidget *world_events_tab;
     QVBoxLayout *verticalLayout_5;
     QTextEdit *textEdit_5;
+    QWidget *custom_textures_tab;
+    QVBoxLayout *verticalLayout_6;
+    QTextEdit *textEdit_6;
 
     void setupUi(QWidget *Info)
     {
@@ -106,6 +109,17 @@ public:
         verticalLayout_5->addWidget(textEdit_5);
 
         tabWidget->addTab(world_events_tab, QString());
+        custom_textures_tab = new QWidget();
+        custom_textures_tab->setObjectName(QString::fromUtf8("custom_textures_tab"));
+        verticalLayout_6 = new QVBoxLayout(custom_textures_tab);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        textEdit_6 = new QTextEdit(custom_textures_tab);
+        textEdit_6->setObjectName(QString::fromUtf8("textEdit_6"));
+        textEdit_6->setReadOnly(true);
+
+        verticalLayout_6->addWidget(textEdit_6);
+
+        tabWidget->addTab(custom_textures_tab, QString());
 
         verticalLayout->addWidget(tabWidget);
 
@@ -284,6 +298,14 @@ public:
                         "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If simulation resets, world events will also automatically reset and start from the beginning. If execution of world events is stopped or the simulation resets, the simulation settings will be set to the state they were before the execution of world events started, unless you stop them with \342\200\234Stop Events No Setting Reset\342\200\235.</p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can pause/resume execution of world events with buttons \342\200\234Pause events\342\200\235/\342\200\234Resume events\342\200\235. These buttons will not reset world events.<br />If world events are already applied and were stopped, you can use \342\200\234Start Events\342\200\235 button to re-enable already applied world events.</p></body></html>", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(world_events_tab), QApplication::translate("Info", "World Events", nullptr));
+        textEdit_6->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"Custom_Textures_0\"></a><span style=\" font-size:xx-large; font-weight:600;\">C</span><span style=\" font-size:xx-large; font-weight:600;\">ustom Textures</span></h1>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Life Engine Extended allows you to set arbitrary images as textures for organism cells, food, walls and empty space.<br />For image to be usable by program, it needs to be renamed to one of these titles: <span style=\" font-weight:600;\">(\342\200\234empty\342\200"
+                        "\235, \342\200\234mouth\342\200\235, \342\200\234producer\342\200\235, \342\200\234mover\342\200\235, \342\200\234killer\342\200\235, \342\200\234armor\342\200\235, \342\200\234eye\342\200\235, \342\200\234food\342\200\235, \342\200\234wall\342\200\235)</span> and be placed into <span style=\" font-weight:600;\">\342\200\234/textures/\342\200\235</span> folder.<br />These textures will be loaded upon program loading, or if you click <span style=\" font-weight:600;\">\342\200\234Update textures\342\200\235</span>.<br />If there is no image with type in <span style=\" font-weight:600;\">\342\200\234/textures/\342\200\235</span> folder, the program will revert to base texture.<br />The images can be of any size, but the program will stretch them to box shape.</p></body></html>", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(custom_textures_tab), QApplication::translate("Info", "Custom Textures", nullptr));
     } // retranslateUi
 
 };

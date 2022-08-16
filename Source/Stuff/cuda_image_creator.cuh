@@ -30,6 +30,12 @@ struct Differences {
     Rotation rotation;
 };
 
+struct CudaTextureHolder {
+    int width;
+    int height;
+    color* texture;
+};
+
 class CUDAImageCreator {
     int * d_lin_width = nullptr;
     int * d_lin_height = nullptr;
@@ -39,6 +45,9 @@ class CUDAImageCreator {
     unsigned char * d_image_vector = nullptr;
     BaseGridBlock * d_second_simulation_grid = nullptr;
     Differences * d_differences = nullptr;
+    CudaTextureHolder * d_textures = nullptr;
+
+    std::vector<color*> d_textures_pointers;
 
     int last_image_width = 0;
     int last_image_height = 0;
@@ -60,6 +69,8 @@ class CUDAImageCreator {
     void lin_size_changed(int lin_width_size, int lin_height_size);
 
     void differences_changed(int differences);
+
+    void free_textures();
 
     void check_if_changed(int image_width, int image_height, int simulation_width, int simulation_height,
                           int width_img_boundaries_size, int height_img_boundaries_size,
@@ -87,6 +98,8 @@ public:
                            std::vector<int> &truncated_lin_height);
 
     void load_symbols(ColorContainer *colorContainer);
+
+    void copy_textures(TexturesContainer & container);
 };
 
 #endif //THELIFEENGINECPP_CUDA_IMAGE_CREATOR_CUH

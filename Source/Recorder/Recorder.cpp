@@ -4,7 +4,7 @@
 
 #include "Recorder.h"
 
-Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures,
+Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, TexturesContainer * textures,
                    RecordingData * recording_data):
     parent_ui(_parent_ui), edc(edc), ecp(ecp), cc(cc), textures(textures), recd(recording_data) {
     _ui.setupUi(this);

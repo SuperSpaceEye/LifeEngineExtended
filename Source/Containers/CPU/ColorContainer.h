@@ -17,14 +17,14 @@ struct ColorContainer {
     color organism_boundary {255, 0, 0};
 
     color empty_block {14, 19, 24};
-    color mouth       {222,177,77};
-    color producer    {21, 222,89};
+    color mouth       {222,177, 77};
+    color producer    {21, 222, 89};
     color mover       {96, 212,255};
     color killer      {248,35, 128};
     color armor       {114,48, 219};
     color eye         {182,193,234};
     color food        {47, 122,183};
-    color wall        {128, 128, 128};
+    color wall        {128,128,128};
 };
 
 

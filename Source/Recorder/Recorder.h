@@ -39,7 +39,7 @@ private:
     EngineControlParameters * ecp = nullptr;
     SimulationEngine * engine = nullptr;
     ColorContainer * cc = nullptr;
-    Textures * textures = nullptr;
+    TexturesContainer * textures = nullptr;
     RecordingData * recd;
 
     std::string ffmpeg_path = "ffmpeg";
@@ -62,7 +62,7 @@ private:
     void clear_data();
 
 public:
-    Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, Textures * textures,
+    Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, TexturesContainer * textures,
              RecordingData * recording_data);
 
     void set_engine(SimulationEngine * engine);
