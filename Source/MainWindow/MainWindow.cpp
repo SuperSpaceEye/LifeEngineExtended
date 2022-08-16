@@ -707,29 +707,22 @@ void MainWindow::load_textures_from_disk() {
     QImage image;
     auto executable_path = QCoreApplication::applicationDirPath().toStdString();
 
-    std::vector<std::string> filenames{"empty", "mouth", "producer", "mover", "killer", "armor", "eye", "food", "wall"};
+    std::array<std::string, 9> filenames{"empty", "mouth", "producer", "mover", "killer", "armor", "eye", "food", "wall"};
+    std::array<std::string, 5> file_extensions{".png", ".jpg", ".jpeg", ".bmp", ".gif"};
 
     for (int i = 0; i < filenames.size(); i++) {
         std::string filename;
         filename.append(executable_path).append("/textures/").append(filenames[i]);
 
         bool exists = false;
-        if (std::filesystem::exists(filename + ".png")) {
-            filename.append(".png");
-            exists = true;
-        } else if (std::filesystem::exists(filename + ".jpg")) {
-            filename.append(".jpg");
-            exists = true;
-        } else if (std::filesystem::exists(filename + ".jpeg")) {
-            filename.append(".jpeg");
-            exists = true;
-        } else if (std::filesystem::exists(filename + ".bmp")) {
-            filename.append(".bmp");
-            exists = true;
-        } else if (std::filesystem::exists(filename + ".gif")) {
-            filename.append(".gif");
-            exists = true;
+        for (auto & extension: file_extensions) {
+            if (std::filesystem::exists(filename + extension)) {
+                filename.append(extension);
+                exists = true;
+                break;
+            }
         }
+
         if (exists) {
             image.load(QString::fromStdString(filename));
 
