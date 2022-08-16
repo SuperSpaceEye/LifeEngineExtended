@@ -759,9 +759,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>620</width>
-                  <height>217</height>
+                  <y>-20</y>
+                  <width>606</width>
+                  <height>237</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -923,6 +923,51 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_53">
+                      <item>
+                       <widget class="QPushButton" name="pushButton">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Biomes</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="checkBox">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_54">
+                      <item>
+                       <widget class="QPushButton" name="tb_open_benchmarks">
+                        <property name="text">
+                         <string>Benchmarks</string>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_benchmarks_always_on_top">
                         <property name="text">
                          <string>Always on top</string>
                         </property>
@@ -4134,6 +4179,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_benchmarks_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>830</x>
+     <y>878</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tb_open_benchmarks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_benchmarks_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>531</x>
+     <y>878</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4245,6 +4322,8 @@
   <slot>tb_open_world_events_slot(bool)</slot>
   <slot>cb_world_events_always_on_top_slot(bool)</slot>
   <slot>b_update_textures_slot()</slot>
+  <slot>tb_open_benchmarks_slot(bool)</slot>
+  <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="cursor_modes">

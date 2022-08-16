@@ -67,6 +67,7 @@
 #include "../InfoWindow/InfoWindow.h"
 #include "../Recorder/Recorder.h"
 #include "../WorldEvents/WorldEvents.h"
+#include "../Benchmark/Benchmarks.h"
 
 
 #if __CUDA_USED__
@@ -101,7 +102,7 @@ private:
     OrganismBlockParameters bp;
     RecordingData recd;
 
-    Ui::MainWindow _ui{};
+    Ui::MainWindow ui{};
     QTimer * timer;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
@@ -110,11 +111,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine engine{edc, ecp, bp, sp, &recd};
-    OrganismEditor ee{15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
-    StatisticsCore s{&_ui};
-    InfoWindow iw{&_ui};
-    Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
-    WorldEvents we{&_ui, &sp, &bp, &engine.info, &ecp, &engine};
+    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
+    StatisticsCore s{&ui};
+    InfoWindow iw{&ui};
+    Recorder rec{&ui, &edc, &ecp, &cc, &textures, &recd};
+    WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
+    Benchmarks bs{ui};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -259,6 +261,7 @@ private slots:
     void tb_open_info_window_slot(bool state);
     void tb_open_recorder_window_slot(bool state);
     void tb_open_world_events_slot(bool state);
+    void tb_open_benchmarks_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -359,6 +362,7 @@ private slots:
     void cb_reset_with_editor_organism_slot(bool state);
     void cb_recorder_window_always_on_top_slot(bool state);
     void cb_world_events_always_on_top_slot(bool state);
+    void cb_benchmarks_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);

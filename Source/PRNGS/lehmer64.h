@@ -23,11 +23,12 @@
 #include "splitmix64.h"
 
 class lehmer64 {
-    __uint128_t g_lehmer64_state;
+    __uint128_t g_lehmer64_state = 0;
 public:
     using result_type = uint64_t;
     lehmer64()=default;
-    lehmer64(uint64_t seed) {
+    lehmer64(uint64_t seed) { set_seed(seed); }
+    void set_seed(uint64_t seed) {
         g_lehmer64_state = (((__uint128_t)splitmix64_stateless(seed)) << 64) +
                            splitmix64_stateless(seed + 1);
     }

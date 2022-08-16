@@ -84,7 +84,7 @@ bool MainWindow::read_data_container_data(std::ifstream &is) {
     new_simulation_width = edc.simulation_width;
     new_simulation_height = edc.simulation_height;
     fill_window = false;
-    _ui.cb_fill_window->setChecked(false);
+    ui.cb_fill_window->setChecked(false);
     update_simulation_size_label();
     return false;
 }
@@ -150,10 +150,10 @@ void MainWindow::update_table_values() {
                     value = &type->lifetime_weight;
                     break;
             }
-            _ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
+            ui.table_organism_block_parameters->item(row, col)->setText(QString::fromStdString(to_str(*value)));
         }
     }
-    _ui.table_organism_block_parameters->update();
+    ui.table_organism_block_parameters->update();
 }
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
@@ -198,7 +198,7 @@ void MainWindow::json_read_grid_data(rapidjson::Document & d) {
     new_simulation_height = edc.simulation_height;
 
     fill_window = false;
-    _ui.cb_fill_window->setChecked(false);
+    ui.cb_fill_window->setChecked(false);
     disable_warnings = true;
 
     update_simulation_size_label();

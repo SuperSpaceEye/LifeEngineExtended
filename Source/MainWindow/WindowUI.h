@@ -124,6 +124,12 @@ public:
     QHBoxLayout *horizontalLayout_52;
     QPushButton *tb_open_world_events;
     QCheckBox *cb_world_events_always_on_top;
+    QHBoxLayout *horizontalLayout_53;
+    QPushButton *pushButton;
+    QCheckBox *checkBox;
+    QHBoxLayout *horizontalLayout_54;
+    QPushButton *tb_open_benchmarks;
+    QCheckBox *cb_benchmarks_always_on_top;
     QWidget *evolution_controls_tab;
     QHBoxLayout *horizontalLayout_7;
     QScrollArea *scrollArea_2;
@@ -718,7 +724,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 620, 217));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, -20, 606, 237));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -822,6 +828,39 @@ public:
 
 
         verticalLayout_37->addLayout(horizontalLayout_52);
+
+        horizontalLayout_53 = new QHBoxLayout();
+        horizontalLayout_53->setObjectName(QString::fromUtf8("horizontalLayout_53"));
+        pushButton = new QPushButton(widget_5);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setEnabled(false);
+
+        horizontalLayout_53->addWidget(pushButton);
+
+        checkBox = new QCheckBox(widget_5);
+        checkBox->setObjectName(QString::fromUtf8("checkBox"));
+        checkBox->setEnabled(false);
+
+        horizontalLayout_53->addWidget(checkBox);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_53);
+
+        horizontalLayout_54 = new QHBoxLayout();
+        horizontalLayout_54->setObjectName(QString::fromUtf8("horizontalLayout_54"));
+        tb_open_benchmarks = new QPushButton(widget_5);
+        tb_open_benchmarks->setObjectName(QString::fromUtf8("tb_open_benchmarks"));
+        tb_open_benchmarks->setCheckable(true);
+
+        horizontalLayout_54->addWidget(tb_open_benchmarks);
+
+        cb_benchmarks_always_on_top = new QCheckBox(widget_5);
+        cb_benchmarks_always_on_top->setObjectName(QString::fromUtf8("cb_benchmarks_always_on_top"));
+
+        horizontalLayout_54->addWidget(cb_benchmarks_always_on_top);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_54);
 
 
         verticalLayout_24->addWidget(widget_5);
@@ -1946,6 +1985,8 @@ public:
         QObject::connect(cb_world_events_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_world_events_always_on_top_slot(bool)));
         QObject::connect(tb_open_world_events, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_world_events_slot(bool)));
         QObject::connect(b_update_textures, SIGNAL(clicked()), MainWindow, SLOT(b_update_textures_slot()));
+        QObject::connect(cb_benchmarks_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_benchmarks_always_on_top_slot(bool)));
+        QObject::connect(tb_open_benchmarks, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_benchmarks_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2005,6 +2046,10 @@ public:
         cb_recorder_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         tb_open_world_events->setText(QApplication::translate("MainWindow", "World Events", nullptr));
         cb_world_events_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        pushButton->setText(QApplication::translate("MainWindow", "Biomes", nullptr));
+        checkBox->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_benchmarks->setText(QApplication::translate("MainWindow", "Benchmarks", nullptr));
+        cb_benchmarks_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         Tabs->setTabText(Tabs->indexOf(windows_tab), QApplication::translate("MainWindow", "Windows", nullptr));
         label_4->setText(QApplication::translate("MainWindow", "Food production probability:", nullptr));
         le_food_production_probability->setText(QApplication::translate("MainWindow", "0.5", nullptr));
