@@ -35,24 +35,24 @@ public:
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout_4;
     QSpacerItem *verticalSpacer_2;
-    QPushButton *pushButton;
+    QPushButton *b_run_all_benchmarks;
     QSpacerItem *verticalSpacer_4;
-    QPushButton *pushButton_7;
-    QPushButton *pushButton_9;
-    QPushButton *pushButton_11;
-    QPushButton *pushButton_12;
-    QPushButton *pushButton_10;
-    QPushButton *pushButton_8;
-    QPushButton *pushButton_6;
-    QPushButton *pushButton_5;
-    QPushButton *pushButton_3;
-    QPushButton *pushButton_4;
-    QPushButton *pushButton_13;
+    QPushButton *b_benchmark_produce_food;
+    QPushButton *b_benchmark_eat_food;
+    QPushButton *b_benchmark_apply_damage;
+    QPushButton *b_benchmark_tick_lifetime;
+    QPushButton *b_benchmark_erase_organisms;
+    QPushButton *b_benchmark_reserve_organisms;
+    QPushButton *b_benchmark_get_observations;
+    QPushButton *b_benchmark_think_decision;
+    QPushButton *b_benchmark_rotate_organism;
+    QPushButton *b_benchmark_move_organism;
+    QPushButton *b_benchmark_try_make_child;
     QSpacerItem *verticalSpacer_3;
-    QPushButton *pushButton_2;
+    QPushButton *b_stop_benchmarks;
     QSpacerItem *verticalSpacer;
     QVBoxLayout *verticalLayout_5;
-    QTextEdit *textEdit;
+    QTextEdit *benchmarks_output_text_edit;
     QWidget *settings_tab;
 
     void setupUi(QWidget *Benchmark)
@@ -92,78 +92,78 @@ public:
 
         verticalLayout_4->addItem(verticalSpacer_2);
 
-        pushButton = new QPushButton(scrollAreaWidgetContents);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        b_run_all_benchmarks = new QPushButton(scrollAreaWidgetContents);
+        b_run_all_benchmarks->setObjectName(QString::fromUtf8("b_run_all_benchmarks"));
 
-        verticalLayout_4->addWidget(pushButton);
+        verticalLayout_4->addWidget(b_run_all_benchmarks);
 
         verticalSpacer_4 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout_4->addItem(verticalSpacer_4);
 
-        pushButton_7 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_7->setObjectName(QString::fromUtf8("pushButton_7"));
+        b_benchmark_produce_food = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_produce_food->setObjectName(QString::fromUtf8("b_benchmark_produce_food"));
 
-        verticalLayout_4->addWidget(pushButton_7);
+        verticalLayout_4->addWidget(b_benchmark_produce_food);
 
-        pushButton_9 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_9->setObjectName(QString::fromUtf8("pushButton_9"));
+        b_benchmark_eat_food = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_eat_food->setObjectName(QString::fromUtf8("b_benchmark_eat_food"));
 
-        verticalLayout_4->addWidget(pushButton_9);
+        verticalLayout_4->addWidget(b_benchmark_eat_food);
 
-        pushButton_11 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_11->setObjectName(QString::fromUtf8("pushButton_11"));
+        b_benchmark_apply_damage = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_apply_damage->setObjectName(QString::fromUtf8("b_benchmark_apply_damage"));
 
-        verticalLayout_4->addWidget(pushButton_11);
+        verticalLayout_4->addWidget(b_benchmark_apply_damage);
 
-        pushButton_12 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_12->setObjectName(QString::fromUtf8("pushButton_12"));
+        b_benchmark_tick_lifetime = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_tick_lifetime->setObjectName(QString::fromUtf8("b_benchmark_tick_lifetime"));
 
-        verticalLayout_4->addWidget(pushButton_12);
+        verticalLayout_4->addWidget(b_benchmark_tick_lifetime);
 
-        pushButton_10 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_10->setObjectName(QString::fromUtf8("pushButton_10"));
+        b_benchmark_erase_organisms = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_erase_organisms->setObjectName(QString::fromUtf8("b_benchmark_erase_organisms"));
 
-        verticalLayout_4->addWidget(pushButton_10);
+        verticalLayout_4->addWidget(b_benchmark_erase_organisms);
 
-        pushButton_8 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_8->setObjectName(QString::fromUtf8("pushButton_8"));
+        b_benchmark_reserve_organisms = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_reserve_organisms->setObjectName(QString::fromUtf8("b_benchmark_reserve_organisms"));
 
-        verticalLayout_4->addWidget(pushButton_8);
+        verticalLayout_4->addWidget(b_benchmark_reserve_organisms);
 
-        pushButton_6 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_6->setObjectName(QString::fromUtf8("pushButton_6"));
+        b_benchmark_get_observations = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_get_observations->setObjectName(QString::fromUtf8("b_benchmark_get_observations"));
 
-        verticalLayout_4->addWidget(pushButton_6);
+        verticalLayout_4->addWidget(b_benchmark_get_observations);
 
-        pushButton_5 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_5->setObjectName(QString::fromUtf8("pushButton_5"));
+        b_benchmark_think_decision = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_think_decision->setObjectName(QString::fromUtf8("b_benchmark_think_decision"));
 
-        verticalLayout_4->addWidget(pushButton_5);
+        verticalLayout_4->addWidget(b_benchmark_think_decision);
 
-        pushButton_3 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
+        b_benchmark_rotate_organism = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_rotate_organism->setObjectName(QString::fromUtf8("b_benchmark_rotate_organism"));
 
-        verticalLayout_4->addWidget(pushButton_3);
+        verticalLayout_4->addWidget(b_benchmark_rotate_organism);
 
-        pushButton_4 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_4->setObjectName(QString::fromUtf8("pushButton_4"));
+        b_benchmark_move_organism = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_move_organism->setObjectName(QString::fromUtf8("b_benchmark_move_organism"));
 
-        verticalLayout_4->addWidget(pushButton_4);
+        verticalLayout_4->addWidget(b_benchmark_move_organism);
 
-        pushButton_13 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_13->setObjectName(QString::fromUtf8("pushButton_13"));
+        b_benchmark_try_make_child = new QPushButton(scrollAreaWidgetContents);
+        b_benchmark_try_make_child->setObjectName(QString::fromUtf8("b_benchmark_try_make_child"));
 
-        verticalLayout_4->addWidget(pushButton_13);
+        verticalLayout_4->addWidget(b_benchmark_try_make_child);
 
         verticalSpacer_3 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout_4->addItem(verticalSpacer_3);
 
-        pushButton_2 = new QPushButton(scrollAreaWidgetContents);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        b_stop_benchmarks = new QPushButton(scrollAreaWidgetContents);
+        b_stop_benchmarks->setObjectName(QString::fromUtf8("b_stop_benchmarks"));
 
-        verticalLayout_4->addWidget(pushButton_2);
+        verticalLayout_4->addWidget(b_stop_benchmarks);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -174,11 +174,11 @@ public:
 
         verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
-        textEdit = new QTextEdit(scrollAreaWidgetContents);
-        textEdit->setObjectName(QString::fromUtf8("textEdit"));
-        textEdit->setReadOnly(true);
+        benchmarks_output_text_edit = new QTextEdit(scrollAreaWidgetContents);
+        benchmarks_output_text_edit->setObjectName(QString::fromUtf8("benchmarks_output_text_edit"));
+        benchmarks_output_text_edit->setReadOnly(true);
 
-        verticalLayout_5->addWidget(textEdit);
+        verticalLayout_5->addWidget(benchmarks_output_text_edit);
 
 
         horizontalLayout->addLayout(verticalLayout_5);
@@ -201,6 +201,19 @@ public:
 
 
         retranslateUi(Benchmark);
+        QObject::connect(b_benchmark_produce_food, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_produce_food_slot()));
+        QObject::connect(b_benchmark_apply_damage, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_apply_damage_slot()));
+        QObject::connect(b_benchmark_eat_food, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_eat_food_slot()));
+        QObject::connect(b_benchmark_erase_organisms, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_erase_organisms_slot()));
+        QObject::connect(b_benchmark_get_observations, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_get_observations_slot()));
+        QObject::connect(b_benchmark_move_organism, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_move_organism_slot()));
+        QObject::connect(b_benchmark_reserve_organisms, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_reserve_organism_slot()));
+        QObject::connect(b_benchmark_rotate_organism, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_rotate_organism_slot()));
+        QObject::connect(b_benchmark_think_decision, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_think_decision_slot()));
+        QObject::connect(b_benchmark_tick_lifetime, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_tick_lifetime_slot()));
+        QObject::connect(b_benchmark_try_make_child, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_try_make_child_slot()));
+        QObject::connect(b_run_all_benchmarks, SIGNAL(clicked()), Benchmark, SLOT(b_run_all_benchmarks_slot()));
+        QObject::connect(b_stop_benchmarks, SIGNAL(clicked()), Benchmark, SLOT(b_stop_benchmarks_slot()));
 
         tabWidget->setCurrentIndex(0);
 
@@ -211,19 +224,19 @@ public:
     void retranslateUi(QWidget *Benchmark)
     {
         Benchmark->setWindowTitle(QApplication::translate("Benchmark", "Form", nullptr));
-        pushButton->setText(QApplication::translate("Benchmark", "Full benchmark", nullptr));
-        pushButton_7->setText(QApplication::translate("Benchmark", "Benchmark produce food", nullptr));
-        pushButton_9->setText(QApplication::translate("Benchmark", "Benchmark eat food", nullptr));
-        pushButton_11->setText(QApplication::translate("Benchmark", "Benchmark apply damage", nullptr));
-        pushButton_12->setText(QApplication::translate("Benchmark", "Benchmark tick lifetime", nullptr));
-        pushButton_10->setText(QApplication::translate("Benchmark", "Benchmark erase organisms", nullptr));
-        pushButton_8->setText(QApplication::translate("Benchmark", "Benchmark reserve organisms", nullptr));
-        pushButton_6->setText(QApplication::translate("Benchmark", "Benchmark get observations", nullptr));
-        pushButton_5->setText(QApplication::translate("Benchmark", "Benchmark think decision", nullptr));
-        pushButton_3->setText(QApplication::translate("Benchmark", "Benchmark rotate organism", nullptr));
-        pushButton_4->setText(QApplication::translate("Benchmark", "Benchmark move organism", nullptr));
-        pushButton_13->setText(QApplication::translate("Benchmark", "Benchmark try make child", nullptr));
-        pushButton_2->setText(QApplication::translate("Benchmark", "Stop benchmark", nullptr));
+        b_run_all_benchmarks->setText(QApplication::translate("Benchmark", "Run all benchmarks", nullptr));
+        b_benchmark_produce_food->setText(QApplication::translate("Benchmark", "Benchmark produce food", nullptr));
+        b_benchmark_eat_food->setText(QApplication::translate("Benchmark", "Benchmark eat food", nullptr));
+        b_benchmark_apply_damage->setText(QApplication::translate("Benchmark", "Benchmark apply damage", nullptr));
+        b_benchmark_tick_lifetime->setText(QApplication::translate("Benchmark", "Benchmark tick lifetime", nullptr));
+        b_benchmark_erase_organisms->setText(QApplication::translate("Benchmark", "Benchmark erase organisms", nullptr));
+        b_benchmark_reserve_organisms->setText(QApplication::translate("Benchmark", "Benchmark reserve organisms", nullptr));
+        b_benchmark_get_observations->setText(QApplication::translate("Benchmark", "Benchmark get observations", nullptr));
+        b_benchmark_think_decision->setText(QApplication::translate("Benchmark", "Benchmark think decision", nullptr));
+        b_benchmark_rotate_organism->setText(QApplication::translate("Benchmark", "Benchmark rotate organism", nullptr));
+        b_benchmark_move_organism->setText(QApplication::translate("Benchmark", "Benchmark move organism", nullptr));
+        b_benchmark_try_make_child->setText(QApplication::translate("Benchmark", "Benchmark try make child", nullptr));
+        b_stop_benchmarks->setText(QApplication::translate("Benchmark", "Stop benchmarks / Finish benchmarking", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(main_tab), QApplication::translate("Benchmark", "Benchmark", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(settings_tab), QApplication::translate("Benchmark", "Benchmark Settings", nullptr));
     } // retranslateUi

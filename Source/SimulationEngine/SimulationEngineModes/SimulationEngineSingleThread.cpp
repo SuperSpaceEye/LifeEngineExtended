@@ -602,3 +602,17 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
     }
     return true;
 }
+
+std::array<int, 4> SimulationEngineSingleThread::get_organism_dimensions(Organism * organism) {
+    std::array<int, 4> output{INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN};
+    auto & anatomy = organism->anatomy;
+
+    for (auto & block: anatomy._organism_blocks) {
+        if (block.relative_x < output[0]) {output[0] = block.relative_x;}
+        if (block.relative_y < output[1]) {output[1] = block.relative_y;}
+        if (block.relative_x > output[2]) {output[2] = block.relative_x;}
+        if (block.relative_y > output[3]) {output[3] = block.relative_y;}
+    }
+
+    return output;
+}

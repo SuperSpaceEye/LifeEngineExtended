@@ -82,6 +82,9 @@ public:
     static void new_child_pos_calculator(Organism *organism, const Rotation to_place, int distance);
 
     static void old_child_pos_calculator(Organism *organism, const Rotation to_place, int distance);
+
+    //min x, min y, max x, max y
+    static std::array<int, 4> get_organism_dimensions(Organism * organism);
 };
 
 
