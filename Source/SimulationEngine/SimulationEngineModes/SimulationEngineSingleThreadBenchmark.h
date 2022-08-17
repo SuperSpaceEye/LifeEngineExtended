@@ -11,12 +11,25 @@
 #include "SimulationEngineSingleThread.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 
+enum class BenchmarkTypes {
+    ProduceFood,
+    EatFood,
+    ApplyDamage,
+    TickLifetime,
+    EraseOrganisms,
+    ReserveOrganisms,
+    GetObservations,
+    ThinkDecision,
+    RotateOrganism,
+    MoveOrganism,
+    TryMakeChild
+};
+
 struct BenchmarkResult {
-    int total_num_tries = 0;
     int num_organisms = 0;
     uint64_t num_tried = 0;
     uint64_t total_time_measured = 0;
-    std::string benchmark_type;
+    BenchmarkTypes benchmark_type;
 };
 
 struct BenchmarkThreadControls {
@@ -30,13 +43,13 @@ class SimulationEngineSingleThreadBenchmark {
     OrganismBlockParameters bp;
     std::thread benchmark_thread;
 
-    std::vector<uint64_t> seeds;
+    uint64_t seed = 0;
     lehmer64 gen{0};
 
-    int num_tries = 10'000;
+    int num_iterations = 10'000;
     int num_organisms = 10'000;
 
-    boost::unordered_map<std::string, std::vector<Organism *>> benchmark_organisms;
+    boost::unordered_map<BenchmarkTypes, std::vector<Organism *>> benchmark_organisms;
 
     bool initialized = false;
     bool benchmark_running = false;
@@ -47,8 +60,7 @@ class SimulationEngineSingleThreadBenchmark {
     void remove_benchmark_organisms();
 
     void prepare_produce_food_benchmark();
-    void benchmark_produce_food();
-    void finish_produce_food_benchmark();
+    void benchmark_produce_food(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_eat_food_benchmark();
     void benchmark_eat_food();
@@ -89,6 +101,10 @@ class SimulationEngineSingleThreadBenchmark {
     void prepare_try_make_child_benchmark();
     void benchmark_try_make_child();
     void finish_try_make_child_benchmark();
+
+    void place_organisms_of_type(Organism *organism, int num_organisms,
+                                 BenchmarkResult &result);
+    void reset_state();
 public:
     SimulationEngineSingleThreadBenchmark();
 
@@ -98,6 +114,8 @@ public:
     bool resize_benchmark_grid(int width, int height);
     bool set_num_organisms(int num);
     bool set_num_tries(int num);
+
+    void start_benchmarking(const std::vector<BenchmarkTypes>& benchmarks_to_do);
 
     void finish_benchmarking();
 
