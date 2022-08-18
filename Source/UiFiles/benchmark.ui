@@ -169,13 +169,6 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="b_benchmark_reserve_organisms">
-                 <property name="text">
-                  <string>Benchmark reserve organisms</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QPushButton" name="b_benchmark_get_observations">
                  <property name="text">
                   <string>Benchmark get observations</string>
@@ -205,6 +198,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="b_benchmark_try_make_child">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Benchmark try make child</string>
                  </property>
@@ -375,22 +371,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>b_benchmark_reserve_organisms</sender>
-   <signal>clicked()</signal>
-   <receiver>Benchmark</receiver>
-   <slot>b_benchmark_reserve_organism_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>258</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>515</x>
-     <y>308</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>b_benchmark_rotate_organism</sender>
    <signal>clicked()</signal>
    <receiver>Benchmark</receiver>
@@ -494,7 +474,6 @@
   <slot>b_benchmark_apply_damage_slot()</slot>
   <slot>b_benchmark_tick_lifetime_slot()</slot>
   <slot>b_benchmark_erase_organisms_slot()</slot>
-  <slot>b_benchmark_reserve_organism_slot()</slot>
   <slot>b_benchmark_get_observations_slot()</slot>
   <slot>b_benchmark_think_decision_slot()</slot>
   <slot>b_benchmark_rotate_organism_slot()</slot>

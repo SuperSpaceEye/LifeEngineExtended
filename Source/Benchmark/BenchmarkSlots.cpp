@@ -79,11 +79,11 @@ void Benchmarks::b_run_all_benchmarks_slot() {
                                                              BenchmarkTypes::EraseOrganisms,
                                                              BenchmarkTypes::GetObservations,
                                                              BenchmarkTypes::MoveOrganism,
-                                                             BenchmarkTypes::ReserveOrganisms,
                                                              BenchmarkTypes::RotateOrganism,
                                                              BenchmarkTypes::ThinkDecision,
                                                              BenchmarkTypes::TickLifetime,
-                                                             BenchmarkTypes::TryMakeChild});
+//                                                             BenchmarkTypes::TryMakeChild
+    });
 }
 
 void Benchmarks::b_stop_benchmarks_slot() {

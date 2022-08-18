@@ -234,7 +234,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
         auto distance = 2 * i + 2;
         benchmark_organisms[BenchmarkTypes::TryMakeChild].emplace_back(
-                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism, distance}
         );
     }
 }
@@ -602,8 +602,8 @@ SimulationEngineSingleThreadBenchmark::benchmark_move_organism(bool randomized_o
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark() {
-    for (auto iter = dc.organisms.begin() + num_organisms - 1; iter != dc.organisms.end(); iter++) {
-        auto organism = (*iter);
+    for (int i = num_organisms; i < dc.organisms.size(); i++) {
+        auto organism = dc.organisms[i];
         for (auto & block: organism->anatomy._organism_blocks) {
             auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
             w_block->type = BlockTypes::FoodBlock;
@@ -621,7 +621,8 @@ SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(bool randomized_
     auto start = NOW();
     auto end  = NOW();
 
-    for (auto * organism: organisms) {
+    for (int i = 0; i < num_organisms; i++) {
+        auto organism = dc.organisms[i];
         organism->food_collected = organism->food_needed+1;
         start = NOW();
         SimulationEngineSingleThread::try_make_child(&dc, &sp, organism, &gen);
