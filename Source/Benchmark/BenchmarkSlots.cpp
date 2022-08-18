@@ -7,6 +7,7 @@
 void Benchmarks::b_benchmark_produce_food_slot() {
     benchmark_buttons_enabled(false);
     benchmark.init_benchmark();
+    benchmark.start_benchmarking(std::vector<BenchmarkTypes>{BenchmarkTypes::ProduceFood});
 }
 
 void Benchmarks::b_benchmark_apply_damage_slot() {
@@ -66,7 +67,5 @@ void Benchmarks::b_run_all_benchmarks_slot() {
 
 void Benchmarks::b_stop_benchmarks_slot() {
     benchmark_buttons_enabled(true);
-
-
     benchmark.finish_benchmarking();
 }

@@ -27,9 +27,16 @@ enum class BenchmarkTypes {
 
 struct BenchmarkResult {
     int num_organisms = 0;
+    int num_iterations = 0;
     uint64_t num_tried = 0;
     uint64_t total_time_measured = 0;
     BenchmarkTypes benchmark_type;
+    std::string additional_data;
+};
+
+struct OrganismContainer {
+    std::string additional_data;
+    Organism * organism;
 };
 
 struct BenchmarkThreadControls {
@@ -46,13 +53,14 @@ class SimulationEngineSingleThreadBenchmark {
     uint64_t seed = 0;
     lehmer64 gen{0};
 
-    int num_iterations = 10'000;
+    int num_iterations = 500;
     int num_organisms = 10'000;
 
-    boost::unordered_map<BenchmarkTypes, std::vector<Organism *>> benchmark_organisms;
+    boost::unordered_map<BenchmarkTypes, std::vector<OrganismContainer>> benchmark_organisms;
 
     bool initialized = false;
-    bool benchmark_running = false;
+    volatile bool benchmark_running = false;
+    volatile bool stop_benchmark = false;
 
     std::vector<BenchmarkResult> benchmark_results;
 
@@ -110,7 +118,7 @@ public:
 
     void init_benchmark();
 
-    bool set_seeds(std::vector<uint64_t> & seeds);
+    bool set_seed(uint64_t seed);
     bool resize_benchmark_grid(int width, int height);
     bool set_num_organisms(int num);
     bool set_num_tries(int num);
@@ -119,7 +127,10 @@ public:
 
     void finish_benchmarking();
 
+    void stop_benchmark_thread();
+
     const std::vector<BenchmarkResult> & get_results();
+    int get_total_num_iterations() const {return num_iterations;}
 };
 
 

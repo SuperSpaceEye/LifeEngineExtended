@@ -22,7 +22,7 @@ private:
 public:
     Benchmarks(Ui::MainWindow & parent_window);
 
-    void update();
+    void update_result_info();
 private slots:
     void b_benchmark_produce_food_slot();
     void b_benchmark_apply_damage_slot();

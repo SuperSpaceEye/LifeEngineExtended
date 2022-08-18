@@ -5,7 +5,17 @@
 #include "SimulationEngineSingleThreadBenchmark.h"
 
 SimulationEngineSingleThreadBenchmark::SimulationEngineSingleThreadBenchmark() {
+    resize_benchmark_grid(1000, 1000);
+    reset_state();
+    init_benchmark();
+}
 
+bool SimulationEngineSingleThreadBenchmark::resize_benchmark_grid(int width, int height) {
+    if (benchmark_running) {return false;}
+    dc.simulation_width  = width;
+    dc.simulation_height = height;
+    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<SingleThreadGridBlock>(dc.simulation_height, SingleThreadGridBlock{}));
+    return true;
 }
 
 using SC = SerializedOrganismBlockContainer;
@@ -25,14 +35,17 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
         }
         anatomy.set_many_blocks(blocks);
         p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
-        benchmark_organisms[BenchmarkTypes::ProduceFood].emplace_back(p_organism);
+        benchmark_organisms[BenchmarkTypes::ProduceFood].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " producing blocks", p_organism}
+                );
     }
+    auto & vector = benchmark_organisms[BenchmarkTypes::ProduceFood];
 }
 
 void SimulationEngineSingleThreadBenchmark::remove_benchmark_organisms() {
     for (auto & [key, value]: benchmark_organisms) {
-        for (auto organism: value) {
-            delete organism;
+        for (const auto& data: value) {
+            delete data.organism;
         }
         value.clear();
     }
@@ -41,10 +54,16 @@ void SimulationEngineSingleThreadBenchmark::remove_benchmark_organisms() {
 }
 
 void SimulationEngineSingleThreadBenchmark::init_benchmark() {
+    if (initialized) { return;}
     create_benchmark_organisms();
+    initialized = true;
 }
 
 void SimulationEngineSingleThreadBenchmark::finish_benchmarking() {
+    stop_benchmark = true;
+    while (benchmark_running) {}
+    stop_benchmark = false;
+    initialized = false;
     remove_benchmark_organisms();
     benchmark_results.clear();
 }
@@ -55,14 +74,23 @@ const std::vector<BenchmarkResult> & SimulationEngineSingleThreadBenchmark::get_
 
 void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector<BenchmarkTypes>& benchmarks_to_do) {
     if (benchmark_running) { return;}
-    std::thread thread([&, benchmarks_to_do](){
+    benchmark_running = true;
+    std::thread thread([&, benchmarks_to_do]() {
         for (auto & benchmark: benchmarks_to_do) {
-            benchmark_results.emplace_back(BenchmarkResult{num_iterations, 0, 0, benchmark});
-            auto &res = benchmark_results.back();
+            for (auto & benchmark_organism_data: benchmark_organisms[benchmark]) {
+                auto * benchmark_organism = benchmark_organism_data.organism;
+                benchmark_results.emplace_back(BenchmarkResult{num_organisms, 0, 0, 0, benchmark, benchmark_organism_data.additional_data});
+                auto &res = benchmark_results.back();
 
-            for (auto * benchmark_organism: benchmark_organisms[benchmark]) {
                 place_organisms_of_type(benchmark_organism, num_organisms, res);
                 for (int i = 0; i < num_iterations; i++) {
+                    if (stop_benchmark) {
+                        reset_state();
+                        stop_benchmark = false;
+                        benchmark_running = false;
+                        return;
+                    }
+                    res.num_iterations++;
                     switch (benchmark) {
                         case BenchmarkTypes::ProduceFood:
                             prepare_produce_food_benchmark();
@@ -96,7 +124,6 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
         benchmark_running = false;
     });
     thread.detach();
-    benchmark_running = true;
 }
 
 void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *organism, int num_organisms, BenchmarkResult &result) {
@@ -107,8 +134,8 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
     int x_step = std::abs(dimensions[0]) + dimensions[2] + 2;
     int y_step = std::abs(dimensions[1]) + dimensions[3] + 2;
 
-    int x = x_step;
-    int y = 0;
+    int x = 1;
+    int y = 1;
 
     int i = 0;
     for (; i < num_organisms; i++) {
@@ -118,8 +145,8 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
 
         organism->x = x;
         organism->y = y;
-        for (auto & block: organism->child_pattern->anatomy._organism_blocks) {
-            if (SimulationEngineSingleThread::check_if_block_out_of_bounds(&dc, organism, block, organism->rotation)) {return;}
+        for (auto & block: organism->anatomy._organism_blocks) {
+            if (SimulationEngineSingleThread::check_if_block_out_of_bounds(&dc, organism, block, organism->rotation)) { continue_flag = true;break;}
 
             auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
             [organism->y + block.get_pos(organism->rotation).y];
@@ -133,17 +160,28 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
         dc.organisms.emplace_back(new_organism);
         SimulationEngineSingleThread::place_organism(&dc, organism);
     }
-    result.num_organisms = i + 1;
+    result.num_organisms = i;
 }
 
 void SimulationEngineSingleThreadBenchmark::reset_state() {
     for (auto * organism: dc.organisms) {
         delete organism;
     }
+
     dc.organisms.clear();
     for (auto & row: dc.CPU_simulation_grid) {
         row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
     }
+    for (int x = 0; x < dc.simulation_width; x++) {
+        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
+    }
+
+    for (int y = 0; y < dc.simulation_height; y++) {
+        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+    }
+
     gen.set_seed(seed);
 }
 

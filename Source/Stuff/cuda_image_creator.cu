@@ -86,6 +86,9 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
     int x = rxs * holder.width;
     int y = rys * holder.height;
 
+    if (x == holder.width) {x--;}
+    if (y == holder.height) {y--;}
+
     return holder.texture[x + y * holder.width];
 }
 

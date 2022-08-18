@@ -178,6 +178,8 @@ void MainWindow::ui_tick() {
 
     if (update_textures) {load_textures_from_disk(); update_textures = false;}
 
+    bs.update_result_info();
+
     rec.update_label();
 
 #if __VALGRIND_MODE__ == 1
