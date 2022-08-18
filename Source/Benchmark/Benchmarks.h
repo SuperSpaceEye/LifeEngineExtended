@@ -5,6 +5,8 @@
 #ifndef LIFEENGINEEXTENDED_BENCHMARKS_H
 #define LIFEENGINEEXTENDED_BENCHMARKS_H
 
+#include <QScrollBar>
+
 #include "BenchmarkUI.h"
 #include "../MainWindow/WindowUI.h"
 #include "../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThreadBenchmark.h"
@@ -16,13 +18,16 @@ private:
     Ui::MainWindow & parent_window;
     SimulationEngineSingleThreadBenchmark benchmark{};
 
+    bool updated_after_end = false;
+
     void benchmark_buttons_enabled(bool state);
+    void update_result_info();
 
     void closeEvent(QCloseEvent * event) override;
 public:
     Benchmarks(Ui::MainWindow & parent_window);
 
-    void update_result_info();
+    void update_();
 private slots:
     void b_benchmark_produce_food_slot();
     void b_benchmark_apply_damage_slot();

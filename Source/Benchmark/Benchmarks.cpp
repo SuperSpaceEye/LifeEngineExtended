@@ -6,6 +6,7 @@
 
 Benchmarks::Benchmarks(Ui::MainWindow &parent_window): parent_window(parent_window) {
     ui.setupUi(this);
+    update_result_info();
 }
 
 void Benchmarks::closeEvent(QCloseEvent *event) {
@@ -28,6 +29,18 @@ void Benchmarks::benchmark_buttons_enabled(bool state) {
     ui.b_run_all_benchmarks         ->setEnabled(state);
 }
 
+void Benchmarks::update_() {
+    if (!benchmark.benchmark_is_running()) { benchmark_buttons_enabled(true);}
+    if (!benchmark.benchmark_is_running() && !updated_after_end) {
+        updated_after_end = true;
+        update_result_info();
+    }
+    if (benchmark.benchmark_is_running()) {
+        update_result_info();
+        updated_after_end = false;
+    }
+}
+
 void Benchmarks::update_result_info() {
     std::string result_str;
     auto & results = benchmark.get_results();
@@ -38,24 +51,31 @@ void Benchmarks::update_result_info() {
         return;
     }
 
+    BenchmarkTypes last_type = results[0].benchmark_type;
+
     for (auto & result: results) {
         std::string benchmark_type;
         switch (result.benchmark_type) {
-            case BenchmarkTypes::ProduceFood:      benchmark_type = "produce food"; break;
-            case BenchmarkTypes::EatFood:          benchmark_type = " "; break;
-            case BenchmarkTypes::ApplyDamage:      benchmark_type = " "; break;
-            case BenchmarkTypes::TickLifetime:     benchmark_type = " "; break;
-            case BenchmarkTypes::EraseOrganisms:   benchmark_type = " "; break;
-            case BenchmarkTypes::ReserveOrganisms: benchmark_type = " "; break;
-            case BenchmarkTypes::GetObservations:  benchmark_type = " "; break;
-            case BenchmarkTypes::ThinkDecision:    benchmark_type = " "; break;
-            case BenchmarkTypes::RotateOrganism:   benchmark_type = " "; break;
-            case BenchmarkTypes::MoveOrganism:     benchmark_type = " "; break;
-            case BenchmarkTypes::TryMakeChild:     benchmark_type = " "; break;
+            case BenchmarkTypes::ProduceFood:      benchmark_type = "produce food";      break;
+            case BenchmarkTypes::EatFood:          benchmark_type = "eat food";          break;
+            case BenchmarkTypes::ApplyDamage:      benchmark_type = "apply damage";      break;
+            case BenchmarkTypes::TickLifetime:     benchmark_type = "tick lifetime";     break;
+            case BenchmarkTypes::EraseOrganisms:   benchmark_type = "erase organism";    break;
+            case BenchmarkTypes::ReserveOrganisms: benchmark_type = "reserve organisms"; break;
+            case BenchmarkTypes::GetObservations:  benchmark_type = "get observations";  break;
+            case BenchmarkTypes::ThinkDecision:    benchmark_type = "think decision";    break;
+            case BenchmarkTypes::RotateOrganism:   benchmark_type = "rotate organism";   break;
+            case BenchmarkTypes::MoveOrganism:     benchmark_type = "move organism";     break;
+            case BenchmarkTypes::TryMakeChild:     benchmark_type = "try make child";    break;
         }
         std::string avg_time;
         if (result.num_tried > 0) {
             avg_time = "Avg nanoseconds per operation: " + std::to_string(result.total_time_measured / result.num_tried);
+        }
+
+        if (result.benchmark_type != last_type) {
+            last_type = result.benchmark_type;
+            result_str.append("==============================\n\n\n");
         }
 
         result_str.append("Benchmark type: ").append(benchmark_type).append(" ||| Num organism in benchmark: ")
@@ -64,4 +84,6 @@ void Benchmarks::update_result_info() {
         .append(result.additional_data).append(" ||| ").append(avg_time).append("\n\n\n");
     }
     ui.benchmarks_output_text_edit->setText(QString::fromStdString(result_str));
+
+    ui.benchmarks_output_text_edit->verticalScrollBar()->setValue(ui.benchmarks_output_text_edit->verticalScrollBar()->maximum());
 }

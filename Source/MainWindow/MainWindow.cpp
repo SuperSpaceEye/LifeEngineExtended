@@ -178,7 +178,7 @@ void MainWindow::ui_tick() {
 
     if (update_textures) {load_textures_from_disk(); update_textures = false;}
 
-    bs.update_result_info();
+    bs.update_();
 
     rec.update_label();
 

@@ -155,8 +155,6 @@ void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<
             observations.emplace_back(0);
         }
     }
-//    smart_reserve(observations, organisms.size(), edc->minimum_fixed_capacity);
-//    for (auto & item: edc->single_thread_organisms_observations) {observations.emplace_back(std::vector<Observation>(item));}
 }
 
 void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, SimulationParameters *sp,

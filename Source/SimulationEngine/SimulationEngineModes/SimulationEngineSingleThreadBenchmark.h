@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <thread>
+#include <random>
 
 #include "SimulationEngineSingleThread.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
@@ -37,11 +38,7 @@ struct BenchmarkResult {
 struct OrganismContainer {
     std::string additional_data;
     Organism * organism;
-};
-
-struct BenchmarkThreadControls {
-    bool stop = false;
-    bool pause = true;
+    int additional_distance = 0;
 };
 
 class SimulationEngineSingleThreadBenchmark {
@@ -71,52 +68,45 @@ class SimulationEngineSingleThreadBenchmark {
     void benchmark_produce_food(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_eat_food_benchmark();
-    void benchmark_eat_food();
-    void finish_eat_food_benchmark();
+    void benchmark_eat_food(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_apply_damage_benchmark();
-    void benchmark_apply_damage();
-    void finish_apply_damage_benchmark();
+    void benchmark_apply_damage(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_tick_lifetime_benchmark();
-    void benchmark_tick_lifetime();
-    void finish_tick_lifetime_benchmark();
+    void benchmark_tick_lifetime(bool randomized_organism_access, BenchmarkResult &res);
 
-    void prepare_erase_organisms_benchmark();
-    void benchmark_erase_organisms();
-    void finish_erase_organisms_benchmark();
+    void prepare_erase_organisms_benchmark(Organism *organism);
+    void benchmark_erase_organisms(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_reserve_organisms_benchmark();
     void benchmark_reserve_organisms();
-    void finish_reserve_organisms_benchmark();
 
     void prepare_get_observations_benchmark();
-    void benchmark_get_observations();
-    void finish_get_observations_benchmark();
+    void benchmark_get_observations(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_think_decision_benchmark();
-    void benchmark_think_decision();
-    void finish_think_decision_benchmark();
+    void benchmark_think_decision(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_rotate_organism_benchmark();
-    void benchmark_rotate_organism();
-    void finish_rotate_organism_benchmark();
+    void benchmark_rotate_organism(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_move_organism_benchmark();
-    void benchmark_move_organism();
-    void finish_move_organism_benchmark();
+    void benchmark_move_organism(bool randomized_organism_access, BenchmarkResult &res);
 
     void prepare_try_make_child_benchmark();
-    void benchmark_try_make_child();
+    void benchmark_try_make_child(bool randomized_organism_access, BenchmarkResult &res);
     void finish_try_make_child_benchmark();
 
     void place_organisms_of_type(Organism *organism, int num_organisms,
-                                 BenchmarkResult &result);
+                                 BenchmarkResult &result, int additional_distance);
     void reset_state();
 public:
     SimulationEngineSingleThreadBenchmark();
 
     void init_benchmark();
+
+    bool benchmark_is_running() const {return benchmark_running;}
 
     bool set_seed(uint64_t seed);
     bool resize_benchmark_grid(int width, int height);

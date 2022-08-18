@@ -25,6 +25,13 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
     auto anatomy = Anatomy();
     Organism * p_organism;
 
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::ProduceFood].emplace_back(
+            OrganismContainer{"1 block", p_organism}
+    );
+
     for (int i = 1; i <= 3; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
@@ -39,7 +46,197 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
                 OrganismContainer{std::to_string(blocks.size()) + " producing blocks", p_organism}
                 );
     }
-    auto & vector = benchmark_organisms[BenchmarkTypes::ProduceFood];
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::EatFood].emplace_back(
+            OrganismContainer{"1 mouth block", p_organism}
+            );
+
+    for (int i = 1; i <= 3; i++) {
+        anatomy = Anatomy();
+        std::vector<SC> blocks;
+        for (int x = -2*i; x <= 2*i; x += 2) {
+            for (int y = -2*i; y <= 2*i; y += 2) {
+                blocks.emplace_back(BlockTypes::MouthBlock, Rotation::UP, x, y);
+            }
+        }
+        anatomy.set_many_blocks(blocks);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        benchmark_organisms[BenchmarkTypes::EatFood].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " mouth blocks", p_organism}
+        );
+    }
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::KillerBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::ApplyDamage].emplace_back(
+            OrganismContainer{"1 block", p_organism, -1}
+    );
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism->damage = p_organism->calculate_max_life() + 1;
+    benchmark_organisms[BenchmarkTypes::TickLifetime].emplace_back(
+            OrganismContainer{"1 block", p_organism}
+    );
+
+    for (int i = 1; i <= 3; i++) {
+        anatomy = Anatomy();
+        std::vector<SC> blocks;
+        for (int x = -2*i; x <= 2*i; x += 2) {
+            for (int y = -2*i; y <= 2*i; y += 2) {
+                blocks.emplace_back(BlockTypes::MouthBlock, Rotation::UP, x, y);
+            }
+        }
+        anatomy.set_many_blocks(blocks);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism->damage = p_organism->calculate_max_life() + 1;
+        benchmark_organisms[BenchmarkTypes::TickLifetime].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+        );
+    }
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::EraseOrganisms].emplace_back(
+            OrganismContainer{"1 block", p_organism}
+    );
+
+    for (int i = 1; i <= 3; i++) {
+        anatomy = Anatomy();
+        std::vector<SC> blocks;
+        for (int x = -2*i; x <= 2*i; x += 2) {
+            for (int y = -2*i; y <= 2*i; y += 2) {
+                blocks.emplace_back(BlockTypes::MouthBlock, Rotation::UP, x, y);
+            }
+        }
+        anatomy.set_many_blocks(blocks);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        benchmark_organisms[BenchmarkTypes::EraseOrganisms].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+        );
+    }
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
+            OrganismContainer{"1 block 1 space", p_organism}
+    );
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
+            OrganismContainer{"1 block 10 space", p_organism, 10}
+    );
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
+            OrganismContainer{"1 block 20 space", p_organism, 20}
+    );
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
+            OrganismContainer{"1 block 50 space", p_organism, 50}
+    );
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::ThinkDecision].emplace_back(
+            OrganismContainer{"none", p_organism}
+    );
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::RotateOrganism].emplace_back(
+            OrganismContainer{"1 block", p_organism}
+    );
+
+    for (int i = 1; i <= 3; i++) {
+        anatomy = Anatomy();
+        std::vector<SC> blocks;
+        for (int x = -2*i; x <= 2*i; x += 2) {
+            for (int y = -2*i; y <= 2*i; y += 2) {
+                blocks.emplace_back(BlockTypes::MoverBlock, Rotation::UP, x, y);
+            }
+        }
+        anatomy.set_many_blocks(blocks);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        benchmark_organisms[BenchmarkTypes::RotateOrganism].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+        );
+    }
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::MoveOrganism].emplace_back(
+            OrganismContainer{"1 block", p_organism}
+    );
+
+    for (int i = 1; i <= 3; i++) {
+        anatomy = Anatomy();
+        std::vector<SC> blocks;
+        for (int x = -2*i; x <= 2*i; x += 2) {
+            for (int y = -2*i; y <= 2*i; y += 2) {
+                blocks.emplace_back(BlockTypes::MoverBlock, Rotation::UP, x, y);
+            }
+        }
+        anatomy.set_many_blocks(blocks);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        benchmark_organisms[BenchmarkTypes::MoveOrganism].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+        );
+    }
+
+
+
+    anatomy = Anatomy();
+    anatomy.set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    benchmark_organisms[BenchmarkTypes::TryMakeChild].emplace_back(
+            OrganismContainer{"1 block", p_organism, 2}
+    );
+
+    for (int i = 1; i <= 3; i++) {
+        anatomy = Anatomy();
+        std::vector<SC> blocks;
+        for (int x = -i; x <= i; x += 1) {
+            for (int y = -i; y <= i; y += 1) {
+                blocks.emplace_back(BlockTypes::MoverBlock, Rotation::UP, x, y);
+            }
+        }
+        anatomy.set_many_blocks(blocks);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+
+        auto distance = 2 * i + 2;
+        benchmark_organisms[BenchmarkTypes::TryMakeChild].emplace_back(
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+        );
+    }
 }
 
 void SimulationEngineSingleThreadBenchmark::remove_benchmark_organisms() {
@@ -82,7 +279,8 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
                 benchmark_results.emplace_back(BenchmarkResult{num_organisms, 0, 0, 0, benchmark, benchmark_organism_data.additional_data});
                 auto &res = benchmark_results.back();
 
-                place_organisms_of_type(benchmark_organism, num_organisms, res);
+                place_organisms_of_type(benchmark_organism, num_organisms, res, benchmark_organism_data.additional_distance);
+                gen.set_seed(seed);
                 for (int i = 0; i < num_iterations; i++) {
                     if (stop_benchmark) {
                         reset_state();
@@ -97,24 +295,38 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
                             benchmark_produce_food(false, res);
                             break;
                         case BenchmarkTypes::EatFood:
+                            prepare_eat_food_benchmark();
+                            benchmark_eat_food(false, res);
                             break;
                         case BenchmarkTypes::ApplyDamage:
+//                            prepare_apply_damage_benchmark();
+                            benchmark_apply_damage(false, res);
                             break;
                         case BenchmarkTypes::TickLifetime:
+                            prepare_tick_lifetime_benchmark();
+                            benchmark_tick_lifetime(false, res);
                             break;
                         case BenchmarkTypes::EraseOrganisms:
+                            prepare_erase_organisms_benchmark(benchmark_organism);
+                            benchmark_erase_organisms(false, res);
                             break;
                         case BenchmarkTypes::ReserveOrganisms:
                             break;
                         case BenchmarkTypes::GetObservations:
+                            benchmark_get_observations(false, res);
                             break;
                         case BenchmarkTypes::ThinkDecision:
+                            benchmark_think_decision(false, res);
                             break;
                         case BenchmarkTypes::RotateOrganism:
+                            benchmark_rotate_organism(false, res);
                             break;
                         case BenchmarkTypes::MoveOrganism:
+                            benchmark_move_organism(false, res);
                             break;
                         case BenchmarkTypes::TryMakeChild:
+                            prepare_try_make_child_benchmark();
+                            benchmark_try_make_child(false, res);
                             break;
                     }
                 }
@@ -126,13 +338,14 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
     thread.detach();
 }
 
-void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *organism, int num_organisms, BenchmarkResult &result) {
+void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *organism, int num_organisms,
+                                                                    BenchmarkResult &result, int additional_distance) {
     auto dimensions = SimulationEngineSingleThread::get_organism_dimensions(organism);
 
     bool continue_flag = false;
 
-    int x_step = std::abs(dimensions[0]) + dimensions[2] + 2;
-    int y_step = std::abs(dimensions[1]) + dimensions[3] + 2;
+    int x_step = std::abs(dimensions[0]) + dimensions[2] + 2 + additional_distance;
+    int y_step = std::abs(dimensions[1]) + dimensions[3] + 2 + additional_distance;
 
     int x = 1;
     int y = 1;
@@ -185,6 +398,10 @@ void SimulationEngineSingleThreadBenchmark::reset_state() {
     gen.set_seed(seed);
 }
 
+#define NOW std::chrono::high_resolution_clock::now
+using std::chrono::duration_cast;
+using std::chrono::nanoseconds;
+
 void SimulationEngineSingleThreadBenchmark::prepare_produce_food_benchmark() {
     for (auto & row: dc.CPU_simulation_grid) {
         for (auto & block: row) {
@@ -192,13 +409,7 @@ void SimulationEngineSingleThreadBenchmark::prepare_produce_food_benchmark() {
         }
     }
 }
-
-#define NOW std::chrono::high_resolution_clock::now
-using std::chrono::duration_cast;
-using std::chrono::nanoseconds;
-
-void
-SimulationEngineSingleThreadBenchmark::benchmark_produce_food(bool randomized_organism_access, BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(bool randomized_organism_access, BenchmarkResult &res) {
     auto organisms = std::vector(dc.organisms);
     if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
     auto start = NOW();
@@ -206,6 +417,214 @@ SimulationEngineSingleThreadBenchmark::benchmark_produce_food(bool randomized_or
     for (auto * organism: organisms) {
         start = NOW();
         SimulationEngineSingleThread::produce_food(&dc, &sp, organism, gen);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_eat_food_benchmark() {
+    for (auto & row: dc.CPU_simulation_grid) {
+        for (auto & block: row) {
+            if (block.type == BlockTypes::EmptyBlock) {block.type = BlockTypes::FoodBlock;}
+        }
+    }
+}
+void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+    for (auto * organism: organisms) {
+        start = NOW();
+        SimulationEngineSingleThread::eat_food(&dc, &sp, organism);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_apply_damage_benchmark() {
+
+}
+void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+    for (auto * organism: organisms) {
+        start = NOW();
+        SimulationEngineSingleThread::apply_damage(&dc, &sp, organism);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_tick_lifetime_benchmark() {
+    for (auto * organism: dc.organisms) {
+        SimulationEngineSingleThread::place_organism(&dc, organism);
+    }
+}
+void
+SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+
+    std::vector<int> to_erase;
+    to_erase.reserve(organisms.size());
+
+    for (auto * organism: organisms) {
+        start = NOW();
+        SimulationEngineSingleThread::tick_lifetime(&dc, to_erase, organism, 0);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_erase_organisms_benchmark(Organism *organism) {
+    for (int i = 0; i < num_organisms; i++) {
+        dc.organisms.emplace_back(new Organism(organism));
+    }
+}
+void SimulationEngineSingleThreadBenchmark::benchmark_erase_organisms(bool randomized_organism_access,
+                                                                      BenchmarkResult &res) {
+    std::vector<int> to_erase{};
+    to_erase.reserve(dc.organisms.size());
+    for (int i = 0; i < num_organisms; i++) {
+        to_erase.emplace_back(i);
+    }
+    auto start = NOW();
+    auto end  = NOW();
+
+    for (int i = 0; i < num_organisms; i++) {
+        start = NOW();
+        SimulationEngineSingleThread::erase_organisms(&dc, to_erase, i);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_reserve_organisms_benchmark() {}
+void SimulationEngineSingleThreadBenchmark::benchmark_reserve_organisms() {}
+
+void SimulationEngineSingleThreadBenchmark::prepare_get_observations_benchmark() {}
+void
+SimulationEngineSingleThreadBenchmark::benchmark_get_observations(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+
+    std::vector<std::vector<Observation>> observations;
+    observations.resize(dc.organisms.size(), std::vector<Observation>{Observation{}});
+
+    start = NOW();
+    SimulationEngineSingleThread::get_observations(&dc, &sp, organisms, observations);
+    end = NOW();
+    auto difference = duration_cast<nanoseconds>(end - start).count();
+    res.total_time_measured += difference;
+    res.num_tried += dc.organisms.size();
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_think_decision_benchmark() {}
+void
+SimulationEngineSingleThreadBenchmark::benchmark_think_decision(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+    std::vector<std::vector<Observation>> observations{dc.organisms.size()};
+    for (auto & observation: observations) {
+        observation = std::vector<Observation>{Observation{
+                static_cast<BlockTypes>(std::uniform_int_distribution<int>(0, 8)(gen)), 5, Rotation::UP
+                    }};
+    }
+
+    for (int i = 0; i < num_organisms; i++) {
+        auto * organism = organisms[i];
+        start = NOW();
+        organism->think_decision(observations[i], &gen);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_rotate_organism_benchmark() {}
+void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(bool randomized_organism_access,
+                                                                      BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+
+    for (auto * organism: organisms) {
+        start = NOW();
+        SimulationEngineSingleThread::rotate_organism(&dc, organism, BrainDecision::RotateRight, &sp);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_move_organism_benchmark() {}
+void
+SimulationEngineSingleThreadBenchmark::benchmark_move_organism(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+
+    for (auto * organism: organisms) {
+        auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
+        start = NOW();
+        SimulationEngineSingleThread::move_organism(&dc, organism,
+                                                    decision,
+                                                    &sp);
+        end = NOW();
+        auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.total_time_measured += difference;
+        res.num_tried++;
+    }
+}
+
+void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark() {
+    for (auto iter = dc.organisms.begin() + num_organisms - 1; iter != dc.organisms.end(); iter++) {
+        auto organism = (*iter);
+        for (auto & block: organism->anatomy._organism_blocks) {
+            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+            w_block->type = BlockTypes::FoodBlock;
+            w_block->organism = nullptr;
+        }
+    }
+
+    dc.organisms.erase(dc.organisms.begin() + num_organisms, dc.organisms.end());
+}
+
+void
+SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(bool randomized_organism_access, BenchmarkResult &res) {
+    auto organisms = std::vector(dc.organisms);
+    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+    auto start = NOW();
+    auto end  = NOW();
+
+    for (auto * organism: organisms) {
+        organism->food_collected = organism->food_needed+1;
+        start = NOW();
+        SimulationEngineSingleThread::try_make_child(&dc, &sp, organism, &gen);
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
         res.total_time_measured += difference;
