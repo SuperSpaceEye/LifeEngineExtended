@@ -358,7 +358,7 @@ void SimulationEngine::partial_clear_world() {
             block.type = BlockTypes::EmptyBlock;
         }
     }
-    for (auto & block: edc.second_simulation_grid) {
+    for (auto & block: edc.simple_state_grid) {
         if (!sp.clear_walls_on_reset) {
             if (block.type == BlockTypes::WallBlock) { continue; }
         }
@@ -464,8 +464,8 @@ void SimulationEngine::unpause() {
 void SimulationEngine::parse_full_simulation_grid() {
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
-            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
 }

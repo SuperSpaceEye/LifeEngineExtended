@@ -52,6 +52,9 @@ public:
     int max_decision_lifetime = 2;
     int max_do_nothing_lifetime = 3;
 
+    bool is_dead = false;
+    int array_place = 0;
+
     DecisionObservation last_decision = DecisionObservation{};
 
     OrganismData()=default;
@@ -79,13 +82,17 @@ public:
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
 
     void init_values();
+
+    Organism & operator=(const Organism & organism)=default;
+    Organism & operator=(Organism & organism);
     //public:
+    Organism()=default;
     Organism(int x, int y, Rotation rotation, Anatomy anatomy,
              Brain brain, SimulationParameters *sp,
              OrganismBlockParameters *block_parameters, int move_range,
              float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
+    Organism(Organism const &organism);
     Organism(Organism *organism);
-    Organism()=default;
     ~Organism();
     Organism * create_child(lehmer64 *gen);
 };

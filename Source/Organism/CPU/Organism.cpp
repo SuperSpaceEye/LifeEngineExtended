@@ -238,3 +238,15 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
         last_decision.time++;
     }
 }
+
+Organism & Organism::operator=(Organism & organism) {
+    //TODO
+    *((OrganismData*)this) = *((OrganismData*)&organism);
+
+    brain = organism.brain;
+    anatomy = organism.anatomy;
+    sp = organism.sp;
+    bp = organism.bp;
+
+    return *this;
+}

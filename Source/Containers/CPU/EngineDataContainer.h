@@ -43,9 +43,22 @@ struct EngineDataContainer {
     std::vector<int> single_thread_observation_count{};
     std::vector<std::vector<Observation>> single_thread_organisms_observations{};
 
+    struct SingleThreadContainer {
+        float max_dead_to_alive_organisms_factor = 50;
+        uint32_t num_dead_organisms = 0;
+        std::vector<Organism> organisms;
+        //Should be in the reverse order of the position of dead organism in main grid
+        std::vector<uint32_t> dead_organisms_positions;
+        std::vector<Organism> child_organisms;
+        std::vector<uint32_t> free_child_organisms_positions;
+        std::vector<int> observation_count{};
+        std::vector<std::vector<Observation>> organisms_observations{};
+    };
+    SingleThreadContainer stc;
+
     std::vector<std::vector<Organism*>> organisms_pools;
 
-    std::vector<BaseGridBlock> second_simulation_grid;
+    std::vector<BaseGridBlock> simple_state_grid;
 
 //    std::vector<eager_worker_partial> threads;
     std::vector<std::vector<int>> threaded_to_erase;

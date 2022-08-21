@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
-    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+    edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
@@ -274,7 +274,7 @@ void MainWindow::create_image() {
                                                                   textures,
                                                                   ui.simulation_graphicsView->width(),
                                                                   image_vector,
-                                                                  edc.second_simulation_grid);
+                                                                  edc.simple_state_grid);
     } else {
 #if __CUDA_USED__
         cuda_creator.cuda_create_image(image_width,
@@ -321,8 +321,8 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
         if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= edc.simulation_height) { continue; }
-            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
 }
@@ -366,10 +366,10 @@ void MainWindow::just_resize_simulation_grid() {
     edc.simulation_height = new_simulation_height;
 
     edc.CPU_simulation_grid.clear();
-    edc.second_simulation_grid.clear();
+    edc.simple_state_grid.clear();
 
     edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
-    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+    edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 }
