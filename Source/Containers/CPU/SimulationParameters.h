@@ -45,10 +45,10 @@ struct SimulationParameters {
         int change_cell = 33;
         int remove_cell = 33;
 
-    int   perlin_octaves = 4;
+    int   perlin_octaves = 2;
     float perlin_persistence = 0.5;
-    float perlin_upper_bound = 0.4;
-    float perlin_lower_bound = 0.3;
+    float perlin_upper_bound = 0.503;
+    float perlin_lower_bound = 0.497;
     float perlin_x_modifier = 0.015; //0.005 for 1000 size
     float perlin_y_modifier = 0.015; //0.005
 
