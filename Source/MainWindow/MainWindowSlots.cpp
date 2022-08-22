@@ -213,8 +213,8 @@ void MainWindow::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
     engine.pause();
 
-    for (auto & organism: edc.organisms) {
-        organism->lifetime = organism->max_lifetime*2;
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+        edc.stc.organisms[i].lifetime = edc.stc.organisms[i].max_lifetime + 5;
     }
 
     engine.unpause();

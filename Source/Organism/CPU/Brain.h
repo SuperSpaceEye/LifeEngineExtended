@@ -83,7 +83,9 @@ private:
 public:
     Brain()=default;
     Brain(Brain & brain);
-    Brain(BrainTypes brain_type);
+    explicit Brain(BrainTypes brain_type);
+    Brain(Brain&&)=default;
+    Brain & operator=(const Brain & brain)=default;
 
     SimpleActionTable simple_action_table;
 

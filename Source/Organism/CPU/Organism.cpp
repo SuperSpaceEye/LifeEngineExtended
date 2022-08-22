@@ -8,9 +8,7 @@
 
 #include "Organism.h"
 
-#include <utility>
-#include "Rotation.h"
-#include "ObservationStuff.h"
+#include "../../SimulationEngine/OrganismsController.h"
 
 Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy,
                    Brain brain, SimulationParameters *sp,
@@ -35,11 +33,6 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
                                                      organism->anatomy_mutation_rate,
                                                      organism->brain_mutation_rate) {
     init_values();
-}
-
-Organism::~Organism() {
-    //delete anatomy;
-    delete child_pattern;
 }
 
 void Organism::init_values() {
@@ -189,7 +182,7 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
     }
 }
 
-Organism * Organism::create_child(lehmer64 *gen) {
+Organism * Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     Anatomy new_anatomy;
     Brain new_brain;
 
@@ -203,16 +196,17 @@ Organism * Organism::create_child(lehmer64 *gen) {
     if (new_anatomy._eye_blocks > 0 && new_anatomy._mover_blocks > 0) {new_brain.brain_type = BrainTypes::SimpleBrain;}
     else {new_brain.brain_type = BrainTypes::RandomActions;}
 
-    return new Organism(0,
-                        0,
-                        rotation,
-                        new_anatomy,
-                        new_brain,
-                        sp,
-                        bp,
-                        child_move_range,
-                        _anatomy_mutation_rate,
-                        _brain_mutation_rate);
+    auto * child_ptr = OrganismsController::get_new_child_organism(edc);
+    child_ptr->rotation = rotation;
+    child_ptr->anatomy = new_anatomy;
+    child_ptr->brain = new_brain;
+    child_ptr->sp = sp;
+    child_ptr->bp = bp;
+    child_ptr->move_range = child_move_range;
+    child_ptr->anatomy_mutation_rate = _anatomy_mutation_rate;
+    child_ptr->brain_mutation_rate = _brain_mutation_rate;
+
+    return child_ptr;
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
@@ -239,14 +233,34 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
     }
 }
 
-Organism & Organism::operator=(Organism & organism) {
-    //TODO
-    *((OrganismData*)this) = *((OrganismData*)&organism);
+void Organism::move_organism(Organism &organism) {
+    x = organism.x;
+    y = organism.y;
+    life_points = organism.life_points;
+    damage = organism.damage;
+    max_lifetime = organism.max_lifetime;
+    lifetime = organism.lifetime;
+    anatomy_mutation_rate = organism.anatomy_mutation_rate;
+    brain_mutation_rate = organism.brain_mutation_rate;
+    food_collected = organism.food_collected;
+    food_needed = organism.food_needed;
+    multiplier = organism.multiplier;
+    move_range = organism.move_range;
+    rotation = organism.rotation;
+    move_counter = organism.move_counter;
+    max_decision_lifetime = organism.max_decision_lifetime;
+    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
     brain = organism.brain;
     anatomy = organism.anatomy;
     sp = organism.sp;
     bp = organism.bp;
 
-    return *this;
+    organism = Organism();
+}
+
+void Organism::kill_organism(EngineDataContainer &edc) {
+    if (is_dead) { return;}
+    OrganismsController::free_child_organism(child_pattern, edc);
+    OrganismsController::free_main_organism(this, edc);
 }

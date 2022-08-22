@@ -57,6 +57,7 @@
 #include "../Stuff/ImageCreation.h"
 #include "../Stuff/DataSavingFunctions.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
+#include "../SimulationEngine/OrganismsController.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"

@@ -39,18 +39,16 @@ public:
 
     static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
-    static void tick_lifetime   (EngineDataContainer * dc, std::vector<int>& to_erase, Organism *organism, int organism_pos);
-
-    static void erase_organisms (EngineDataContainer * dc, std::vector<int>& to_erase, int i);
+    static void tick_lifetime(EngineDataContainer *dc, Organism *organism);
 
     static void apply_damage    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
     static void reserve_observations(std::vector<std::vector<Observation>> &observations,
-                                     std::vector<Organism *> &organisms,
-                                     SimulationParameters *sp, EngineDataContainer *dc);
+                                     std::vector<Organism> &organisms,
+                                     EngineDataContainer *dc);
 
     static void get_observations(EngineDataContainer *dc, SimulationParameters *sp,
-                                 std::vector<Organism *> &organisms,
+                                 Organism *organism,
                                  std::vector<std::vector<Observation>> &organism_observations);
 
     static void rotate_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,

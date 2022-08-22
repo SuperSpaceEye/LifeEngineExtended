@@ -71,8 +71,11 @@ MainWindow::MainWindow(QWidget *parent) :
     edc.base_organism->last_decision = DecisionObservation{};
     edc.chosen_organism->last_decision = DecisionObservation{};
 
-    auto * organism = new Organism(edc.base_organism);
-    edc.organisms.push_back(organism);
+    auto * organism = OrganismsController::get_new_main_organism(edc);
+    auto array_place = organism->array_place;
+    *organism = Organism(edc.base_organism);
+    organism->array_place = array_place;
+
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
     resize_image();

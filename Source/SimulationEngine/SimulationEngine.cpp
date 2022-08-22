@@ -19,6 +19,8 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
+    //TODO
+    gen.set_seed(0);
     //TODO only do if enabled?
     init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 }
@@ -100,7 +102,7 @@ void SimulationEngine::simulation_tick() {
 
     switch (ecp.simulation_mode) {
         case SimulationModes::CPU_Single_Threaded:
-            if (edc.organisms.empty()) {
+            if (edc.stc.organisms.empty()) {
                 ecp.organisms_extinct = true;
             } else {
                 ecp.organisms_extinct = false;
@@ -200,7 +202,11 @@ void SimulationEngine::process_user_action_pool() {
 
                 if (continue_flag) { continue; }
 
-                auto * new_organism = new Organism(edc.chosen_organism);
+                auto * new_organism = OrganismsController::get_new_main_organism(edc);
+
+                auto array_place = new_organism->array_place;
+                *new_organism = Organism(edc.chosen_organism);
+                new_organism->array_place = array_place;
 
                 new_organism->x = action.x;
                 new_organism->y = action.y;
@@ -209,12 +215,10 @@ void SimulationEngine::process_user_action_pool() {
                     int x = block.get_pos(edc.chosen_organism->rotation).x + new_organism->x;
                     int y = block.get_pos(edc.chosen_organism->rotation).y + new_organism->y;
 
-                    edc.CPU_simulation_grid[x][y].type = block.type;
+                    edc.CPU_simulation_grid[x][y].type     = block.type;
                     edc.CPU_simulation_grid[x][y].organism = new_organism;
                     edc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, edc.chosen_organism->rotation);
                 }
-
-                edc.organisms.emplace_back(new_organism);
             }
                 break;
             case ActionType::TryKillOrganism: {
@@ -222,13 +226,12 @@ void SimulationEngine::process_user_action_pool() {
             }
                 break;
             case ActionType::TrySelectOrganism: {
-                    if (edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
-                        edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock ||
-                        edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
+                if (edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
+                    edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock  ||
+                    edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
                 edc.selected_organism = edc.CPU_simulation_grid[action.x][action.y].organism;
-                    goto endfor;
+                goto endfor;
                 }
-                break;
         }
     }
     endfor:
@@ -293,9 +296,9 @@ void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & 
         [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
     }
     if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-        for (int i = 0; i < edc.organisms.size(); i++) {
-            if (edc.organisms[i] == organism_ptr) {
-                edc.organisms.erase(edc.organisms.begin() + i);
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+            if (&edc.stc.organisms[i] == organism_ptr) {
+                edc.stc.organisms[i].kill_organism(edc);
                 break;
             }
         }
@@ -329,15 +332,16 @@ void SimulationEngine::reset_world() {
     edc.chosen_organism->x = edc.simulation_width / 2;
     edc.chosen_organism->y = edc.simulation_height / 2;
 
-    Organism * organism;
+    Organism * organism = OrganismsController::get_new_main_organism(edc);
+    auto array_place = organism->array_place;
 
     if (ecp.reset_with_editor_organism) {
-        organism = new Organism(edc.chosen_organism);
+        *organism = Organism(edc.chosen_organism);
     } else {
-        organism = new Organism(edc.base_organism);
+        *organism = Organism(edc.base_organism);
     }
+    organism->array_place = array_place;
 
-    edc.organisms.push_back(organism);
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
     if (ecp.execute_world_events) {stop_world_events(); start_world_events();}
@@ -368,14 +372,8 @@ void SimulationEngine::partial_clear_world() {
 }
 
 void SimulationEngine::clear_organisms() {
-    if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-        for (auto &organism: edc.organisms) { delete organism; }
-        edc.organisms.clear();
-    } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        for (auto &pool: edc.organisms_pools) {
-            for (auto &organism: pool) { delete organism; }
-            pool.clear();
-        }
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+        edc.stc.organisms[i].kill_organism(edc);
     }
 }
 
@@ -414,8 +412,8 @@ void SimulationEngine::reinit_organisms() {
 
     switch (ecp.simulation_mode) {
         case SimulationModes::CPU_Single_Threaded:
-            for (auto & organism: edc.organisms) {
-                organism->init_values();
+            for (auto & organism: edc.stc.organisms) {
+                organism.init_values();
             }
             break;
         case SimulationModes::CPU_Partial_Multi_threaded:

@@ -19,6 +19,10 @@
 #include "Rotation.h"
 #include "../../PRNGS/lehmer64.h"
 #include "ObservationStuff.h"
+#include "Rotation.h"
+#include "ObservationStuff.h"
+
+struct EngineDataContainer;
 
 struct OrganismData {
 public:
@@ -83,18 +87,22 @@ public:
 
     void init_values();
 
+    void kill_organism(EngineDataContainer & edc);
+
+    void move_organism(Organism & organism);
+
     Organism & operator=(const Organism & organism)=default;
-    Organism & operator=(Organism & organism);
+//    Organism & operator=(Organism & organism);
     //public:
     Organism()=default;
+    Organism(Organism&&)=default;
     Organism(int x, int y, Rotation rotation, Anatomy anatomy,
              Brain brain, SimulationParameters *sp,
              OrganismBlockParameters *block_parameters, int move_range,
              float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
-    Organism(Organism const &organism);
     Organism(Organism *organism);
-    ~Organism();
-    Organism * create_child(lehmer64 *gen);
+//    ~Organism()=default;
+    Organism *create_child(lehmer64 *gen, EngineDataContainer &edc);
 };
 
 
