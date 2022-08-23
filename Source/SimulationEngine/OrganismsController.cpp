@@ -74,11 +74,12 @@ void OrganismsController::precise_sort_dead_organisms(EngineDataContainer &edc) 
     std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
         return a < b;
     });
+
 }
 
 //TODO i probably messed something up here.
 void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContainer &edc) {
-    if ((edc.stc.organisms.size() - edc.stc.num_dead_organisms) * edc.stc.max_dead_to_alive_organisms_factor < edc.stc.organisms.size()) {
+    if (edc.stc.num_dead_organisms < edc.stc.organisms.size() * edc.stc.max_dead_to_alive_organisms_factor) {
         return;
     }
 

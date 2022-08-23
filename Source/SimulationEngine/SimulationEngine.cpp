@@ -19,8 +19,6 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
-    //TODO
-    gen.set_seed(0);
     //TODO only do if enabled?
     init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 }
@@ -57,6 +55,7 @@ void SimulationEngine::threaded_mainloop() {
             if (ecp.execute_world_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {
                 world_events_controller.tick_events(edc.total_engine_ticks, ecp.pause_world_events);
             }
+            OrganismsController::check_dead_to_alive_organisms_factor(edc);
         }
         if (ecp.calculate_simulation_tick_delta_time) { edc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
         if (!edc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(edc.simulation_interval * 1000000 - edc.delta_time)));}
@@ -100,25 +99,25 @@ void SimulationEngine::simulation_tick() {
     edc.engine_ticks++;
     edc.total_engine_ticks++;
 
-    switch (ecp.simulation_mode) {
-        case SimulationModes::CPU_Single_Threaded:
-            if (edc.stc.organisms.empty()) {
+//    switch (ecp.simulation_mode) {
+//        case SimulationModes::CPU_Single_Threaded:
+            if (edc.stc.num_alive_organisms == 0) {
                 ecp.organisms_extinct = true;
             } else {
                 ecp.organisms_extinct = false;
             }
-            break;
-        case SimulationModes::CPU_Partial_Multi_threaded:
-            ecp.organisms_extinct = true;
-            for (auto & pool: edc.organisms_pools) {
-                if (!pool.empty()) {
-                    ecp.organisms_extinct = false;
-                    break;
-                }
-            }
-            break;
-        default: break;
-    }
+//            break;
+//        case SimulationModes::CPU_Partial_Multi_threaded:
+//            ecp.organisms_extinct = true;
+//            for (auto & pool: edc.organisms_pools) {
+//                if (!pool.empty()) {
+//                    ecp.organisms_extinct = false;
+//                    break;
+//                }
+//            }
+//            break;
+//        default: break;
+//    }
 
     if (ecp.organisms_extinct && (sp.pause_on_total_extinction || sp.reset_on_total_extinction)) {
         ecp.engine_paused = true;
@@ -331,6 +330,20 @@ void SimulationEngine::reset_world() {
     edc.chosen_organism->x = edc.simulation_width / 2;
     edc.chosen_organism->y = edc.simulation_height / 2;
 
+    edc.stc.organisms.clear();
+    edc.stc.child_organisms.clear();
+    edc.stc.dead_organisms_positions.clear();
+    edc.stc.free_child_organisms_positions.clear();
+
+    edc.stc.organisms.shrink_to_fit();
+    edc.stc.child_organisms.shrink_to_fit();
+    edc.stc.dead_organisms_positions.shrink_to_fit();
+    edc.stc.free_child_organisms_positions.shrink_to_fit();
+
+    edc.stc.num_alive_organisms = 0;
+    edc.stc.num_dead_organisms = 0;
+    edc.stc.last_alive_position = 0;
+
     Organism * organism = OrganismsController::get_new_main_organism(edc);
     auto array_place = organism->vector_index;
 
@@ -340,6 +353,7 @@ void SimulationEngine::reset_world() {
         *organism = Organism(edc.base_organism);
     }
     organism->vector_index = array_place;
+    edc.stc.last_alive_position = organism->vector_index;
 
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
@@ -404,28 +418,27 @@ void SimulationEngine::make_random_walls() {
     }
 }
 
-//DO NOT USE IN SimulationEngine
 void SimulationEngine::reinit_organisms() {
     ecp.engine_pause = true;
     while(!ecp.engine_paused) {}
 
-    switch (ecp.simulation_mode) {
-        case SimulationModes::CPU_Single_Threaded:
+//    switch (ecp.simulation_mode) {
+//        case SimulationModes::CPU_Single_Threaded:
             for (auto & organism: edc.stc.organisms) {
                 organism.init_values();
             }
-            break;
-        case SimulationModes::CPU_Partial_Multi_threaded:
-        case SimulationModes::CPU_Multi_Threaded:
-            for (auto & pool: edc.organisms_pools) {
-                for (auto & organism: pool) {
-                    organism->init_values();
-                }
-            }
-            break;
-        case SimulationModes::GPU_CUDA_mode:
-            break;
-    }
+//            break;
+//        case SimulationModes::CPU_Partial_Multi_threaded:
+//        case SimulationModes::CPU_Multi_Threaded:
+//            for (auto & pool: edc.organisms_pools) {
+//                for (auto & organism: pool) {
+//                    organism->init_values();
+//                }
+//            }
+//            break;
+//        case SimulationModes::GPU_CUDA_mode:
+//            break;
+//    }
 
     ecp.engine_pause = false;
 }
