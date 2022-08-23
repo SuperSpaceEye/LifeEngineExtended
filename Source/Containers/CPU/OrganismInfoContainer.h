@@ -54,7 +54,6 @@ private:
     static void parse_organisms_info(OrganismInfoContainer & info, EngineDataContainer * edc, EngineControlParameters * ecp) {
         bool has_pool = true;
         int i = 0;
-        //Why while loop? the easier implementation with for loop randomly crashes sometimes, and I don't know why.
         while (has_pool) {
             std::vector<Organism> * pool;
 
@@ -72,6 +71,8 @@ private:
             }
 
             for (auto & organism: *pool) {
+                if (organism.is_dead) { continue;}
+
                 info.total_size_organism_blocks += organism.anatomy._organism_blocks.size();
                 info.total_size_producing_space += organism.anatomy._producing_space.size();
                 info.total_size_eating_space    += organism.anatomy._eating_space.size();

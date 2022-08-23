@@ -4,7 +4,6 @@
 
 #include "OrganismsController.h"
 
-//TODO this will not work because when resize of vector happens during push_back or emplace_back, all pointers to vector will become invalid.
 Organism *OrganismsController::get_new_child_organism(EngineDataContainer &edc) {
     if (!edc.stc.free_child_organisms_positions.empty()) {
         auto * ptr = &edc.stc.child_organisms[edc.stc.free_child_organisms_positions.back()];
@@ -77,7 +76,6 @@ void OrganismsController::precise_sort_dead_organisms(EngineDataContainer &edc) 
     });
 }
 
-//TODO i probably messed something up here.
 void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContainer &edc) {
     if (edc.stc.num_dead_organisms <= edc.stc.num_alive_organisms * edc.stc.max_dead_to_alive_organisms_factor || edc.stc.num_alive_organisms == 0) {
         return;
@@ -94,8 +92,9 @@ void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContain
     edc.stc.organisms.erase(edc.stc.organisms.begin() + last_alive_organism_place + 1, edc.stc.organisms.end());
     edc.stc.dead_organisms_positions.erase(edc.stc.dead_organisms_positions.end() - dead_organisms, edc.stc.dead_organisms_positions.end());
 
-    edc.stc.organisms.shrink_to_fit();
-    edc.stc.dead_organisms_positions.shrink_to_fit();
+    std::vector<Organism>(edc.stc.organisms).swap(edc.stc.organisms);
+//    edc.stc.organisms.shrink_to_fit();
+//    edc.stc.dead_organisms_positions.shrink_to_fit();
 }
 
 int32_t OrganismsController::get_last_alive_organism_position(EngineDataContainer &edc) {

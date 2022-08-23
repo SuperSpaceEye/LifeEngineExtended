@@ -105,6 +105,8 @@ MainWindow::MainWindow(QWidget *parent) :
     set_window_interval(60);
     set_simulation_interval(60);
 
+    cb_show_extended_statistics_slot(false);
+
     timer->start();
 #if __VALGRIND_MODE__ == 1
     cb_synchronise_simulation_and_window_slot(false);
@@ -473,6 +475,13 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     s.ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.station_avg._eye_blocks, float_precision)));
     s.ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
     s.ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.station_avg.brain_mutation_rate, float_precision)));
+
+    s.ui.lb_child_organisms->setText(QString::fromStdString("Child organisms: " + std::to_string(edc.stc.child_organisms.size())));
+    s.ui.lb_child_organisms_capacity->setText(QString::fromStdString("Child organisms capacity: " + std::to_string(edc.stc.child_organisms.capacity())));
+    s.ui.lb_child_organisms_in_use->setText(QString::fromStdString("Child organisms in use: " + std::to_string(edc.stc.child_organisms.size() - edc.stc.free_child_organisms_positions.size())));
+    s.ui.lb_dead_organisms->setText(QString::fromStdString("Dead organisms: " + std::to_string(edc.stc.dead_organisms_positions.size())));
+    s.ui.lb_organisms_capacity->setText(QString::fromStdString("Organisms capacity: " + std::to_string(edc.stc.organisms.capacity())));
+    s.ui.lb_total_organisms->setText(QString::fromStdString("Total organisms: " + std::to_string(edc.stc.organisms.size())));
 }
 
 // So that changes in code values would be set by default in gui.

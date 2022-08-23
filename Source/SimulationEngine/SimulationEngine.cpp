@@ -330,20 +330,6 @@ void SimulationEngine::reset_world() {
     edc.chosen_organism->x = edc.simulation_width / 2;
     edc.chosen_organism->y = edc.simulation_height / 2;
 
-    edc.stc.organisms.clear();
-    edc.stc.child_organisms.clear();
-    edc.stc.dead_organisms_positions.clear();
-    edc.stc.free_child_organisms_positions.clear();
-
-    edc.stc.organisms.shrink_to_fit();
-    edc.stc.child_organisms.shrink_to_fit();
-    edc.stc.dead_organisms_positions.shrink_to_fit();
-    edc.stc.free_child_organisms_positions.shrink_to_fit();
-
-    edc.stc.num_alive_organisms = 0;
-    edc.stc.num_dead_organisms = 0;
-    edc.stc.last_alive_position = 0;
-
     Organism * organism = OrganismsController::get_new_main_organism(edc);
     auto array_place = organism->vector_index;
 
@@ -388,6 +374,20 @@ void SimulationEngine::clear_organisms() {
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         edc.stc.organisms[i].kill_organism(edc);
     }
+
+    edc.stc.organisms.clear();
+    edc.stc.child_organisms.clear();
+    edc.stc.dead_organisms_positions.clear();
+    edc.stc.free_child_organisms_positions.clear();
+
+    edc.stc.organisms.shrink_to_fit();
+    edc.stc.child_organisms.shrink_to_fit();
+    edc.stc.dead_organisms_positions.shrink_to_fit();
+    edc.stc.free_child_organisms_positions.shrink_to_fit();
+
+    edc.stc.num_alive_organisms = 0;
+    edc.stc.num_dead_organisms  = 0;
+    edc.stc.last_alive_position = 0;
 }
 
 void SimulationEngine::make_walls() {

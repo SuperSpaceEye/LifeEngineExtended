@@ -164,7 +164,7 @@ bool DataSavingFunctions::read_organisms(std::ifstream& is, EngineDataContainer 
     for (int i = 0; i < num_organisms; i++) {
         auto * organism = OrganismsController::get_new_main_organism(edc);
         auto array_place = organism->vector_index;
-        read_organism(is, sp, bp, nullptr);
+        read_organism(is, sp, bp, organism);
         organism->vector_index = array_place;
         SimulationEngineSingleThread::place_organism(&edc, organism);
     }

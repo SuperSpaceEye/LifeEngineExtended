@@ -11,6 +11,8 @@
 
 Brain::Brain(Brain & brain): brain_type(brain.brain_type), simple_action_table(copy_parents_table(brain.simple_action_table)) {}
 
+Brain::Brain(const Brain &brain): brain_type(brain.brain_type), simple_action_table(copy_parents_table(brain.simple_action_table)) {}
+
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
 void Brain::set_simple_action_table(Brain brain) {
@@ -24,7 +26,7 @@ DecisionObservation Brain::get_random_action(lehmer64 &mt) {
 }
 
 
-SimpleActionTable Brain::copy_parents_table(SimpleActionTable &parents_simple_action_table) {
+SimpleActionTable Brain::copy_parents_table(const SimpleActionTable &parents_simple_action_table) {
     auto simple_action_table = SimpleActionTable{};
     simple_action_table.MouthBlock    = parents_simple_action_table.MouthBlock;
     simple_action_table.ProducerBlock = parents_simple_action_table.ProducerBlock;

@@ -96,6 +96,7 @@ public:
     //public:
     Organism()=default;
     Organism(Organism&&)=default;
+    Organism(const Organism& organism);
     Organism(int x, int y, Rotation rotation, Anatomy anatomy,
              Brain brain, SimulationParameters *sp,
              OrganismBlockParameters *block_parameters, int move_range,
