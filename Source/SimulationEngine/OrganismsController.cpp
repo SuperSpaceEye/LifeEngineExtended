@@ -31,6 +31,7 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
     if (organism->vector_index == edc.stc.last_alive_position) {
         edc.stc.last_alive_position--;
     }
+
     edc.stc.num_dead_organisms++;
     edc.stc.num_alive_organisms--;
 }
@@ -39,9 +40,9 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
 int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *child_organism, EngineDataContainer &edc) {
     auto * main_o_ptr = get_new_main_organism(edc);
 
-//    auto main_organism_place = main_o_ptr->vector_index;
+    auto main_organism_place = main_o_ptr->vector_index;
     main_o_ptr->move_organism(*child_organism);
-//    main_o_ptr->vector_index = main_organism_place;
+    main_o_ptr->vector_index = main_organism_place;
 
     if (main_o_ptr->vector_index > edc.stc.last_alive_position) { edc.stc.last_alive_position = main_o_ptr->vector_index; }
 
@@ -72,16 +73,18 @@ Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
 void OrganismsController::precise_sort_dead_organisms(EngineDataContainer &edc) {
     //TODO the result of sorting doesn't need to be perfect, just good enough.
     std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
-        return a < b;
+        return a > b;
     });
-
 }
 
 //TODO i probably messed something up here.
 void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContainer &edc) {
-    if (edc.stc.num_dead_organisms < edc.stc.organisms.size() * edc.stc.max_dead_to_alive_organisms_factor) {
+    if (edc.stc.num_dead_organisms <= edc.stc.num_alive_organisms * edc.stc.max_dead_to_alive_organisms_factor || edc.stc.num_alive_organisms == 0) {
         return;
     }
+    std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
+        return a < b;
+    });
 
     uint32_t last_alive_organism_place = get_last_alive_organism_position(edc);
     uint32_t dead_organisms = edc.stc.organisms.size() - 1 - last_alive_organism_place;
@@ -89,28 +92,17 @@ void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContain
     edc.stc.num_dead_organisms -= dead_organisms;
 
     edc.stc.organisms.erase(edc.stc.organisms.begin() + last_alive_organism_place + 1, edc.stc.organisms.end());
-    edc.stc.dead_organisms_positions.erase(edc.stc.dead_organisms_positions.end() + 1 - dead_organisms, edc.stc.dead_organisms_positions.end());
+    edc.stc.dead_organisms_positions.erase(edc.stc.dead_organisms_positions.end() - dead_organisms, edc.stc.dead_organisms_positions.end());
 
     edc.stc.organisms.shrink_to_fit();
     edc.stc.dead_organisms_positions.shrink_to_fit();
 }
 
-uint32_t OrganismsController::get_last_alive_organism_position(EngineDataContainer &edc) {
-    uint32_t last_alive_organism_place = edc.stc.organisms.size() - 1;
+int32_t OrganismsController::get_last_alive_organism_position(EngineDataContainer &edc) {
+    int32_t last_alive_organism_place = edc.stc.organisms.size() - 1;
     while (edc.stc.organisms[last_alive_organism_place].is_dead) {
         last_alive_organism_place--;
     }
 
     return last_alive_organism_place;
-}
-
-//TODO remake as inline ternary function
-Organism * OrganismsController::get_organism_by_index(int32_t organism_index, EngineDataContainer &edc) {
-    if (organism_index < 0) {return nullptr;}
-    return &edc.stc.organisms[organism_index];
-}
-
-Organism * OrganismsController::get_child_organism_by_index(int32_t child_organism_index, EngineDataContainer &edc) {
-    if (child_organism_index < 0) {return nullptr;}
-    return &edc.stc.child_organisms[child_organism_index];
 }
