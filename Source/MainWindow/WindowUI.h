@@ -278,6 +278,10 @@ public:
     QLabel *label_37;
     QLineEdit *le_scaling_coefficient;
     QPushButton *b_update_textures;
+    QCheckBox *cb_show_extended_statistics;
+    QHBoxLayout *horizontalLayout_55;
+    QLabel *label_38;
+    QLineEdit *le_max_dead_to_alive_organisms_factor;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -724,7 +728,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, -20, 606, 237));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 606, 237));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -1553,7 +1557,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 720));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -503, 606, 774));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1749,6 +1753,27 @@ public:
         b_update_textures->setObjectName(QString::fromUtf8("b_update_textures"));
 
         verticalLayout_19->addWidget(b_update_textures);
+
+        cb_show_extended_statistics = new QCheckBox(widget_2);
+        cb_show_extended_statistics->setObjectName(QString::fromUtf8("cb_show_extended_statistics"));
+
+        verticalLayout_19->addWidget(cb_show_extended_statistics);
+
+        horizontalLayout_55 = new QHBoxLayout();
+        horizontalLayout_55->setObjectName(QString::fromUtf8("horizontalLayout_55"));
+        horizontalLayout_55->setContentsMargins(0, -1, -1, -1);
+        label_38 = new QLabel(widget_2);
+        label_38->setObjectName(QString::fromUtf8("label_38"));
+
+        horizontalLayout_55->addWidget(label_38);
+
+        le_max_dead_to_alive_organisms_factor = new QLineEdit(widget_2);
+        le_max_dead_to_alive_organisms_factor->setObjectName(QString::fromUtf8("le_max_dead_to_alive_organisms_factor"));
+
+        horizontalLayout_55->addWidget(le_max_dead_to_alive_organisms_factor);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_55);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1987,6 +2012,8 @@ public:
         QObject::connect(b_update_textures, SIGNAL(clicked()), MainWindow, SLOT(b_update_textures_slot()));
         QObject::connect(cb_benchmarks_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_benchmarks_always_on_top_slot(bool)));
         QObject::connect(tb_open_benchmarks, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_benchmarks_slot(bool)));
+        QObject::connect(cb_show_extended_statistics, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_show_extended_statistics_slot(bool)));
+        QObject::connect(le_max_dead_to_alive_organisms_factor, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_dead_to_alive_organism_factor_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -2205,6 +2232,8 @@ public:
         label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
         label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         b_update_textures->setText(QApplication::translate("MainWindow", "Update textures", nullptr));
+        cb_show_extended_statistics->setText(QApplication::translate("MainWindow", "Show extended statistics", nullptr));
+        label_38->setText(QApplication::translate("MainWindow", "Max dead to alive organisms factor", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

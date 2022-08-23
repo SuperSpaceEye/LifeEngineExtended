@@ -984,8 +984,8 @@
   <slot>le_brain_mutation_rate_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="edit_group"/>
   <buttongroup name="cells_group"/>
   <buttongroup name="organism_action_group"/>
+  <buttongroup name="edit_group"/>
  </buttongroups>
 </ui>

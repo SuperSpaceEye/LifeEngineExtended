@@ -32,6 +32,12 @@ public:
     QLabel *lb_simulation_size;
     QLabel *lb_organisms_memory_consumption;
     QLabel *lb_total_engine_ticks;
+    QLabel *lb_child_organisms;
+    QLabel *lb_child_organisms_in_use;
+    QLabel *lb_child_organisms_capacity;
+    QLabel *lb_total_organisms;
+    QLabel *lb_dead_organisms;
+    QLabel *lb_organisms_capacity;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_47;
     QVBoxLayout *verticalLayout_38;
@@ -91,7 +97,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 723, 430));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 709, 567));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -125,6 +131,36 @@ public:
         lb_total_engine_ticks->setObjectName(QString::fromUtf8("lb_total_engine_ticks"));
 
         verticalLayout_37->addWidget(lb_total_engine_ticks);
+
+        lb_child_organisms = new QLabel(widget_5);
+        lb_child_organisms->setObjectName(QString::fromUtf8("lb_child_organisms"));
+
+        verticalLayout_37->addWidget(lb_child_organisms);
+
+        lb_child_organisms_in_use = new QLabel(widget_5);
+        lb_child_organisms_in_use->setObjectName(QString::fromUtf8("lb_child_organisms_in_use"));
+
+        verticalLayout_37->addWidget(lb_child_organisms_in_use);
+
+        lb_child_organisms_capacity = new QLabel(widget_5);
+        lb_child_organisms_capacity->setObjectName(QString::fromUtf8("lb_child_organisms_capacity"));
+
+        verticalLayout_37->addWidget(lb_child_organisms_capacity);
+
+        lb_total_organisms = new QLabel(widget_5);
+        lb_total_organisms->setObjectName(QString::fromUtf8("lb_total_organisms"));
+
+        verticalLayout_37->addWidget(lb_total_organisms);
+
+        lb_dead_organisms = new QLabel(widget_5);
+        lb_dead_organisms->setObjectName(QString::fromUtf8("lb_dead_organisms"));
+
+        verticalLayout_37->addWidget(lb_dead_organisms);
+
+        lb_organisms_capacity = new QLabel(widget_5);
+        lb_organisms_capacity->setObjectName(QString::fromUtf8("lb_organisms_capacity"));
+
+        verticalLayout_37->addWidget(lb_organisms_capacity);
 
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -358,6 +394,12 @@ public:
         lb_simulation_size->setText(QApplication::translate("Statistics", "Simulation size:", nullptr));
         lb_organisms_memory_consumption->setText(QApplication::translate("Statistics", "Organism's memory consumption:", nullptr));
         lb_total_engine_ticks->setText(QApplication::translate("Statistics", "Total engine ticks: ", nullptr));
+        lb_child_organisms->setText(QApplication::translate("Statistics", "Child organisms:", nullptr));
+        lb_child_organisms_in_use->setText(QApplication::translate("Statistics", "Child organisms in use:", nullptr));
+        lb_child_organisms_capacity->setText(QApplication::translate("Statistics", "Child organisms capacity:", nullptr));
+        lb_total_organisms->setText(QApplication::translate("Statistics", "Total organisms:", nullptr));
+        lb_dead_organisms->setText(QApplication::translate("Statistics", "Dead organisms:", nullptr));
+        lb_organisms_capacity->setText(QApplication::translate("Statistics", "Organisms capacity:", nullptr));
         lb_moving_organisms->setText(QApplication::translate("Statistics", "Moving organisms:", nullptr));
         lb_organisms_with_eyes->setText(QApplication::translate("Statistics", "Organisms with eyes:", nullptr));
         lb_avg_org_lifetime_2->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));

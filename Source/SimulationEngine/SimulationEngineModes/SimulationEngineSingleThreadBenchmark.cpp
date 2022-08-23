@@ -234,7 +234,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
         auto distance = 2 * i + 2;
         benchmark_organisms[BenchmarkTypes::TryMakeChild].emplace_back(
-                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
+                OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism, distance}
         );
     }
 }
@@ -340,62 +340,62 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
 
 void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *organism, int num_organisms,
                                                                     BenchmarkResult &result, int additional_distance) {
-    auto dimensions = SimulationEngineSingleThread::get_organism_dimensions(organism);
-
-    bool continue_flag = false;
-
-    int x_step = std::abs(dimensions[0]) + dimensions[2] + 2 + additional_distance;
-    int y_step = std::abs(dimensions[1]) + dimensions[3] + 2 + additional_distance;
-
-    int x = 1;
-    int y = 1;
-
-    int i = 0;
-    for (; i < num_organisms; i++) {
-        x += x_step;
-        if (x >= dc.simulation_width)  { y += y_step; x = x_step; }
-        if (y >= dc.simulation_height) { break; }
-
-        organism->x = x;
-        organism->y = y;
-        for (auto & block: organism->anatomy._organism_blocks) {
-            if (SimulationEngineSingleThread::check_if_block_out_of_bounds(&dc, organism, block, organism->rotation)) { continue_flag = true;break;}
-
-            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-            [organism->y + block.get_pos(organism->rotation).y];
-
-            if (w_block->type != BlockTypes::EmptyBlock)
-            { continue_flag = true;break;}
-        }
-        if (continue_flag) {continue_flag = false; i--; continue;}
-
-        auto new_organism = new Organism(organism);
-        dc.organisms.emplace_back(new_organism);
-        SimulationEngineSingleThread::place_organism(&dc, organism);
-    }
-    result.num_organisms = i;
+//    auto dimensions = SimulationEngineSingleThread::get_organism_dimensions(organism);
+//
+//    bool continue_flag = false;
+//
+//    int x_step = std::abs(dimensions[0]) + dimensions[2] + 2 + additional_distance;
+//    int y_step = std::abs(dimensions[1]) + dimensions[3] + 2 + additional_distance;
+//
+//    int x = 1;
+//    int y = 1;
+//
+//    int i = 0;
+//    for (; i < num_organisms; i++) {
+//        x += x_step;
+//        if (x >= dc.simulation_width)  { y += y_step; x = x_step; }
+//        if (y >= dc.simulation_height) { break; }
+//
+//        organism_index->x = x;
+//        organism_index->y = y;
+//        for (auto & block: organism_index->anatomy._organism_blocks) {
+//            if (SimulationEngineSingleThread::check_if_block_out_of_bounds(&dc, organism_index, block, organism_index->rotation)) { continue_flag = true;break;}
+//
+//            auto * w_block = &dc.CPU_simulation_grid[organism_index->x + block.get_pos(organism_index->rotation).x]
+//            [organism_index->y + block.get_pos(organism_index->rotation).y];
+//
+//            if (w_block->type != BlockTypes::EmptyBlock)
+//            { continue_flag = true;break;}
+//        }
+//        if (continue_flag) {continue_flag = false; i--; continue;}
+//
+//        auto new_organism = new Organism(organism_index);
+//        dc.organisms.emplace_back(new_organism);
+//        SimulationEngineSingleThread::place_organism(&dc, organism_index);
+//    }
+//    result.num_organisms = i;
 }
 
 void SimulationEngineSingleThreadBenchmark::reset_state() {
-    for (auto * organism: dc.organisms) {
-        delete organism;
-    }
-
-    dc.organisms.clear();
-    for (auto & row: dc.CPU_simulation_grid) {
-        row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
-    }
-    for (int x = 0; x < dc.simulation_width; x++) {
-        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
-    }
-
-    for (int y = 0; y < dc.simulation_height; y++) {
-        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
-    }
-
-    gen.set_seed(seed);
+//    for (auto * organism_index: dc.organisms) {
+//        delete organism_index;
+//    }
+//
+//    dc.organisms.clear();
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
+//    }
+//    for (int x = 0; x < dc.simulation_width; x++) {
+//        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+//        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
+//    }
+//
+//    for (int y = 0; y < dc.simulation_height; y++) {
+//        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+//        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+//    }
+//
+//    gen.set_seed(seed);
 }
 
 #define NOW std::chrono::high_resolution_clock::now
@@ -410,18 +410,18 @@ void SimulationEngineSingleThreadBenchmark::prepare_produce_food_benchmark() {
     }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-    for (auto * organism: organisms) {
-        start = NOW();
-        SimulationEngineSingleThread::produce_food(&dc, &sp, organism, gen);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//    for (auto * organism_index: organisms) {
+//        start = NOW();
+//        SimulationEngineSingleThread::produce_food(&dc, &sp, organism_index, gen);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_eat_food_benchmark() {
@@ -432,86 +432,86 @@ void SimulationEngineSingleThreadBenchmark::prepare_eat_food_benchmark() {
     }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-    for (auto * organism: organisms) {
-        start = NOW();
-        SimulationEngineSingleThread::eat_food(&dc, &sp, organism);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//    for (auto * organism_index: organisms) {
+//        start = NOW();
+//        SimulationEngineSingleThread::eat_food(&dc, &sp, organism_index);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_apply_damage_benchmark() {
 
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-    for (auto * organism: organisms) {
-        start = NOW();
-        SimulationEngineSingleThread::apply_damage(&dc, &sp, organism);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//    for (auto * organism_index: organisms) {
+//        start = NOW();
+//        SimulationEngineSingleThread::apply_damage(&dc, &sp, organism_index);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_tick_lifetime_benchmark() {
-    for (auto * organism: dc.organisms) {
-        SimulationEngineSingleThread::place_organism(&dc, organism);
-    }
+//    for (auto * organism_index: dc.organisms) {
+//        SimulationEngineSingleThread::place_organism(&dc, organism_index);
+//    }
 }
 void
 SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-
-    std::vector<int> to_erase;
-    to_erase.reserve(organisms.size());
-
-    for (auto * organism: organisms) {
-        start = NOW();
-        SimulationEngineSingleThread::tick_lifetime(&dc, to_erase, organism, 0);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//
+//    std::vector<int> to_erase;
+//    to_erase.reserve(organisms.size());
+//
+//    for (auto * organism_index: organisms) {
+//        start = NOW();
+//        SimulationEngineSingleThread::tick_lifetime(&dc, organism_index);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_erase_organisms_benchmark(Organism *organism) {
-    for (int i = 0; i < num_organisms; i++) {
-        dc.organisms.emplace_back(new Organism(organism));
-    }
+//    for (int i = 0; i < num_organisms; i++) {
+//        dc.organisms.emplace_back(new Organism(organism_index));
+//    }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_erase_organisms(bool randomized_organism_access,
                                                                       BenchmarkResult &res) {
-    std::vector<int> to_erase{};
-    to_erase.reserve(dc.organisms.size());
-    for (int i = 0; i < num_organisms; i++) {
-        to_erase.emplace_back(i);
-    }
-    auto start = NOW();
-    auto end  = NOW();
-
-    for (int i = 0; i < num_organisms; i++) {
-        start = NOW();
-        SimulationEngineSingleThread::erase_organisms(&dc, to_erase, i);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    std::vector<int> to_erase{};
+//    to_erase.reserve(dc.organisms.size());
+//    for (int i = 0; i < num_organisms; i++) {
+//        to_erase.emplace_back(i);
+//    }
+//    auto start = NOW();
+//    auto end  = NOW();
+//
+//    for (int i = 0; i < num_organisms; i++) {
+//        start = NOW();
+////        SimulationEngineSingleThread::erase_organisms(&dc, to_erase, i);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_reserve_organisms_benchmark() {}
@@ -520,114 +520,115 @@ void SimulationEngineSingleThreadBenchmark::benchmark_reserve_organisms() {}
 void SimulationEngineSingleThreadBenchmark::prepare_get_observations_benchmark() {}
 void
 SimulationEngineSingleThreadBenchmark::benchmark_get_observations(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-
-    std::vector<std::vector<Observation>> observations;
-    observations.resize(dc.organisms.size(), std::vector<Observation>{Observation{}});
-
-    start = NOW();
-    SimulationEngineSingleThread::get_observations(&dc, &sp, organisms, observations);
-    end = NOW();
-    auto difference = duration_cast<nanoseconds>(end - start).count();
-    res.total_time_measured += difference;
-    res.num_tried += dc.organisms.size();
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//
+//    std::vector<std::vector<Observation>> observations;
+//    observations.resize(dc.organisms.size(), std::vector<Observation>{Observation{}});
+//
+//    start = NOW();
+////    SimulationEngineSingleThread::get_observations(&dc, &sp, organisms, observations);
+//    end = NOW();
+//    auto difference = duration_cast<nanoseconds>(end - start).count();
+//    res.total_time_measured += difference;
+//    res.num_tried += dc.organisms.size();
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_think_decision_benchmark() {}
 void
 SimulationEngineSingleThreadBenchmark::benchmark_think_decision(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-    std::vector<std::vector<Observation>> observations{dc.organisms.size()};
-    for (auto & observation: observations) {
-        observation = std::vector<Observation>{Observation{
-                static_cast<BlockTypes>(std::uniform_int_distribution<int>(0, 8)(gen)), 5, Rotation::UP
-                    }};
-    }
-
-    for (int i = 0; i < num_organisms; i++) {
-        auto * organism = organisms[i];
-        start = NOW();
-        organism->think_decision(observations[i], &gen);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//    std::vector<std::vector<Observation>> observations{dc.organisms.size()};
+//    for (auto & observation: observations) {
+//        observation = std::vector<Observation>{Observation{
+//                static_cast<BlockTypes>(std::uniform_int_distribution<int>(0, 8)(gen)), 5, Rotation::UP
+//                    }};
+//    }
+//
+//    for (int i = 0; i < num_organisms; i++) {
+//        auto * organism_index = organisms[i];
+//        start = NOW();
+//        organism_index->think_decision(observations[i], &gen);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_rotate_organism_benchmark() {}
 void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(bool randomized_organism_access,
                                                                       BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-
-    for (auto * organism: organisms) {
-        start = NOW();
-        SimulationEngineSingleThread::rotate_organism(&dc, organism, BrainDecision::RotateRight, &sp);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//
+//    for (auto * organism_index: organisms) {
+//        start = NOW();
+//        SimulationEngineSingleThread::rotate_organism(&dc, organism_index, BrainDecision::RotateRight, &sp);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_move_organism_benchmark() {}
 void
 SimulationEngineSingleThreadBenchmark::benchmark_move_organism(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-
-    for (auto * organism: organisms) {
-        auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
-        start = NOW();
-        SimulationEngineSingleThread::move_organism(&dc, organism,
-                                                    decision,
-                                                    &sp);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//
+//    for (auto * organism_index: organisms) {
+//        auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
+//        start = NOW();
+//        SimulationEngineSingleThread::move_organism(&dc, organism_index,
+//                                                    decision,
+//                                                    &sp);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark() {
-    for (auto iter = dc.organisms.begin() + num_organisms - 1; iter != dc.organisms.end(); iter++) {
-        auto organism = (*iter);
-        for (auto & block: organism->anatomy._organism_blocks) {
-            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-            w_block->type = BlockTypes::FoodBlock;
-            w_block->organism = nullptr;
-        }
-    }
-
-    dc.organisms.erase(dc.organisms.begin() + num_organisms, dc.organisms.end());
+//    for (int i = num_organisms; i < dc.organisms.size(); i++) {
+//        auto organism_index = dc.organisms[i];
+//        for (auto & block: organism_index->anatomy._organism_blocks) {
+//            auto * w_block = &dc.CPU_simulation_grid[organism_index->x + block.get_pos(organism_index->rotation).x][organism_index->y + block.get_pos(organism_index->rotation).y];
+//            w_block->type = BlockTypes::FoodBlock;
+//            w_block->organism_index = nullptr;
+//        }
+//    }
+//
+//    dc.organisms.erase(dc.organisms.begin() + num_organisms, dc.organisms.end());
 }
 
 void
 SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(bool randomized_organism_access, BenchmarkResult &res) {
-    auto organisms = std::vector(dc.organisms);
-    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
-    auto start = NOW();
-    auto end  = NOW();
-
-    for (auto * organism: organisms) {
-        organism->food_collected = organism->food_needed+1;
-        start = NOW();
-        SimulationEngineSingleThread::try_make_child(&dc, &sp, organism, &gen);
-        end = NOW();
-        auto difference = duration_cast<nanoseconds>(end - start).count();
-        res.total_time_measured += difference;
-        res.num_tried++;
-    }
+//    auto organisms = std::vector(dc.organisms);
+//    if (randomized_organism_access) { std::shuffle(organisms.begin(), organisms.end(), gen); gen.set_seed(seed);}
+//    auto start = NOW();
+//    auto end  = NOW();
+//
+//    for (int i = 0; i < num_organisms; i++) {
+//        auto organism_index = dc.organisms[i];
+//        organism_index->food_collected = organism_index->food_needed+1;
+//        start = NOW();
+//        SimulationEngineSingleThread::try_make_child(&dc, &sp, organism_index, &gen);
+//        end = NOW();
+//        auto difference = duration_cast<nanoseconds>(end - start).count();
+//        res.total_time_measured += difference;
+//        res.num_tried++;
+//    }
 }

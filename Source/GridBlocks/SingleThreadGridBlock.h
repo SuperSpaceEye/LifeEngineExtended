@@ -13,12 +13,12 @@ struct SingleThreadGridBlock {
     BlockTypes type = BlockTypes::EmptyBlock;
     Rotation rotation = Rotation::UP;
 
-    Organism * organism = nullptr;
+    int32_t organism_index = -1;
     SingleThreadGridBlock()=default;
     SingleThreadGridBlock(const SingleThreadGridBlock & block)=default;
     explicit SingleThreadGridBlock(BlockTypes type, Rotation rotation = Rotation::UP,
-                                   Organism * organism = nullptr):
-    type(type), rotation(rotation), organism(organism) {}
+                                   int32_t organism_index = -1):
+            type(type), rotation(rotation), organism_index(organism_index) {}
     SingleThreadGridBlock& operator=(const SingleThreadGridBlock & block) = default;;
 };
 

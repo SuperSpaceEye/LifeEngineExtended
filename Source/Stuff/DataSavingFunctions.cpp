@@ -54,10 +54,13 @@ void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) 
 }
 
 void DataSavingFunctions::write_organisms(std::ofstream & os, EngineDataContainer &edc) {
-    uint32_t size = edc.organisms.size();
+    uint32_t size = edc.stc.num_alive_organisms;
     os.write((char*)&size, sizeof(uint32_t));
-    for (auto & organism: edc.organisms) {
-        write_organism(os, organism);
+//    for (auto & organism_index: edc.stc.organisms) {
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+        auto & organism = edc.stc.organisms[i];
+        if (organism.is_dead) {continue;}
+        write_organism(os, &organism);
     }
 }
 
@@ -134,35 +137,35 @@ void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataCont
     }
 }
 
-Organism * DataSavingFunctions::read_organism(std::ifstream& is, SimulationParameters &sp, OrganismBlockParameters &bp) {
+void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
+                                        Organism *organism) {
     auto brain = Brain();
     auto anatomy = Anatomy();
 
     read_organism_brain(is, &brain);
     read_organism_anatomy(is, &anatomy);
 
-    auto * organism = new Organism(0,
-                                   0,
-                                   Rotation::UP,
-                                   anatomy,
-                                   brain,
-                                   &sp,
-                                   &bp,
-                                   0,
-                                   0,
-                                   0);
+    *organism = Organism(0,
+                         0,
+                         Rotation::UP,
+                         anatomy,
+                         brain,
+                         &sp,
+                         &bp,
+                         0,
+                         0,
+                         0);
     read_organism_data(is, *static_cast<OrganismData*>(organism));
-
-    return organism;
 }
 
 //TODO save child patterns?
 bool DataSavingFunctions::read_organisms(std::ifstream& is, EngineDataContainer &edc, SimulationParameters &sp, OrganismBlockParameters &bp, uint32_t num_organisms) {
-    edc.organisms.reserve(num_organisms);
+    edc.stc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
-        auto * organism = read_organism(is, sp, bp);
-
-        edc.organisms.emplace_back(organism);
+        auto * organism = OrganismsController::get_new_main_organism(edc);
+        auto array_place = organism->vector_index;
+        read_organism(is, sp, bp, organism);
+        organism->vector_index = array_place;
         SimulationEngineSingleThread::place_organism(&edc, organism);
     }
 
@@ -275,7 +278,10 @@ void DataSavingFunctions::json_write_grid(Document & d, EngineDataContainer &edc
 void DataSavingFunctions::json_write_organisms(Document & d, EngineDataContainer &edc, SimulationParameters &sp) {
     Value j_organisms(kArrayType);
 
-    for (auto & organism: edc.organisms) {
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+        auto * organism = &edc.stc.organisms[i];
+        if (organism->is_dead) { continue;}
+
         Value j_organism(kObjectType);
         write_json_organism(d, organism, j_organism, sp);
         j_organisms.PushBack(j_organism, d.GetAllocator());
@@ -450,7 +456,9 @@ void DataSavingFunctions::json_read_simulation_parameters(rapidjson::Document & 
     sp.extra_mover_reproductive_cost     = d["controls"]["extraMoverFoodCost"].GetFloat();
 }
 
-Organism * DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::UTF8<>> &organism, SimulationParameters &sp, OrganismBlockParameters &bp) {
+void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::UTF8<>> &organism,
+                                             SimulationParameters &sp,
+                                             OrganismBlockParameters &bp, Organism *new_organism) {
     auto brain = Brain();
     auto anatomy = Anatomy();
 
@@ -506,27 +514,27 @@ Organism * DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapid
         table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
     }
 
-    auto * new_organism = new Organism(x,
-                                       y,
-                                       static_cast<Rotation>(rotation),
-                                       anatomy,
-                                       brain,
-                                       &sp,
-                                       &bp,
-                                       move_range,
-                                       mutability);
+    *new_organism = Organism(x,
+                             y,
+                             static_cast<Rotation>(rotation),
+                             anatomy,
+                             brain,
+                             &sp,
+                             &bp,
+                             move_range,
+                             mutability);
     new_organism->lifetime = lifetime;
     new_organism->food_collected = food_collected;
     new_organism->damage = damage;
-
-    return new_organism;
 }
 
 void DataSavingFunctions::json_read_organisms_data(rapidjson::Document & d, SimulationParameters &sp, OrganismBlockParameters &bp, EngineDataContainer &edc) {
     for (auto & organism: d["organisms"].GetArray()) {
-        auto new_organism = json_read_organism(organism, sp, bp);
+        auto new_organism = OrganismsController::get_new_main_organism(edc);
+        auto array_place = new_organism->vector_index;
+        json_read_organism(organism, sp, bp, new_organism);
+        new_organism->vector_index = array_place;
 
-        edc.organisms.emplace_back(new_organism);
         SimulationEngineSingleThread::place_organism(&edc, new_organism);
     }
 }

@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
-    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+    edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
 
@@ -71,8 +71,11 @@ MainWindow::MainWindow(QWidget *parent) :
     edc.base_organism->last_decision = DecisionObservation{};
     edc.chosen_organism->last_decision = DecisionObservation{};
 
-    auto * organism = new Organism(edc.base_organism);
-    edc.organisms.push_back(organism);
+    auto * organism = OrganismsController::get_new_main_organism(edc);
+    auto array_place = organism->vector_index;
+    *organism = Organism(edc.base_organism);
+    organism->vector_index = array_place;
+
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
     resize_image();
@@ -101,6 +104,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     set_window_interval(60);
     set_simulation_interval(60);
+
+    cb_show_extended_statistics_slot(false);
 
     timer->start();
 #if __VALGRIND_MODE__ == 1
@@ -274,7 +279,7 @@ void MainWindow::create_image() {
                                                                   textures,
                                                                   ui.simulation_graphicsView->width(),
                                                                   image_vector,
-                                                                  edc.second_simulation_grid);
+                                                                  edc.simple_state_grid);
     } else {
 #if __CUDA_USED__
         cuda_creator.cuda_create_image(image_width,
@@ -321,8 +326,8 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
         if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= edc.simulation_height) { continue; }
-            edc.second_simulation_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.second_simulation_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
+            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
         }
     }
 }
@@ -366,10 +371,10 @@ void MainWindow::just_resize_simulation_grid() {
     edc.simulation_height = new_simulation_height;
 
     edc.CPU_simulation_grid.clear();
-    edc.second_simulation_grid.clear();
+    edc.simple_state_grid.clear();
 
     edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
-    edc.second_simulation_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
+    edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 }
@@ -470,6 +475,13 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     s.ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.station_avg._eye_blocks, float_precision)));
     s.ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
     s.ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.station_avg.brain_mutation_rate, float_precision)));
+
+    s.ui.lb_child_organisms->setText(QString::fromStdString("Child organisms: " + std::to_string(edc.stc.child_organisms.size())));
+    s.ui.lb_child_organisms_capacity->setText(QString::fromStdString("Child organisms capacity: " + std::to_string(edc.stc.child_organisms.capacity())));
+    s.ui.lb_child_organisms_in_use->setText(QString::fromStdString("Child organisms in use: " + std::to_string(edc.stc.child_organisms.size() - edc.stc.free_child_organisms_positions.size())));
+    s.ui.lb_dead_organisms->setText(QString::fromStdString("Dead organisms: " + std::to_string(edc.stc.dead_organisms_positions.size())));
+    s.ui.lb_organisms_capacity->setText(QString::fromStdString("Organisms capacity: " + std::to_string(edc.stc.organisms.capacity())));
+    s.ui.lb_total_organisms->setText(QString::fromStdString("Total organisms: " + std::to_string(edc.stc.organisms.size())));
 }
 
 // So that changes in code values would be set by default in gui.

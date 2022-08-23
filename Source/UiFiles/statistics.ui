@@ -45,8 +45,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>723</width>
-        <height>430</height>
+        <width>709</width>
+        <height>567</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -104,6 +104,48 @@
            <widget class="QLabel" name="lb_total_engine_ticks">
             <property name="text">
              <string>Total engine ticks: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_child_organisms">
+            <property name="text">
+             <string>Child organisms:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_child_organisms_in_use">
+            <property name="text">
+             <string>Child organisms in use:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_child_organisms_capacity">
+            <property name="text">
+             <string>Child organisms capacity:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_total_organisms">
+            <property name="text">
+             <string>Total organisms:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_dead_organisms">
+            <property name="text">
+             <string>Dead organisms:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_organisms_capacity">
+            <property name="text">
+             <string>Organisms capacity:</string>
             </property>
            </widget>
           </item>

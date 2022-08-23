@@ -35,6 +35,7 @@
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
 #include "../WorldEvents/WorldEventsController.h"
+#include "OrganismsController.h"
 
 //TODO move simulation grid translation to here
 class SimulationEngine {

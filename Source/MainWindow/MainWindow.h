@@ -57,6 +57,7 @@
 #include "../Stuff/ImageCreation.h"
 #include "../Stuff/DataSavingFunctions.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
+#include "../SimulationEngine/OrganismsController.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -323,6 +324,7 @@ private slots:
     void le_font_size_slot();
     void le_float_number_precision_slot();
     void le_scaling_coefficient_slot();
+    void le_max_dead_to_alive_organism_factor_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();
@@ -370,6 +372,7 @@ private slots:
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
     void cb_really_stop_render_slot(bool state);
+    void cb_show_extended_statistics_slot(bool state);
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);

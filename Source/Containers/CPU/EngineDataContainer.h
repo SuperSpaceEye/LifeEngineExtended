@@ -15,9 +15,10 @@
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../GridBlocks/SingleThreadGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
+#include "../../Organism/CPU/Organism.h"
 
 struct eager_worker_partial;
-class Organism;
+//class Organism;
 struct pool_changes_info;
 
 struct EngineDataContainer {
@@ -37,15 +38,26 @@ struct EngineDataContainer {
     bool unlimited_simulation_fps = true;
 
     std::vector<std::vector<SingleThreadGridBlock>> CPU_simulation_grid;
-    std::vector<Organism*> organisms;
 
-    std::vector<int> single_thread_to_erase{};
-    std::vector<int> single_thread_observation_count{};
-    std::vector<std::vector<Observation>> single_thread_organisms_observations{};
+    struct SingleThreadContainer {
+        float max_dead_to_alive_organisms_factor = 5;
+        int32_t num_dead_organisms  = 0;
+        int32_t num_alive_organisms = 0;
+        //TODO process organisms from last_alive_position -> 0 so that organisms that are going to die could reduce the last_alive_position as they die.
+        int32_t last_alive_position = 0;
+        std::vector<Organism> organisms{};
+        //Should be in the reverse order of the position of dead organism in main grid
+        std::vector<uint32_t> dead_organisms_positions{};
+        std::vector<Organism> child_organisms{};
+        std::vector<uint32_t> free_child_organisms_positions{};
+        std::vector<int> observation_count{};
+        std::vector<std::vector<Observation>> organisms_observations{};
+    };
+    SingleThreadContainer stc{};
 
     std::vector<std::vector<Organism*>> organisms_pools;
 
-    std::vector<BaseGridBlock> second_simulation_grid;
+    std::vector<BaseGridBlock> simple_state_grid;
 
 //    std::vector<eager_worker_partial> threads;
     std::vector<std::vector<int>> threaded_to_erase;
@@ -53,6 +65,7 @@ struct EngineDataContainer {
     std::vector<std::vector<pool_changes_info>> sorted_organisms_by_x_position;
     std::vector<std::vector<pool_changes_info*>> pool_changes;
 
+    //TODO
     Organism * base_organism = nullptr;
     Organism * chosen_organism = nullptr;
 

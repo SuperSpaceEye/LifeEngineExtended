@@ -151,8 +151,8 @@ CUDAImageCreator::compile_differences(std::vector<int> &truncated_lin_width, std
             if (y < 0 || y >= dc->simulation_height) { continue;}
             host_differences.emplace_back(Differences{static_cast<uint32_t>(x),
                                                       static_cast<uint32_t>(y),
-                                                      dc->second_simulation_grid[x + y * dc->simulation_width].type,
-                                                      dc->second_simulation_grid[x + y * dc->simulation_width].rotation,
+                                                      dc->simple_state_grid[x + y * dc->simulation_width].type,
+                                                      dc->simple_state_grid[x + y * dc->simulation_width].rotation,
             });
         }
     }

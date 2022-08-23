@@ -118,10 +118,13 @@ void MainWindow::b_save_world_slot() {
     bool flag = ecp.synchronise_simulation_and_window;
     ecp.synchronise_simulation_and_window = false;
     engine.pause();
+    ecp.engine_global_pause = true;
+    engine.wait_for_engine_to_pause_force();
 
     QString selected_filter;
     QFileDialog file_dialog{};
 
+    std::atomic_thread_fence(std::memory_order_release);
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
                                                  "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
 #ifndef __WIN32
@@ -135,6 +138,7 @@ void MainWindow::b_save_world_slot() {
     } else {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
+        engine.unpause();
         return;
     }
     std::string full_path = file_name.toStdString();
@@ -157,6 +161,7 @@ void MainWindow::b_save_world_slot() {
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
+    engine.unpause();
 }
 
 void MainWindow::b_load_world_slot() {
@@ -168,6 +173,7 @@ void MainWindow::b_load_world_slot() {
     ecp.engine_global_pause = true;
     engine.wait_for_engine_to_pause_force();
 
+    std::atomic_thread_fence(std::memory_order_release);
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
                                                   tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
@@ -179,6 +185,7 @@ void MainWindow::b_load_world_slot() {
     } else {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
+        engine.unpause();
         return;
     }
 
@@ -213,8 +220,8 @@ void MainWindow::b_kill_all_organisms_slot() {
     if (!display_dialog_message("All organisms will be killed.", disable_warnings)) {return;}
     engine.pause();
 
-    for (auto & organism: edc.organisms) {
-        organism->lifetime = organism->max_lifetime*2;
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+        edc.stc.organisms[i].lifetime = edc.stc.organisms[i].max_lifetime + 5;
     }
 
     engine.unpause();
@@ -507,6 +514,11 @@ void MainWindow::le_scaling_coefficient_slot() {
                                ui.le_scaling_coefficient, 1, "1");
 }
 
+void MainWindow::le_max_dead_to_alive_organism_factor_slot() {
+    le_slot_lower_bound<float>(edc.stc.max_dead_to_alive_organisms_factor, edc.stc.max_dead_to_alive_organisms_factor, "float",
+                               ui.le_max_dead_to_alive_organisms_factor, 1, "1");
+}
+
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
@@ -586,6 +598,24 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
 #if __CUDA_USED__
     cuda_creator.copy_textures(textures);
 #endif
+}
+
+void MainWindow::cb_show_extended_statistics_slot(bool state) {
+    if (state) {
+        s.ui.lb_child_organisms->show();
+        s.ui.lb_child_organisms_capacity->show();
+        s.ui.lb_child_organisms_in_use->show();
+        s.ui.lb_dead_organisms->show();
+        s.ui.lb_organisms_capacity->show();
+        s.ui.lb_total_organisms->show();
+    } else {
+        s.ui.lb_child_organisms->hide();
+        s.ui.lb_child_organisms_capacity->hide();
+        s.ui.lb_child_organisms_in_use->hide();
+        s.ui.lb_dead_organisms->hide();
+        s.ui.lb_organisms_capacity->hide();
+        s.ui.lb_total_organisms->hide();
+    }
 }
 
 void MainWindow::cb_statistics_always_on_top_slot(bool state) {

@@ -5,10 +5,10 @@
 #include "OrganismEditor.h"
 
 void OrganismEditor::read_organism(std::ifstream &is) {
-    auto * organism = DataSavingFunctions::read_organism(is, *sp, *editor_organism->bp);
+
+    DataSavingFunctions::read_organism(is, *sp, *editor_organism->bp, *chosen_organism);
 
     delete editor_organism;
-    *chosen_organism = organism;
     load_chosen_organism();
 }
 
@@ -36,10 +36,9 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
         return;
     }
 
-    auto * new_organism = DataSavingFunctions::json_read_organism(organism, *sp, *editor_organism->bp);
+    DataSavingFunctions::json_read_organism(organism, *sp, *editor_organism->bp, *chosen_organism);
 
     delete editor_organism;
-    *chosen_organism = new_organism;
     load_chosen_organism();
 }
 
