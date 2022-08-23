@@ -26,17 +26,17 @@ struct EngineDataContainer;
 
 struct OrganismData {
 public:
-    //coordinates of a central block of an organism_index
+    //coordinates of a central block of an organism
     int x = 0;
     int y = 0;
-    //how much damage organism_index can sustain.
+    //how much damage organism can sustain.
     float life_points = 0;
-    //how much damage organism_index sustained. If damage > life_points, organism_index dies
+    //how much damage organism sustained. If damage > life_points, organism dies
     float damage = 0;
 
-    //an amount of simulation ticks organism_index can live
+    //an amount of simulation ticks organism can live
     int max_lifetime = 0;
-    //how much organism_index already lived.
+    //how much organism already lived.
     int lifetime = 0;
 
     float anatomy_mutation_rate = 0.05;

@@ -332,7 +332,7 @@
                       <item>
                        <widget class="QLabel" name="label_8">
                         <property name="text">
-                         <string>Starting organism_index rotation:</string>
+                         <string>Starting organism rotation:</string>
                         </property>
                        </widget>
                       </item>
@@ -385,7 +385,7 @@
                     <item>
                      <widget class="QPushButton" name="b_reset_organism">
                       <property name="text">
-                       <string>Reset organism_index</string>
+                       <string>Reset organism</string>
                       </property>
                      </widget>
                     </item>
@@ -521,7 +521,7 @@
               <item>
                <widget class="QRadioButton" name="rb_chose_organism">
                 <property name="text">
-                 <string>Choose organism_index</string>
+                 <string>Choose organism</string>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">organism_action_group</string>
@@ -984,8 +984,8 @@
   <slot>le_brain_mutation_rate_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="edit_group"/>
   <buttongroup name="cells_group"/>
   <buttongroup name="organism_action_group"/>
+  <buttongroup name="edit_group"/>
  </buttongroups>
 </ui>

@@ -59,12 +59,12 @@ void Benchmarks::update_result_info() {
             case BenchmarkTypes::EatFood:          benchmark_type = "eat food";          break;
             case BenchmarkTypes::ApplyDamage:      benchmark_type = "apply damage";      break;
             case BenchmarkTypes::TickLifetime:     benchmark_type = "tick lifetime";     break;
-            case BenchmarkTypes::EraseOrganisms:   benchmark_type = "erase organism_index";    break;
+            case BenchmarkTypes::EraseOrganisms:   benchmark_type = "erase organism";    break;
             case BenchmarkTypes::ReserveOrganisms: benchmark_type = "reserve organisms"; break;
             case BenchmarkTypes::GetObservations:  benchmark_type = "get observations";  break;
             case BenchmarkTypes::ThinkDecision:    benchmark_type = "think decision";    break;
-            case BenchmarkTypes::RotateOrganism:   benchmark_type = "rotate organism_index";   break;
-            case BenchmarkTypes::MoveOrganism:     benchmark_type = "move organism_index";     break;
+            case BenchmarkTypes::RotateOrganism:   benchmark_type = "rotate organism";   break;
+            case BenchmarkTypes::MoveOrganism:     benchmark_type = "move organism";     break;
             case BenchmarkTypes::TryMakeChild:     benchmark_type = "try make child";    break;
         }
         std::string avg_time;
@@ -77,7 +77,7 @@ void Benchmarks::update_result_info() {
             result_str.append("==============================\n\n\n");
         }
 
-        result_str.append("Benchmark type: ").append(benchmark_type).append(" ||| Num organism_index in benchmark: ")
+        result_str.append("Benchmark type: ").append(benchmark_type).append(" ||| Num organism in benchmark: ")
         .append(std::to_string(result.num_organisms)).append(" ||| Num iterations: ").append(std::to_string(result.num_iterations))
         .append(" ||| Operations measured: ").append(std::to_string(result.num_tried)).append(" ||| Additional data: ")
         .append(result.additional_data).append(" ||| ").append(avg_time).append("\n\n\n");

@@ -211,7 +211,7 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
-    if (move_counter == 0) { //if organism_index can make new move
+    if (move_counter == 0) { //if organism can make new move
         auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
         if (new_decision.decision != BrainDecision::DoNothing
             && new_decision.observation.distance > last_decision.observation.distance) {

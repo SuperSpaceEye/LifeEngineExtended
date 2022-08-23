@@ -226,8 +226,8 @@ public:
         b_benchmark_erase_organisms->setText(QApplication::translate("Benchmark", "Benchmark erase organisms", nullptr));
         b_benchmark_get_observations->setText(QApplication::translate("Benchmark", "Benchmark get observations", nullptr));
         b_benchmark_think_decision->setText(QApplication::translate("Benchmark", "Benchmark think decision", nullptr));
-        b_benchmark_rotate_organism->setText(QApplication::translate("Benchmark", "Benchmark rotate organism_index", nullptr));
-        b_benchmark_move_organism->setText(QApplication::translate("Benchmark", "Benchmark move organism_index", nullptr));
+        b_benchmark_rotate_organism->setText(QApplication::translate("Benchmark", "Benchmark rotate organism", nullptr));
+        b_benchmark_move_organism->setText(QApplication::translate("Benchmark", "Benchmark move organism", nullptr));
         b_benchmark_try_make_child->setText(QApplication::translate("Benchmark", "Benchmark try make child", nullptr));
         b_stop_benchmarks->setText(QApplication::translate("Benchmark", "Stop benchmarks / Finish benchmarking", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(main_tab), QApplication::translate("Benchmark", "Benchmark", nullptr));

@@ -433,9 +433,9 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     s.ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
                                                                          convert_num_bytes(info.total_size)));
     s.ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: " + std::to_string(info.total_avg.total)));
-    s.ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism_index size: " + to_str(info.total_avg.size, float_precision)));
-    s.ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism_index lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
-    s.ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism_index age: " + to_str(info.total_avg._organism_age, float_precision)));
+    s.ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size, float_precision)));
+    s.ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
+    s.ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.total_avg._organism_age, float_precision)));
     s.ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.total_avg._mouth_blocks, float_precision)));
     s.ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.total_avg._producer_blocks, float_precision)));
     s.ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.total_avg._mover_blocks, float_precision)));
@@ -448,10 +448,10 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
 
     s.ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: " + std::to_string(info.moving_avg.total)));
     s.ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: " + std::to_string(info.organisms_with_eyes)));
-    s.ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism_index lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
-    s.ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism_index age: " + to_str(info.moving_avg._organism_age, float_precision)));
+    s.ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
+    s.ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.moving_avg._organism_age, float_precision)));
     s.ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: " + to_str(info.move_range, float_precision)));
-    s.ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism_index size: " + to_str(info.moving_avg.size, float_precision)));
+    s.ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size, float_precision)));
     s.ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.moving_avg._mouth_blocks, float_precision)));
     s.ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.moving_avg._producer_blocks, float_precision)));
     s.ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.moving_avg._mover_blocks, float_precision)));
@@ -463,9 +463,9 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
 
 
     s.ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: " + std::to_string(info.station_avg.total)));
-    s.ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism_index size: " + to_str(info.station_avg.size, float_precision)));
-    s.ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism_index lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
-    s.ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism_index age: " + to_str(info.station_avg._organism_age, float_precision)));
+    s.ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size, float_precision)));
+    s.ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
+    s.ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.station_avg._organism_age, float_precision)));
     s.ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.station_avg._mouth_blocks, float_precision)));
     s.ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.station_avg._producer_blocks, float_precision)));
     s.ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.station_avg._killer_blocks, float_precision)));
@@ -574,7 +574,7 @@ void MainWindow::initialize_gui() {
     ui.cb_use_nvidia_for_image_generation->hide();
 #endif
 
-    //So that when user clicks on rbs in organism_index editors, rbs in main window would be unchecked and vice versa
+    //So that when user clicks on rbs in organism editors, rbs in main window would be unchecked and vice versa
     ui.rb_null_button->hide();
     ee.ui.rb_null_button->hide();
 

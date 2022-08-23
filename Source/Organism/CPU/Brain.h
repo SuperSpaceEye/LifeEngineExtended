@@ -20,7 +20,7 @@
 #include "ObservationStuff.h"
 
 enum class BrainDecision {
-    //Movement and rotation from organism_index viewpoint.
+    //Movement and rotation from organism viewpoint.
     MoveUp,
     MoveLeft,
     MoveDown,

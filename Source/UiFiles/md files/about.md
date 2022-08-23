@@ -7,7 +7,7 @@ This version is work in progress.
 - You should press enter after inputing text in line edits or it will not register.
 - Setting -1 into max fps/sps/organisms line edits will disable the limit.
 - To use keyboard actions you should click on simulation window first.
-- When you use "Choose organism_index" mouse mode it will search for any organism_index in brush area and will stop when it finds one.
+- When you use "Choose organism" mouse mode it will search for any organism in brush area and will stop when it finds one.
 - You can use mouse actions in editor.
 - Keyboard actions do not work in editor.
 
