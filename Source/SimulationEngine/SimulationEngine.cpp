@@ -295,24 +295,23 @@ void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & 
         [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
         [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
     }
-    if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {
-            if (&edc.stc.organisms[i] == organism_ptr) {
-                edc.stc.organisms[i].kill_organism(edc);
-                break;
-            }
-        }
-    } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        for (auto &pool: edc.organisms_pools) {
-            for (int i = 0; i < pool.size(); i++) {
-                if (pool[i] == organism_ptr) {
-                    pool.erase(pool.begin() + i);
-                    break;
-                }
-            }
-        }
+//    if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
+        if (&edc.stc.organisms[i] == organism_ptr) {
+            edc.stc.organisms[i].kill_organism(edc);
+            break;
+}
     }
-    delete organism_ptr;
+//    } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+//        for (auto &pool: edc.organisms_pools) {
+//            for (int i = 0; i < pool.size(); i++) {
+//                if (pool[i] == organism_ptr) {
+//                    pool.erase(pool.begin() + i);
+//                    break;
+//                }
+//            }
+//        }
+//    }
 }
 
 bool SimulationEngine::check_if_out_of_bounds(EngineDataContainer *dc, int x, int y) {

@@ -4,6 +4,7 @@
 
 #include "OrganismsController.h"
 
+//TODO this will not work because when resize of vector happens during push_back or emplace_back, all pointers to vector will become invalid
 Organism *OrganismsController::get_new_child_organism(EngineDataContainer &edc) {
     if (!edc.stc.free_child_organisms_positions.empty()) {
         auto * ptr = &edc.stc.child_organisms[edc.stc.free_child_organisms_positions.back()];
@@ -22,6 +23,9 @@ void OrganismsController::free_child_organism(Organism *child_organism, EngineDa
 }
 
 void OrganismsController::free_main_organism(Organism *organism, EngineDataContainer &edc) {
+    free_child_organism(organism->child_pattern, edc);
+    organism->child_pattern = nullptr;
+
     organism->is_dead = true;
     edc.stc.dead_organisms_positions.emplace_back(organism->array_place);
     if (organism->array_place == edc.stc.last_alive_position) {
@@ -29,20 +33,20 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
     }
     edc.stc.num_dead_organisms++;
     edc.stc.num_alive_organisms--;
-    organism->child_pattern = nullptr;
 }
 
 void OrganismsController::emplace_child_organisms_to_main_vector(Organism *child_organism, EngineDataContainer &edc) {
     auto * main_o_ptr = get_new_main_organism(edc);
 
-    auto main_organism_place = main_o_ptr->array_place;
+//    auto main_organism_place = main_o_ptr->array_place;
     main_o_ptr->move_organism(*child_organism);
-    main_o_ptr->array_place = main_organism_place;
+//    main_o_ptr->array_place = main_organism_place;
 
     if (main_o_ptr->array_place > edc.stc.last_alive_position) { edc.stc.last_alive_position = main_o_ptr->array_place; }
 
     free_child_organism(child_organism, edc);
     main_o_ptr->is_dead = false;
+    main_o_ptr->init_values();
 }
 
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {

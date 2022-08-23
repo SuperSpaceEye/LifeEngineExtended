@@ -139,12 +139,12 @@ void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<
                                                         EngineDataContainer *dc) {
     observations.resize(dc->stc.last_alive_position+1);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {
-        auto & organism = dc->stc.organisms[i];
-        if (organism.is_dead) { continue;}
+        auto * organism = &dc->stc.organisms[i];
+        if (organism->is_dead) { continue;}
 
         //if organism has no eyes, movers or is moving, then do not observe.
-        if (organism.anatomy._eye_blocks > 0 && organism.anatomy._mover_blocks > 0 && organism.move_counter == 0) {
-            observations.emplace_back(organism.anatomy._eye_blocks);
+        if (organism->anatomy._eye_blocks > 0 && organism->anatomy._mover_blocks > 0 && organism->move_counter == 0) {
+            observations.emplace_back(organism->anatomy._eye_blocks);
         } else {
             observations.emplace_back(0);
         }

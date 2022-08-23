@@ -205,6 +205,7 @@ Organism * Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     child_ptr->move_range = child_move_range;
     child_ptr->anatomy_mutation_rate = _anatomy_mutation_rate;
     child_ptr->brain_mutation_rate = _brain_mutation_rate;
+    child_ptr->init_values();
 
     return child_ptr;
 }
@@ -261,6 +262,5 @@ void Organism::move_organism(Organism &organism) {
 
 void Organism::kill_organism(EngineDataContainer &edc) {
     if (is_dead) { return;}
-    OrganismsController::free_child_organism(child_pattern, edc);
     OrganismsController::free_main_organism(this, edc);
 }
