@@ -50,7 +50,7 @@ const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes typ
 
             std::swap(rxs, rys);
 
-            rys = -rys;
+            rxs = -rxs;
             rxs += 0.5;
             rys += 0.5;
             break;
@@ -70,7 +70,7 @@ const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes typ
 
             std::swap(rxs, rys);
 
-            rxs = -rxs;
+            rys = -rys;
             rxs += 0.5;
             rys += 0.5;
             break;

@@ -55,7 +55,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
             rxs = rys;
             rys = temp;
 
-            rys = -rys;
+            rxs = -rxs;
             rxs += 0.5;
             rys += 0.5;
             break;
@@ -77,7 +77,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
             rxs = rys;
             rys = temp;
 
-            rxs = -rxs;
+            rys = -rys;
             rxs += 0.5;
             rys += 0.5;
             break;
