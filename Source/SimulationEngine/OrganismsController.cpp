@@ -4,7 +4,7 @@
 
 #include "OrganismsController.h"
 
-//TODO this will not work because when resize of vector happens during push_back or emplace_back, all pointers to vector will become invalid
+//TODO this will not work because when resize of vector happens during push_back or emplace_back, all pointers to vector will become invalid.
 Organism *OrganismsController::get_new_child_organism(EngineDataContainer &edc) {
     if (!edc.stc.free_child_organisms_positions.empty()) {
         auto * ptr = &edc.stc.child_organisms[edc.stc.free_child_organisms_positions.back()];
@@ -13,40 +13,43 @@ Organism *OrganismsController::get_new_child_organism(EngineDataContainer &edc) 
     }
 
     edc.stc.child_organisms.emplace_back();
-    edc.stc.child_organisms.back().array_place = edc.stc.child_organisms.size()-1;
+    edc.stc.child_organisms.back().vector_index = edc.stc.child_organisms.size() - 1;
     return & edc.stc.child_organisms.back();
 }
 
 void OrganismsController::free_child_organism(Organism *child_organism, EngineDataContainer &edc) {
     if (child_organism == nullptr) { return;}
-    edc.stc.free_child_organisms_positions.emplace_back(child_organism->array_place);
+    edc.stc.free_child_organisms_positions.emplace_back(child_organism->vector_index);
 }
 
 void OrganismsController::free_main_organism(Organism *organism, EngineDataContainer &edc) {
-    free_child_organism(organism->child_pattern, edc);
-    organism->child_pattern = nullptr;
+    free_child_organism(get_child_organism_by_index(organism->child_pattern_index, edc), edc);
+    organism->child_pattern_index = -1;
 
     organism->is_dead = true;
-    edc.stc.dead_organisms_positions.emplace_back(organism->array_place);
-    if (organism->array_place == edc.stc.last_alive_position) {
+    edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
+    if (organism->vector_index == edc.stc.last_alive_position) {
         edc.stc.last_alive_position--;
     }
     edc.stc.num_dead_organisms++;
     edc.stc.num_alive_organisms--;
 }
 
-void OrganismsController::emplace_child_organisms_to_main_vector(Organism *child_organism, EngineDataContainer &edc) {
+//returns index of placed organism
+int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *child_organism, EngineDataContainer &edc) {
     auto * main_o_ptr = get_new_main_organism(edc);
 
-//    auto main_organism_place = main_o_ptr->array_place;
+//    auto main_organism_place = main_o_ptr->vector_index;
     main_o_ptr->move_organism(*child_organism);
-//    main_o_ptr->array_place = main_organism_place;
+//    main_o_ptr->vector_index = main_organism_place;
 
-    if (main_o_ptr->array_place > edc.stc.last_alive_position) { edc.stc.last_alive_position = main_o_ptr->array_place; }
+    if (main_o_ptr->vector_index > edc.stc.last_alive_position) { edc.stc.last_alive_position = main_o_ptr->vector_index; }
 
     free_child_organism(child_organism, edc);
     main_o_ptr->is_dead = false;
     main_o_ptr->init_values();
+
+    return main_o_ptr->vector_index;
 }
 
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
@@ -61,7 +64,7 @@ Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
 
     // If there are no free organisms, create default one and return it.
     edc.stc.organisms.emplace_back();
-    edc.stc.organisms.back().array_place = edc.stc.organisms.size()-1;
+    edc.stc.organisms.back().vector_index = edc.stc.organisms.size() - 1;
     edc.stc.last_alive_position = edc.stc.organisms.size()-1;
     return & edc.stc.organisms.back();
 }
@@ -98,4 +101,15 @@ uint32_t OrganismsController::get_last_alive_organism_position(EngineDataContain
     }
 
     return last_alive_organism_place;
+}
+
+//TODO remake as inline ternary function
+Organism * OrganismsController::get_organism_by_index(int32_t organism_index, EngineDataContainer &edc) {
+    if (organism_index < 0) {return nullptr;}
+    return &edc.stc.organisms[organism_index];
+}
+
+Organism * OrganismsController::get_child_organism_by_index(int32_t child_organism_index, EngineDataContainer &edc) {
+    if (child_organism_index < 0) {return nullptr;}
+    return &edc.stc.child_organisms[child_organism_index];
 }

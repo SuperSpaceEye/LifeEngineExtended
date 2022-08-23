@@ -332,7 +332,7 @@
                       <item>
                        <widget class="QLabel" name="label_8">
                         <property name="text">
-                         <string>Starting organism rotation:</string>
+                         <string>Starting organism_index rotation:</string>
                         </property>
                        </widget>
                       </item>
@@ -385,7 +385,7 @@
                     <item>
                      <widget class="QPushButton" name="b_reset_organism">
                       <property name="text">
-                       <string>Reset organism</string>
+                       <string>Reset organism_index</string>
                       </property>
                      </widget>
                     </item>
@@ -521,7 +521,7 @@
               <item>
                <widget class="QRadioButton" name="rb_chose_organism">
                 <property name="text">
-                 <string>Choose organism</string>
+                 <string>Choose organism_index</string>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">organism_action_group</string>

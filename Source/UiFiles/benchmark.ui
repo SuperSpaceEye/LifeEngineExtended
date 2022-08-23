@@ -185,14 +185,14 @@
                <item>
                 <widget class="QPushButton" name="b_benchmark_rotate_organism">
                  <property name="text">
-                  <string>Benchmark rotate organism</string>
+                  <string>Benchmark rotate organism_index</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="b_benchmark_move_organism">
                  <property name="text">
-                  <string>Benchmark move organism</string>
+                  <string>Benchmark move organism_index</string>
                  </property>
                 </widget>
                </item>

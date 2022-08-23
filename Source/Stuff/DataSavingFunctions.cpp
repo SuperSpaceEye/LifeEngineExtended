@@ -56,7 +56,7 @@ void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) 
 void DataSavingFunctions::write_organisms(std::ofstream & os, EngineDataContainer &edc) {
     uint32_t size = edc.stc.num_alive_organisms;
     os.write((char*)&size, sizeof(uint32_t));
-//    for (auto & organism: edc.stc.organisms) {
+//    for (auto & organism_index: edc.stc.organisms) {
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         auto & organism = edc.stc.organisms[i];
         if (organism.is_dead) {continue;}
@@ -163,9 +163,9 @@ bool DataSavingFunctions::read_organisms(std::ifstream& is, EngineDataContainer 
     edc.stc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
         auto * organism = OrganismsController::get_new_main_organism(edc);
-        auto array_place = organism->array_place;
+        auto array_place = organism->vector_index;
         read_organism(is, sp, bp, nullptr);
-        organism->array_place = array_place;
+        organism->vector_index = array_place;
         SimulationEngineSingleThread::place_organism(&edc, organism);
     }
 
@@ -531,9 +531,9 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
 void DataSavingFunctions::json_read_organisms_data(rapidjson::Document & d, SimulationParameters &sp, OrganismBlockParameters &bp, EngineDataContainer &edc) {
     for (auto & organism: d["organisms"].GetArray()) {
         auto new_organism = OrganismsController::get_new_main_organism(edc);
-        auto array_place = new_organism->array_place;
+        auto array_place = new_organism->vector_index;
         json_read_organism(organism, sp, bp, new_organism);
-        new_organism->array_place = array_place;
+        new_organism->vector_index = array_place;
 
         SimulationEngineSingleThread::place_organism(&edc, new_organism);
     }

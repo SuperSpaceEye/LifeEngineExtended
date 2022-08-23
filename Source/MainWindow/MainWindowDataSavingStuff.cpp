@@ -288,39 +288,39 @@ void MainWindow::json_read_grid_data(rapidjson::Document & d) {
 //void MainWindow::json_write_organisms(rapidjson::Document & d) {
 //    Value j_organisms(kArrayType);
 //
-//    for (auto & organism: edc.organisms) {
+//    for (auto & organism_index: edc.organisms) {
 //        Value j_organism(kObjectType);
-//        write_json_organism(d, organism, j_organism);
+//        write_json_organism(d, organism_index, j_organism);
 //        j_organisms.PushBack(j_organism, d.GetAllocator());
 //    }
 //    d.AddMember("organisms", j_organisms, d.GetAllocator());
 //}
 //
-//void MainWindow::write_json_organism(Document &d, Organism *&organism, Value &j_organism) const {
+//void MainWindow::write_json_organism(Document &d, Organism *&organism_index, Value &j_organism) const {
 //    Value j_anatomy(kObjectType);
 //    Value j_brain(kObjectType);
 //    Value cells(kArrayType);
 //
-//    j_organism.AddMember("c",                Value(organism->x-1), d.GetAllocator());
-//    j_organism.AddMember("r",                Value(organism->y-1), d.GetAllocator());
-//    j_organism.AddMember("lifetime",         Value(organism->lifetime), d.GetAllocator());
-//    j_organism.AddMember("food_collected",   Value(organism->food_collected), d.GetAllocator());
+//    j_organism.AddMember("c",                Value(organism_index->x-1), d.GetAllocator());
+//    j_organism.AddMember("r",                Value(organism_index->y-1), d.GetAllocator());
+//    j_organism.AddMember("lifetime",         Value(organism_index->lifetime), d.GetAllocator());
+//    j_organism.AddMember("food_collected",   Value(organism_index->food_collected), d.GetAllocator());
 //    j_organism.AddMember("living",           Value(true), d.GetAllocator());
 //    j_organism.AddMember("direction",        Value(2), d.GetAllocator());
-//    j_organism.AddMember("rotation",         Value(static_cast<int>(organism->rotation)), d.GetAllocator());
+//    j_organism.AddMember("rotation",         Value(static_cast<int>(organism_index->rotation)), d.GetAllocator());
 //    j_organism.AddMember("can_rotate",       Value(sp.runtime_rotation_enabled), d.GetAllocator());
 //    j_organism.AddMember("move_count",       Value(0), d.GetAllocator());
-//    j_organism.AddMember("move_range",       Value(organism->move_range), d.GetAllocator());
+//    j_organism.AddMember("move_range",       Value(organism_index->move_range), d.GetAllocator());
 //    j_organism.AddMember("ignore_brain_for", Value(0), d.GetAllocator());
-//    j_organism.AddMember("mutability",       Value(organism->anatomy_mutation_rate*100), d.GetAllocator());
-//    j_organism.AddMember("damage",           Value(organism->damage), d.GetAllocator());
+//    j_organism.AddMember("mutability",       Value(organism_index->anatomy_mutation_rate*100), d.GetAllocator());
+//    j_organism.AddMember("damage",           Value(organism_index->damage), d.GetAllocator());
 //
 //    j_anatomy.AddMember("birth_distance", Value(6), d.GetAllocator());
-//    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
-//    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
-//    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism_index->anatomy._producer_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism_index->anatomy._mover_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism_index->anatomy._eye_blocks)), d.GetAllocator());
 //
-//    for (auto & block: organism->anatomy._organism_blocks) {
+//    for (auto & block: organism_index->anatomy._organism_blocks) {
 //        Value cell(kObjectType);
 //        std::string state_name;
 //
@@ -352,7 +352,7 @@ void MainWindow::json_read_grid_data(rapidjson::Document & d) {
 //
 //    j_organism.AddMember("anatomy", j_anatomy, d.GetAllocator());
 //
-//    auto & table = organism->brain.simple_action_table;
+//    auto & table = organism_index->brain.simple_action_table;
 //
 //    Value decisions(kObjectType);
 //

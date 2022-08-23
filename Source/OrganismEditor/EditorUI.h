@@ -525,19 +525,19 @@ public:
         label_2->setText(QApplication::translate("Editor", "Move range:", nullptr));
         label_3->setText(QApplication::translate("Editor", "Anatomy mutation rate:", nullptr));
         label_6->setText(QApplication::translate("Editor", "Brain mutation rate:", nullptr));
-        label_8->setText(QApplication::translate("Editor", "Starting organism rotation:", nullptr));
+        label_8->setText(QApplication::translate("Editor", "Starting organism_index rotation:", nullptr));
         cmb_organism_rotation->setItemText(0, QApplication::translate("Editor", "Up", nullptr));
         cmb_organism_rotation->setItemText(1, QApplication::translate("Editor", "Left", nullptr));
         cmb_organism_rotation->setItemText(2, QApplication::translate("Editor", "Down", nullptr));
         cmb_organism_rotation->setItemText(3, QApplication::translate("Editor", "Right", nullptr));
 
         b_reset_editing_view->setText(QApplication::translate("Editor", "Reset View", nullptr));
-        b_reset_organism->setText(QApplication::translate("Editor", "Reset organism", nullptr));
+        b_reset_organism->setText(QApplication::translate("Editor", "Reset organism_index", nullptr));
         label_4->setText(QApplication::translate("Editor", "Grid width:", nullptr));
         label_5->setText(QApplication::translate("Editor", "Grid height:", nullptr));
         b_resize_editing_grid->setText(QApplication::translate("Editor", "Resize editing grid", nullptr));
         rb_place_organism->setText(QApplication::translate("Editor", "Place Organism", nullptr));
-        rb_chose_organism->setText(QApplication::translate("Editor", "Choose organism", nullptr));
+        rb_chose_organism->setText(QApplication::translate("Editor", "Choose organism_index", nullptr));
         rb_null_button->setText(QString());
         b_save_organism->setText(QApplication::translate("Editor", "Save Organism", nullptr));
         b_load_organism->setText(QApplication::translate("Editor", "Load Organism", nullptr));

@@ -26,17 +26,17 @@ struct EngineDataContainer;
 
 struct OrganismData {
 public:
-    //coordinates of a central block of an organism
+    //coordinates of a central block of an organism_index
     int x = 0;
     int y = 0;
-    //how much damage organism can sustain.
+    //how much damage organism_index can sustain.
     float life_points = 0;
-    //how much damage organism sustained. If damage > life_points, organism dies
+    //how much damage organism_index sustained. If damage > life_points, organism_index dies
     float damage = 0;
 
-    //an amount of simulation ticks organism can live
+    //an amount of simulation ticks organism_index can live
     int max_lifetime = 0;
-    //how much organism already lived.
+    //how much organism_index already lived.
     int lifetime = 0;
 
     float anatomy_mutation_rate = 0.05;
@@ -57,7 +57,7 @@ public:
     int max_do_nothing_lifetime = 3;
 
     bool is_dead = false;
-    int array_place = 0;
+    int vector_index = 0;
 
     DecisionObservation last_decision = DecisionObservation{};
 
@@ -73,7 +73,7 @@ public:
     Brain brain;
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
-    Organism * child_pattern = nullptr;
+    int32_t child_pattern_index = -1;
 
     float calculate_max_life();
     int calculate_organism_lifetime();
@@ -92,7 +92,7 @@ public:
     void move_organism(Organism & organism);
 
     Organism & operator=(const Organism & organism)=default;
-//    Organism & operator=(Organism & organism);
+//    Organism & operator=(Organism & organism_index);
     //public:
     Organism()=default;
     Organism(Organism&&)=default;
@@ -102,7 +102,7 @@ public:
              float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
     Organism(Organism *organism);
 //    ~Organism()=default;
-    Organism *create_child(lehmer64 *gen, EngineDataContainer &edc);
+    int32_t create_child(lehmer64 *gen, EngineDataContainer &edc);
 };
 
 

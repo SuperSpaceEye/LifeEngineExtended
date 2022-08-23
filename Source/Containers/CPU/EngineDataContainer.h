@@ -46,7 +46,7 @@ struct EngineDataContainer {
         //TODO process organisms from last_alive_position -> 0 so that organisms that are going to die could reduce the last_alive_position as they die.
         int32_t last_alive_position = 0;
         std::vector<Organism> organisms{};
-        //Should be in the reverse order of the position of dead organism in main grid
+        //Should be in the reverse order of the position of dead organism_index in main grid
         std::vector<uint32_t> dead_organisms_positions{};
         std::vector<Organism> child_organisms{};
         std::vector<uint32_t> free_child_organisms_positions{};

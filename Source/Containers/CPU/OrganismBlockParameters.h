@@ -10,8 +10,8 @@
 #define THELIFEENGINECPP_ORGANISMBLOCKPARAMETERS_H
 
 struct BParameters {
-    // food_cost_modifier - how much food does organism have to spend on one block when creating a child
-    // life_point_amount - how much organism gains life points from this block
+    // food_cost_modifier - how much food does organism_index have to spend on one block when creating a child
+    // life_point_amount - how much organism_index gains life points from this block
     float food_cost_modifier = 1; float life_point_amount = 1; float lifetime_weight = 1; float chance_weight = 1;
 };
 

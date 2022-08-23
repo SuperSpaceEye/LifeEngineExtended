@@ -182,7 +182,7 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
     }
 }
 
-Organism * Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
+int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     Anatomy new_anatomy;
     Brain new_brain;
 
@@ -207,11 +207,11 @@ Organism * Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     child_ptr->brain_mutation_rate = _brain_mutation_rate;
     child_ptr->init_values();
 
-    return child_ptr;
+    return child_ptr->vector_index;
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
-    if (move_counter == 0) { //if organism can make new move
+    if (move_counter == 0) { //if organism_index can make new move
         auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
         if (new_decision.decision != BrainDecision::DoNothing
             && new_decision.observation.distance > last_decision.observation.distance) {

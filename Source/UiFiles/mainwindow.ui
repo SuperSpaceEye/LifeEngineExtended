@@ -585,7 +585,7 @@
                         <item>
                          <widget class="QCheckBox" name="cb_reset_with_editor_organism">
                           <property name="text">
-                           <string>Reset with editor organism</string>
+                           <string>Reset with editor organism_index</string>
                           </property>
                          </widget>
                         </item>

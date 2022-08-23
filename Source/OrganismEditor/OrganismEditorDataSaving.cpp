@@ -32,7 +32,7 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
     organism.Parse(json.c_str());
 
     if (!organism.HasMember("r")) {
-        display_message("Failed to load organism");
+        display_message("Failed to load organism_index");
         return;
     }
 

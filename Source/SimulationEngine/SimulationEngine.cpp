@@ -204,9 +204,9 @@ void SimulationEngine::process_user_action_pool() {
 
                 auto * new_organism = OrganismsController::get_new_main_organism(edc);
 
-                auto array_place = new_organism->array_place;
+                auto array_place = new_organism->vector_index;
                 *new_organism = Organism(edc.chosen_organism);
-                new_organism->array_place = array_place;
+                new_organism->vector_index = array_place;
 
                 new_organism->x = action.x;
                 new_organism->y = action.y;
@@ -216,7 +216,7 @@ void SimulationEngine::process_user_action_pool() {
                     int y = block.get_pos(edc.chosen_organism->rotation).y + new_organism->y;
 
                     edc.CPU_simulation_grid[x][y].type     = block.type;
-                    edc.CPU_simulation_grid[x][y].organism = new_organism;
+                    edc.CPU_simulation_grid[x][y].organism_index = new_organism->vector_index;
                     edc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, edc.chosen_organism->rotation);
                 }
             }
@@ -229,7 +229,7 @@ void SimulationEngine::process_user_action_pool() {
                 if (edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
                     edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock  ||
                     edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
-                edc.selected_organism = edc.CPU_simulation_grid[action.x][action.y].organism;
+                edc.selected_organism = OrganismsController::get_organism_by_index(edc.CPU_simulation_grid[action.x][action.y].organism_index, edc);
                 goto endfor;
                 }
         }
@@ -285,7 +285,7 @@ void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & 
     if (edc.CPU_simulation_grid[x][y].type == BlockTypes::EmptyBlock ||
         edc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock ||
         edc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) { return; }
-    Organism * organism_ptr = (edc.CPU_simulation_grid[x][y].organism);
+    Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.CPU_simulation_grid[x][y].organism_index, edc);
     bool continue_flag = false;
     for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
     if (continue_flag) { return;}
@@ -332,14 +332,14 @@ void SimulationEngine::reset_world() {
     edc.chosen_organism->y = edc.simulation_height / 2;
 
     Organism * organism = OrganismsController::get_new_main_organism(edc);
-    auto array_place = organism->array_place;
+    auto array_place = organism->vector_index;
 
     if (ecp.reset_with_editor_organism) {
         *organism = Organism(edc.chosen_organism);
     } else {
         *organism = Organism(edc.base_organism);
     }
-    organism->array_place = array_place;
+    organism->vector_index = array_place;
 
     SimulationEngineSingleThread::place_organism(&edc, organism);
 

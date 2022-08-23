@@ -25,7 +25,7 @@ void OrganismEditor::b_resize_editing_grid_slot() {
 
 void OrganismEditor::b_load_organism_slot() {
     QString selected_filter;
-    auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism"), "",
+    auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism_index"), "",
                                                   tr("Custom save type (*.lfeo);;JSON (*.json)"), &selected_filter);
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
@@ -48,7 +48,7 @@ void OrganismEditor::b_load_organism_slot() {
             read_json_organism(full_path);
         }
     } catch (std::string & _) {
-        display_message("Loading of organism was unsuccessful.");
+        display_message("Loading of organism_index was unsuccessful.");
     }
     finalize_chosen_organism();
 }
@@ -57,7 +57,7 @@ void OrganismEditor::b_save_organism_slot() {
     QString selected_filter;
     QFileDialog file_dialog{};
 
-    auto file_name = file_dialog.getSaveFileName(this, tr("Save organism"), "",
+    auto file_name = file_dialog.getSaveFileName(this, tr("Save organism_index"), "",
                                                  "Custom save type (*.lfeo);;JSON (*.json)", &selected_filter);
 #ifndef __WIN32
     bool file_exists = std::filesystem::exists(file_name.toStdString());
