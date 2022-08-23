@@ -256,8 +256,6 @@ void Organism::move_organism(Organism &organism) {
     anatomy = organism.anatomy;
     sp = organism.sp;
     bp = organism.bp;
-
-    organism = Organism();
 }
 
 void Organism::kill_organism(EngineDataContainer &edc) {

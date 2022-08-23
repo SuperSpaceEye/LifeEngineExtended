@@ -135,16 +135,16 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
                                                         std::vector<Organism> &organisms,
                                                         EngineDataContainer *dc) {
-    observations.resize(dc->stc.last_alive_position+1);
+    observations.reserve(dc->stc.last_alive_position+1);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {
         auto & organism = dc->stc.organisms[i];
-        if (organism.is_dead) { continue;}
+        if (organism.is_dead) { observations.emplace_back(); continue;}
 
         //if organism has no eyes, movers or is moving, then do not observe.
         if (organism.anatomy._eye_blocks > 0 && organism.anatomy._mover_blocks > 0 && organism.move_counter == 0) {
-            observations.emplace_back(organism.anatomy._eye_blocks);
+            observations.emplace_back(std::vector<Observation>(organism.anatomy._eye_blocks));
         } else {
-            observations.emplace_back(0);
+            observations.emplace_back();
         }
     }
 }
@@ -155,6 +155,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
     if (organism->anatomy._eye_blocks <= 0 || organism->anatomy._mover_blocks <= 0) {return;}
     if (organism->move_counter != 0) {return;}
     auto eye_i = -1;
+    //TODO inefficient
     for (auto & block: organism->anatomy._organism_blocks) {
         if (block.type != BlockTypes::EyeBlock) {continue;}
         eye_i++;
@@ -366,7 +367,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
         distance = std::uniform_int_distribution<int>(sp->min_reproducing_distance, sp->max_reproducing_distance)(*gen);
     }
 
-    auto child_pattern = OrganismsController::get_child_organism_by_index(organism->child_pattern_index, *dc);
+    auto * child_pattern = OrganismsController::get_child_organism_by_index(organism->child_pattern_index, *dc);
 
     child_pattern->rotation = rotation;
 
@@ -385,7 +386,8 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
                                organism->y + block.get_pos(rotation).y,
                                to_place,
                                c_distance,
-                               organism->vector_index, dc, sp)) {return;}
+                               organism->vector_index, dc, sp)) {
+                return;}
         }
     }
 
@@ -428,7 +430,7 @@ void SimulationEngineSingleThread::new_child_pos_calculator(Organism *organism, 
     auto c_max_y = 0;
     auto c_max_x = 0;
 
-    auto * child_pattern = OrganismsController::get_organism_by_index(organism->child_pattern_index, edc);
+    auto * child_pattern = OrganismsController::get_child_organism_by_index(organism->child_pattern_index, edc);
 
     //To get the position of a child on an axis you need to know the largest/smallest position of organism blocks on an axis
     // and smallest/largest position of a child organism block + -1/+1 to compensate for organism center and + -/+ distance.
@@ -506,7 +508,7 @@ void SimulationEngineSingleThread::old_child_pos_calculator(Organism *organism, 
     auto max_y = INT32_MIN;
     auto max_x = INT32_MIN;
 
-    auto * child_pattern = OrganismsController::get_organism_by_index(organism->child_pattern_index, edc);
+    auto * child_pattern = OrganismsController::get_child_organism_by_index(organism->child_pattern_index, edc);
 
     switch (to_place) {
         case Rotation::UP:
@@ -576,7 +578,9 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
                 x += 1;
                 break;
         }
-        if (check_if_out_of_bounds(dc, x, y)) {return false;};
+        if (check_if_out_of_bounds(dc, x, y)) {
+            return false;
+        };
 
         auto * block = &dc->CPU_simulation_grid[x][y];
         switch (block->type) {
