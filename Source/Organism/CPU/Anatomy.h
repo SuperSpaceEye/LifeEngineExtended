@@ -36,9 +36,9 @@ public:
     inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
-            case Rotation::LEFT:  return Vector2<int>{-relative_y, relative_x};
+            case Rotation::LEFT:  return Vector2<int>{relative_y, -relative_x};
             case Rotation::DOWN:  return Vector2<int>{-relative_x, -relative_y};
-            case Rotation::RIGHT: return Vector2<int>{relative_y, -relative_x};
+            case Rotation::RIGHT: return Vector2<int>{-relative_y, relative_x};
             default: return Vector2<int>{relative_x, relative_y};
         }
     }

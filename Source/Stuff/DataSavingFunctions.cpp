@@ -300,7 +300,11 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     j_organism.AddMember("food_collected",   Value(organism->food_collected), d.GetAllocator());
     j_organism.AddMember("living",           Value(true), d.GetAllocator());
     j_organism.AddMember("direction",        Value(2), d.GetAllocator());
-    j_organism.AddMember("rotation",         Value(static_cast<int>(organism->rotation)), d.GetAllocator());
+    //TODO ????
+    auto rotation = static_cast<int>(organism->rotation);
+    if (rotation == 1) {rotation = 3;}
+    else if (rotation == 3) {rotation = 1;}
+    j_organism.AddMember("rotation",         Value(rotation), d.GetAllocator());
     j_organism.AddMember("can_rotate",       Value(sp.runtime_rotation_enabled), d.GetAllocator());
     j_organism.AddMember("move_count",       Value(0), d.GetAllocator());
     j_organism.AddMember("move_range",       Value(organism->move_range), d.GetAllocator());
@@ -332,8 +336,6 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
 
         if (block.type == BlockTypes::EyeBlock) {
             auto rotation = block.rotation;
-            if (rotation == Rotation::RIGHT)     {rotation = Rotation::LEFT;}
-            else if (rotation == Rotation::LEFT) {rotation = Rotation::RIGHT;}
             cell.AddMember("direction", Value(static_cast<int>(rotation)), d.GetAllocator());
         }
 
@@ -497,9 +499,6 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
         } else if (state == "eye") {
             type = BlockTypes::EyeBlock;
             _rotation = static_cast<Rotation>(cell["direction"].GetInt());
-            // TODO I don't know why the rotations are swapped.
-            if (_rotation == Rotation::RIGHT) {_rotation = Rotation::LEFT;}
-            else if (_rotation == Rotation::LEFT)  {_rotation = Rotation::RIGHT;}
         } else if (state == "armor") {
             type = BlockTypes::ArmorBlock;
         }
@@ -519,6 +518,10 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
         table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
         table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
     }
+
+    //TODO ????
+    if (rotation == 1) {rotation = 3;}
+    else if (rotation == 3) {rotation = 1;}
 
     *new_organism = Organism(x,
                              y,

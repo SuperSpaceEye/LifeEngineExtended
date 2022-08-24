@@ -217,8 +217,6 @@ void SimulationEngine::process_user_action_pool() {
                     edc.CPU_simulation_grid[x][y].type     = block.type;
                     edc.CPU_simulation_grid[x][y].organism_index = new_organism->vector_index;
                     edc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, edc.chosen_organism->rotation);
-//
-//                    SimulationEngineSingleThread::place_block_on_grid(&edc, new_organism, block);
                 }
             }
                 break;
