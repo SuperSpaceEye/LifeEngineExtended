@@ -182,5 +182,15 @@ void OrganismEditor::cmd_organism_rotation_slot(const QString& name) {
     if (name.toStdString() == "Left")  {editor_organism->rotation = Rotation::RIGHT;}
     if (name.toStdString() == "Down")  {editor_organism->rotation = Rotation::DOWN;}
     if (name.toStdString() == "Right") {editor_organism->rotation = Rotation::LEFT;}
+
+//    if (editor_organism->rotation == Rotation::RIGHT || )
+//    for (auto & block: editor_organism->anatomy._organism_blocks) {
+//        block.rotation = (Rotation)(((int)block.rotation + 2)%4);
+//    }
+
     finalize_chosen_organism();
+
+//    for (auto & block: editor_organism->anatomy._organism_blocks) {
+//        block.rotation = (Rotation)(((int)block.rotation + 2)%4);
+//    }
 }

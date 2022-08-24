@@ -331,7 +331,10 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
         }
 
         if (block.type == BlockTypes::EyeBlock) {
-            cell.AddMember("direction", Value(static_cast<int>(block.rotation)), d.GetAllocator());
+            auto rotation = block.rotation;
+            if (rotation == Rotation::RIGHT)     {rotation = Rotation::LEFT;}
+            else if (rotation == Rotation::LEFT) {rotation = Rotation::RIGHT;}
+            cell.AddMember("direction", Value(static_cast<int>(rotation)), d.GetAllocator());
         }
 
         Value state(kObjectType);

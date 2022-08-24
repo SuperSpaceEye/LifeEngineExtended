@@ -83,6 +83,8 @@ public:
 
     //min x, min y, max x, max y
     static std::array<int, 4> get_organism_dimensions(Organism * organism);
+
+    static void place_block_on_grid(EngineDataContainer *dc, Organism *organism, SerializedOrganismBlockContainer &block);
 };
 
 

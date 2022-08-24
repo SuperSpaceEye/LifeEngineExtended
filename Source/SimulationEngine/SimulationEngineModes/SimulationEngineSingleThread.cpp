@@ -36,12 +36,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
     for (auto &block: organism->anatomy._organism_blocks) {
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-        w_block->type = block.type;
-        if (block.type == BlockTypes::EyeBlock) {
-            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-        }
-        w_block->organism_index = organism->vector_index;
+        place_block_on_grid(dc, organism, block);
     }
 }
 
@@ -251,15 +246,22 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
     //If there is a place for rotated organism, then rotation can happen
     organism->rotation = new_rotation;
     for (auto & block: organism->anatomy._organism_blocks) {
-        auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
-        w_block->type = block.type;
-        w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-//        if (block.type == BlockTypes::EyeBlock) {
-//            w_block->rotation = get_global_rotation(block.rotation,organism_index->rotation);
-//        }
-        w_block->organism_index = organism->vector_index;
+        place_block_on_grid(dc, organism, block);
     }
+}
+
+void SimulationEngineSingleThread::place_block_on_grid(EngineDataContainer *dc, Organism *organism,
+                                                       SerializedOrganismBlockContainer &block) {
+    auto pos = block.get_pos(organism->rotation);
+    auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
+    w_block->type = block.type;
+    //TODO I have no idea why, but if rotation of organism is left or right, the rotation on the grid is wrong.
+    if (organism->rotation == Rotation::LEFT || organism->rotation == Rotation::RIGHT) {
+        w_block->rotation = get_global_rotation((Rotation)(((int)block.rotation + 2)%4), organism->rotation);
+    } else {
+        w_block->rotation = get_global_rotation(block.rotation, organism->rotation);
+    }
+    w_block->organism_index = organism->vector_index;
 }
 
 void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
@@ -301,14 +303,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
     }
 
     for (auto & block: organism->anatomy._organism_blocks) {
-        auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[new_x + pos.x][new_y + pos.y];
-        w_block->type = block.type;
-        w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-//        if (block.type == BlockTypes::EyeBlock) {
-//            w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-//        }
-        w_block->organism_index = organism->vector_index;
+        place_block_on_grid(dc, organism, block);
     }
 
     organism->x = new_x;
