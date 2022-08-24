@@ -610,40 +610,21 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
             //If delete block, then the decrementing logic will be configured by remove_block
-            if (type != BlockTypes::EmptyBlock) {
-            switch (item.type) {
-                case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
-                case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
-                case BlockTypes::MoverBlock:    _mover_blocks--    ; break;
-                case BlockTypes::KillerBlock:   _killer_blocks--   ; break;
-                case BlockTypes::ArmorBlock:    _armor_blocks--    ; break;
-                case BlockTypes::EyeBlock:      _eye_blocks--      ; break;
-                case BlockTypes::EmptyBlock:
-                case BlockTypes::FoodBlock:
-                case BlockTypes::WallBlock:
-                    break;
+            if (type  != BlockTypes::EmptyBlock) {
+                switch (item.type) {
+                    case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
+                    case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
+                    case BlockTypes::MoverBlock:    _mover_blocks--    ; break;
+                    case BlockTypes::KillerBlock:   _killer_blocks--   ; break;
+                    case BlockTypes::ArmorBlock:    _armor_blocks--    ; break;
+                    case BlockTypes::EyeBlock:      _eye_blocks--      ; break;
+                    case BlockTypes::EmptyBlock:
+                    case BlockTypes::FoodBlock:
+                    case BlockTypes::WallBlock:
+                        break;
+                }
             }
-            }
-
-            switch (type) {
-                case BlockTypes::MouthBlock:    _mouth_blocks++    ; break;
-                case BlockTypes::ProducerBlock: _producer_blocks++ ; break;
-                case BlockTypes::MoverBlock:    _mover_blocks++    ; break;
-                case BlockTypes::KillerBlock:   _killer_blocks++   ; break;
-                case BlockTypes::ArmorBlock:    _armor_blocks++    ; break;
-                case BlockTypes::EyeBlock:      _eye_blocks++      ; break;
-                case BlockTypes::EmptyBlock:
-                case BlockTypes::FoodBlock:
-                case BlockTypes::WallBlock:
-                    break;
-            }
-            if (type != BlockTypes::EmptyBlock) {
-                item.type = type;
-                item.rotation = rotation;
-                return;
-            } else {
-                break;
-            }
+            break;
         }
         num_block++;
     }

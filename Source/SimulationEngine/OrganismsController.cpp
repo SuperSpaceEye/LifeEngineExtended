@@ -92,7 +92,7 @@ void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContain
     edc.stc.organisms.erase(edc.stc.organisms.begin() + last_alive_organism_place + 1, edc.stc.organisms.end());
     edc.stc.dead_organisms_positions.erase(edc.stc.dead_organisms_positions.end() - dead_organisms, edc.stc.dead_organisms_positions.end());
 
-    std::vector<Organism>(edc.stc.organisms).swap(edc.stc.organisms);
+//    std::vector<Organism>(edc.stc.organisms).swap(edc.stc.organisms);
 //    edc.stc.organisms.shrink_to_fit();
 //    edc.stc.dead_organisms_positions.shrink_to_fit();
 }

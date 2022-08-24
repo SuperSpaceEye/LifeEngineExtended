@@ -213,7 +213,9 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
     if (move_counter == 0) { //if organism can make new move
         auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
-        last_decision = new_decision;
+        if (new_decision.decision != BrainDecision::DoNothing) {
+            last_decision = new_decision;
+        }
 //        if (new_decision.decision != BrainDecision::DoNothing
 //            && new_decision.observation.distance > last_decision.observation.distance) {
 //            last_decision = new_decision;
@@ -264,26 +266,26 @@ void Organism::kill_organism(EngineDataContainer &edc) {
     OrganismsController::free_main_organism(this, edc);
 }
 
-Organism::Organism(const Organism & organism) {
-    x = organism.x;
-    y = organism.y;
-    life_points = organism.life_points;
-    damage = organism.damage;
-    max_lifetime = organism.max_lifetime;
-    lifetime = organism.lifetime;
-    anatomy_mutation_rate = organism.anatomy_mutation_rate;
-    brain_mutation_rate = organism.brain_mutation_rate;
-    food_collected = organism.food_collected;
-    food_needed = organism.food_needed;
-    multiplier = organism.multiplier;
-    move_range = organism.move_range;
-    rotation = organism.rotation;
-    move_counter = organism.move_counter;
-    max_decision_lifetime = organism.max_decision_lifetime;
-    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
-
-    brain = Brain(organism.brain);
-    anatomy = Anatomy(organism.anatomy);
-    sp = organism.sp;
-    bp = organism.bp;
-}
+//Organism::Organism(const Organism & organism) {
+//    x = organism.x;
+//    y = organism.y;
+//    life_points = organism.life_points;
+//    damage = organism.damage;
+//    max_lifetime = organism.max_lifetime;
+//    lifetime = organism.lifetime;
+//    anatomy_mutation_rate = organism.anatomy_mutation_rate;
+//    brain_mutation_rate = organism.brain_mutation_rate;
+//    food_collected = organism.food_collected;
+//    food_needed = organism.food_needed;
+//    multiplier = organism.multiplier;
+//    move_range = organism.move_range;
+//    rotation = organism.rotation;
+//    move_counter = organism.move_counter;
+//    max_decision_lifetime = organism.max_decision_lifetime;
+//    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
+//
+//    brain = Brain(organism.brain);
+//    anatomy = Anatomy(organism.anatomy);
+//    sp = organism.sp;
+//    bp = organism.bp;
+//}

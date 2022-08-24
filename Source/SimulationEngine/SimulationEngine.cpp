@@ -55,7 +55,7 @@ void SimulationEngine::threaded_mainloop() {
             if (ecp.execute_world_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {
                 world_events_controller.tick_events(edc.total_engine_ticks, ecp.pause_world_events);
             }
-            OrganismsController::check_dead_to_alive_organisms_factor(edc);
+//            OrganismsController::check_dead_to_alive_organisms_factor(edc);
         }
         if (ecp.calculate_simulation_tick_delta_time) { edc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
         if (!edc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(edc.simulation_interval * 1000000 - edc.delta_time)));}
