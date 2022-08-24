@@ -300,7 +300,7 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     j_organism.AddMember("food_collected",   Value(organism->food_collected), d.GetAllocator());
     j_organism.AddMember("living",           Value(true), d.GetAllocator());
     j_organism.AddMember("direction",        Value(2), d.GetAllocator());
-    //TODO ????
+    //The rotation in the original version goes Up, right, down, left. while in mine it is up, left, down, right.
     auto rotation = static_cast<int>(organism->rotation);
     if (rotation == 1) {rotation = 3;}
     else if (rotation == 3) {rotation = 1;}
@@ -524,7 +524,6 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
         table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
     }
 
-    //TODO ????
     if (rotation == 1) {rotation = 3;}
     else if (rotation == 3) {rotation = 1;}
 
