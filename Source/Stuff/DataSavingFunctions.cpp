@@ -494,6 +494,9 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
         } else if (state == "eye") {
             type = BlockTypes::EyeBlock;
             _rotation = static_cast<Rotation>(cell["direction"].GetInt());
+            // TODO I don't know why the rotations are swapped.
+            if (_rotation == Rotation::RIGHT) {_rotation = Rotation::LEFT;}
+            else if (_rotation == Rotation::LEFT)  {_rotation = Rotation::RIGHT;}
         } else if (state == "armor") {
             type = BlockTypes::ArmorBlock;
         }
@@ -535,6 +538,19 @@ void DataSavingFunctions::json_read_organisms_data(rapidjson::Document & d, Simu
         json_read_organism(organism, sp, bp, new_organism);
         new_organism->vector_index = array_place;
 
+        if (new_organism->anatomy._mover_blocks > 0 && new_organism->anatomy._eye_blocks > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
+
         SimulationEngineSingleThread::place_organism(&edc, new_organism);
+    }
+
+    auto gen = lehmer64(0);
+
+    for (auto & organism: edc.stc.organisms) {
+        edc.stc.organisms_observations.clear();
+        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, &edc);
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(&edc, &sp, &organism, edc.stc.organisms_observations);}}
+
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i],
+                                                                                                                                                        &gen);}}
     }
 }

@@ -211,10 +211,13 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
+    if (anatomy._mover_blocks == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
         auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
         if (new_decision.decision != BrainDecision::DoNothing) {
             last_decision = new_decision;
+        } else {
+            last_decision = brain.get_random_action(*mt);
         }
 //        if (new_decision.decision != BrainDecision::DoNothing
 //            && new_decision.observation.distance > last_decision.observation.distance) {

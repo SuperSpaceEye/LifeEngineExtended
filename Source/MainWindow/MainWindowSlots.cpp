@@ -127,6 +127,7 @@ void MainWindow::b_save_world_slot() {
     std::atomic_thread_fence(std::memory_order_release);
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
                                                  "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
+    std::atomic_thread_fence(std::memory_order_release);
 #ifndef __WIN32
     bool file_exists = std::filesystem::exists(file_name.toStdString());
 #endif
@@ -177,6 +178,7 @@ void MainWindow::b_load_world_slot() {
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
                                                   tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
+    std::atomic_thread_fence(std::memory_order_release);
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
         filetype = ".lfew";
