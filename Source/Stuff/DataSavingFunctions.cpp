@@ -336,6 +336,8 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
 
         if (block.type == BlockTypes::EyeBlock) {
             auto rotation = block.rotation;
+            if (rotation == Rotation::RIGHT)     {rotation = Rotation::LEFT;}
+            else if (rotation == Rotation::LEFT) {rotation = Rotation::RIGHT;}
             cell.AddMember("direction", Value(static_cast<int>(rotation)), d.GetAllocator());
         }
 
@@ -502,6 +504,9 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
         } else if (state == "armor") {
             type = BlockTypes::ArmorBlock;
         }
+
+        if (_rotation == Rotation::RIGHT)     {_rotation = Rotation::LEFT;}
+        else if (_rotation == Rotation::LEFT) {_rotation = Rotation::RIGHT;}
 
         block_data.emplace_back(type, _rotation, l_x, l_y);
     }
