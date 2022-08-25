@@ -25,14 +25,13 @@ private:
 
     void closeEvent(QCloseEvent * event) override;
 public:
-    Benchmarks(Ui::MainWindow & parent_window);
+    explicit Benchmarks(Ui::MainWindow & parent_window);
 
     void update_();
 private slots:
     void b_benchmark_produce_food_slot();
     void b_benchmark_apply_damage_slot();
     void b_benchmark_eat_food_slot();
-    void b_benchmark_erase_organisms_slot();
     void b_benchmark_get_observations_slot();
     void b_benchmark_move_organism_slot();
     void b_benchmark_reserve_organism_slot();

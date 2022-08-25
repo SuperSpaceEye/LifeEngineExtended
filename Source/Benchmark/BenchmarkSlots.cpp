@@ -22,12 +22,6 @@ void Benchmarks::b_benchmark_eat_food_slot() {
     benchmark.start_benchmarking(std::vector<BenchmarkTypes>{BenchmarkTypes::EatFood});
 }
 
-void Benchmarks::b_benchmark_erase_organisms_slot() {
-    benchmark_buttons_enabled(false);
-    benchmark.init_benchmark();
-    benchmark.start_benchmarking(std::vector<BenchmarkTypes>{BenchmarkTypes::EraseOrganisms});
-}
-
 void Benchmarks::b_benchmark_get_observations_slot() {
     benchmark_buttons_enabled(false);
     benchmark.init_benchmark();
@@ -76,13 +70,12 @@ void Benchmarks::b_run_all_benchmarks_slot() {
     benchmark.start_benchmarking(std::vector<BenchmarkTypes>{BenchmarkTypes::ProduceFood,
                                                              BenchmarkTypes::ApplyDamage,
                                                              BenchmarkTypes::EatFood,
-                                                             BenchmarkTypes::EraseOrganisms,
                                                              BenchmarkTypes::GetObservations,
                                                              BenchmarkTypes::MoveOrganism,
                                                              BenchmarkTypes::RotateOrganism,
                                                              BenchmarkTypes::ThinkDecision,
                                                              BenchmarkTypes::TickLifetime,
-//                                                             BenchmarkTypes::TryMakeChild
+                                                             BenchmarkTypes::TryMakeChild
     });
 }
 

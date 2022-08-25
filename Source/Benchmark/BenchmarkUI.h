@@ -41,7 +41,6 @@ public:
     QPushButton *b_benchmark_eat_food;
     QPushButton *b_benchmark_apply_damage;
     QPushButton *b_benchmark_tick_lifetime;
-    QPushButton *b_benchmark_erase_organisms;
     QPushButton *b_benchmark_get_observations;
     QPushButton *b_benchmark_think_decision;
     QPushButton *b_benchmark_rotate_organism;
@@ -120,11 +119,6 @@ public:
 
         verticalLayout_4->addWidget(b_benchmark_tick_lifetime);
 
-        b_benchmark_erase_organisms = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_erase_organisms->setObjectName(QString::fromUtf8("b_benchmark_erase_organisms"));
-
-        verticalLayout_4->addWidget(b_benchmark_erase_organisms);
-
         b_benchmark_get_observations = new QPushButton(scrollAreaWidgetContents);
         b_benchmark_get_observations->setObjectName(QString::fromUtf8("b_benchmark_get_observations"));
 
@@ -147,7 +141,7 @@ public:
 
         b_benchmark_try_make_child = new QPushButton(scrollAreaWidgetContents);
         b_benchmark_try_make_child->setObjectName(QString::fromUtf8("b_benchmark_try_make_child"));
-        b_benchmark_try_make_child->setEnabled(false);
+        b_benchmark_try_make_child->setEnabled(true);
 
         verticalLayout_4->addWidget(b_benchmark_try_make_child);
 
@@ -199,7 +193,6 @@ public:
         QObject::connect(b_benchmark_produce_food, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_produce_food_slot()));
         QObject::connect(b_benchmark_apply_damage, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_apply_damage_slot()));
         QObject::connect(b_benchmark_eat_food, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_eat_food_slot()));
-        QObject::connect(b_benchmark_erase_organisms, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_erase_organisms_slot()));
         QObject::connect(b_benchmark_get_observations, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_get_observations_slot()));
         QObject::connect(b_benchmark_move_organism, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_move_organism_slot()));
         QObject::connect(b_benchmark_rotate_organism, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_rotate_organism_slot()));
@@ -223,7 +216,6 @@ public:
         b_benchmark_eat_food->setText(QApplication::translate("Benchmark", "Benchmark eat food", nullptr));
         b_benchmark_apply_damage->setText(QApplication::translate("Benchmark", "Benchmark apply damage", nullptr));
         b_benchmark_tick_lifetime->setText(QApplication::translate("Benchmark", "Benchmark tick lifetime", nullptr));
-        b_benchmark_erase_organisms->setText(QApplication::translate("Benchmark", "Benchmark erase organisms", nullptr));
         b_benchmark_get_observations->setText(QApplication::translate("Benchmark", "Benchmark get observations", nullptr));
         b_benchmark_think_decision->setText(QApplication::translate("Benchmark", "Benchmark think decision", nullptr));
         b_benchmark_rotate_organism->setText(QApplication::translate("Benchmark", "Benchmark rotate organism", nullptr));

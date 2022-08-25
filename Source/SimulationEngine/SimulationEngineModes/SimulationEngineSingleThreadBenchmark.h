@@ -10,6 +10,7 @@
 #include <random>
 
 #include "SimulationEngineSingleThread.h"
+#include "../OrganismsController.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 
 enum class BenchmarkTypes {
@@ -17,7 +18,6 @@ enum class BenchmarkTypes {
     EatFood,
     ApplyDamage,
     TickLifetime,
-    EraseOrganisms,
     ReserveOrganisms,
     GetObservations,
     ThinkDecision,
@@ -50,7 +50,7 @@ class SimulationEngineSingleThreadBenchmark {
     uint64_t seed = 0;
     lehmer64 gen{0};
 
-    int num_iterations = 500;
+    int num_iterations = 200;
     int num_organisms = 10'000;
 
     boost::unordered_map<BenchmarkTypes, std::vector<OrganismContainer>> benchmark_organisms;
@@ -65,38 +65,26 @@ class SimulationEngineSingleThreadBenchmark {
     void remove_benchmark_organisms();
 
     void prepare_produce_food_benchmark();
-    void benchmark_produce_food(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_produce_food(BenchmarkResult &res);
 
     void prepare_eat_food_benchmark();
-    void benchmark_eat_food(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_eat_food(BenchmarkResult &res);
 
-    void prepare_apply_damage_benchmark();
-    void benchmark_apply_damage(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_apply_damage(BenchmarkResult &res);
 
     void prepare_tick_lifetime_benchmark();
-    void benchmark_tick_lifetime(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_tick_lifetime(BenchmarkResult &res);
 
-    void prepare_erase_organisms_benchmark(Organism *organism);
-    void benchmark_erase_organisms(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_get_observations(BenchmarkResult &res);
 
-    void prepare_reserve_organisms_benchmark();
-    void benchmark_reserve_organisms();
+    void benchmark_think_decision(BenchmarkResult &res);
 
-    void prepare_get_observations_benchmark();
-    void benchmark_get_observations(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_rotate_organism(BenchmarkResult &res);
 
-    void prepare_think_decision_benchmark();
-    void benchmark_think_decision(bool randomized_organism_access, BenchmarkResult &res);
+    void benchmark_move_organism(BenchmarkResult &res);
 
-    void prepare_rotate_organism_benchmark();
-    void benchmark_rotate_organism(bool randomized_organism_access, BenchmarkResult &res);
-
-    void prepare_move_organism_benchmark();
-    void benchmark_move_organism(bool randomized_organism_access, BenchmarkResult &res);
-
-    void prepare_try_make_child_benchmark();
-    void benchmark_try_make_child(bool randomized_organism_access, BenchmarkResult &res);
-    void finish_try_make_child_benchmark();
+    void prepare_try_make_child_benchmark(int num_organisms);
+    void benchmark_try_make_child(BenchmarkResult &res);
 
     void place_organisms_of_type(Organism *organism, int num_organisms,
                                  BenchmarkResult &result, int additional_distance);

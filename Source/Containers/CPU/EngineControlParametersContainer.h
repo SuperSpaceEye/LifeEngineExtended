@@ -70,6 +70,8 @@ struct EngineControlParameters {
 
     volatile uint8_t num_threads = 2;
 
+    volatile bool do_not_clear_user_actions = false;
+
 };
 
 #endif //THELIFEENGINECPP_ENGINECONTROLCONTAINER_H

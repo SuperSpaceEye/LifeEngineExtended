@@ -19,12 +19,11 @@ void Benchmarks::benchmark_buttons_enabled(bool state) {
     ui.b_benchmark_eat_food         ->setEnabled(state);
     ui.b_benchmark_apply_damage     ->setEnabled(state);
     ui.b_benchmark_tick_lifetime    ->setEnabled(state);
-    ui.b_benchmark_erase_organisms  ->setEnabled(state);
     ui.b_benchmark_get_observations ->setEnabled(state);
     ui.b_benchmark_think_decision   ->setEnabled(state);
     ui.b_benchmark_rotate_organism  ->setEnabled(state);
     ui.b_benchmark_move_organism    ->setEnabled(state);
-//    ui.b_benchmark_try_make_child   ->setEnabled(state);
+    ui.b_benchmark_try_make_child   ->setEnabled(state);
     ui.b_run_all_benchmarks         ->setEnabled(state);
 }
 
@@ -59,7 +58,6 @@ void Benchmarks::update_result_info() {
             case BenchmarkTypes::EatFood:          benchmark_type = "eat food";          break;
             case BenchmarkTypes::ApplyDamage:      benchmark_type = "apply damage";      break;
             case BenchmarkTypes::TickLifetime:     benchmark_type = "tick lifetime";     break;
-            case BenchmarkTypes::EraseOrganisms:   benchmark_type = "erase organism";    break;
             case BenchmarkTypes::ReserveOrganisms: benchmark_type = "reserve organisms"; break;
             case BenchmarkTypes::GetObservations:  benchmark_type = "get observations";  break;
             case BenchmarkTypes::ThinkDecision:    benchmark_type = "think decision";    break;
