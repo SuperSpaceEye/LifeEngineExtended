@@ -55,7 +55,6 @@ void SimulationEngine::threaded_mainloop() {
             if (ecp.execute_world_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {
                 world_events_controller.tick_events(edc.total_engine_ticks, ecp.pause_world_events);
             }
-//            OrganismsController::check_dead_to_alive_organisms_factor(edc);
         }
         if (ecp.calculate_simulation_tick_delta_time) { edc.delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - point).count();}
         if (!edc.unlimited_simulation_fps) {std::this_thread::sleep_for(std::chrono::microseconds(int(edc.simulation_interval * 1000000 - edc.delta_time)));}
@@ -206,6 +205,8 @@ void SimulationEngine::process_user_action_pool() {
                 auto array_place = new_organism->vector_index;
                 *new_organism = Organism(edc.chosen_organism);
                 new_organism->vector_index = array_place;
+
+                if (array_place > edc.stc.last_alive_position) { edc.stc.last_alive_position = array_place; }
 
                 new_organism->x = action.x;
                 new_organism->y = action.y;
@@ -375,15 +376,10 @@ void SimulationEngine::clear_organisms() {
         edc.stc.organisms[i].kill_organism(edc);
     }
 
-    edc.stc.organisms.clear();
-    edc.stc.child_organisms.clear();
-    edc.stc.dead_organisms_positions.clear();
-    edc.stc.free_child_organisms_positions.clear();
-
-    edc.stc.organisms.shrink_to_fit();
-    edc.stc.child_organisms.shrink_to_fit();
-    edc.stc.dead_organisms_positions.shrink_to_fit();
-    edc.stc.free_child_organisms_positions.shrink_to_fit();
+    edc.stc.organisms = std::vector<Organism>();
+    edc.stc.child_organisms = std::vector<Organism>();
+    edc.stc.dead_organisms_positions = std::vector<uint32_t>();
+    edc.stc.free_child_organisms_positions = std::vector<uint32_t>();
 
     edc.stc.num_alive_organisms = 0;
     edc.stc.num_dead_organisms  = 0;

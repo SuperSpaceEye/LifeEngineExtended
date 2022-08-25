@@ -68,8 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
                                        Rotation::UP, Anatomy(anatomy), Brain(),
                                        &sp, &bp, 1);
 
-    edc.base_organism->last_decision = DecisionObservation{};
-    edc.chosen_organism->last_decision = DecisionObservation{};
+    edc.base_organism->last_decision_observation = DecisionObservation{};
+    edc.chosen_organism->last_decision_observation = DecisionObservation{};
 
     auto * organism = OrganismsController::get_new_main_organism(edc);
     auto array_place = organism->vector_index;

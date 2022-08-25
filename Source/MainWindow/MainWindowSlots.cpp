@@ -516,11 +516,6 @@ void MainWindow::le_scaling_coefficient_slot() {
                                ui.le_scaling_coefficient, 1, "1");
 }
 
-void MainWindow::le_max_dead_to_alive_organism_factor_slot() {
-    le_slot_lower_bound<float>(edc.stc.max_dead_to_alive_organisms_factor, edc.stc.max_dead_to_alive_organisms_factor, "float",
-                               ui.le_max_dead_to_alive_organisms_factor, 1, "1");
-}
-
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {

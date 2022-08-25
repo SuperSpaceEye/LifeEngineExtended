@@ -59,7 +59,8 @@ public:
     bool is_dead = false;
     int vector_index = 0;
 
-    DecisionObservation last_decision = DecisionObservation{};
+    DecisionObservation last_decision_observation = DecisionObservation{};
+    BrainDecision last_decision = BrainDecision::MoveUp;
 
     OrganismData()=default;
     OrganismData(int x, int y, Rotation rotation, int move_range, float anatomy_mutation_rate,

@@ -2041,9 +2041,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-503</y>
+                  <y>0</y>
                   <width>606</width>
-                  <height>774</height>
+                  <height>745</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2327,23 +2327,6 @@
                        <string>Show extended statistics</string>
                       </property>
                      </widget>
-                    </item>
-                    <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_55">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QLabel" name="label_38">
-                        <property name="text">
-                         <string>Max dead to alive organisms factor</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLineEdit" name="le_max_dead_to_alive_organisms_factor"/>
-                      </item>
-                     </layout>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -4251,22 +4234,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>le_max_dead_to_alive_organisms_factor</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>le_max_dead_to_alive_organism_factor_slot()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>802</x>
-     <y>719</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>499</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4381,14 +4348,13 @@
   <slot>tb_open_benchmarks_slot(bool)</slot>
   <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
   <slot>cb_show_extended_statistics_slot(bool)</slot>
-  <slot>le_max_dead_to_alive_organism_factor_slot()</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

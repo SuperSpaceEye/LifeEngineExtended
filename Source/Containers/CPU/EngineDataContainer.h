@@ -40,7 +40,6 @@ struct EngineDataContainer {
     std::vector<std::vector<SingleThreadGridBlock>> CPU_simulation_grid;
 
     struct SingleThreadContainer {
-        float max_dead_to_alive_organisms_factor = 5;
         int32_t num_dead_organisms  = 0;
         int32_t num_alive_organisms = 0;
         //TODO process organisms from last_alive_position -> 0 so that organisms that are going to die could reduce the last_alive_position as they die.

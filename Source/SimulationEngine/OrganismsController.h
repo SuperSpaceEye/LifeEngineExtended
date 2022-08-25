@@ -22,8 +22,6 @@ public:
     static void free_main_organism(Organism * organism, EngineDataContainer &edc);
     //Sorts locations of dead organisms in main vector from smallest to biggest
     static void precise_sort_dead_organisms(EngineDataContainer &edc);
-    //If dead_organism > num_alive_organism * max_dead_to_alive_organisms_factor, removes extra dead organisms and shrinks the vectors capacity
-    static void check_dead_to_alive_organisms_factor(EngineDataContainer &edc);
     //Dead organisms can be between alive ones.
     static int32_t get_last_alive_organism_position(EngineDataContainer &edc);
     static inline Organism *get_organism_by_index(int32_t organism_index, EngineDataContainer &edc)             {return organism_index < 0 ? nullptr : &edc.stc.organisms[organism_index];}

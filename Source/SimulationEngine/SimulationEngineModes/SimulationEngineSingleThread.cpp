@@ -309,28 +309,25 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
 }
 
 void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen) {
-    switch (organism->last_decision.decision) {
+    switch (organism->last_decision_observation.decision) {
         case BrainDecision::MoveUp:
         case BrainDecision::MoveDown:
         case BrainDecision::MoveLeft:
         case BrainDecision::MoveRight:
             if (organism->anatomy._mover_blocks > 0) {
-                move_organism(dc, organism, organism->last_decision.decision, sp);
-                if (sp->rotate_every_move_tick && organism->anatomy._mover_blocks > 0 && sp->runtime_rotation_enabled) {
-                    rotate_organism(dc, organism,
-                                    static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)),
-                                    sp);
-                }
+                move_organism(dc, organism, organism->last_decision_observation.decision, sp);
                 organism->move_counter++;
             }
             break;
         default: break;
     }
-    if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_move_range == organism->move_counter)) {
+    if ((organism->move_counter >= organism->move_range) || (sp->set_fixed_move_range && sp->min_move_range >= organism->move_counter)) {
         organism->move_counter = 0;
-        if (!sp->rotate_every_move_tick && organism->anatomy._mover_blocks > 0 && sp->runtime_rotation_enabled) {
-            rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)),
-                            sp);
+    }
+    if ((organism->move_counter == 0 || sp->rotate_every_move_tick) && organism->anatomy._mover_blocks > 0 && sp->runtime_rotation_enabled) {
+        if (organism->last_decision_observation.decision != organism->last_decision) {
+            organism->last_decision = organism->last_decision_observation.decision;
+            rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)), sp);
         }
     }
 }

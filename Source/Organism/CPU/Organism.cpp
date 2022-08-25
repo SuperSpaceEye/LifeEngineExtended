@@ -215,28 +215,28 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
     if (move_counter == 0) { //if organism can make new move
         auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
         if (new_decision.decision != BrainDecision::DoNothing) {
-            last_decision = new_decision;
+            last_decision_observation = new_decision;
         } else {
-            last_decision = brain.get_random_action(*mt);
+            last_decision_observation = brain.get_random_action(*mt);
         }
 //        if (new_decision.decision != BrainDecision::DoNothing
-//            && new_decision.observation.distance > last_decision.observation.distance) {
-//            last_decision = new_decision;
+//            && new_decision.observation.distance > last_decision_observation.observation.distance) {
+//            last_decision_observation = new_decision;
 //            return;
 //        }
 //
 //        if (new_decision.decision != BrainDecision::DoNothing
-//            && last_decision.time > max_decision_lifetime) {
-//            last_decision = new_decision;
+//            && last_decision_observation.time > max_decision_lifetime) {
+//            last_decision_observation = new_decision;
 //            return;
 //        }
 //
-//        if (last_decision.time > max_do_nothing_lifetime) {
-//            last_decision = brain.get_random_action(*mt);
+//        if (last_decision_observation.time > max_do_nothing_lifetime) {
+//            last_decision_observation = brain.get_random_action(*mt);
 //            return;
 //        }
 //
-//        last_decision.time++;
+//        last_decision_observation.time++;
     }
 }
 

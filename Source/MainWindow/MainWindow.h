@@ -324,7 +324,6 @@ private slots:
     void le_font_size_slot();
     void le_float_number_precision_slot();
     void le_scaling_coefficient_slot();
-    void le_max_dead_to_alive_organism_factor_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();

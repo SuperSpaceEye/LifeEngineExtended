@@ -76,27 +76,6 @@ void OrganismsController::precise_sort_dead_organisms(EngineDataContainer &edc) 
     });
 }
 
-void OrganismsController::check_dead_to_alive_organisms_factor(EngineDataContainer &edc) {
-    if (edc.stc.num_dead_organisms <= edc.stc.num_alive_organisms * edc.stc.max_dead_to_alive_organisms_factor || edc.stc.num_alive_organisms == 0) {
-        return;
-    }
-    std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
-        return a < b;
-    });
-
-    uint32_t last_alive_organism_place = get_last_alive_organism_position(edc);
-    uint32_t dead_organisms = edc.stc.organisms.size() - 1 - last_alive_organism_place;
-
-    edc.stc.num_dead_organisms -= dead_organisms;
-
-    edc.stc.organisms.erase(edc.stc.organisms.begin() + last_alive_organism_place + 1, edc.stc.organisms.end());
-    edc.stc.dead_organisms_positions.erase(edc.stc.dead_organisms_positions.end() - dead_organisms, edc.stc.dead_organisms_positions.end());
-
-//    std::vector<Organism>(edc.stc.organisms).swap(edc.stc.organisms);
-//    edc.stc.organisms.shrink_to_fit();
-//    edc.stc.dead_organisms_positions.shrink_to_fit();
-}
-
 int32_t OrganismsController::get_last_alive_organism_position(EngineDataContainer &edc) {
     int32_t last_alive_organism_place = edc.stc.organisms.size() - 1;
     while (edc.stc.organisms[last_alive_organism_place].is_dead) {
