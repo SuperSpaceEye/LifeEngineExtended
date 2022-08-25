@@ -235,6 +235,7 @@ public:
     QCheckBox *cb_eat_then_produce;
     QCheckBox *cb_use_new_child_pos_calculator;
     QCheckBox *cb_checks_if_path_is_clear;
+    QCheckBox *cb_no_random_decisions;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -893,7 +894,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1533));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1155, 606, 1562));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1418,6 +1419,11 @@ public:
         cb_checks_if_path_is_clear->setObjectName(QString::fromUtf8("cb_checks_if_path_is_clear"));
 
         verticalLayout_20->addWidget(cb_checks_if_path_is_clear);
+
+        cb_no_random_decisions = new QCheckBox(widget);
+        cb_no_random_decisions->setObjectName(QString::fromUtf8("cb_no_random_decisions"));
+
+        verticalLayout_20->addWidget(cb_no_random_decisions);
 
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
@@ -1994,6 +2000,7 @@ public:
         QObject::connect(cb_benchmarks_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_benchmarks_always_on_top_slot(bool)));
         QObject::connect(tb_open_benchmarks, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_benchmarks_slot(bool)));
         QObject::connect(cb_show_extended_statistics, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_show_extended_statistics_slot(bool)));
+        QObject::connect(cb_no_random_decisions, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_no_random_decisions_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2117,6 +2124,7 @@ public:
         cb_eat_then_produce->setText(QApplication::translate("MainWindow", "Eat first, then produce food.", nullptr));
         cb_use_new_child_pos_calculator->setText(QApplication::translate("MainWindow", "Use new child position calculator", nullptr));
         cb_checks_if_path_is_clear->setText(QApplication::translate("MainWindow", "Check if path is clear", nullptr));
+        cb_no_random_decisions->setText(QApplication::translate("MainWindow", "No random decisions", nullptr));
         label_45->setText(QApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "Food Cost", nullptr));

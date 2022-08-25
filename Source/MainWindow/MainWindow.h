@@ -355,6 +355,7 @@ private slots:
     void cb_food_blocks_movement_slot(bool state);
     void cb_use_new_child_pos_calculator_slot(bool state);
     void cb_check_if_path_is_clear_slot(bool state);
+    void cb_no_random_decisions_slot(bool state);
     //Other
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);

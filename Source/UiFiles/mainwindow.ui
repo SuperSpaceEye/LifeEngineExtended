@@ -1049,9 +1049,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-1155</y>
                   <width>606</width>
-                  <height>1533</height>
+                  <height>1562</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1090,7 +1090,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1710,6 +1710,13 @@
                      <widget class="QCheckBox" name="cb_checks_if_path_is_clear">
                       <property name="text">
                        <string>Check if path is clear</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_no_random_decisions">
+                      <property name="text">
+                       <string>No random decisions</string>
                       </property>
                      </widget>
                     </item>
@@ -4234,6 +4241,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_no_random_decisions</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_no_random_decisions_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>868</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4348,6 +4371,7 @@
   <slot>tb_open_benchmarks_slot(bool)</slot>
   <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
   <slot>cb_show_extended_statistics_slot(bool)</slot>
+  <slot>cb_no_random_decisions_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

@@ -748,6 +748,8 @@ void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check
 
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
+void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_random_decisions = state;}
+
 //==================== Table ====================
 
 void MainWindow::table_cell_changed_slot(int row, int col) {

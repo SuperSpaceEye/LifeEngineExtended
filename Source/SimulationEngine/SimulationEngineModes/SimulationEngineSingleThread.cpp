@@ -325,7 +325,7 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer *dc, Simula
         organism->move_counter = 0;
     }
     if ((organism->move_counter == 0 || sp->rotate_every_move_tick) && organism->anatomy._mover_blocks > 0 && sp->runtime_rotation_enabled) {
-        if (organism->last_decision_observation.decision != organism->last_decision) {
+        if (organism->last_decision_observation.decision != organism->last_decision || sp->no_random_decisions) {
             organism->last_decision = organism->last_decision_observation.decision;
             rotate_organism(dc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(*gen)), sp);
         }

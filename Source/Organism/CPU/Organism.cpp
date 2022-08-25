@@ -217,7 +217,9 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
         if (new_decision.decision != BrainDecision::DoNothing) {
             last_decision_observation = new_decision;
         } else {
-            last_decision_observation = brain.get_random_action(*mt);
+            if (!sp->no_random_decisions) {
+                last_decision_observation = Brain::get_random_action(*mt);
+            }
         }
 //        if (new_decision.decision != BrainDecision::DoNothing
 //            && new_decision.observation.distance > last_decision_observation.observation.distance) {
