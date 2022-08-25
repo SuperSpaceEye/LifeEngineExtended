@@ -516,6 +516,11 @@ void MainWindow::le_scaling_coefficient_slot() {
                                ui.le_scaling_coefficient, 1, "1");
 }
 
+void MainWindow::le_memory_allocation_strategy_modifier_slot() {
+    le_slot_lower_bound<float>(edc.stc.memory_allocation_strategy_modifier, edc.stc.memory_allocation_strategy_modifier, "float",
+                               ui.le_memory_allocation_strategy_modifier, 1, "1");
+}
+
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {

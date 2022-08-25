@@ -95,7 +95,7 @@ void SimulationEngine::change_mode() {
 }
 
 void SimulationEngine::simulation_tick() {
-    edc.engine_ticks++;
+    edc.engine_ticks_between_updates++;
     edc.total_engine_ticks++;
 
 //    switch (ecp.simulation_mode) {

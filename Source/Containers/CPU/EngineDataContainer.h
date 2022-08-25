@@ -24,7 +24,7 @@ struct pool_changes_info;
 struct EngineDataContainer {
     uint64_t delta_time = 0;
     // for calculating ticks/second
-    uint32_t engine_ticks = 0;
+    uint32_t engine_ticks_between_updates = 0;
     // for tracking total ticks since start/reset of simulation.
     uint32_t total_engine_ticks = 0;
 
@@ -42,8 +42,9 @@ struct EngineDataContainer {
     struct SingleThreadContainer {
         int32_t num_dead_organisms  = 0;
         int32_t num_alive_organisms = 0;
-        //TODO process organisms from last_alive_position -> 0 so that organisms that are going to die could reduce the last_alive_position as they die.
+        //TODO process death of organisms from last_alive_position -> 0 so that organisms that are going to die could reduce the last_alive_position as they die.
         int32_t last_alive_position = 0;
+        float memory_allocation_strategy_modifier = 2;
         std::vector<Organism> organisms{};
         //Should be in the reverse order of the position of dead organism in main grid
         std::vector<uint32_t> dead_organisms_positions{};

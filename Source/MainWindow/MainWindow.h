@@ -324,6 +324,7 @@ private slots:
     void le_font_size_slot();
     void le_float_number_precision_slot();
     void le_scaling_coefficient_slot();
+    void le_memory_allocation_strategy_modifier_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();
@@ -382,6 +383,14 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
+
+    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
+                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+                                         std::vector<int> &truncated_lin_height);
+
+    void
+    parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
+                                const std::vector<int> &truncated_lin_height);
 };
 
 

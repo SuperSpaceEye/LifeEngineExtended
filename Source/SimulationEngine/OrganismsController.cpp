@@ -11,7 +11,13 @@ Organism *OrganismsController::get_new_child_organism(EngineDataContainer &edc) 
         return ptr;
     }
 
+    if (edc.stc.child_organisms.size() == edc.stc.child_organisms.capacity()) {
+        edc.stc.child_organisms.reserve(edc.stc.child_organisms.capacity()*edc.stc.memory_allocation_strategy_modifier);
+        edc.stc.free_child_organisms_positions.reserve(edc.stc.free_child_organisms_positions.capacity()*edc.stc.memory_allocation_strategy_modifier);
+    }
+
     edc.stc.child_organisms.emplace_back();
+
     edc.stc.child_organisms.back().vector_index = edc.stc.child_organisms.size() - 1;
     return & edc.stc.child_organisms.back();
 }
@@ -60,6 +66,11 @@ Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
         auto * ptr = &edc.stc.organisms[edc.stc.dead_organisms_positions.back()];
         edc.stc.dead_organisms_positions.pop_back();
         return ptr;
+    }
+
+    if (edc.stc.organisms.size() == edc.stc.organisms.capacity()) {
+        edc.stc.organisms.reserve(edc.stc.organisms.capacity()*edc.stc.memory_allocation_strategy_modifier);
+        edc.stc.dead_organisms_positions.reserve(edc.stc.dead_organisms_positions.capacity()*edc.stc.memory_allocation_strategy_modifier);
     }
 
     // If there are no free organisms, create default one and return it.

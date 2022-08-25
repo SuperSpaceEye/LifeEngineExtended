@@ -2048,9 +2048,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-556</y>
                   <width>606</width>
-                  <height>745</height>
+                  <height>774</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2334,6 +2334,20 @@
                        <string>Show extended statistics</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_55">
+                      <item>
+                       <widget class="QLabel" name="label_38">
+                        <property name="text">
+                         <string>Memory allocation strategy modifier</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_memory_allocation_strategy_modifier"/>
+                      </item>
+                     </layout>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -4257,6 +4271,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_memory_allocation_strategy_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_memory_allocation_strategy_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>808</x>
+     <y>774</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4372,6 +4402,7 @@
   <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
   <slot>cb_show_extended_statistics_slot(bool)</slot>
   <slot>cb_no_random_decisions_slot(bool)</slot>
+  <slot>le_memory_allocation_strategy_modifier_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

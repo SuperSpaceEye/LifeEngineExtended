@@ -33,17 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     update_simulation_size_label();
 
-//    engine = new SimulationEngine(std::ref(edc), std::ref(ecp), std::ref(bp), std::ref(sp), &recd);
-
     engine.make_walls();
 
     rec.set_engine(&engine);
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
-//    boost::random_device rd;
-//    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
-//    gen = lehmer64(rd());
 
     cc = ColorContainer{};
     sp = SimulationParameters{};
@@ -52,13 +47,6 @@ MainWindow::MainWindow(QWidget *parent) :
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
     anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
     anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
-
-//    anatomy->set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
-//    anatomy->set_block(BlockTypes::MouthBlock, Rotation::UP, 1, 2);
-//    anatomy->set_block(BlockTypes::KillerBlock, Rotation::UP, 1, 1);
-//    anatomy->set_block(BlockTypes::ArmorBlock, Rotation::UP, -1, 1);
-//    anatomy->set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, 2);
-//    anatomy->set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 3);
 
     auto brain = Brain(BrainTypes::RandomActions);
 
@@ -130,22 +118,15 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::mainloop_tick() {
-    if (ecp.synchronise_simulation_and_window) {
-        ecp.engine_pass_tick = true;
-        ecp.synchronise_simulation_tick = true;
-    }
-    if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
-
     ui_tick();
-    window_frames++;
 
     auto info_update = std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - fps_timer).count();
 
     if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
         auto start_timer = clock_now();
         engine.pause();
-        uint32_t simulation_frames = edc.engine_ticks;
-        edc.engine_ticks = 0;
+        uint32_t simulation_frames = edc.engine_ticks_between_updates;
+        edc.engine_ticks_between_updates = 0;
 
         if (info_update == 0) {info_update = 1;}
 
@@ -170,6 +151,13 @@ void MainWindow::update_fps_labels(int fps, int sps) {
 }
 
 void MainWindow::ui_tick() {
+    if (ecp.synchronise_simulation_and_window) {
+        ecp.engine_pass_tick = true;
+        ecp.synchronise_simulation_tick = true;
+    }
+
+    if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
+
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
     if (ecp.tb_paused) {ui.tb_pause->setChecked(true);}
 
@@ -187,6 +175,7 @@ void MainWindow::ui_tick() {
 
     rec.update_label();
 
+    window_frames++;
 #if __VALGRIND_MODE__ == 1
     return;
 #endif
@@ -238,37 +227,16 @@ void MainWindow::reset_scale_view() {
 
 
 void MainWindow::create_image() {
-    resize_image();
-    auto image_width  = ui.simulation_graphicsView->viewport()->width();
-    auto image_height = ui.simulation_graphicsView->viewport()->height();
-
-    int scaled_width  = image_width * scaling_zoom;
-    int scaled_height = image_height * scaling_zoom;
-
-    // start and y coordinates on simulation grid
-    auto start_x = int(center_x-(scaled_width / 2));
-    auto end_x   = int(center_x+(scaled_width / 2));
-
-    auto start_y = int(center_y-(scaled_height / 2));
-    auto end_y   = int(center_y+(scaled_height / 2));
-
+    int image_width;
+    int image_height;
     std::vector<int> lin_width;
     std::vector<int> lin_height;
+    std::vector<int> truncated_lin_width;
+    std::vector<int> truncated_lin_height;
 
-    ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
+    pre_parse_simulation_grid_stage(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 
-    std::vector<int> truncated_lin_width;  truncated_lin_width .reserve(image_width);
-    std::vector<int> truncated_lin_height; truncated_lin_height.reserve(image_height);
-
-    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
-
-    if ((!pause_grid_parsing && !ecp.engine_global_pause) || ecp.synchronise_simulation_and_window) {
-        ecp.engine_pause = true;
-        // pausing engine to parse data from engine.
-        auto paused = wait_for_engine_to_pause();
-        // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
-        if (paused) {parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine.unpause();}
-    }
+    parse_simulation_grid_stage(truncated_lin_width, truncated_lin_height);
 
     if (!use_cuda) {
         ImageCreation::ImageCreationTools::complex_image_creation(lin_width,
@@ -294,13 +262,46 @@ void MainWindow::create_image() {
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
 }
 
+void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
+                                             const std::vector<int> &truncated_lin_height) {
+    if ((!pause_grid_parsing && !ecp.engine_global_pause) || ecp.synchronise_simulation_and_window) {
+        ecp.engine_pause = true;
+        // pausing engine to parse data from engine.
+        auto paused = wait_for_engine_to_pause();
+        // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
+        if (paused) { parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine.unpause();}
+    }
+}
+
+void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
+                                                 std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+                                                 std::vector<int> &truncated_lin_height) {
+    image_width= ui.simulation_graphicsView->viewport()->width();
+    image_height= ui.simulation_graphicsView->viewport()->height();
+    resize_image();
+    int scaled_width  = image_width * scaling_zoom;
+    int scaled_height = image_height * scaling_zoom;
+
+    // start and y coordinates on simulation grid
+    auto start_x = int(center_x - (scaled_width / 2));
+    auto end_x   = int(center_x + (scaled_width / 2));
+
+    auto start_y = int(center_y - (scaled_height / 2));
+    auto end_y   = int(center_y + (scaled_height / 2));
+    ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
+    truncated_lin_width .reserve(image_width);
+    truncated_lin_height.reserve(image_height);
+
+    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+}
+
 void MainWindow::set_window_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
         window_interval = 0.;
         timer->setInterval(0);
         return;
     }
-    window_interval = 1./max_window_fps;
+    window_interval = 1. / max_window_fps;
     timer->setInterval(1000/max_window_fps);
 }
 
@@ -541,6 +542,7 @@ void MainWindow::initialize_gui() {
     ui.cb_eat_then_produce                  ->setChecked(sp.eat_then_produce);
     ui.cb_use_new_child_pos_calculator      ->setChecked(sp.use_new_child_pos_calculator);
     ui.cb_checks_if_path_is_clear           ->setChecked(sp.check_if_path_is_clear);
+    ui.cb_no_random_decisions               ->setChecked(sp.no_random_decisions);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
@@ -550,6 +552,7 @@ void MainWindow::initialize_gui() {
     ui.le_perlin_y_modifier ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier, 3)));
     ui.le_keyboard_movement_amount->setText(QString::fromStdString(to_str(keyboard_movement_amount, 1)));
     ui.le_scaling_coefficient->setText(QString::fromStdString(to_str(scaling_coefficient, 1)));
+    ui.le_memory_allocation_strategy_modifier->setText(QString::fromStdString(to_str(edc.stc.memory_allocation_strategy_modifier, 0)));
 
     ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
@@ -579,6 +582,7 @@ void MainWindow::initialize_gui() {
     disable_warnings = false;
     ui.le_menu_height->setText(QString::fromStdString(std::to_string(ui.menu_frame->frameSize().height())));
     ui.cb_really_stop_render->setChecked(really_stop_render);
+    ui.cb_show_extended_statistics->setChecked(false);
 #if __CUDA_USED__ == 0
     ui.cb_use_nvidia_for_image_generation->hide();
 #endif

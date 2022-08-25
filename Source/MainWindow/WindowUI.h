@@ -280,6 +280,9 @@ public:
     QLineEdit *le_scaling_coefficient;
     QPushButton *b_update_textures;
     QCheckBox *cb_show_extended_statistics;
+    QHBoxLayout *horizontalLayout_55;
+    QLabel *label_38;
+    QLineEdit *le_memory_allocation_strategy_modifier;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -1560,7 +1563,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 745));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -556, 606, 774));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1761,6 +1764,21 @@ public:
         cb_show_extended_statistics->setObjectName(QString::fromUtf8("cb_show_extended_statistics"));
 
         verticalLayout_19->addWidget(cb_show_extended_statistics);
+
+        horizontalLayout_55 = new QHBoxLayout();
+        horizontalLayout_55->setObjectName(QString::fromUtf8("horizontalLayout_55"));
+        label_38 = new QLabel(widget_2);
+        label_38->setObjectName(QString::fromUtf8("label_38"));
+
+        horizontalLayout_55->addWidget(label_38);
+
+        le_memory_allocation_strategy_modifier = new QLineEdit(widget_2);
+        le_memory_allocation_strategy_modifier->setObjectName(QString::fromUtf8("le_memory_allocation_strategy_modifier"));
+
+        horizontalLayout_55->addWidget(le_memory_allocation_strategy_modifier);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_55);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -2001,6 +2019,7 @@ public:
         QObject::connect(tb_open_benchmarks, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_benchmarks_slot(bool)));
         QObject::connect(cb_show_extended_statistics, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_show_extended_statistics_slot(bool)));
         QObject::connect(cb_no_random_decisions, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_no_random_decisions_slot(bool)));
+        QObject::connect(le_memory_allocation_strategy_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_memory_allocation_strategy_modifier_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -2221,6 +2240,7 @@ public:
         label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         b_update_textures->setText(QApplication::translate("MainWindow", "Update textures", nullptr));
         cb_show_extended_statistics->setText(QApplication::translate("MainWindow", "Show extended statistics", nullptr));
+        label_38->setText(QApplication::translate("MainWindow", "Memory allocation strategy modifier", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));
