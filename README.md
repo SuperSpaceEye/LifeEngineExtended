@@ -3,6 +3,9 @@ C++ implementation of https://github.com/MaxRobinsonTheGreat/LifeEngine that ext
 
 **The program needs to be placed in path with only english letters.**
 
+# Update 24.08.2022
+The program right now is very broken. When I started optimizing and cleaning up code I found so many serious bugs that I don't understand how the program even functions and manages to evolve stuff.
+
 # Important information:
 - You should press enter after inputing text in line edits or it will not register.
 - Setting -1 into max fps/sps/organisms line edits will disable the limit.
