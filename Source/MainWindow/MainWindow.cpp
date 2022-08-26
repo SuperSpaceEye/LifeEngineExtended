@@ -135,6 +135,8 @@ void MainWindow::mainloop_tick() {
         engine.update_info();
         auto info = engine.get_info();
 
+//        std::cout << "Last alive position: " << edc.stc.last_alive_position << " || dead inside: " << edc.stc.dead_organisms_before_last_alive_position << " || dead outside: " << edc.stc.num_dead_organisms - edc.stc.dead_organisms_before_last_alive_position << "\n";
+
         engine.unpause();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);

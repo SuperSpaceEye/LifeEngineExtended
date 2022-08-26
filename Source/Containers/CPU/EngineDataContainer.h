@@ -10,6 +10,7 @@
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
 #include <vector>
+#include <deque>
 
 #include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
@@ -42,12 +43,17 @@ struct EngineDataContainer {
     struct SingleThreadContainer {
         int32_t num_dead_organisms  = 0;
         int32_t num_alive_organisms = 0;
-        //TODO process death of organisms from last_alive_position -> 0 so that organisms that are going to die could reduce the last_alive_position as they die.
+        //position of the last alive organism in organism vector.
         int32_t last_alive_position = 0;
+        //number of organisms that are located before last_alive_position
+        uint32_t dead_organisms_before_last_alive_position = 0;
+        //factor determining how many dead_organisms_before_last_alive_position can be before compress_organisms is called
+        float max_dead_organisms_in_alive_section_factor = 2;
         float memory_allocation_strategy_modifier = 2;
         std::vector<Organism> organisms{};
         //Should be in the reverse order of the position of dead organism in main grid
         std::vector<uint32_t> dead_organisms_positions{};
+        std::vector<uint32_t> temp_dead_organisms_positions{};
         std::vector<Organism> child_organisms{};
         std::vector<uint32_t> free_child_organisms_positions{};
         std::vector<int> observation_count{};

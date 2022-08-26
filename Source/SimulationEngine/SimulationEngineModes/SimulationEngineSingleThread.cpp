@@ -30,8 +30,10 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(dc->stc.organisms_observations[i], gen);}}
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {make_decision(dc, sp, &organism, gen);}}
 
-    OrganismsController::precise_sort_dead_organisms(*dc);
+    OrganismsController::compress_organisms(*dc);
+    OrganismsController::precise_sort_high_to_low_dead_organisms_positions(*dc);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {try_make_child(dc, sp, &organism, gen);}}
+//    dc->stc.last_alive_position = OrganismsController::get_last_alive_organism_position(*dc);
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {

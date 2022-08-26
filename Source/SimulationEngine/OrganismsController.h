@@ -21,11 +21,13 @@ public:
     static Organism *get_new_main_organism(EngineDataContainer &edc);
     static void free_main_organism(Organism * organism, EngineDataContainer &edc);
     //Sorts locations of dead organisms in main vector from smallest to biggest
-    static void precise_sort_dead_organisms(EngineDataContainer &edc);
+    static void precise_sort_low_to_high_dead_organisms_positions(EngineDataContainer &edc);
+    static void precise_sort_high_to_low_dead_organisms_positions(EngineDataContainer &edc);
     //Dead organisms can be between alive ones.
     static int32_t get_last_alive_organism_position(EngineDataContainer &edc);
     static inline Organism *get_organism_by_index(int32_t organism_index, EngineDataContainer &edc)             {return organism_index < 0 ? nullptr : &edc.stc.organisms[organism_index];}
     static inline Organism *get_child_organism_by_index(int32_t child_organism_index, EngineDataContainer &edc) {return child_organism_index < 0 ? nullptr : &edc.stc.child_organisms[child_organism_index];}
+    static void compress_organisms(EngineDataContainer &edc);
 };
 
 

@@ -151,6 +151,7 @@ void SimulationEngine::simulation_tick() {
 //TODO refactor
 void SimulationEngine::process_user_action_pool() {
     auto temp = std::vector<Organism*>{};
+    bool killed_organisms = false;
     //do not remake this as range or iterator for loop
     for (int i = 0; i < edc.user_actions_pool.size(); i++) {
         auto & action = edc.user_actions_pool[i];
@@ -165,6 +166,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryAddWall:
                 set_wall(temp, action);
+                killed_organisms = true;
                 break;
             case ActionType::TryRemoveWall:
                 if (action.x == 0 || action.y == 0 || action.x == edc.simulation_width - 1 || action.y == edc.simulation_height - 1) {continue;}
@@ -223,6 +225,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryKillOrganism: {
                 try_kill_organism(action.x, action.y, temp);
+                killed_organisms = true;
             }
                 break;
             case ActionType::TrySelectOrganism: {
@@ -245,6 +248,10 @@ void SimulationEngine::process_user_action_pool() {
             break;
         }
     }
+
+//    if (killed_organisms) {
+//        edc.stc.last_alive_position = OrganismsController::get_last_alive_organism_position(edc);
+//    }
 
     edc.user_actions_pool.clear();
 }
