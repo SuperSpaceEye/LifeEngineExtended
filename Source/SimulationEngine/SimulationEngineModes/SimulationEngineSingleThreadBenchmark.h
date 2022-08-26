@@ -65,26 +65,26 @@ class SimulationEngineSingleThreadBenchmark {
     void remove_benchmark_organisms();
 
     void prepare_produce_food_benchmark();
-    void benchmark_produce_food(BenchmarkResult &res);
+    void benchmark_produce_food(BenchmarkResult &res, bool flag);
 
     void prepare_eat_food_benchmark();
-    void benchmark_eat_food(BenchmarkResult &res);
+    void benchmark_eat_food(BenchmarkResult &res, bool flag);
 
-    void benchmark_apply_damage(BenchmarkResult &res);
+    void benchmark_apply_damage(BenchmarkResult &res, bool flag);
 
     void prepare_tick_lifetime_benchmark();
-    void benchmark_tick_lifetime(BenchmarkResult &res);
+    void benchmark_tick_lifetime(BenchmarkResult &res, bool flag);
 
-    void benchmark_get_observations(BenchmarkResult &res);
+    void benchmark_get_observations(BenchmarkResult &res, bool flag);
 
-    void benchmark_think_decision(BenchmarkResult &res);
+    void benchmark_think_decision(BenchmarkResult &res, bool flag);
 
-    void benchmark_rotate_organism(BenchmarkResult &res);
+    void benchmark_rotate_organism(BenchmarkResult &res, bool flag);
 
-    void benchmark_move_organism(BenchmarkResult &res);
+    void benchmark_move_organism(BenchmarkResult &res, bool flag);
 
     void prepare_try_make_child_benchmark(int num_organisms);
-    void benchmark_try_make_child(BenchmarkResult &res);
+    void benchmark_try_make_child(BenchmarkResult &res, bool flag);
 
     void place_organisms_of_type(Organism *organism, int num_organisms,
                                  BenchmarkResult &result, int additional_distance);

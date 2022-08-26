@@ -246,8 +246,6 @@ void SimulationEngine::process_user_action_pool() {
         }
     }
 
-    while (ecp.do_not_clear_user_actions) {}
-    std::atomic_thread_fence(std::memory_order_release);
     edc.user_actions_pool.clear();
 }
 

@@ -5,9 +5,8 @@
 #include "SimulationEngineSingleThreadBenchmark.h"
 
 SimulationEngineSingleThreadBenchmark::SimulationEngineSingleThreadBenchmark() {
-    resize_benchmark_grid(5000, 5000);
-    reset_state();
-    init_benchmark();
+//    init_benchmark();
+//    reset_state();
 }
 
 bool SimulationEngineSingleThreadBenchmark::resize_benchmark_grid(int width, int height) {
@@ -230,8 +229,10 @@ void SimulationEngineSingleThreadBenchmark::remove_benchmark_organisms() {
 
 void SimulationEngineSingleThreadBenchmark::init_benchmark() {
     if (initialized) { return;}
+    sp = SimulationParameters{};
+    resize_benchmark_grid(2000, 2000);
+    reset_state();
     create_benchmark_organisms();
-    resize_benchmark_grid(5000, 5000);
     sp.food_production_probability = 1;
     initialized = true;
 }
@@ -256,57 +257,64 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
     benchmark_running = true;
     std::thread thread([&, benchmarks_to_do]() {
         for (auto & benchmark: benchmarks_to_do) {
-            for (auto & benchmark_organism_data: benchmark_organisms[benchmark]) {
-                auto * benchmark_organism = benchmark_organism_data.organism;
-                benchmark_results.emplace_back(BenchmarkResult{num_organisms, 0, 0, 0, benchmark, benchmark_organism_data.additional_data});
-                auto &res = benchmark_results.back();
+            for (auto &benchmark_organism_data: benchmark_organisms[benchmark]) {
+                for (int flag = 0; flag <= 1; flag++) {
+                    auto *benchmark_organism = benchmark_organism_data.organism;
+                    benchmark_results.emplace_back(BenchmarkResult{num_organisms, 0, 0, 0, benchmark,
+                                                                   benchmark_organism_data.additional_data});
+                    auto &res = benchmark_results.back();
 
-                place_organisms_of_type(benchmark_organism, num_organisms, res, benchmark_organism_data.additional_distance);
-                gen.set_seed(seed);
-                for (int i = 0; i < num_iterations; i++) {
-                    if (stop_benchmark) {
-                        reset_state();
-                        stop_benchmark = false;
-                        benchmark_running = false;
-                        return;
+                    if (flag) {res.additional_data += " | continuous run";}
+
+                    place_organisms_of_type(benchmark_organism, num_organisms, res,
+                                            benchmark_organism_data.additional_distance);
+                    gen.set_seed(seed);
+                    for (int i = 0; i < num_iterations; i++) {
+                        if (stop_benchmark) {
+                            reset_state();
+                            stop_benchmark = false;
+                            benchmark_running = false;
+                            return;
+                        }
+                        res.num_iterations++;
+                        switch (benchmark) {
+                            case BenchmarkTypes::ProduceFood:
+                                prepare_produce_food_benchmark();
+                                benchmark_produce_food(res, flag);
+                                break;
+                            case BenchmarkTypes::EatFood:
+                                prepare_eat_food_benchmark();
+                                benchmark_eat_food(res, flag);
+                                break;
+                            case BenchmarkTypes::ApplyDamage:
+                                benchmark_apply_damage(res, flag);
+                                break;
+                            case BenchmarkTypes::TickLifetime:
+                                prepare_tick_lifetime_benchmark();
+                                benchmark_tick_lifetime(res, flag);
+                                break;
+                            case BenchmarkTypes::GetObservations:
+                                benchmark_get_observations(res, flag);
+                                break;
+                            case BenchmarkTypes::ThinkDecision:
+                                benchmark_think_decision(res, flag);
+                                break;
+                            case BenchmarkTypes::RotateOrganism:
+                                benchmark_rotate_organism(res, flag);
+                                break;
+                            case BenchmarkTypes::MoveOrganism:
+                                benchmark_move_organism(res, flag);
+                                break;
+                            case BenchmarkTypes::TryMakeChild:
+                                prepare_try_make_child_benchmark(res.num_organisms);
+                                benchmark_try_make_child(res, flag);
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                    res.num_iterations++;
-                    switch (benchmark) {
-                        case BenchmarkTypes::ProduceFood:
-                            prepare_produce_food_benchmark();
-                            benchmark_produce_food(res);
-                            break;
-                        case BenchmarkTypes::EatFood:
-                            prepare_eat_food_benchmark();
-                            benchmark_eat_food(res);
-                            break;
-                        case BenchmarkTypes::ApplyDamage:
-                            benchmark_apply_damage(res);
-                            break;
-                        case BenchmarkTypes::TickLifetime:
-                            prepare_tick_lifetime_benchmark();
-                            benchmark_tick_lifetime(res);
-                            break;
-                        case BenchmarkTypes::GetObservations:
-                            benchmark_get_observations(res);
-                            break;
-                        case BenchmarkTypes::ThinkDecision:
-                            benchmark_think_decision(res);
-                            break;
-                        case BenchmarkTypes::RotateOrganism:
-                            benchmark_rotate_organism(res);
-                            break;
-                        case BenchmarkTypes::MoveOrganism:
-                            benchmark_move_organism(res);
-                            break;
-                        case BenchmarkTypes::TryMakeChild:
-                            prepare_try_make_child_benchmark(res.num_organisms);
-                            benchmark_try_make_child(res);
-                            break;
-                        default: break;
-                    }
+                    reset_state();
                 }
-                reset_state();
             }
         }
         benchmark_running = false;
@@ -385,16 +393,27 @@ void SimulationEngineSingleThreadBenchmark::prepare_produce_food_benchmark() {
         }
     }
 }
-void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            SimulationEngineSingleThread::produce_food(&dc, &sp, &dc.stc.organisms[i], gen);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        SimulationEngineSingleThread::produce_food(&dc, &sp, &dc.stc.organisms[i], gen);
+        for (int i = 0; i < res.num_organisms; i++) {
+            SimulationEngineSingleThread::produce_food(&dc, &sp, &dc.stc.organisms[i], gen);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
@@ -405,29 +424,51 @@ void SimulationEngineSingleThreadBenchmark::prepare_eat_food_benchmark() {
         }
     }
 }
-void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            SimulationEngineSingleThread::eat_food(&dc, &sp, &dc.stc.organisms[i]);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        SimulationEngineSingleThread::eat_food(&dc, &sp, &dc.stc.organisms[i]);
+        for (int i = 0; i < res.num_organisms; i++) {
+            SimulationEngineSingleThread::eat_food(&dc, &sp, &dc.stc.organisms[i]);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
-void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            SimulationEngineSingleThread::apply_damage(&dc, &sp, &dc.stc.organisms[i]);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        SimulationEngineSingleThread::apply_damage(&dc, &sp, &dc.stc.organisms[i]);
+        for (int i = 0; i < res.num_organisms; i++) {
+            SimulationEngineSingleThread::apply_damage(&dc, &sp, &dc.stc.organisms[i]);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
@@ -439,38 +480,59 @@ void SimulationEngineSingleThreadBenchmark::prepare_tick_lifetime_benchmark() {
     }
 }
 void
-SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(BenchmarkResult &res) {
+SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(BenchmarkResult &res, bool flag) {
     auto start = NOW();
-    auto end  = NOW();
-
-    for (int i = 0; i < res.num_organisms; i++) {
+    auto end = NOW();
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            SimulationEngineSingleThread::tick_lifetime(&dc, &dc.stc.organisms[i]);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        SimulationEngineSingleThread::tick_lifetime(&dc, &dc.stc.organisms[i]);
+        for (int i = 0; i < res.num_organisms; i++) {
+            SimulationEngineSingleThread::tick_lifetime(&dc, &dc.stc.organisms[i]);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
-void SimulationEngineSingleThreadBenchmark::benchmark_get_observations(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_get_observations(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
 
     std::vector<std::vector<Observation>> observations;
     observations.resize(dc.stc.organisms.size(), std::vector<Observation>{Observation{}});
 
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            SimulationEngineSingleThread::get_observations(&dc, &sp, &dc.stc.organisms[i], observations);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        SimulationEngineSingleThread::get_observations(&dc, &sp, &dc.stc.organisms[i], observations);
+        for (int i = 0; i < res.num_organisms; i++) {
+            SimulationEngineSingleThread::get_observations(&dc, &sp, &dc.stc.organisms[i], observations);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
-void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
     std::vector<std::vector<Observation>> observations{dc.stc.organisms.size()};
@@ -480,44 +542,80 @@ void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkRe
                     }};
     }
 
-    for (int i = 0; i < num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < num_organisms; i++) {
+            start = NOW();
+            auto &organism = dc.stc.organisms[i];
+            organism.think_decision(observations[i], &gen);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        auto & organism = dc.stc.organisms[i];
-        organism.think_decision(observations[i], &gen);
+        for (int i = 0; i < res.num_organisms; i++) {
+            auto &organism = dc.stc.organisms[i];
+            organism.think_decision(observations[i], &gen);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
-
     }
 }
 
-void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
 
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+        for (int i = 0; i < res.num_organisms; i++) {
+            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
-void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
 
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
+            start = NOW();
+            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
+
         start = NOW();
-        SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+        for (int i = 0; i < res.num_organisms; i++) {
+            decision = BrainDecision(((int)decision+1)%4);
+            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }
 
@@ -540,18 +638,31 @@ void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark(int
     }
 }
 
-void SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(BenchmarkResult &res) {
+void SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(BenchmarkResult &res, bool flag) {
     auto start = NOW();
-    auto end  = NOW();
+    auto end = NOW();
 
-    for (int i = 0; i < res.num_organisms; i++) {
+    if (!flag) {
+        for (int i = 0; i < res.num_organisms; i++) {
+            start = NOW();
+            auto &organism = dc.stc.organisms[i];
+            organism.food_collected = organism.food_needed + 1;
+            SimulationEngineSingleThread::try_make_child(&dc, &sp, &organism, &gen);
+            end = NOW();
+            auto difference = duration_cast<nanoseconds>(end - start).count();
+            res.total_time_measured += difference;
+            res.num_tried++;
+        }
+    } else {
         start = NOW();
-        auto & organism = dc.stc.organisms[i];
-        organism.food_collected = organism.food_needed+1;
-        SimulationEngineSingleThread::try_make_child(&dc, &sp, &organism, &gen);
+        for (int i = 0; i < res.num_organisms; i++) {
+            auto &organism = dc.stc.organisms[i];
+            organism.food_collected = organism.food_needed + 1;
+            SimulationEngineSingleThread::try_make_child(&dc, &sp, &organism, &gen);
+        }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
+        res.num_tried += res.num_organisms;
         res.total_time_measured += difference;
-        res.num_tried++;
     }
 }

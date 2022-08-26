@@ -631,8 +631,6 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
 
 //TODO clear command in simulation probably causes segfaults.
 void MainWindow::change_main_grid_left_click() {
-    ecp.do_not_clear_user_actions = true;
-    std::atomic_thread_fence(std::memory_order_release);
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //    ecp.pause_processing_user_action = true;
@@ -659,8 +657,7 @@ void MainWindow::change_main_grid_left_click() {
         }
     }
     endfor:
-    std::atomic_thread_fence(std::memory_order_release);
-    ecp.do_not_clear_user_actions = false;
+    return;
 }
 
 void MainWindow::change_main_grid_right_click() {
