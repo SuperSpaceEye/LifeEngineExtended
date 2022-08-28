@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>725</width>
-    <height>432</height>
+    <width>859</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>709</width>
-        <height>636</height>
+        <y>-165</y>
+        <width>843</width>
+        <height>659</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -212,6 +212,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="lb_avg_gathered_food_2">
+                <property name="text">
+                 <string>Avg gathered food:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="lb_avg_age_2">
                 <property name="text">
                  <string>Avg organism age:</string>
@@ -314,6 +321,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="lb_avg_gathered_food_3">
+                <property name="text">
+                 <string>Avg gathered food:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="lb_avg_age_3">
                 <property name="text">
                  <string>Avg organism age:</string>
@@ -391,6 +405,13 @@
                <widget class="QLabel" name="lb_avg_org_lifetime_4">
                 <property name="text">
                  <string>Avg organism lifetime:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lb_avg_gathered_food_4">
+                <property name="text">
+                 <string>Avg gathered food:</string>
                 </property>
                </widget>
               </item>

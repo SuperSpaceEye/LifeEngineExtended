@@ -13,6 +13,7 @@ struct OrganismInfoHolder {
     double size = 0;
     double _organism_lifetime = 0;
     double _organism_age    = 0;
+    double _gathered_food   = 0;
     double _mouth_blocks    = 0;
     double _producer_blocks = 0;
     double _mover_blocks    = 0;
@@ -90,6 +91,7 @@ private:
 
                 info.total_avg._organism_lifetime += organism.max_lifetime;
                 info.total_avg._organism_age      += organism.lifetime;
+                info.total_avg._gathered_food     += organism.food_collected;
                 info.total_avg._mouth_blocks      += organism.anatomy._mouth_blocks;
                 info.total_avg._producer_blocks   += organism.anatomy._producer_blocks;
                 info.total_avg._mover_blocks      += organism.anatomy._mover_blocks;
@@ -106,6 +108,7 @@ private:
 
                     info.moving_avg._organism_lifetime += organism.max_lifetime;
                     info.moving_avg._organism_age      += organism.lifetime;
+                    info.moving_avg._gathered_food     += organism.food_collected;
                     info.moving_avg._mouth_blocks      += organism.anatomy._mouth_blocks;
                     info.moving_avg._producer_blocks   += organism.anatomy._producer_blocks;
                     info.moving_avg._mover_blocks      += organism.anatomy._mover_blocks;
@@ -121,6 +124,7 @@ private:
 
                     info.station_avg._organism_lifetime += organism.max_lifetime;
                     info.station_avg._organism_age      += organism.lifetime;
+                    info.station_avg._gathered_food     += organism.food_collected;
                     info.station_avg._mouth_blocks      += organism.anatomy._mouth_blocks;
                     info.station_avg._producer_blocks   += organism.anatomy._producer_blocks;
                     info.station_avg._mover_blocks      += organism.anatomy._mover_blocks;
@@ -158,6 +162,7 @@ private:
 
         info.total_avg._organism_lifetime /= info.total_avg.total;
         info.total_avg._organism_age      /= info.total_avg.total;
+        info.total_avg._gathered_food     /= info.total_avg.total;
         info.total_avg._mouth_blocks      /= info.total_avg.total;
         info.total_avg._producer_blocks   /= info.total_avg.total;
         info.total_avg._mover_blocks      /= info.total_avg.total;
@@ -173,6 +178,7 @@ private:
 
         if (std::isnan(info.total_avg._organism_lifetime)) {info.total_avg._organism_lifetime = 0;}
         if (std::isnan(info.total_avg._organism_age))      {info.total_avg._organism_age      = 0;}
+        if (std::isnan(info.total_avg._gathered_food))     {info.total_avg._gathered_food     = 0;}
         if (std::isnan(info.total_avg._mouth_blocks))      {info.total_avg._mouth_blocks      = 0;}
         if (std::isnan(info.total_avg._producer_blocks))   {info.total_avg._producer_blocks   = 0;}
         if (std::isnan(info.total_avg._mover_blocks))      {info.total_avg._mover_blocks      = 0;}
@@ -188,6 +194,7 @@ private:
 
         info.moving_avg._organism_lifetime /= info.moving_avg.total;
         info.moving_avg._organism_age      /= info.moving_avg.total;
+        info.moving_avg._gathered_food     /= info.moving_avg.total;
         info.moving_avg._mouth_blocks      /= info.moving_avg.total;
         info.moving_avg._producer_blocks   /= info.moving_avg.total;
         info.moving_avg._mover_blocks      /= info.moving_avg.total;
@@ -202,6 +209,7 @@ private:
 
         if (std::isnan(info.moving_avg._organism_lifetime)) {info.moving_avg._organism_lifetime = 0;}
         if (std::isnan(info.moving_avg._organism_age))      {info.moving_avg._organism_age      = 0;}
+        if (std::isnan(info.moving_avg._gathered_food))     {info.moving_avg._gathered_food     = 0;}
         if (std::isnan(info.moving_avg._mouth_blocks))      {info.moving_avg._mouth_blocks      = 0;}
         if (std::isnan(info.moving_avg._producer_blocks))   {info.moving_avg._producer_blocks   = 0;}
         if (std::isnan(info.moving_avg._mover_blocks))      {info.moving_avg._mover_blocks      = 0;}
@@ -217,6 +225,7 @@ private:
 
         info.station_avg._organism_lifetime /= info.station_avg.total;
         info.station_avg._organism_age      /= info.station_avg.total;
+        info.station_avg._gathered_food     /= info.station_avg.total;
         info.station_avg._mouth_blocks      /= info.station_avg.total;
         info.station_avg._producer_blocks   /= info.station_avg.total;
         info.station_avg._mover_blocks      /= info.station_avg.total;
@@ -231,6 +240,7 @@ private:
 
         if (std::isnan(info.station_avg._organism_lifetime)) {info.station_avg._organism_lifetime = 0;}
         if (std::isnan(info.station_avg._organism_age))      {info.station_avg._organism_age      = 0;}
+        if (std::isnan(info.station_avg._gathered_food))     {info.station_avg._gathered_food     = 0;}
         if (std::isnan(info.station_avg._mouth_blocks))      {info.station_avg._mouth_blocks      = 0;}
         if (std::isnan(info.station_avg._producer_blocks))   {info.station_avg._producer_blocks   = 0;}
         if (std::isnan(info.station_avg._mover_blocks))      {info.station_avg._mover_blocks      = 0;}

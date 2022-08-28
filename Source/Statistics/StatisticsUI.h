@@ -47,6 +47,7 @@ public:
     QLabel *lb_moving_organisms;
     QLabel *lb_organisms_with_eyes;
     QLabel *lb_avg_org_lifetime_2;
+    QLabel *lb_avg_gathered_food_2;
     QLabel *lb_avg_age_2;
     QLabel *lb_average_moving_range;
     QLabel *lb_organism_size_2;
@@ -62,6 +63,7 @@ public:
     QLabel *lb_stationary_organisms;
     QLabel *lb_organism_size_3;
     QLabel *lb_avg_org_lifetime_3;
+    QLabel *lb_avg_gathered_food_3;
     QLabel *lb_avg_age_3;
     QLabel *lb_anatomy_mutation_rate_3;
     QLabel *lb_brain_mutation_rate_3;
@@ -74,6 +76,7 @@ public:
     QLabel *lb_organisms_alive_2;
     QLabel *lb_organism_size_4;
     QLabel *lb_avg_org_lifetime_4;
+    QLabel *lb_avg_gathered_food_4;
     QLabel *lb_avg_age_4;
     QLabel *lb_anatomy_mutation_rate_4;
     QLabel *lb_brain_mutation_rate_4;
@@ -89,7 +92,7 @@ public:
     {
         if (Statistics->objectName().isEmpty())
             Statistics->setObjectName(QString::fromUtf8("Statistics"));
-        Statistics->resize(725, 432);
+        Statistics->resize(859, 495);
         verticalLayout = new QVBoxLayout(Statistics);
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
@@ -100,7 +103,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 709, 636));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, -165, 843, 659));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -203,6 +206,11 @@ public:
 
         verticalLayout_38->addWidget(lb_avg_org_lifetime_2);
 
+        lb_avg_gathered_food_2 = new QLabel(widget_5);
+        lb_avg_gathered_food_2->setObjectName(QString::fromUtf8("lb_avg_gathered_food_2"));
+
+        verticalLayout_38->addWidget(lb_avg_gathered_food_2);
+
         lb_avg_age_2 = new QLabel(widget_5);
         lb_avg_age_2->setObjectName(QString::fromUtf8("lb_avg_age_2"));
 
@@ -278,6 +286,11 @@ public:
 
         verticalLayout_40->addWidget(lb_avg_org_lifetime_3);
 
+        lb_avg_gathered_food_3 = new QLabel(widget_5);
+        lb_avg_gathered_food_3->setObjectName(QString::fromUtf8("lb_avg_gathered_food_3"));
+
+        verticalLayout_40->addWidget(lb_avg_gathered_food_3);
+
         lb_avg_age_3 = new QLabel(widget_5);
         lb_avg_age_3->setObjectName(QString::fromUtf8("lb_avg_age_3"));
 
@@ -337,6 +350,11 @@ public:
         lb_avg_org_lifetime_4->setObjectName(QString::fromUtf8("lb_avg_org_lifetime_4"));
 
         verticalLayout_10->addWidget(lb_avg_org_lifetime_4);
+
+        lb_avg_gathered_food_4 = new QLabel(widget_5);
+        lb_avg_gathered_food_4->setObjectName(QString::fromUtf8("lb_avg_gathered_food_4"));
+
+        verticalLayout_10->addWidget(lb_avg_gathered_food_4);
 
         lb_avg_age_4 = new QLabel(widget_5);
         lb_avg_age_4->setObjectName(QString::fromUtf8("lb_avg_age_4"));
@@ -424,6 +442,7 @@ public:
         lb_moving_organisms->setText(QApplication::translate("Statistics", "Moving organisms:", nullptr));
         lb_organisms_with_eyes->setText(QApplication::translate("Statistics", "Organisms with eyes:", nullptr));
         lb_avg_org_lifetime_2->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
+        lb_avg_gathered_food_2->setText(QApplication::translate("Statistics", "Avg gathered food:", nullptr));
         lb_avg_age_2->setText(QApplication::translate("Statistics", "Avg organism age:", nullptr));
         lb_average_moving_range->setText(QApplication::translate("Statistics", "Avg moving range:", nullptr));
         lb_organism_size_2->setText(QApplication::translate("Statistics", "Avg organism size:", nullptr));
@@ -438,6 +457,7 @@ public:
         lb_stationary_organisms->setText(QApplication::translate("Statistics", "Stationary organisms:", nullptr));
         lb_organism_size_3->setText(QApplication::translate("Statistics", "Avg organism size:", nullptr));
         lb_avg_org_lifetime_3->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
+        lb_avg_gathered_food_3->setText(QApplication::translate("Statistics", "Avg gathered food:", nullptr));
         lb_avg_age_3->setText(QApplication::translate("Statistics", "Avg organism age:", nullptr));
         lb_anatomy_mutation_rate_3->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
         lb_brain_mutation_rate_3->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
@@ -449,6 +469,7 @@ public:
         lb_organisms_alive_2->setText(QApplication::translate("Statistics", "Organisms alive:", nullptr));
         lb_organism_size_4->setText(QApplication::translate("Statistics", "Avg organism size:", nullptr));
         lb_avg_org_lifetime_4->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
+        lb_avg_gathered_food_4->setText(QApplication::translate("Statistics", "Avg gathered food:", nullptr));
         lb_avg_age_4->setText(QApplication::translate("Statistics", "Avg organism age:", nullptr));
         lb_anatomy_mutation_rate_4->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
         lb_brain_mutation_rate_4->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
