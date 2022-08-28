@@ -137,6 +137,13 @@ void OrganismsController::compress_organisms(EngineDataContainer &edc) {
         right_organism->vector_index = right_index;
         left_organism->vector_index  = left_index;
 
+        for (auto * organism: std::array<Organism*, 2>{left_organism, right_organism}) {
+            for (auto & block: organism->anatomy._organism_blocks) {
+                auto * w_block = &edc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+                w_block->organism_index = organism->vector_index;
+            }
+        }
+
         edc.stc.dead_organisms_positions.pop_back();
         edc.stc.temp_dead_organisms_positions.emplace_back(right_index);
     }
