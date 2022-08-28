@@ -75,7 +75,7 @@ struct SimpleActionTable {
 
 class Brain {
 private:
-    static SimpleActionTable copy_parents_table(SimpleActionTable & parents_simple_action_table);
+    static SimpleActionTable copy_parents_table(const SimpleActionTable & parents_simple_action_table);
     static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
     static SimpleActionTable get_random_action_table(lehmer64 &mt);
     DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, lehmer64 &mt);
@@ -83,7 +83,10 @@ private:
 public:
     Brain()=default;
     Brain(Brain & brain);
-    Brain(BrainTypes brain_type);
+    Brain(const Brain &brain);
+    explicit Brain(BrainTypes brain_type);
+    Brain(Brain&&)=default;
+    Brain & operator=(const Brain & brain)=default;
 
     SimpleActionTable simple_action_table;
 

@@ -124,6 +124,12 @@ public:
     QHBoxLayout *horizontalLayout_52;
     QPushButton *tb_open_world_events;
     QCheckBox *cb_world_events_always_on_top;
+    QHBoxLayout *horizontalLayout_53;
+    QPushButton *pushButton;
+    QCheckBox *checkBox;
+    QHBoxLayout *horizontalLayout_54;
+    QPushButton *tb_open_benchmarks;
+    QCheckBox *cb_benchmarks_always_on_top;
     QWidget *evolution_controls_tab;
     QHBoxLayout *horizontalLayout_7;
     QScrollArea *scrollArea_2;
@@ -229,6 +235,7 @@ public:
     QCheckBox *cb_eat_then_produce;
     QCheckBox *cb_use_new_child_pos_calculator;
     QCheckBox *cb_checks_if_path_is_clear;
+    QCheckBox *cb_no_random_decisions;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -272,6 +279,13 @@ public:
     QLabel *label_37;
     QLineEdit *le_scaling_coefficient;
     QPushButton *b_update_textures;
+    QCheckBox *cb_show_extended_statistics;
+    QHBoxLayout *horizontalLayout_55;
+    QLabel *label_38;
+    QLineEdit *le_memory_allocation_strategy_modifier;
+    QHBoxLayout *horizontalLayout_56;
+    QLabel *label_39;
+    QLineEdit *le_random_seed;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -292,8 +306,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -718,7 +732,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 620, 217));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 606, 237));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -823,6 +837,39 @@ public:
 
         verticalLayout_37->addLayout(horizontalLayout_52);
 
+        horizontalLayout_53 = new QHBoxLayout();
+        horizontalLayout_53->setObjectName(QString::fromUtf8("horizontalLayout_53"));
+        pushButton = new QPushButton(widget_5);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        pushButton->setEnabled(false);
+
+        horizontalLayout_53->addWidget(pushButton);
+
+        checkBox = new QCheckBox(widget_5);
+        checkBox->setObjectName(QString::fromUtf8("checkBox"));
+        checkBox->setEnabled(false);
+
+        horizontalLayout_53->addWidget(checkBox);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_53);
+
+        horizontalLayout_54 = new QHBoxLayout();
+        horizontalLayout_54->setObjectName(QString::fromUtf8("horizontalLayout_54"));
+        tb_open_benchmarks = new QPushButton(widget_5);
+        tb_open_benchmarks->setObjectName(QString::fromUtf8("tb_open_benchmarks"));
+        tb_open_benchmarks->setCheckable(true);
+
+        horizontalLayout_54->addWidget(tb_open_benchmarks);
+
+        cb_benchmarks_always_on_top = new QCheckBox(widget_5);
+        cb_benchmarks_always_on_top->setObjectName(QString::fromUtf8("cb_benchmarks_always_on_top"));
+
+        horizontalLayout_54->addWidget(cb_benchmarks_always_on_top);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_54);
+
 
         verticalLayout_24->addWidget(widget_5);
 
@@ -853,7 +900,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1533));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1562));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1379,6 +1426,11 @@ public:
 
         verticalLayout_20->addWidget(cb_checks_if_path_is_clear);
 
+        cb_no_random_decisions = new QCheckBox(widget);
+        cb_no_random_decisions->setObjectName(QString::fromUtf8("cb_no_random_decisions"));
+
+        verticalLayout_20->addWidget(cb_no_random_decisions);
+
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
         verticalLayout_20->addItem(verticalSpacer);
@@ -1514,7 +1566,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 720));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -556, 606, 803));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1710,6 +1762,41 @@ public:
         b_update_textures->setObjectName(QString::fromUtf8("b_update_textures"));
 
         verticalLayout_19->addWidget(b_update_textures);
+
+        cb_show_extended_statistics = new QCheckBox(widget_2);
+        cb_show_extended_statistics->setObjectName(QString::fromUtf8("cb_show_extended_statistics"));
+
+        verticalLayout_19->addWidget(cb_show_extended_statistics);
+
+        horizontalLayout_55 = new QHBoxLayout();
+        horizontalLayout_55->setObjectName(QString::fromUtf8("horizontalLayout_55"));
+        label_38 = new QLabel(widget_2);
+        label_38->setObjectName(QString::fromUtf8("label_38"));
+
+        horizontalLayout_55->addWidget(label_38);
+
+        le_memory_allocation_strategy_modifier = new QLineEdit(widget_2);
+        le_memory_allocation_strategy_modifier->setObjectName(QString::fromUtf8("le_memory_allocation_strategy_modifier"));
+
+        horizontalLayout_55->addWidget(le_memory_allocation_strategy_modifier);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_55);
+
+        horizontalLayout_56 = new QHBoxLayout();
+        horizontalLayout_56->setObjectName(QString::fromUtf8("horizontalLayout_56"));
+        label_39 = new QLabel(widget_2);
+        label_39->setObjectName(QString::fromUtf8("label_39"));
+
+        horizontalLayout_56->addWidget(label_39);
+
+        le_random_seed = new QLineEdit(widget_2);
+        le_random_seed->setObjectName(QString::fromUtf8("le_random_seed"));
+
+        horizontalLayout_56->addWidget(le_random_seed);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_56);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -1946,6 +2033,12 @@ public:
         QObject::connect(cb_world_events_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_world_events_always_on_top_slot(bool)));
         QObject::connect(tb_open_world_events, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_world_events_slot(bool)));
         QObject::connect(b_update_textures, SIGNAL(clicked()), MainWindow, SLOT(b_update_textures_slot()));
+        QObject::connect(cb_benchmarks_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_benchmarks_always_on_top_slot(bool)));
+        QObject::connect(tb_open_benchmarks, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_benchmarks_slot(bool)));
+        QObject::connect(cb_show_extended_statistics, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_show_extended_statistics_slot(bool)));
+        QObject::connect(cb_no_random_decisions, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_no_random_decisions_slot(bool)));
+        QObject::connect(le_memory_allocation_strategy_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_memory_allocation_strategy_modifier_slot()));
+        QObject::connect(le_random_seed, SIGNAL(returnPressed()), MainWindow, SLOT(le_random_seed_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -2005,6 +2098,10 @@ public:
         cb_recorder_window_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         tb_open_world_events->setText(QApplication::translate("MainWindow", "World Events", nullptr));
         cb_world_events_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        pushButton->setText(QApplication::translate("MainWindow", "Biomes", nullptr));
+        checkBox->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_benchmarks->setText(QApplication::translate("MainWindow", "Benchmarks", nullptr));
+        cb_benchmarks_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         Tabs->setTabText(Tabs->indexOf(windows_tab), QApplication::translate("MainWindow", "Windows", nullptr));
         label_4->setText(QApplication::translate("MainWindow", "Food production probability:", nullptr));
         le_food_production_probability->setText(QApplication::translate("MainWindow", "0.5", nullptr));
@@ -2065,6 +2162,7 @@ public:
         cb_eat_then_produce->setText(QApplication::translate("MainWindow", "Eat first, then produce food.", nullptr));
         cb_use_new_child_pos_calculator->setText(QApplication::translate("MainWindow", "Use new child position calculator", nullptr));
         cb_checks_if_path_is_clear->setText(QApplication::translate("MainWindow", "Check if path is clear", nullptr));
+        cb_no_random_decisions->setText(QApplication::translate("MainWindow", "No random decisions", nullptr));
         label_45->setText(QApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "Food Cost", nullptr));
@@ -2160,6 +2258,9 @@ public:
         label_36->setText(QApplication::translate("MainWindow", "Keyboard movement amount:", nullptr));
         label_37->setText(QApplication::translate("MainWindow", "Scaling coefficient", nullptr));
         b_update_textures->setText(QApplication::translate("MainWindow", "Update textures", nullptr));
+        cb_show_extended_statistics->setText(QApplication::translate("MainWindow", "Show extended statistics", nullptr));
+        label_38->setText(QApplication::translate("MainWindow", "Memory allocation strategy modifier", nullptr));
+        label_39->setText(QApplication::translate("MainWindow", "Random seed", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

@@ -19,6 +19,10 @@
 #include "Rotation.h"
 #include "../../PRNGS/lehmer64.h"
 #include "ObservationStuff.h"
+#include "Rotation.h"
+#include "ObservationStuff.h"
+
+struct EngineDataContainer;
 
 struct OrganismData {
 public:
@@ -52,7 +56,11 @@ public:
     int max_decision_lifetime = 2;
     int max_do_nothing_lifetime = 3;
 
-    DecisionObservation last_decision = DecisionObservation{};
+    bool is_dead = false;
+    int vector_index = 0;
+
+    DecisionObservation last_decision_observation = DecisionObservation{};
+    BrainDecision last_decision = BrainDecision::MoveUp;
 
     OrganismData()=default;
     OrganismData(int x, int y, Rotation rotation, int move_range, float anatomy_mutation_rate,
@@ -66,7 +74,7 @@ public:
     Brain brain;
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
-    Organism * child_pattern = nullptr;
+    int32_t child_pattern_index = -1;
 
     float calculate_max_life();
     int calculate_organism_lifetime();
@@ -79,15 +87,25 @@ public:
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
 
     void init_values();
+
+    void kill_organism(EngineDataContainer & edc);
+
+    void move_organism(Organism & organism);
+
+    Organism & operator=(const Organism & organism)=default;
+//    Organism & operator=(Organism & organism_index);
     //public:
+    Organism()=default;
+    Organism(Organism&&)=default;
+    //TODO this breaks the simulation for some reason.
+//    Organism(const Organism& organism);
     Organism(int x, int y, Rotation rotation, Anatomy anatomy,
              Brain brain, SimulationParameters *sp,
              OrganismBlockParameters *block_parameters, int move_range,
              float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
     Organism(Organism *organism);
-    Organism()=default;
-    ~Organism();
-    Organism * create_child(lehmer64 *gen);
+//    ~Organism()=default;
+    int32_t create_child(lehmer64 *gen, EngineDataContainer &edc);
 };
 
 

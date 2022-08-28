@@ -179,8 +179,9 @@ void OrganismEditor::cmd_block_rotation_slot(const QString& name) {
 
 void OrganismEditor::cmd_organism_rotation_slot(const QString& name) {
     if (name.toStdString() == "Up")    {editor_organism->rotation = Rotation::UP;}
-    if (name.toStdString() == "Left")  {editor_organism->rotation = Rotation::RIGHT;}
+    if (name.toStdString() == "Left")  {editor_organism->rotation = Rotation::LEFT;}
     if (name.toStdString() == "Down")  {editor_organism->rotation = Rotation::DOWN;}
-    if (name.toStdString() == "Right") {editor_organism->rotation = Rotation::LEFT;}
+    if (name.toStdString() == "Right") {editor_organism->rotation = Rotation::RIGHT;}
+
     finalize_chosen_organism();
 }

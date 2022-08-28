@@ -760,8 +760,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>620</width>
-                  <height>217</height>
+                  <width>606</width>
+                  <height>237</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -930,6 +930,51 @@
                       </item>
                      </layout>
                     </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_53">
+                      <item>
+                       <widget class="QPushButton" name="pushButton">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Biomes</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="checkBox">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_54">
+                      <item>
+                       <widget class="QPushButton" name="tb_open_benchmarks">
+                        <property name="text">
+                         <string>Benchmarks</string>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_benchmarks_always_on_top">
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
                    </layout>
                   </widget>
                  </item>
@@ -1006,7 +1051,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>606</width>
-                  <height>1533</height>
+                  <height>1562</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1045,7 +1090,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1669,6 +1714,13 @@
                      </widget>
                     </item>
                     <item>
+                     <widget class="QCheckBox" name="cb_no_random_decisions">
+                      <property name="text">
+                       <string>No random decisions</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
                      <spacer name="verticalSpacer">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
@@ -1996,9 +2048,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-556</y>
                   <width>606</width>
-                  <height>720</height>
+                  <height>803</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2275,6 +2327,41 @@
                        <string>Update textures</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_show_extended_statistics">
+                      <property name="text">
+                       <string>Show extended statistics</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_55">
+                      <item>
+                       <widget class="QLabel" name="label_38">
+                        <property name="text">
+                         <string>Memory allocation strategy modifier</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_memory_allocation_strategy_modifier"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_56">
+                      <item>
+                       <widget class="QLabel" name="label_39">
+                        <property name="text">
+                         <string>Random seed</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_random_seed"/>
+                      </item>
+                     </layout>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -4134,6 +4221,102 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_benchmarks_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>830</x>
+     <y>878</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tb_open_benchmarks</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_benchmarks_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>531</x>
+     <y>878</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_show_extended_statistics</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_show_extended_statistics_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>692</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_no_random_decisions</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_no_random_decisions_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>868</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_memory_allocation_strategy_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_memory_allocation_strategy_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>808</x>
+     <y>774</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_random_seed</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_random_seed_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>730</x>
+     <y>794</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4245,13 +4428,19 @@
   <slot>tb_open_world_events_slot(bool)</slot>
   <slot>cb_world_events_always_on_top_slot(bool)</slot>
   <slot>b_update_textures_slot()</slot>
+  <slot>tb_open_benchmarks_slot(bool)</slot>
+  <slot>cb_benchmarks_always_on_top_slot(bool)</slot>
+  <slot>cb_show_extended_statistics_slot(bool)</slot>
+  <slot>cb_no_random_decisions_slot(bool)</slot>
+  <slot>le_memory_allocation_strategy_modifier_slot()</slot>
+  <slot>le_random_seed_slot()</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

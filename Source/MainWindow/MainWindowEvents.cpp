@@ -58,11 +58,11 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             last_mouse_x_pos = position.x();
             last_mouse_y_pos = position.y();
 
-            change_main_simulation_grid = _ui.simulation_graphicsView->underMouse();
+            change_main_simulation_grid = ui.simulation_graphicsView->underMouse();
             change_editing_grid = ee.ui.editor_graphicsView->underMouse();
 
             //Removes focus from line edits, buttons, etc. so that user can use keyboard buttons without problems.
-            if (_ui.simulation_graphicsView->underMouse()) {setFocus();}
+            if (ui.simulation_graphicsView->underMouse()) {setFocus();}
         } break;
         case QEvent::MouseButtonRelease: {
             auto mouse_event = dynamic_cast<QMouseEvent*>(event);
@@ -110,7 +110,7 @@ void MainWindow::process_keyboard_events() {
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
-    if (_ui.simulation_graphicsView->underMouse()) {
+    if (ui.simulation_graphicsView->underMouse()) {
         if (event->delta() > 0) {
             scaling_zoom /= scaling_coefficient;
         } else {
@@ -122,14 +122,14 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
 void MainWindow::keyPressEvent(QKeyEvent * event) {
     switch (event->key()) {
         case Qt::Key_M: {
-            if (_ui.simulation_graphicsView->underMouse()) {
+            if (ui.simulation_graphicsView->underMouse()) {
                 if (allow_menu_hidden_change) {
                     if (!menu_hidden) {
-                        _ui.menu_frame->hide();
+                        ui.menu_frame->hide();
                         menu_hidden = true;
                         allow_menu_hidden_change = false;
                     } else {
-                        _ui.menu_frame->show();
+                        ui.menu_frame->show();
                         menu_hidden = false;
                         allow_menu_hidden_change = false;
                     }
@@ -150,15 +150,15 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
         case Qt::Key_Shift: SHIFT_pressed = true;break;
 
         case Qt::Key_R: reset_scale_view();break;
-        case Qt::Key_Space: _ui.tb_pause->setChecked(!ecp.tb_paused);break;
+        case Qt::Key_Space: ui.tb_pause->setChecked(!ecp.tb_paused);break;
         case Qt::Key_Period: b_pass_one_tick_slot();break;
 
         case Qt::Key_Plus: scaling_zoom /= scaling_coefficient;break;
         case Qt::Key_Minus: scaling_zoom *= scaling_coefficient;break;
 
-        case Qt::Key_1: rb_food_slot();_ui.rb_food->setChecked(true);break;
-        case Qt::Key_2: rb_kill_slot();_ui.rb_kill->setChecked(true);break;
-        case Qt::Key_3: rb_wall_slot();_ui.rb_wall->setChecked(true);break;
+        case Qt::Key_1: rb_food_slot();ui.rb_food->setChecked(true);break;
+        case Qt::Key_2: rb_kill_slot();ui.rb_kill->setChecked(true);break;
+        case Qt::Key_3: rb_wall_slot();ui.rb_wall->setChecked(true);break;
         case Qt::Key_4: ee.rb_place_organism_slot();ee.ui.rb_place_organism->setChecked(true);break;
         case Qt::Key_5: ee.rb_choose_organism_slot();ee.ui.rb_chose_organism->setChecked(true);break;
 

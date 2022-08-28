@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Benchmark</class>
+ <widget class="QWidget" name="Benchmark">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1031</width>
+    <height>618</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="main_tab">
+      <attribute name="title">
+       <string>Benchmark</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1025</width>
+            <height>585</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <spacer name="verticalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_run_all_benchmarks">
+                 <property name="text">
+                  <string>Run all benchmarks</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_produce_food">
+                 <property name="text">
+                  <string>Benchmark produce food</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_eat_food">
+                 <property name="text">
+                  <string>Benchmark eat food</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_apply_damage">
+                 <property name="text">
+                  <string>Benchmark apply damage</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_tick_lifetime">
+                 <property name="text">
+                  <string>Benchmark tick lifetime</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_get_observations">
+                 <property name="text">
+                  <string>Benchmark get observations</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_think_decision">
+                 <property name="text">
+                  <string>Benchmark think decision</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_rotate_organism">
+                 <property name="text">
+                  <string>Benchmark rotate organism</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_move_organism">
+                 <property name="text">
+                  <string>Benchmark move organism</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_benchmark_try_make_child">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>Benchmark try make child</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="b_stop_benchmarks">
+                 <property name="text">
+                  <string>Stop benchmarks / Finish benchmarking</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QTextEdit" name="benchmarks_output_text_edit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="settings_tab">
+      <attribute name="title">
+       <string>Benchmark Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Grid width</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_grid_width"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Grid height</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_grid_height"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="b_apply_grid_size">
+         <property name="text">
+          <string>Apply grid size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Num benchmark organisms</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_num_benchmark_organisms"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Num iterations</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_num_iterations"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Organisms diameter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_organisms_diameter"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>b_benchmark_produce_food</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_produce_food_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>167</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_apply_damage</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_apply_damage_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>229</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_eat_food</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_eat_food_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_get_observations</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_get_observations_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>353</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_move_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_move_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>446</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_rotate_organism</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_rotate_organism_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>415</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_think_decision</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_think_decision_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>384</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_tick_lifetime</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_tick_lifetime_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_benchmark_try_make_child</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_benchmark_try_make_child_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>477</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_run_all_benchmarks</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_run_all_benchmarks_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>110</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_stop_benchmarks</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_stop_benchmarks_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>534</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_grid_width</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_grid_width_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_grid_height</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_grid_height_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>808</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_apply_grid_size</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_apply_grid_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>515</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_num_benchmark_organisms</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_num_benchmark_organisms_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>610</x>
+     <y>321</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_num_iterations</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_num_iterations_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>569</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_organisms_diameter</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_num_organisms_diameter_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>587</x>
+     <y>387</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>b_benchmark_produce_food_slot()</slot>
+  <slot>b_run_all_benchmarks_slot()</slot>
+  <slot>b_benchmark_eat_food_slot()</slot>
+  <slot>b_benchmark_apply_damage_slot()</slot>
+  <slot>b_benchmark_tick_lifetime_slot()</slot>
+  <slot>b_benchmark_get_observations_slot()</slot>
+  <slot>b_benchmark_think_decision_slot()</slot>
+  <slot>b_benchmark_rotate_organism_slot()</slot>
+  <slot>b_benchmark_move_organism_slot()</slot>
+  <slot>b_benchmark_try_make_child_slot()</slot>
+  <slot>b_stop_benchmarks_slot()</slot>
+  <slot>le_grid_width_slot()</slot>
+  <slot>le_grid_height_slot()</slot>
+  <slot>b_apply_grid_size_slot()</slot>
+  <slot>le_num_benchmark_organisms_slot()</slot>
+  <slot>le_num_iterations_slot()</slot>
+  <slot>le_num_organisms_diameter_slot()</slot>
+ </slots>
+</ui>

@@ -13,7 +13,6 @@ set(CMAKE_AUTOUIC ON)
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 61)
-set(AUTO_UI_FILE_REBUILDING 0)
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -03")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
@@ -83,38 +82,10 @@ endif()
 
 #Source/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.cpp Source/SimulationEngine/SimulationEngineModes/SimulationEnginePartialMultiThread.h
 
-set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/SimulationEngine/SimulationEngine.h Source/MainWindow/MainWindow.cpp Source/MainWindow/MainWindow.h Source/Organism/CPU/Organism.cpp Source/Organism/CPU/Organism.h Source/GridBlocks/BaseGridBlock.h Source/Containers/CPU/ColorContainer.h Source/Organism/CPU/Anatomy.cpp Source/Organism/CPU/Anatomy.h Source/Stuff/BlockTypes.hpp Source/Containers/CPU/SimulationParameters.h Source/Containers/CPU/EngineControlParametersContainer.h Source/Containers/CPU/OrganismBlockParameters.h Source/Stuff/Linspace.h Source/MainWindow/WindowUI.h Source/MainWindow/MainWindowSlots.cpp Source/MainWindow/MainWindowEvents.cpp Source/Organism/CPU/Brain.cpp Source/Organism/CPU/Brain.h Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp Source/Stuff/Actions.h Source/PRNGS/xorshf96.h Source/PRNGS/RandomGenerator.h Source/Stuff/textures.h Source/Organism/CPU/ObservationStuff.h Source/GridBlocks/SingleThreadGridBlock.h Source/MainWindow/MainWindowDataSavingStuff.cpp Source/Statistics/StatisticsCore.h Source/OrganismEditor/OrganismEditor.h Source/OrganismEditor/OrganismEditor.cpp Source/OrganismEditor/OrganismEditorSlots.cpp Source/Stuff/MiscFuncs.h Source/Stuff/MiscFuncs.cpp Source/Stuff/PerlinNoise.hpp Source/OrganismEditor/OrganismEditorDataSaving.cpp Source/InfoWindow/InfoWindowUI.h Source/InfoWindow/InfoWindow.cpp Source/InfoWindow/InfoWindow.h Source/Recorder/RecorderWindowUI.h Source/Recorder/Recorder.cpp Source/Recorder/Recorder.h Source/Recorder/RecorderSlots.cpp Source/Containers/CPU/RecordingContainer.h Source/Stuff/ImageCreation.h Source/Stuff/ImageCreation.cpp Source/Stuff/DataSavingFunctions.h Source/Stuff/DataSavingFunctions.cpp Source/WorldEvents/WorldEvents.cpp Source/WorldEvents/WorldEvents.h Source/WorldEvents/EventNodes.h Source/WorldEvents/ChangeValueEventNodeWidget.cpp Source/WorldEvents/ChangeValueEventNodeWidget.h Source/WorldEvents/ConditionalEventNodeWidget.cpp Source/WorldEvents/ConditionalEventNodeWidget.h Source/WorldEvents/ConditionalEventNodeWidgetSlots.cpp Source/WorldEvents/ParametersList.h Source/WorldEvents/ParametersList.cpp Source/WorldEvents/ChangeValueEventNodeWidgetSlots.cpp Source/Containers/CPU/OrganismInfoContainer.h Source/WorldEvents/WorldEventsController.h Source/WorldEvents/WorldEventsController.cpp Source/WorldEvents/WorldEventsController.h Source/WorldEvents/WorldEventsSlots.cpp)
+set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/SimulationEngine/SimulationEngine.h Source/MainWindow/MainWindow.cpp Source/MainWindow/MainWindow.h Source/Organism/CPU/Organism.cpp Source/Organism/CPU/Organism.h Source/GridBlocks/BaseGridBlock.h Source/Containers/CPU/ColorContainer.h Source/Organism/CPU/Anatomy.cpp Source/Organism/CPU/Anatomy.h Source/Stuff/BlockTypes.hpp Source/Containers/CPU/SimulationParameters.h Source/Containers/CPU/EngineControlParametersContainer.h Source/Containers/CPU/OrganismBlockParameters.h Source/Stuff/Linspace.h Source/MainWindow/WindowUI.h Source/MainWindow/MainWindowSlots.cpp Source/MainWindow/MainWindowEvents.cpp Source/Organism/CPU/Brain.cpp Source/Organism/CPU/Brain.h Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp Source/Stuff/Actions.h Source/PRNGS/xorshf96.h Source/PRNGS/RandomGenerator.h Source/Stuff/textures.h Source/Organism/CPU/ObservationStuff.h Source/GridBlocks/SingleThreadGridBlock.h Source/MainWindow/MainWindowDataSavingStuff.cpp Source/Statistics/StatisticsCore.h Source/OrganismEditor/OrganismEditor.h Source/OrganismEditor/OrganismEditor.cpp Source/OrganismEditor/OrganismEditorSlots.cpp Source/Stuff/MiscFuncs.h Source/Stuff/MiscFuncs.cpp Source/Stuff/PerlinNoise.hpp Source/OrganismEditor/OrganismEditorDataSaving.cpp Source/InfoWindow/InfoWindowUI.h Source/InfoWindow/InfoWindow.cpp Source/InfoWindow/InfoWindow.h Source/Recorder/RecorderWindowUI.h Source/Recorder/Recorder.cpp Source/Recorder/Recorder.h Source/Recorder/RecorderSlots.cpp Source/Containers/CPU/RecordingContainer.h Source/Stuff/ImageCreation.h Source/Stuff/ImageCreation.cpp Source/Stuff/DataSavingFunctions.h Source/Stuff/DataSavingFunctions.cpp Source/WorldEvents/WorldEvents.cpp Source/WorldEvents/WorldEvents.h Source/WorldEvents/EventNodes.h Source/WorldEvents/ChangeValueEventNodeWidget.cpp Source/WorldEvents/ChangeValueEventNodeWidget.h Source/WorldEvents/ConditionalEventNodeWidget.cpp Source/WorldEvents/ConditionalEventNodeWidget.h Source/WorldEvents/ConditionalEventNodeWidgetSlots.cpp Source/WorldEvents/ParametersList.h Source/WorldEvents/ParametersList.cpp Source/WorldEvents/ChangeValueEventNodeWidgetSlots.cpp Source/Containers/CPU/OrganismInfoContainer.h Source/WorldEvents/WorldEventsController.h Source/WorldEvents/WorldEventsController.cpp Source/WorldEvents/WorldEventsController.h Source/WorldEvents/WorldEventsSlots.cpp Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThreadBenchmark.cpp Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThreadBenchmark.h Source/Benchmark/Benchmarks.cpp Source/Benchmark/Benchmarks.h Source/Benchmark/BenchmarkSlots.cpp Source/SimulationEngine/OrganismsController.cpp Source/SimulationEngine/OrganismsController.h)
 
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES})
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
-
-if (AUTO_UI_FILE_REBUILDING)
-    add_custom_target(
-            run_window ALL
-            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/UiFiles/MainWindow/mainwindow.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/MainWindow/WindowUI.h"
-            BYPRODUCTS WindowUI.h
-            COMMENT "Generating Main Window header file."
-    )
-
-    add_custom_target(
-            run_statistics ALL
-            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/UiFiles/Statistics/statistics.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/Statistics/StatisticsUI.h"
-            BYPRODUCTS StatisticsUI.h
-            COMMENT "Generating Statistics header file."
-    )
-
-    add_custom_target(
-            run_editor ALL
-            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/UiFiles/OrganismEditor/editor.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/OrganismEditor/EditorUI.h"
-            BYPRODUCTS EditorUI.h
-            COMMENT "Generating Organism editor's header file."
-    )
-
-    add_dependencies(${PROJECT_NAME} run_window)
-    add_dependencies(${PROJECT_NAME} run_statistics)
-    add_dependencies(${PROJECT_NAME} run_editor)
-
-endif()
 
 #if (WIN_USE_CUDA_LIBS)
 #    foreach(ITEM IN LISTS CUDA_SOURCES)

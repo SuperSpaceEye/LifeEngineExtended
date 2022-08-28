@@ -35,6 +35,7 @@
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
 #include "../WorldEvents/WorldEventsController.h"
+#include "OrganismsController.h"
 
 //TODO move simulation grid translation to here
 class SimulationEngine {
@@ -113,6 +114,8 @@ public:
     void reset_world_events(std::vector<BaseEventNode *> start_nodes,
                             std::vector<char> repeating_branch,
                             std::vector<BaseEventNode *> node_storage);
+
+    void set_seed(uint64_t new_seed);
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

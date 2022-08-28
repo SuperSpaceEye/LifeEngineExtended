@@ -57,6 +57,7 @@
 #include "../Stuff/ImageCreation.h"
 #include "../Stuff/DataSavingFunctions.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
+#include "../SimulationEngine/OrganismsController.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -67,6 +68,7 @@
 #include "../InfoWindow/InfoWindow.h"
 #include "../Recorder/Recorder.h"
 #include "../WorldEvents/WorldEvents.h"
+#include "../Benchmark/Benchmarks.h"
 
 
 #if __CUDA_USED__
@@ -101,7 +103,7 @@ private:
     OrganismBlockParameters bp;
     RecordingData recd;
 
-    Ui::MainWindow _ui{};
+    Ui::MainWindow ui{};
     QTimer * timer;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
@@ -110,11 +112,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine engine{edc, ecp, bp, sp, &recd};
-    OrganismEditor ee{15, 15, &_ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
-    StatisticsCore s{&_ui};
-    InfoWindow iw{&_ui};
-    Recorder rec{&_ui, &edc, &ecp, &cc, &textures, &recd};
-    WorldEvents we{&_ui, &sp, &bp, &engine.info, &ecp, &engine};
+    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
+    StatisticsCore s{&ui};
+    InfoWindow iw{&ui};
+    Recorder rec{&ui, &edc, &ecp, &cc, &textures, &recd};
+    WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
+    Benchmarks bs{ui};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -259,6 +262,7 @@ private slots:
     void tb_open_info_window_slot(bool state);
     void tb_open_recorder_window_slot(bool state);
     void tb_open_world_events_slot(bool state);
+    void tb_open_benchmarks_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -320,6 +324,8 @@ private slots:
     void le_font_size_slot();
     void le_float_number_precision_slot();
     void le_scaling_coefficient_slot();
+    void le_memory_allocation_strategy_modifier_slot();
+    void le_random_seed_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();
@@ -351,6 +357,7 @@ private slots:
     void cb_food_blocks_movement_slot(bool state);
     void cb_use_new_child_pos_calculator_slot(bool state);
     void cb_check_if_path_is_clear_slot(bool state);
+    void cb_no_random_decisions_slot(bool state);
     //Other
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);
@@ -359,6 +366,7 @@ private slots:
     void cb_reset_with_editor_organism_slot(bool state);
     void cb_recorder_window_always_on_top_slot(bool state);
     void cb_world_events_always_on_top_slot(bool state);
+    void cb_benchmarks_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);
@@ -366,6 +374,7 @@ private slots:
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_simplified_rendering_slot(bool state);
     void cb_really_stop_render_slot(bool state);
+    void cb_show_extended_statistics_slot(bool state);
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
@@ -375,6 +384,14 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
+
+    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
+                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+                                         std::vector<int> &truncated_lin_height);
+
+    void
+    parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
+                                const std::vector<int> &truncated_lin_height);
 };
 
 

@@ -36,9 +36,9 @@ public:
     inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
-            case Rotation::LEFT:  return Vector2<int>{-relative_y, relative_x};
+            case Rotation::LEFT:  return Vector2<int>{relative_y, -relative_x};
             case Rotation::DOWN:  return Vector2<int>{-relative_x, -relative_y};
-            case Rotation::RIGHT: return Vector2<int>{relative_y, -relative_x};
+            case Rotation::RIGHT: return Vector2<int>{-relative_y, relative_x};
             default: return Vector2<int>{relative_x, relative_y};
         }
     }
@@ -186,6 +186,8 @@ private:
     SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, lehmer64 *gen);
     SerializedOrganismStructureContainer *remove_block(int block_choice);
 
+    int configure_block_counters(BlockTypes type, int x, int y);
+
 public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
@@ -202,6 +204,8 @@ public:
     explicit Anatomy(SerializedOrganismStructureContainer *structure);
     Anatomy(const Anatomy& anatomy);
     Anatomy()=default;
+    Anatomy & operator=(Anatomy const & other_anatomy)=default;
+    Anatomy & operator=(Anatomy & other_anatomy);
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt);
     SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen);

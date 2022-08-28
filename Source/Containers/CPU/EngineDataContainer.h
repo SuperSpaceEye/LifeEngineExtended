@@ -10,20 +10,18 @@
 #define THELIFEENGINECPP_ENGINEDATACONTAINER_H
 
 #include <vector>
+#include <deque>
 
 #include "../../Stuff/Actions.h"
 #include "../../GridBlocks/BaseGridBlock.h"
 #include "../../GridBlocks/SingleThreadGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
-
-struct eager_worker_partial;
-class Organism;
-struct pool_changes_info;
+#include "../../Organism/CPU/Organism.h"
 
 struct EngineDataContainer {
     uint64_t delta_time = 0;
     // for calculating ticks/second
-    uint32_t engine_ticks = 0;
+    uint32_t engine_ticks_between_updates = 0;
     // for tracking total ticks since start/reset of simulation.
     uint32_t total_engine_ticks = 0;
 
@@ -37,21 +35,28 @@ struct EngineDataContainer {
     bool unlimited_simulation_fps = true;
 
     std::vector<std::vector<SingleThreadGridBlock>> CPU_simulation_grid;
-    std::vector<Organism*> organisms;
 
-    std::vector<int> single_thread_to_erase{};
-    std::vector<int> single_thread_observation_count{};
-    std::vector<std::vector<Observation>> single_thread_organisms_observations{};
+    struct SingleThreadContainer {
+        int32_t num_dead_organisms  = 0;
+        int32_t num_alive_organisms = 0;
+        //position of the last alive organism in organism vector.
+        int32_t last_alive_position = 0;
+        //number of organisms that are located before last_alive_position
+        uint32_t dead_organisms_before_last_alive_position = 0;
+        //factor determining how many dead_organisms_before_last_alive_position can be before compress_organisms is called
+        float max_dead_organisms_in_alive_section_factor = 2;
+        float memory_allocation_strategy_modifier = 2;
+        std::vector<Organism> organisms{};
+        std::vector<uint32_t> dead_organisms_positions{};
+        std::vector<uint32_t> temp_dead_organisms_positions{};
+        std::vector<Organism> child_organisms{};
+        std::vector<uint32_t> free_child_organisms_positions{};
+        std::vector<int> observation_count{};
+        std::vector<std::vector<Observation>> organisms_observations{};
+    };
+    SingleThreadContainer stc{};
 
-    std::vector<std::vector<Organism*>> organisms_pools;
-
-    std::vector<BaseGridBlock> second_simulation_grid;
-
-//    std::vector<eager_worker_partial> threads;
-    std::vector<std::vector<int>> threaded_to_erase;
-    std::vector<std::vector<std::vector<Observation>>> pooled_organisms_observations;
-    std::vector<std::vector<pool_changes_info>> sorted_organisms_by_x_position;
-    std::vector<std::vector<pool_changes_info*>> pool_changes;
+    std::vector<BaseGridBlock> simple_state_grid;
 
     Organism * base_organism = nullptr;
     Organism * chosen_organism = nullptr;
@@ -62,13 +67,6 @@ struct EngineDataContainer {
     std::vector<Action> user_actions_pool;
 
     Organism * selected_organism = nullptr;
-};
-
-struct pool_changes_info {
-    Organism * organism = nullptr;
-    int position_in_old_pool = -1;
-    int old_pool = 500;
-    int new_pool = 500;
 };
 
 

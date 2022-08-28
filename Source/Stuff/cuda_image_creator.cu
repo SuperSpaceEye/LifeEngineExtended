@@ -55,7 +55,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
             rxs = rys;
             rys = temp;
 
-            rys = -rys;
+            rxs = -rxs;
             rxs += 0.5;
             rys += 0.5;
             break;
@@ -77,7 +77,7 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
             rxs = rys;
             rys = temp;
 
-            rxs = -rxs;
+            rys = -rys;
             rxs += 0.5;
             rys += 0.5;
             break;
@@ -85,6 +85,9 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
 
     int x = rxs * holder.width;
     int y = rys * holder.height;
+
+    if (x == holder.width) {x--;}
+    if (y == holder.height) {y--;}
 
     return holder.texture[x + y * holder.width];
 }
@@ -148,8 +151,8 @@ CUDAImageCreator::compile_differences(std::vector<int> &truncated_lin_width, std
             if (y < 0 || y >= dc->simulation_height) { continue;}
             host_differences.emplace_back(Differences{static_cast<uint32_t>(x),
                                                       static_cast<uint32_t>(y),
-                                                      dc->second_simulation_grid[x + y * dc->simulation_width].type,
-                                                      dc->second_simulation_grid[x + y * dc->simulation_width].rotation,
+                                                      dc->simple_state_grid[x + y * dc->simulation_width].type,
+                                                      dc->simple_state_grid[x + y * dc->simulation_width].rotation,
             });
         }
     }

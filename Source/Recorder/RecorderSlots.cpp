@@ -76,7 +76,7 @@ void Recorder::b_create_image_slot() {
 
     engine->parse_full_simulation_grid();
 
-    create_image(raw_image_data, edc->second_simulation_grid, edc->simulation_width, edc->simulation_height, num_pixels_per_block);
+    create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height, num_pixels_per_block);
 
     QImage image(raw_image_data.data(),
                  edc->simulation_width*num_pixels_per_block,

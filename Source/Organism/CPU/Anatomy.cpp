@@ -610,40 +610,21 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
             //If delete block, then the decrementing logic will be configured by remove_block
-            if (type != BlockTypes::EmptyBlock) {
-            switch (item.type) {
-                case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
-                case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
-                case BlockTypes::MoverBlock:    _mover_blocks--    ; break;
-                case BlockTypes::KillerBlock:   _killer_blocks--   ; break;
-                case BlockTypes::ArmorBlock:    _armor_blocks--    ; break;
-                case BlockTypes::EyeBlock:      _eye_blocks--      ; break;
-                case BlockTypes::EmptyBlock:
-                case BlockTypes::FoodBlock:
-                case BlockTypes::WallBlock:
-                    break;
+            if (type  != BlockTypes::EmptyBlock) {
+                switch (item.type) {
+                    case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
+                    case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
+                    case BlockTypes::MoverBlock:    _mover_blocks--    ; break;
+                    case BlockTypes::KillerBlock:   _killer_blocks--   ; break;
+                    case BlockTypes::ArmorBlock:    _armor_blocks--    ; break;
+                    case BlockTypes::EyeBlock:      _eye_blocks--      ; break;
+                    case BlockTypes::EmptyBlock:
+                    case BlockTypes::FoodBlock:
+                    case BlockTypes::WallBlock:
+                        break;
+                }
             }
-            }
-
-            switch (type) {
-                case BlockTypes::MouthBlock:    _mouth_blocks++    ; break;
-                case BlockTypes::ProducerBlock: _producer_blocks++ ; break;
-                case BlockTypes::MoverBlock:    _mover_blocks++    ; break;
-                case BlockTypes::KillerBlock:   _killer_blocks++   ; break;
-                case BlockTypes::ArmorBlock:    _armor_blocks++    ; break;
-                case BlockTypes::EyeBlock:      _eye_blocks++      ; break;
-                case BlockTypes::EmptyBlock:
-                case BlockTypes::FoodBlock:
-                case BlockTypes::WallBlock:
-                    break;
-            }
-            if (type != BlockTypes::EmptyBlock) {
-                item.type = type;
-                item.rotation = rotation;
-                return;
-            } else {
-                break;
-            }
+            break;
         }
         num_block++;
     }
@@ -778,4 +759,20 @@ int Anatomy::get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>
         total_size += xmap.second.size();
     }
     return total_size;
+}
+
+Anatomy &Anatomy::operator=(Anatomy &other_anatomy) {
+    _mouth_blocks    = other_anatomy._mouth_blocks;
+    _producer_blocks = other_anatomy._producer_blocks;
+    _mover_blocks    = other_anatomy._mover_blocks;
+    _killer_blocks   = other_anatomy._killer_blocks;
+    _armor_blocks    = other_anatomy._armor_blocks;
+    _eye_blocks      = other_anatomy._eye_blocks;
+
+    _organism_blocks = std::move(other_anatomy._organism_blocks);
+    _producing_space = std::move(other_anatomy._producing_space);
+    _eating_space    = std::move(other_anatomy._eating_space);
+    _killing_space   = std::move(other_anatomy._killing_space);
+
+    return *this;
 }

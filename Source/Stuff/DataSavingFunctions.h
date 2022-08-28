@@ -17,6 +17,7 @@
 #include "../Organism/CPU/Organism.h"
 #include "../Organism/CPU/Anatomy.h"
 #include "../Organism/CPU/Brain.h"
+#include "../SimulationEngine/OrganismsController.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -47,7 +48,8 @@ namespace DataSavingFunctions {
     void read_organisms_block_parameters(std::ifstream& is, OrganismBlockParameters &bp);
     void read_data_container_data(std::ifstream& is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height);
     void read_simulation_grid(std::ifstream& is, EngineDataContainer &edc);
-    Organism * read_organism(std::ifstream& is, SimulationParameters &sp, OrganismBlockParameters &bp);
+    void read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
+                       Organism *organism);
     bool read_organisms(std::ifstream& is, EngineDataContainer &edc, SimulationParameters &sp, OrganismBlockParameters &bp, uint32_t num_organisms);
     void read_organism_data(std::ifstream& is, OrganismData & data);
     void read_organism_brain(std::ifstream& is, Brain * brain);
@@ -61,9 +63,12 @@ namespace DataSavingFunctions {
     void json_write_fossil_record(rapidjson::Document &d);
     void json_write_controls(rapidjson::Document &d, SimulationParameters &sp);
 
-    void json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp);
-    Organism * json_read_organism(rapidjson::GenericValue<rapidjson::UTF8<>> &organism, SimulationParameters &sp, OrganismBlockParameters &bp);
-    void json_read_organisms_data(rapidjson::Document & d, SimulationParameters &sp, OrganismBlockParameters &bp, EngineDataContainer &edc);
+//    void json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp);
+    void json_read_organism(rapidjson::GenericValue<rapidjson::UTF8<>> &organism, SimulationParameters &sp,
+                            OrganismBlockParameters &bp, Organism *new_organism);
+    void json_read_organisms_data(rapidjson::Document *d_, SimulationParameters *sp_, OrganismBlockParameters *bp_, EngineDataContainer *edc_);
+
+    void json_read_simulation_parameters(rapidjson::Document * d, SimulationParameters * sp);
 }
 
 #endif //LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H

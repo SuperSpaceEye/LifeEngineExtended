@@ -47,31 +47,40 @@ const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes typ
         case Rotation::LEFT:
             rxs -= 0.5;
             rys -= 0.5;
+
             std::swap(rxs, rys);
-            rys = -rys;
+
+            rxs = -rxs;
             rxs += 0.5;
             rys += 0.5;
             break;
         case Rotation::DOWN:
             rxs -= 0.5;
             rys -= 0.5;
+
             rxs = -rxs;
             rys = -rys;
+
             rxs += 0.5;
             rys += 0.5;
             break;
         case Rotation::RIGHT:
             rxs -= 0.5;
             rys -= 0.5;
+
             std::swap(rxs, rys);
-            rxs = -rxs;
+
+            rys = -rys;
             rxs += 0.5;
             rys += 0.5;
             break;
     }
 
-    int x = rxs * (holder.width-1);
-    int y = rys * (holder.height-1);
+    int x = rxs * holder.width;
+    int y = rys * holder.height;
+
+    if (x == holder.width) {x--;}
+    if (y == holder.height) {y--;}
 
     return holder.texture.at(x + y * holder.width);
 }
