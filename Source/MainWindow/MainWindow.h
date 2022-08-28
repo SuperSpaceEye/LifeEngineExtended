@@ -325,6 +325,7 @@ private slots:
     void le_float_number_precision_slot();
     void le_scaling_coefficient_slot();
     void le_memory_allocation_strategy_modifier_slot();
+    void le_random_seed_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();

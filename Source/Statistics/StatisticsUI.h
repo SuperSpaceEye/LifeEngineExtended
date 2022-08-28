@@ -37,6 +37,9 @@ public:
     QLabel *lb_child_organisms_capacity;
     QLabel *lb_total_organisms;
     QLabel *lb_dead_organisms;
+    QLabel *lb_last_alive_position;
+    QLabel *lb_dead_inside;
+    QLabel *lb_dead_outside;
     QLabel *lb_organisms_capacity;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_47;
@@ -97,7 +100,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 709, 567));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 709, 636));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -156,6 +159,21 @@ public:
         lb_dead_organisms->setObjectName(QString::fromUtf8("lb_dead_organisms"));
 
         verticalLayout_37->addWidget(lb_dead_organisms);
+
+        lb_last_alive_position = new QLabel(widget_5);
+        lb_last_alive_position->setObjectName(QString::fromUtf8("lb_last_alive_position"));
+
+        verticalLayout_37->addWidget(lb_last_alive_position);
+
+        lb_dead_inside = new QLabel(widget_5);
+        lb_dead_inside->setObjectName(QString::fromUtf8("lb_dead_inside"));
+
+        verticalLayout_37->addWidget(lb_dead_inside);
+
+        lb_dead_outside = new QLabel(widget_5);
+        lb_dead_outside->setObjectName(QString::fromUtf8("lb_dead_outside"));
+
+        verticalLayout_37->addWidget(lb_dead_outside);
 
         lb_organisms_capacity = new QLabel(widget_5);
         lb_organisms_capacity->setObjectName(QString::fromUtf8("lb_organisms_capacity"));
@@ -399,6 +417,9 @@ public:
         lb_child_organisms_capacity->setText(QApplication::translate("Statistics", "Child organisms capacity:", nullptr));
         lb_total_organisms->setText(QApplication::translate("Statistics", "Total organisms:", nullptr));
         lb_dead_organisms->setText(QApplication::translate("Statistics", "Dead organisms:", nullptr));
+        lb_last_alive_position->setText(QApplication::translate("Statistics", "Last alive position:", nullptr));
+        lb_dead_inside->setText(QApplication::translate("Statistics", "Dead inside:", nullptr));
+        lb_dead_outside->setText(QApplication::translate("Statistics", "Dead outside:", nullptr));
         lb_organisms_capacity->setText(QApplication::translate("Statistics", "Organisms capacity:", nullptr));
         lb_moving_organisms->setText(QApplication::translate("Statistics", "Moving organisms:", nullptr));
         lb_organisms_with_eyes->setText(QApplication::translate("Statistics", "Organisms with eyes:", nullptr));

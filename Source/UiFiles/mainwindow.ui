@@ -1049,7 +1049,7 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-1155</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>1562</height>
                  </rect>
@@ -2050,7 +2050,7 @@
                   <x>0</x>
                   <y>-556</y>
                   <width>606</width>
-                  <height>774</height>
+                  <height>803</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2346,6 +2346,20 @@
                       </item>
                       <item>
                        <widget class="QLineEdit" name="le_memory_allocation_strategy_modifier"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_56">
+                      <item>
+                       <widget class="QLabel" name="label_39">
+                        <property name="text">
+                         <string>Random seed</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_random_seed"/>
                       </item>
                      </layout>
                     </item>
@@ -4287,6 +4301,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_random_seed</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_random_seed_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>730</x>
+     <y>794</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4403,6 +4433,7 @@
   <slot>cb_show_extended_statistics_slot(bool)</slot>
   <slot>cb_no_random_decisions_slot(bool)</slot>
   <slot>le_memory_allocation_strategy_modifier_slot()</slot>
+  <slot>le_random_seed_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

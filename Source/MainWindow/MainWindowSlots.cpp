@@ -521,6 +521,15 @@ void MainWindow::le_memory_allocation_strategy_modifier_slot() {
                                ui.le_memory_allocation_strategy_modifier, 1, "1");
 }
 
+void MainWindow::le_random_seed_slot() {
+    uint64_t temp = 0;
+    le_slot_lower_bound<uint64_t>(temp, temp, "uint64_t",
+                               ui.le_random_seed, 0, "0");
+    if (!temp) { return;}
+
+    engine.set_seed(temp);
+}
+
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
@@ -610,6 +619,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         s.ui.lb_dead_organisms->show();
         s.ui.lb_organisms_capacity->show();
         s.ui.lb_total_organisms->show();
+        s.ui.lb_last_alive_position->show();
+        s.ui.lb_dead_inside->show();
+        s.ui.lb_dead_outside->show();
     } else {
         s.ui.lb_child_organisms->hide();
         s.ui.lb_child_organisms_capacity->hide();
@@ -617,6 +629,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         s.ui.lb_dead_organisms->hide();
         s.ui.lb_organisms_capacity->hide();
         s.ui.lb_total_organisms->hide();
+        s.ui.lb_last_alive_position->hide();
+        s.ui.lb_dead_inside->hide();
+        s.ui.lb_dead_outside->hide();
     }
 }
 

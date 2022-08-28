@@ -549,3 +549,7 @@ void SimulationEngine::stop_world_events_no_setting_reset() {
     world_events_controller.reset();
     unpause();
 }
+
+void SimulationEngine::set_seed(uint64_t new_seed) {
+    gen.set_seed(new_seed);
+}

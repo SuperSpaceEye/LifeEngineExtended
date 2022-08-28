@@ -283,6 +283,9 @@ public:
     QHBoxLayout *horizontalLayout_55;
     QLabel *label_38;
     QLineEdit *le_memory_allocation_strategy_modifier;
+    QHBoxLayout *horizontalLayout_56;
+    QLabel *label_39;
+    QLineEdit *le_random_seed;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -897,7 +900,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1155, 606, 1562));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1562));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1563,7 +1566,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -556, 606, 774));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -556, 606, 803));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1779,6 +1782,21 @@ public:
 
 
         verticalLayout_19->addLayout(horizontalLayout_55);
+
+        horizontalLayout_56 = new QHBoxLayout();
+        horizontalLayout_56->setObjectName(QString::fromUtf8("horizontalLayout_56"));
+        label_39 = new QLabel(widget_2);
+        label_39->setObjectName(QString::fromUtf8("label_39"));
+
+        horizontalLayout_56->addWidget(label_39);
+
+        le_random_seed = new QLineEdit(widget_2);
+        le_random_seed->setObjectName(QString::fromUtf8("le_random_seed"));
+
+        horizontalLayout_56->addWidget(le_random_seed);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_56);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -2020,6 +2038,7 @@ public:
         QObject::connect(cb_show_extended_statistics, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_show_extended_statistics_slot(bool)));
         QObject::connect(cb_no_random_decisions, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_no_random_decisions_slot(bool)));
         QObject::connect(le_memory_allocation_strategy_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_memory_allocation_strategy_modifier_slot()));
+        QObject::connect(le_random_seed, SIGNAL(returnPressed()), MainWindow, SLOT(le_random_seed_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -2241,6 +2260,7 @@ public:
         b_update_textures->setText(QApplication::translate("MainWindow", "Update textures", nullptr));
         cb_show_extended_statistics->setText(QApplication::translate("MainWindow", "Show extended statistics", nullptr));
         label_38->setText(QApplication::translate("MainWindow", "Memory allocation strategy modifier", nullptr));
+        label_39->setText(QApplication::translate("MainWindow", "Random seed", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

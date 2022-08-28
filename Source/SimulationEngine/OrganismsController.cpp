@@ -29,7 +29,6 @@ void OrganismsController::free_child_organism(Organism *child_organism, EngineDa
 
 
 
-
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
     // If there are organisms not in use, take them.
     edc.stc.num_alive_organisms++;
@@ -67,16 +66,11 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
     if (organism->vector_index < edc.stc.last_alive_position) {
         edc.stc.dead_organisms_before_last_alive_position++;
     }
-//
-//    if (organism->vector_index == edc.stc.last_alive_position) {
-//        edc.stc.last_alive_position--;
-//    }
 
     edc.stc.num_dead_organisms++;
     edc.stc.num_alive_organisms--;
 }
 
-//returns index of placed organism
 int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *child_organism, EngineDataContainer &edc) {
     auto * main_o_ptr = get_new_main_organism(edc);
 
@@ -94,14 +88,12 @@ int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *ch
 }
 
 void OrganismsController::precise_sort_low_to_high_dead_organisms_positions(EngineDataContainer &edc) {
-    //TODO the result of sorting doesn't need to be perfect, just good enough.
     std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
         return a < b;
     });
 }
 
 void OrganismsController::precise_sort_high_to_low_dead_organisms_positions(EngineDataContainer &edc) {
-    //TODO the result of sorting doesn't need to be perfect, just good enough.
     std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
         return a > b;
     });
@@ -122,45 +114,36 @@ void OrganismsController::compress_organisms(EngineDataContainer &edc) {
     if (edc.stc.dead_organisms_before_last_alive_position * edc.stc.max_dead_organisms_in_alive_section_factor < edc.stc.num_alive_organisms) { return;}
     if (edc.stc.num_alive_organisms == 1) { return;}
 
-    //TODO
+    //TODO on call of compress_organisms go through all dead organisms positions and only append to temp list positions that are < last_alive_position
     OrganismsController::precise_sort_high_to_low_dead_organisms_positions(edc);
 
-//    OrganismsController::precise_sort_low_to_high_dead_organisms_positions(edc);
     int left_index = 0;
     int right_index = edc.stc.last_alive_position;
 
     Organism * left_organism;
     Organism * right_organism;
 
-    //std::vector<uint32_t> temp;
-
+    //there will be no dead organisms before last_alive_position by the end of compression
     edc.stc.dead_organisms_before_last_alive_position = 0;
 
     while (left_index <= right_index) {
-        //while right organism is dead, search left until it is alive
-        while ((right_organism = &edc.stc.organisms[right_index])->is_dead)
-        {right_index--;
-            if (right_index <= left_index)
-            { goto endlogic_right;}}
-        //while left organism is alive, search right until it is dead
-        while (!(left_organism = &edc.stc.organisms[left_index])->is_dead) {left_index++; if (left_index >= right_index) {goto endlogic_left;}}
+        //while right organism is dead, go left until it is alive
+        while ((right_organism = &edc.stc.organisms[right_index])->is_dead) {right_index--; if (right_index <= left_index) { goto endlogic_right;}}
+        //while left organism is alive, go right until it is dead
+        while (!(left_organism = &edc.stc.organisms[left_index])->is_dead)  {left_index++;  if (left_index >= right_index) { goto endlogic_left;}}
 
         //If left organism is dead, and right one is alive, then swap them, update positions, and repeat the process.
         std::swap(*right_organism, *left_organism);
         right_organism->vector_index = right_index;
         left_organism->vector_index  = left_index;
 
-        //edc.stc.dead_organisms_positions.pop_back();
-        //temp.emplace_back(right_index);
-
         edc.stc.dead_organisms_positions.pop_back();
         edc.stc.temp_dead_organisms_positions.emplace_back(right_index);
     }
     endlogic_left:
-//    edc.stc.last_alive_position = OrganismsController::get_last_alive_organism_position(edc);
+    //left index by the end of compression will be the last alive position
     edc.stc.last_alive_position = left_index;
     endlogic_right:
-
     edc.stc.dead_organisms_positions.insert(edc.stc.dead_organisms_positions.end(),
                                             edc.stc.temp_dead_organisms_positions.begin(),
                                             edc.stc.temp_dead_organisms_positions.end());

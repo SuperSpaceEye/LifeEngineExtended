@@ -46,7 +46,7 @@
         <x>0</x>
         <y>0</y>
         <width>709</width>
-        <height>567</height>
+        <height>636</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -139,6 +139,27 @@
            <widget class="QLabel" name="lb_dead_organisms">
             <property name="text">
              <string>Dead organisms:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_last_alive_position">
+            <property name="text">
+             <string>Last alive position:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_dead_inside">
+            <property name="text">
+             <string>Dead inside:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_dead_outside">
+            <property name="text">
+             <string>Dead outside:</string>
             </property>
            </widget>
           </item>

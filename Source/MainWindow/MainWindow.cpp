@@ -134,9 +134,6 @@ void MainWindow::mainloop_tick() {
 
         engine.update_info();
         auto info = engine.get_info();
-
-//        std::cout << "Last alive position: " << edc.stc.last_alive_position << " || dead inside: " << edc.stc.dead_organisms_before_last_alive_position << " || dead outside: " << edc.stc.num_dead_organisms - edc.stc.dead_organisms_before_last_alive_position << "\n";
-
         engine.unpause();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
@@ -424,6 +421,8 @@ void MainWindow::resize_simulation_grid() {
     engine.reset_world();
     engine.unpause();
 
+    update_simulation_size_label();
+
     reset_scale_view();
 }
 
@@ -485,6 +484,9 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     s.ui.lb_dead_organisms->setText(QString::fromStdString("Dead organisms: " + std::to_string(edc.stc.dead_organisms_positions.size())));
     s.ui.lb_organisms_capacity->setText(QString::fromStdString("Organisms capacity: " + std::to_string(edc.stc.organisms.capacity())));
     s.ui.lb_total_organisms->setText(QString::fromStdString("Total organisms: " + std::to_string(edc.stc.organisms.size())));
+    s.ui.lb_last_alive_position->setText(QString::fromStdString("Last alive position: " + std::to_string(edc.stc.last_alive_position)));
+    s.ui.lb_dead_inside->setText(QString::fromStdString("Dead inside: " + std::to_string(edc.stc.dead_organisms_before_last_alive_position)));
+    s.ui.lb_dead_outside->setText(QString::fromStdString("Dead outside: " + std::to_string(edc.stc.num_dead_organisms - edc.stc.dead_organisms_before_last_alive_position)));
 }
 
 // So that changes in code values would be set by default in gui.
@@ -712,12 +714,7 @@ void MainWindow::change_editing_grid_right_click() {
 
 bool MainWindow::cuda_is_available() {
 #if __CUDA_USED__
-    auto count = get_device_count();
-    if (count <= 0) {
-        return false;
-    } else {
-        return true;
-    }
+    return get_device_count();
 #else
     return false;
 #endif

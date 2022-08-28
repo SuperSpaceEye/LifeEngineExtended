@@ -31,9 +31,9 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {make_decision(dc, sp, &organism, gen);}}
 
     OrganismsController::compress_organisms(*dc);
+    //TODO the result of sorting doesn't need to be perfect, just good enough.
     OrganismsController::precise_sort_high_to_low_dead_organisms_positions(*dc);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {try_make_child(dc, sp, &organism, gen);}}
-//    dc->stc.last_alive_position = OrganismsController::get_last_alive_organism_position(*dc);
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
@@ -582,10 +582,6 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
             case BlockTypes::WallBlock:
                 return false;
             case BlockTypes::FoodBlock:
-                //Big producers will not evolve if uncommented.
-//                if (sp->food_blocks_reproduction) {
-//                    return false;
-//                }
                 continue;
             default:
                 if (block->organism_index == allow_organism) { continue;}

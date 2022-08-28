@@ -18,10 +18,6 @@
 #include "../../Organism/CPU/ObservationStuff.h"
 #include "../../Organism/CPU/Organism.h"
 
-struct eager_worker_partial;
-//class Organism;
-struct pool_changes_info;
-
 struct EngineDataContainer {
     uint64_t delta_time = 0;
     // for calculating ticks/second
@@ -51,7 +47,6 @@ struct EngineDataContainer {
         float max_dead_organisms_in_alive_section_factor = 2;
         float memory_allocation_strategy_modifier = 2;
         std::vector<Organism> organisms{};
-        //Should be in the reverse order of the position of dead organism in main grid
         std::vector<uint32_t> dead_organisms_positions{};
         std::vector<uint32_t> temp_dead_organisms_positions{};
         std::vector<Organism> child_organisms{};
@@ -61,17 +56,8 @@ struct EngineDataContainer {
     };
     SingleThreadContainer stc{};
 
-    std::vector<std::vector<Organism*>> organisms_pools;
-
     std::vector<BaseGridBlock> simple_state_grid;
 
-//    std::vector<eager_worker_partial> threads;
-    std::vector<std::vector<int>> threaded_to_erase;
-    std::vector<std::vector<std::vector<Observation>>> pooled_organisms_observations;
-    std::vector<std::vector<pool_changes_info>> sorted_organisms_by_x_position;
-    std::vector<std::vector<pool_changes_info*>> pool_changes;
-
-    //TODO
     Organism * base_organism = nullptr;
     Organism * chosen_organism = nullptr;
 
@@ -81,13 +67,6 @@ struct EngineDataContainer {
     std::vector<Action> user_actions_pool;
 
     Organism * selected_organism = nullptr;
-};
-
-struct pool_changes_info {
-    Organism * organism = nullptr;
-    int position_in_old_pool = -1;
-    int old_pool = 500;
-    int new_pool = 500;
 };
 
 
