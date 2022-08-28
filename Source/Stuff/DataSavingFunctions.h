@@ -63,10 +63,12 @@ namespace DataSavingFunctions {
     void json_write_fossil_record(rapidjson::Document &d);
     void json_write_controls(rapidjson::Document &d, SimulationParameters &sp);
 
-    void json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp);
+//    void json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp);
     void json_read_organism(rapidjson::GenericValue<rapidjson::UTF8<>> &organism, SimulationParameters &sp,
                             OrganismBlockParameters &bp, Organism *new_organism);
-    void json_read_organisms_data(rapidjson::Document & d, SimulationParameters &sp, OrganismBlockParameters &bp, EngineDataContainer &edc);
+    void json_read_organisms_data(rapidjson::Document *d_, SimulationParameters *sp_, OrganismBlockParameters *bp_, EngineDataContainer *edc_);
+
+    void json_read_simulation_parameters(rapidjson::Document * d, SimulationParameters * sp);
 }
 
 #endif //LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H

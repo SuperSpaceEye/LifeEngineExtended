@@ -51,10 +51,12 @@ void MainWindow::read_data(std::ifstream &is) {
     DataSavingFunctions::read_organisms_block_parameters(is, bp);
     if (read_data_container_data(is)) {
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        return;
     }
     read_simulation_grid(is);
     if (read_organisms(is)) {
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        return;
     }
 
     edc.total_engine_ticks = edc.loaded_engine_ticks;
@@ -158,6 +160,31 @@ void MainWindow::update_table_values() {
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
+#include <csetjmp>
+#include <csignal>
+
+jmp_buf env;
+
+void on_sigabrt (int signum)
+{
+    signal (signum, SIG_DFL);
+    longjmp (env, 1);
+}
+
+template <typename ...A>
+bool try_and_catch_abort(std::function<void(A...)> f, A... args)
+{
+    if (setjmp (env) == 0) {
+        signal(SIGABRT, &on_sigabrt);
+        f(args...);
+        signal (SIGABRT, SIG_DFL);
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 void MainWindow::read_json_data(const std::string &path) {
     std::string json;
     auto ss = std::ostringstream();
@@ -179,20 +206,35 @@ void MainWindow::read_json_data(const std::string &path) {
         display_message("Failed to load world");
         return;
     }
-
     engine.partial_clear_world();
-    engine.make_walls();
 
+    SimulationParameters recovery_sp = sp;
+    OrganismBlockParameters recovery_bp = bp;
+    uint32_t recovery_simulation_width = edc.simulation_width;
+    uint32_t recovery_simulation_height = edc.simulation_height;
+
+    //TODO divide json access from private class stuff for abort protection
     json_read_grid_data(document);
-    DataSavingFunctions::json_read_simulation_parameters(document, sp);
-    DataSavingFunctions::json_read_organisms_data(document, sp, bp, edc);
+    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, SimulationParameters*)> func1 = &DataSavingFunctions::json_read_simulation_parameters;
+    if (try_and_catch_abort(func1, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &sp)) {
+        display_message("Failed to read simulation parameters");
+        recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        return;
+    }
+
+    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, SimulationParameters*, OrganismBlockParameters*, EngineDataContainer*)> func2 = &DataSavingFunctions::json_read_organisms_data;
+    if (try_and_catch_abort(func2, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &sp, &bp, &edc)) {
+        display_message("Failed to read simulation parameters");
+        recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        return;
+    }
 
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-void MainWindow::json_read_grid_data(rapidjson::Document & d) {
-    edc.simulation_height = d["num_rows"].GetInt() + 2;
-    edc.simulation_width  = d["num_cols"].GetInt() + 2;
+void MainWindow::json_read_grid_data(Document & d) {
+    edc.simulation_height = d["grid"]["rows"].GetInt() + 2;
+    edc.simulation_width  = d["grid"]["cols"].GetInt() + 2;
 
     new_simulation_width = edc.simulation_width;
     new_simulation_height = edc.simulation_height;

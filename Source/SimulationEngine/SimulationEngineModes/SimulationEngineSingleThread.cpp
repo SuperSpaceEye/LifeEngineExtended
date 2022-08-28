@@ -20,7 +20,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {apply_damage(dc, sp, &organism);}}
 
-    for (int i = dc->stc.last_alive_position; i >= 0; i--) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {tick_lifetime(dc, &organism);}}
+    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {tick_lifetime(dc, &organism);}}
 
     dc->stc.organisms_observations.clear();
 
@@ -32,8 +32,17 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     OrganismsController::compress_organisms(*dc);
     //TODO the result of sorting doesn't need to be perfect, just good enough.
+    //https://en.wikipedia.org/wiki/K-sorted_sequence#Algorithms
+    //https://en.wikipedia.org/wiki/Partial_sorting
     OrganismsController::precise_sort_high_to_low_dead_organisms_positions(*dc);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {try_make_child(dc, sp, &organism, gen);}}
+
+    //Possible optimization
+    //1. collect organisms that are going to reproduce
+    //2. partially sort outside dead organisms of amount num_organisms_to_reproduce - dead_inside.
+    //3. reproduce organisms.
+    //Because it is possible that organisms will "jump" over dead organisms, there will be needed some algorithm that will
+    //detect jumping and compute accurate dead_organisms_before_last_alive_position.
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
@@ -49,7 +58,6 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
 void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen) {
     if (organism->anatomy._producer_blocks == 0) {return;}
     if (organism->anatomy._mover_blocks > 0 && !sp->movers_can_produce_food) {return;}
-    //TODO delete?
     if (organism->lifetime % sp->produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp->simplified_food_production) {
@@ -134,6 +142,8 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
     }
 }
 
+//TODO reserve_observations and .clear() take like 5.5% of execution time. Maybe do not clear and reserve, and instead
+// expand observations as needed, while keeping some int to keep track of how many observations took place?
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
                                                         std::vector<Organism> &organisms,
                                                         EngineDataContainer *dc) {
@@ -186,23 +196,25 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
 
         auto last_observation = Observation{BlockTypes::EmptyBlock, 0, block.rotation};
 
-        for (int i = 1; i < sp->look_range; i++) {
+        for (int i = 1; i <= sp->look_range; i++) {
             pos_x += offset_x;
             pos_y += offset_y;
 
             last_observation.type = dc->CPU_simulation_grid[pos_x][pos_y].type;
             last_observation.distance = i;
 
-            //TODO maybe switch?
-            if (last_observation.type == BlockTypes::WallBlock) {break;}
-            if (last_observation.type == BlockTypes::FoodBlock) {break;}
-            if (last_observation.type != BlockTypes::EmptyBlock) {
-                if (!sp->organism_self_blocks_block_sight && dc->CPU_simulation_grid[pos_x][pos_y].organism_index == organism->vector_index) {
-                    continue;
-                }
-                break;
+            switch (last_observation.type) {
+                case BlockTypes::EmptyBlock: continue;
+                case BlockTypes::FoodBlock:
+                case BlockTypes::WallBlock: goto endfor;
+                default:
+                    if (!sp->organism_self_blocks_block_sight && dc->CPU_simulation_grid[pos_x][pos_y].organism_index == organism->vector_index) {
+                        continue;
+                    }
+                    goto endfor;
             }
         }
+        endfor:
         organism_observations[organism->vector_index][eye_i] = last_observation;
     }
 }

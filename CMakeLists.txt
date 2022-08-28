@@ -13,7 +13,6 @@ set(CMAKE_AUTOUIC ON)
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
 set(CMAKE_CUDA_ARCHITECTURES 61)
-set(AUTO_UI_FILE_REBUILDING 0)
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -03")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
@@ -87,34 +86,6 @@ set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/S
 
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES})
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
-
-if (AUTO_UI_FILE_REBUILDING)
-    add_custom_target(
-            run_window ALL
-            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/UiFiles/MainWindow/mainwindow.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/MainWindow/WindowUI.h"
-            BYPRODUCTS WindowUI.h
-            COMMENT "Generating Main Window header file."
-    )
-
-    add_custom_target(
-            run_statistics ALL
-            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/UiFiles/Statistics/statistics.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/Statistics/StatisticsUI.h"
-            BYPRODUCTS StatisticsUI.h
-            COMMENT "Generating Statistics header file."
-    )
-
-    add_custom_target(
-            run_editor ALL
-            COMMAND uic -g cpp "${CMAKE_SOURCE_DIR}/UiFiles/OrganismEditor/editor.ui" -o "${CMAKE_SOURCE_DIR}/LifeEngineCpp/OrganismEditor/EditorUI.h"
-            BYPRODUCTS EditorUI.h
-            COMMENT "Generating Organism editor's header file."
-    )
-
-    add_dependencies(${PROJECT_NAME} run_window)
-    add_dependencies(${PROJECT_NAME} run_statistics)
-    add_dependencies(${PROJECT_NAME} run_editor)
-
-endif()
 
 #if (WIN_USE_CUDA_LIBS)
 #    foreach(ITEM IN LISTS CUDA_SOURCES)

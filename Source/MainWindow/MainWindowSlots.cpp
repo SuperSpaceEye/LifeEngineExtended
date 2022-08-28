@@ -523,8 +523,7 @@ void MainWindow::le_memory_allocation_strategy_modifier_slot() {
 
 void MainWindow::le_random_seed_slot() {
     uint64_t temp = 0;
-    le_slot_lower_bound<uint64_t>(temp, temp, "uint64_t",
-                               ui.le_random_seed, 0, "0");
+    le_slot_lower_bound<uint64_t>(temp, temp, "uint64_t", ui.le_random_seed, 0, "0");
     if (!temp) { return;}
 
     engine.set_seed(temp);

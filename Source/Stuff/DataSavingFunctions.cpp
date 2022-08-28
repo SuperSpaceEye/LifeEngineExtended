@@ -446,8 +446,26 @@ void DataSavingFunctions::json_write_controls(rapidjson::Document & d, Simulatio
     d.AddMember("controls", j_controls, d.GetAllocator());
 }
 
+//void DataSavingFunctions::json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp) {
+//    sp.lifespan_multiplier               = d["controls"]["lifespanMultiplier"].GetFloat();
+//    sp.food_production_probability       = d["controls"]["foodProdProb"].GetFloat() / 100;
+//    sp.use_anatomy_evolved_mutation_rate =!d["controls"]["useGlobalMutability"].GetBool();
+//    sp.global_anatomy_mutation_rate      = d["controls"]["globalMutability"].GetFloat() / 100;
+//    sp.add_cell                          = d["controls"]["addProb"].GetInt();
+//    sp.change_cell                       = d["controls"]["changeProb"].GetInt();
+//    sp.remove_cell                       = d["controls"]["removeProb"].GetInt();
+//    sp.runtime_rotation_enabled          = d["controls"]["rotationEnabled"].GetBool();
+//    sp.food_blocks_reproduction          = d["controls"]["foodBlocksReproduction"].GetBool();
+//    sp.movers_can_produce_food           = d["controls"]["moversCanProduce"].GetBool();
+//    sp.on_touch_kill                     = d["controls"]["instaKill"].GetBool();
+//    sp.look_range                        = d["controls"]["lookRange"].GetInt();
+//    sp.extra_mover_reproductive_cost     = d["controls"]["extraMoverFoodCost"].GetFloat();
+//}
 
-void DataSavingFunctions::json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp) {
+void DataSavingFunctions::json_read_simulation_parameters(rapidjson::Document * d_, SimulationParameters * sp_) {
+    auto &sp = *sp_;
+    auto &d = *d_;
+
     sp.lifespan_multiplier               = d["controls"]["lifespanMultiplier"].GetFloat();
     sp.food_production_probability       = d["controls"]["foodProdProb"].GetFloat() / 100;
     sp.use_anatomy_evolved_mutation_rate =!d["controls"]["useGlobalMutability"].GetBool();
@@ -541,7 +559,12 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
     new_organism->damage = damage;
 }
 
-void DataSavingFunctions::json_read_organisms_data(rapidjson::Document & d, SimulationParameters &sp, OrganismBlockParameters &bp, EngineDataContainer &edc) {
+void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParameters *sp_, OrganismBlockParameters *bp_, EngineDataContainer *edc_) {
+    auto &d = *d_;
+    auto &sp = *sp_;
+    auto &bp = *bp_;
+    auto &edc = *edc_;
+
     for (auto & organism: d["organisms"].GetArray()) {
         auto new_organism = OrganismsController::get_new_main_organism(edc);
         auto array_place = new_organism->vector_index;
@@ -553,7 +576,7 @@ void DataSavingFunctions::json_read_organisms_data(rapidjson::Document & d, Simu
         SimulationEngineSingleThread::place_organism(&edc, new_organism);
     }
 
-    auto gen = lehmer64(0);
+    auto gen = lehmer64(42);
 
     for (auto & organism: edc.stc.organisms) {
         edc.stc.organisms_observations.clear();
@@ -561,6 +584,6 @@ void DataSavingFunctions::json_read_organisms_data(rapidjson::Document & d, Simu
         for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(&edc, &sp, &organism, edc.stc.organisms_observations);}}
 
         for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i],
-                                                                                                                                                        &gen);}}
+                                                                                                                                                          &gen);}}
     }
 }

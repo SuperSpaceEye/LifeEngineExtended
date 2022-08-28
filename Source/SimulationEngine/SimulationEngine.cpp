@@ -379,10 +379,6 @@ void SimulationEngine::partial_clear_world() {
 }
 
 void SimulationEngine::clear_organisms() {
-    for (int i = 0; i <= edc.stc.last_alive_position; i++) {
-        edc.stc.organisms[i].kill_organism(edc);
-    }
-
     edc.stc.organisms = std::vector<Organism>();
     edc.stc.child_organisms = std::vector<Organism>();
     edc.stc.dead_organisms_positions = std::vector<uint32_t>();
