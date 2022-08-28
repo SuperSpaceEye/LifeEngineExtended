@@ -446,22 +446,6 @@ void DataSavingFunctions::json_write_controls(rapidjson::Document & d, Simulatio
     d.AddMember("controls", j_controls, d.GetAllocator());
 }
 
-//void DataSavingFunctions::json_read_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp) {
-//    sp.lifespan_multiplier               = d["controls"]["lifespanMultiplier"].GetFloat();
-//    sp.food_production_probability       = d["controls"]["foodProdProb"].GetFloat() / 100;
-//    sp.use_anatomy_evolved_mutation_rate =!d["controls"]["useGlobalMutability"].GetBool();
-//    sp.global_anatomy_mutation_rate      = d["controls"]["globalMutability"].GetFloat() / 100;
-//    sp.add_cell                          = d["controls"]["addProb"].GetInt();
-//    sp.change_cell                       = d["controls"]["changeProb"].GetInt();
-//    sp.remove_cell                       = d["controls"]["removeProb"].GetInt();
-//    sp.runtime_rotation_enabled          = d["controls"]["rotationEnabled"].GetBool();
-//    sp.food_blocks_reproduction          = d["controls"]["foodBlocksReproduction"].GetBool();
-//    sp.movers_can_produce_food           = d["controls"]["moversCanProduce"].GetBool();
-//    sp.on_touch_kill                     = d["controls"]["instaKill"].GetBool();
-//    sp.look_range                        = d["controls"]["lookRange"].GetInt();
-//    sp.extra_mover_reproductive_cost     = d["controls"]["extraMoverFoodCost"].GetFloat();
-//}
-
 void DataSavingFunctions::json_read_simulation_parameters(rapidjson::Document * d_, SimulationParameters * sp_) {
     auto &sp = *sp_;
     auto &d = *d_;

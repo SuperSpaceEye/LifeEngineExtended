@@ -20,6 +20,16 @@
 
 class WorldEvents: public QWidget {
     Q_OBJECT
+public:
+    enum class VerifyNodesFailCodes {
+        NoProblems,
+        UnknownNode,
+        EmptyStartingNode,
+        ChangeValueNodeNoChangeValue,
+        ChangeValueIncorrectValue,
+        ConditionalNodeNoValueToCheck,
+        ConditionalNodeIncorrectValueToChange
+    };
 private:
     Ui::WorldEvents ui{};
     Ui::MainWindow * parent_ui = nullptr;
@@ -35,9 +45,9 @@ private:
     void button_add_new_branch();
     QWidget * node_chooser(QHBoxLayout * widget_layout);
 
-    bool verify_nodes();
-    static bool check_conditional_node(BaseEventNode * node);
-    static bool check_change_value_node(BaseEventNode * node);
+    VerifyNodesFailCodes verify_nodes();
+    static WorldEvents::VerifyNodesFailCodes check_conditional_node(BaseEventNode * node);
+    static VerifyNodesFailCodes check_change_value_node(BaseEventNode * node);
     BaseEventNode *copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage);
     void copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage);
 public:

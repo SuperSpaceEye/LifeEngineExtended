@@ -15,10 +15,35 @@ void WorldEvents::b_apply_events_slot() {
         _repeating_branch[i] = *repeating_branch[i];
     }
 
-    if (!verify_nodes()) {
-        display_message("Applying new events failed");
-        return;
+    auto fail_code = verify_nodes();
+
+    if (fail_code != VerifyNodesFailCodes::NoProblems) {
+        switch (fail_code) {
+            case VerifyNodesFailCodes::UnknownNode:
+                display_message("Applying new events failed. Unknown node.");
+                return;
+            case VerifyNodesFailCodes::EmptyStartingNode:
+                display_message("Applying new events failed. No starting node.");
+                return;
+            case VerifyNodesFailCodes::ChangeValueNodeNoChangeValue:
+                display_message("Applying new events failed. No value chosen.");
+                return;
+            case VerifyNodesFailCodes::ChangeValueIncorrectValue:
+                display_message("Applying new events failed. Incorrect value chosen.");
+                return;
+            case VerifyNodesFailCodes::ConditionalNodeNoValueToCheck:
+                display_message("Applying new events failed. No value chosen.");
+                return;
+            case VerifyNodesFailCodes::ConditionalNodeIncorrectValueToChange:
+                display_message("Applying new events failed. Incorrect value chosen.");
+                return;
+        }
     }
+
+//    if (!verify_nodes()) {
+//        display_message("Applying new events failed");
+//        return;
+//    }
 
     copy_nodes(start_nodes, node_storage);
 

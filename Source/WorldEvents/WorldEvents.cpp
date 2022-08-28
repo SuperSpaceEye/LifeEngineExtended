@@ -92,8 +92,8 @@ QWidget * WorldEvents::node_chooser(QHBoxLayout * widget_layout) {
     return new_widget;
 }
 
-bool WorldEvents::verify_nodes() {
-    if (starting_nodes_container.empty()) {return false;}
+WorldEvents::VerifyNodesFailCodes WorldEvents::verify_nodes() {
+    if (starting_nodes_container.empty()) {return VerifyNodesFailCodes::EmptyStartingNode;}
     for (auto * starting_node: starting_nodes_container) {
         std::vector<BaseEventNode*> branch_stack;
         branch_stack.push_back(starting_node);
@@ -101,37 +101,45 @@ bool WorldEvents::verify_nodes() {
             auto node = branch_stack.back();
             branch_stack.pop_back();
 
+            VerifyNodesFailCodes fail_code;
+
             while (node != nullptr) {
                 switch (node->type) {
                     case NodeType::ChangeValue:
-                        if (!check_change_value_node(node)) { return false; }
+                        fail_code = check_change_value_node(node);
+                        if (fail_code != VerifyNodesFailCodes::NoProblems) {
+                            return fail_code;
+                        }
                         break;
                     case NodeType::Conditional:
-                        if (!check_conditional_node(node)) { return false; }
+                        fail_code = check_conditional_node(node);
+                        if (fail_code != VerifyNodesFailCodes::NoProblems) {
+                            return fail_code;
+                        }
                         if (node->alternative_node != nullptr) {branch_stack.push_back(node->alternative_node);}
                         break;
                     default:
-                        return false;
+                        return VerifyNodesFailCodes::UnknownNode;
                 }
                 node = node->next_node;
             }
         }
     }
-    return true;
+    return VerifyNodesFailCodes::NoProblems;
 }
 
-bool WorldEvents::check_change_value_node(BaseEventNode *node) {
+WorldEvents::VerifyNodesFailCodes WorldEvents::check_change_value_node(BaseEventNode *node) {
     auto * _node = reinterpret_cast<ChangeValueEventNode<float>*>(node);
-    if (_node->change_value == nullptr) {return false;}
-    if (_node->value_type   == ChangeTypes::NONE) {return false;}
-    return true;
+    if (_node->change_value == nullptr) {return VerifyNodesFailCodes::ChangeValueNodeNoChangeValue;}
+    if (_node->value_type   == ChangeTypes::NONE) {return VerifyNodesFailCodes::ChangeValueIncorrectValue;}
+    return VerifyNodesFailCodes::NoProblems;
 }
 
-bool WorldEvents::check_conditional_node(BaseEventNode *node) {
+WorldEvents::VerifyNodesFailCodes WorldEvents::check_conditional_node(BaseEventNode *node) {
     auto * _node = reinterpret_cast<ConditionalEventNode<double>*>(node);
-    if (_node->check_value == nullptr) {return false;}
-    if (_node->value_type  == ConditionalTypes::NONE) {return false;}
-    return true;
+    if (_node->check_value == nullptr) {return VerifyNodesFailCodes::ConditionalNodeNoValueToCheck;}
+    if (_node->value_type  == ConditionalTypes::NONE) {return VerifyNodesFailCodes::ConditionalNodeIncorrectValueToChange;}
+    return VerifyNodesFailCodes::NoProblems;
 }
 
 BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage) {
