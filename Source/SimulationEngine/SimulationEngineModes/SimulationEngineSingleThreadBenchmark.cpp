@@ -5,8 +5,7 @@
 #include "SimulationEngineSingleThreadBenchmark.h"
 
 SimulationEngineSingleThreadBenchmark::SimulationEngineSingleThreadBenchmark() {
-//    init_benchmark();
-//    reset_state();
+
 }
 
 bool SimulationEngineSingleThreadBenchmark::resize_benchmark_grid(int width, int height) {
@@ -31,7 +30,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             OrganismContainer{"1 block", p_organism}
     );
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= organisms_diameter; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
         for (int x = -2*i; x <= 2*i; x += 2) {
@@ -55,7 +54,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             OrganismContainer{"1 mouth block", p_organism}
             );
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= organisms_diameter; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
         for (int x = -2*i; x <= 2*i; x += 2) {
@@ -89,7 +88,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             OrganismContainer{"1 block", p_organism}
     );
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= organisms_diameter; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
         for (int x = -2*i; x <= 2*i; x += 2) {
@@ -150,7 +149,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             OrganismContainer{"1 block", p_organism}
     );
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= organisms_diameter; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
         for (int x = -2*i; x <= 2*i; x += 2) {
@@ -174,7 +173,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             OrganismContainer{"1 block", p_organism}
     );
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= organisms_diameter; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
         for (int x = -2*i; x <= 2*i; x += 2) {
@@ -198,7 +197,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             OrganismContainer{"1 block", p_organism, 2}
     );
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= organisms_diameter; i++) {
         anatomy = Anatomy();
         std::vector<SC> blocks;
         for (int x = -i; x <= i; x += 1) {

@@ -84,3 +84,34 @@ void Benchmarks::b_stop_benchmarks_slot() {
     benchmark.finish_benchmarking();
     update_result_info();
 }
+
+void Benchmarks::b_apply_grid_size_slot() {
+    benchmark.resize_benchmark_grid(new_width, new_height);
+}
+
+
+void Benchmarks::le_grid_width_slot() {
+    le_slot_lower_bound<int>(new_width, new_width, "int", ui.le_grid_width, 100, "100");
+}
+
+void Benchmarks::le_grid_height_slot() {
+    le_slot_lower_bound<int>(new_height, new_height, "int", ui.le_grid_width, 100, "100");
+}
+
+void Benchmarks::le_num_benchmark_organisms_slot() {
+    auto temp = benchmark.get_num_organisms();
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_num_benchmark_organisms, 1, "1");
+    benchmark.set_num_organisms(temp);
+}
+
+void Benchmarks::le_num_iterations_slot() {
+    auto temp = benchmark.get_total_num_iterations();
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_num_iterations, 10, "10");
+    benchmark.set_num_tries(temp);
+}
+
+void Benchmarks::le_num_organisms_diameter_slot() {
+    auto temp = benchmark.get_organisms_diameter();
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_organisms_diameter, 1, "1");
+    benchmark.set_organisms_diameter(temp);
+}

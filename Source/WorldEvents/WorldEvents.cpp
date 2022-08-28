@@ -107,15 +107,11 @@ WorldEvents::VerifyNodesFailCodes WorldEvents::verify_nodes() {
                 switch (node->type) {
                     case NodeType::ChangeValue:
                         fail_code = check_change_value_node(node);
-                        if (fail_code != VerifyNodesFailCodes::NoProblems) {
-                            return fail_code;
-                        }
+                        if (fail_code != VerifyNodesFailCodes::NoProblems) { return fail_code;}
                         break;
                     case NodeType::Conditional:
                         fail_code = check_conditional_node(node);
-                        if (fail_code != VerifyNodesFailCodes::NoProblems) {
-                            return fail_code;
-                        }
+                        if (fail_code != VerifyNodesFailCodes::NoProblems) { return fail_code;}
                         if (node->alternative_node != nullptr) {branch_stack.push_back(node->alternative_node);}
                         break;
                     default:

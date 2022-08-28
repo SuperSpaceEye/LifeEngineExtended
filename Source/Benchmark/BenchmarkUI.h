@@ -12,6 +12,8 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
@@ -52,6 +54,24 @@ public:
     QVBoxLayout *verticalLayout_5;
     QTextEdit *benchmarks_output_text_edit;
     QWidget *settings_tab;
+    QVBoxLayout *verticalLayout_6;
+    QSpacerItem *verticalSpacer_5;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_2;
+    QLineEdit *le_grid_width;
+    QLabel *label;
+    QLineEdit *le_grid_height;
+    QPushButton *b_apply_grid_size;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label_3;
+    QLineEdit *le_num_benchmark_organisms;
+    QHBoxLayout *horizontalLayout_4;
+    QLabel *label_4;
+    QLineEdit *le_num_iterations;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *label_5;
+    QLineEdit *le_organisms_diameter;
+    QSpacerItem *verticalSpacer_6;
 
     void setupUi(QWidget *Benchmark)
     {
@@ -184,6 +204,91 @@ public:
         tabWidget->addTab(main_tab, QString());
         settings_tab = new QWidget();
         settings_tab->setObjectName(QString::fromUtf8("settings_tab"));
+        verticalLayout_6 = new QVBoxLayout(settings_tab);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_6->addItem(verticalSpacer_5);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        label_2 = new QLabel(settings_tab);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+
+        horizontalLayout_2->addWidget(label_2);
+
+        le_grid_width = new QLineEdit(settings_tab);
+        le_grid_width->setObjectName(QString::fromUtf8("le_grid_width"));
+
+        horizontalLayout_2->addWidget(le_grid_width);
+
+        label = new QLabel(settings_tab);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout_2->addWidget(label);
+
+        le_grid_height = new QLineEdit(settings_tab);
+        le_grid_height->setObjectName(QString::fromUtf8("le_grid_height"));
+
+        horizontalLayout_2->addWidget(le_grid_height);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_2);
+
+        b_apply_grid_size = new QPushButton(settings_tab);
+        b_apply_grid_size->setObjectName(QString::fromUtf8("b_apply_grid_size"));
+
+        verticalLayout_6->addWidget(b_apply_grid_size);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        label_3 = new QLabel(settings_tab);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        horizontalLayout_3->addWidget(label_3);
+
+        le_num_benchmark_organisms = new QLineEdit(settings_tab);
+        le_num_benchmark_organisms->setObjectName(QString::fromUtf8("le_num_benchmark_organisms"));
+
+        horizontalLayout_3->addWidget(le_num_benchmark_organisms);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_3);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        label_4 = new QLabel(settings_tab);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        horizontalLayout_4->addWidget(label_4);
+
+        le_num_iterations = new QLineEdit(settings_tab);
+        le_num_iterations->setObjectName(QString::fromUtf8("le_num_iterations"));
+
+        horizontalLayout_4->addWidget(le_num_iterations);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_4);
+
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        label_5 = new QLabel(settings_tab);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        horizontalLayout_5->addWidget(label_5);
+
+        le_organisms_diameter = new QLineEdit(settings_tab);
+        le_organisms_diameter->setObjectName(QString::fromUtf8("le_organisms_diameter"));
+
+        horizontalLayout_5->addWidget(le_organisms_diameter);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_5);
+
+        verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_6->addItem(verticalSpacer_6);
+
         tabWidget->addTab(settings_tab, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -201,6 +306,12 @@ public:
         QObject::connect(b_benchmark_try_make_child, SIGNAL(clicked()), Benchmark, SLOT(b_benchmark_try_make_child_slot()));
         QObject::connect(b_run_all_benchmarks, SIGNAL(clicked()), Benchmark, SLOT(b_run_all_benchmarks_slot()));
         QObject::connect(b_stop_benchmarks, SIGNAL(clicked()), Benchmark, SLOT(b_stop_benchmarks_slot()));
+        QObject::connect(le_grid_width, SIGNAL(returnPressed()), Benchmark, SLOT(le_grid_width_slot()));
+        QObject::connect(le_grid_height, SIGNAL(returnPressed()), Benchmark, SLOT(le_grid_height_slot()));
+        QObject::connect(b_apply_grid_size, SIGNAL(clicked()), Benchmark, SLOT(b_apply_grid_size_slot()));
+        QObject::connect(le_num_benchmark_organisms, SIGNAL(returnPressed()), Benchmark, SLOT(le_num_benchmark_organisms_slot()));
+        QObject::connect(le_num_iterations, SIGNAL(returnPressed()), Benchmark, SLOT(le_num_iterations_slot()));
+        QObject::connect(le_organisms_diameter, SIGNAL(returnPressed()), Benchmark, SLOT(le_num_organisms_diameter_slot()));
 
         tabWidget->setCurrentIndex(0);
 
@@ -223,6 +334,12 @@ public:
         b_benchmark_try_make_child->setText(QApplication::translate("Benchmark", "Benchmark try make child", nullptr));
         b_stop_benchmarks->setText(QApplication::translate("Benchmark", "Stop benchmarks / Finish benchmarking", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(main_tab), QApplication::translate("Benchmark", "Benchmark", nullptr));
+        label_2->setText(QApplication::translate("Benchmark", "Grid width", nullptr));
+        label->setText(QApplication::translate("Benchmark", "Grid height", nullptr));
+        b_apply_grid_size->setText(QApplication::translate("Benchmark", "Apply grid size", nullptr));
+        label_3->setText(QApplication::translate("Benchmark", "Num benchmark organisms", nullptr));
+        label_4->setText(QApplication::translate("Benchmark", "Num iterations", nullptr));
+        label_5->setText(QApplication::translate("Benchmark", "Organisms diameter", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(settings_tab), QApplication::translate("Benchmark", "Benchmark Settings", nullptr));
     } // retranslateUi
 

@@ -52,6 +52,7 @@ class SimulationEngineSingleThreadBenchmark {
 
     int num_iterations = 200;
     int num_organisms = 10'000;
+    int organisms_diameter = 1;
 
     boost::unordered_map<BenchmarkTypes, std::vector<OrganismContainer>> benchmark_organisms;
 
@@ -96,10 +97,10 @@ public:
 
     bool benchmark_is_running() const {return benchmark_running;}
 
-    bool set_seed(uint64_t seed);
+    bool set_seed(uint64_t seed) {if (!benchmark_running) {gen.set_seed(seed); return true;} else {return false;}}
     bool resize_benchmark_grid(int width, int height);
-    bool set_num_organisms(int num);
-    bool set_num_tries(int num);
+    bool set_num_organisms(int num) {if (!benchmark_running) {num_organisms = num; return true;} else {return false;}}
+    bool set_num_tries(int num) {if (!benchmark_running) {num_iterations = num; return true;} else {return false;}}
 
     void start_benchmarking(const std::vector<BenchmarkTypes>& benchmarks_to_do);
 
@@ -109,6 +110,9 @@ public:
 
     const std::vector<BenchmarkResult> & get_results();
     int get_total_num_iterations() const {return num_iterations;}
+    int get_num_organisms() const {return num_organisms;}
+    void set_organisms_diameter(int diameter) {organisms_diameter = diameter;}
+    int get_organisms_diameter() const {return organisms_diameter;}
 };
 
 

@@ -25,6 +25,10 @@ void Benchmarks::benchmark_buttons_enabled(bool state) {
     ui.b_benchmark_move_organism    ->setEnabled(state);
     ui.b_benchmark_try_make_child   ->setEnabled(state);
     ui.b_run_all_benchmarks         ->setEnabled(state);
+    ui.b_apply_grid_size            ->setEnabled(state);
+    ui.le_num_benchmark_organisms   ->setEnabled(state);
+    ui.le_num_iterations            ->setEnabled(state);
+    ui.le_organisms_diameter        ->setEnabled(state);
 }
 
 void Benchmarks::update_() {

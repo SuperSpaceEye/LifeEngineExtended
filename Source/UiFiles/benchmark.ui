@@ -260,6 +260,107 @@
       <attribute name="title">
        <string>Benchmark Settings</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Grid width</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_grid_width"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Grid height</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_grid_height"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="b_apply_grid_size">
+         <property name="text">
+          <string>Apply grid size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Num benchmark organisms</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_num_benchmark_organisms"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Num iterations</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_num_iterations"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Organisms diameter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_organisms_diameter"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -443,6 +544,102 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_grid_width</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_grid_width_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_grid_height</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_grid_height_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>808</x>
+     <y>257</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_apply_grid_size</sender>
+   <signal>clicked()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>b_apply_grid_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>515</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_num_benchmark_organisms</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_num_benchmark_organisms_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>610</x>
+     <y>321</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_num_iterations</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_num_iterations_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>569</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_organisms_diameter</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Benchmark</receiver>
+   <slot>le_num_organisms_diameter_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>587</x>
+     <y>387</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>515</x>
+     <y>308</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_benchmark_produce_food_slot()</slot>
@@ -456,5 +653,11 @@
   <slot>b_benchmark_move_organism_slot()</slot>
   <slot>b_benchmark_try_make_child_slot()</slot>
   <slot>b_stop_benchmarks_slot()</slot>
+  <slot>le_grid_width_slot()</slot>
+  <slot>le_grid_height_slot()</slot>
+  <slot>b_apply_grid_size_slot()</slot>
+  <slot>le_num_benchmark_organisms_slot()</slot>
+  <slot>le_num_iterations_slot()</slot>
+  <slot>le_num_organisms_diameter_slot()</slot>
  </slots>
 </ui>

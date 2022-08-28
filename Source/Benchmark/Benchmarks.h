@@ -10,6 +10,7 @@
 #include "BenchmarkUI.h"
 #include "../MainWindow/WindowUI.h"
 #include "../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThreadBenchmark.h"
+#include "../Stuff/MiscFuncs.h"
 
 class Benchmarks: public QWidget {
     Q_OBJECT
@@ -17,6 +18,9 @@ private:
     Ui::Benchmark ui{};
     Ui::MainWindow & parent_window;
     SimulationEngineSingleThreadBenchmark benchmark{};
+
+    int new_width = 2000;
+    int new_height = 2000;
 
     bool updated_after_end = false;
 
@@ -41,6 +45,13 @@ private slots:
     void b_benchmark_try_make_child_slot();
     void b_run_all_benchmarks_slot();
     void b_stop_benchmarks_slot();
+    void b_apply_grid_size_slot();
+
+    void le_grid_width_slot();
+    void le_grid_height_slot();
+    void le_num_benchmark_organisms_slot();
+    void le_num_iterations_slot();
+    void le_num_organisms_diameter_slot();
 
 };
 
