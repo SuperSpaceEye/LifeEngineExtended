@@ -386,6 +386,7 @@ void SimulationEngine::clear_organisms() {
     edc.stc.num_alive_organisms = 0;
     edc.stc.num_dead_organisms  = 0;
     edc.stc.last_alive_position = 0;
+    edc.stc.dead_organisms_before_last_alive_position = 0;
 }
 
 void SimulationEngine::make_walls() {
