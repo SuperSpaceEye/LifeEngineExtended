@@ -52,6 +52,7 @@ struct OrganismInfoContainer {
     }
 
 private:
+    //TODO possible optimization - iterative info updates.
     static void parse_organisms_info(OrganismInfoContainer & info, EngineDataContainer * edc, EngineControlParameters * ecp) {
         bool has_pool = true;
         int i = 0;

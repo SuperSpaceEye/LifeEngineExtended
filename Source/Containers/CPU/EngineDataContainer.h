@@ -64,7 +64,8 @@ struct EngineDataContainer {
     int auto_reset_counter = 0;
 
     // adding/killing organisms, adding/deleting food/walls, etc.
-    std::vector<Action> user_actions_pool;
+    std::vector<Action> ui_user_actions_pool;
+    std::vector<Action> engine_user_actions_pool;
 
     Organism * selected_organism = nullptr;
 };

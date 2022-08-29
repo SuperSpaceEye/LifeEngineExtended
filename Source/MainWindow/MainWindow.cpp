@@ -124,7 +124,6 @@ void MainWindow::mainloop_tick() {
 
     if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
         auto start_timer = clock_now();
-        engine.pause();
         uint32_t simulation_frames = edc.engine_ticks_between_updates;
         edc.engine_ticks_between_updates = 0;
 
@@ -134,7 +133,6 @@ void MainWindow::mainloop_tick() {
 
         engine.update_info();
         auto info = engine.get_info();
-        engine.unpause();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
@@ -637,6 +635,9 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
 
 //TODO clear command in simulation probably causes segfaults.
 void MainWindow::change_main_grid_left_click() {
+    while (ecp.do_not_use_user_actions_engine) {}
+    ecp.do_not_use_user_actions_ui = true;
+
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //    ecp.pause_processing_user_action = true;
@@ -645,28 +646,31 @@ void MainWindow::change_main_grid_left_click() {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    edc.user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ModifyWall:
-                    edc.user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::KillOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::PlaceOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
                     goto endfor;
             }
         }
     }
     endfor:
-    return;
+    ecp.do_not_use_user_actions_ui = false;
 }
 
 void MainWindow::change_main_grid_right_click() {
+    while (ecp.do_not_use_user_actions_engine) {}
+    ecp.do_not_use_user_actions_ui = true;
+
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //    ecp.pause_processing_user_action = true;
 //    wait_for_engine_to_pause_processing_user_actions();
@@ -674,13 +678,13 @@ void MainWindow::change_main_grid_right_click() {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    edc.user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ModifyWall:
-                    edc.user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::KillOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
                     break;
@@ -689,7 +693,7 @@ void MainWindow::change_main_grid_right_click() {
             }
         }
     }
-//    ecp.pause_processing_user_action = false;
+    ecp.do_not_use_user_actions_ui = false;
 }
 
 void MainWindow::change_editing_grid_left_click() {
