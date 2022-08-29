@@ -181,7 +181,9 @@ private:
     void reset_scale_view();
 
     void read_json_data(const std::string &path);
-    void json_read_grid_data(rapidjson::Document & d);
+    void json_resize_and_make_walls(rapidjson::Document & d);
+    static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
+    static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
@@ -246,6 +248,13 @@ private:
     void just_resize_simulation_grid();
 
     void load_textures_from_disk();
+
+    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
+                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+                                         std::vector<int> &truncated_lin_height);
+
+    void parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
+                                     const std::vector<int> &truncated_lin_height);
 
     void process_keyboard_events();
 
@@ -384,14 +393,6 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
-
-    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
-                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
-                                         std::vector<int> &truncated_lin_height);
-
-    void
-    parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
-                                const std::vector<int> &truncated_lin_height);
 };
 
 
