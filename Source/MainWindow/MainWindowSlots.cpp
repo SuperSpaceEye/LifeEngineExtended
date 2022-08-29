@@ -408,6 +408,7 @@ void MainWindow::le_font_size_slot() {
     iw.setFont(_font);
     rec.setFont(_font);
     we.setFont(_font);
+    bs.setFont(_font);
 }
 
 void MainWindow::le_max_move_range_slot() {
