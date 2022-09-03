@@ -34,8 +34,8 @@ void ImageCreation::calculate_truncated_linspace(int image_width, int image_heig
     truncated_lin_height.pop_back();
 }
 
-const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation, float rxs,
-                                                                  float rys,
+const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation,
+                                                                  double rxs, double rys,
                                                                   const TexturesContainer &textures) {
     auto & holder = textures.textures[static_cast<int>(type)];
 
@@ -82,7 +82,7 @@ const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes typ
     if (x == holder.width) {x--;}
     if (y == holder.height) {y--;}
 
-    return holder.texture.at(x + y * holder.width);
+    return holder.texture[x + y * holder.width];
 }
 
 // depth * ( y * width + x) + z
@@ -146,10 +146,14 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
                         pixel_color = cc.simulation_background_color;
                     } else {
                         auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
+                        //double({pos} - {dim}_b.x) / ({dim}_b.y - {dim}_b.x)
+                        // first,  calculate relative position of a pixel inside a texture block.
+                        // second, calculate a dimension of a pixel that is going to be displayed.
+                        // third,  normalize relative position between 0 and 1 by dividing result of first stage by second one.
                         pixel_color = get_texture_color(block.type,
                                                         block.rotation,
-                                                        float(x - w_b.x) / (w_b.y - w_b.x),
-                                                        float(y - h_b.x) / (h_b.y - h_b.x),
+                                                        double(x - w_b.x) / (w_b.y - w_b.x),
+                                                        double(y - h_b.x) / (h_b.y - h_b.x),
                                                         textures);
                     }
                     set_image_pixel(x, y, image_width, pixel_color, image_vector);

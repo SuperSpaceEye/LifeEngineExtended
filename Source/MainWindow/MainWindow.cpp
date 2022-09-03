@@ -273,8 +273,8 @@ void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_l
 void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
                                                  std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
                                                  std::vector<int> &truncated_lin_height) {
-    image_width= ui.simulation_graphicsView->viewport()->width();
-    image_height= ui.simulation_graphicsView->viewport()->height();
+    image_width  = ui.simulation_graphicsView->viewport()->width();
+    image_height = ui.simulation_graphicsView->viewport()->height();
     resize_image();
     int scaled_width  = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
@@ -286,8 +286,9 @@ void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_he
     auto start_y = int(center_y - (scaled_height / 2));
     auto end_y   = int(center_y + (scaled_height / 2));
     ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
-    truncated_lin_width .reserve(image_width);
-    truncated_lin_height.reserve(image_height);
+
+    truncated_lin_width .reserve(std::abs(lin_width [lin_width.size() -1])+1);
+    truncated_lin_height.reserve(std::abs(lin_height[lin_height.size()-1])+1);
 
     ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 }
