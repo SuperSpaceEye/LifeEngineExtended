@@ -113,9 +113,9 @@ private:
 
     SimulationEngine engine{edc, ecp, bp, sp, &recd};
     OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
-    StatisticsCore s{&ui};
+    StatisticsCore st{&ui};
     InfoWindow iw{&ui};
-    Recorder rec{&ui, &edc, &ecp, &cc, &textures, &recd};
+    Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
     Benchmarks bs{ui};
 
@@ -152,6 +152,7 @@ private:
     bool pause_grid_parsing = false;
     bool really_stop_render = false;
     bool update_textures = false;
+    bool is_fullscreen = false;
 
     bool W_pressed = false;
     bool A_pressed = false;
@@ -257,6 +258,9 @@ private:
                                      const std::vector<int> &truncated_lin_height);
 
     void process_keyboard_events();
+
+    void flip_fullscreen();
+    void set_child_windows_always_on_top(bool state);
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;

@@ -25,9 +25,9 @@ void MainWindow::tb_stoprender_slot(bool state) {
 
 void MainWindow::tb_open_statistics_slot(bool state) {
     if (state) {
-       s.show();
+       st.show();
     } else {
-       s.close();
+       st.close();
     }
 }
 
@@ -54,9 +54,9 @@ void MainWindow::tb_open_info_window_slot(bool state) {
 
 void MainWindow::tb_open_recorder_window_slot(bool state) {
     if (state) {
-        rec.show();
+        rc.show();
     } else {
-        rec.close();
+        rc.close();
     }
 }
 
@@ -404,9 +404,9 @@ void MainWindow::le_font_size_slot() {
     }
     setFont(_font);
     ee.setFont(_font);
-    s.setFont(_font);
+    st.setFont(_font);
     iw.setFont(_font);
-    rec.setFont(_font);
+    rc.setFont(_font);
     we.setFont(_font);
     bs.setFont(_font);
 }
@@ -613,42 +613,44 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
 
 void MainWindow::cb_show_extended_statistics_slot(bool state) {
     if (state) {
-        s.ui.lb_child_organisms->show();
-        s.ui.lb_child_organisms_capacity->show();
-        s.ui.lb_child_organisms_in_use->show();
-        s.ui.lb_dead_organisms->show();
-        s.ui.lb_organisms_capacity->show();
-        s.ui.lb_total_organisms->show();
-        s.ui.lb_last_alive_position->show();
-        s.ui.lb_dead_inside->show();
-        s.ui.lb_dead_outside->show();
+        st.ui.lb_child_organisms->show();
+        st.ui.lb_child_organisms_capacity->show();
+        st.ui.lb_child_organisms_in_use->show();
+        st.ui.lb_dead_organisms->show();
+        st.ui.lb_organisms_capacity->show();
+        st.ui.lb_total_organisms->show();
+        st.ui.lb_last_alive_position->show();
+        st.ui.lb_dead_inside->show();
+        st.ui.lb_dead_outside->show();
     } else {
-        s.ui.lb_child_organisms->hide();
-        s.ui.lb_child_organisms_capacity->hide();
-        s.ui.lb_child_organisms_in_use->hide();
-        s.ui.lb_dead_organisms->hide();
-        s.ui.lb_organisms_capacity->hide();
-        s.ui.lb_total_organisms->hide();
-        s.ui.lb_last_alive_position->hide();
-        s.ui.lb_dead_inside->hide();
-        s.ui.lb_dead_outside->hide();
+        st.ui.lb_child_organisms->hide();
+        st.ui.lb_child_organisms_capacity->hide();
+        st.ui.lb_child_organisms_in_use->hide();
+        st.ui.lb_dead_organisms->hide();
+        st.ui.lb_organisms_capacity->hide();
+        st.ui.lb_total_organisms->hide();
+        st.ui.lb_last_alive_position->hide();
+        st.ui.lb_dead_inside->hide();
+        st.ui.lb_dead_outside->hide();
     }
 }
 
 void MainWindow::cb_statistics_always_on_top_slot(bool state) {
-    auto hidden = s.isHidden();
+    if (is_fullscreen) {return;}
+    auto hidden = st.isHidden();
 
-    s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    st.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
     //Why sleep? For some reason changes are not applied instantly and main process needs to wait for some time.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
-        s.show();
+        st.show();
     }
 }
 
 void MainWindow::cb_editor_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = ee.isHidden();
 
     ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -661,6 +663,7 @@ void MainWindow::cb_editor_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_info_window_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = iw.isHidden();
 
     iw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -673,18 +676,20 @@ void MainWindow::cb_info_window_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
-    auto hidden = rec.isHidden();
+    if (is_fullscreen) {return;}
+    auto hidden = rc.isHidden();
 
-    rec.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    rc.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
-        rec.show();
+        rc.show();
     }
 }
 
 void MainWindow::cb_world_events_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = we.isHidden();
 
     we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -697,6 +702,7 @@ void MainWindow::cb_world_events_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_benchmarks_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = bs.isHidden();
 
     bs.setWindowFlag(Qt::WindowStaysOnTopHint, state);

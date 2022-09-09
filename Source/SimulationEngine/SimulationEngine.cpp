@@ -277,7 +277,7 @@ void SimulationEngine::random_food_drop() {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
             auto & vec = auto_food_drop_coordinates_shuffled[auto_food_drop_index % auto_food_drop_coordinates_shuffled.size()];
             auto_food_drop_index++;
-            edc.engine_user_actions_pool.emplace_back(ActionType::TryAddFood, vec.x, vec.y);
+            edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, vec.x, vec.y);
         }
     }
 }
