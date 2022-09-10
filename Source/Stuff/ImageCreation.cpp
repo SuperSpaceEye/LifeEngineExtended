@@ -98,6 +98,7 @@ void ImageCreation::ImageCreationTools::set_image_pixel(int x,
     image_vector[index  ] = color.b;
 }
 
+//First calculates what world blocks are seen, then calculates how much of each world block is seen in the frame.
 void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector<int> &lin_width,
                                                                const std::vector<int> &lin_height,
                                                                uint32_t simulation_width,
@@ -135,8 +136,10 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
     //width of boundaries of an organisms
 
     //width bound, height bound
+    //goes through seen blocks
     for (auto &w_b: width_img_boundaries) {
         for (auto &h_b: height_img_boundaries) {
+            //calculates texture in seen block.
             for (int x = w_b.x; x < w_b.y; x++) {
                 for (int y = h_b.x; y < h_b.y; y++) {
                     if (lin_width[x] < 0 ||

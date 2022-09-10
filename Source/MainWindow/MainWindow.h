@@ -137,8 +137,6 @@ private:
     bool use_cuda = true;
     bool synchronise_info_update_with_window_update = false;
     bool wait_for_engine_to_stop_to_render = false;
-    // do not use textures (now for eyes only)
-    bool simplified_rendering = false;
     //TODO redundant?
     bool resize_simulation_grid_flag = false;
     bool menu_hidden = false;
@@ -153,6 +151,7 @@ private:
     bool really_stop_render = false;
     bool update_textures = false;
     bool is_fullscreen = false;
+    bool save_simulation_settings = true;
 
     bool W_pressed = false;
     bool A_pressed = false;
@@ -261,6 +260,11 @@ private:
 
     void flip_fullscreen();
     void set_child_windows_always_on_top(bool state);
+
+    void apply_font_to_windows(const QFont &_font);
+
+    void save_state();
+    void load_state();
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -385,7 +389,6 @@ private slots:
     void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
-    void cb_simplified_rendering_slot(bool state);
     void cb_really_stop_render_slot(bool state);
     void cb_show_extended_statistics_slot(bool state);
     //Windows

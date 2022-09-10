@@ -402,13 +402,8 @@ void MainWindow::le_font_size_slot() {
     } else {
         _font.setPixelSize(result.result);
     }
-    setFont(_font);
-    ee.setFont(_font);
-    st.setFont(_font);
-    iw.setFont(_font);
-    rc.setFont(_font);
-    we.setFont(_font);
-    bs.setFont(_font);
+
+    apply_font_to_windows(_font);
 }
 
 void MainWindow::le_max_move_range_slot() {
@@ -753,8 +748,6 @@ void MainWindow::cb_failed_reproduction_eats_food_slot   (bool state) { sp.faile
 void MainWindow::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop_to_render = state;}
 
 void MainWindow::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
-
-void MainWindow::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
 
 void MainWindow::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state; engine.reinit_organisms();}
 

@@ -115,6 +115,8 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     load_textures_from_disk();
+
+    load_state();
 }
 
 void MainWindow::mainloop_tick() {
@@ -578,7 +580,6 @@ void MainWindow::initialize_gui() {
     ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
     ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
     ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop_to_render);
-    ui.cb_simplified_rendering->setChecked(simplified_rendering);
 
     ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     ui.cb_synchronise_info_with_window->setChecked(synchronise_info_update_with_window_update);
@@ -807,4 +808,22 @@ void MainWindow::set_child_windows_always_on_top(bool state) {
     rc.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     bs.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+}
+
+void MainWindow::apply_font_to_windows(const QFont &_font) {
+    setFont(_font);
+    ee.setFont(_font);
+    st.setFont(_font);
+    iw.setFont(_font);
+    rc.setFont(_font);
+    we.setFont(_font);
+    bs.setFont(_font);
+}
+
+void MainWindow::save_state() {
+
+}
+
+void MainWindow::load_state() {
+
 }

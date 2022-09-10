@@ -32,6 +32,26 @@ namespace DataSavingFunctions {
         WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type) {}
     };
 
+    struct ProgramState {
+        float & scaling_zoom;
+        float & keyboard_movement_amount;
+        float & SHIFT_keyboard_movement_multiplier;
+
+        bool & use_cuda;
+        bool & wait_for_engine_to_stop_to_render;
+        bool & disable_warnings;
+        bool & pause_grid_parsing;
+        bool & really_stop_render;
+        bool & save_simulation_settings;
+        bool & point_size_m;
+
+        int & font_size;
+        int & starting_cell_size_on_resize;
+        int & float_precision;
+        int & brush_size;
+        int & update_info_every_n_milliseconds;
+    };
+
     void write_version(std::ofstream &os);
     void write_simulation_parameters(std::ofstream & os, SimulationParameters &sp);
     void write_organisms_block_parameters(std::ofstream & os, OrganismBlockParameters &bp);
@@ -69,6 +89,15 @@ namespace DataSavingFunctions {
     void json_read_organisms_data(rapidjson::Document *d_, SimulationParameters *sp_, OrganismBlockParameters *bp_, EngineDataContainer *edc_);
 
     void json_read_simulation_parameters(rapidjson::Document * d, SimulationParameters * sp);
+
+    void write_json_version(rapidjson::Document & d);
+    void read_json_version(rapidjson::Document & d);
+
+    void write_json_extended_simulation_parameters(rapidjson::Document & d);
+    void read_json_extended_simulation_parameters(rapidjson::Document & d);
+
+    void write_json_program_settings(rapidjson::Document & d);
+    void read_json_program_settings(rapidjson::Document & d);
 }
 
 #endif //LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H
