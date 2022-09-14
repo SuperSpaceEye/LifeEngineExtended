@@ -575,16 +575,17 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
 
 const uint32_t STATE_SAVE_VERSION = 1;
 
-void write_json_version(rapidjson::Document & d) {
+void DataSavingFunctions::write_json_version(rapidjson::Document & d) {
     d.AddMember("save_version", Value(STATE_SAVE_VERSION), d.GetAllocator());
 }
 
-bool read_json_version(rapidjson::Document & d) {
+bool DataSavingFunctions::read_json_version(rapidjson::Document & d) {
+    if (!d.HasMember("save_version")) {return false;}
     auto version = d["save_version"].GetUint();
     return version == STATE_SAVE_VERSION;
 }
 
-void write_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
+void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
     d.AddMember("food_production_probability",     Value(sp.food_production_probability), d.GetAllocator());
     d.AddMember("produce_food_every_n_life_ticks", Value(sp.produce_food_every_n_life_ticks), d.GetAllocator());
     d.AddMember("lifespan_multiplier",             Value(sp.lifespan_multiplier), d.GetAllocator());
@@ -651,7 +652,7 @@ void write_json_extended_simulation_parameters(rapidjson::Document &d, Simulatio
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
 }
 
-void read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
+void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
     sp.food_production_probability     = d["food_production_probability"].GetFloat();
     sp.produce_food_every_n_life_ticks = d["produce_food_every_n_life_ticks"].GetInt();
     sp.lifespan_multiplier             = d["lifespan_multiplier"].GetFloat();
@@ -681,9 +682,9 @@ void read_json_extended_simulation_parameters(rapidjson::Document &d, Simulation
     sp.set_fixed_move_range = d["set_fixed_move_range"].GetBool();
     sp.min_organism_size    = d["min_organism_size"].GetInt();
 
-    sp.add_cell    = d["food_production_probability"].GetInt();
-    sp.change_cell = d["food_production_probability"].GetInt();
-    sp.remove_cell = d["food_production_probability"].GetInt();
+    sp.add_cell    = d["add_cell"].GetInt();
+    sp.change_cell = d["change_cell"].GetInt();
+    sp.remove_cell = d["remove_cell"].GetInt();
 
     sp.perlin_octaves     = d["perlin_octaves"].GetInt();
     sp.perlin_persistence = d["perlin_persistence"].GetFloat();
@@ -719,10 +720,96 @@ void read_json_extended_simulation_parameters(rapidjson::Document &d, Simulation
 }
 
 
-void write_json_program_settings(rapidjson::Document & d) {
+void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, DataSavingFunctions::ProgramState &state) {
+    d.AddMember("scaling_zoom",                       Value(state.scaling_zoom), d.GetAllocator());
+    d.AddMember("keyboard_movement_amount",           Value(state.keyboard_movement_amount), d.GetAllocator());
+    d.AddMember("SHIFT_keyboard_movement_multiplier", Value(state.SHIFT_keyboard_movement_multiplier), d.GetAllocator());
 
+    d.AddMember("font_size",                        Value(state.font_size), d.GetAllocator());
+    d.AddMember("float_precision",                  Value(state.float_precision), d.GetAllocator());
+    d.AddMember("brush_size",                       Value(state.brush_size), d.GetAllocator());
+    d.AddMember("update_info_every_n_milliseconds", Value(state.update_info_every_n_milliseconds), d.GetAllocator());
+
+    d.AddMember("use_cuda",                          Value(state.use_cuda), d.GetAllocator());
+    d.AddMember("wait_for_engine_to_stop_to_render", Value(state.wait_for_engine_to_stop_to_render), d.GetAllocator());
+    d.AddMember("disable_warnings",                  Value(state.disable_warnings), d.GetAllocator());
+    d.AddMember("really_stop_render",                Value(state.really_stop_render), d.GetAllocator());
+    d.AddMember("save_simulation_settings",          Value(state.save_simulation_settings), d.GetAllocator());
+    d.AddMember("use_point_size",                    Value(state.use_point_size), d.GetAllocator());
 }
 
-void read_json_program_settings(rapidjson::Document & d) {
+void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, DataSavingFunctions::ProgramState &state) {
+    state.scaling_zoom                       = d["scaling_zoom"].GetFloat();
+    state.keyboard_movement_amount           = d["keyboard_movement_amount"].GetFloat();
+    state.SHIFT_keyboard_movement_multiplier = d["SHIFT_keyboard_movement_multiplier"].GetFloat();
 
+    state.font_size                        = d["font_size"].GetInt();
+    state.float_precision                  = d["float_precision"].GetInt();
+    state.brush_size                       = d["brush_size"].GetInt();
+    state.update_info_every_n_milliseconds = d["update_info_every_n_milliseconds"].GetInt();
+
+    state.wait_for_engine_to_stop_to_render = d["wait_for_engine_to_stop_to_render"].GetBool();
+    state.disable_warnings                  = d["disable_warnings"].GetBool();
+    state.really_stop_render                = d["really_stop_render"].GetBool();
+    state.save_simulation_settings          = d["save_simulation_settings"].GetBool();
+    state.use_point_size                    = d["use_point_size"].GetBool();
+
+    bool use_cuda = d["use_cuda"].GetBool();
+    if (cuda_is_available()) {
+        state.use_cuda = use_cuda;
+    }
+}
+
+void DataSavingFunctions::write_json_state(const std::string& path, ProgramState state,
+                                           SimulationParameters &sp) {
+    Document d;
+    d.SetObject();
+
+    write_json_version(d);
+    write_json_program_settings(d, state);
+    if (state.save_simulation_settings) {
+        write_json_extended_simulation_parameters(d, sp);
+    }
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    std::fstream file;
+    file.open(path, std::ios_base::out);
+    file << buffer.GetString();
+    file.close();
+}
+
+bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState state,
+                                          SimulationParameters &sp) {
+    if (!std::filesystem::exists(path)) {
+        write_json_state(path, state, sp);
+        return false;
+    }
+
+    std::string json;
+    auto ss = std::ostringstream();
+    std::ifstream file;
+    file.open(path);
+    if (!file.is_open()) {
+        return false;
+    }
+
+    ss << file.rdbuf();
+    json = ss.str();
+
+    file.close();
+
+    Document d;
+    d.Parse(json.c_str());
+
+    if (!read_json_version(d)) {
+        return false;
+    }
+
+    read_json_program_settings(d, state);
+    if (state.save_simulation_settings) { read_json_extended_simulation_parameters(d, sp); }
+
+    return true;
 }

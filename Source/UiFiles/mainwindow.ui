@@ -2048,7 +2048,7 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-556</y>
+                  <y>-548</y>
                   <width>606</width>
                   <height>803</height>
                  </rect>
@@ -2238,13 +2238,6 @@
                      </layout>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_simplified_rendering">
-                      <property name="text">
-                       <string>Simplified rendering</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_10">
                       <item>
                        <widget class="QLabel" name="label_46">
@@ -2362,6 +2355,13 @@
                        <widget class="QLineEdit" name="le_random_seed"/>
                       </item>
                      </layout>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_load_evolution_controls_from_state">
+                      <property name="text">
+                       <string>Save/Load evolution controls upon program loading.</string>
+                      </property>
+                     </widget>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -3886,22 +3886,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>cb_simplified_rendering</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_simplified_rendering_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>647</x>
-     <y>883</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>448</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cb_failed_reproduction_eats_food</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -4317,6 +4301,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_load_evolution_controls_from_state</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_load_evolution_controls_from_state_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>1048</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4434,13 +4434,14 @@
   <slot>cb_no_random_decisions_slot(bool)</slot>
   <slot>le_memory_allocation_strategy_modifier_slot()</slot>
   <slot>le_random_seed_slot()</slot>
+  <slot>cb_load_evolution_controls_from_state_slot(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

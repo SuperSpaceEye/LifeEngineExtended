@@ -80,10 +80,13 @@ MainWindow::MainWindow(QWidget *parent) :
         ui.simulation_graphicsView->setScene(&scene);
 
         reset_scale_view();
+        get_current_font_size();
         initialize_gui();
         #if defined(__WIN32)
         ShowWindow(GetConsoleWindow(), SW_HIDE);
         #endif
+
+        load_state();
     });
 
     timer = new QTimer(parent);
@@ -115,8 +118,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     load_textures_from_disk();
-
-    load_state();
 }
 
 void MainWindow::mainloop_tick() {
@@ -564,13 +565,6 @@ void MainWindow::initialize_gui() {
     ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
     ui.le_perlin_octaves->setText(QString::fromStdString(std::to_string(sp.perlin_octaves)));
-    //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
-    int font_size;
-    if (font().pixelSize() < 0) {
-        font_size = font().pointSize();
-    } else {
-        font_size = font().pixelSize();
-    }
     ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
 //    ui.rb_partial_multi_thread_mode->hide();
@@ -589,6 +583,7 @@ void MainWindow::initialize_gui() {
     ui.le_menu_height->setText(QString::fromStdString(std::to_string(ui.menu_frame->frameSize().height())));
     ui.cb_really_stop_render->setChecked(really_stop_render);
     ui.cb_show_extended_statistics->setChecked(false);
+    ui.cb_load_evolution_controls_from_state->setChecked(save_simulation_settings);
 #if __CUDA_USED__ == 0
     ui.cb_use_nvidia_for_image_generation->hide();
 #endif
@@ -603,6 +598,17 @@ void MainWindow::initialize_gui() {
     ui.le_num_threads->hide();
     ui.lb_set_num_threads->hide();
     st.ui.lb_organisms_memory_consumption->hide();
+}
+
+void
+MainWindow::get_current_font_size() {//font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
+    if (font().pixelSize() < 0) {
+        font_size = font().pointSize();
+        uses_point_size = true;
+    } else {
+        font_size = font().pixelSize();
+        uses_point_size = false;
+    }
 }
 
 void MainWindow::update_world_event_values_ui() {
@@ -722,14 +728,6 @@ void MainWindow::change_editing_grid_right_click() {
     ee.create_image();
 }
 
-bool MainWindow::cuda_is_available() {
-#if __CUDA_USED__
-    return get_device_count();
-#else
-    return false;
-#endif
-}
-
 void MainWindow::load_textures_from_disk() {
     QImage image;
     auto executable_path = QCoreApplication::applicationDirPath().toStdString();
@@ -821,9 +819,38 @@ void MainWindow::apply_font_to_windows(const QFont &_font) {
 }
 
 void MainWindow::save_state() {
-
+    auto json_state_path = QCoreApplication::applicationDirPath().toStdString() + "/settings.json";
+    DataSavingFunctions::write_json_state(json_state_path,
+                                          DataSavingFunctions::ProgramState{
+                                              scaling_zoom, keyboard_movement_amount, SHIFT_keyboard_movement_multiplier,
+                                              font_size, float_precision, brush_size, update_info_every_n_milliseconds,
+                                              use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                              really_stop_render, save_simulation_settings, uses_point_size
+                                          }, sp);
 }
 
 void MainWindow::load_state() {
+    auto json_state_path = QCoreApplication::applicationDirPath().toStdString() + "/settings.json";
+    DataSavingFunctions::read_json_state(json_state_path,
+                                        DataSavingFunctions::ProgramState{
+                                              scaling_zoom, keyboard_movement_amount, SHIFT_keyboard_movement_multiplier,
+                                              font_size, float_precision, brush_size, update_info_every_n_milliseconds,
+                                              use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                              really_stop_render, save_simulation_settings, uses_point_size
+                                        }, sp);
+    initialize_gui();
 
+    apply_font_size();
+}
+
+void MainWindow::apply_font_size() {
+    auto _font = font();
+
+    if (uses_point_size) {
+        _font.setPointSize(font_size);
+    } else {
+        _font.setPixelSize(font_size);
+    }
+
+    apply_font_to_windows(_font);
 }

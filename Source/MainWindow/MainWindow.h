@@ -152,6 +152,7 @@ private:
     bool update_textures = false;
     bool is_fullscreen = false;
     bool save_simulation_settings = true;
+    bool uses_point_size = false;
 
     bool W_pressed = false;
     bool A_pressed = false;
@@ -173,6 +174,7 @@ private:
     //Will give a warning if num is higher than this.
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
+    int font_size = 0;
 
     static auto clock_now() {return std::chrono::high_resolution_clock::now();}
 
@@ -199,8 +201,6 @@ private:
     bool read_organisms(std::ifstream& is);
 
     void update_table_values();
-
-    bool cuda_is_available();
 
     void mainloop_tick();
     void ui_tick();
@@ -391,6 +391,7 @@ private slots:
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_really_stop_render_slot(bool state);
     void cb_show_extended_statistics_slot(bool state);
+    void cb_load_evolution_controls_from_state_slot(bool state);
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
@@ -400,6 +401,10 @@ private slots:
     void table_cell_changed_slot(int row, int col);
 public:
     MainWindow(QWidget *parent);
+
+    void apply_font_size();
+
+    void get_current_font_size();
 };
 
 

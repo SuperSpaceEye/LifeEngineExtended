@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <ostream>
 #include <fstream>
+#include <filesystem>
 
 #include "../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "BlockTypes.hpp"
@@ -18,6 +19,7 @@
 #include "../Organism/CPU/Anatomy.h"
 #include "../Organism/CPU/Brain.h"
 #include "../SimulationEngine/OrganismsController.h"
+#include "MiscFuncs.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -37,19 +39,17 @@ namespace DataSavingFunctions {
         float & keyboard_movement_amount;
         float & SHIFT_keyboard_movement_multiplier;
 
-        bool & use_cuda;
-        bool & wait_for_engine_to_stop_to_render;
-        bool & disable_warnings;
-        bool & pause_grid_parsing;
-        bool & really_stop_render;
-        bool & save_simulation_settings;
-        bool & point_size_m;
-
         int & font_size;
-        int & starting_cell_size_on_resize;
         int & float_precision;
         int & brush_size;
         int & update_info_every_n_milliseconds;
+
+        bool & use_cuda;
+        bool & wait_for_engine_to_stop_to_render;
+        bool & disable_warnings;
+        bool & really_stop_render;
+        bool & save_simulation_settings;
+        bool & use_point_size;
     };
 
     void write_version(std::ofstream &os);
@@ -91,13 +91,18 @@ namespace DataSavingFunctions {
     void json_read_simulation_parameters(rapidjson::Document * d, SimulationParameters * sp);
 
     void write_json_version(rapidjson::Document & d);
-    void read_json_version(rapidjson::Document & d);
+    bool read_json_version(rapidjson::Document & d);
 
-    void write_json_extended_simulation_parameters(rapidjson::Document & d);
-    void read_json_extended_simulation_parameters(rapidjson::Document & d);
+    void write_json_extended_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp);
+    void read_json_extended_simulation_parameters(rapidjson::Document & d, SimulationParameters &sp);
 
-    void write_json_program_settings(rapidjson::Document & d);
-    void read_json_program_settings(rapidjson::Document & d);
+    void write_json_program_settings(rapidjson::Document & d, DataSavingFunctions::ProgramState &state);
+    void read_json_program_settings(rapidjson::Document & d, DataSavingFunctions::ProgramState &state);
+
+    void write_json_state(const std::string& path, ProgramState state,
+                          SimulationParameters &sp);
+    bool read_json_state(const std::string& path, ProgramState state,
+                         SimulationParameters &sp);
 }
 
 #endif //LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H

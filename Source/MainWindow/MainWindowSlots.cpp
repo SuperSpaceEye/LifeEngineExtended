@@ -382,14 +382,12 @@ void MainWindow::le_font_size_slot() {
 
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1.
     //so the program needs to understand which mode it is
-    int font_size;
-    bool point_size_m;
     if (font().pixelSize() < 0) {
         font_size = font().pointSize();
-        point_size_m = true;
+        uses_point_size = true;
     } else {
         font_size = font().pixelSize();
-        point_size_m = false;
+        uses_point_size = false;
     }
 
     int fallback = font_size;
@@ -397,7 +395,9 @@ void MainWindow::le_font_size_slot() {
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
 
-    if (point_size_m) {
+    font_size = result.result;
+
+    if (uses_point_size) {
         _font.setPointSize(result.result);
     } else {
         _font.setPixelSize(result.result);
@@ -768,6 +768,8 @@ void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
 void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_random_decisions = state;}
+
+void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 
 //==================== Table ====================
 
