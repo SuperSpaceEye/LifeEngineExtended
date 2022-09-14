@@ -29,11 +29,13 @@ C++ implementation of https://github.com/MaxRobinsonTheGreat/LifeEngine that ext
 - "." - pass one simulation tick.
 - "numpad +" - zoom in.
 - "numpad -" - zoom out.
+- "0" - switch mouse mode to no action.
 - "1" - switch mouse mode to place/delete food.
 - "2" - switch mouse mode to kill organisms.
 - "3" - switch mouse mode to place/delete walls.
 - "4" - switch mouse mode to place editor organisms.
 - "5" - switch mouse mode to choose organisms from simulation.
+- "F11" - enable/disable fullscreen.
 
 # Known bugs:
 - Saving and loading will not work correctly unless your path contains only english letters.
