@@ -113,9 +113,9 @@ private:
 
     SimulationEngine engine{edc, ecp, bp, sp, &recd};
     OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
-    StatisticsCore s{&ui};
+    StatisticsCore st{&ui};
     InfoWindow iw{&ui};
-    Recorder rec{&ui, &edc, &ecp, &cc, &textures, &recd};
+    Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
     Benchmarks bs{ui};
 
@@ -137,8 +137,6 @@ private:
     bool use_cuda = true;
     bool synchronise_info_update_with_window_update = false;
     bool wait_for_engine_to_stop_to_render = false;
-    // do not use textures (now for eyes only)
-    bool simplified_rendering = false;
     //TODO redundant?
     bool resize_simulation_grid_flag = false;
     bool menu_hidden = false;
@@ -152,6 +150,9 @@ private:
     bool pause_grid_parsing = false;
     bool really_stop_render = false;
     bool update_textures = false;
+    bool is_fullscreen = false;
+    bool save_simulation_settings = true;
+    bool uses_point_size = false;
 
     bool W_pressed = false;
     bool A_pressed = false;
@@ -173,6 +174,7 @@ private:
     //Will give a warning if num is higher than this.
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
+    int font_size = 0;
 
     static auto clock_now() {return std::chrono::high_resolution_clock::now();}
 
@@ -181,7 +183,9 @@ private:
     void reset_scale_view();
 
     void read_json_data(const std::string &path);
-    void json_read_grid_data(rapidjson::Document & d);
+    void json_resize_and_make_walls(rapidjson::Document & d);
+    static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
+    static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
     void write_data(std::ofstream& os);
@@ -197,8 +201,6 @@ private:
     bool read_organisms(std::ifstream& is);
 
     void update_table_values();
-
-    bool cuda_is_available();
 
     void mainloop_tick();
     void ui_tick();
@@ -247,7 +249,22 @@ private:
 
     void load_textures_from_disk();
 
+    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
+                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+                                         std::vector<int> &truncated_lin_height);
+
+    void parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
+                                     const std::vector<int> &truncated_lin_height);
+
     void process_keyboard_events();
+
+    void flip_fullscreen();
+    void set_child_windows_always_on_top(bool state);
+
+    void apply_font_to_windows(const QFont &_font);
+
+    void save_state();
+    void load_state();
 
     void wheelEvent(QWheelEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -372,9 +389,9 @@ private slots:
     void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
-    void cb_simplified_rendering_slot(bool state);
     void cb_really_stop_render_slot(bool state);
     void cb_show_extended_statistics_slot(bool state);
+    void cb_load_evolution_controls_from_state_slot(bool state);
     //Windows
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
@@ -385,13 +402,9 @@ private slots:
 public:
     MainWindow(QWidget *parent);
 
-    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
-                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
-                                         std::vector<int> &truncated_lin_height);
+    void apply_font_size();
 
-    void
-    parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
-                                const std::vector<int> &truncated_lin_height);
+    void get_current_font_size();
 };
 
 

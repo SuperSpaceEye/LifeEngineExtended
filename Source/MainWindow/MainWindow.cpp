@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     engine.make_walls();
 
-    rec.set_engine(&engine);
+    rc.set_engine(&engine);
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
@@ -80,10 +80,13 @@ MainWindow::MainWindow(QWidget *parent) :
         ui.simulation_graphicsView->setScene(&scene);
 
         reset_scale_view();
+        get_current_font_size();
         initialize_gui();
         #if defined(__WIN32)
         ShowWindow(GetConsoleWindow(), SW_HIDE);
         #endif
+
+        load_state();
     });
 
     timer = new QTimer(parent);
@@ -124,7 +127,6 @@ void MainWindow::mainloop_tick() {
 
     if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
         auto start_timer = clock_now();
-        engine.pause();
         uint32_t simulation_frames = edc.engine_ticks_between_updates;
         edc.engine_ticks_between_updates = 0;
 
@@ -134,7 +136,6 @@ void MainWindow::mainloop_tick() {
 
         engine.update_info();
         auto info = engine.get_info();
-        engine.unpause();
 
         update_fps_labels(window_frames/scale, simulation_frames/scale);
         update_statistics_info(info);
@@ -172,7 +173,7 @@ void MainWindow::ui_tick() {
 
     bs.update_();
 
-    rec.update_label();
+    rc.update_label();
 
     window_frames++;
 #if __VALGRIND_MODE__ == 1
@@ -275,8 +276,8 @@ void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_l
 void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
                                                  std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
                                                  std::vector<int> &truncated_lin_height) {
-    image_width= ui.simulation_graphicsView->viewport()->width();
-    image_height= ui.simulation_graphicsView->viewport()->height();
+    image_width  = ui.simulation_graphicsView->viewport()->width();
+    image_height = ui.simulation_graphicsView->viewport()->height();
     resize_image();
     int scaled_width  = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
@@ -288,8 +289,9 @@ void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_he
     auto start_y = int(center_y - (scaled_height / 2));
     auto end_y   = int(center_y + (scaled_height / 2));
     ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
-    truncated_lin_width .reserve(image_width);
-    truncated_lin_height.reserve(image_height);
+
+    truncated_lin_width .reserve(std::abs(lin_width [lin_width.size() -1])+1);
+    truncated_lin_height.reserve(std::abs(lin_height[lin_height.size()-1])+1);
 
     ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 }
@@ -433,60 +435,62 @@ void MainWindow::clear_world() {
 }
 
 void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
-    s.ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: " + std::to_string(edc.total_engine_ticks)));
-    s.ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms's memory consumption: " +
-                                                                         convert_num_bytes(info.total_size)));
-    s.ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: " + std::to_string(info.total_avg.total)));
-    s.ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size, float_precision)));
-    s.ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
-    s.ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.total_avg._organism_age, float_precision)));
-    s.ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.total_avg._mouth_blocks, float_precision)));
-    s.ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.total_avg._producer_blocks, float_precision)));
-    s.ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.total_avg._mover_blocks, float_precision)));
-    s.ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.total_avg._killer_blocks, float_precision)));
-    s.ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.total_avg._armor_blocks, float_precision)));
-    s.ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.total_avg._eye_blocks, float_precision)));
-    s.ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
-    s.ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.total_avg.brain_mutation_rate, float_precision)));
+    st.ui.lb_total_engine_ticks ->setText(QString::fromStdString("Total engine ticks: " + std::to_string(edc.total_engine_ticks)));
+    st.ui.lb_organisms_memory_consumption->setText(QString::fromStdString("Organisms memory consumption: " + convert_num_bytes(info.total_size)));
+    st.ui.lb_organisms_alive_2    ->setText(QString::fromStdString("Organism alive: " + std::to_string(info.total_avg.total)));
+    st.ui.lb_organism_size_4      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.total_avg.size, float_precision)));
+    st.ui.lb_avg_org_lifetime_4   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.total_avg._organism_lifetime, float_precision)));
+    st.ui.lb_avg_gathered_food_4  ->setText(QString::fromStdString("Avg gathered food: " + to_str(info.total_avg._gathered_food, float_precision)));
+    st.ui.lb_avg_age_4            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.total_avg._organism_age, float_precision)));
+    st.ui.lb_mouth_num_4          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.total_avg._mouth_blocks, float_precision)));
+    st.ui.lb_producer_num_4       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.total_avg._producer_blocks, float_precision)));
+    st.ui.lb_mover_num_4          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.total_avg._mover_blocks, float_precision)));
+    st.ui.lb_killer_num_4         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.total_avg._killer_blocks, float_precision)));
+    st.ui.lb_armor_num_4          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.total_avg._armor_blocks, float_precision)));
+    st.ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.total_avg._eye_blocks, float_precision)));
+    st.ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
+    st.ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.total_avg.brain_mutation_rate, float_precision)));
 
 
-    s.ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: " + std::to_string(info.moving_avg.total)));
-    s.ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: " + std::to_string(info.organisms_with_eyes)));
-    s.ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
-    s.ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.moving_avg._organism_age, float_precision)));
-    s.ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: " + to_str(info.move_range, float_precision)));
-    s.ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size, float_precision)));
-    s.ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.moving_avg._mouth_blocks, float_precision)));
-    s.ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.moving_avg._producer_blocks, float_precision)));
-    s.ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.moving_avg._mover_blocks, float_precision)));
-    s.ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.moving_avg._killer_blocks, float_precision)));
-    s.ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.moving_avg._armor_blocks, float_precision)));
-    s.ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.moving_avg._eye_blocks, float_precision)));
-    s.ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
-    s.ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.moving_avg.brain_mutation_rate, float_precision)));
+    st.ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: " + std::to_string(info.moving_avg.total)));
+    st.ui.lb_organisms_with_eyes  ->setText(QString::fromStdString("Organisms with eyes: " + std::to_string(info.organisms_with_eyes)));
+    st.ui.lb_avg_org_lifetime_2   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.moving_avg._organism_lifetime, float_precision)));
+    st.ui.lb_avg_gathered_food_2  ->setText(QString::fromStdString("Avg gathered food: " + to_str(info.moving_avg._gathered_food, float_precision)));
+    st.ui.lb_avg_age_2            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.moving_avg._organism_age, float_precision)));
+    st.ui.lb_average_moving_range ->setText(QString::fromStdString("Avg moving range: " + to_str(info.move_range, float_precision)));
+    st.ui.lb_organism_size_2      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.moving_avg.size, float_precision)));
+    st.ui.lb_mouth_num_2          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.moving_avg._mouth_blocks, float_precision)));
+    st.ui.lb_producer_num_2       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.moving_avg._producer_blocks, float_precision)));
+    st.ui.lb_mover_num_2          ->setText(QString::fromStdString("Avg mover num: " + to_str(info.moving_avg._mover_blocks, float_precision)));
+    st.ui.lb_killer_num_2         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.moving_avg._killer_blocks, float_precision)));
+    st.ui.lb_armor_num_2          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.moving_avg._armor_blocks, float_precision)));
+    st.ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.moving_avg._eye_blocks, float_precision)));
+    st.ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
+    st.ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.moving_avg.brain_mutation_rate, float_precision)));
 
 
-    s.ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: " + std::to_string(info.station_avg.total)));
-    s.ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size, float_precision)));
-    s.ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
-    s.ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.station_avg._organism_age, float_precision)));
-    s.ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.station_avg._mouth_blocks, float_precision)));
-    s.ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.station_avg._producer_blocks, float_precision)));
-    s.ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.station_avg._killer_blocks, float_precision)));
-    s.ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.station_avg._armor_blocks, float_precision)));
-    s.ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.station_avg._eye_blocks, float_precision)));
-    s.ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
-    s.ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.station_avg.brain_mutation_rate, float_precision)));
+    st.ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: " + std::to_string(info.station_avg.total)));
+    st.ui.lb_organism_size_3      ->setText(QString::fromStdString("Avg organism size: " + to_str(info.station_avg.size, float_precision)));
+    st.ui.lb_avg_org_lifetime_3   ->setText(QString::fromStdString("Avg organism lifetime: " + to_str(info.station_avg._organism_lifetime, float_precision)));
+    st.ui.lb_avg_gathered_food_3  ->setText(QString::fromStdString("Avg gathered food: " + to_str(info.station_avg._gathered_food, float_precision)));
+    st.ui.lb_avg_age_3            ->setText(QString::fromStdString("Avg organism age: " + to_str(info.station_avg._organism_age, float_precision)));
+    st.ui.lb_mouth_num_3          ->setText(QString::fromStdString("Avg mouth num: " + to_str(info.station_avg._mouth_blocks, float_precision)));
+    st.ui.lb_producer_num_3       ->setText(QString::fromStdString("Avg producer num: " + to_str(info.station_avg._producer_blocks, float_precision)));
+    st.ui.lb_killer_num_3         ->setText(QString::fromStdString("Avg killer num: " + to_str(info.station_avg._killer_blocks, float_precision)));
+    st.ui.lb_armor_num_3          ->setText(QString::fromStdString("Avg armor num: " + to_str(info.station_avg._armor_blocks, float_precision)));
+    st.ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.station_avg._eye_blocks, float_precision)));
+    st.ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
+    st.ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.station_avg.brain_mutation_rate, float_precision)));
 
-    s.ui.lb_child_organisms->setText(QString::fromStdString("Child organisms: " + std::to_string(edc.stc.child_organisms.size())));
-    s.ui.lb_child_organisms_capacity->setText(QString::fromStdString("Child organisms capacity: " + std::to_string(edc.stc.child_organisms.capacity())));
-    s.ui.lb_child_organisms_in_use->setText(QString::fromStdString("Child organisms in use: " + std::to_string(edc.stc.child_organisms.size() - edc.stc.free_child_organisms_positions.size())));
-    s.ui.lb_dead_organisms->setText(QString::fromStdString("Dead organisms: " + std::to_string(edc.stc.dead_organisms_positions.size())));
-    s.ui.lb_organisms_capacity->setText(QString::fromStdString("Organisms capacity: " + std::to_string(edc.stc.organisms.capacity())));
-    s.ui.lb_total_organisms->setText(QString::fromStdString("Total organisms: " + std::to_string(edc.stc.organisms.size())));
-    s.ui.lb_last_alive_position->setText(QString::fromStdString("Last alive position: " + std::to_string(edc.stc.last_alive_position)));
-    s.ui.lb_dead_inside->setText(QString::fromStdString("Dead inside: " + std::to_string(edc.stc.dead_organisms_before_last_alive_position)));
-    s.ui.lb_dead_outside->setText(QString::fromStdString("Dead outside: " + std::to_string(edc.stc.num_dead_organisms - edc.stc.dead_organisms_before_last_alive_position)));
+    st.ui.lb_child_organisms         ->setText(QString::fromStdString("Child organisms: " + std::to_string(edc.stc.child_organisms.size())));
+    st.ui.lb_child_organisms_capacity->setText(QString::fromStdString("Child organisms capacity: " + std::to_string(edc.stc.child_organisms.capacity())));
+    st.ui.lb_child_organisms_in_use  ->setText(QString::fromStdString("Child organisms in use: " + std::to_string(edc.stc.child_organisms.size() - edc.stc.free_child_organisms_positions.size())));
+    st.ui.lb_dead_organisms          ->setText(QString::fromStdString("Dead organisms: " + std::to_string(edc.stc.dead_organisms_positions.size())));
+    st.ui.lb_organisms_capacity      ->setText(QString::fromStdString("Organisms capacity: " + std::to_string(edc.stc.organisms.capacity())));
+    st.ui.lb_total_organisms         ->setText(QString::fromStdString("Total organisms: " + std::to_string(edc.stc.organisms.size())));
+    st.ui.lb_last_alive_position     ->setText(QString::fromStdString("Last alive position: " + std::to_string(edc.stc.last_alive_position)));
+    st.ui.lb_dead_inside             ->setText(QString::fromStdString("Dead inside: " + std::to_string(edc.stc.dead_organisms_before_last_alive_position)));
+    st.ui.lb_dead_outside            ->setText(QString::fromStdString("Dead outside: " + std::to_string(edc.stc.num_dead_organisms - edc.stc.dead_organisms_before_last_alive_position)));
 }
 
 // So that changes in code values would be set by default in gui.
@@ -561,13 +565,6 @@ void MainWindow::initialize_gui() {
     ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
     ui.le_perlin_octaves->setText(QString::fromStdString(std::to_string(sp.perlin_octaves)));
-    //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
-    int font_size;
-    if (font().pixelSize() < 0) {
-        font_size = font().pointSize();
-    } else {
-        font_size = font().pixelSize();
-    }
     ui.le_font_size              ->setText(QString::fromStdString(std::to_string(font_size)));
 
 //    ui.rb_partial_multi_thread_mode->hide();
@@ -577,7 +574,6 @@ void MainWindow::initialize_gui() {
     ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
     ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
     ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop_to_render);
-    ui.cb_simplified_rendering->setChecked(simplified_rendering);
 
     ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     ui.cb_synchronise_info_with_window->setChecked(synchronise_info_update_with_window_update);
@@ -587,6 +583,7 @@ void MainWindow::initialize_gui() {
     ui.le_menu_height->setText(QString::fromStdString(std::to_string(ui.menu_frame->frameSize().height())));
     ui.cb_really_stop_render->setChecked(really_stop_render);
     ui.cb_show_extended_statistics->setChecked(false);
+    ui.cb_load_evolution_controls_from_state->setChecked(save_simulation_settings);
 #if __CUDA_USED__ == 0
     ui.cb_use_nvidia_for_image_generation->hide();
 #endif
@@ -600,7 +597,18 @@ void MainWindow::initialize_gui() {
     ui.rb_partial_multi_thread_mode->hide();
     ui.le_num_threads->hide();
     ui.lb_set_num_threads->hide();
-    s.ui.lb_organisms_memory_consumption->hide();
+    st.ui.lb_organisms_memory_consumption->hide();
+}
+
+void
+MainWindow::get_current_font_size() {//font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
+    if (font().pixelSize() < 0) {
+        font_size = font().pointSize();
+        uses_point_size = true;
+    } else {
+        font_size = font().pixelSize();
+        uses_point_size = false;
+    }
 }
 
 void MainWindow::update_world_event_values_ui() {
@@ -623,7 +631,7 @@ void MainWindow::update_world_event_values_ui() {
 }
 
 void MainWindow::update_simulation_size_label() {
-  s.ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
+  st.ui.lb_simulation_size->setText(QString::fromStdString("Simulation size: " + std::to_string(edc.simulation_width) + "x" + std::to_string(edc.simulation_height)));
 }
 
 Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
@@ -635,6 +643,9 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
 
 //TODO clear command in simulation probably causes segfaults.
 void MainWindow::change_main_grid_left_click() {
+    while (ecp.do_not_use_user_actions_engine) {}
+    ecp.do_not_use_user_actions_ui = true;
+
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //    ecp.pause_processing_user_action = true;
@@ -643,28 +654,32 @@ void MainWindow::change_main_grid_left_click() {
         for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    edc.user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ModifyWall:
-                    edc.user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::KillOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::PlaceOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
                     goto endfor;
+                default: break;
             }
         }
     }
     endfor:
-    return;
+    ecp.do_not_use_user_actions_ui = false;
 }
 
 void MainWindow::change_main_grid_right_click() {
+    while (ecp.do_not_use_user_actions_engine) {}
+    ecp.do_not_use_user_actions_ui = true;
+
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
 //    ecp.pause_processing_user_action = true;
 //    wait_for_engine_to_pause_processing_user_actions();
@@ -672,22 +687,23 @@ void MainWindow::change_main_grid_right_click() {
         for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
             switch (cursor_mode) {
                 case CursorMode::ModifyFood:
-                    edc.user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ModifyWall:
-                    edc.user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::KillOrganism:
-                    edc.user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
+                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
                     break;
                 case CursorMode::ChooseOrganism:
                     break;
                 case CursorMode::PlaceOrganism:
                     break;
+                default: break;
             }
         }
     }
-//    ecp.pause_processing_user_action = false;
+    ecp.do_not_use_user_actions_ui = false;
 }
 
 void MainWindow::change_editing_grid_left_click() {
@@ -710,14 +726,6 @@ void MainWindow::change_editing_grid_right_click() {
     auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
     ee.editor_organism->anatomy.set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
     ee.create_image();
-}
-
-bool MainWindow::cuda_is_available() {
-#if __CUDA_USED__
-    return get_device_count();
-#else
-    return false;
-#endif
 }
 
 void MainWindow::load_textures_from_disk() {
@@ -769,4 +777,80 @@ void MainWindow::load_textures_from_disk() {
         cuda_creator.copy_textures(textures);
     }
 #endif
+}
+
+void MainWindow::flip_fullscreen() {
+    if (!is_fullscreen) {
+        parentWidget()->showFullScreen();
+        parentWidget()->show();
+        is_fullscreen = true;
+    } else {
+        parentWidget()->showNormal();
+        parentWidget()->show();
+        is_fullscreen = false;
+    }
+    set_child_windows_always_on_top(is_fullscreen);
+}
+
+void MainWindow::set_child_windows_always_on_top(bool state) {
+    ui.cb_statistics_always_on_top     ->setChecked(false);
+    ui.cb_editor_always_on_top         ->setChecked(false);
+    ui.cb_info_window_always_on_top    ->setChecked(false);
+    ui.cb_recorder_window_always_on_top->setChecked(false);
+    ui.cb_world_events_always_on_top   ->setChecked(false);
+    ui.cb_benchmarks_always_on_top     ->setChecked(false);
+
+    st.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    iw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    rc.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    bs.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+}
+
+void MainWindow::apply_font_to_windows(const QFont &_font) {
+    setFont(_font);
+    ee.setFont(_font);
+    st.setFont(_font);
+    iw.setFont(_font);
+    rc.setFont(_font);
+    we.setFont(_font);
+    bs.setFont(_font);
+}
+
+void MainWindow::save_state() {
+    auto json_state_path = QCoreApplication::applicationDirPath().toStdString() + "/settings.json";
+    DataSavingFunctions::write_json_state(json_state_path,
+                                          DataSavingFunctions::ProgramState{
+                                              scaling_coefficient, keyboard_movement_amount, SHIFT_keyboard_movement_multiplier,
+                                              font_size, float_precision, brush_size, update_info_every_n_milliseconds,
+                                              use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                              really_stop_render, save_simulation_settings, uses_point_size
+                                          }, sp);
+}
+
+void MainWindow::load_state() {
+    auto json_state_path = QCoreApplication::applicationDirPath().toStdString() + "/settings.json";
+    DataSavingFunctions::read_json_state(json_state_path,
+                                        DataSavingFunctions::ProgramState{
+                                              scaling_coefficient, keyboard_movement_amount, SHIFT_keyboard_movement_multiplier,
+                                              font_size, float_precision, brush_size, update_info_every_n_milliseconds,
+                                              use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                              really_stop_render, save_simulation_settings, uses_point_size
+                                        }, sp);
+    initialize_gui();
+
+    apply_font_size();
+}
+
+void MainWindow::apply_font_size() {
+    auto _font = font();
+
+    if (uses_point_size) {
+        _font.setPointSize(font_size);
+    } else {
+        _font.setPixelSize(font_size);
+    }
+
+    apply_font_to_windows(_font);
 }

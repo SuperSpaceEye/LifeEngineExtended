@@ -43,8 +43,8 @@ namespace ImageCreation {
 
         const color &get_texture_color(BlockTypes type,
                                        Rotation rotation,
-                                       float rxs,
-                                       float rys,
+                                       double rxs,
+                                       double rys,
                                        const TexturesContainer &textures);
 
         void set_image_pixel(int x,

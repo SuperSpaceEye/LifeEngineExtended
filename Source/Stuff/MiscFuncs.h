@@ -156,4 +156,6 @@ std::string convert_seconds(uint64_t num_seconds);
 
 bool choose_node_window(NodeType &new_node_type);
 
+bool cuda_is_available();
+
 #endif //THELIFEENGINECPP_MISCFUNCS_H

@@ -86,6 +86,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
             if (watched->objectName().toStdString() == "QWidgetClassWindow") {
                 engine.pause();
+                save_state();
                 exit(0);
             }
             close_event->accept();
@@ -137,7 +138,6 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
             }
         } break;
 
-        //TODO refactor?
         case Qt::Key_Up:
         case Qt::Key_W: W_pressed = true;break;
         case Qt::Key_Down:
@@ -161,7 +161,9 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
         case Qt::Key_3: rb_wall_slot();ui.rb_wall->setChecked(true);break;
         case Qt::Key_4: ee.rb_place_organism_slot();ee.ui.rb_place_organism->setChecked(true);break;
         case Qt::Key_5: ee.rb_choose_organism_slot();ee.ui.rb_chose_organism->setChecked(true);break;
+        case Qt::Key_0: ui.rb_null_button->setChecked(true);cursor_mode = CursorMode::NoAction;break;
 
+        case Qt::Key_F11: flip_fullscreen();break;
     }
 }
 

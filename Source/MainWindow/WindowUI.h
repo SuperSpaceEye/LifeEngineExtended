@@ -262,7 +262,6 @@ public:
     QHBoxLayout *horizontalLayout_30;
     QLabel *label_25;
     QLineEdit *le_font_size;
-    QCheckBox *cb_simplified_rendering;
     QHBoxLayout *horizontalLayout_10;
     QLabel *label_46;
     QLineEdit *le_update_info_every_n_milliseconds;
@@ -286,6 +285,7 @@ public:
     QHBoxLayout *horizontalLayout_56;
     QLabel *label_39;
     QLineEdit *le_random_seed;
+    QCheckBox *cb_load_evolution_controls_from_state;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -306,8 +306,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -1566,7 +1566,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -556, 606, 803));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -548, 606, 803));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1677,11 +1677,6 @@ public:
 
 
         verticalLayout_19->addLayout(horizontalLayout_30);
-
-        cb_simplified_rendering = new QCheckBox(widget_2);
-        cb_simplified_rendering->setObjectName(QString::fromUtf8("cb_simplified_rendering"));
-
-        verticalLayout_19->addWidget(cb_simplified_rendering);
 
         horizontalLayout_10 = new QHBoxLayout();
         horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
@@ -1797,6 +1792,11 @@ public:
 
 
         verticalLayout_19->addLayout(horizontalLayout_56);
+
+        cb_load_evolution_controls_from_state = new QCheckBox(widget_2);
+        cb_load_evolution_controls_from_state->setObjectName(QString::fromUtf8("cb_load_evolution_controls_from_state"));
+
+        verticalLayout_19->addWidget(cb_load_evolution_controls_from_state);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -2012,7 +2012,6 @@ public:
         QObject::connect(le_num_threads, SIGNAL(returnPressed()), MainWindow, SLOT(le_num_threads_slot()));
         QObject::connect(le_lifespan_multiplier, SIGNAL(returnPressed()), MainWindow, SLOT(le_lifespan_multiplier_slot()));
         QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
-        QObject::connect(cb_simplified_rendering, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_simplified_rendering_slot(bool)));
         QObject::connect(cb_failed_reproduction_eats_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_failed_reproduction_eats_food_slot(bool)));
         QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop_slot(bool)));
         QObject::connect(cb_use_new_child_pos_calculator, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_new_child_pos_calculator_slot(bool)));
@@ -2039,6 +2038,7 @@ public:
         QObject::connect(cb_no_random_decisions, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_no_random_decisions_slot(bool)));
         QObject::connect(le_memory_allocation_strategy_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_memory_allocation_strategy_modifier_slot()));
         QObject::connect(le_random_seed, SIGNAL(returnPressed()), MainWindow, SLOT(le_random_seed_slot()));
+        QObject::connect(cb_load_evolution_controls_from_state, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_load_evolution_controls_from_state_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2249,7 +2249,6 @@ public:
         cb_disable_warnings->setText(QApplication::translate("MainWindow", "Disable warnings", nullptr));
         cb_wait_for_engine_to_stop->setText(QApplication::translate("MainWindow", "Wait for engine to stop to render", nullptr));
         label_25->setText(QApplication::translate("MainWindow", "Font size:", nullptr));
-        cb_simplified_rendering->setText(QApplication::translate("MainWindow", "Simplified rendering", nullptr));
         label_46->setText(QApplication::translate("MainWindow", "Update info every n milliseconds:", nullptr));
         cb_synchronise_info_with_window->setText(QApplication::translate("MainWindow", "Synhronise info updates with window updates", nullptr));
         cb_use_nvidia_for_image_generation->setText(QApplication::translate("MainWindow", "Use NVIDIA GPU for image rendering", nullptr));
@@ -2261,6 +2260,7 @@ public:
         cb_show_extended_statistics->setText(QApplication::translate("MainWindow", "Show extended statistics", nullptr));
         label_38->setText(QApplication::translate("MainWindow", "Memory allocation strategy modifier", nullptr));
         label_39->setText(QApplication::translate("MainWindow", "Random seed", nullptr));
+        cb_load_evolution_controls_from_state->setText(QApplication::translate("MainWindow", "Save/Load evolution controls upon program loading.", nullptr));
         label_22->setText(QApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QApplication::translate("MainWindow", "Persistence: ", nullptr));

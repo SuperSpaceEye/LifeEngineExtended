@@ -213,17 +213,29 @@ void MainWindow::read_json_data(const std::string &path) {
     uint32_t recovery_simulation_width = edc.simulation_width;
     uint32_t recovery_simulation_height = edc.simulation_height;
 
-    //TODO divide json access from private class stuff for abort protection
-    json_read_grid_data(document);
-    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, SimulationParameters*)> func1 = &DataSavingFunctions::json_read_simulation_parameters;
-    if (try_and_catch_abort(func1, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &sp)) {
+    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, int32_t*, int32_t*)> func1 = &json_read_sim_width_height;
+    if (try_and_catch_abort(func1, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &edc.simulation_width, &edc.simulation_height)) {
+        display_message("Failed to read grids width or height.");
+        recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        return;
+    }
+    json_resize_and_make_walls(document);
+    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, EngineDataContainer*)> func2 = &json_read_ticks_food_walls;
+    if (try_and_catch_abort(func2, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &edc)) {
+        display_message("Failed to read positions of walls or food.");
+        recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
+        return;
+    }
+
+    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, SimulationParameters*)> func3 = &DataSavingFunctions::json_read_simulation_parameters;
+    if (try_and_catch_abort(func3, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &sp)) {
         display_message("Failed to read simulation parameters");
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
         return;
     }
 
-    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, SimulationParameters*, OrganismBlockParameters*, EngineDataContainer*)> func2 = &DataSavingFunctions::json_read_organisms_data;
-    if (try_and_catch_abort(func2, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &sp, &bp, &edc)) {
+    std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, SimulationParameters*, OrganismBlockParameters*, EngineDataContainer*)> func4 = &DataSavingFunctions::json_read_organisms_data;
+    if (try_and_catch_abort(func4, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &sp, &bp, &edc)) {
         display_message("Failed to read simulation parameters");
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
         return;
@@ -232,10 +244,13 @@ void MainWindow::read_json_data(const std::string &path) {
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-void MainWindow::json_read_grid_data(Document & d) {
-    edc.simulation_height = d["grid"]["rows"].GetInt() + 2;
-    edc.simulation_width  = d["grid"]["cols"].GetInt() + 2;
+void MainWindow::json_read_sim_width_height(Document * d_, int32_t * new_width, int32_t * new_height) {
+    auto & d = *d_;
+    *new_height = d["grid"]["rows"].GetInt() + 2;
+    *new_width  = d["grid"]["cols"].GetInt() + 2;
+}
 
+void MainWindow::json_resize_and_make_walls(Document &d) {
     new_simulation_width = edc.simulation_width;
     new_simulation_height = edc.simulation_height;
 
@@ -249,6 +264,11 @@ void MainWindow::json_read_grid_data(Document & d) {
 
     engine.make_walls();
     disable_warnings = false;
+}
+
+void MainWindow::json_read_ticks_food_walls(Document *d_, EngineDataContainer *edc_) {
+    auto & d = *d_;
+    auto & edc = *edc_;
 
     edc.loaded_engine_ticks = d["total_ticks"].GetInt64();
 

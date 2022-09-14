@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-uint32_t SAVE_VERSION = 6;
+const uint32_t SAVE_VERSION = 6;
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -570,4 +570,246 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
         for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i],
                                                                                                                                                           &gen);}}
     }
+}
+
+
+const uint32_t STATE_SAVE_VERSION = 1;
+
+void DataSavingFunctions::write_json_version(rapidjson::Document & d) {
+    d.AddMember("save_version", Value(STATE_SAVE_VERSION), d.GetAllocator());
+}
+
+bool DataSavingFunctions::read_json_version(rapidjson::Document & d) {
+    if (!d.HasMember("save_version")) {return false;}
+    auto version = d["save_version"].GetUint();
+    return version == STATE_SAVE_VERSION;
+}
+
+void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
+    d.AddMember("food_production_probability",     Value(sp.food_production_probability), d.GetAllocator());
+    d.AddMember("produce_food_every_n_life_ticks", Value(sp.produce_food_every_n_life_ticks), d.GetAllocator());
+    d.AddMember("lifespan_multiplier",             Value(sp.lifespan_multiplier), d.GetAllocator());
+    d.AddMember("look_range",                      Value(sp.look_range), d.GetAllocator());
+    d.AddMember("auto_produce_food_every_n_ticks", Value(sp.auto_produce_food_every_n_ticks), d.GetAllocator());
+    d.AddMember("auto_produce_n_food",             Value(sp.auto_produce_n_food), d.GetAllocator());
+    d.AddMember("extra_reproduction_cost",         Value(sp.extra_reproduction_cost), d.GetAllocator());
+    d.AddMember("extra_mover_reproductive_cost",   Value(sp.extra_mover_reproductive_cost), d.GetAllocator());
+    d.AddMember("global_anatomy_mutation_rate",    Value(sp.global_anatomy_mutation_rate), d.GetAllocator());
+    d.AddMember("global_brain_mutation_rate",      Value(sp.global_brain_mutation_rate), d.GetAllocator());
+    d.AddMember("killer_damage_amount",            Value(sp.killer_damage_amount), d.GetAllocator());
+
+    d.AddMember("min_reproducing_distance", Value(sp.min_reproducing_distance), d.GetAllocator());
+    d.AddMember("max_reproducing_distance", Value(sp.max_reproducing_distance), d.GetAllocator());
+
+    d.AddMember("anatomy_mutations_rate_mutation_step", Value(sp.anatomy_mutations_rate_mutation_step), d.GetAllocator());
+    d.AddMember("anatomy_min_possible_mutation_rate",   Value(sp.anatomy_min_possible_mutation_rate), d.GetAllocator());
+    d.AddMember("anatomy_mutation_rate_delimiter",      Value(sp.anatomy_mutation_rate_delimiter), d.GetAllocator());
+
+    d.AddMember("brain_mutation_rate_mutation_step", Value(sp.brain_mutation_rate_mutation_step), d.GetAllocator());
+    d.AddMember("brain_min_possible_mutation_rate",  Value(sp.brain_min_possible_mutation_rate), d.GetAllocator());
+    d.AddMember("brain_mutation_rate_delimiter",     Value(sp.brain_mutation_rate_delimiter), d.GetAllocator());
+
+    d.AddMember("min_move_range",       Value(sp.min_move_range), d.GetAllocator());
+    d.AddMember("max_move_range",       Value(sp.max_move_range), d.GetAllocator());
+    d.AddMember("move_range_delimiter", Value(sp.move_range_delimiter), d.GetAllocator());
+    d.AddMember("set_fixed_move_range", Value(sp.set_fixed_move_range), d.GetAllocator());
+    d.AddMember("min_organism_size",    Value(sp.min_organism_size), d.GetAllocator());
+
+    d.AddMember("add_cell",    Value(sp.add_cell), d.GetAllocator());
+    d.AddMember("change_cell", Value(sp.change_cell), d.GetAllocator());
+    d.AddMember("remove_cell", Value(sp.remove_cell), d.GetAllocator());
+
+    d.AddMember("perlin_octaves",     Value(sp.perlin_octaves), d.GetAllocator());
+    d.AddMember("perlin_persistence", Value(sp.perlin_persistence), d.GetAllocator());
+    d.AddMember("perlin_upper_bound", Value(sp.perlin_upper_bound), d.GetAllocator());
+    d.AddMember("perlin_lower_bound", Value(sp.perlin_lower_bound), d.GetAllocator());
+    d.AddMember("perlin_x_modifier",  Value(sp.perlin_x_modifier), d.GetAllocator());
+    d.AddMember("perlin_y_modifier",  Value(sp.perlin_y_modifier), d.GetAllocator());
+
+    d.AddMember("reproduction_rotation_enabled",     Value(sp.reproduction_rotation_enabled), d.GetAllocator());
+    d.AddMember("on_touch_kill",                     Value(sp.on_touch_kill), d.GetAllocator());
+    d.AddMember("use_anatomy_evolved_mutation_rate", Value(sp.use_anatomy_evolved_mutation_rate), d.GetAllocator());
+    d.AddMember("use_brain_evolved_mutation_rate",   Value(sp.use_brain_evolved_mutation_rate), d.GetAllocator());
+    d.AddMember("movers_can_produce_food",           Value(sp.movers_can_produce_food), d.GetAllocator());
+    d.AddMember("food_blocks_reproduction",          Value(sp.food_blocks_reproduction), d.GetAllocator());
+
+    d.AddMember("reset_on_total_extinction",        Value(sp.reset_on_total_extinction), d.GetAllocator());
+    d.AddMember("pause_on_total_extinction",        Value(sp.pause_on_total_extinction), d.GetAllocator());
+    d.AddMember("clear_walls_on_reset",             Value(sp.clear_walls_on_reset), d.GetAllocator());
+    d.AddMember("generate_random_walls_on_reset",   Value(sp.generate_random_walls_on_reset), d.GetAllocator());
+    d.AddMember("reproduction_distance_fixed",      Value(sp.reproduction_distance_fixed), d.GetAllocator());
+    d.AddMember("runtime_rotation_enabled",         Value(sp.runtime_rotation_enabled), d.GetAllocator());
+    d.AddMember("organism_self_blocks_block_sight", Value(sp.organism_self_blocks_block_sight), d.GetAllocator());
+    d.AddMember("failed_reproduction_eats_food",    Value(sp.failed_reproduction_eats_food), d.GetAllocator());
+    d.AddMember("rotate_every_move_tick",           Value(sp.rotate_every_move_tick), d.GetAllocator());
+    d.AddMember("multiply_food_production_prob",    Value(sp.multiply_food_production_prob), d.GetAllocator());
+    d.AddMember("simplified_food_production",       Value(sp.simplified_food_production), d.GetAllocator());
+    d.AddMember("stop_when_one_food_generated",     Value(sp.stop_when_one_food_generated), d.GetAllocator());
+    d.AddMember("eat_then_produce",                 Value(sp.eat_then_produce), d.GetAllocator());
+    d.AddMember("check_if_path_is_clear",           Value(sp.check_if_path_is_clear), d.GetAllocator());
+    d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
+    d.AddMember("use_new_child_pos_calculator",     Value(sp.use_new_child_pos_calculator), d.GetAllocator());
+    d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
+}
+
+void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
+    sp.food_production_probability     = d["food_production_probability"].GetFloat();
+    sp.produce_food_every_n_life_ticks = d["produce_food_every_n_life_ticks"].GetInt();
+    sp.lifespan_multiplier             = d["lifespan_multiplier"].GetFloat();
+    sp.look_range                      = d["look_range"].GetInt();
+    sp.auto_produce_food_every_n_ticks = d["auto_produce_food_every_n_ticks"].GetInt();
+    sp.auto_produce_n_food             = d["auto_produce_n_food"].GetInt();
+    sp.extra_reproduction_cost         = d["extra_reproduction_cost"].GetFloat();
+    sp.extra_mover_reproductive_cost   = d["extra_mover_reproductive_cost"].GetFloat();
+    sp.global_anatomy_mutation_rate    = d["global_anatomy_mutation_rate"].GetFloat();
+    sp.global_brain_mutation_rate      = d["global_brain_mutation_rate"].GetFloat();
+    sp.killer_damage_amount            = d["killer_damage_amount"].GetFloat();
+
+    sp.min_reproducing_distance    = d["min_reproducing_distance"].GetInt();
+    sp.max_reproducing_distance    = d["max_reproducing_distance"].GetInt();
+
+    sp.anatomy_mutations_rate_mutation_step = d["anatomy_mutations_rate_mutation_step"].GetFloat();
+    sp.anatomy_min_possible_mutation_rate   = d["anatomy_min_possible_mutation_rate"].GetFloat();
+    sp.anatomy_mutation_rate_delimiter      = d["anatomy_mutation_rate_delimiter"].GetFloat();
+
+    sp.brain_mutation_rate_mutation_step = d["brain_mutation_rate_mutation_step"].GetFloat();
+    sp.brain_min_possible_mutation_rate  = d["brain_min_possible_mutation_rate"].GetFloat();
+    sp.brain_mutation_rate_delimiter     = d["brain_mutation_rate_delimiter"].GetFloat();
+
+    sp.min_move_range       = d["min_move_range"].GetInt();
+    sp.max_move_range       = d["max_move_range"].GetInt();
+    sp.move_range_delimiter = d["move_range_delimiter"].GetFloat();
+    sp.set_fixed_move_range = d["set_fixed_move_range"].GetBool();
+    sp.min_organism_size    = d["min_organism_size"].GetInt();
+
+    sp.add_cell    = d["add_cell"].GetInt();
+    sp.change_cell = d["change_cell"].GetInt();
+    sp.remove_cell = d["remove_cell"].GetInt();
+
+    sp.perlin_octaves     = d["perlin_octaves"].GetInt();
+    sp.perlin_persistence = d["perlin_persistence"].GetFloat();
+    sp.perlin_upper_bound = d["perlin_upper_bound"].GetFloat();
+    sp.perlin_lower_bound = d["perlin_lower_bound"].GetFloat();
+    sp.perlin_x_modifier  = d["perlin_x_modifier"].GetFloat();
+    sp.perlin_y_modifier  = d["perlin_y_modifier"].GetFloat();
+
+    sp.reproduction_rotation_enabled     = d["reproduction_rotation_enabled"].GetBool();
+    sp.on_touch_kill                     = d["on_touch_kill"].GetBool();
+    sp.use_anatomy_evolved_mutation_rate = d["use_anatomy_evolved_mutation_rate"].GetBool();
+    sp.use_brain_evolved_mutation_rate   = d["use_brain_evolved_mutation_rate"].GetBool();
+    sp.movers_can_produce_food           = d["movers_can_produce_food"].GetBool();
+    sp.food_blocks_reproduction          = d["food_blocks_reproduction"].GetBool();
+
+    sp.reset_on_total_extinction        = d["reset_on_total_extinction"].GetBool();
+    sp.pause_on_total_extinction        = d["pause_on_total_extinction"].GetBool();
+    sp.clear_walls_on_reset             = d["clear_walls_on_reset"].GetBool();
+    sp.generate_random_walls_on_reset   = d["generate_random_walls_on_reset"].GetBool();
+    sp.reproduction_distance_fixed      = d["reproduction_distance_fixed"].GetBool();
+    sp.runtime_rotation_enabled         = d["runtime_rotation_enabled"].GetBool();
+    sp.organism_self_blocks_block_sight = d["organism_self_blocks_block_sight"].GetBool();
+    sp.failed_reproduction_eats_food    = d["failed_reproduction_eats_food"].GetBool();
+    sp.rotate_every_move_tick           = d["rotate_every_move_tick"].GetBool();
+    sp.multiply_food_production_prob    = d["multiply_food_production_prob"].GetBool();
+    sp.simplified_food_production       = d["simplified_food_production"].GetBool();
+    sp.stop_when_one_food_generated     = d["stop_when_one_food_generated"].GetBool();
+    sp.eat_then_produce                 = d["eat_then_produce"].GetBool();
+    sp.check_if_path_is_clear           = d["check_if_path_is_clear"].GetBool();
+    sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
+    sp.use_new_child_pos_calculator     = d["use_new_child_pos_calculator"].GetBool();
+    sp.no_random_decisions              = d["no_random_decisions"].GetBool();
+}
+
+
+void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, DataSavingFunctions::ProgramState &state) {
+    d.AddMember("scaling_coefficient",                Value(state.scaling_coefficient), d.GetAllocator());
+    d.AddMember("keyboard_movement_amount",           Value(state.keyboard_movement_amount), d.GetAllocator());
+    d.AddMember("SHIFT_keyboard_movement_multiplier", Value(state.SHIFT_keyboard_movement_multiplier), d.GetAllocator());
+
+    d.AddMember("font_size",                        Value(state.font_size), d.GetAllocator());
+    d.AddMember("float_precision",                  Value(state.float_precision), d.GetAllocator());
+    d.AddMember("brush_size",                       Value(state.brush_size), d.GetAllocator());
+    d.AddMember("update_info_every_n_milliseconds", Value(state.update_info_every_n_milliseconds), d.GetAllocator());
+
+    d.AddMember("use_cuda",                          Value(state.use_cuda), d.GetAllocator());
+    d.AddMember("wait_for_engine_to_stop_to_render", Value(state.wait_for_engine_to_stop_to_render), d.GetAllocator());
+    d.AddMember("disable_warnings",                  Value(state.disable_warnings), d.GetAllocator());
+    d.AddMember("really_stop_render",                Value(state.really_stop_render), d.GetAllocator());
+    d.AddMember("save_simulation_settings",          Value(state.save_simulation_settings), d.GetAllocator());
+    d.AddMember("use_point_size",                    Value(state.use_point_size), d.GetAllocator());
+}
+
+void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, DataSavingFunctions::ProgramState &state) {
+    state.scaling_coefficient                = d["scaling_coefficient"].GetFloat();
+    state.keyboard_movement_amount           = d["keyboard_movement_amount"].GetFloat();
+    state.SHIFT_keyboard_movement_multiplier = d["SHIFT_keyboard_movement_multiplier"].GetFloat();
+
+    state.font_size                        = d["font_size"].GetInt();
+    state.float_precision                  = d["float_precision"].GetInt();
+    state.brush_size                       = d["brush_size"].GetInt();
+    state.update_info_every_n_milliseconds = d["update_info_every_n_milliseconds"].GetInt();
+
+    state.wait_for_engine_to_stop_to_render = d["wait_for_engine_to_stop_to_render"].GetBool();
+    state.disable_warnings                  = d["disable_warnings"].GetBool();
+    state.really_stop_render                = d["really_stop_render"].GetBool();
+    state.save_simulation_settings          = d["save_simulation_settings"].GetBool();
+    state.use_point_size                    = d["use_point_size"].GetBool();
+
+    bool use_cuda = d["use_cuda"].GetBool();
+    if (cuda_is_available()) {
+        state.use_cuda = use_cuda;
+    }
+}
+
+void DataSavingFunctions::write_json_state(const std::string& path, ProgramState state,
+                                           SimulationParameters &sp) {
+    Document d;
+    d.SetObject();
+
+    write_json_version(d);
+    write_json_program_settings(d, state);
+    if (state.save_simulation_settings) {
+        write_json_extended_simulation_parameters(d, sp);
+    }
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    std::fstream file;
+    file.open(path, std::ios_base::out);
+    file << buffer.GetString();
+    file.close();
+}
+
+bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState state,
+                                          SimulationParameters &sp) {
+    if (!std::filesystem::exists(path)) {
+        write_json_state(path, state, sp);
+        return false;
+    }
+
+    std::string json;
+    auto ss = std::ostringstream();
+    std::ifstream file;
+    file.open(path);
+    if (!file.is_open()) {
+        return false;
+    }
+
+    ss << file.rdbuf();
+    json = ss.str();
+
+    file.close();
+
+    Document d;
+    d.Parse(json.c_str());
+
+    if (!read_json_version(d)) {
+        return false;
+    }
+
+    read_json_program_settings(d, state);
+    if (state.save_simulation_settings) { read_json_extended_simulation_parameters(d, sp); }
+
+    return true;
 }

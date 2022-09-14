@@ -10,6 +10,7 @@
 #define THELIFEENGINECPP_CURSORMODE_H
 
 enum class CursorMode {
+    NoAction,
     ModifyFood,
     ModifyWall,
     KillOrganism,

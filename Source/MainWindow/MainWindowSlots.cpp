@@ -25,9 +25,9 @@ void MainWindow::tb_stoprender_slot(bool state) {
 
 void MainWindow::tb_open_statistics_slot(bool state) {
     if (state) {
-       s.show();
+       st.show();
     } else {
-       s.close();
+       st.close();
     }
 }
 
@@ -54,9 +54,9 @@ void MainWindow::tb_open_info_window_slot(bool state) {
 
 void MainWindow::tb_open_recorder_window_slot(bool state) {
     if (state) {
-        rec.show();
+        rc.show();
     } else {
-        rec.close();
+        rc.close();
     }
 }
 
@@ -382,14 +382,12 @@ void MainWindow::le_font_size_slot() {
 
     //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1.
     //so the program needs to understand which mode it is
-    int font_size;
-    bool point_size_m;
     if (font().pixelSize() < 0) {
         font_size = font().pointSize();
-        point_size_m = true;
+        uses_point_size = true;
     } else {
         font_size = font().pixelSize();
-        point_size_m = false;
+        uses_point_size = false;
     }
 
     int fallback = font_size;
@@ -397,17 +395,15 @@ void MainWindow::le_font_size_slot() {
     if (!result.is_valid) {return;}
     if (result.result < 1) {display_message("Input cannot be less than 1."); return;}
 
-    if (point_size_m) {
+    font_size = result.result;
+
+    if (uses_point_size) {
         _font.setPointSize(result.result);
     } else {
         _font.setPixelSize(result.result);
     }
-    setFont(_font);
-    ee.setFont(_font);
-    s.setFont(_font);
-    iw.setFont(_font);
-    rec.setFont(_font);
-    we.setFont(_font);
+
+    apply_font_to_windows(_font);
 }
 
 void MainWindow::le_max_move_range_slot() {
@@ -612,42 +608,44 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
 
 void MainWindow::cb_show_extended_statistics_slot(bool state) {
     if (state) {
-        s.ui.lb_child_organisms->show();
-        s.ui.lb_child_organisms_capacity->show();
-        s.ui.lb_child_organisms_in_use->show();
-        s.ui.lb_dead_organisms->show();
-        s.ui.lb_organisms_capacity->show();
-        s.ui.lb_total_organisms->show();
-        s.ui.lb_last_alive_position->show();
-        s.ui.lb_dead_inside->show();
-        s.ui.lb_dead_outside->show();
+        st.ui.lb_child_organisms->show();
+        st.ui.lb_child_organisms_capacity->show();
+        st.ui.lb_child_organisms_in_use->show();
+        st.ui.lb_dead_organisms->show();
+        st.ui.lb_organisms_capacity->show();
+        st.ui.lb_total_organisms->show();
+        st.ui.lb_last_alive_position->show();
+        st.ui.lb_dead_inside->show();
+        st.ui.lb_dead_outside->show();
     } else {
-        s.ui.lb_child_organisms->hide();
-        s.ui.lb_child_organisms_capacity->hide();
-        s.ui.lb_child_organisms_in_use->hide();
-        s.ui.lb_dead_organisms->hide();
-        s.ui.lb_organisms_capacity->hide();
-        s.ui.lb_total_organisms->hide();
-        s.ui.lb_last_alive_position->hide();
-        s.ui.lb_dead_inside->hide();
-        s.ui.lb_dead_outside->hide();
+        st.ui.lb_child_organisms->hide();
+        st.ui.lb_child_organisms_capacity->hide();
+        st.ui.lb_child_organisms_in_use->hide();
+        st.ui.lb_dead_organisms->hide();
+        st.ui.lb_organisms_capacity->hide();
+        st.ui.lb_total_organisms->hide();
+        st.ui.lb_last_alive_position->hide();
+        st.ui.lb_dead_inside->hide();
+        st.ui.lb_dead_outside->hide();
     }
 }
 
 void MainWindow::cb_statistics_always_on_top_slot(bool state) {
-    auto hidden = s.isHidden();
+    if (is_fullscreen) {return;}
+    auto hidden = st.isHidden();
 
-    s.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    st.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
     //Why sleep? For some reason changes are not applied instantly and main process needs to wait for some time.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
-        s.show();
+        st.show();
     }
 }
 
 void MainWindow::cb_editor_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = ee.isHidden();
 
     ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -660,6 +658,7 @@ void MainWindow::cb_editor_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_info_window_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = iw.isHidden();
 
     iw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -672,18 +671,20 @@ void MainWindow::cb_info_window_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
-    auto hidden = rec.isHidden();
+    if (is_fullscreen) {return;}
+    auto hidden = rc.isHidden();
 
-    rec.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    rc.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     if (!hidden) {
-        rec.show();
+        rc.show();
     }
 }
 
 void MainWindow::cb_world_events_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = we.isHidden();
 
     we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -696,6 +697,7 @@ void MainWindow::cb_world_events_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_benchmarks_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
     auto hidden = bs.isHidden();
 
     bs.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -747,8 +749,6 @@ void MainWindow::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for
 
 void MainWindow::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 
-void MainWindow::cb_simplified_rendering_slot            (bool state) { simplified_rendering = state;}
-
 void MainWindow::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state; engine.reinit_organisms();}
 
 void MainWindow::cb_simplified_food_production_slot      (bool state) { sp.simplified_food_production = state;}
@@ -768,6 +768,8 @@ void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
 void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_random_decisions = state;}
+
+void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 
 //==================== Table ====================
 

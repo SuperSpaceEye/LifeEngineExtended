@@ -56,9 +56,6 @@ public:
     int max_decision_lifetime = 2;
     int max_do_nothing_lifetime = 3;
 
-    bool is_dead = false;
-    int vector_index = 0;
-
     DecisionObservation last_decision_observation = DecisionObservation{};
     BrainDecision last_decision = BrainDecision::MoveUp;
 
@@ -75,6 +72,9 @@ public:
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
     int32_t child_pattern_index = -1;
+    int32_t vector_index = -1;
+
+    bool is_dead = false;
 
     float calculate_max_life();
     int calculate_organism_lifetime();

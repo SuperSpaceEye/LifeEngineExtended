@@ -150,11 +150,16 @@ void SimulationEngine::simulation_tick() {
 
 //TODO refactor
 void SimulationEngine::process_user_action_pool() {
+    if (!edc.ui_user_actions_pool.empty() && !ecp.do_not_use_user_actions_ui) {
+        ecp.do_not_use_user_actions_engine = true;
+        edc.engine_user_actions_pool.resize(edc.ui_user_actions_pool.size());
+        std::copy(edc.ui_user_actions_pool.begin(), edc.ui_user_actions_pool.end(), edc.engine_user_actions_pool.begin());
+        edc.ui_user_actions_pool.clear();
+        ecp.do_not_use_user_actions_engine = false;
+    } else { return; }
+
     auto temp = std::vector<Organism*>{};
-    bool killed_organisms = false;
-    //do not remake this as range or iterator for loop
-    for (int i = 0; i < edc.user_actions_pool.size(); i++) {
-        auto & action = edc.user_actions_pool[i];
+    for (auto & action : edc.engine_user_actions_pool) {
         if (check_if_out_of_bounds(&edc, action.x, action.y)) {continue;}
         switch (action.type) {
             case ActionType::TryAddFood:
@@ -166,7 +171,6 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryAddWall:
                 set_wall(temp, action);
-                killed_organisms = true;
                 break;
             case ActionType::TryRemoveWall:
                 if (action.x == 0 || action.y == 0 || action.x == edc.simulation_width - 1 || action.y == edc.simulation_height - 1) {continue;}
@@ -225,7 +229,6 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryKillOrganism: {
                 try_kill_organism(action.x, action.y, temp);
-                killed_organisms = true;
             }
                 break;
             case ActionType::TrySelectOrganism: {
@@ -239,7 +242,7 @@ void SimulationEngine::process_user_action_pool() {
     }
     endfor:
 
-    for (auto & action: edc.user_actions_pool) {
+    for (auto & action: edc.engine_user_actions_pool) {
         if (action.type == ActionType::TrySelectOrganism && edc.selected_organism != nullptr) {
             delete edc.chosen_organism;
             edc.chosen_organism = new Organism(edc.selected_organism);
@@ -249,11 +252,7 @@ void SimulationEngine::process_user_action_pool() {
         }
     }
 
-//    if (killed_organisms) {
-//        edc.stc.last_alive_position = OrganismsController::get_last_alive_organism_position(edc);
-//    }
-
-    edc.user_actions_pool.clear();
+    edc.engine_user_actions_pool.clear();
 }
 
 void SimulationEngine::clear_walls() {
@@ -278,7 +277,7 @@ void SimulationEngine::random_food_drop() {
         for (int i = 0; i < sp.auto_produce_n_food; i++) {
             auto & vec = auto_food_drop_coordinates_shuffled[auto_food_drop_index % auto_food_drop_coordinates_shuffled.size()];
             auto_food_drop_index++;
-            edc.user_actions_pool.emplace_back(ActionType::TryAddFood, vec.x, vec.y);
+            edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, vec.x, vec.y);
         }
     }
 }
@@ -387,6 +386,7 @@ void SimulationEngine::clear_organisms() {
     edc.stc.num_alive_organisms = 0;
     edc.stc.num_dead_organisms  = 0;
     edc.stc.last_alive_position = 0;
+    edc.stc.dead_organisms_before_last_alive_position = 0;
 }
 
 void SimulationEngine::make_walls() {
