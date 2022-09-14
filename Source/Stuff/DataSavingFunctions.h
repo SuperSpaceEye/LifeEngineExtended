@@ -35,7 +35,7 @@ namespace DataSavingFunctions {
     };
 
     struct ProgramState {
-        float & scaling_zoom;
+        float & scaling_coefficient;
         float & keyboard_movement_amount;
         float & SHIFT_keyboard_movement_multiplier;
 

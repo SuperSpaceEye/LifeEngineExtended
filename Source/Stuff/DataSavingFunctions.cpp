@@ -721,7 +721,7 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
 
 
 void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, DataSavingFunctions::ProgramState &state) {
-    d.AddMember("scaling_zoom",                       Value(state.scaling_zoom), d.GetAllocator());
+    d.AddMember("scaling_coefficient",                Value(state.scaling_coefficient), d.GetAllocator());
     d.AddMember("keyboard_movement_amount",           Value(state.keyboard_movement_amount), d.GetAllocator());
     d.AddMember("SHIFT_keyboard_movement_multiplier", Value(state.SHIFT_keyboard_movement_multiplier), d.GetAllocator());
 
@@ -739,7 +739,7 @@ void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, Da
 }
 
 void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, DataSavingFunctions::ProgramState &state) {
-    state.scaling_zoom                       = d["scaling_zoom"].GetFloat();
+    state.scaling_coefficient                = d["scaling_coefficient"].GetFloat();
     state.keyboard_movement_amount           = d["keyboard_movement_amount"].GetFloat();
     state.SHIFT_keyboard_movement_multiplier = d["SHIFT_keyboard_movement_multiplier"].GetFloat();
 
