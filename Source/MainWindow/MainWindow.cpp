@@ -600,8 +600,8 @@ void MainWindow::initialize_gui() {
     st.ui.lb_organisms_memory_consumption->hide();
 }
 
-void
-MainWindow::get_current_font_size() {//font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
+void MainWindow::get_current_font_size() {
+    //font size could be set either by pixel_size or point_size. If it is set by one, the other will give -1
     if (font().pixelSize() < 0) {
         font_size = font().pointSize();
         uses_point_size = true;

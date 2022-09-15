@@ -1,0 +1,13 @@
+//
+// Created by spaceeye on 15.09.22.
+//
+
+#ifndef LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H
+#define LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H
+
+struct OCCParameters {
+    int max_distance = 1;
+    int max_mutation_group_size = 1;
+};
+
+#endif //LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H
