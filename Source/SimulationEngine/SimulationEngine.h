@@ -43,6 +43,7 @@ class SimulationEngine {
     EngineDataContainer& edc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
+    OCCParameters &occp;
     RecordingData * recd;
 //    OrganismInfoContainer info{};
     WorldEventsController world_events_controller{};
@@ -59,7 +60,6 @@ class SimulationEngine {
     void process_user_action_pool();
 
     void simulation_tick();
-    void partial_multi_threaded_tick();
 
     void change_mode();
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
@@ -76,7 +76,7 @@ public:
 
     SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
                      OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters,
-                     RecordingData * recording_data);
+                     RecordingData *recording_data, OCCParameters &occp);
     void threaded_mainloop();
 
     void make_random_walls();

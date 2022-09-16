@@ -149,9 +149,9 @@ void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters 
                          0,
                          Rotation::UP,
                          anatomy,
-                         brain,
+                         brain, OrganismConstructionCode(),
                          &sp,
-                         &bp,
+                         &bp, nullptr, nullptr,
                          0,
                          0,
                          0);
@@ -533,9 +533,9 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
                              y,
                              static_cast<Rotation>(rotation),
                              anatomy,
-                             brain,
+                             brain, OrganismConstructionCode(),
                              &sp,
-                             &bp,
+                             &bp, nullptr, nullptr,
                              move_range,
                              mutability);
     new_organism->lifetime = lifetime;

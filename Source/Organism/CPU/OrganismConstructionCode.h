@@ -26,11 +26,15 @@ class OrganismConstructionCode {
 public:
     OrganismConstructionCode()=default;
     OrganismConstructionCode(const OrganismConstructionCode & parent_code);
-    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept ;
+    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept;
+    OrganismConstructionCode & operator=(const OrganismConstructionCode & code)=default;
 
     OrganismConstructionCode mutate(OCCParameters & occp, lehmer64 & gen);
     SerializedOrganismStructureContainer * compile_code(OCCLogicContainer & occ_container);
 
+    void set_code(std::vector<OCCInstruction> && code) {occ_vector = std::move(code);}
+    const std::vector<OCCInstruction> & get_code() {return occ_vector;}
+    std::vector<OCCInstruction> & get_code_ref() {return occ_vector;}
 private:
     std::vector<OCCInstruction> occ_vector;
     //min x, max x, min y, max y

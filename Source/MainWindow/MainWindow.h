@@ -102,6 +102,7 @@ private:
     EngineDataContainer edc;
     OrganismBlockParameters bp;
     RecordingData recd;
+    OCCParameters occp;
 
     Ui::MainWindow ui{};
     QTimer * timer;
@@ -111,8 +112,8 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
-    SimulationEngine engine{edc, ecp, bp, sp, &recd};
-    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures};
+    SimulationEngine engine{edc, ecp, bp, sp, &recd, occp};
+    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, nullptr, nullptr};
     StatisticsCore st{&ui};
     InfoWindow iw{&ui};
     Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};

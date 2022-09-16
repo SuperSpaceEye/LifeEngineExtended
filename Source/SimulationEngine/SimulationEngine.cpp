@@ -12,9 +12,9 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
                                    EngineControlParameters &engine_control_parameters,
                                    OrganismBlockParameters &organism_block_parameters,
                                    SimulationParameters &simulation_parameters,
-                                   RecordingData * recording_data) :
+                                   RecordingData *recording_data, OCCParameters &occp) :
         edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters),
-        recd(recording_data){
+        recd(recording_data), occp(occp) {
 
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};

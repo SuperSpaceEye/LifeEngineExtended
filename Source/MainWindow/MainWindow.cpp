@@ -44,17 +44,28 @@ MainWindow::MainWindow(QWidget *parent) :
     sp = SimulationParameters{};
 
     auto anatomy = Anatomy();
-    anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
-    anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
 
     auto brain = Brain(BrainTypes::RandomActions);
 
+    auto occ = OrganismConstructionCode();
+    occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth,
+                                             OCCInstruction::ShiftUpLeft, OCCInstruction::SetBlockProducer,
+                                             OCCInstruction::ShiftDownRight, OCCInstruction::SetBlockProducer});
+
+    if (sp.use_occ) {
+        anatomy = Anatomy(occ.compile_code(edc.stc.occl));
+    } else {
+        anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+        anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
+        anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
+    }
+
     edc.base_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
-                                     Rotation::UP, anatomy, brain, &sp, &bp, 1);
+                                     Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
+                                     &edc.stc.occl, 1);
     edc.chosen_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
-                                       Rotation::UP, Anatomy(anatomy), Brain(),
-                                       &sp, &bp, 1);
+                                       Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp, &occp,
+                                       &edc.stc.occl, 1);
 
     edc.base_organism->last_decision_observation = DecisionObservation{};
     edc.chosen_organism->last_decision_observation = DecisionObservation{};

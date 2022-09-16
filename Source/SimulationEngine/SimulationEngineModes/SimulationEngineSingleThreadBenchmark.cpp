@@ -1,11 +1,11 @@
-//
+//edc.base_organism
 // Created by spaceeye on 16.08.22.
 //
 
 #include "SimulationEngineSingleThreadBenchmark.h"
 
 SimulationEngineSingleThreadBenchmark::SimulationEngineSingleThreadBenchmark() {
-
+    sp.use_occ = false;
 }
 
 bool SimulationEngineSingleThreadBenchmark::resize_benchmark_grid(int width, int height) {
@@ -25,7 +25,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::ProduceFood].emplace_back(
             OrganismContainer{"1 block", p_organism}
     );
@@ -39,7 +40,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             }
         }
         anatomy.set_many_blocks(blocks);
-        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                                  nullptr, 1);
         benchmark_organisms[BenchmarkTypes::ProduceFood].emplace_back(
                 OrganismContainer{std::to_string(blocks.size()) + " producing blocks", p_organism}
                 );
@@ -49,7 +51,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::EatFood].emplace_back(
             OrganismContainer{"1 mouth block", p_organism}
             );
@@ -63,7 +66,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             }
         }
         anatomy.set_many_blocks(blocks);
-        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                                  nullptr, 1);
         benchmark_organisms[BenchmarkTypes::EatFood].emplace_back(
                 OrganismContainer{std::to_string(blocks.size()) + " mouth blocks", p_organism}
         );
@@ -73,7 +77,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::KillerBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::ApplyDamage].emplace_back(
             OrganismContainer{"1 block", p_organism, -1}
     );
@@ -82,7 +87,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     p_organism->damage = p_organism->calculate_max_life() + 1;
     benchmark_organisms[BenchmarkTypes::TickLifetime].emplace_back(
             OrganismContainer{"1 block", p_organism}
@@ -97,7 +103,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             }
         }
         anatomy.set_many_blocks(blocks);
-        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                                  nullptr, 1);
         p_organism->damage = p_organism->calculate_max_life() + 1;
         benchmark_organisms[BenchmarkTypes::TickLifetime].emplace_back(
                 OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
@@ -108,25 +115,29 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
             OrganismContainer{"1 block 1 space", p_organism}
     );
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
             OrganismContainer{"1 block 10 space", p_organism, 10}
     );
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
             OrganismContainer{"1 block 20 space", p_organism, 20}
     );
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::GetObservations].emplace_back(
             OrganismContainer{"1 block 50 space", p_organism, 50}
     );
@@ -135,7 +146,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::EyeBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::ThinkDecision].emplace_back(
             OrganismContainer{"none", p_organism}
     );
@@ -144,7 +156,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::RotateOrganism].emplace_back(
             OrganismContainer{"1 block", p_organism}
     );
@@ -158,7 +171,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             }
         }
         anatomy.set_many_blocks(blocks);
-        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                                  nullptr, 1);
         benchmark_organisms[BenchmarkTypes::RotateOrganism].emplace_back(
                 OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
         );
@@ -168,7 +182,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::MoveOrganism].emplace_back(
             OrganismContainer{"1 block", p_organism}
     );
@@ -182,7 +197,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             }
         }
         anatomy.set_many_blocks(blocks);
-        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                                  nullptr, 1);
         benchmark_organisms[BenchmarkTypes::MoveOrganism].emplace_back(
                 OrganismContainer{std::to_string(blocks.size()) + " blocks", p_organism}
         );
@@ -192,7 +208,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MoverBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                              nullptr, 1);
     benchmark_organisms[BenchmarkTypes::TryMakeChild].emplace_back(
             OrganismContainer{"1 block", p_organism, 2}
     );
@@ -206,7 +223,8 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
             }
         }
         anatomy.set_many_blocks(blocks);
-        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, &sp, &bp, 1);
+        p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
+                                  nullptr, 1);
 
         auto distance = 2 * i + 2;
         benchmark_organisms[BenchmarkTypes::TryMakeChild].emplace_back(

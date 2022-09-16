@@ -55,7 +55,7 @@ struct EngineDataContainer {
         std::vector<int> observation_count{};
         std::vector<std::vector<Observation>> organisms_observations{};
 
-        OCCLogicContainer occ_container{};
+        OCCLogicContainer occl{};
     };
     SingleThreadContainer stc{};
 

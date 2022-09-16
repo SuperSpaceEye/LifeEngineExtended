@@ -10,7 +10,9 @@
 
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                               Organism **chosen_organism, TexturesContainer &textures) : editor_width(width), editor_height(height),
+                               Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                               OCCParameters *occp)
+        : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
                                 chosen_organism(chosen_organism), textures(textures) {
     ui.setupUi(this);
@@ -27,13 +29,13 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     auto brain = Brain();
     brain.brain_type = BrainTypes::SimpleBrain;
 
-    editor_organism = new Organism(editor_width  / 2,
+    editor_organism = new Organism(editor_width / 2,
                                    editor_height / 2,
                                    Rotation::UP,
                                    anatomy,
-                                   brain,
+                                   brain, OrganismConstructionCode(),
                                    sp,
-                                   bp,
+                                   bp, occp, occl,
                                    1);
 
     resize_editing_grid(width, height);
