@@ -128,9 +128,6 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
         block.parent_block_pos = temp_blocks.size()-1;
         block.type = type;
     } else {
-        temp_blocks[block.parent_block_pos].type = type;
-        temp_blocks[block.parent_block_pos].rotation = rotation;
-
         switch (block.type) {
             case BlockTypes::MouthBlock:    structure_container->mouth_blocks--    ; break;
             case BlockTypes::ProducerBlock: structure_container->producer_blocks-- ; break;
@@ -143,6 +140,8 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
             case BlockTypes::WallBlock:
                 break;
         }
+        temp_blocks[block.parent_block_pos].type = type;
+        temp_blocks[block.parent_block_pos].rotation = rotation;
         block.type = type;
     }
 
@@ -324,7 +323,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                     if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width-1 || y_-1 >= occ_c.occ_height-1 ||
                         occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].counter != occ_c.spaces_counter
                         && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_height].counter != occ_c.main_counter) {
-                        temp_producing_space.emplace_back(producer, x_-1, y_-1);
+                        temp_producing_space.emplace_back(producer, x_-center_x, y_-center_y);
                         occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos = eating_space.size() - 1;
                     } else if (occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].counter == occ_c.spaces_counter) {
                         temp_producing_space[occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos].producer = producer;
@@ -339,7 +338,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                     if (x_-1 < 0 || y_-1 < 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
                         occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_height + 2)].counter != occ_c.spaces_counter
                         && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_height].counter != occ_c.main_counter) {
-                        eating_space.emplace_back(x_-1, y_-1);
+                        eating_space.emplace_back(x_-center_x, y_-center_y);
                         occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos = eating_space.size() - 1;
                     }
                 }
@@ -352,7 +351,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                     if (x_-1 < 0 || y_-1 < 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
                         occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_height + 2)].counter != occ_c.spaces_counter
                         && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_height].counter != occ_c.main_counter) {
-                        killer_space.emplace_back(x_-1, y_-1);
+                        killer_space.emplace_back(x_-center_x, y_-center_y);
                         occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos = killer_space.size() - 1;
                     }
                 }
@@ -448,11 +447,11 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
         }
             break;
         case OCCMutations::DeleteRandom: {
-//            int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
-//            int allowed_erasing = std::min<int>(group_size, child_code.occ_vector.size()-position-1);
-//
-//            auto position_iterator = child_code.occ_vector.begin()+position;
-//            child_code.occ_vector.erase(position_iterator, position_iterator+allowed_erasing);
+            int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
+            int allowed_erasing = std::min<int>(group_size, child_code.occ_vector.size()-position-1);
+
+            auto position_iterator = child_code.occ_vector.begin()+position;
+            child_code.occ_vector.erase(position_iterator, position_iterator+allowed_erasing);
         }
             break;
         //TODO
@@ -468,6 +467,6 @@ OrganismConstructionCode::OrganismConstructionCode(const OrganismConstructionCod
     occ_vector = std::vector(parent_code.occ_vector);
 }
 
-OrganismConstructionCode::OrganismConstructionCode(OrganismConstructionCode &&code_to_move) noexcept {
-    occ_vector = std::move(code_to_move.occ_vector);
-}
+//OrganismConstructionCode::OrganismConstructionCode(OrganismConstructionCode &&code_to_move) noexcept {
+//    occ_vector = std::move(code_to_move.occ_vector);
+//}

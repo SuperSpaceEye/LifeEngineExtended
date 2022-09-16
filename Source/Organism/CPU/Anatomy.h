@@ -33,6 +33,7 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
+    //TODO i think i messed this up somehow
     inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return Vector2<int>{relative_x, relative_y};

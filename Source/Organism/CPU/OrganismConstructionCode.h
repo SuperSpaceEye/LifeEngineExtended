@@ -26,7 +26,7 @@ class OrganismConstructionCode {
 public:
     OrganismConstructionCode()=default;
     OrganismConstructionCode(const OrganismConstructionCode & parent_code);
-    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept;
+//    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept;
     OrganismConstructionCode & operator=(const OrganismConstructionCode & code)=default;
 
     OrganismConstructionCode mutate(OCCParameters & occp, lehmer64 & gen);
