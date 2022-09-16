@@ -9,9 +9,13 @@
 
 enum class OCCInstruction {
     ShiftUp,
+    ShiftUpLeft,
     ShiftLeft,
+    ShiftLeftDown,
     ShiftDown,
+    ShiftDownRight,
     ShiftRight,
+    ShiftUpRight,
 
     ApplyRotationUp,
     ApplyRotationLeft,
