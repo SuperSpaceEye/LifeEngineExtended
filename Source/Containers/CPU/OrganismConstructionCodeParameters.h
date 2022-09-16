@@ -8,6 +8,19 @@
 struct OCCParameters {
     int max_distance = 1;
     int max_mutation_group_size = 1;
+
+    bool uniform_mutation_distribution = true;
+    std::array<int, 5> mutation_type_weights{1, 1, 1, 1, 1};
+    std::discrete_distribution<int> mutation_discrete_distribution{mutation_type_weights.begin(), mutation_type_weights.end()};
+
+    bool uniform_group_size_distribution = true;
+    int max_group_size = 5;
+    std::vector<int> group_size_weights{1, 1, 1, 1, 1};
+    std::discrete_distribution<int> group_size_discrete_distribution{group_size_weights.begin(), group_size_weights.end()};
+
+    bool uniform_occ_instructions_mutation = true;
+    std::vector<int> occ_instructions_mutation_weights{1};
+    std::discrete_distribution<int> occ_instructions_mutation_discrete_distribution{occ_instructions_mutation_weights.begin(), occ_instructions_mutation_weights.end()};
 };
 
 #endif //LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H

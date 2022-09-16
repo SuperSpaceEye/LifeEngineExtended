@@ -13,13 +13,22 @@
 //https://github.com/DavidPal/discrete-distribution
 //https://stackoverflow.com/questions/53632441/c-sampling-from-discrete-distribution-without-replacement
 
+enum class OCCMutations {
+    AppendRandom,
+    InsertRandom,
+    ChangeRandom,
+    DeleteRandom,
+    //TODO
+    MoveRandom
+};
+
 class OrganismConstructionCode {
 public:
     OrganismConstructionCode()=default;
     OrganismConstructionCode(const OrganismConstructionCode & parent_code);
-    OrganismConstructionCode(OrganismConstructionCode && code_to_move);
+    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept ;
 
-    OrganismConstructionCode && mutate(OCCParameters & occp, lehmer64 & gen);
+    OrganismConstructionCode mutate(OCCParameters & occp, lehmer64 & gen);
     SerializedOrganismStructureContainer * compile_code(OCCLogicContainer & occ_container);
 
 private:

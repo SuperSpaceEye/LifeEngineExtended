@@ -7,6 +7,9 @@
 
 #include "Anatomy.h"
 
+//18
+//6
+//24 total
 enum class OCCInstruction {
     ShiftUp,
     ShiftUpLeft,

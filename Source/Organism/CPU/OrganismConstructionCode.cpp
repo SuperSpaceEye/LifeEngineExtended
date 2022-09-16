@@ -377,3 +377,97 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
 
     return spaces;
 }
+
+std::vector<OCCInstruction> create_random_group(int group_size, OCCParameters &occp, lehmer64 &gen) {
+    std::vector<OCCInstruction> group;
+    group.reserve(group_size);
+
+    for (int i = 0; i < group_size; i++) {
+        if (occp.uniform_occ_instructions_mutation) {
+            group.emplace_back(static_cast<OCCInstruction>(std::uniform_int_distribution<int>(0, 23)(gen)));
+        } else {
+            group.emplace_back(static_cast<OCCInstruction>(occp.occ_instructions_mutation_discrete_distribution(gen)));
+        }
+    }
+    return group;
+}
+
+OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, lehmer64 &gen) {
+    auto child_code = OrganismConstructionCode(*this);
+
+    OCCMutations mutation_type;
+    int group_size;
+
+    if (occp.uniform_mutation_distribution) {
+        mutation_type = static_cast<OCCMutations>(std::uniform_int_distribution<int>(0, 3)(gen));
+    } else {
+        mutation_type = static_cast<OCCMutations>(occp.mutation_discrete_distribution(gen));
+    }
+
+    if (occp.uniform_group_size_distribution) {
+        group_size = std::uniform_int_distribution<int>(1, occp.max_group_size)(gen);
+    } else {
+        group_size = occp.group_size_discrete_distribution(gen)+1;
+    }
+
+    switch (mutation_type) {
+        case OCCMutations::AppendRandom: {
+            auto group = create_random_group(group_size, occp, gen);
+            child_code.occ_vector.insert(child_code.occ_vector.end(), group.begin(), group.end());
+        }
+        case OCCMutations::InsertRandom: {
+            auto group = create_random_group(group_size, occp, gen);
+            int position = std::uniform_int_distribution<int>(0, child_code.occ_vector.size()-1)(gen);
+
+            child_code.occ_vector.insert(child_code.occ_vector.begin()+position, group.begin(), group.end());
+        }
+            break;
+        //TODO cell at 0,0 can be rotated with this logic.
+        case OCCMutations::ChangeRandom: {
+            auto group = create_random_group(group_size, occp, gen);
+            int starting_position = 1;
+            switch (group[0]) {
+                case OCCInstruction::SetBlockMouth:
+                case OCCInstruction::SetBlockProducer:
+                case OCCInstruction::SetBlockMover:
+                case OCCInstruction::SetBlockKiller:
+                case OCCInstruction::SetBlockArmor:
+                case OCCInstruction::SetBlockEye:
+                    starting_position = 0;
+                    break;
+                default: break;
+            }
+
+            int position = std::uniform_int_distribution<int>(starting_position, child_code.occ_vector.size()-1)(gen);
+
+            int iterated = 0;
+            for (auto iterator = child_code.occ_vector.begin()+position; iterator != child_code.occ_vector.end() && iterated < group.size(); iterator++) {
+                iterated++;
+                (*iterator) = group[iterated-1];
+            }
+        }
+            break;
+        case OCCMutations::DeleteRandom: {
+            int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
+            int allowed_erasing = std::min<int>(group_size, child_code.occ_vector.size()-position);
+
+            auto position_iterator = child_code.occ_vector.begin()+position;
+            child_code.occ_vector.erase(position_iterator, position_iterator+allowed_erasing);
+        }
+            break;
+        //TODO
+        case OCCMutations::MoveRandom: {
+
+        }
+            break;
+    }
+    return child_code;
+}
+
+OrganismConstructionCode::OrganismConstructionCode(const OrganismConstructionCode &parent_code) {
+    occ_vector = std::vector(parent_code.occ_vector);
+}
+
+OrganismConstructionCode::OrganismConstructionCode(OrganismConstructionCode &&code_to_move) noexcept {
+    occ_vector = std::move(code_to_move.occ_vector);
+}
