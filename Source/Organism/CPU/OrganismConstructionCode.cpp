@@ -116,13 +116,13 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
                std::vector<SerializedOrganismBlockContainer> &temp_blocks,
                SerializedOrganismStructureContainer *structure_container, int center_x, int center_y) {
     auto & block = occ_c.occ_main_block_construction_space[x + y * occ_c.occ_width];
-    bool change = false;
+    bool set_block = false;
 
-    if (block.type == BlockTypes::EmptyBlock || block.counter < occ_c.main_counter) {
-        change = true;
+    if (block.counter < occ_c.main_counter) {
+        set_block = true;
     }
 
-    if (change) {
+    if (set_block) {
         temp_blocks.emplace_back(type, rotation, x - center_x, y - center_y);
         block.counter = occ_c.main_counter;
         block.parent_block_pos = temp_blocks.size()-1;
@@ -187,8 +187,12 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
     int cursor_x = std::abs(edges[0]);
     int cursor_y = std::abs(edges[2]);
 
+    //actual center
     int center_x = cursor_x;
     int center_y = cursor_y;
+
+    int origin_x = cursor_x;
+    int origin_y = cursor_y;
 
     occ_c.main_counter++;
 
@@ -231,12 +235,12 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
             case OCCInstruction::SetRotationRight: set_rotation(cursor_x, cursor_y, Rotation::RIGHT, occ_c, blocks);break;
 
             case OCCInstruction::ResetToOrigin:
-                cursor_x = center_x;
-                cursor_y = center_y;
+                cursor_x = origin_x;
+                cursor_y = origin_y;
                 break;
             case OCCInstruction::SetOrigin:
-                center_x = cursor_x;
-                center_y = cursor_y;
+                origin_x = cursor_x;
+                origin_y = cursor_y;
                 break;
 
             case OCCInstruction::SetBlockMouth:    set_block(cursor_x, cursor_y, BlockTypes::MouthBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
@@ -360,6 +364,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
         }
     }
 
+
     for (auto & producing: temp_producing_space) {
         producing_space[producing.producer].emplace_back(producing.x, producing.y);
     }
@@ -398,7 +403,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
     int group_size;
 
     if (occp.uniform_mutation_distribution) {
-        mutation_type = static_cast<OCCMutations>(std::uniform_int_distribution<int>(0, 3)(gen));
+        mutation_type = static_cast<OCCMutations>(std::uniform_int_distribution<int>(0, 4)(gen));
     } else {
         mutation_type = static_cast<OCCMutations>(occp.mutation_discrete_distribution(gen));
     }
@@ -454,9 +459,32 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             child_code.occ_vector.erase(position_iterator, position_iterator+allowed_erasing);
         }
             break;
-        //TODO
         case OCCMutations::MoveRandom: {
+            int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
+            int distance;
 
+            if (occp.uniform_move_distance) {
+                distance = std::uniform_int_distribution<int>(1, occp.max_distance)(gen);
+            } else {
+                distance = occp.move_distance_mutation_discrete_distribution(gen);
+            }
+
+            int modifier = std::uniform_int_distribution<int>(0, 1)(gen);
+
+            int second_position = position + distance * (modifier ? -1 : 1);
+            second_position = std::min<int>(std::max<int>(1, second_position), occ_vector.size()-1);
+
+            auto first_iterator = occ_vector.begin()  + position;
+            auto second_iterator = occ_vector.begin() + second_position;
+
+            int i = 0;
+            while (i < group_size && first_iterator != occ_vector.end() && second_iterator != occ_vector.end()) {
+                std::swap(*first_iterator, *second_iterator);
+
+                i++;
+                second_iterator++;
+                first_iterator++;
+            }
         }
             break;
     }
