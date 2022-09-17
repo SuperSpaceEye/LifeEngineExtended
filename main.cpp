@@ -1,6 +1,6 @@
 #include <QApplication>
 #include <QStyleFactory>
-#include "Source/MainWindow/MainWindow.h"
+#include "Source/UIWindows/MainWindow/MainWindow.h"
 
 int main(int argc, char *argv[]) {
     std::cout << "Loading...\n";

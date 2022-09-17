@@ -562,6 +562,7 @@ void MainWindow::initialize_gui() {
     ui.cb_use_new_child_pos_calculator      ->setChecked(sp.use_new_child_pos_calculator);
     ui.cb_checks_if_path_is_clear           ->setChecked(sp.check_if_path_is_clear);
     ui.cb_no_random_decisions               ->setChecked(sp.no_random_decisions);
+    ui.cb_use_organism_construction_code    ->setChecked(sp.use_occ);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
@@ -810,6 +811,7 @@ void MainWindow::set_child_windows_always_on_top(bool state) {
     ui.cb_recorder_window_always_on_top->setChecked(false);
     ui.cb_world_events_always_on_top   ->setChecked(false);
     ui.cb_benchmarks_always_on_top     ->setChecked(false);
+    ui.cb_occp_always_on_top           ->setChecked(false);
 
     st.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -817,6 +819,7 @@ void MainWindow::set_child_windows_always_on_top(bool state) {
     rc.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     bs.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    occpw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
 }
 
 void MainWindow::apply_font_to_windows(const QFont &_font) {
@@ -827,6 +830,7 @@ void MainWindow::apply_font_to_windows(const QFont &_font) {
     rc.setFont(_font);
     we.setFont(_font);
     bs.setFont(_font);
+    occpw.setFont(_font);
 }
 
 void MainWindow::save_state() {

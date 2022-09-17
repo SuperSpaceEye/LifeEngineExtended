@@ -30,11 +30,11 @@
 #include "../Stuff/Linspace.h"
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
-#include "../OrganismEditor/OrganismEditor.h"
+#include "../UIWindows/OrganismEditor/OrganismEditor.h"
 //#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
-#include "../WorldEvents/WorldEventsController.h"
+#include "../UIWindows/WorldEvents/WorldEventsController.h"
 #include "OrganismsController.h"
 
 //TODO move simulation grid translation to here

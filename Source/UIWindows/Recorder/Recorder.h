@@ -14,16 +14,16 @@
 
 #include "RecorderWindowUI.h"
 #include "../MainWindow/WindowUI.h"
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Stuff/MiscFuncs.h"
-#include "../Containers/CPU/EngineControlParametersContainer.h"
-#include "../Organism/CPU/Organism.h"
-#include "../Organism/CPU/Brain.h"
-#include "../Organism/CPU/Anatomy.h"
-#include "../SimulationEngine/SimulationEngine.h"
-#include "../Stuff/textures.h"
-#include "../Stuff/ImageCreation.h"
-#include "../Containers/CPU/OrganismInfoContainer.h"
+#include "../../Containers/CPU/EngineDataContainer.h"
+#include "../../Stuff/MiscFuncs.h"
+#include "../../Containers/CPU/EngineControlParametersContainer.h"
+#include "../../Organism/CPU/Organism.h"
+#include "../../Organism/CPU/Brain.h"
+#include "../../Organism/CPU/Anatomy.h"
+#include "../../SimulationEngine/SimulationEngine.h"
+#include "../../Stuff/textures.h"
+#include "../../Stuff/ImageCreation.h"
+#include "../../Containers/CPU/OrganismInfoContainer.h"
 
 #if defined(__WIN32)
 #include <windows.h>

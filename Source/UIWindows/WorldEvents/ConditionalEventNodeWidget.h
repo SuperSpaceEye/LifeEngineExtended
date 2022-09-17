@@ -8,7 +8,7 @@
 #include "ConditionalEventNodeWidgetUI.h"
 #include "EventNodes.h"
 #include "SimulationParametersTypes.h"
-#include "../Stuff/MiscFuncs.h"
+#include "../../Stuff/MiscFuncs.h"
 #include "ParametersList.h"
 #include "ChangeValueEventNodeWidget.h"
 

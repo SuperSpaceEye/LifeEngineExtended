@@ -42,38 +42,39 @@
 //#include <QtCharts>
 
 #include "WindowUI.h"
-#include "../SimulationEngine/SimulationEngine.h"
-#include "../Containers/CPU/ColorContainer.h"
-#include "../Containers/CPU/SimulationParameters.h"
-#include "../Containers/CPU/EngineControlParametersContainer.h"
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../PRNGS/lehmer64.h"
-#include "../Stuff/textures.h"
-#include "../Stuff/MiscFuncs.h"
-#include "../Stuff/CursorMode.h"
-#include "../Stuff/Vector2.h"
-#include "../Containers/CPU/RecordingContainer.h"
-#include "../Stuff/ImageCreation.h"
-#include "../Stuff/DataSavingFunctions.h"
-#include "../Containers/CPU/OrganismInfoContainer.h"
-#include "../SimulationEngine/OrganismsController.h"
+#include "../../SimulationEngine/SimulationEngine.h"
+#include "../../Containers/CPU/ColorContainer.h"
+#include "../../Containers/CPU/SimulationParameters.h"
+#include "../../Containers/CPU/EngineControlParametersContainer.h"
+#include "../../Containers/CPU/EngineDataContainer.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../PRNGS/lehmer64.h"
+#include "../../Stuff/textures.h"
+#include "../../Stuff/MiscFuncs.h"
+#include "../../Stuff/CursorMode.h"
+#include "../../Stuff/Vector2.h"
+#include "../../Containers/CPU/RecordingContainer.h"
+#include "../../Stuff/ImageCreation.h"
+#include "../../Stuff/DataSavingFunctions.h"
+#include "../../Containers/CPU/OrganismInfoContainer.h"
+#include "../../SimulationEngine/OrganismsController.h"
 
-#include "../Stuff/rapidjson/document.h"
-#include "../Stuff/rapidjson/writer.h"
-#include "../Stuff/rapidjson/stringbuffer.h"
+#include "../../Stuff/rapidjson/document.h"
+#include "../../Stuff/rapidjson/writer.h"
+#include "../../Stuff/rapidjson/stringbuffer.h"
 
 #include "../Statistics/StatisticsCore.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
 #include "../Recorder/Recorder.h"
-#include "../WorldEvents/WorldEvents.h"
+#include "../../UIWindows/WorldEvents/WorldEvents.h"
 #include "../Benchmark/Benchmarks.h"
+#include "../OCCParameters/OCCParameters.h"
 
 
 #if __CUDA_USED__
-#include "../Stuff/cuda_image_creator.cuh"
-#include "../Stuff/get_device_count.cuh"
+#include "../../Stuff/cuda_image_creator.cuh"
+#include "../../Stuff/get_device_count.cuh"
 #endif
 
 #if defined(__WIN32)
@@ -119,6 +120,7 @@ private:
     Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
     Benchmarks bs{ui};
+    OCCParametersWindow occpw{&ui};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;
@@ -281,6 +283,7 @@ private slots:
     void tb_open_recorder_window_slot(bool state);
     void tb_open_world_events_slot(bool state);
     void tb_open_benchmarks_slot(bool state);
+    void tb_open_occ_parameters_slot(bool state);
 
     void b_clear_slot();
     void b_reset_slot();
@@ -376,15 +379,13 @@ private slots:
     void cb_use_new_child_pos_calculator_slot(bool state);
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);
+    void cb_use_occ_slot(bool state);
     //Other
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
-    void cb_recorder_window_always_on_top_slot(bool state);
-    void cb_world_events_always_on_top_slot(bool state);
-    void cb_benchmarks_always_on_top_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
     void cb_wait_for_engine_to_stop_slot(bool state);
@@ -397,6 +398,10 @@ private slots:
     void cb_statistics_always_on_top_slot(bool state);
     void cb_editor_always_on_top_slot(bool state);
     void cb_info_window_always_on_top_slot(bool state);
+    void cb_recorder_window_always_on_top_slot(bool state);
+    void cb_world_events_always_on_top_slot(bool state);
+    void cb_benchmarks_always_on_top_slot(bool state);
+    void cb_occp_always_on_top_slot(bool state);
 
     //Evolution Controls
     void table_cell_changed_slot(int row, int col);

@@ -127,6 +127,9 @@ public:
     QHBoxLayout *horizontalLayout_53;
     QPushButton *pushButton;
     QCheckBox *checkBox;
+    QHBoxLayout *horizontalLayout_57;
+    QPushButton *tb_open_occ_parameters;
+    QCheckBox *cb_occp_always_on_top;
     QHBoxLayout *horizontalLayout_54;
     QPushButton *tb_open_benchmarks;
     QCheckBox *cb_benchmarks_always_on_top;
@@ -236,6 +239,7 @@ public:
     QCheckBox *cb_use_new_child_pos_calculator;
     QCheckBox *cb_checks_if_path_is_clear;
     QCheckBox *cb_no_random_decisions;
+    QCheckBox *cb_use_organism_construction_code;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -732,7 +736,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 606, 237));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, -53, 606, 270));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -854,6 +858,22 @@ public:
 
         verticalLayout_37->addLayout(horizontalLayout_53);
 
+        horizontalLayout_57 = new QHBoxLayout();
+        horizontalLayout_57->setObjectName(QString::fromUtf8("horizontalLayout_57"));
+        tb_open_occ_parameters = new QPushButton(widget_5);
+        tb_open_occ_parameters->setObjectName(QString::fromUtf8("tb_open_occ_parameters"));
+        tb_open_occ_parameters->setCheckable(true);
+
+        horizontalLayout_57->addWidget(tb_open_occ_parameters);
+
+        cb_occp_always_on_top = new QCheckBox(widget_5);
+        cb_occp_always_on_top->setObjectName(QString::fromUtf8("cb_occp_always_on_top"));
+
+        horizontalLayout_57->addWidget(cb_occp_always_on_top);
+
+
+        verticalLayout_37->addLayout(horizontalLayout_57);
+
         horizontalLayout_54 = new QHBoxLayout();
         horizontalLayout_54->setObjectName(QString::fromUtf8("horizontalLayout_54"));
         tb_open_benchmarks = new QPushButton(widget_5);
@@ -900,7 +920,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1562));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1345, 606, 1591));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1431,6 +1451,11 @@ public:
 
         verticalLayout_20->addWidget(cb_no_random_decisions);
 
+        cb_use_organism_construction_code = new QCheckBox(widget);
+        cb_use_organism_construction_code->setObjectName(QString::fromUtf8("cb_use_organism_construction_code"));
+
+        verticalLayout_20->addWidget(cb_use_organism_construction_code);
+
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
         verticalLayout_20->addItem(verticalSpacer);
@@ -1566,7 +1591,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, -548, 606, 803));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 803));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -2039,6 +2064,9 @@ public:
         QObject::connect(le_memory_allocation_strategy_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_memory_allocation_strategy_modifier_slot()));
         QObject::connect(le_random_seed, SIGNAL(returnPressed()), MainWindow, SLOT(le_random_seed_slot()));
         QObject::connect(cb_load_evolution_controls_from_state, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_load_evolution_controls_from_state_slot(bool)));
+        QObject::connect(cb_occp_always_on_top, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_occp_always_on_top_slot(bool)));
+        QObject::connect(tb_open_occ_parameters, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_occ_parameters_slot(bool)));
+        QObject::connect(cb_use_organism_construction_code, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_occ_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2100,6 +2128,8 @@ public:
         cb_world_events_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         pushButton->setText(QApplication::translate("MainWindow", "Biomes", nullptr));
         checkBox->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
+        tb_open_occ_parameters->setText(QApplication::translate("MainWindow", "Organism Construction Code Parameters", nullptr));
+        cb_occp_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         tb_open_benchmarks->setText(QApplication::translate("MainWindow", "Benchmarks", nullptr));
         cb_benchmarks_always_on_top->setText(QApplication::translate("MainWindow", "Always on top", nullptr));
         Tabs->setTabText(Tabs->indexOf(windows_tab), QApplication::translate("MainWindow", "Windows", nullptr));
@@ -2163,6 +2193,7 @@ public:
         cb_use_new_child_pos_calculator->setText(QApplication::translate("MainWindow", "Use new child position calculator", nullptr));
         cb_checks_if_path_is_clear->setText(QApplication::translate("MainWindow", "Check if path is clear", nullptr));
         cb_no_random_decisions->setText(QApplication::translate("MainWindow", "No random decisions", nullptr));
+        cb_use_organism_construction_code->setText(QApplication::translate("MainWindow", "Use Organism Construction Code", nullptr));
         label_45->setText(QApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "Food Cost", nullptr));

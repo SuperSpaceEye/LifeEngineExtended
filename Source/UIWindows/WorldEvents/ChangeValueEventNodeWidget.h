@@ -7,7 +7,7 @@
 
 #include "ChangeValueEventNodeWidgetUI.h"
 #include "EventNodes.h"
-#include "../Stuff/MiscFuncs.h"
+#include "../../Stuff/MiscFuncs.h"
 #include "ParametersList.h"
 #include "ConditionalEventNodeWidget.h"
 

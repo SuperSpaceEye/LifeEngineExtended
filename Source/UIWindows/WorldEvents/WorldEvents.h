@@ -12,11 +12,11 @@
 #include "../MainWindow/WindowUI.h"
 #include "EventNodes.h"
 #include "ParametersList.h"
-#include "../SimulationEngine/SimulationEngine.h"
+#include "../../SimulationEngine/SimulationEngine.h"
 
 #include "ConditionalEventNodeWidget.h"
 #include "ChangeValueEventNodeWidget.h"
-#include "../Stuff/MiscFuncs.h"
+#include "../../Stuff/MiscFuncs.h"
 
 class WorldEvents: public QWidget {
     Q_OBJECT

@@ -21,7 +21,7 @@ struct OCCParameters {
 
     bool uniform_move_distance = true;
     int max_distance = 5;
-    std::vector<int> move_distance_mutation_weights{1};
+    std::vector<int> move_distance_mutation_weights{1, 1, 1, 1, 1};
     std::discrete_distribution<int> move_distance_mutation_discrete_distribution{move_distance_mutation_weights.begin(), move_distance_mutation_weights.end()};
 };
 

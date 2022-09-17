@@ -9,9 +9,9 @@
 #include <string>
 #include <boost/unordered_map.hpp>
 
-#include "../Containers/CPU/SimulationParameters.h"
-#include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Containers/CPU/OrganismInfoContainer.h"
+#include "../../Containers/CPU/SimulationParameters.h"
+#include "../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../Containers/CPU/OrganismInfoContainer.h"
 #include "WorldEventsEnums.h"
 
 #include "SimulationParametersTypes.h"

@@ -139,7 +139,7 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
         }
     }
     //if not mutated.
-    new_anatomy = Anatomy(anatomy);
+    new_anatomy = std::move(Anatomy(anatomy));
     new_occ = OrganismConstructionCode(occ);
 }
 
@@ -208,7 +208,7 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
 
     auto * child_ptr = OrganismsController::get_new_child_organism(edc);
     child_ptr->rotation = rotation;
-    child_ptr->anatomy = new_anatomy;
+    child_ptr->anatomy = std::move(new_anatomy);
     child_ptr->brain = new_brain;
     child_ptr->occ = new_occ;
     child_ptr->sp = sp;
@@ -274,7 +274,7 @@ void Organism::move_organism(Organism &organism) {
     max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
     brain = organism.brain;
-    anatomy = organism.anatomy;
+    anatomy = std::move(organism.anatomy);
     occ = organism.occ;
 
     sp = organism.sp;

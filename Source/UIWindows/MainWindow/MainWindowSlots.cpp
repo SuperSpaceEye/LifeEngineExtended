@@ -76,6 +76,14 @@ void MainWindow::tb_open_benchmarks_slot(bool state) {
     }
 }
 
+void MainWindow::tb_open_occ_parameters_slot(bool state) {
+    if (state) {
+        occpw.show();
+    } else {
+        occpw.close();
+    }
+}
+
 //==================== Buttons ====================
 
 void MainWindow::b_clear_slot() {
@@ -709,6 +717,19 @@ void MainWindow::cb_benchmarks_always_on_top_slot(bool state) {
     }
 }
 
+void MainWindow::cb_occp_always_on_top_slot(bool state) {
+    if (is_fullscreen) {return;}
+    auto hidden = occpw.isHidden();
+
+    occpw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    if (!hidden) {
+        occpw.show();
+    }
+}
+
 void MainWindow::cb_really_stop_render_slot(bool state) {
     really_stop_render = state;
     if (!state && pause_grid_parsing) {
@@ -716,6 +737,18 @@ void MainWindow::cb_really_stop_render_slot(bool state) {
     }
 }
 
+void MainWindow::cb_use_occ_slot(bool state) {
+    if (state == sp.use_occ) { return;}
+    if (!display_dialog_message("Changing this parameter will reset world. Continue?", disable_warnings)) {
+        ui.cb_use_organism_construction_code->setChecked(sp.use_occ);
+        return;
+    }
+
+    engine.pause();
+    sp.use_occ = state;
+    engine.reset_world();
+    engine.unpause();
+}
 
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 

@@ -21,25 +21,25 @@
 #include <QWheelEvent>
 #include <QFileDialog>
 
-#include "../Stuff/rapidjson/document.h"
-#include "../Stuff/rapidjson/writer.h"
-#include "../Stuff/rapidjson/stringbuffer.h"
+#include "../../Stuff/rapidjson/document.h"
+#include "../../Stuff/rapidjson/writer.h"
+#include "../../Stuff/rapidjson/stringbuffer.h"
 
-#include "../Stuff/Linspace.h"
-#include "../Organism/CPU/Organism.h"
-#include "../Organism/CPU/Anatomy.h"
-#include "../Organism/CPU/Brain.h"
-#include "../Organism/CPU/Rotation.h"
-#include "../GridBlocks/BaseGridBlock.h"
+#include "../../Stuff/Linspace.h"
+#include "../../Organism/CPU/Organism.h"
+#include "../../Organism/CPU/Anatomy.h"
+#include "../../Organism/CPU/Brain.h"
+#include "../../Organism/CPU/Rotation.h"
+#include "../../GridBlocks/BaseGridBlock.h"
 #include "EditorUI.h"
 #include "../MainWindow/WindowUI.h"
-#include "../Stuff/Vector2.h"
-#include "../Containers/CPU/ColorContainer.h"
-#include "../Stuff/textures.h"
-#include "../Stuff/CursorMode.h"
-#include "../Stuff/MiscFuncs.h"
-#include "../Stuff/ImageCreation.h"
-#include "../Stuff/DataSavingFunctions.h"
+#include "../../Stuff/Vector2.h"
+#include "../../Containers/CPU/ColorContainer.h"
+#include "../../Stuff/textures.h"
+#include "../../Stuff/CursorMode.h"
+#include "../../Stuff/MiscFuncs.h"
+#include "../../Stuff/ImageCreation.h"
+#include "../../Stuff/DataSavingFunctions.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
