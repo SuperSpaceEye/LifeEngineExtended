@@ -27,7 +27,7 @@ public:
     OrganismConstructionCode()=default;
     OrganismConstructionCode(const OrganismConstructionCode & parent_code);
 //    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept;
-    OrganismConstructionCode & operator=(const OrganismConstructionCode & code)=default;
+    OrganismConstructionCode & operator=(const OrganismConstructionCode & code) {occ_vector = std::vector(code.occ_vector); return *this;}
 
     OrganismConstructionCode mutate(OCCParameters & occp, lehmer64 & gen);
     SerializedOrganismStructureContainer * compile_code(OCCLogicContainer & occ_container);

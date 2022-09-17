@@ -506,7 +506,7 @@ void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blo
     delete new_structure;
 }
 
-Anatomy &Anatomy::operator=(Anatomy &other_anatomy) {
+Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
     _mouth_blocks    = other_anatomy._mouth_blocks;
     _producer_blocks = other_anatomy._producer_blocks;
     _mover_blocks    = other_anatomy._mover_blocks;
