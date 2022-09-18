@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>729</width>
-    <height>546</height>
+    <width>808</width>
+    <height>746</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,24 +39,56 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>727</width>
-        <height>544</height>
+        <width>806</width>
+        <height>744</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="cb_use_uniform_mutation_type">
          <property name="text">
           <string>Use uniform mutation type distribution</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <layout class="QVBoxLayout" name="mutation_type_distribution_vert_layout"/>
-         </item>
-        </layout>
+        <widget class="QScrollArea" name="scrollArea_4">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_4">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>786</width>
+            <height>95</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="mutation_types_widget" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_7"/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -75,7 +107,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="cb_use_uniform_group_size">
          <property name="text">
           <string>Use uniform group size distribution</string>
          </property>
@@ -91,16 +123,80 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit"/>
+          <widget class="QLineEdit" name="le_max_group_size"/>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <layout class="QVBoxLayout" name="group_size_weights_layout"/>
-         </item>
-        </layout>
+        <widget class="QScrollArea" name="scrollArea_3">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_3">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>786</width>
+            <height>95</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="group_size_widget" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="group_size_layout">
+                <property name="leftMargin">
+                 <number>9</number>
+                </property>
+                <property name="topMargin">
+                 <number>9</number>
+                </property>
+                <property name="rightMargin">
+                 <number>9</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>9</number>
+                </property>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer_2">
@@ -119,18 +215,68 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_3">
+        <widget class="QCheckBox" name="cb_use_uniform_occ_instructions">
          <property name="text">
           <string>Use uniform occ instructions distribution</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <layout class="QVBoxLayout" name="occ_instructions_weights_layout"/>
-         </item>
-        </layout>
+        <widget class="QScrollArea" name="scrollArea_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>786</width>
+            <height>95</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="occ_mutation_type_widget" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>40</horstretch>
+               <verstretch>40</verstretch>
+              </sizepolicy>
+             </property>
+             <layout class="QVBoxLayout" name="occ_instructions_weights_layout"/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer_3">
@@ -149,7 +295,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_4">
+        <widget class="QCheckBox" name="cb_use_uniform_move_distance">
          <property name="text">
           <string>Use uniform move distance distribution</string>
          </property>
@@ -165,16 +311,80 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2"/>
+          <widget class="QLineEdit" name="le_max_move_distance"/>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <layout class="QVBoxLayout" name="move_distance_weights_layout"/>
-         </item>
-        </layout>
+        <widget class="QScrollArea" name="scrollArea_5">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_5">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>786</width>
+            <height>95</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="move_distance_widget" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="move_distance_layout">
+                <property name="leftMargin">
+                 <number>9</number>
+                </property>
+                <property name="topMargin">
+                 <number>9</number>
+                </property>
+                <property name="rightMargin">
+                 <number>9</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>9</number>
+                </property>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -183,5 +393,110 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>cb_use_uniform_group_size</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>OCCParametes</receiver>
+   <slot>cb_use_uniform_group_size_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>142</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_uniform_move_distance</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>OCCParametes</receiver>
+   <slot>cb_use_uniform_move_distance_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>431</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_uniform_mutation_type</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>OCCParametes</receiver>
+   <slot>cb_use_uniform_mutation_type_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_uniform_occ_instructions</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>OCCParametes</receiver>
+   <slot>cb_use_uniform_occ_instructions_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>364</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_max_group_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>OCCParametes</receiver>
+   <slot>le_max_group_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>418</x>
+     <y>180</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_max_move_distance</sender>
+   <signal>returnPressed()</signal>
+   <receiver>OCCParametes</receiver>
+   <slot>le_max_move_distance_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>432</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>364</x>
+     <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>cb_use_uniform_mutation_type_slot(bool)</slot>
+  <slot>cb_use_uniform_group_size_slot(bool)</slot>
+  <slot>cb_use_uniform_occ_instructions_slot(bool)</slot>
+  <slot>cb_use_uniform_move_distance_slot(bool)</slot>
+  <slot>le_max_group_size_slot()</slot>
+  <slot>le_max_move_distance_slot()</slot>
+ </slots>
 </ui>

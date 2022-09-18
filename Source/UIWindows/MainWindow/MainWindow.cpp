@@ -589,9 +589,10 @@ void MainWindow::initialize_gui() {
 
     ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     ui.cb_synchronise_info_with_window->setChecked(synchronise_info_update_with_window_update);
+    auto state = disable_warnings;
     disable_warnings = true;
     ui.cb_use_nvidia_for_image_generation->setChecked(use_cuda);
-    disable_warnings = false;
+    disable_warnings = state;
     ui.le_menu_height->setText(QString::fromStdString(std::to_string(ui.menu_frame->frameSize().height())));
     ui.cb_really_stop_render->setChecked(really_stop_render);
     ui.cb_show_extended_statistics->setChecked(false);

@@ -40,4 +40,35 @@ enum class OCCInstruction {
     SetBlockArmor,
     SetBlockEye
 };
+
+const std::array<std::string, 24> OCC_INSTRUCTIONS_NAME {
+        "Shift Up",
+        "Shift Up Left",
+        "Shift Left",
+        "Shift Left Down",
+        "Shift Down",
+        "Shift Down Right",
+        "Shift Right",
+        "Shift Up Right",
+
+        "Apply Rotation Up",
+        "Apply Rotation Left",
+        "Apply Rotation Down",
+        "Apply Rotation Right",
+
+        "Set Rotation Up",
+        "Set Rotation Left",
+        "Set Rotation Down",
+        "Set Rotation Right",
+
+        "Reset To Origin",
+        "Set Origin",
+
+        "Set Block Mouth",
+        "Set Block Producer",
+        "Set Block Mover",
+        "Set Block Killer",
+        "Set Block Armor",
+        "Set Block Eye"
+};
 #endif //LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEINSTRUCTION_H

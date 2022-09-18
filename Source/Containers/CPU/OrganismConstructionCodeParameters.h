@@ -5,6 +5,9 @@
 #ifndef LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H
 #define LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H
 
+#include <random>
+#include <vector>
+
 struct OCCParameters {
     bool uniform_mutation_distribution = true;
     std::array<int, 5> mutation_type_weights{1, 1, 1, 1, 1};

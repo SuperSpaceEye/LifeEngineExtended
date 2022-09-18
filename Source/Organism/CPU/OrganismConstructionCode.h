@@ -18,7 +18,6 @@ enum class OCCMutations {
     InsertRandom,
     ChangeRandom,
     DeleteRandom,
-    //TODO
     MoveRandom
 };
 
@@ -34,7 +33,7 @@ public:
     SerializedOrganismStructureContainer * compile_code(OCCLogicContainer & occ_container);
 
     void set_code(std::vector<OCCInstruction> && code) {occ_vector = std::move(code);}
-    const std::vector<OCCInstruction> & get_code() {return occ_vector;}
+    const std::vector<OCCInstruction> & get_code_const_ref() {return occ_vector;}
     std::vector<OCCInstruction> & get_code_ref() {return occ_vector;}
 private:
     std::vector<OCCInstruction> occ_vector;

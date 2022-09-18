@@ -114,13 +114,13 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine engine{edc, ecp, bp, sp, &recd, occp};
-    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, nullptr, nullptr};
+    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp};
     StatisticsCore st{&ui};
     InfoWindow iw{&ui};
     Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
     Benchmarks bs{ui};
-    OCCParametersWindow occpw{&ui};
+    OCCParametersWindow occpw{&ui, occp, engine};
 
     // coefficient of a zoom
     float scaling_coefficient = 1.2;

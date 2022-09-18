@@ -5,6 +5,7 @@
 #include "OrganismConstructionCode.h"
 
 
+//Will simulate changes in cursor position and find max/min positions that occ will need to actually construct anatomy
 std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
     // min x, max x, min y, max y
     auto edges = std::array<int, 4>({0, 0, 0, 0});
@@ -19,10 +20,11 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
         std::array<int, 2>{ 1, 0},
         std::array<int, 2>{ 1, 1},
     };
-
+    //position of cursor
     int x = 0;
     int y = 0;
 
+    //changeable origin of cursor
     int origin_x = 0;
     int origin_y = 0;
 
@@ -118,6 +120,8 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
     auto & block = occ_c.occ_main_block_construction_space[x + y * occ_c.occ_width];
     bool set_block = false;
 
+    //If block got from space was not placed for current anatomy, then treat it as empty space, otherwise find the actual
+    //position in temp_blocks and change it.
     if (block.counter < occ_c.main_counter) {
         set_block = true;
     }
@@ -200,6 +204,7 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
         auto instruction = occ_vector[i];
         auto next_instruction = OCCInstruction::ShiftUp;
         //if not last instruction
+        //is needed for shift instruction logic.
         if (i != occ_vector.size()-1) {
             next_instruction = occ_vector[i+1];
         }
@@ -213,6 +218,8 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
             case OCCInstruction::ShiftDownRight:
             case OCCInstruction::ShiftRight:
             case OCCInstruction::ShiftUpRight: {
+                //if next instruction is set block, then do not shift the cursor,
+                // but place block on shifted position from cursor and increment i so that it will not get set block instruction
                 bool pass = false;
                 shift_instruction_part(container, occ_c, shift_values, shift, base_rotation, cursor_x, cursor_y,
                                        center_x, center_y,
@@ -273,6 +280,7 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
         case OCCInstruction::SetBlockEye:
             shift = shift_values[static_cast<int>(instruction)];
             set_block(cursor_x + shift[0], cursor_y + shift[1],
+                      //set block instruction are in the same order as block types.
                       static_cast<BlockTypes>(static_cast<int>(next_instruction) - 18 + 1),
                       base_rotation, occ_c, blocks, container, center_x, center_y);
             i++;
@@ -283,6 +291,7 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
     }
 }
 
+//Will compile spaces all at the same time in one go.
 std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>>
 OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<int, 4> edges,
                                          std::vector<SerializedOrganismBlockContainer> &organism_blocks,
@@ -305,6 +314,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
     auto temp_producing_space = std::vector<OCCSerializedProducingSpace>();
 
     producing_space.resize(container->producer_blocks);
+    //TODO probably not very space efficient
     eating_space.reserve(container->mouth_blocks*4);
     killer_space.reserve(container->killer_blocks*4);
 
@@ -415,10 +425,12 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
     }
 
     switch (mutation_type) {
+        //just append group to the end
         case OCCMutations::AppendRandom: {
             auto group = create_random_group(group_size, occp, gen);
             child_code.occ_vector.insert(child_code.occ_vector.end(), group.begin(), group.end());
         }
+        //insert group into sequence
         case OCCMutations::InsertRandom: {
             auto group = create_random_group(group_size, occp, gen);
             int position = std::uniform_int_distribution<int>(0, child_code.occ_vector.size()-1)(gen);
@@ -427,6 +439,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
         }
             break;
         //TODO cell at 0,0 can be rotated with this logic.
+        //Overwrite existing part of a sequence with a group
         case OCCMutations::ChangeRandom: {
             auto group = create_random_group(group_size, occp, gen);
             int starting_position = 1;
@@ -451,6 +464,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             }
         }
             break;
+        //delete part of a sequence with group_size
         case OCCMutations::DeleteRandom: {
             int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
             int allowed_erasing = std::min<int>(group_size, child_code.occ_vector.size()-position-1);
@@ -459,6 +473,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             child_code.occ_vector.erase(position_iterator, position_iterator+allowed_erasing);
         }
             break;
+        //shift instructions with size of group_size to the left or right by some distance
         case OCCMutations::MoveRandom: {
             int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
             int distance;
@@ -469,12 +484,14 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
                 distance = occp.move_distance_mutation_discrete_distribution(gen);
             }
 
+            //will determine whenever the shift is left or right
             int modifier = std::uniform_int_distribution<int>(0, 1)(gen);
 
             int second_position = position + distance * (modifier ? -1 : 1);
+            //will clamp the value between first and last vector positions
             second_position = std::min<int>(std::max<int>(1, second_position), occ_vector.size()-1);
 
-            auto first_iterator = occ_vector.begin()  + position;
+            auto first_iterator  = occ_vector.begin() + position;
             auto second_iterator = occ_vector.begin() + second_position;
 
             int i = 0;
