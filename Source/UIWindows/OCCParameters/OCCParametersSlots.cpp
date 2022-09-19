@@ -20,6 +20,7 @@ void OCCParametersWindow::le_max_group_size_slot() {
 
     le_slot_lower_bound(occp.max_group_size, occp.max_group_size, "int", ui.le_max_group_size, 1, "1");
     occp.group_size_weights.resize(occp.max_group_size, 1);
+    occp.group_size_discrete_distribution = std::discrete_distribution<int>(occp.group_size_weights.begin(), occp.group_size_weights.end());
 
     engine.unpause();
 
@@ -31,6 +32,7 @@ void OCCParametersWindow::le_max_move_distance_slot() {
 
     le_slot_lower_bound(occp.max_distance, occp.max_distance, "int", ui.le_max_move_distance, 1, "1");
     occp.move_distance_mutation_weights.resize(occp.max_distance, 1);
+    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
 
     engine.unpause();
 

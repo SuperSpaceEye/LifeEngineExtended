@@ -38,8 +38,10 @@ QLayout *OCCParametersWindow::prepare_layout(QLayout *layout) {
             delete item2;
         }
         layout->removeItem(item);
+        item->layout()->deleteLater();
         delete item;
     }
+
     return layout;
 }
 
@@ -74,6 +76,9 @@ void OCCParametersWindow::create_mutation_type_distribution() {
         new_layout->addWidget(label);
         new_layout->addWidget(line_edit);
 
+        label->show();
+        line_edit->show();
+
         layout->addItem(new_layout);
     }
 }
@@ -100,6 +105,9 @@ void OCCParametersWindow::create_group_size_distribution() {
 
         new_layout->addWidget(label);
         new_layout->addWidget(line_edit);
+
+        label->show();
+        line_edit->show();
 
         layout->addItem(new_layout);
     }
@@ -130,6 +138,9 @@ void OCCParametersWindow::create_occ_instructions_distribution() {
         new_layout->addWidget(label);
         new_layout->addWidget(line_edit);
 
+        label->show();
+        line_edit->show();
+
         layout->addItem(new_layout);
     }
 }
@@ -156,6 +167,9 @@ void OCCParametersWindow::create_move_distance_distribution() {
 
         new_layout->addWidget(label);
         new_layout->addWidget(line_edit);
+
+        label->show();
+        line_edit->show();
 
         layout->addItem(new_layout);
     }
