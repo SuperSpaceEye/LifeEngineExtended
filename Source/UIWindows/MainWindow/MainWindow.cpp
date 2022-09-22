@@ -461,6 +461,8 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     st.ui.lb_eye_num_4            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.total_avg._eye_blocks, float_precision)));
     st.ui.lb_anatomy_mutation_rate_4 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.total_avg.anatomy_mutation_rate, float_precision)));
     st.ui.lb_brain_mutation_rate_4   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.total_avg.brain_mutation_rate, float_precision)));
+    st.ui.lb_avg_occ_length_4     ->setText(QString::fromStdString("Avg OCC length: " + to_str(info.total_avg.occ_instructions_num)));
+    st.ui.lb_total_occ_length_4   ->setText(QString::fromStdString("Total OCC length: " + std::to_string(info.total_avg.occ_instructions_num)));
 
 
     st.ui.lb_moving_organisms     ->setText(QString::fromStdString("Moving organisms: " + std::to_string(info.moving_avg.total)));
@@ -478,6 +480,8 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     st.ui.lb_eye_num_2            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.moving_avg._eye_blocks, float_precision)));
     st.ui.lb_anatomy_mutation_rate_2 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.moving_avg.anatomy_mutation_rate, float_precision)));
     st.ui.lb_brain_mutation_rate_2   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.moving_avg.brain_mutation_rate, float_precision)));
+    st.ui.lb_avg_occ_len_2        ->setText(QString::fromStdString("Avg OCC length: " + to_str(info.moving_avg.occ_instructions_num)));
+    st.ui.lb_total_occ_len_2      ->setText(QString::fromStdString("Total OCC length: " + std::to_string(info.moving_avg.occ_instructions_num)));
 
 
     st.ui.lb_stationary_organisms ->setText(QString::fromStdString("Stationary organisms: " + std::to_string(info.station_avg.total)));
@@ -492,6 +496,9 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     st.ui.lb_eye_num_3            ->setText(QString::fromStdString("Avg eye num: " + to_str(info.station_avg._eye_blocks, float_precision)));
     st.ui.lb_anatomy_mutation_rate_3 ->setText(QString::fromStdString("Avg anatomy mutation rate: " + to_str(info.station_avg.anatomy_mutation_rate, float_precision)));
     st.ui.lb_brain_mutation_rate_3   ->setText(QString::fromStdString("Avg brain mutation rate: " + to_str(info.station_avg.brain_mutation_rate, float_precision)));
+    st.ui.lb_avg_occ_len_3        ->setText(QString::fromStdString("Avg OCC length: " + to_str(info.station_avg.occ_instructions_num)));
+    st.ui.lb_total_occ_length_3   ->setText(QString::fromStdString("Total OCC length: " + std::to_string(info.station_avg.occ_instructions_num)));
+
 
     st.ui.lb_child_organisms         ->setText(QString::fromStdString("Child organisms: " + std::to_string(edc.stc.child_organisms.size())));
     st.ui.lb_child_organisms_capacity->setText(QString::fromStdString("Child organisms capacity: " + std::to_string(edc.stc.child_organisms.capacity())));
