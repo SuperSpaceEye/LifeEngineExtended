@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 6;
+const uint32_t SAVE_VERSION = 7;
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -138,7 +138,7 @@ void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataCont
 }
 
 void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
-                                        Organism *organism) {
+                                        Organism *organism, OCCParameters &occp, OCCLogicContainer &occl) {
     auto brain = Brain();
     auto anatomy = Anatomy();
 
@@ -151,20 +151,21 @@ void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters 
                          anatomy,
                          brain, OrganismConstructionCode(),
                          &sp,
-                         &bp, nullptr, nullptr,
-                         0,
-                         0,
-                         0);
+                         &bp,
+                         &occp,
+                         &occl, 0, 0, 0);
     read_organism_data(is, *static_cast<OrganismData*>(organism));
 }
 
 //TODO save child patterns?
-bool DataSavingFunctions::read_organisms(std::ifstream& is, EngineDataContainer &edc, SimulationParameters &sp, OrganismBlockParameters &bp, uint32_t num_organisms) {
+bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer &edc, SimulationParameters &sp,
+                                         OrganismBlockParameters &bp, uint32_t num_organisms, OCCParameters &occp,
+                                         OCCLogicContainer &occl) {
     edc.stc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
         auto * organism = OrganismsController::get_new_main_organism(edc);
         auto array_place = organism->vector_index;
-        read_organism(is, sp, bp, organism);
+        read_organism(is, sp, bp, organism, occp, occl);
         organism->vector_index = array_place;
         SimulationEngineSingleThread::place_organism(&edc, organism);
     }
@@ -812,4 +813,75 @@ bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState 
     if (state.save_simulation_settings) { read_json_extended_simulation_parameters(d, sp); }
 
     return true;
+}
+
+void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
+    os.write((char*)&occp.uniform_mutation_distribution, sizeof(bool));
+    os.write((char*)&occp.uniform_group_size_distribution, sizeof(bool));
+    os.write((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
+    os.write((char*)&occp.uniform_move_distance, sizeof(bool));
+
+    int size = occp.mutation_type_weights.size();
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+
+    size = occp.max_group_size;
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.group_size_weights.data(), sizeof(int)*size);
+
+    size = occp.occ_instructions_mutation_weights.size();
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
+
+    size = occp.max_distance;
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.move_distance_mutation_weights.data(), sizeof(int)*size);
+}
+
+void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
+    is.read((char*)&occp.uniform_mutation_distribution, sizeof(bool));
+    is.read((char*)&occp.uniform_group_size_distribution, sizeof(bool));
+    is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
+    is.read((char*)&occp.uniform_move_distance, sizeof(bool));
+
+    size_t size;
+    is.read((char*)&size, sizeof(int));
+    is.read((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+
+    is.read((char*)&size, sizeof(int));
+    occp.max_group_size = size;
+    occp.group_size_weights.resize(occp.max_group_size);
+    is.read((char*)occp.group_size_weights.data(), sizeof(int)*size);
+
+    is.read((char*)&size, sizeof(int));
+    if (size != occp.occ_instructions_mutation_weights.size()) {
+        //TODO throw error
+        throw "";
+    }
+    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
+
+    is.read((char*)&size, sizeof(int));
+    occp.max_distance = size;
+    is.read((char*)occp.move_distance_mutation_weights.data(), sizeof(int)*size);
+
+    occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
+    occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
+    occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>{occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end()};
+    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end()};
+}
+
+void DataSavingFunctions::write_organism_occ(std::ofstream &os, OrganismConstructionCode &occ) {
+    int size = occ.get_code_const_ref().size();
+    os.write((char*)size, sizeof(int));
+    if (size > 0) {
+        os.write((char*)occ.get_code_const_ref().data(), sizeof(OCCInstruction)*size);
+    }
+}
+
+void DataSavingFunctions::read_organism_occ(std::ifstream &is, OrganismConstructionCode &occ) {
+    int size = 0;
+    is.read((char*)&size, sizeof(int));
+    if (size > 0) {
+        is.read((char*)occ.get_code_ref().data(), sizeof(OCCInstruction)*size);
+    }
 }

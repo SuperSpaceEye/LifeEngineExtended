@@ -33,6 +33,8 @@ private:
     static QLayout *prepare_layout(QLayout *layout) ;
 public:
     OCCParametersWindow(Ui::MainWindow * parent_ui, OCCParameters & occp, SimulationEngine & engine);
+
+    void reinit_gui();
 private slots:
     void cb_use_uniform_group_size_slot(bool state);
     void cb_use_uniform_move_distance_slot(bool state);

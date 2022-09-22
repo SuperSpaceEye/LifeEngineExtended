@@ -174,3 +174,11 @@ void OCCParametersWindow::create_move_distance_distribution() {
         layout->addItem(new_layout);
     }
 }
+
+void OCCParametersWindow::reinit_gui() {
+    init_gui();
+    create_occ_instructions_distribution();
+    create_mutation_type_distribution();
+    create_move_distance_distribution();
+    create_group_size_distribution();
+}

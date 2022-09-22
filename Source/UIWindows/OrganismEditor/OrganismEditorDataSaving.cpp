@@ -5,8 +5,10 @@
 #include "OrganismEditor.h"
 
 void OrganismEditor::read_organism(std::ifstream &is) {
+    OCCParameters p{};
+    OCCLogicContainer l{};
 
-    DataSavingFunctions::read_organism(is, *sp, *editor_organism->bp, *chosen_organism);
+    DataSavingFunctions::read_organism(is, *sp, *editor_organism->bp, *chosen_organism, p, l);
 
     delete editor_organism;
     load_chosen_organism();

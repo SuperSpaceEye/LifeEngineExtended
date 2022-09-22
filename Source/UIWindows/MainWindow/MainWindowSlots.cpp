@@ -216,6 +216,8 @@ void MainWindow::b_load_world_slot() {
     engine.unpause();
     initialize_gui();
     update_table_values();
+
+    occpw.reinit_gui();
 }
 
 void MainWindow::b_pass_one_tick_slot() {
@@ -742,6 +744,22 @@ void MainWindow::cb_use_occ_slot(bool state) {
     if (!display_dialog_message("Changing this parameter will reset world. Continue?", disable_warnings)) {
         ui.cb_use_organism_construction_code->setChecked(sp.use_occ);
         return;
+    }
+
+    if (state) {
+        st.ui.lb_avg_occ_len_2->show();
+        st.ui.lb_avg_occ_len_3->show();
+        st.ui.lb_avg_occ_length_4->show();
+        st.ui.lb_total_occ_len_2->show();
+        st.ui.lb_total_occ_length_3->show();
+        st.ui.lb_total_occ_length_4->show();
+    } else {
+        st.ui.lb_avg_occ_len_2->hide();
+        st.ui.lb_avg_occ_len_3->hide();
+        st.ui.lb_avg_occ_length_4->hide();
+        st.ui.lb_total_occ_len_2->hide();
+        st.ui.lb_total_occ_length_3->hide();
+        st.ui.lb_total_occ_length_4->hide();
     }
 
     engine.pause();

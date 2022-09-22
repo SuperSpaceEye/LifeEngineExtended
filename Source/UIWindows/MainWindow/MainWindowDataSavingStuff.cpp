@@ -12,6 +12,7 @@ void MainWindow::write_data(std::ofstream &os) {
     DataSavingFunctions::write_version(os);
     DataSavingFunctions::write_simulation_parameters(os, sp);
     DataSavingFunctions::write_organisms_block_parameters(os, bp);
+    DataSavingFunctions::write_occp(os, occp);
     DataSavingFunctions::write_data_container_data(os, edc);
     DataSavingFunctions::write_simulation_grid(os, edc);
     DataSavingFunctions::write_organisms(os, edc);
@@ -49,6 +50,7 @@ void MainWindow::read_data(std::ifstream &is) {
 
     DataSavingFunctions::read_simulation_parameters(is, sp);
     DataSavingFunctions::read_organisms_block_parameters(is, bp);
+    DataSavingFunctions::read_occp(is, occp);
     if (read_data_container_data(is)) {
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
         return;
@@ -108,7 +110,7 @@ bool MainWindow::read_organisms(std::ifstream &is) {
         }
     }
 
-    DataSavingFunctions::read_organisms(is, edc, sp, bp, num_organisms);
+    DataSavingFunctions::read_organisms(is, edc, sp, bp, num_organisms, occp, edc.stc.occl);
     return false;
 }
 
