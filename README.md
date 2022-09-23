@@ -41,3 +41,4 @@ C++ implementation of https://github.com/MaxRobinsonTheGreat/LifeEngine that ext
 - Saving and loading will not work correctly unless your path contains only english letters.
 - Mouse movement tracking is imprecise.
 - Renderer imprecisely calculates textures for small num of pixels per block. So if you want to have nice, correct images/videos when using recorder, set "Number of pixels per world block" > 10
+- The program will crash sometimes.
