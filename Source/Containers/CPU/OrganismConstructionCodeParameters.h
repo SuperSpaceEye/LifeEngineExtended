@@ -8,6 +8,8 @@
 #include <random>
 #include <vector>
 
+//https://github.com/DavidPal/discrete-distribution
+
 struct OCCParameters {
     bool uniform_mutation_distribution = true;
     std::array<int, 5> mutation_type_weights{1, 1, 1, 1, 1};

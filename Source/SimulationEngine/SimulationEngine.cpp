@@ -350,7 +350,7 @@ void SimulationEngine::reset_world() {
 
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
-    if (ecp.execute_world_events) {stop_world_events(); start_world_events();}
+    if (ecp.execute_world_events) { stop_world_events(true); start_world_events();}
 
     //Just in case
     ecp.engine_pass_tick = true;
@@ -508,7 +508,7 @@ const OrganismInfoContainer & SimulationEngine::get_info() {
 void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nodes,
                                           std::vector<char> repeating_branch,
                                           std::vector<BaseEventNode *> node_storage) {
-    pause();
+    stop_world_events();
     world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
     unpause();
 }
@@ -529,13 +529,13 @@ void SimulationEngine::pause_world_events() {
     ecp.pause_world_events = false;
 }
 
-void SimulationEngine::stop_world_events() {
+void SimulationEngine::stop_world_events(bool no_resume) {
     pause();
     sp = SimulationParameters{sp_copy};
     ecp.execute_world_events = false;
     ecp.pause_world_events = false;
     world_events_controller.reset();
-    unpause();
+    if (!no_resume) {unpause();}
 }
 
 void SimulationEngine::stop_world_events_no_setting_reset() {

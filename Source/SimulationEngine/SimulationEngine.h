@@ -108,7 +108,7 @@ public:
     void start_world_events();
     void resume_world_events();
     void pause_world_events();
-    void stop_world_events();
+    void stop_world_events(bool no_resume = true);
     void stop_world_events_no_setting_reset();
 
     void reset_world_events(std::vector<BaseEventNode *> start_nodes,

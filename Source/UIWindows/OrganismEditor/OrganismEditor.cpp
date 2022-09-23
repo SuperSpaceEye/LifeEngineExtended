@@ -356,6 +356,66 @@ void OrganismEditor::load_chosen_organism() {
     resize_editing_grid(new_editor_width, new_editor_height);
     create_image();
     update_gui();
+    clear_occ_layout();
+    load_occ();
     update_brain_checkboxes();
+}
+
+void OrganismEditor::occ_mode(bool state) {
+    if (state) {
+        ui.rb_mouth->hide();
+        ui.rb_producer->hide();
+        ui.rb_mover->hide();
+        ui.rb_killer->hide();
+        ui.rb_armor->hide();
+        ui.rb_eye->hide();
+
+        ui.cmb_block_rotation->hide();
+        ui.label_7->hide();
+
+        change_disabled = true;
+
+        b_reset_organism_slot();
+
+        auto & occ = editor_organism->occ;
+        occ.get_code_ref().clear();
+        occ.get_code_ref().emplace_back(OCCInstruction::SetBlockMouth);
+    } else {
+        ui.rb_mouth->show();
+        ui.rb_producer->show();
+        ui.rb_mover->show();
+        ui.rb_killer->show();
+        ui.rb_armor->show();
+        ui.rb_eye->show();
+
+        ui.cmb_block_rotation->show();
+        ui.label_7->show();
+
+        change_disabled = false;
+
+        auto & occ = editor_organism->occ;
+        occ.get_code_ref().clear();
+    }
+}
+
+void OrganismEditor::clear_occ_layout() {
+    QLayoutItem * item;
+    while ((item = ui.occ_layout->takeAt(0)) != nullptr) {
+        if (item->widget()) {
+            item->widget()->deleteLater();
+        }
+        delete item;
+    }
+}
+
+void OrganismEditor::load_occ() {
+    if (editor_organism->occ.get_code_const_ref().empty()) { return;}
+    ui.occ_layout->addWidget(new OCCInstructionWidget(true, ui, editor_organism->occ.get_code_const_ref()[0], ui.widget_3));
+
+    for (int i = 1; i < editor_organism->occ.get_code_const_ref().size(); i++) {
+        auto inst = editor_organism->occ.get_code_const_ref()[i];
+        ui.occ_layout->addWidget(new OCCInstructionWidget(false, ui, inst, ui.widget_3));
+    }
+    ui.occ_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
 }
 

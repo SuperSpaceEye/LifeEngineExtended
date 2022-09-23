@@ -71,4 +71,14 @@ const std::array<std::string, 24> OCC_INSTRUCTIONS_NAME {
         "Set Block Armor",
         "Set Block Eye"
 };
+
+//it will probably be much faster than using hashmap
+int inline get_index_of_occ_instruction_name(std::string &name) {
+    for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
+        if (name == OCC_INSTRUCTIONS_NAME[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
 #endif //LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEINSTRUCTION_H

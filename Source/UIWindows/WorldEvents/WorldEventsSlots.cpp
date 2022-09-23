@@ -40,11 +40,6 @@ void WorldEvents::b_apply_events_slot() {
         }
     }
 
-//    if (!verify_nodes()) {
-//        display_message("Applying new events failed");
-//        return;
-//    }
-
     copy_nodes(start_nodes, node_storage);
 
     engine->reset_world_events(std::move(start_nodes), std::move(_repeating_branch), std::move(node_storage));

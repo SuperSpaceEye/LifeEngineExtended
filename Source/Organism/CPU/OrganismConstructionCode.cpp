@@ -438,9 +438,9 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             child_code.occ_vector.insert(child_code.occ_vector.begin()+position, group.begin(), group.end());
         }
             break;
-        //TODO cell at 0,0 can be rotated with this logic.
         //Overwrite existing part of a sequence with a group
         case OCCMutations::ChangeRandom: {
+            if (child_code.occ_vector.size() == 1) { break;}
             auto group = create_random_group(group_size, occp, gen);
             int starting_position = 1;
             switch (group[0]) {
@@ -466,6 +466,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             break;
         //delete part of a sequence with group_size
         case OCCMutations::DeleteRandom: {
+            if (child_code.occ_vector.size() == 1) { break;}
             int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
             int allowed_erasing = std::min<int>(group_size, child_code.occ_vector.size()-position-1);
 
@@ -475,6 +476,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             break;
         //shift instructions with size of group_size to the left or right by some distance
         case OCCMutations::MoveRandom: {
+            if (child_code.occ_vector.size() == 1) { break;}
             int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
             int distance;
 

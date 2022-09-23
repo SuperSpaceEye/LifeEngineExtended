@@ -86,6 +86,15 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QVBoxLayout *brain_vertical_layout;
     QSpacerItem *horizontalSpacer;
+    QWidget *page;
+    QVBoxLayout *verticalLayout_7;
+    QScrollArea *scrollArea_2;
+    QWidget *scrollAreaWidgetContents_2;
+    QVBoxLayout *verticalLayout_8;
+    QWidget *widget_3;
+    QVBoxLayout *verticalLayout_9;
+    QHBoxLayout *occ_layout;
+    QPushButton *b_compile_occ;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_6;
     QRadioButton *rb_place_organism;
@@ -96,9 +105,10 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
-    QButtonGroup *cells_group;
-    QButtonGroup *organism_action_group;
+    QRadioButton *rb_edit_occ;
     QButtonGroup *edit_group;
+    QButtonGroup *organism_action_group;
+    QButtonGroup *cells_group;
 
     void setupUi(QWidget *Editor)
     {
@@ -401,6 +411,47 @@ public:
         verticalLayout_6->addWidget(widget_2);
 
         stackedWidget->addWidget(brain_edit_page);
+        page = new QWidget();
+        page->setObjectName(QString::fromUtf8("page"));
+        verticalLayout_7 = new QVBoxLayout(page);
+        verticalLayout_7->setSpacing(0);
+        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
+        verticalLayout_7->setContentsMargins(0, 0, 0, 0);
+        scrollArea_2 = new QScrollArea(page);
+        scrollArea_2->setObjectName(QString::fromUtf8("scrollArea_2"));
+        scrollArea_2->setWidgetResizable(true);
+        scrollAreaWidgetContents_2 = new QWidget();
+        scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 924, 472));
+        verticalLayout_8 = new QVBoxLayout(scrollAreaWidgetContents_2);
+        verticalLayout_8->setSpacing(0);
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
+        verticalLayout_8->setContentsMargins(0, 0, 0, 10);
+        widget_3 = new QWidget(scrollAreaWidgetContents_2);
+        widget_3->setObjectName(QString::fromUtf8("widget_3"));
+        verticalLayout_9 = new QVBoxLayout(widget_3);
+        verticalLayout_9->setSpacing(0);
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
+        occ_layout = new QHBoxLayout();
+        occ_layout->setObjectName(QString::fromUtf8("occ_layout"));
+        occ_layout->setContentsMargins(9, 9, 9, 9);
+
+        verticalLayout_9->addLayout(occ_layout);
+
+
+        verticalLayout_8->addWidget(widget_3);
+
+        b_compile_occ = new QPushButton(scrollAreaWidgetContents_2);
+        b_compile_occ->setObjectName(QString::fromUtf8("b_compile_occ"));
+
+        verticalLayout_8->addWidget(b_compile_occ);
+
+        scrollArea_2->setWidget(scrollAreaWidgetContents_2);
+
+        verticalLayout_7->addWidget(scrollArea_2);
+
+        stackedWidget->addWidget(page);
 
         verticalLayout->addWidget(stackedWidget);
 
@@ -462,6 +513,12 @@ public:
 
         horizontalLayout_4->addWidget(rb_edit_brain);
 
+        rb_edit_occ = new QRadioButton(widget);
+        edit_group->addButton(rb_edit_occ);
+        rb_edit_occ->setObjectName(QString::fromUtf8("rb_edit_occ"));
+
+        horizontalLayout_4->addWidget(rb_edit_occ);
+
 
         verticalLayout_4->addLayout(horizontalLayout_4);
 
@@ -499,6 +556,8 @@ public:
         QObject::connect(cmb_block_rotation, SIGNAL(currentTextChanged(QString)), Editor, SLOT(cmd_block_rotation_slot(QString)));
         QObject::connect(cmb_organism_rotation, SIGNAL(currentTextChanged(QString)), Editor, SLOT(cmd_organism_rotation_slot(QString)));
         QObject::connect(le_brain_mutation_rate, SIGNAL(returnPressed()), Editor, SLOT(le_brain_mutation_rate_slot()));
+        QObject::connect(rb_edit_occ, SIGNAL(clicked()), Editor, SLOT(rb_edit_occ_slot()));
+        QObject::connect(b_compile_occ, SIGNAL(clicked()), Editor, SLOT(b_compile_occ_slot()));
 
         stackedWidget->setCurrentIndex(0);
 
@@ -536,6 +595,7 @@ public:
         label_4->setText(QApplication::translate("Editor", "Grid width:", nullptr));
         label_5->setText(QApplication::translate("Editor", "Grid height:", nullptr));
         b_resize_editing_grid->setText(QApplication::translate("Editor", "Resize editing grid", nullptr));
+        b_compile_occ->setText(QApplication::translate("Editor", "Compile Organism Construction Code", nullptr));
         rb_place_organism->setText(QApplication::translate("Editor", "Place Organism", nullptr));
         rb_chose_organism->setText(QApplication::translate("Editor", "Choose organism", nullptr));
         rb_null_button->setText(QString());
@@ -543,6 +603,7 @@ public:
         b_load_organism->setText(QApplication::translate("Editor", "Load Organism", nullptr));
         rb_edit_anatomy->setText(QApplication::translate("Editor", "Edit Anatomy", nullptr));
         rb_edit_brain->setText(QApplication::translate("Editor", "Edit brain", nullptr));
+        rb_edit_occ->setText(QApplication::translate("Editor", "Edit OCC", nullptr));
     } // retranslateUi
 
 };

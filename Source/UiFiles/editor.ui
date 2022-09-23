@@ -83,7 +83,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="anatomy_edit_page">
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -499,6 +499,109 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="page">
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="widget_3" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QScrollArea" name="scrollArea_2">
+                   <property name="widgetResizable">
+                    <bool>true</bool>
+                   </property>
+                   <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                    <property name="geometry">
+                     <rect>
+                      <x>0</x>
+                      <y>0</y>
+                      <width>924</width>
+                      <height>472</height>
+                     </rect>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_8">
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>0</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>10</number>
+                     </property>
+                     <item>
+                      <layout class="QHBoxLayout" name="occ_layout">
+                       <property name="leftMargin">
+                        <number>9</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>9</number>
+                       </property>
+                       <property name="rightMargin">
+                        <number>9</number>
+                       </property>
+                       <property name="bottomMargin">
+                        <number>9</number>
+                       </property>
+                       <item>
+                        <spacer name="horizontalSpacer_3">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
           <item>
@@ -551,6 +654,13 @@
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="b_compile_occ">
+                <property name="text">
+                 <string>Compile Organism Construction Code</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="b_save_organism">
                 <property name="text">
                  <string>Save Organism</string>
@@ -585,6 +695,16 @@
                <widget class="QRadioButton" name="rb_edit_brain">
                 <property name="text">
                  <string>Edit brain</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">edit_group</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="rb_edit_occ">
+                <property name="text">
+                 <string>Edit OCC</string>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">edit_group</string>
@@ -958,6 +1078,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>rb_edit_occ</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_edit_occ_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>779</x>
+     <y>533</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_compile_occ</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_compile_occ_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>469</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_reset_editing_view_slot()</slot>
@@ -982,10 +1134,12 @@
   <slot>cmd_block_rotation_slot(QString)</slot>
   <slot>cmd_organism_rotation_slot(QString)</slot>
   <slot>le_brain_mutation_rate_slot()</slot>
+  <slot>rb_edit_occ_slot()</slot>
+  <slot>b_compile_occ_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="cells_group"/>
-  <buttongroup name="organism_action_group"/>
   <buttongroup name="edit_group"/>
+  <buttongroup name="organism_action_group"/>
+  <buttongroup name="cells_group"/>
  </buttongroups>
 </ui>

@@ -40,6 +40,7 @@
 #include "../../Stuff/MiscFuncs.h"
 #include "../../Stuff/ImageCreation.h"
 #include "../../Stuff/DataSavingFunctions.h"
+#include "OCCInstructionWidget.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -72,6 +73,7 @@ public:
     OrganismBlockParameters * bp;
 
     ColorContainer * color_container;
+    OCCLogicContainer occl;
 
     double scaling_coefficient = 1.2;
 
@@ -97,6 +99,8 @@ public:
     void update_cell_count_label();
     void initialize_gui();
 
+    void occ_mode(bool state);
+
     void brain_cb_chooser(std::string observation, std::string action);
     void update_brain_checkboxes();
 
@@ -107,6 +111,8 @@ public:
     int editor_width = 15;
     int editor_height = 15;
     double scaling_zoom = 1;
+
+    bool change_disabled = false;
 
     Organism * editor_organism;
     Organism ** chosen_organism;
@@ -139,12 +145,16 @@ public:
     void read_json_organism(std::string & full_path);
     void write_json_organism(std::string &full_path);
 
+    void clear_occ_layout();
+    void load_occ();
+
 private slots:
     void b_load_organism_slot();
     void b_reset_editing_view_slot();
     void b_resize_editing_grid_slot();
     void b_save_organism_slot();
     void b_reset_organism_slot();
+    void b_compile_occ_slot();
 
     void le_anatomy_mutation_rate_slot();
     void le_grid_height_slot();
@@ -160,6 +170,7 @@ private slots:
     void rb_producer_slot();
     void rb_edit_anatomy_slot();
     void rb_edit_brain_slot();
+    void rb_edit_occ_slot();
 
     void cmd_block_rotation_slot(const QString& name);
     void cmd_organism_rotation_slot(const QString& name);

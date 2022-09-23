@@ -105,6 +105,20 @@ void OrganismEditor::b_reset_organism_slot() {
     create_image();
 }
 
+void OrganismEditor::b_compile_occ_slot() {
+    auto & occ = editor_organism->occ;
+    if (occ.get_code_const_ref().empty()) { return;}
+
+    occ.get_code_ref().clear();
+    occ.get_code_ref().reserve(ui.occ_layout->count());
+    for (int i = 0; i < ui.occ_layout->count()-1; i++) {
+        auto *instw = reinterpret_cast<OCCInstructionWidget*>(ui.occ_layout->itemAt(i));
+        occ.get_code_ref().emplace_back(instw->instruction);
+    }
+
+    editor_organism->anatomy = Anatomy(occ.compile_code(occl));
+}
+
 //==================== Line edits ====================
 
 
@@ -166,6 +180,10 @@ void OrganismEditor::rb_edit_anatomy_slot() {
 
 void OrganismEditor::rb_edit_brain_slot() {
     ui.stackedWidget->setCurrentIndex(1);
+}
+
+void OrganismEditor::rb_edit_occ_slot() {
+    ui.stackedWidget->setCurrentIndex(2);
 }
 
 //==================== Combo boxes ====================

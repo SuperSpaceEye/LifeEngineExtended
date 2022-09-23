@@ -360,6 +360,7 @@ SerializedOrganismStructureContainer * Anatomy::remove_random_block(lehmer64 &ge
 }
 
 void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
+//    if (type == BlockTypes::EmptyBlock) { return;}
     int num_block = 0;
     for (auto & item: _organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {

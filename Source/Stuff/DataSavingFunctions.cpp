@@ -50,7 +50,8 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
 void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) {
     write_organism_brain(os,   &organism->brain);
     write_organism_anatomy(os, &organism->anatomy);
-    write_organism_data(os,    organism);
+    write_organism_occ(os,      organism->occ);
+    write_organism_data(os,     organism);
 }
 
 void DataSavingFunctions::write_organisms(std::ofstream & os, EngineDataContainer &edc) {
@@ -141,15 +142,18 @@ void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters 
                                         Organism *organism, OCCParameters &occp, OCCLogicContainer &occl) {
     auto brain = Brain();
     auto anatomy = Anatomy();
+    auto occ = OrganismConstructionCode();
 
     read_organism_brain(is, &brain);
     read_organism_anatomy(is, &anatomy);
+    read_organism_occ(is, occ);
 
     *organism = Organism(0,
                          0,
                          Rotation::UP,
                          anatomy,
-                         brain, OrganismConstructionCode(),
+                         brain,
+                         occ,
                          &sp,
                          &bp,
                          &occp,
@@ -844,7 +848,7 @@ void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
     is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
     is.read((char*)&occp.uniform_move_distance, sizeof(bool));
 
-    size_t size;
+    int size;
     is.read((char*)&size, sizeof(int));
     is.read((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
 
@@ -872,7 +876,7 @@ void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
 
 void DataSavingFunctions::write_organism_occ(std::ofstream &os, OrganismConstructionCode &occ) {
     int size = occ.get_code_const_ref().size();
-    os.write((char*)size, sizeof(int));
+    os.write((char*)&size, sizeof(int));
     if (size > 0) {
         os.write((char*)occ.get_code_const_ref().data(), sizeof(OCCInstruction)*size);
     }
@@ -881,6 +885,7 @@ void DataSavingFunctions::write_organism_occ(std::ofstream &os, OrganismConstruc
 void DataSavingFunctions::read_organism_occ(std::ifstream &is, OrganismConstructionCode &occ) {
     int size = 0;
     is.read((char*)&size, sizeof(int));
+    occ.get_code_ref().resize(size);
     if (size > 0) {
         is.read((char*)occ.get_code_ref().data(), sizeof(OCCInstruction)*size);
     }

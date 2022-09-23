@@ -162,10 +162,13 @@ void MainWindow::b_save_world_slot() {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
         write_data(out);
         out.close();
-
     } else {
-        auto info = engine.get_info();
-        DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
+        if (!sp.use_occ) {
+            auto info = engine.get_info();
+            DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
+        } else {
+            display_message("Worlds cannot be saved in json format with OCC enabled.");
+        }
     }
 
     ecp.synchronise_simulation_and_window = flag;
@@ -207,6 +210,7 @@ void MainWindow::b_load_world_slot() {
         in.close();
 
     } else if (filetype == ".json") {
+        sp.use_occ = false;
         read_json_data(full_path);
     }
 
@@ -745,6 +749,8 @@ void MainWindow::cb_use_occ_slot(bool state) {
         ui.cb_use_organism_construction_code->setChecked(sp.use_occ);
         return;
     }
+
+    ee.occ_mode(state);
 
     if (state) {
         st.ui.lb_avg_occ_len_2->show();

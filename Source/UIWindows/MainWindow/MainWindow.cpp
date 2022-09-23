@@ -60,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
         anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, 1, 1);
     }
 
+    ee.occ_mode(sp.use_occ);
+
     edc.base_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                      Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
                                      &edc.stc.occl, 1);
@@ -727,6 +729,8 @@ void MainWindow::change_main_grid_right_click() {
 }
 
 void MainWindow::change_editing_grid_left_click() {
+    if (ee.change_disabled) { return;}
+
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
 
@@ -737,6 +741,8 @@ void MainWindow::change_editing_grid_left_click() {
 }
 
 void MainWindow::change_editing_grid_right_click() {
+    if (ee.change_disabled) { return;}
+
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
     if (cpg.x == ee.editor_organism->x && cpg.y == ee.editor_organism->y) {return;}
