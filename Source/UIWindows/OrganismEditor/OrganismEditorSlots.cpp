@@ -133,6 +133,12 @@ void OrganismEditor::b_compile_occ_temp_slot() {
             //will just reset transpiler
             occt.get_transpiled_instructions();
             return;
+        case OCCTranspilingErrorCodes::FirstInstructionNotSetBlock:
+            display_message("First instruction is not a SetBlock.");
+
+            //will just reset transpiler
+            occt.get_transpiled_instructions();
+            return;
     }
 
     auto & occ = editor_organism->occ;

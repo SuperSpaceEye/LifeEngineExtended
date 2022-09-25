@@ -437,5 +437,8 @@ void OrganismEditor::load_occ() {
         ui.occ_layout->addWidget(new OCCInstructionWidget(false, ui, inst, ui.widget_3));
     }
     ui.occ_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+    //TODO
+    ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism->occ.get_code_const_ref(), false)));
 }
 

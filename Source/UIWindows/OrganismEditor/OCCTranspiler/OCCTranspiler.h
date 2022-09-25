@@ -13,7 +13,8 @@
 enum class OCCTranspilingErrorCodes {
     NoError,
     UnknownInstruction,
-    NoInstructionsAfterTranspiling
+    NoInstructionsAfterTranspiling,
+    FirstInstructionNotSetBlock
 };
 
 class OCCTranspiler {
@@ -29,6 +30,7 @@ public:
     OCCTranspiler()=default;
     OCCTranspilingErrorCodes transpile(std::string && code);
     std::vector<OCCInstruction> get_transpiled_instructions();
+    static std::string convert_to_text_code(const std::vector<OCCInstruction> & instructions, bool short_instructions);
 };
 
 

@@ -41,6 +41,24 @@ OCCTranspilingErrorCodes OCCTranspiler::transpile(std::string &&code) {
 
     if (transpiled_instructions.empty()) { return OCCTranspilingErrorCodes::NoInstructionsAfterTranspiling;}
 
+    switch (transpiled_instructions[0]) {
+        case OCCInstruction::SetBlockMouth:
+        case OCCInstruction::SetBlockProducer:
+        case OCCInstruction::SetBlockMover:
+        case OCCInstruction::SetBlockKiller:
+        case OCCInstruction::SetBlockArmor:
+        case OCCInstruction::SetBlockEye:
+        case OCCInstruction::SetUnderBlockMouth:
+        case OCCInstruction::SetUnderBlockProducer:
+        case OCCInstruction::SetUnderBlockMover:
+        case OCCInstruction::SetUnderBlockKiller:
+        case OCCInstruction::SetUnderBlockArmor:
+        case OCCInstruction::SetUnderBlockEye:
+            break;
+        default:
+            return OCCTranspilingErrorCodes::FirstInstructionNotSetBlock;
+    }
+
     return OCCTranspilingErrorCodes::NoError;
 }
 
@@ -70,4 +88,18 @@ std::vector<OCCInstruction> OCCTranspiler::get_transpiled_instructions() {
     character = 0;
     unknown_instruction = "";
     return temp;
+}
+
+std::string OCCTranspiler::convert_to_text_code(const std::vector<OCCInstruction> & instructions, bool short_instructions) {
+    std::string text_code;
+
+    for (auto & instruction: instructions) {
+        if (short_instructions) {
+            text_code += OCC_INSTRUCTIONS_SHORT[int(instruction)] + "; ";
+        } else {
+            text_code += OCC_INSTRUCTIONS[int(instruction)] + "; ";
+        }
+    }
+
+    return text_code;
 }
