@@ -29,11 +29,14 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     auto brain = Brain();
     brain.brain_type = BrainTypes::SimpleBrain;
 
+    auto occ = OrganismConstructionCode();
+    occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
+
     editor_organism = new Organism(editor_width / 2,
                                    editor_height / 2,
                                    Rotation::UP,
                                    anatomy,
-                                   brain, OrganismConstructionCode(),
+                                   brain, occ,
                                    sp,
                                    bp, occp, occl,
                                    1);
@@ -44,6 +47,8 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     initialize_gui();
     reset_scale_view();
+    clear_occ_layout();
+    load_occ();
 
     actual_cursor.setParent(this);
     actual_cursor.setGeometry(50, 50, 5, 5);
@@ -340,6 +345,16 @@ void OrganismEditor::finalize_chosen_organism() {
 void OrganismEditor::load_chosen_organism() {
     editor_organism = new Organism(*chosen_organism);
 
+    check_edit_area();
+
+    create_image();
+    update_gui();
+    clear_occ_layout();
+    load_occ();
+    update_brain_checkboxes();
+}
+
+void OrganismEditor::check_edit_area() {
     Vector2 min{0, 0};
     Vector2 max{0, 0};
 
@@ -350,15 +365,10 @@ void OrganismEditor::load_chosen_organism() {
         if (block.relative_y > max.y) {max.y = block.relative_y;}
     }
 
-    if (std::abs(min.x) + max.x >= new_editor_width)  {new_editor_width  = std::max(std::abs(min.x), max.x)*2+1;}
-    if (std::abs(min.y) + max.y >= new_editor_height) {new_editor_height = std::max(std::abs(min.y), max.y)*2+1;}
+    if (abs(min.x) + max.x >= new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;}
+    if (abs(min.y) + max.y >= new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1;}
 
     resize_editing_grid(new_editor_width, new_editor_height);
-    create_image();
-    update_gui();
-    clear_occ_layout();
-    load_occ();
-    update_brain_checkboxes();
 }
 
 void OrganismEditor::occ_mode(bool state) {
@@ -380,6 +390,11 @@ void OrganismEditor::occ_mode(bool state) {
         auto & occ = editor_organism->occ;
         occ.get_code_ref().clear();
         occ.get_code_ref().emplace_back(OCCInstruction::SetBlockMouth);
+
+        ui.rb_edit_occ->show();
+        ui.b_save_organism->hide();
+        ui.b_load_organism->hide();
+        clear_occ_layout();
     } else {
         ui.rb_mouth->show();
         ui.rb_producer->show();
@@ -395,6 +410,11 @@ void OrganismEditor::occ_mode(bool state) {
 
         auto & occ = editor_organism->occ;
         occ.get_code_ref().clear();
+
+        ui.rb_edit_occ->hide();
+        ui.b_save_organism->show();
+        ui.b_load_organism->show();
+        clear_occ_layout();
     }
 }
 

@@ -148,6 +148,8 @@ public:
     void clear_occ_layout();
     void load_occ();
 
+    void check_edit_area();
+
 private slots:
     void b_load_organism_slot();
     void b_reset_editing_view_slot();

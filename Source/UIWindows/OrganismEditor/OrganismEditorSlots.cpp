@@ -92,15 +92,10 @@ void OrganismEditor::b_save_organism_slot() {
 }
 
 void OrganismEditor::b_reset_organism_slot() {
-    for (int i = 0; i < editor_organism->anatomy._organism_blocks.size(); i++) {
-        if (editor_organism->anatomy._organism_blocks[i].relative_x == 0 && editor_organism->anatomy._organism_blocks[i].relative_y == 0) {
-            continue;
-        }
-        editor_organism->anatomy._organism_blocks.erase(editor_organism->anatomy._organism_blocks.begin() + i);
-        i--;
-    }
+    auto blocks = std::vector<SerializedOrganismBlockContainer>{SerializedOrganismBlockContainer{BlockTypes::MouthBlock, Rotation::UP, 0, 0}};
+    editor_organism->anatomy.set_many_blocks(blocks);
+    editor_organism->occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
 
-    editor_organism->anatomy.set_many_blocks(editor_organism->anatomy._organism_blocks);
     finalize_chosen_organism();
     create_image();
 }
@@ -112,11 +107,14 @@ void OrganismEditor::b_compile_occ_slot() {
     occ.get_code_ref().clear();
     occ.get_code_ref().reserve(ui.occ_layout->count());
     for (int i = 0; i < ui.occ_layout->count()-1; i++) {
-        auto *instw = reinterpret_cast<OCCInstructionWidget*>(ui.occ_layout->itemAt(i));
+        auto *instw = reinterpret_cast<OCCInstructionWidget*>(ui.occ_layout->itemAt(i)->widget());
         occ.get_code_ref().emplace_back(instw->instruction);
     }
 
     editor_organism->anatomy = Anatomy(occ.compile_code(occl));
+    check_edit_area();
+    place_organism_on_a_grid();
+    create_image();
 }
 
 //==================== Line edits ====================
