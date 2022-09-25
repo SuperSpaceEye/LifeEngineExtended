@@ -8,8 +8,11 @@
 #include "Anatomy.h"
 
 //18
-//6
-//24 total
+//6 + 6
+//30 total
+
+const int NON_SET_BLOCK_OCC_INSTRUCTIONS = 18;
+
 enum class OCCInstruction {
     ShiftUp,
     ShiftUpLeft,
@@ -38,10 +41,17 @@ enum class OCCInstruction {
     SetBlockMover,
     SetBlockKiller,
     SetBlockArmor,
-    SetBlockEye
+    SetBlockEye,
+
+    SetUnderBlockMouth,
+    SetUnderBlockProducer,
+    SetUnderBlockMover,
+    SetUnderBlockKiller,
+    SetUnderBlockArmor,
+    SetUnderBlockEye
 };
 
-const std::array<std::string, 24> OCC_INSTRUCTIONS_NAME {
+const std::array<std::string, 30> OCC_INSTRUCTIONS_NAME {
         "Shift Up",
         "Shift Up Left",
         "Shift Left",
@@ -69,10 +79,17 @@ const std::array<std::string, 24> OCC_INSTRUCTIONS_NAME {
         "Set Block Mover",
         "Set Block Killer",
         "Set Block Armor",
-        "Set Block Eye"
+        "Set Block Eye",
+
+        "Set Under Block Mouth",
+        "Set Under Block Producer",
+        "Set Under Block Mover",
+        "Set Under Block Killer",
+        "Set Under Block Armor",
+        "Set Under Block Eye"
 };
 
-const std::array<std::string, 24> OCC_INSTRUCTIONS {
+const std::array<std::string, 30> OCC_INSTRUCTIONS {
         "ShiftUp",
         "ShiftUpLeft",
         "ShiftLeft",
@@ -100,10 +117,17 @@ const std::array<std::string, 24> OCC_INSTRUCTIONS {
         "SetBlockMover",
         "SetBlockKiller",
         "SetBlockArmor",
-        "SetBlockEye"
+        "SetBlockEye",
+
+        "SetUnderBlockMouth",
+        "SetUnderBlockProducer",
+        "SetUnderBlockMover",
+        "SetUnderBlockKiller",
+        "SetUnderBlockArmor",
+        "SetUnderBlockEye"
 };
 
-const std::array<std::string, 24> OCC_INSTRUCTIONS_SHORT {
+const std::array<std::string, 30> OCC_INSTRUCTIONS_SHORT {
         "SU",
         "SUL",
         "SL",
@@ -131,7 +155,14 @@ const std::array<std::string, 24> OCC_INSTRUCTIONS_SHORT {
         "SBMV",
         "SRK",
         "SBA",
-        "SBE"
+        "SBE",
+
+        "SUBM",
+        "SUBP",
+        "SUBMV",
+        "SURK",
+        "SUBA",
+        "SUBE"
 };
 
 //it will probably be much faster than using hashmap

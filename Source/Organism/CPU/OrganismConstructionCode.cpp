@@ -256,6 +256,13 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
             case OCCInstruction::SetBlockKiller:   set_block(cursor_x, cursor_y, BlockTypes::KillerBlock,   base_rotation, occ_c, blocks, container, center_x, center_y);break;
             case OCCInstruction::SetBlockArmor:    set_block(cursor_x, cursor_y, BlockTypes::ArmorBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
             case OCCInstruction::SetBlockEye:      set_block(cursor_x, cursor_y, BlockTypes::EyeBlock,      base_rotation, occ_c, blocks, container, center_x, center_y);break;
+
+            case OCCInstruction::SetUnderBlockMouth:    set_block(cursor_x, cursor_y, BlockTypes::MouthBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
+            case OCCInstruction::SetUnderBlockProducer: set_block(cursor_x, cursor_y, BlockTypes::ProducerBlock, base_rotation, occ_c, blocks, container, center_x, center_y);break;
+            case OCCInstruction::SetUnderBlockMover:    set_block(cursor_x, cursor_y, BlockTypes::MoverBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
+            case OCCInstruction::SetUnderBlockKiller:   set_block(cursor_x, cursor_y, BlockTypes::KillerBlock,   base_rotation, occ_c, blocks, container, center_x, center_y);break;
+            case OCCInstruction::SetUnderBlockArmor:    set_block(cursor_x, cursor_y, BlockTypes::ArmorBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
+            case OCCInstruction::SetUnderBlockEye:      set_block(cursor_x, cursor_y, BlockTypes::EyeBlock,      base_rotation, occ_c, blocks, container, center_x, center_y);break;
         }
     }
 

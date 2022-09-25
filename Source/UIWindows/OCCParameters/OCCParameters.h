@@ -11,6 +11,7 @@
 #include "../../Stuff/MiscFuncs.h"
 #include "../../Organism/CPU/OrganismConstructionCodeInstruction.h"
 #include "../../SimulationEngine/SimulationEngine.h"
+#include "../../Organism/CPU/OrganismConstructionCodeInstruction.h"
 
 class OCCParametersWindow: public QWidget {
     Q_OBJECT

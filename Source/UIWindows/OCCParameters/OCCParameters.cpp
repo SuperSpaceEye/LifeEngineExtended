@@ -118,10 +118,19 @@ void OCCParametersWindow::create_occ_instructions_distribution() {
 
     occp.occ_instructions_mutation_weights.resize(OCC_INSTRUCTIONS_NAME.size(), 1);
 
+    //To balance the distribution.
+    for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
+        if (i < NON_SET_BLOCK_OCC_INSTRUCTIONS) {
+            occp.occ_instructions_mutation_weights[i] = 2;
+        } else {
+            occp.occ_instructions_mutation_weights[i] = 1;
+        }
+    }
+
     for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
         auto * new_layout = new QHBoxLayout{};
         auto * label = new QLabel(QString::fromStdString("\""+OCC_INSTRUCTIONS_NAME[i])+"\" weight ", ui.occ_mutation_type_widget);
-        auto * line_edit = new QLineEdit(QString::fromStdString("1"), ui.occ_mutation_type_widget);
+        auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string((int)occp.occ_instructions_mutation_weights[i])), ui.occ_mutation_type_widget);
 
         auto * p_occp = &occp;
         auto * p_engine = &engine;
