@@ -12,6 +12,7 @@
 //30 total
 
 const int NON_SET_BLOCK_OCC_INSTRUCTIONS = 18;
+const int SET_BLOCK_OCC_INSTRUCTIONS = 12;
 
 enum class OCCInstruction {
     ShiftUp,

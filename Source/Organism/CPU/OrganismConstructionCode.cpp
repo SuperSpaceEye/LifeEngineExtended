@@ -405,7 +405,8 @@ std::vector<OCCInstruction> create_random_group(int group_size, OCCParameters &o
 
     for (int i = 0; i < group_size; i++) {
         if (occp.uniform_occ_instructions_mutation) {
-            group.emplace_back(static_cast<OCCInstruction>(std::uniform_int_distribution<int>(0, 23)(gen)));
+            group.emplace_back(static_cast<OCCInstruction>(std::uniform_int_distribution<int>(0, NON_SET_BLOCK_OCC_INSTRUCTIONS
+                                                                                                +SET_BLOCK_OCC_INSTRUCTIONS)(gen)));
         } else {
             group.emplace_back(static_cast<OCCInstruction>(occp.occ_instructions_mutation_discrete_distribution(gen)));
         }

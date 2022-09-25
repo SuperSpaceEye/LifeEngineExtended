@@ -17,12 +17,12 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -99,7 +99,7 @@ public:
     QPushButton *b_compile_occ;
     QWidget *page_2;
     QVBoxLayout *verticalLayout_10;
-    QTextEdit *te_occ_edit_window;
+    QPlainTextEdit *te_occ_edit_window;
     QPushButton *b_compile_occ_temp;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_6;
@@ -113,9 +113,9 @@ public:
     QRadioButton *rb_edit_brain;
     QRadioButton *rb_edit_occ;
     QRadioButton *rb_edit_occ_2;
-    QButtonGroup *organism_action_group;
     QButtonGroup *cells_group;
     QButtonGroup *edit_group;
+    QButtonGroup *organism_action_group;
 
     void setupUi(QWidget *Editor)
     {
@@ -467,7 +467,7 @@ public:
         page_2->setObjectName(QString::fromUtf8("page_2"));
         verticalLayout_10 = new QVBoxLayout(page_2);
         verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
-        te_occ_edit_window = new QTextEdit(page_2);
+        te_occ_edit_window = new QPlainTextEdit(page_2);
         te_occ_edit_window->setObjectName(QString::fromUtf8("te_occ_edit_window"));
 
         verticalLayout_10->addWidget(te_occ_edit_window);
@@ -593,7 +593,7 @@ public:
         QObject::connect(b_compile_occ_temp, SIGNAL(clicked()), Editor, SLOT(b_compile_occ_temp_slot()));
         QObject::connect(rb_edit_occ_2, SIGNAL(clicked()), Editor, SLOT(rb_edit_occ_2_slot()));
 
-        stackedWidget->setCurrentIndex(3);
+        stackedWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(Editor);
