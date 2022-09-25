@@ -117,6 +117,32 @@ void OrganismEditor::b_compile_occ_slot() {
     create_image();
 }
 
+void OrganismEditor::b_compile_occ_temp_slot() {
+    auto err = occt.transpile(ui.te_occ_edit_window->toPlainText().toStdString());
+
+    switch (err) {
+        case OCCTranspilingErrorCodes::NoError:
+            break;
+        case OCCTranspilingErrorCodes::UnknownInstruction:
+            display_message("Unknown instruction \"" + occt.unknown_instruction + "\" on line " + std::to_string(occt.line) + " character " + std::to_string(occt.character));
+            //will just reset transpiler
+            occt.get_transpiled_instructions();
+            return;
+        case OCCTranspilingErrorCodes::NoInstructionsAfterTranspiling:
+            display_message("The code produced no instruction after transpiling");
+            //will just reset transpiler
+            occt.get_transpiled_instructions();
+            return;
+    }
+
+    auto & occ = editor_organism->occ;
+    occ.get_code_ref() = occt.get_transpiled_instructions();
+    editor_organism->anatomy = Anatomy(occ.compile_code(occl));
+    check_edit_area();
+    place_organism_on_a_grid();
+    create_image();
+}
+
 //==================== Line edits ====================
 
 
@@ -182,6 +208,10 @@ void OrganismEditor::rb_edit_brain_slot() {
 
 void OrganismEditor::rb_edit_occ_slot() {
     ui.stackedWidget->setCurrentIndex(2);
+}
+
+void OrganismEditor::rb_edit_occ_2_slot() {
+    ui.stackedWidget->setCurrentIndex(3);
 }
 
 //==================== Combo boxes ====================

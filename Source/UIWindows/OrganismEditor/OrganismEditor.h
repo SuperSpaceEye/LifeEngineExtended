@@ -41,6 +41,7 @@
 #include "../../Stuff/ImageCreation.h"
 #include "../../Stuff/DataSavingFunctions.h"
 #include "OCCInstructionWidget.h"
+#include "OCCTranspiler/OCCTranspiler.h"
 
 struct EditBlock : BaseGridBlock {
     //For when cursor is hovering above block
@@ -74,6 +75,7 @@ public:
 
     ColorContainer * color_container;
     OCCLogicContainer occl;
+    OCCTranspiler occt{};
 
     double scaling_coefficient = 1.2;
 
@@ -157,6 +159,7 @@ private slots:
     void b_save_organism_slot();
     void b_reset_organism_slot();
     void b_compile_occ_slot();
+    void b_compile_occ_temp_slot();
 
     void le_anatomy_mutation_rate_slot();
     void le_grid_height_slot();
@@ -173,6 +176,7 @@ private slots:
     void rb_edit_anatomy_slot();
     void rb_edit_brain_slot();
     void rb_edit_occ_slot();
+    void rb_edit_occ_2_slot();
 
     void cmd_block_rotation_slot(const QString& name);
     void cmd_organism_rotation_slot(const QString& name);

@@ -22,6 +22,7 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -88,13 +89,18 @@ public:
     QSpacerItem *horizontalSpacer;
     QWidget *page;
     QVBoxLayout *verticalLayout_7;
+    QWidget *widget_3;
+    QVBoxLayout *verticalLayout_9;
     QScrollArea *scrollArea_2;
     QWidget *scrollAreaWidgetContents_2;
     QVBoxLayout *verticalLayout_8;
-    QWidget *widget_3;
-    QVBoxLayout *verticalLayout_9;
     QHBoxLayout *occ_layout;
+    QSpacerItem *horizontalSpacer_3;
     QPushButton *b_compile_occ;
+    QWidget *page_2;
+    QVBoxLayout *verticalLayout_10;
+    QTextEdit *te_occ_edit_window;
+    QPushButton *b_compile_occ_temp;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_6;
     QRadioButton *rb_place_organism;
@@ -106,9 +112,10 @@ public:
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
     QRadioButton *rb_edit_occ;
-    QButtonGroup *edit_group;
+    QRadioButton *rb_edit_occ_2;
     QButtonGroup *organism_action_group;
     QButtonGroup *cells_group;
+    QButtonGroup *edit_group;
 
     void setupUi(QWidget *Editor)
     {
@@ -417,7 +424,13 @@ public:
         verticalLayout_7->setSpacing(0);
         verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
         verticalLayout_7->setContentsMargins(0, 0, 0, 0);
-        scrollArea_2 = new QScrollArea(page);
+        widget_3 = new QWidget(page);
+        widget_3->setObjectName(QString::fromUtf8("widget_3"));
+        verticalLayout_9 = new QVBoxLayout(widget_3);
+        verticalLayout_9->setSpacing(0);
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
+        scrollArea_2 = new QScrollArea(widget_3);
         scrollArea_2->setObjectName(QString::fromUtf8("scrollArea_2"));
         scrollArea_2->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
@@ -427,20 +440,15 @@ public:
         verticalLayout_8->setSpacing(0);
         verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
         verticalLayout_8->setContentsMargins(0, 0, 0, 10);
-        widget_3 = new QWidget(scrollAreaWidgetContents_2);
-        widget_3->setObjectName(QString::fromUtf8("widget_3"));
-        verticalLayout_9 = new QVBoxLayout(widget_3);
-        verticalLayout_9->setSpacing(0);
-        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
-        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
         occ_layout = new QHBoxLayout();
         occ_layout->setObjectName(QString::fromUtf8("occ_layout"));
         occ_layout->setContentsMargins(9, 9, 9, 9);
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        verticalLayout_9->addLayout(occ_layout);
+        occ_layout->addItem(horizontalSpacer_3);
 
 
-        verticalLayout_8->addWidget(widget_3);
+        verticalLayout_8->addLayout(occ_layout);
 
         b_compile_occ = new QPushButton(scrollAreaWidgetContents_2);
         b_compile_occ->setObjectName(QString::fromUtf8("b_compile_occ"));
@@ -449,9 +457,27 @@ public:
 
         scrollArea_2->setWidget(scrollAreaWidgetContents_2);
 
-        verticalLayout_7->addWidget(scrollArea_2);
+        verticalLayout_9->addWidget(scrollArea_2);
+
+
+        verticalLayout_7->addWidget(widget_3);
 
         stackedWidget->addWidget(page);
+        page_2 = new QWidget();
+        page_2->setObjectName(QString::fromUtf8("page_2"));
+        verticalLayout_10 = new QVBoxLayout(page_2);
+        verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
+        te_occ_edit_window = new QTextEdit(page_2);
+        te_occ_edit_window->setObjectName(QString::fromUtf8("te_occ_edit_window"));
+
+        verticalLayout_10->addWidget(te_occ_edit_window);
+
+        b_compile_occ_temp = new QPushButton(page_2);
+        b_compile_occ_temp->setObjectName(QString::fromUtf8("b_compile_occ_temp"));
+
+        verticalLayout_10->addWidget(b_compile_occ_temp);
+
+        stackedWidget->addWidget(page_2);
 
         verticalLayout->addWidget(stackedWidget);
 
@@ -519,6 +545,12 @@ public:
 
         horizontalLayout_4->addWidget(rb_edit_occ);
 
+        rb_edit_occ_2 = new QRadioButton(widget);
+        edit_group->addButton(rb_edit_occ_2);
+        rb_edit_occ_2->setObjectName(QString::fromUtf8("rb_edit_occ_2"));
+
+        horizontalLayout_4->addWidget(rb_edit_occ_2);
+
 
         verticalLayout_4->addLayout(horizontalLayout_4);
 
@@ -558,8 +590,10 @@ public:
         QObject::connect(le_brain_mutation_rate, SIGNAL(returnPressed()), Editor, SLOT(le_brain_mutation_rate_slot()));
         QObject::connect(rb_edit_occ, SIGNAL(clicked()), Editor, SLOT(rb_edit_occ_slot()));
         QObject::connect(b_compile_occ, SIGNAL(clicked()), Editor, SLOT(b_compile_occ_slot()));
+        QObject::connect(b_compile_occ_temp, SIGNAL(clicked()), Editor, SLOT(b_compile_occ_temp_slot()));
+        QObject::connect(rb_edit_occ_2, SIGNAL(clicked()), Editor, SLOT(rb_edit_occ_2_slot()));
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(Editor);
@@ -596,6 +630,7 @@ public:
         label_5->setText(QApplication::translate("Editor", "Grid height:", nullptr));
         b_resize_editing_grid->setText(QApplication::translate("Editor", "Resize editing grid", nullptr));
         b_compile_occ->setText(QApplication::translate("Editor", "Compile Organism Construction Code", nullptr));
+        b_compile_occ_temp->setText(QApplication::translate("Editor", " Compile code", nullptr));
         rb_place_organism->setText(QApplication::translate("Editor", "Place Organism", nullptr));
         rb_chose_organism->setText(QApplication::translate("Editor", "Choose organism", nullptr));
         rb_null_button->setText(QString());
@@ -604,6 +639,7 @@ public:
         rb_edit_anatomy->setText(QApplication::translate("Editor", "Edit Anatomy", nullptr));
         rb_edit_brain->setText(QApplication::translate("Editor", "Edit brain", nullptr));
         rb_edit_occ->setText(QApplication::translate("Editor", "Edit OCC", nullptr));
+        rb_edit_occ_2->setText(QApplication::translate("Editor", "Edit OCC 2", nullptr));
     } // retranslateUi
 
 };

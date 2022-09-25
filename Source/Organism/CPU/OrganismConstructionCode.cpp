@@ -11,14 +11,14 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
     auto edges = std::array<int, 4>({0, 0, 0, 0});
 
     auto shift_values = std::array<std::array<int, 2>, 8> {
-        std::array<int, 2>{ 0, 1},
-        std::array<int, 2>{-1, 1},
-        std::array<int, 2>{-1, 0},
-        std::array<int, 2>{-1,-1},
         std::array<int, 2>{ 0,-1},
-        std::array<int, 2>{ 1,-1},
-        std::array<int, 2>{ 1, 0},
+        std::array<int, 2>{-1,-1},
+        std::array<int, 2>{-1, 0},
+        std::array<int, 2>{-1, 1},
+        std::array<int, 2>{ 0, 1},
         std::array<int, 2>{ 1, 1},
+        std::array<int, 2>{ 1, 0},
+        std::array<int, 2>{ 1,-1},
     };
     //position of cursor
     int x = 0;
@@ -176,14 +176,14 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
                                                  OCCLogicContainer &occ_c, std::array<int, 4> edges) {
     std::vector<SerializedOrganismBlockContainer> blocks;
     auto shift_values = std::array<std::array<int, 2>, 8> {
-            std::array<int, 2>{ 0, 1},
-            std::array<int, 2>{-1, 1},
-            std::array<int, 2>{-1, 0},
-            std::array<int, 2>{-1,-1},
             std::array<int, 2>{ 0,-1},
-            std::array<int, 2>{ 1,-1},
-            std::array<int, 2>{ 1, 0},
+            std::array<int, 2>{-1,-1},
+            std::array<int, 2>{-1, 0},
+            std::array<int, 2>{-1, 1},
+            std::array<int, 2>{ 0, 1},
             std::array<int, 2>{ 1, 1},
+            std::array<int, 2>{ 1, 0},
+            std::array<int, 2>{ 1,-1},
     };
     auto shift = shift_values[0];
 
@@ -299,10 +299,10 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
     std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>> spaces;
 
     auto shifting_positions = std::array<std::array<int, 2>, 4> {
-        std::array<int, 2>{ 0,  1},
-        std::array<int, 2>{-1,  0},
-        std::array<int, 2>{ 0, -1},
-        std::array<int, 2>{ 1,  0},
+        std::array<int, 2>{ 0,-1},
+        std::array<int, 2>{-1, 0},
+        std::array<int, 2>{ 0, 1},
+        std::array<int, 2>{ 1, 0},
     };
 
     occ_c.spaces_counter++;

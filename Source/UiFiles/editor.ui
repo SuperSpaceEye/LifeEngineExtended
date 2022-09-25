@@ -83,7 +83,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="anatomy_edit_page">
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -593,11 +593,32 @@
                        </item>
                       </layout>
                      </item>
+                     <item>
+                      <widget class="QPushButton" name="b_compile_occ">
+                       <property name="text">
+                        <string>Compile Organism Construction Code</string>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </widget>
                   </widget>
                  </item>
                 </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_2">
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <item>
+               <widget class="QTextEdit" name="te_occ_edit_window"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="b_compile_occ_temp">
+                <property name="text">
+                 <string> Compile code</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -654,13 +675,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="b_compile_occ">
-                <property name="text">
-                 <string>Compile Organism Construction Code</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="b_save_organism">
                 <property name="text">
                  <string>Save Organism</string>
@@ -705,6 +719,16 @@
                <widget class="QRadioButton" name="rb_edit_occ">
                 <property name="text">
                  <string>Edit OCC</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">edit_group</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="rb_edit_occ_2">
+                <property name="text">
+                 <string>Edit OCC 2</string>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">edit_group</string>
@@ -1110,6 +1134,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_compile_occ_temp</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_compile_occ_temp_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>469</x>
+     <y>459</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_edit_occ_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_edit_occ_2_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>817</x>
+     <y>533</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_reset_editing_view_slot()</slot>
@@ -1136,10 +1192,12 @@
   <slot>le_brain_mutation_rate_slot()</slot>
   <slot>rb_edit_occ_slot()</slot>
   <slot>b_compile_occ_slot()</slot>
+  <slot>b_compile_occ_temp_slot()</slot>
+  <slot>rb_edit_occ_2_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="edit_group"/>
   <buttongroup name="organism_action_group"/>
   <buttongroup name="cells_group"/>
+  <buttongroup name="edit_group"/>
  </buttongroups>
 </ui>

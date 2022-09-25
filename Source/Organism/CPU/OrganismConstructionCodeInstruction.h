@@ -72,10 +72,92 @@ const std::array<std::string, 24> OCC_INSTRUCTIONS_NAME {
         "Set Block Eye"
 };
 
+const std::array<std::string, 24> OCC_INSTRUCTIONS {
+        "ShiftUp",
+        "ShiftUpLeft",
+        "ShiftLeft",
+        "ShiftLeftDown",
+        "ShiftDown",
+        "ShiftDownRight",
+        "ShiftRight",
+        "ShiftUpRight",
+
+        "ApplyRotationUp",
+        "ApplyRotationLeft",
+        "ApplyRotationDown",
+        "ApplyRotationRight",
+
+        "SetRotationUp",
+        "SetRotationLeft",
+        "SetRotationDown",
+        "SetRotationRight",
+
+        "ResetToOrigin",
+        "SetOrigin",
+
+        "SetBlockMouth",
+        "SetBlockProducer",
+        "SetBlockMover",
+        "SetBlockKiller",
+        "SetBlockArmor",
+        "SetBlockEye"
+};
+
+const std::array<std::string, 24> OCC_INSTRUCTIONS_SHORT {
+        "SU",
+        "SUL",
+        "SL",
+        "SLD",
+        "SD",
+        "SDR",
+        "SR",
+        "SUR",
+
+        "ARU",
+        "ARL",
+        "ARD",
+        "ARR",
+
+        "SRU",
+        "SRL",
+        "SRD",
+        "SRR",
+
+        "RTO",
+        "SO",
+
+        "SBM",
+        "SBP",
+        "SBMV",
+        "SRK",
+        "SBA",
+        "SBE"
+};
+
 //it will probably be much faster than using hashmap
 int inline get_index_of_occ_instruction_name(std::string &name) {
     for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
         if (name == OCC_INSTRUCTIONS_NAME[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+//it will probably be much faster than using hashmap
+int inline get_index_of_occ_instruction(std::string &name) {
+    for (int i = 0; i < OCC_INSTRUCTIONS.size(); i++) {
+        if (name == OCC_INSTRUCTIONS[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+//it will probably be much faster than using hashmap
+int inline get_index_of_occ_instruction_short(std::string &name) {
+    for (int i = 0; i < OCC_INSTRUCTIONS_SHORT.size(); i++) {
+        if (name == OCC_INSTRUCTIONS_SHORT[i]) {
             return i;
         }
     }
