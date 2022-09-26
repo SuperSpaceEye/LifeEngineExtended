@@ -25,7 +25,7 @@ class OrganismConstructionCode {
 public:
     OrganismConstructionCode()=default;
     OrganismConstructionCode(const OrganismConstructionCode & parent_code);
-    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept {occ_vector = std::move(code_to_move.occ_vector);};
+//    OrganismConstructionCode(OrganismConstructionCode && code_to_move) noexcept {occ_vector = std::move(code_to_move.occ_vector);};
     OrganismConstructionCode & operator=(const OrganismConstructionCode & code) {occ_vector = std::vector(code.occ_vector); return *this;}
     OrganismConstructionCode & operator=(OrganismConstructionCode && code)  noexcept {occ_vector = std::move(code.occ_vector); return *this;}
 

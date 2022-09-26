@@ -97,27 +97,11 @@ void OrganismEditor::b_reset_organism_slot() {
     editor_organism->occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
 
     finalize_chosen_organism();
+    load_occ();
     create_image();
 }
 
 void OrganismEditor::b_compile_occ_slot() {
-    auto & occ = editor_organism->occ;
-    if (occ.get_code_const_ref().empty()) { return;}
-
-    occ.get_code_ref().clear();
-    occ.get_code_ref().reserve(ui.occ_layout->count());
-    for (int i = 0; i < ui.occ_layout->count()-1; i++) {
-        auto *instw = reinterpret_cast<OCCInstructionWidget*>(ui.occ_layout->itemAt(i)->widget());
-        occ.get_code_ref().emplace_back(instw->instruction);
-    }
-
-    editor_organism->anatomy = Anatomy(occ.compile_code(occl));
-    check_edit_area();
-    place_organism_on_a_grid();
-    create_image();
-}
-
-void OrganismEditor::b_compile_occ_temp_slot() {
     auto err = occt.transpile(ui.te_occ_edit_window->toPlainText().toStdString());
 
     switch (err) {
@@ -142,7 +126,7 @@ void OrganismEditor::b_compile_occ_temp_slot() {
     }
 
     auto & occ = editor_organism->occ;
-    occ.get_code_ref() = occt.get_transpiled_instructions();
+    occ.get_code_ref() = std::move(occt.get_transpiled_instructions());
     editor_organism->anatomy = Anatomy(occ.compile_code(occl));
     check_edit_area();
     place_organism_on_a_grid();
@@ -216,10 +200,6 @@ void OrganismEditor::rb_edit_occ_slot() {
     ui.stackedWidget->setCurrentIndex(2);
 }
 
-void OrganismEditor::rb_edit_occ_2_slot() {
-    ui.stackedWidget->setCurrentIndex(3);
-}
-
 //==================== Combo boxes ====================
 
 void OrganismEditor::cmd_block_rotation_slot(const QString& name) {
@@ -237,3 +217,5 @@ void OrganismEditor::cmd_organism_rotation_slot(const QString& name) {
 
     finalize_chosen_organism();
 }
+
+void OrganismEditor::cb_short_instructions_slot(bool state) { short_instructions = state;}

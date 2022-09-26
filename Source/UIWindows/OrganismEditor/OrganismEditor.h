@@ -40,7 +40,6 @@
 #include "../../Stuff/MiscFuncs.h"
 #include "../../Stuff/ImageCreation.h"
 #include "../../Stuff/DataSavingFunctions.h"
-#include "OCCInstructionWidget.h"
 #include "OCCTranspiler/OCCTranspiler.h"
 
 struct EditBlock : BaseGridBlock {
@@ -115,6 +114,7 @@ public:
     double scaling_zoom = 1;
 
     bool change_disabled = false;
+    bool short_instructions = false;
 
     Organism * editor_organism;
     Organism ** chosen_organism;
@@ -147,7 +147,7 @@ public:
     void read_json_organism(std::string & full_path);
     void write_json_organism(std::string &full_path);
 
-    void clear_occ_layout();
+    void clear_occ();
     void load_occ();
 
     void check_edit_area();
@@ -159,7 +159,6 @@ private slots:
     void b_save_organism_slot();
     void b_reset_organism_slot();
     void b_compile_occ_slot();
-    void b_compile_occ_temp_slot();
 
     void le_anatomy_mutation_rate_slot();
     void le_grid_height_slot();
@@ -176,10 +175,11 @@ private slots:
     void rb_edit_anatomy_slot();
     void rb_edit_brain_slot();
     void rb_edit_occ_slot();
-    void rb_edit_occ_2_slot();
 
     void cmd_block_rotation_slot(const QString& name);
     void cmd_organism_rotation_slot(const QString& name);
+
+    void cb_short_instructions_slot(bool state);
 public slots:
     void rb_place_organism_slot();
     void rb_choose_organism_slot();

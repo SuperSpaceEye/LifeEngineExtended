@@ -47,7 +47,7 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     initialize_gui();
     reset_scale_view();
-    clear_occ_layout();
+    clear_occ();
     load_occ();
 
     actual_cursor.setParent(this);
@@ -349,7 +349,7 @@ void OrganismEditor::load_chosen_organism() {
 
     create_image();
     update_gui();
-    clear_occ_layout();
+    clear_occ();
     load_occ();
     update_brain_checkboxes();
 }
@@ -394,7 +394,7 @@ void OrganismEditor::occ_mode(bool state) {
         ui.rb_edit_occ->show();
         ui.b_save_organism->hide();
         ui.b_load_organism->hide();
-        clear_occ_layout();
+        clear_occ();
     } else {
         ui.rb_mouth->show();
         ui.rb_producer->show();
@@ -414,31 +414,17 @@ void OrganismEditor::occ_mode(bool state) {
         ui.rb_edit_occ->hide();
         ui.b_save_organism->show();
         ui.b_load_organism->show();
-        clear_occ_layout();
+        clear_occ();
     }
 }
 
-void OrganismEditor::clear_occ_layout() {
-    QLayoutItem * item;
-    while ((item = ui.occ_layout->takeAt(0)) != nullptr) {
-        if (item->widget()) {
-            item->widget()->deleteLater();
-        }
-        delete item;
-    }
+void OrganismEditor::clear_occ() {
+    ui.te_occ_edit_window->setPlainText(QString(""));
 }
 
 void OrganismEditor::load_occ() {
     if (editor_organism->occ.get_code_const_ref().empty()) { return;}
-    ui.occ_layout->addWidget(new OCCInstructionWidget(true, ui, editor_organism->occ.get_code_const_ref()[0], ui.widget_3));
 
-    for (int i = 1; i < editor_organism->occ.get_code_const_ref().size(); i++) {
-        auto inst = editor_organism->occ.get_code_const_ref()[i];
-        ui.occ_layout->addWidget(new OCCInstructionWidget(false, ui, inst, ui.widget_3));
-    }
-    ui.occ_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    //TODO
-    ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism->occ.get_code_const_ref(), false)));
+    ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism->occ.get_code_const_ref(), short_instructions)));
 }
 

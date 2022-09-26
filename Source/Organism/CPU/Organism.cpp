@@ -275,7 +275,7 @@ void Organism::move_organism(Organism &organism) {
 
     brain = organism.brain;
     anatomy = std::move(organism.anatomy);
-    occ = organism.occ;
+    occ = std::move(organism.occ);
 
     sp = organism.sp;
     bp = organism.bp;

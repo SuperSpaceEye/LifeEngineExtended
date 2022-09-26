@@ -36,8 +36,6 @@ struct OCCLogicContainer {
     std::vector<OCCSpace> occ_producing_space;
     std::vector<OCCSpace> occ_eating_space;
     std::vector<OCCSpace> occ_killing_space;
-
-    std::vector<BaseGridBlock> blocks{};
 };
 
 #endif //LIFEENGINEEXTENDED_OCCLOGICCONTAINER_H

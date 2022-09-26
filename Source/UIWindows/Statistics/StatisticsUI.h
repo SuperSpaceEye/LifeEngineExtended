@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'statistics.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.3
+** Created by: Qt User Interface Compiler version 5.12.8
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -462,65 +462,65 @@ public:
 
     void retranslateUi(QWidget *Statistics)
     {
-        Statistics->setWindowTitle(QCoreApplication::translate("Statistics", "Statistics", nullptr));
-        lb_simulation_size->setText(QCoreApplication::translate("Statistics", "Simulation size:", nullptr));
-        lb_organisms_memory_consumption->setText(QCoreApplication::translate("Statistics", "Organism's memory consumption:", nullptr));
-        lb_total_engine_ticks->setText(QCoreApplication::translate("Statistics", "Total engine ticks: ", nullptr));
-        lb_child_organisms->setText(QCoreApplication::translate("Statistics", "Child organisms:", nullptr));
-        lb_child_organisms_in_use->setText(QCoreApplication::translate("Statistics", "Child organisms in use:", nullptr));
-        lb_child_organisms_capacity->setText(QCoreApplication::translate("Statistics", "Child organisms capacity:", nullptr));
-        lb_total_organisms->setText(QCoreApplication::translate("Statistics", "Total organisms:", nullptr));
-        lb_dead_organisms->setText(QCoreApplication::translate("Statistics", "Dead organisms:", nullptr));
-        lb_last_alive_position->setText(QCoreApplication::translate("Statistics", "Last alive position:", nullptr));
-        lb_dead_inside->setText(QCoreApplication::translate("Statistics", "Dead inside:", nullptr));
-        lb_dead_outside->setText(QCoreApplication::translate("Statistics", "Dead outside:", nullptr));
-        lb_organisms_capacity->setText(QCoreApplication::translate("Statistics", "Organisms capacity:", nullptr));
-        lb_moving_organisms->setText(QCoreApplication::translate("Statistics", "Moving organisms:", nullptr));
-        lb_organisms_with_eyes->setText(QCoreApplication::translate("Statistics", "Organisms with eyes:", nullptr));
-        lb_avg_org_lifetime_2->setText(QCoreApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
-        lb_avg_gathered_food_2->setText(QCoreApplication::translate("Statistics", "Avg gathered food:", nullptr));
-        lb_avg_age_2->setText(QCoreApplication::translate("Statistics", "Avg organism age:", nullptr));
-        lb_average_moving_range->setText(QCoreApplication::translate("Statistics", "Avg moving range:", nullptr));
-        lb_organism_size_2->setText(QCoreApplication::translate("Statistics", "Avg organism size:", nullptr));
-        lb_avg_occ_len_2->setText(QCoreApplication::translate("Statistics", "Avg occ length:", nullptr));
-        lb_total_occ_len_2->setText(QCoreApplication::translate("Statistics", "Total occ length:", nullptr));
-        lb_anatomy_mutation_rate_2->setText(QCoreApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
-        lb_brain_mutation_rate_2->setText(QCoreApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
-        lb_mouth_num_2->setText(QCoreApplication::translate("Statistics", "Avg mouth num: ", nullptr));
-        lb_producer_num_2->setText(QCoreApplication::translate("Statistics", "Avg producer num: ", nullptr));
-        lb_mover_num_2->setText(QCoreApplication::translate("Statistics", "Avg mover num:", nullptr));
-        lb_killer_num_2->setText(QCoreApplication::translate("Statistics", "Avg killer num:", nullptr));
-        lb_armor_num_2->setText(QCoreApplication::translate("Statistics", "Avg armor num: ", nullptr));
-        lb_eye_num_2->setText(QCoreApplication::translate("Statistics", "Avg eye num: ", nullptr));
-        lb_stationary_organisms->setText(QCoreApplication::translate("Statistics", "Stationary organisms:", nullptr));
-        lb_organism_size_3->setText(QCoreApplication::translate("Statistics", "Avg organism size:", nullptr));
-        lb_avg_occ_len_3->setText(QCoreApplication::translate("Statistics", "Avg occ length:", nullptr));
-        lb_total_occ_length_3->setText(QCoreApplication::translate("Statistics", "Total occ length:", nullptr));
-        lb_avg_org_lifetime_3->setText(QCoreApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
-        lb_avg_gathered_food_3->setText(QCoreApplication::translate("Statistics", "Avg gathered food:", nullptr));
-        lb_avg_age_3->setText(QCoreApplication::translate("Statistics", "Avg organism age:", nullptr));
-        lb_anatomy_mutation_rate_3->setText(QCoreApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
-        lb_brain_mutation_rate_3->setText(QCoreApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
-        lb_producer_num_3->setText(QCoreApplication::translate("Statistics", "Avg producer num: ", nullptr));
-        lb_mouth_num_3->setText(QCoreApplication::translate("Statistics", "Avg mouth num: ", nullptr));
-        lb_killer_num_3->setText(QCoreApplication::translate("Statistics", "Avg killer num:", nullptr));
-        lb_armor_num_3->setText(QCoreApplication::translate("Statistics", "Avg armor num: ", nullptr));
-        lb_eye_num_3->setText(QCoreApplication::translate("Statistics", "Avg eye num: ", nullptr));
-        lb_organisms_alive_2->setText(QCoreApplication::translate("Statistics", "Organisms alive:", nullptr));
-        lb_organism_size_4->setText(QCoreApplication::translate("Statistics", "Avg organism size:", nullptr));
-        lb_avg_occ_length_4->setText(QCoreApplication::translate("Statistics", "Avg occ length:", nullptr));
-        lb_total_occ_length_4->setText(QCoreApplication::translate("Statistics", "Total occ length:", nullptr));
-        lb_avg_org_lifetime_4->setText(QCoreApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
-        lb_avg_gathered_food_4->setText(QCoreApplication::translate("Statistics", "Avg gathered food:", nullptr));
-        lb_avg_age_4->setText(QCoreApplication::translate("Statistics", "Avg organism age:", nullptr));
-        lb_anatomy_mutation_rate_4->setText(QCoreApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
-        lb_brain_mutation_rate_4->setText(QCoreApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
-        lb_producer_num_4->setText(QCoreApplication::translate("Statistics", "Avg producer num: ", nullptr));
-        lb_mover_num_4->setText(QCoreApplication::translate("Statistics", "Avg mover num:", nullptr));
-        lb_mouth_num_4->setText(QCoreApplication::translate("Statistics", "Avg mouth num: ", nullptr));
-        lb_killer_num_4->setText(QCoreApplication::translate("Statistics", "Avg killer num:", nullptr));
-        lb_armor_num_4->setText(QCoreApplication::translate("Statistics", "Avg armor num: ", nullptr));
-        lb_eye_num_4->setText(QCoreApplication::translate("Statistics", "Avg eye num: ", nullptr));
+        Statistics->setWindowTitle(QApplication::translate("Statistics", "Statistics", nullptr));
+        lb_simulation_size->setText(QApplication::translate("Statistics", "Simulation size:", nullptr));
+        lb_organisms_memory_consumption->setText(QApplication::translate("Statistics", "Organism's memory consumption:", nullptr));
+        lb_total_engine_ticks->setText(QApplication::translate("Statistics", "Total engine ticks: ", nullptr));
+        lb_child_organisms->setText(QApplication::translate("Statistics", "Child organisms:", nullptr));
+        lb_child_organisms_in_use->setText(QApplication::translate("Statistics", "Child organisms in use:", nullptr));
+        lb_child_organisms_capacity->setText(QApplication::translate("Statistics", "Child organisms capacity:", nullptr));
+        lb_total_organisms->setText(QApplication::translate("Statistics", "Total organisms:", nullptr));
+        lb_dead_organisms->setText(QApplication::translate("Statistics", "Dead organisms:", nullptr));
+        lb_last_alive_position->setText(QApplication::translate("Statistics", "Last alive position:", nullptr));
+        lb_dead_inside->setText(QApplication::translate("Statistics", "Dead inside:", nullptr));
+        lb_dead_outside->setText(QApplication::translate("Statistics", "Dead outside:", nullptr));
+        lb_organisms_capacity->setText(QApplication::translate("Statistics", "Organisms capacity:", nullptr));
+        lb_moving_organisms->setText(QApplication::translate("Statistics", "Moving organisms:", nullptr));
+        lb_organisms_with_eyes->setText(QApplication::translate("Statistics", "Organisms with eyes:", nullptr));
+        lb_avg_org_lifetime_2->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
+        lb_avg_gathered_food_2->setText(QApplication::translate("Statistics", "Avg gathered food:", nullptr));
+        lb_avg_age_2->setText(QApplication::translate("Statistics", "Avg organism age:", nullptr));
+        lb_average_moving_range->setText(QApplication::translate("Statistics", "Avg moving range:", nullptr));
+        lb_organism_size_2->setText(QApplication::translate("Statistics", "Avg organism size:", nullptr));
+        lb_avg_occ_len_2->setText(QApplication::translate("Statistics", "Avg occ length:", nullptr));
+        lb_total_occ_len_2->setText(QApplication::translate("Statistics", "Total occ length:", nullptr));
+        lb_anatomy_mutation_rate_2->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
+        lb_brain_mutation_rate_2->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
+        lb_mouth_num_2->setText(QApplication::translate("Statistics", "Avg mouth num: ", nullptr));
+        lb_producer_num_2->setText(QApplication::translate("Statistics", "Avg producer num: ", nullptr));
+        lb_mover_num_2->setText(QApplication::translate("Statistics", "Avg mover num:", nullptr));
+        lb_killer_num_2->setText(QApplication::translate("Statistics", "Avg killer num:", nullptr));
+        lb_armor_num_2->setText(QApplication::translate("Statistics", "Avg armor num: ", nullptr));
+        lb_eye_num_2->setText(QApplication::translate("Statistics", "Avg eye num: ", nullptr));
+        lb_stationary_organisms->setText(QApplication::translate("Statistics", "Stationary organisms:", nullptr));
+        lb_organism_size_3->setText(QApplication::translate("Statistics", "Avg organism size:", nullptr));
+        lb_avg_occ_len_3->setText(QApplication::translate("Statistics", "Avg occ length:", nullptr));
+        lb_total_occ_length_3->setText(QApplication::translate("Statistics", "Total occ length:", nullptr));
+        lb_avg_org_lifetime_3->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
+        lb_avg_gathered_food_3->setText(QApplication::translate("Statistics", "Avg gathered food:", nullptr));
+        lb_avg_age_3->setText(QApplication::translate("Statistics", "Avg organism age:", nullptr));
+        lb_anatomy_mutation_rate_3->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
+        lb_brain_mutation_rate_3->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
+        lb_producer_num_3->setText(QApplication::translate("Statistics", "Avg producer num: ", nullptr));
+        lb_mouth_num_3->setText(QApplication::translate("Statistics", "Avg mouth num: ", nullptr));
+        lb_killer_num_3->setText(QApplication::translate("Statistics", "Avg killer num:", nullptr));
+        lb_armor_num_3->setText(QApplication::translate("Statistics", "Avg armor num: ", nullptr));
+        lb_eye_num_3->setText(QApplication::translate("Statistics", "Avg eye num: ", nullptr));
+        lb_organisms_alive_2->setText(QApplication::translate("Statistics", "Organisms alive:", nullptr));
+        lb_organism_size_4->setText(QApplication::translate("Statistics", "Avg organism size:", nullptr));
+        lb_avg_occ_length_4->setText(QApplication::translate("Statistics", "Avg occ length:", nullptr));
+        lb_total_occ_length_4->setText(QApplication::translate("Statistics", "Total occ length:", nullptr));
+        lb_avg_org_lifetime_4->setText(QApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
+        lb_avg_gathered_food_4->setText(QApplication::translate("Statistics", "Avg gathered food:", nullptr));
+        lb_avg_age_4->setText(QApplication::translate("Statistics", "Avg organism age:", nullptr));
+        lb_anatomy_mutation_rate_4->setText(QApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
+        lb_brain_mutation_rate_4->setText(QApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
+        lb_producer_num_4->setText(QApplication::translate("Statistics", "Avg producer num: ", nullptr));
+        lb_mover_num_4->setText(QApplication::translate("Statistics", "Avg mover num:", nullptr));
+        lb_mouth_num_4->setText(QApplication::translate("Statistics", "Avg mouth num: ", nullptr));
+        lb_killer_num_4->setText(QApplication::translate("Statistics", "Avg killer num:", nullptr));
+        lb_armor_num_4->setText(QApplication::translate("Statistics", "Avg armor num: ", nullptr));
+        lb_eye_num_4->setText(QApplication::translate("Statistics", "Avg eye num: ", nullptr));
     } // retranslateUi
 
 };

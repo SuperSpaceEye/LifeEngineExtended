@@ -40,7 +40,7 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
             case OCCInstruction::ShiftDown:
             case OCCInstruction::ShiftDownRight:
             case OCCInstruction::ShiftRight:
-            case OCCInstruction::ShiftUpRight: {
+            case OCCInstruction::ShiftRightUp: {
                 auto shift = shift_values[static_cast<int>(instruction)];
 
                 if (!last_instruction) {
@@ -110,7 +110,6 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
     container->eating_space    = std::move(std::get<1>(spaces));
     container->killing_space   = std::move(std::get<2>(spaces));
 
-    occ_c.blocks.clear();
     return container;
 }
 
@@ -202,11 +201,13 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
 
     for (int i = 0; i < occ_vector.size(); i++) {
         auto instruction = occ_vector[i];
-        auto next_instruction = OCCInstruction::ShiftUp;
+        OCCInstruction next_instruction;
         //if not last instruction
         //is needed for shift instruction logic.
         if (i != occ_vector.size()-1) {
             next_instruction = occ_vector[i+1];
+        } else {
+            next_instruction = OCCInstruction::ResetToOrigin;
         }
 
         switch (instruction) {
@@ -217,7 +218,7 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
             case OCCInstruction::ShiftDown:
             case OCCInstruction::ShiftDownRight:
             case OCCInstruction::ShiftRight:
-            case OCCInstruction::ShiftUpRight: {
+            case OCCInstruction::ShiftRightUp: {
                 //if next instruction is set block, then do not shift the cursor,
                 // but place block on shifted position from cursor and increment i so that it will not get set block instruction
                 bool pass = false;
@@ -499,13 +500,13 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
 
             int second_position = position + distance * (modifier ? -1 : 1);
             //will clamp the value between first and last vector positions
-            second_position = std::min<int>(std::max<int>(1, second_position), occ_vector.size()-1);
+            second_position = std::min<int>(std::max<int>(1, second_position), child_code.occ_vector.size()-1);
 
-            auto first_iterator  = occ_vector.begin() + position;
-            auto second_iterator = occ_vector.begin() + second_position;
+            auto first_iterator  = child_code.occ_vector.begin() + position;
+            auto second_iterator = child_code.occ_vector.begin() + second_position;
 
             int i = 0;
-            while (i < group_size && first_iterator != occ_vector.end() && second_iterator != occ_vector.end()) {
+            while (i < group_size && first_iterator != child_code.occ_vector.end() && second_iterator != child_code.occ_vector.end()) {
                 std::swap(*first_iterator, *second_iterator);
 
                 i++;

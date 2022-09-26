@@ -22,7 +22,7 @@ enum class OCCInstruction {
     ShiftDown,
     ShiftDownRight,
     ShiftRight,
-    ShiftUpRight,
+    ShiftRightUp,
 
     ApplyRotationUp,
     ApplyRotationLeft,
@@ -60,7 +60,7 @@ const std::array<std::string, 30> OCC_INSTRUCTIONS_NAME {
         "Shift Down",
         "Shift Down Right",
         "Shift Right",
-        "Shift Up Right",
+        "Shift Right Up",
 
         "Apply Rotation Up",
         "Apply Rotation Left",
@@ -98,7 +98,7 @@ const std::array<std::string, 30> OCC_INSTRUCTIONS {
         "ShiftDown",
         "ShiftDownRight",
         "ShiftRight",
-        "ShiftUpRight",
+        "ShiftRightUp",
 
         "ApplyRotationUp",
         "ApplyRotationLeft",
@@ -136,14 +136,14 @@ const std::array<std::string, 30> OCC_INSTRUCTIONS_SHORT {
         "SD",
         "SDR",
         "SR",
-        "SUR",
+        "SRU",
 
         "ARU",
         "ARL",
         "ARD",
         "ARR",
 
-        "SRU",
+        "SRTU",
         "SRL",
         "SRD",
         "SRR",
