@@ -134,7 +134,7 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
             if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(*gen));return;}
         } else {
             new_occ = occ.mutate(*occp, *gen);
-            new_anatomy = Anatomy(occ.compile_code(*occl));
+            new_anatomy = Anatomy(new_occ.compile_code(*occl));
             return;
         }
     }
@@ -210,7 +210,7 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     child_ptr->rotation = rotation;
     child_ptr->anatomy = std::move(new_anatomy);
     child_ptr->brain = new_brain;
-    child_ptr->occ = new_occ;
+    child_ptr->occ = std::move(new_occ);
     child_ptr->sp = sp;
     child_ptr->bp = bp;
     child_ptr->occl = occl;
