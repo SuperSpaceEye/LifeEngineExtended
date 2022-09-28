@@ -150,7 +150,7 @@ public:
     void clear_occ();
     void load_occ();
 
-    void check_edit_area();
+    bool check_edit_area();
 
 private slots:
     void b_load_organism_slot();

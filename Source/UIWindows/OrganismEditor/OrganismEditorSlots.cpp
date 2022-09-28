@@ -117,18 +117,25 @@ void OrganismEditor::b_compile_occ_slot() {
             //will just reset transpiler
             occt.get_transpiled_instructions();
             return;
-        case OCCTranspilingErrorCodes::FirstInstructionNotSetBlock:
-            display_message("First instruction is not a SetBlock.");
+    }
 
-            //will just reset transpiler
-            occt.get_transpiled_instructions();
-            return;
+    OrganismConstructionCode temp_occ;
+    Anatomy temp_anatomy;
+    temp_occ.get_code_ref() = std::move(occt.get_transpiled_instructions());
+    temp_anatomy = Anatomy(temp_occ.compile_code(occl));
+    if (temp_anatomy._organism_blocks.empty()) {
+        display_message("Instruction sequence produced empty anatomy");
+        occt.get_transpiled_instructions();
+        return;
     }
 
     auto & occ = editor_organism->occ;
-    occ.get_code_ref() = std::move(occt.get_transpiled_instructions());
-    editor_organism->anatomy = Anatomy(occ.compile_code(occl));
-    check_edit_area();
+    editor_organism->occ = std::move(temp_occ);
+    editor_organism->anatomy = std::move(temp_anatomy);
+
+
+    if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
+
     place_organism_on_a_grid();
     create_image();
 }

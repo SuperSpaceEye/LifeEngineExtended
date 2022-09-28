@@ -226,32 +226,6 @@ void LegacyAnatomyMutationLogic::serialize_producing_space(
 //    std::vector<std::vector<SerializedAdjacentSpaceContainer>>(_producing_space).swap(_producing_space);
 }
 
-void LegacyAnatomyMutationLogic::reset_organism_center(std::vector<SerializedOrganismBlockContainer> & _organism_blocks,
-                                                       boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                                       int & x, int & y) {
-    //first we need to find the closest block to the center.
-    int32_t min_x = INT32_MAX; int32_t min_y = INT32_MAX; auto pos = -1;
-    for (int i = 0; i < _organism_blocks.size(); i++) {
-        //if block is the center, we don't do anything, as it will be deleted.
-        if (_organism_blocks[i].relative_x == 0 && _organism_blocks[i].relative_y == 0) {continue;}
-        if (abs(_organism_blocks[i].relative_x) < min_x &&
-            abs(_organism_blocks[i].relative_y) < min_y) {
-            pos = i;
-        }
-    }
-    // we need to shift coordinates of every block by coordinates of a block chosen as a new center.
-    int shift_x = _organism_blocks[pos].relative_x;
-    int shift_y = _organism_blocks[pos].relative_y;
-
-    for (auto& block: _organism_blocks) {
-        organism_blocks[block.relative_x - shift_x][block.relative_y - shift_y].type     = block.type;
-        organism_blocks[block.relative_x - shift_x][block.relative_y - shift_y].rotation = block.rotation;
-    }
-    // new coordinates of a previous center, which will be deleted.
-    x -= shift_x;
-    y -= shift_y;
-}
-
 template<typename T>
 int LegacyAnatomyMutationLogic::get_map_size(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, T>> map) {
     int total_size = 0;

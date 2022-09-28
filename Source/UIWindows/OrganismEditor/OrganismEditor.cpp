@@ -313,6 +313,7 @@ void OrganismEditor::clear_grid() {
 
 void OrganismEditor::place_organism_on_a_grid() {
     clear_grid();
+    if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
 
     for (auto & block: editor_organism->anatomy._organism_blocks) {
         auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
@@ -345,7 +346,7 @@ void OrganismEditor::finalize_chosen_organism() {
 void OrganismEditor::load_chosen_organism() {
     editor_organism = new Organism(*chosen_organism);
 
-    check_edit_area();
+    if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
 
     create_image();
     update_gui();
@@ -354,9 +355,11 @@ void OrganismEditor::load_chosen_organism() {
     update_brain_checkboxes();
 }
 
-void OrganismEditor::check_edit_area() {
+bool OrganismEditor::check_edit_area() {
     Vector2 min{0, 0};
     Vector2 max{0, 0};
+
+    bool ret = false;
 
     for (auto & block: editor_organism->anatomy._organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
@@ -365,10 +368,10 @@ void OrganismEditor::check_edit_area() {
         if (block.relative_y > max.y) {max.y = block.relative_y;}
     }
 
-    if (abs(min.x) + max.x >= new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;}
-    if (abs(min.y) + max.y >= new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1;}
+    if (abs(min.x) + max.x >= new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;  ret=true;}
+    if (abs(min.y) + max.y >= new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1; ret=true;}
 
-    resize_editing_grid(new_editor_width, new_editor_height);
+    return ret;
 }
 
 void OrganismEditor::occ_mode(bool state) {

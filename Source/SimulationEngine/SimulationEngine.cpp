@@ -179,6 +179,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryAddOrganism: {
                 bool continue_flag = false;
+                edc.chosen_organism->init_values();
 
                 for (auto &block: edc.chosen_organism->anatomy._organism_blocks) {
                     continue_flag = check_if_out_of_bounds(&edc,
@@ -418,12 +419,16 @@ void SimulationEngine::make_random_walls() {
 }
 
 void SimulationEngine::reinit_organisms() {
-    ecp.engine_pause = true;
-    while(!ecp.engine_paused) {}
+    pause();
 
 //    switch (ecp.simulation_mode) {
 //        case SimulationModes::CPU_Single_Threaded:
             for (auto & organism: edc.stc.organisms) {
+                if (!organism.is_dead) {
+                    organism.init_values();
+                }
+            }
+            for (auto & organism: edc.stc.child_organisms) {
                 organism.init_values();
             }
 //            break;
@@ -439,7 +444,7 @@ void SimulationEngine::reinit_organisms() {
 //            break;
 //    }
 
-    ecp.engine_pause = false;
+    unpause();
 }
 
 void SimulationEngine::init_auto_food_drop(int width, int height) {

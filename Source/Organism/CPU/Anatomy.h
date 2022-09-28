@@ -119,6 +119,10 @@ private:
     SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, lehmer64 *gen);
     SerializedOrganismStructureContainer *remove_block(int block_choice);
 
+    void subtract_difference(int x, int y);
+    void recenter_to_imaginary();
+    void recenter_to_existing();
+
 public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
@@ -144,6 +148,7 @@ public:
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);
     void set_many_blocks(std::vector<SerializedOrganismBlockContainer> & blocks);
+    void recenter_blocks(bool imaginary_center);
 };
 
 

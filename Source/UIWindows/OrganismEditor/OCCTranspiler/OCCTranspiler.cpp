@@ -41,24 +41,6 @@ OCCTranspilingErrorCodes OCCTranspiler::transpile(std::string &&code) {
 
     if (transpiled_instructions.empty()) { return OCCTranspilingErrorCodes::NoInstructionsAfterTranspiling;}
 
-    switch (transpiled_instructions[0]) {
-        case OCCInstruction::SetBlockMouth:
-        case OCCInstruction::SetBlockProducer:
-        case OCCInstruction::SetBlockMover:
-        case OCCInstruction::SetBlockKiller:
-        case OCCInstruction::SetBlockArmor:
-        case OCCInstruction::SetBlockEye:
-        case OCCInstruction::SetUnderBlockMouth:
-        case OCCInstruction::SetUnderBlockProducer:
-        case OCCInstruction::SetUnderBlockMover:
-        case OCCInstruction::SetUnderBlockKiller:
-        case OCCInstruction::SetUnderBlockArmor:
-        case OCCInstruction::SetUnderBlockEye:
-            break;
-        default:
-            return OCCTranspilingErrorCodes::FirstInstructionNotSetBlock;
-    }
-
     return OCCTranspilingErrorCodes::NoError;
 }
 

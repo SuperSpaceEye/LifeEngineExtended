@@ -31,7 +31,8 @@ private:
     void create_occ_instructions_distribution();
     void create_move_distance_distribution();
 
-    static QLayout *prepare_layout(QLayout *layout) ;
+    static QLayout *prepare_layout(QLayout *layout);
+
 public:
     OCCParametersWindow(Ui::MainWindow * parent_ui, OCCParameters & occp, SimulationEngine & engine);
 

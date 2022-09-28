@@ -373,6 +373,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     }
 
     auto * child_pattern = OrganismsController::get_child_organism_by_index(organism->child_pattern_index, *dc);
+    child_pattern->anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
     child_pattern->rotation = rotation;
 

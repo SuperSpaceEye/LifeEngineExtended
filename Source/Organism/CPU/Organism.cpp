@@ -40,6 +40,7 @@ void Organism::init_values() {
     calculate_max_life();
     calculate_organism_lifetime();
     calculate_food_needed();
+    anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
     multiplier = 1;
 
@@ -135,6 +136,11 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
         } else {
             new_occ = occ.mutate(*occp, *gen);
             new_anatomy = Anatomy(new_occ.compile_code(*occl));
+
+            if (new_anatomy._organism_blocks.empty()) {
+                new_anatomy = std::move(Anatomy(anatomy));
+                new_occ = OrganismConstructionCode(occ);
+            }
             return;
         }
     }

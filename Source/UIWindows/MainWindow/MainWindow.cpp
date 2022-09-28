@@ -745,7 +745,6 @@ void MainWindow::change_editing_grid_right_click() {
 
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
-    if (cpg.x == ee.editor_organism->x && cpg.y == ee.editor_organism->y) {return;}
     if (ee.editor_organism->anatomy._organism_blocks.size() == 1) { return;}
 
     //relative position

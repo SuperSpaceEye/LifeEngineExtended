@@ -320,15 +320,8 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
     int x = _organism_blocks[block_choice].relative_x;
     int y = _organism_blocks[block_choice].relative_y;
 
-    if (x == 0 && y == 0) {
-        //if center block is deleted, we need to recenter the anatomy
-        LegacyAnatomyMutationLogic::reset_organism_center(_organism_blocks, organism_blocks, x, y);
-    } else {
-        for (auto &block: _organism_blocks) {
-            organism_blocks[block.relative_x][block.relative_y] = BaseGridBlock{block.type, block.rotation};
-//            organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-//            organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
-        }
+    for (auto &block: _organism_blocks) {
+        organism_blocks[block.relative_x][block.relative_y] = BaseGridBlock{block.type, block.rotation};
     }
 
     organism_blocks[x].erase(organism_blocks[x].find(y));
@@ -521,4 +514,75 @@ Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
     _killing_space   = std::move(other_anatomy._killing_space);
 
     return *this;
+}
+
+void Anatomy::recenter_blocks(bool imaginary_center) {
+    if (imaginary_center) {
+        recenter_to_imaginary();
+    } else {
+        recenter_to_existing();
+    }
+}
+
+void Anatomy::subtract_difference(int x, int y) {
+    for (auto & block: _organism_blocks) {
+        block.relative_x -= x;
+        block.relative_y -= y;
+    }
+
+    for (auto & spe: _producing_space) {
+        for (auto & pc: spe) {
+            pc.relative_x -= x;
+            pc.relative_y -= y;
+        }
+    }
+
+    for (auto & block: _eating_space) {
+        block.relative_x -= x;
+        block.relative_y -= y;
+    }
+
+    for (auto & block: _killing_space) {
+        block.relative_x -= x;
+        block.relative_y -= y;
+    }
+}
+
+void Anatomy::recenter_to_existing() {
+    if (_organism_blocks.empty()) { return;}
+    int block_pos_in_vec = 0;
+    //the position of a block will definitely never be bigger than this.
+    Vector2<int32_t> abs_pos{INT32_MAX/4, INT32_MAX/4};
+
+    //will find the closest cell to the center
+    int i = 0;
+    for (auto & block: _organism_blocks) {
+        if (std::abs(block.relative_x) + std::abs(block.relative_y) < abs_pos.x + abs_pos.y) {
+            abs_pos = {std::abs(block.relative_x), std::abs(block.relative_y)};
+            block_pos_in_vec = i;
+        }
+        i++;
+    }
+
+    Vector2<int32_t> new_center_pos = {_organism_blocks[block_pos_in_vec].relative_x, _organism_blocks[block_pos_in_vec].relative_y};
+
+    subtract_difference(new_center_pos.x, new_center_pos.y);
+}
+
+void Anatomy::recenter_to_imaginary() {
+    if (_organism_blocks.empty()) { return;}
+    Vector2 min{0, 0};
+    Vector2 max{0, 0};
+
+    for (auto & block: _organism_blocks) {
+        if (block.relative_x < min.x) {min.x = block.relative_x;}
+        if (block.relative_y < min.y) {min.y = block.relative_y;}
+        if (block.relative_x > max.x) {max.x = block.relative_x;}
+        if (block.relative_y > max.y) {max.y = block.relative_y;}
+    }
+
+    auto diff_x = (max.x - min.x) / 2 + min.x;
+    auto diff_y = (max.y - min.y) / 2 + min.y;
+
+    subtract_difference(diff_x, diff_y);
 }

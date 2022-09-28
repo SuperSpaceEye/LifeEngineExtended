@@ -71,10 +71,6 @@ public:
             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
 
-    static void reset_organism_center(std::vector<SerializedOrganismBlockContainer> & _organism_blocks,
-                                      boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                      int & x, int & y);
-
     static SerializedOrganismStructureContainer * serialize(
             const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
             const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>>& producing_space,

@@ -81,6 +81,8 @@ void OCCParametersWindow::create_mutation_type_distribution() {
 
         layout->addItem(new_layout);
     }
+
+    occp.mutation_discrete_distribution = std::discrete_distribution<int>(occp.mutation_type_weights.begin(), occp.mutation_type_weights.end());
 }
 
 void OCCParametersWindow::create_group_size_distribution() {
@@ -111,6 +113,8 @@ void OCCParametersWindow::create_group_size_distribution() {
 
         layout->addItem(new_layout);
     }
+
+    occp.group_size_discrete_distribution = std::discrete_distribution<int>(occp.group_size_weights.begin(), occp.group_size_weights.end());
 }
 
 void OCCParametersWindow::create_occ_instructions_distribution() {
@@ -152,6 +156,8 @@ void OCCParametersWindow::create_occ_instructions_distribution() {
 
         layout->addItem(new_layout);
     }
+
+    occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>(occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end());
 }
 
 void OCCParametersWindow::create_move_distance_distribution() {
@@ -182,6 +188,8 @@ void OCCParametersWindow::create_move_distance_distribution() {
 
         layout->addItem(new_layout);
     }
+
+    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
 }
 
 void OCCParametersWindow::reinit_gui() {
