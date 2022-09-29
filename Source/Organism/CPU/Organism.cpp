@@ -15,14 +15,13 @@
 Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
                    SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
                    OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate, float brain_mutation_rate) :
-        anatomy(anatomy), sp(sp), bp(block_parameters), brain(brain), occ(std::move(occ)), occp(occp), occl(occl),
+        anatomy(anatomy), sp(sp), bp(block_parameters), brain(brain), occ(occ), occp(occp), occl(occl),
         OrganismData(x,
                                 y,
                                 rotation,
                                 move_range,
                                 anatomy_mutation_rate,
                                 brain_mutation_rate) {
-    last_recenter = sp->recenter_to_imaginary_pos;
     init_values();
 }
 
@@ -34,7 +33,6 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
                                                      organism->move_range,
                                                      organism->anatomy_mutation_rate,
                                                      organism->brain_mutation_rate) {
-    last_recenter = sp->recenter_to_imaginary_pos;
     init_values();
 }
 
@@ -44,16 +42,11 @@ void Organism::init_values() {
     calculate_food_needed();
     auto vec = anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
-    //TODO
-    if (sp->recenter_to_imaginary_pos && !last_recenter) {
-        x -= vec.x;
-        y -= vec.y;
-    }
-    if (!sp->recenter_to_imaginary_pos && !last_recenter) {
-        x += vec.x;
-        y += vec.y;
-    }
-    last_recenter = sp->recenter_to_imaginary_pos;
+    //just to reuse rotation of positions logic
+    auto temp = BaseSerializedContainer{vec.x, vec.y};
+    //because organism can be rotated, the shift positions on grid also need to be rotated.
+    x += temp.get_pos(rotation).x;
+    y += temp.get_pos(rotation).y;
 
     multiplier = 1;
 

@@ -79,7 +79,6 @@ public:
     int32_t vector_index = -1;
 
     bool is_dead = false;
-    bool last_recenter;
 
     float calculate_max_life();
     int calculate_organism_lifetime();
