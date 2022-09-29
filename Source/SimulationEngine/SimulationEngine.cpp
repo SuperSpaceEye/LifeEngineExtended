@@ -12,9 +12,9 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
                                    EngineControlParameters &engine_control_parameters,
                                    OrganismBlockParameters &organism_block_parameters,
                                    SimulationParameters &simulation_parameters,
-                                   RecordingData * recording_data) :
+                                   RecordingData *recording_data, OCCParameters &occp) :
         edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters),
-        recd(recording_data){
+        recd(recording_data), occp(occp) {
 
     boost::random_device rd;
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
@@ -179,6 +179,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryAddOrganism: {
                 bool continue_flag = false;
+                edc.chosen_organism->init_values();
 
                 for (auto &block: edc.chosen_organism->anatomy._organism_blocks) {
                     continue_flag = check_if_out_of_bounds(&edc,
@@ -350,7 +351,7 @@ void SimulationEngine::reset_world() {
 
     SimulationEngineSingleThread::place_organism(&edc, organism);
 
-    if (ecp.execute_world_events) {stop_world_events(); start_world_events();}
+    if (ecp.execute_world_events) { stop_world_events(true); start_world_events();}
 
     //Just in case
     ecp.engine_pass_tick = true;
@@ -418,12 +419,16 @@ void SimulationEngine::make_random_walls() {
 }
 
 void SimulationEngine::reinit_organisms() {
-    ecp.engine_pause = true;
-    while(!ecp.engine_paused) {}
+    pause();
 
 //    switch (ecp.simulation_mode) {
 //        case SimulationModes::CPU_Single_Threaded:
             for (auto & organism: edc.stc.organisms) {
+                if (!organism.is_dead) {
+                    organism.init_values();
+                }
+            }
+            for (auto & organism: edc.stc.child_organisms) {
                 organism.init_values();
             }
 //            break;
@@ -439,7 +444,7 @@ void SimulationEngine::reinit_organisms() {
 //            break;
 //    }
 
-    ecp.engine_pause = false;
+    unpause();
 }
 
 void SimulationEngine::init_auto_food_drop(int width, int height) {
@@ -508,7 +513,7 @@ const OrganismInfoContainer & SimulationEngine::get_info() {
 void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nodes,
                                           std::vector<char> repeating_branch,
                                           std::vector<BaseEventNode *> node_storage) {
-    pause();
+    stop_world_events();
     world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
     unpause();
 }
@@ -529,13 +534,13 @@ void SimulationEngine::pause_world_events() {
     ecp.pause_world_events = false;
 }
 
-void SimulationEngine::stop_world_events() {
+void SimulationEngine::stop_world_events(bool no_resume) {
     pause();
     sp = SimulationParameters{sp_copy};
     ecp.execute_world_events = false;
     ecp.pause_world_events = false;
     world_events_controller.reset();
-    unpause();
+    if (!no_resume) {unpause();}
 }
 
 void SimulationEngine::stop_world_events_no_setting_reset() {

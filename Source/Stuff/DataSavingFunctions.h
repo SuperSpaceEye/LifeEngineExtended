@@ -20,6 +20,7 @@
 #include "../Organism/CPU/Brain.h"
 #include "../SimulationEngine/OrganismsController.h"
 #include "MiscFuncs.h"
+#include "../Containers/CPU/OrganismConstructionCodeParameters.h"
 
 #include "../Stuff/rapidjson/document.h"
 #include "../Stuff/rapidjson/writer.h"
@@ -55,6 +56,7 @@ namespace DataSavingFunctions {
     void write_version(std::ofstream &os);
     void write_simulation_parameters(std::ofstream & os, SimulationParameters &sp);
     void write_organisms_block_parameters(std::ofstream & os, OrganismBlockParameters &bp);
+    void write_occp(std::ofstream & os, OCCParameters & occp);
     void write_data_container_data(std::ofstream & os, EngineDataContainer &edc);
     void write_simulation_grid(std::ofstream & os, EngineDataContainer &edc);
     void write_organism(std::ofstream& os, Organism * organism);
@@ -62,18 +64,23 @@ namespace DataSavingFunctions {
     void write_organism_data(std::ofstream & os, Organism * organism);
     void write_organism_brain(std::ofstream & os, Brain * brain);
     void write_organism_anatomy(std::ofstream & os, Anatomy * anatomy);
+    void write_organism_occ(std::ofstream& os, OrganismConstructionCode & occ);
 
     bool read_version(std::ifstream &is);
     void read_simulation_parameters(std::ifstream& is, SimulationParameters &sp);
     void read_organisms_block_parameters(std::ifstream& is, OrganismBlockParameters &bp);
     void read_data_container_data(std::ifstream& is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height);
+    void read_occp(std::ifstream& is, OCCParameters & occp);
     void read_simulation_grid(std::ifstream& is, EngineDataContainer &edc);
     void read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
-                       Organism *organism);
-    bool read_organisms(std::ifstream& is, EngineDataContainer &edc, SimulationParameters &sp, OrganismBlockParameters &bp, uint32_t num_organisms);
+                       Organism *organism, OCCParameters &occp, OCCLogicContainer &occl);
+    bool read_organisms(std::ifstream &is, EngineDataContainer &edc, SimulationParameters &sp,
+                        OrganismBlockParameters &bp, uint32_t num_organisms, OCCParameters &occp,
+                        OCCLogicContainer &occl);
     void read_organism_data(std::ifstream& is, OrganismData & data);
     void read_organism_brain(std::ifstream& is, Brain * brain);
     void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
+    void read_organism_occ(std::ifstream& is, OrganismConstructionCode & occ);
 
 
     void write_json_data(const std::string &path, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate);
@@ -99,10 +106,13 @@ namespace DataSavingFunctions {
     void write_json_program_settings(rapidjson::Document & d, DataSavingFunctions::ProgramState &state);
     void read_json_program_settings(rapidjson::Document & d, DataSavingFunctions::ProgramState &state);
 
-    void write_json_state(const std::string& path, ProgramState state,
-                          SimulationParameters &sp);
-    bool read_json_state(const std::string& path, ProgramState state,
-                         SimulationParameters &sp);
+    void write_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                          OCCParameters &occp);
+    bool read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                         OCCParameters &occp);
+
+    void write_json_occp(rapidjson::Document & d, OCCParameters & parameters);
+    void read_json_occp(rapidjson::Document & d, OCCParameters & parameters);
 }
 
 #endif //LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H

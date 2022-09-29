@@ -8,14 +8,15 @@
 
 #include "Organism.h"
 
+#include <utility>
+
 #include "../../SimulationEngine/OrganismsController.h"
 
-Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy,
-                   Brain brain, SimulationParameters *sp,
-                   OrganismBlockParameters *block_parameters, int move_range, float anatomy_mutation_rate,
-                   float brain_mutation_rate) :
-                   anatomy(anatomy), sp(sp), bp(block_parameters), brain(brain),
-                   OrganismData(x,
+Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
+                   SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
+                   OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate, float brain_mutation_rate) :
+        anatomy(anatomy), sp(sp), bp(block_parameters), brain(brain), occ(occ), occp(occp), occl(occl),
+        OrganismData(x,
                                 y,
                                 rotation,
                                 move_range,
@@ -24,8 +25,8 @@ Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy,
     init_values();
 }
 
-Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism->sp),
-                                        bp(organism->bp), brain(organism->brain),
+Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism->sp), occp(organism->occp), occl(organism->occl),
+                                        bp(organism->bp), brain(organism->brain), occ(organism->occ),
                                         OrganismData(organism->x,
                                                      organism->y,
                                                      organism->rotation,
@@ -39,6 +40,13 @@ void Organism::init_values() {
     calculate_max_life();
     calculate_organism_lifetime();
     calculate_food_needed();
+    auto vec = anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
+
+    //just to reuse rotation of positions logic
+    auto temp = BaseSerializedContainer{vec.x, vec.y};
+    //because organism can be rotated, the shift positions on grid also need to be rotated.
+    x += temp.get_pos(rotation).x;
+    y += temp.get_pos(rotation).y;
 
     multiplier = 1;
 
@@ -97,7 +105,8 @@ float Organism::calculate_food_needed() {
     return food_needed;
 }
 
-void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen) {
+void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen,
+                              OrganismConstructionCode &new_occ) {
     bool mutate_anatomy;
     _anatomy_mutation_rate = anatomy_mutation_rate;
 
@@ -117,21 +126,33 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
     }
 
     if (mutate_anatomy) {
-        int total_chance = 0;
-        total_chance += sp->add_cell;
-        total_chance += sp->change_cell;
-        total_chance += sp->remove_cell;
+        if (!sp->use_occ) {
+            int total_chance = 0;
+            total_chance += sp->add_cell;
+            total_chance += sp->change_cell;
+            total_chance += sp->remove_cell;
 
-        int choice = std::uniform_int_distribution<int>(0, total_chance)(*gen);
+            int choice = std::uniform_int_distribution<int>(0, total_chance)(*gen);
 
-        if (choice < sp->add_cell) {new_anatomy = Anatomy(anatomy.add_random_block(*bp, *gen));return;}
-        choice -= sp->add_cell;
-        if (choice < sp->change_cell) {new_anatomy = Anatomy(anatomy.change_random_block(*bp, *gen));return;}
-        choice -= sp->change_cell;
-        if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(*gen));return;}
+            if (choice < sp->add_cell) {new_anatomy = Anatomy(anatomy.add_random_block(*bp, *gen));return;}
+            choice -= sp->add_cell;
+            if (choice < sp->change_cell) {new_anatomy = Anatomy(anatomy.change_random_block(*bp, *gen));return;}
+            choice -= sp->change_cell;
+            if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(*gen));return;}
+        } else {
+            new_occ = occ.mutate(*occp, *gen);
+            new_anatomy = Anatomy(new_occ.compile_code(*occl));
+
+            if (new_anatomy._organism_blocks.empty()) {
+                new_anatomy = std::move(Anatomy(anatomy));
+                new_occ = OrganismConstructionCode(occ);
+            }
+            return;
+        }
     }
     //if not mutated.
-    new_anatomy = Anatomy(anatomy);
+    new_anatomy = std::move(Anatomy(anatomy));
+    new_occ = OrganismConstructionCode(occ);
 }
 
 void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
@@ -185,11 +206,12 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
 int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     Anatomy new_anatomy;
     Brain new_brain;
+    OrganismConstructionCode new_occ;
 
     float _anatomy_mutation_rate = 0;
     float _brain_mutation_rate = 0;
 
-    mutate_anatomy(new_anatomy, _anatomy_mutation_rate, gen);
+    mutate_anatomy(new_anatomy, _anatomy_mutation_rate, gen, new_occ);
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
     auto child_move_range = mutate_move_range(sp, gen, move_range);
 
@@ -198,10 +220,13 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
 
     auto * child_ptr = OrganismsController::get_new_child_organism(edc);
     child_ptr->rotation = rotation;
-    child_ptr->anatomy = new_anatomy;
+    child_ptr->anatomy = std::move(new_anatomy);
     child_ptr->brain = new_brain;
+    child_ptr->occ = std::move(new_occ);
     child_ptr->sp = sp;
     child_ptr->bp = bp;
+    child_ptr->occl = occl;
+    child_ptr->occp = occp;
     child_ptr->move_range = child_move_range;
     child_ptr->anatomy_mutation_rate = _anatomy_mutation_rate;
     child_ptr->brain_mutation_rate = _brain_mutation_rate;
@@ -261,36 +286,16 @@ void Organism::move_organism(Organism &organism) {
     max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
     brain = organism.brain;
-    anatomy = organism.anatomy;
+    anatomy = std::move(organism.anatomy);
+    occ = std::move(organism.occ);
+
     sp = organism.sp;
     bp = organism.bp;
+    occp = organism.occp;
+    occl = organism.occl;
 }
 
 void Organism::kill_organism(EngineDataContainer &edc) {
     if (is_dead) { return;}
     OrganismsController::free_main_organism(this, edc);
 }
-
-//Organism::Organism(const Organism & organism) {
-//    x = organism.x;
-//    y = organism.y;
-//    life_points = organism.life_points;
-//    damage = organism.damage;
-//    max_lifetime = organism.max_lifetime;
-//    lifetime = organism.lifetime;
-//    anatomy_mutation_rate = organism.anatomy_mutation_rate;
-//    brain_mutation_rate = organism.brain_mutation_rate;
-//    food_collected = organism.food_collected;
-//    food_needed = organism.food_needed;
-//    multiplier = organism.multiplier;
-//    move_range = organism.move_range;
-//    rotation = organism.rotation;
-//    move_counter = organism.move_counter;
-//    max_decision_lifetime = organism.max_decision_lifetime;
-//    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
-//
-//    brain = Brain(organism.brain);
-//    anatomy = Anatomy(organism.anatomy);
-//    sp = organism.sp;
-//    bp = organism.bp;
-//}

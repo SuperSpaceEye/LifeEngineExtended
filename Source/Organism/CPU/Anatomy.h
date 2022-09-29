@@ -33,6 +33,7 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
+    //TODO i think i messed this up somehow
     inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
@@ -67,6 +68,7 @@ struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
 
 struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
+    //TODO
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
@@ -107,75 +109,6 @@ struct SerializedOrganismStructureContainer {
 
 class Anatomy {
 private:
-    static void set_single_adjacent(int x, int y, int x_offset, int y_offset,
-                                    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
-                                    const BaseGridBlock &block);
-
-    static void set_single_diagonal_adjacent(int x, int y, int x_offset, int y_offset,
-                                             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
-
-    static void create_single_adjacent_space(
-            boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space);
-
-    static void create_single_diagonal_adjacent_space(
-            boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
-
-    static void create_producing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                       boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
-                                       boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                       std::vector<int> & num_producing_space,
-                                       int32_t producer_blocks);
-
-    static void create_eating_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-                                    boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                    int32_t mouth_blocks);
-
-    static void create_killing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
-                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                     int32_t killer_blocks);
-
-    static void reset_organism_center(std::vector<SerializedOrganismBlockContainer> & _organism_blocks,
-                                      boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                      int & x, int & y);
-
-    static SerializedOrganismStructureContainer * serialize(
-            const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
-            const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-            const boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
-
-            const std::vector<int> & num_producing_space,
-
-            int32_t mouth_blocks,
-            int32_t producer_blocks,
-            int32_t mover_blocks,
-            int32_t killer_blocks,
-            int32_t armor_blocks,
-            int32_t eye_blocks);
-
-    static inline void serialize_producing_space(const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,
-                                                 const std::vector<int> &num_producing_space,
-                                                 std::vector<std::vector<SerializedAdjacentSpaceContainer>> &_producing_space);
-
-    static inline void serialize_organism_blocks(const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                                 std::vector<SerializedOrganismBlockContainer> &_organism_blocks);
-
-    static inline void serialize_eating_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
-                                              std::vector<SerializedAdjacentSpaceContainer> &_eating_space);
-
-    static inline void serialize_killing_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
-                                               std::vector<SerializedAdjacentSpaceContainer> &_killing_space);
-
-    template<typename T>
-    static int get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map);
 
     SerializedOrganismStructureContainer *
     add_block(BlockTypes type, int block_choice, Rotation rotation, int x_, int y_,
@@ -186,7 +119,9 @@ private:
     SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, lehmer64 *gen);
     SerializedOrganismStructureContainer *remove_block(int block_choice);
 
-    int configure_block_counters(BlockTypes type, int x, int y);
+    void subtract_difference(int x, int y);
+    Vector2<int> recenter_to_imaginary();
+    Vector2<int> recenter_to_existing();
 
 public:
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
@@ -205,7 +140,9 @@ public:
     Anatomy(const Anatomy& anatomy);
     Anatomy()=default;
     Anatomy & operator=(Anatomy const & other_anatomy)=default;
-    Anatomy & operator=(Anatomy & other_anatomy);
+//    Anatomy & operator=(Anatomy && other_anatomy) noexcept ;
+    Anatomy & operator=(Anatomy && other_anatomy)=default ;
+
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt);
     SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen);
@@ -213,6 +150,7 @@ public:
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);
     void set_many_blocks(std::vector<SerializedOrganismBlockContainer> & blocks);
+    Vector2<int> recenter_blocks(bool imaginary_center);
 };
 
 

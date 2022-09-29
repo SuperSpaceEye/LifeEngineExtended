@@ -30,11 +30,11 @@
 #include "../Stuff/Linspace.h"
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
-#include "../OrganismEditor/OrganismEditor.h"
+#include "../UIWindows/OrganismEditor/OrganismEditor.h"
 //#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "../Containers/CPU/OrganismInfoContainer.h"
-#include "../WorldEvents/WorldEventsController.h"
+#include "../UIWindows/WorldEvents/WorldEventsController.h"
 #include "OrganismsController.h"
 
 //TODO move simulation grid translation to here
@@ -43,6 +43,7 @@ class SimulationEngine {
     EngineDataContainer& edc;
     OrganismBlockParameters& op;
     SimulationParameters& sp;
+    OCCParameters &occp;
     RecordingData * recd;
 //    OrganismInfoContainer info{};
     WorldEventsController world_events_controller{};
@@ -59,7 +60,6 @@ class SimulationEngine {
     void process_user_action_pool();
 
     void simulation_tick();
-    void partial_multi_threaded_tick();
 
     void change_mode();
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
@@ -76,7 +76,7 @@ public:
 
     SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
                      OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters,
-                     RecordingData * recording_data);
+                     RecordingData *recording_data, OCCParameters &occp);
     void threaded_mainloop();
 
     void make_random_walls();
@@ -108,7 +108,7 @@ public:
     void start_world_events();
     void resume_world_events();
     void pause_world_events();
-    void stop_world_events();
+    void stop_world_events(bool no_resume = true);
     void stop_world_events_no_setting_reset();
 
     void reset_world_events(std::vector<BaseEventNode *> start_nodes,

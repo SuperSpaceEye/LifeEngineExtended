@@ -22,6 +22,8 @@ struct OrganismInfoHolder {
     double _eye_blocks      = 0;
     double brain_mutation_rate = 0;
     double anatomy_mutation_rate = 0;
+    double occ_instructions_num = 0;
+    int64_t total_occ_instructions_num = 0;
     int64_t total = 0;
 };
 struct OrganismInfoContainer {
@@ -52,7 +54,6 @@ struct OrganismInfoContainer {
     }
 
 private:
-    //TODO possible optimization - iterative info updates.
     static void parse_organisms_info(OrganismInfoContainer & info, EngineDataContainer * edc, EngineControlParameters * ecp) {
         bool has_pool = true;
         int i = 0;
@@ -99,6 +100,7 @@ private:
                 info.total_avg._killer_blocks     += organism.anatomy._killer_blocks;
                 info.total_avg._armor_blocks      += organism.anatomy._armor_blocks;
                 info.total_avg._eye_blocks        += organism.anatomy._eye_blocks;
+                info.total_avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
                 info.total_avg.brain_mutation_rate   += organism.brain_mutation_rate;
                 info.total_avg.anatomy_mutation_rate += organism.anatomy_mutation_rate;
@@ -116,6 +118,7 @@ private:
                     info.moving_avg._killer_blocks     += organism.anatomy._killer_blocks;
                     info.moving_avg._armor_blocks      += organism.anatomy._armor_blocks;
                     info.moving_avg._eye_blocks        += organism.anatomy._eye_blocks;
+                    info.moving_avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
                     info.moving_avg.brain_mutation_rate   += organism.brain_mutation_rate;
                     info.moving_avg.anatomy_mutation_rate += organism.anatomy_mutation_rate;
@@ -132,6 +135,7 @@ private:
                     info.station_avg._killer_blocks     += organism.anatomy._killer_blocks;
                     info.station_avg._armor_blocks      += organism.anatomy._armor_blocks;
                     info.station_avg._eye_blocks        += organism.anatomy._eye_blocks;
+                    info.station_avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
                     info.station_avg.brain_mutation_rate   += organism.brain_mutation_rate;
                     info.station_avg.anatomy_mutation_rate += organism.anatomy_mutation_rate;
@@ -170,6 +174,7 @@ private:
         info.total_avg._killer_blocks     /= info.total_avg.total;
         info.total_avg._armor_blocks      /= info.total_avg.total;
         info.total_avg._eye_blocks        /= info.total_avg.total;
+        info.total_avg.occ_instructions_num = info.total_avg.total_occ_instructions_num > 0 ? (double)info.total_avg.total_occ_instructions_num / info.total_avg.total : 0;
 
         info.total_avg.brain_mutation_rate   /= info.total_avg.total;
         info.total_avg.anatomy_mutation_rate /= info.total_avg.total;
@@ -186,6 +191,7 @@ private:
         if (std::isnan(info.total_avg._killer_blocks))     {info.total_avg._killer_blocks     = 0;}
         if (std::isnan(info.total_avg._armor_blocks))      {info.total_avg._armor_blocks      = 0;}
         if (std::isnan(info.total_avg._eye_blocks))        {info.total_avg._eye_blocks        = 0;}
+        if (std::isnan(info.total_avg.occ_instructions_num)) {info.total_avg.occ_instructions_num = 0;}
 
         if (std::isnan(info.total_avg.brain_mutation_rate))   {info.total_avg.brain_mutation_rate   = 0;}
         if (std::isnan(info.total_avg.anatomy_mutation_rate)) {info.total_avg.anatomy_mutation_rate = 0;}
@@ -202,11 +208,12 @@ private:
         info.moving_avg._killer_blocks     /= info.moving_avg.total;
         info.moving_avg._armor_blocks      /= info.moving_avg.total;
         info.moving_avg._eye_blocks        /= info.moving_avg.total;
+        info.moving_avg.occ_instructions_num = info.moving_avg.total_occ_instructions_num > 0 ? (double)info.moving_avg.total_occ_instructions_num / info.moving_avg.total : 0;
 
         info.moving_avg.brain_mutation_rate   /= info.moving_avg.total;
         info.moving_avg.anatomy_mutation_rate /= info.moving_avg.total;
 
-        if (std::isnan(info.moving_avg.size))             {info.moving_avg.size             = 0;}
+        if (std::isnan(info.moving_avg.size))               {info.moving_avg.size               = 0;}
 
         if (std::isnan(info.moving_avg._organism_lifetime)) {info.moving_avg._organism_lifetime = 0;}
         if (std::isnan(info.moving_avg._organism_age))      {info.moving_avg._organism_age      = 0;}
@@ -217,6 +224,7 @@ private:
         if (std::isnan(info.moving_avg._killer_blocks))     {info.moving_avg._killer_blocks     = 0;}
         if (std::isnan(info.moving_avg._armor_blocks))      {info.moving_avg._armor_blocks      = 0;}
         if (std::isnan(info.moving_avg._eye_blocks))        {info.moving_avg._eye_blocks        = 0;}
+        if (std::isnan(info.moving_avg.occ_instructions_num)) {info.moving_avg.occ_instructions_num = 0;}
 
         if (std::isnan(info.moving_avg.brain_mutation_rate))   {info.moving_avg.brain_mutation_rate   = 0;}
         if (std::isnan(info.moving_avg.anatomy_mutation_rate)) {info.moving_avg.anatomy_mutation_rate = 0;}
@@ -233,11 +241,12 @@ private:
         info.station_avg._killer_blocks     /= info.station_avg.total;
         info.station_avg._armor_blocks      /= info.station_avg.total;
         info.station_avg._eye_blocks        /= info.station_avg.total;
+        info.station_avg.occ_instructions_num = info.station_avg.total_occ_instructions_num ? (double)info.station_avg.total_occ_instructions_num / info.station_avg.total : 0;
 
         info.station_avg.brain_mutation_rate   /= info.station_avg.total;
         info.station_avg.anatomy_mutation_rate /= info.station_avg.total;
 
-        if (std::isnan(info.station_avg.size))             {info.station_avg.size             = 0;}
+        if (std::isnan(info.station_avg.size))               {info.station_avg.size               = 0;}
 
         if (std::isnan(info.station_avg._organism_lifetime)) {info.station_avg._organism_lifetime = 0;}
         if (std::isnan(info.station_avg._organism_age))      {info.station_avg._organism_age      = 0;}
@@ -248,6 +257,7 @@ private:
         if (std::isnan(info.station_avg._killer_blocks))     {info.station_avg._killer_blocks     = 0;}
         if (std::isnan(info.station_avg._armor_blocks))      {info.station_avg._armor_blocks      = 0;}
         if (std::isnan(info.station_avg._eye_blocks))        {info.station_avg._eye_blocks        = 0;}
+        if (std::isnan(info.station_avg.occ_instructions_num)) {info.station_avg.occ_instructions_num = 0;}
 
         if (std::isnan(info.station_avg.brain_mutation_rate))   {info.station_avg.brain_mutation_rate   = 0;}
         if (std::isnan(info.station_avg.anatomy_mutation_rate)) {info.station_avg.anatomy_mutation_rate = 0;}

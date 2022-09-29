@@ -14,6 +14,7 @@
 
 #include "Anatomy.h"
 #include "Brain.h"
+#include "OrganismConstructionCode.h"
 #include "../../Containers/CPU/SimulationParameters.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
@@ -69,8 +70,11 @@ class Organism: public OrganismData {
 public:
     Anatomy anatomy;
     Brain brain;
+    OrganismConstructionCode occ;
     SimulationParameters* sp = nullptr;
     OrganismBlockParameters* bp = nullptr;
+    OCCParameters * occp = nullptr;
+    OCCLogicContainer * occl = nullptr;
     int32_t child_pattern_index = -1;
     int32_t vector_index = -1;
 
@@ -80,7 +84,8 @@ public:
     int calculate_organism_lifetime();
     float calculate_food_needed();
 
-    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen);
+    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen,
+                        OrganismConstructionCode &new_occ);
     void mutate_brain(Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 *gen);
     static int mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range);
 
@@ -93,18 +98,13 @@ public:
     void move_organism(Organism & organism);
 
     Organism & operator=(const Organism & organism)=default;
-//    Organism & operator=(Organism & organism_index);
-    //public:
     Organism()=default;
     Organism(Organism&&)=default;
-    //TODO this breaks the simulation for some reason.
-//    Organism(const Organism& organism);
-    Organism(int x, int y, Rotation rotation, Anatomy anatomy,
-             Brain brain, SimulationParameters *sp,
-             OrganismBlockParameters *block_parameters, int move_range,
-             float anatomy_mutation_rate= 0.05, float brain_mutation_rate= 0.1);
+    Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
+             SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
+             OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate = 0.05,
+             float brain_mutation_rate = 0.1);
     Organism(Organism *organism);
-//    ~Organism()=default;
     int32_t create_child(lehmer64 *gen, EngineDataContainer &edc);
 };
 

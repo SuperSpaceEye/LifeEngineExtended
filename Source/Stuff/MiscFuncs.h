@@ -26,8 +26,8 @@
 #include <QGuiApplication>
 #include <QScreen>
 
-#include "../WorldEvents/EventNodes.h"
-#include "../WorldEvents/WorldEventsEnums.h"
+#include "../UIWindows/WorldEvents/EventNodes.h"
+#include "../UIWindows/WorldEvents/WorldEventsEnums.h"
 
 template<typename T>
 struct result_struct {

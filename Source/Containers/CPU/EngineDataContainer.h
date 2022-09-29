@@ -17,6 +17,7 @@
 #include "../../GridBlocks/SingleThreadGridBlock.h"
 #include "../../Organism/CPU/ObservationStuff.h"
 #include "../../Organism/CPU/Organism.h"
+#include "OCCLogicContainer.h"
 
 struct EngineDataContainer {
     uint64_t delta_time = 0;
@@ -53,6 +54,8 @@ struct EngineDataContainer {
         std::vector<uint32_t> free_child_organisms_positions{};
         std::vector<int> observation_count{};
         std::vector<std::vector<Observation>> organisms_observations{};
+
+        OCCLogicContainer occl{};
     };
     SingleThreadContainer stc{};
 

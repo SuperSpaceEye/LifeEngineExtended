@@ -132,7 +132,7 @@
                    </widget>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <item>
                      <spacer name="verticalSpacer_2">
                       <property name="orientation">
@@ -256,6 +256,13 @@
                      <widget class="QLabel" name="label_cell_count">
                       <property name="text">
                        <string>Cell count:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_occ_count">
+                      <property name="text">
+                       <string>OCC instruction count:</string>
                       </property>
                      </widget>
                     </item>
@@ -499,6 +506,37 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="page_2">
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <item>
+               <widget class="QPlainTextEdit" name="te_occ_edit_window"/>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_16">
+                <item>
+                 <widget class="QPushButton" name="b_tcompile_occ">
+                  <property name="text">
+                   <string> Compile code</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="cb_short_instructions">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Short instructions</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
           <item>
@@ -585,6 +623,16 @@
                <widget class="QRadioButton" name="rb_edit_brain">
                 <property name="text">
                  <string>Edit brain</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">edit_group</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="rb_edit_occ">
+                <property name="text">
+                 <string>Edit OCC</string>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">edit_group</string>
@@ -958,6 +1006,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>b_tcompile_occ</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>b_compile_occ_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>458</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_edit_occ</sender>
+   <signal>clicked()</signal>
+   <receiver>Editor</receiver>
+   <slot>rb_edit_occ_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>817</x>
+     <y>533</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_short_instructions</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Editor</receiver>
+   <slot>cb_short_instructions_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>849</x>
+     <y>458</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>b_reset_editing_view_slot()</slot>
@@ -982,10 +1078,13 @@
   <slot>cmd_block_rotation_slot(QString)</slot>
   <slot>cmd_organism_rotation_slot(QString)</slot>
   <slot>le_brain_mutation_rate_slot()</slot>
+  <slot>rb_edit_occ_slot()</slot>
+  <slot>b_compile_occ_slot()</slot>
+  <slot>cb_short_instructions_slot(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="cells_group"/>
-  <buttongroup name="organism_action_group"/>
   <buttongroup name="edit_group"/>
+  <buttongroup name="organism_action_group"/>
+  <buttongroup name="cells_group"/>
  </buttongroups>
 </ui>

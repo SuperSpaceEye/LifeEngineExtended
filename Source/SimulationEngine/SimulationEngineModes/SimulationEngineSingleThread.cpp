@@ -239,9 +239,9 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
 
     //checks if space for organism is empty, or contains itself
     for (auto & block: organism->anatomy._organism_blocks) {
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x][organism->y + block.get_pos(new_rotation).y];
-
         if (check_if_block_out_of_bounds(dc, organism, block, new_rotation)) { return;}
+
+        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x][organism->y + block.get_pos(new_rotation).y];
 
         if (sp->food_blocks_movement) {
             if (w_block->type != BlockTypes::EmptyBlock && w_block->organism_index != organism->vector_index) {
@@ -373,6 +373,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     }
 
     auto * child_pattern = OrganismsController::get_child_organism_by_index(organism->child_pattern_index, *dc);
+    child_pattern->anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
     child_pattern->rotation = rotation;
 

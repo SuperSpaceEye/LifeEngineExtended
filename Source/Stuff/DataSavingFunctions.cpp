@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 6;
+const uint32_t SAVE_VERSION = 8;
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -50,7 +50,8 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
 void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) {
     write_organism_brain(os,   &organism->brain);
     write_organism_anatomy(os, &organism->anatomy);
-    write_organism_data(os,    organism);
+    write_organism_occ(os,      organism->occ);
+    write_organism_data(os,     organism);
 }
 
 void DataSavingFunctions::write_organisms(std::ofstream & os, EngineDataContainer &edc) {
@@ -138,33 +139,37 @@ void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataCont
 }
 
 void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
-                                        Organism *organism) {
+                                        Organism *organism, OCCParameters &occp, OCCLogicContainer &occl) {
     auto brain = Brain();
     auto anatomy = Anatomy();
+    auto occ = OrganismConstructionCode();
 
     read_organism_brain(is, &brain);
     read_organism_anatomy(is, &anatomy);
+    read_organism_occ(is, occ);
 
     *organism = Organism(0,
                          0,
                          Rotation::UP,
                          anatomy,
                          brain,
+                         occ,
                          &sp,
                          &bp,
-                         0,
-                         0,
-                         0);
+                         &occp,
+                         &occl, 0, 0, 0);
     read_organism_data(is, *static_cast<OrganismData*>(organism));
 }
 
 //TODO save child patterns?
-bool DataSavingFunctions::read_organisms(std::ifstream& is, EngineDataContainer &edc, SimulationParameters &sp, OrganismBlockParameters &bp, uint32_t num_organisms) {
+bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer &edc, SimulationParameters &sp,
+                                         OrganismBlockParameters &bp, uint32_t num_organisms, OCCParameters &occp,
+                                         OCCLogicContainer &occl) {
     edc.stc.organisms.reserve(num_organisms);
     for (int i = 0; i < num_organisms; i++) {
         auto * organism = OrganismsController::get_new_main_organism(edc);
         auto array_place = organism->vector_index;
-        read_organism(is, sp, bp, organism);
+        read_organism(is, sp, bp, organism, occp, occl);
         organism->vector_index = array_place;
         SimulationEngineSingleThread::place_organism(&edc, organism);
     }
@@ -533,9 +538,9 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
                              y,
                              static_cast<Rotation>(rotation),
                              anatomy,
-                             brain,
+                             brain, OrganismConstructionCode(),
                              &sp,
-                             &bp,
+                             &bp, nullptr, nullptr,
                              move_range,
                              mutability);
     new_organism->lifetime = lifetime;
@@ -573,7 +578,7 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
 }
 
 
-const uint32_t STATE_SAVE_VERSION = 1;
+const uint32_t STATE_SAVE_VERSION = 2;
 
 void DataSavingFunctions::write_json_version(rapidjson::Document & d) {
     d.AddMember("save_version", Value(STATE_SAVE_VERSION), d.GetAllocator());
@@ -650,6 +655,8 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
     d.AddMember("use_new_child_pos_calculator",     Value(sp.use_new_child_pos_calculator), d.GetAllocator());
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
+    d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
+    d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -717,6 +724,8 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
     sp.use_new_child_pos_calculator     = d["use_new_child_pos_calculator"].GetBool();
     sp.no_random_decisions              = d["no_random_decisions"].GetBool();
+    sp.use_occ                          = d["use_occ"].GetBool();
+    sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
 }
 
 
@@ -760,8 +769,8 @@ void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, Dat
     }
 }
 
-void DataSavingFunctions::write_json_state(const std::string& path, ProgramState state,
-                                           SimulationParameters &sp) {
+void DataSavingFunctions::write_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                                           OCCParameters &occp) {
     Document d;
     d.SetObject();
 
@@ -769,6 +778,7 @@ void DataSavingFunctions::write_json_state(const std::string& path, ProgramState
     write_json_program_settings(d, state);
     if (state.save_simulation_settings) {
         write_json_extended_simulation_parameters(d, sp);
+        write_json_occp(d, occp);
     }
 
     StringBuffer buffer;
@@ -781,10 +791,10 @@ void DataSavingFunctions::write_json_state(const std::string& path, ProgramState
     file.close();
 }
 
-bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState state,
-                                          SimulationParameters &sp) {
+bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                                          OCCParameters &occp) {
     if (!std::filesystem::exists(path)) {
-        write_json_state(path, state, sp);
+        write_json_state(path, state, sp, occp);
         return false;
     }
 
@@ -809,7 +819,153 @@ bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState 
     }
 
     read_json_program_settings(d, state);
-    if (state.save_simulation_settings) { read_json_extended_simulation_parameters(d, sp); }
+    if (state.save_simulation_settings) {
+        read_json_extended_simulation_parameters(d, sp);
+        read_json_occp(d, occp);
+    }
 
     return true;
+}
+
+void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
+    os.write((char*)&occp.uniform_mutation_distribution, sizeof(bool));
+    os.write((char*)&occp.uniform_group_size_distribution, sizeof(bool));
+    os.write((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
+    os.write((char*)&occp.uniform_swap_distance, sizeof(bool));
+
+    int size = occp.mutation_type_weights.size();
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+
+    size = occp.max_group_size;
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.group_size_weights.data(), sizeof(int)*size);
+
+    size = occp.occ_instructions_mutation_weights.size();
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
+
+    size = occp.max_distance;
+    os.write((char*)&size, sizeof(int));
+    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+}
+
+void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
+    is.read((char*)&occp.uniform_mutation_distribution, sizeof(bool));
+    is.read((char*)&occp.uniform_group_size_distribution, sizeof(bool));
+    is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
+    is.read((char*)&occp.uniform_swap_distance, sizeof(bool));
+
+    int size;
+    is.read((char*)&size, sizeof(int));
+    is.read((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+
+    is.read((char*)&size, sizeof(int));
+    occp.max_group_size = size;
+    occp.group_size_weights.resize(occp.max_group_size);
+    is.read((char*)occp.group_size_weights.data(), sizeof(int)*size);
+
+    is.read((char*)&size, sizeof(int));
+    if (size != occp.occ_instructions_mutation_weights.size()) {
+        //TODO throw error
+        throw "";
+    }
+    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
+
+    is.read((char*)&size, sizeof(int));
+    occp.max_distance = size;
+    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+
+    occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
+    occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
+    occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>{occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end()};
+    occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end()};
+}
+
+void DataSavingFunctions::write_json_occp(Document & d, OCCParameters & occp) {
+    d.AddMember("uniform_mutation_distribution",     Value(occp.uniform_mutation_distribution), d.GetAllocator());
+    d.AddMember("uniform_group_size_distribution",   Value(occp.uniform_group_size_distribution), d.GetAllocator());
+    d.AddMember("uniform_occ_instructions_mutation", Value(occp.uniform_occ_instructions_mutation), d.GetAllocator());
+    d.AddMember("uniform_swap_distance",             Value(occp.uniform_swap_distance), d.GetAllocator());
+
+    Value mtw(kArrayType);
+    for (auto & value: occp.mutation_type_weights) {
+        mtw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("mutation_type_weights", mtw, d.GetAllocator());
+
+    Value gsw(kArrayType);
+    for (auto & value: occp.group_size_weights) {
+        gsw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("group_size_weights", gsw, d.GetAllocator());
+
+    Value imw(kArrayType);
+    for (auto & value: occp.occ_instructions_mutation_weights) {
+        imw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("occ_instructions_mutation_weights", imw, d.GetAllocator());
+
+    Value mdw(kArrayType);
+    for (auto & value: occp.swap_distance_mutation_weights) {
+        mdw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("swap_distance_mutation_weights", mdw, d.GetAllocator());
+}
+
+void DataSavingFunctions::read_json_occp(Document & d, OCCParameters & occp) {
+    occp.uniform_mutation_distribution     = d["uniform_mutation_distribution"].GetBool();
+    occp.uniform_group_size_distribution   = d["uniform_group_size_distribution"].GetBool();
+    occp.uniform_occ_instructions_mutation = d["uniform_occ_instructions_mutation"].GetBool();
+    occp.uniform_swap_distance             = d["uniform_swap_distance"].GetBool();
+
+    int i = 0;
+    std::vector<int> temp_weights{};
+    temp_weights.clear();
+    for (auto & value: d["mutation_type_weights"].GetArray()) {
+        occp.mutation_type_weights[i] = value.GetInt();
+        i++;
+    }
+
+    temp_weights.clear();
+    for (auto & value: d["group_size_weights"].GetArray()) {
+        temp_weights.emplace_back(value.GetInt());
+    }
+    occp.group_size_weights = std::vector(temp_weights);
+    occp.max_group_size = temp_weights.size();
+
+    temp_weights.clear();
+    for (auto & value: d["occ_instructions_mutation_weights"].GetArray()) {
+        temp_weights.emplace_back(value.GetInt());
+    }
+    occp.occ_instructions_mutation_weights = std::vector(temp_weights);
+
+    temp_weights.clear();
+    for (auto & value: d["swap_distance_mutation_weights"].GetArray()) {
+        temp_weights.emplace_back(value.GetInt());
+    }
+    occp.swap_distance_mutation_weights = std::vector(temp_weights);
+    occp.max_distance = temp_weights.size();
+
+    occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
+    occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
+    occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>{occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end()};
+    occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end()};
+}
+
+void DataSavingFunctions::write_organism_occ(std::ofstream &os, OrganismConstructionCode &occ) {
+    int size = occ.get_code_const_ref().size();
+    os.write((char*)&size, sizeof(int));
+    if (size > 0) {
+        os.write((char*)occ.get_code_const_ref().data(), sizeof(OCCInstruction)*size);
+    }
+}
+
+void DataSavingFunctions::read_organism_occ(std::ifstream &is, OrganismConstructionCode &occ) {
+    int size = 0;
+    is.read((char*)&size, sizeof(int));
+    occ.get_code_ref().resize(size);
+    if (size > 0) {
+        is.read((char*)occ.get_code_ref().data(), sizeof(OCCInstruction)*size);
+    }
 }

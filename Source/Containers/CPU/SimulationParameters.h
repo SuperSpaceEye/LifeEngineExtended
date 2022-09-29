@@ -76,6 +76,8 @@ struct SimulationParameters {
     bool food_blocks_movement = false;
     bool use_new_child_pos_calculator = true;
     bool no_random_decisions = false;
+    bool use_occ = true;
+    bool recenter_to_imaginary_pos = false;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

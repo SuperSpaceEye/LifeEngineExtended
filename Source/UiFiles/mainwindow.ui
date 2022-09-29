@@ -761,7 +761,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>606</width>
-                  <height>237</height>
+                  <height>270</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -955,6 +955,27 @@
                      </layout>
                     </item>
                     <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_57">
+                      <item>
+                       <widget class="QPushButton" name="tb_open_occ_parameters">
+                        <property name="text">
+                         <string>Organism Construction Code Parameters</string>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="cb_occp_always_on_top">
+                        <property name="text">
+                         <string>Always on top</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_54">
                       <item>
                        <widget class="QPushButton" name="tb_open_benchmarks">
@@ -1049,9 +1070,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-1231</y>
                   <width>606</width>
-                  <height>1562</height>
+                  <height>1620</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1090,7 +1111,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1721,6 +1742,20 @@
                      </widget>
                     </item>
                     <item>
+                     <widget class="QCheckBox" name="cb_use_organism_construction_code">
+                      <property name="text">
+                       <string>Use Organism Construction Code</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_recenter_to_imaginary">
+                      <property name="text">
+                       <string>Recenter organisms to imaginary position</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
                      <spacer name="verticalSpacer">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
@@ -2048,7 +2083,7 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-548</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>803</height>
                  </rect>
@@ -4317,6 +4352,70 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_occp_always_on_top</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_occp_always_on_top_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>830</x>
+     <y>845</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tb_open_occ_parameters</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>tb_open_occ_parameters_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>531</x>
+     <y>845</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_organism_construction_code</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_occ_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>707</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_recenter_to_imaginary</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_recenter_to_imaginary_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>850</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4435,13 +4534,17 @@
   <slot>le_memory_allocation_strategy_modifier_slot()</slot>
   <slot>le_random_seed_slot()</slot>
   <slot>cb_load_evolution_controls_from_state_slot(bool)</slot>
+  <slot>tb_open_occ_parameters_slot(bool)</slot>
+  <slot>cb_occp_always_on_top_slot(bool)</slot>
+  <slot>cb_use_occ_slot(bool)</slot>
+  <slot>cb_recenter_to_imaginary_slot(bool)</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>
