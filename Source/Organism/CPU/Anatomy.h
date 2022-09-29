@@ -140,7 +140,9 @@ public:
     Anatomy(const Anatomy& anatomy);
     Anatomy()=default;
     Anatomy & operator=(Anatomy const & other_anatomy)=default;
-    Anatomy & operator=(Anatomy && other_anatomy) noexcept ;
+//    Anatomy & operator=(Anatomy && other_anatomy) noexcept ;
+    Anatomy & operator=(Anatomy && other_anatomy)=default ;
+
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt);
     SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen);

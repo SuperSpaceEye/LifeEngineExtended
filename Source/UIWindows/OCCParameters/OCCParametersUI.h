@@ -243,7 +243,7 @@ public:
         move_distance_widget = new QWidget(scrollAreaWidgetContents_5);
         move_distance_widget->setObjectName(QString::fromUtf8("move_distance_widget"));
         verticalLayout_9 = new QVBoxLayout(move_distance_widget);
-        verticalLayout_9->setSpacing(0);
+        verticalLayout_9->setSpacing(6);
         verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_9->setContentsMargins(0, 0, 0, 0);
         move_distance_layout = new QVBoxLayout();

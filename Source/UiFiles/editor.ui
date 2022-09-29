@@ -132,7 +132,7 @@
                    </widget>
                   </item>
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <item>
                      <spacer name="verticalSpacer_2">
                       <property name="orientation">
@@ -256,6 +256,13 @@
                      <widget class="QLabel" name="label_cell_count">
                       <property name="text">
                        <string>Cell count:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_occ_count">
+                      <property name="text">
+                       <string>OCC instruction count:</string>
                       </property>
                      </widget>
                     </item>
@@ -1076,8 +1083,8 @@
   <slot>cb_short_instructions_slot(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="organism_action_group"/>
   <buttongroup name="edit_group"/>
+  <buttongroup name="organism_action_group"/>
   <buttongroup name="cells_group"/>
  </buttongroups>
 </ui>

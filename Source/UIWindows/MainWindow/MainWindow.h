@@ -140,12 +140,10 @@ private:
     bool use_cuda = true;
     bool synchronise_info_update_with_window_update = false;
     bool wait_for_engine_to_stop_to_render = false;
-    //TODO redundant?
     bool resize_simulation_grid_flag = false;
     bool menu_hidden = false;
     //is needed to prevent multiple switches when pressing button
     bool allow_menu_hidden_change = true;
-    //TODO remove?
     bool disable_warnings = false;
     // if true, will create simulation grid == simulation_graphicsView.viewport().size()
     bool fill_window = false;

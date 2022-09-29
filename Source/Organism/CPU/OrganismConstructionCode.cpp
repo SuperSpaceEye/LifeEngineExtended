@@ -342,13 +342,13 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                     int x_ = x + shift[0];
                     int y_ = y + shift[1];
                     // if eating space is not already occupied and there is no block existing on this pos in main_space.
-                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width-1 || y_-1 >= occ_c.occ_height-1 ||
-                        occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].counter != occ_c.spaces_counter
-                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_height].counter != occ_c.main_counter) {
+                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
+                        occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_width + 2)].counter != occ_c.spaces_counter
+                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter != occ_c.main_counter) {
                         temp_producing_space.emplace_back(producer, x_-center_x, y_-center_y);
-                        occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos = eating_space.size() - 1;
-                    } else if (occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].counter == occ_c.spaces_counter) {
-                        temp_producing_space[occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos].producer = producer;
+                        occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = eating_space.size() - 1;
+                    } else if (occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_width + 2)].counter == occ_c.spaces_counter) {
+                        temp_producing_space[occ_c.occ_producing_space.at(x_ + y_ * (occ_c.occ_width + 2)).parent_block_pos].producer = producer;
                     }
                 }
                 break;
@@ -357,11 +357,11 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                     int x_ = x + shift[0];
                     int y_ = y + shift[1];
                     // if eating space is not already occupied and there is no block existing on this pos in main_space.
-                    if (x_-1 < 0 || y_-1 < 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
-                        occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_height + 2)].counter != occ_c.spaces_counter
-                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_height].counter != occ_c.main_counter) {
+                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
+                        occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width + 2)].counter != occ_c.spaces_counter
+                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter != occ_c.main_counter) {
                         eating_space.emplace_back(x_-center_x, y_-center_y);
-                        occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos = eating_space.size() - 1;
+                        occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = eating_space.size() - 1;
                     }
                 }
                 break;
@@ -370,11 +370,11 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                     int x_ = x + shift[0];
                     int y_ = y + shift[1];
                     // if eating space is not already occupied and there is no block existing on this pos in main_space.
-                    if (x_-1 < 0 || y_-1 < 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
-                        occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_height + 2)].counter != occ_c.spaces_counter
-                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_height].counter != occ_c.main_counter) {
+                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
+                        occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width + 2)].counter != occ_c.spaces_counter
+                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter != occ_c.main_counter) {
                         killer_space.emplace_back(x_-center_x, y_-center_y);
-                        occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_height + 2)].parent_block_pos = killer_space.size() - 1;
+                        occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = killer_space.size() - 1;
                     }
                 }
                 break;
@@ -407,7 +407,7 @@ std::vector<OCCInstruction> create_random_group(int group_size, OCCParameters &o
     for (int i = 0; i < group_size; i++) {
         if (occp.uniform_occ_instructions_mutation) {
             group.emplace_back(static_cast<OCCInstruction>(std::uniform_int_distribution<int>(0, NON_SET_BLOCK_OCC_INSTRUCTIONS
-                                                                                                +SET_BLOCK_OCC_INSTRUCTIONS)(gen)));
+                                                                                                +SET_BLOCK_OCC_INSTRUCTIONS-1)(gen)));
         } else {
             group.emplace_back(static_cast<OCCInstruction>(occp.occ_instructions_mutation_discrete_distribution(gen)));
         }
@@ -437,6 +437,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
         //just append group to the end
         case OCCMutations::AppendRandom: {
             auto group = create_random_group(group_size, occp, gen);
+            child_code.occ_vector.reserve(child_code.occ_vector.size() + group.size());
             child_code.occ_vector.insert(child_code.occ_vector.end(), group.begin(), group.end());
         }
         //insert group into sequence

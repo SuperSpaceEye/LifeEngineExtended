@@ -349,7 +349,7 @@
             <widget class="QWidget" name="move_distance_widget" native="true">
              <layout class="QVBoxLayout" name="verticalLayout_9">
               <property name="spacing">
-               <number>0</number>
+               <number>6</number>
               </property>
               <property name="leftMargin">
                <number>0</number>

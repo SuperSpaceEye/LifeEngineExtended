@@ -572,6 +572,7 @@ void MainWindow::initialize_gui() {
     ui.cb_checks_if_path_is_clear           ->setChecked(sp.check_if_path_is_clear);
     ui.cb_no_random_decisions               ->setChecked(sp.no_random_decisions);
     ui.cb_use_organism_construction_code    ->setChecked(sp.use_occ);
+    ui.cb_recenter_to_imaginary             ->setChecked(sp.recenter_to_imaginary_pos);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
@@ -620,6 +621,8 @@ void MainWindow::initialize_gui() {
     ui.le_num_threads->hide();
     ui.lb_set_num_threads->hide();
     st.ui.lb_organisms_memory_consumption->hide();
+
+    ee.occ_mode(sp.use_occ);
 }
 
 void MainWindow::get_current_font_size() {

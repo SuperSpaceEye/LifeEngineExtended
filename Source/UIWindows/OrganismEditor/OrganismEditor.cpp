@@ -346,6 +346,9 @@ void OrganismEditor::finalize_chosen_organism() {
 void OrganismEditor::load_chosen_organism() {
     editor_organism = new Organism(*chosen_organism);
 
+    editor_organism->x = editor_width / 2;
+    editor_organism->y = editor_height / 2;
+
     if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
 
     create_image();
@@ -397,6 +400,7 @@ void OrganismEditor::occ_mode(bool state) {
         ui.rb_edit_occ->show();
         ui.b_save_organism->hide();
         ui.b_load_organism->hide();
+        ui.label_occ_count->show();
         clear_occ();
     } else {
         ui.rb_mouth->show();
@@ -417,6 +421,7 @@ void OrganismEditor::occ_mode(bool state) {
         ui.rb_edit_occ->hide();
         ui.b_save_organism->show();
         ui.b_load_organism->show();
+        ui.label_occ_count->hide();
         clear_occ();
     }
 }
@@ -429,5 +434,6 @@ void OrganismEditor::load_occ() {
     if (editor_organism->occ.get_code_const_ref().empty()) { return;}
 
     ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism->occ.get_code_const_ref(), short_instructions)));
+    ui.label_occ_count->setText(QString::fromStdString("OCC instruction count: " + std::to_string(editor_organism->occ.get_code_const_ref().size())));
 }
 

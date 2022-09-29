@@ -500,21 +500,21 @@ void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blo
     delete new_structure;
 }
 
-Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
-    _mouth_blocks    = other_anatomy._mouth_blocks;
-    _producer_blocks = other_anatomy._producer_blocks;
-    _mover_blocks    = other_anatomy._mover_blocks;
-    _killer_blocks   = other_anatomy._killer_blocks;
-    _armor_blocks    = other_anatomy._armor_blocks;
-    _eye_blocks      = other_anatomy._eye_blocks;
-
-    _organism_blocks = std::move(other_anatomy._organism_blocks);
-    _producing_space = std::move(other_anatomy._producing_space);
-    _eating_space    = std::move(other_anatomy._eating_space);
-    _killing_space   = std::move(other_anatomy._killing_space);
-
-    return *this;
-}
+//Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
+//    _mouth_blocks    = other_anatomy._mouth_blocks;
+//    _producer_blocks = other_anatomy._producer_blocks;
+//    _mover_blocks    = other_anatomy._mover_blocks;
+//    _killer_blocks   = other_anatomy._killer_blocks;
+//    _armor_blocks    = other_anatomy._armor_blocks;
+//    _eye_blocks      = other_anatomy._eye_blocks;
+//
+//    _organism_blocks = std::move(other_anatomy._organism_blocks);
+//    _producing_space = std::move(other_anatomy._producing_space);
+//    _eating_space    = std::move(other_anatomy._eating_space);
+//    _killing_space   = std::move(other_anatomy._killing_space);
+//
+//    return *this;
+//}
 
 Vector2<int> Anatomy::recenter_blocks(bool imaginary_center) {
     if (imaginary_center) {

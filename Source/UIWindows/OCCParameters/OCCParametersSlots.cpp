@@ -14,7 +14,6 @@ void OCCParametersWindow::cb_use_uniform_mutation_type_slot   (bool state) { occ
 void OCCParametersWindow::cb_use_uniform_occ_instructions_slot(bool state) { occp.uniform_occ_instructions_mutation = state;}
 
 
-
 void OCCParametersWindow::le_max_group_size_slot() {
     engine.pause();
 
@@ -22,9 +21,8 @@ void OCCParametersWindow::le_max_group_size_slot() {
     occp.group_size_weights.resize(occp.max_group_size, 1);
     occp.group_size_discrete_distribution = std::discrete_distribution<int>(occp.group_size_weights.begin(), occp.group_size_weights.end());
 
-    engine.unpause();
-
     create_group_size_distribution();
+    engine.unpause();
 }
 
 void OCCParametersWindow::le_max_move_distance_slot() {
@@ -34,7 +32,6 @@ void OCCParametersWindow::le_max_move_distance_slot() {
     occp.move_distance_mutation_weights.resize(occp.max_distance, 1);
     occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
 
-    engine.unpause();
-
     create_move_distance_distribution();
+    engine.unpause();
 }

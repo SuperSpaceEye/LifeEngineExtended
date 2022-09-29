@@ -58,6 +58,7 @@ public:
     QLabel *label_7;
     QComboBox *cmb_block_rotation;
     QLabel *label_cell_count;
+    QLabel *label_occ_count;
     QHBoxLayout *horizontalLayout_9;
     QLabel *label_2;
     QLineEdit *le_move_range;
@@ -105,8 +106,8 @@ public:
     QRadioButton *rb_edit_anatomy;
     QRadioButton *rb_edit_brain;
     QRadioButton *rb_edit_occ;
-    QButtonGroup *organism_action_group;
     QButtonGroup *edit_group;
+    QButtonGroup *organism_action_group;
     QButtonGroup *cells_group;
 
     void setupUi(QWidget *Editor)
@@ -242,6 +243,11 @@ public:
         label_cell_count->setObjectName(QString::fromUtf8("label_cell_count"));
 
         verticalLayout_5->addWidget(label_cell_count);
+
+        label_occ_count = new QLabel(anatomy_edit_page);
+        label_occ_count->setObjectName(QString::fromUtf8("label_occ_count"));
+
+        verticalLayout_5->addWidget(label_occ_count);
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
@@ -570,6 +576,7 @@ public:
         cmb_block_rotation->setItemText(3, QApplication::translate("Editor", "Right", nullptr));
 
         label_cell_count->setText(QApplication::translate("Editor", "Cell count:", nullptr));
+        label_occ_count->setText(QApplication::translate("Editor", "OCC instruction count:", nullptr));
         label_2->setText(QApplication::translate("Editor", "Move range:", nullptr));
         label_3->setText(QApplication::translate("Editor", "Anatomy mutation rate:", nullptr));
         label_6->setText(QApplication::translate("Editor", "Brain mutation rate:", nullptr));

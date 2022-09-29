@@ -68,8 +68,8 @@ void OCCParametersWindow::create_mutation_type_distribution() {
         connect(line_edit, &QLineEdit::returnPressed, [i, p_occp, line_edit, p_engine](){
             auto & occp = *p_occp;
             auto & engine = *p_engine;
-            le_slot_lower_bound<int>(occp.mutation_type_weights[i], occp.mutation_type_weights[i], "int", line_edit, 0, "0");
             engine.pause();
+            le_slot_lower_bound<int>(occp.mutation_type_weights[i], occp.mutation_type_weights[i], "int", line_edit, 0, "0");
             occp.mutation_discrete_distribution = std::discrete_distribution<int>(occp.mutation_type_weights.begin(), occp.mutation_type_weights.end());
             engine.unpause();
         });
@@ -101,8 +101,8 @@ void OCCParametersWindow::create_group_size_distribution() {
         connect(line_edit, &QLineEdit::returnPressed, [i, p_occp, line_edit, p_engine](){
             auto & occp = *p_occp;
             auto & engine = *p_engine;
-            le_slot_lower_bound<int>(occp.group_size_weights[i], occp.group_size_weights[i], "int", line_edit, 0, "0");
             engine.pause();
+            le_slot_lower_bound<int>(occp.group_size_weights[i], occp.group_size_weights[i], "int", line_edit, 0, "0");
             occp.group_size_discrete_distribution = std::discrete_distribution<int>(occp.group_size_weights.begin(), occp.group_size_weights.end());
             engine.unpause();
         });
@@ -146,8 +146,8 @@ void OCCParametersWindow::create_occ_instructions_distribution(bool no_reset) {
         connect(line_edit, &QLineEdit::returnPressed, [i, p_occp, line_edit, p_engine](){
             auto & occp = *p_occp;
             auto & engine = *p_engine;
-            le_slot_lower_bound<int>(occp.occ_instructions_mutation_weights[i], occp.occ_instructions_mutation_weights[i], "int", line_edit, 0, "0");
             engine.pause();
+            le_slot_lower_bound<int>(occp.occ_instructions_mutation_weights[i], occp.occ_instructions_mutation_weights[i], "int", line_edit, 0, "0");
             occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>(occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end());
             engine.unpause();
         });
@@ -179,8 +179,8 @@ void OCCParametersWindow::create_move_distance_distribution() {
         connect(line_edit, &QLineEdit::returnPressed, [i, p_occp, line_edit, p_engine](){
             auto & occp = *p_occp;
             auto & engine = *p_engine;
-            le_slot_lower_bound<int>(occp.move_distance_mutation_weights[i], occp.move_distance_mutation_weights[i], "int", line_edit, 0, "0");
             engine.pause();
+            le_slot_lower_bound<int>(occp.move_distance_mutation_weights[i], occp.move_distance_mutation_weights[i], "int", line_edit, 0, "0");
             occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
             engine.unpause();
         });

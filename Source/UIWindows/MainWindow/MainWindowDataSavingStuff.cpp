@@ -18,8 +18,6 @@ void MainWindow::write_data(std::ofstream &os) {
     DataSavingFunctions::write_organisms(os, edc);
 }
 
-//TODO do i need to save spaces?
-
 void MainWindow::recover_state(const SimulationParameters &recovery_sp, const OrganismBlockParameters &recovery_bp,
                                uint32_t recovery_simulation_width, uint32_t recovery_simulation_height) {
     sp = recovery_sp;
