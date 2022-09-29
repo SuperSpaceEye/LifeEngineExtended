@@ -850,23 +850,28 @@ void MainWindow::save_state() {
     auto json_state_path = QCoreApplication::applicationDirPath().toStdString() + "/settings.json";
     DataSavingFunctions::write_json_state(json_state_path,
                                           DataSavingFunctions::ProgramState{
-                                              scaling_coefficient, keyboard_movement_amount, SHIFT_keyboard_movement_multiplier,
-                                              font_size, float_precision, brush_size, update_info_every_n_milliseconds,
-                                              use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
-                                              really_stop_render, save_simulation_settings, uses_point_size
-                                          }, sp);
+                                                  scaling_coefficient, keyboard_movement_amount,
+                                                  SHIFT_keyboard_movement_multiplier,
+                                                  font_size, float_precision, brush_size,
+                                                  update_info_every_n_milliseconds,
+                                                  use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                                  really_stop_render, save_simulation_settings, uses_point_size
+                                          }, sp, occp);
 }
 
 void MainWindow::load_state() {
     auto json_state_path = QCoreApplication::applicationDirPath().toStdString() + "/settings.json";
     DataSavingFunctions::read_json_state(json_state_path,
-                                        DataSavingFunctions::ProgramState{
-                                              scaling_coefficient, keyboard_movement_amount, SHIFT_keyboard_movement_multiplier,
-                                              font_size, float_precision, brush_size, update_info_every_n_milliseconds,
-                                              use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
-                                              really_stop_render, save_simulation_settings, uses_point_size
-                                        }, sp);
+                                         DataSavingFunctions::ProgramState{
+                                                 scaling_coefficient, keyboard_movement_amount,
+                                                 SHIFT_keyboard_movement_multiplier,
+                                                 font_size, float_precision, brush_size,
+                                                 update_info_every_n_milliseconds,
+                                                 use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                                 really_stop_render, save_simulation_settings, uses_point_size
+                                         }, sp, occp);
     initialize_gui();
+    occpw.reinit_gui(true);
 
     apply_font_size();
 }

@@ -106,10 +106,10 @@ namespace DataSavingFunctions {
     void write_json_program_settings(rapidjson::Document & d, DataSavingFunctions::ProgramState &state);
     void read_json_program_settings(rapidjson::Document & d, DataSavingFunctions::ProgramState &state);
 
-    void write_json_state(const std::string& path, ProgramState state,
-                          SimulationParameters &sp);
-    bool read_json_state(const std::string& path, ProgramState state,
-                         SimulationParameters &sp);
+    void write_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                          OCCParameters &occp);
+    bool read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                         OCCParameters &occp);
 
     void write_json_occp(rapidjson::Document & d, OCCParameters & parameters);
     void read_json_occp(rapidjson::Document & d, OCCParameters & parameters);

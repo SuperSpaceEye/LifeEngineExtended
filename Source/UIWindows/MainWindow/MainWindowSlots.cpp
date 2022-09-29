@@ -221,7 +221,7 @@ void MainWindow::b_load_world_slot() {
     initialize_gui();
     update_table_values();
 
-    occpw.reinit_gui();
+    occpw.reinit_gui(true);
 }
 
 void MainWindow::b_pass_one_tick_slot() {

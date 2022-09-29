@@ -765,8 +765,8 @@ void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, Dat
     }
 }
 
-void DataSavingFunctions::write_json_state(const std::string& path, ProgramState state,
-                                           SimulationParameters &sp) {
+void DataSavingFunctions::write_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                                           OCCParameters &occp) {
     Document d;
     d.SetObject();
 
@@ -774,6 +774,7 @@ void DataSavingFunctions::write_json_state(const std::string& path, ProgramState
     write_json_program_settings(d, state);
     if (state.save_simulation_settings) {
         write_json_extended_simulation_parameters(d, sp);
+        write_json_occp(d, occp);
     }
 
     StringBuffer buffer;
@@ -786,10 +787,10 @@ void DataSavingFunctions::write_json_state(const std::string& path, ProgramState
     file.close();
 }
 
-bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState state,
-                                          SimulationParameters &sp) {
+bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+                                          OCCParameters &occp) {
     if (!std::filesystem::exists(path)) {
-        write_json_state(path, state, sp);
+        write_json_state(path, state, sp, occp);
         return false;
     }
 
@@ -814,7 +815,10 @@ bool DataSavingFunctions::read_json_state(const std::string& path, ProgramState 
     }
 
     read_json_program_settings(d, state);
-    if (state.save_simulation_settings) { read_json_extended_simulation_parameters(d, sp); }
+    if (state.save_simulation_settings) {
+        read_json_extended_simulation_parameters(d, sp);
+        read_json_occp(d, occp);
+    }
 
     return true;
 }
@@ -867,6 +871,77 @@ void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
     is.read((char*)&size, sizeof(int));
     occp.max_distance = size;
     is.read((char*)occp.move_distance_mutation_weights.data(), sizeof(int)*size);
+
+    occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
+    occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
+    occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>{occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end()};
+    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end()};
+}
+
+void DataSavingFunctions::write_json_occp(Document & d, OCCParameters & occp) {
+    d.AddMember("uniform_mutation_distribution",     Value(occp.uniform_mutation_distribution), d.GetAllocator());
+    d.AddMember("uniform_group_size_distribution",   Value(occp.uniform_group_size_distribution), d.GetAllocator());
+    d.AddMember("uniform_occ_instructions_mutation", Value(occp.uniform_occ_instructions_mutation), d.GetAllocator());
+    d.AddMember("uniform_move_distance",             Value(occp.uniform_move_distance), d.GetAllocator());
+
+    Value mtw(kArrayType);
+    for (auto & value: occp.mutation_type_weights) {
+        mtw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("mutation_type_weights", mtw, d.GetAllocator());
+
+    Value gsw(kArrayType);
+    for (auto & value: occp.group_size_weights) {
+        gsw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("group_size_weights", gsw, d.GetAllocator());
+
+    Value imw(kArrayType);
+    for (auto & value: occp.occ_instructions_mutation_weights) {
+        imw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("occ_instructions_mutation_weights", imw, d.GetAllocator());
+
+    Value mdw(kArrayType);
+    for (auto & value: occp.move_distance_mutation_weights) {
+        mdw.PushBack(Value(value), d.GetAllocator());
+    }
+    d.AddMember("move_distance_mutation_weights", mdw, d.GetAllocator());
+}
+
+void DataSavingFunctions::read_json_occp(Document & d, OCCParameters & occp) {
+    occp.uniform_mutation_distribution     = d["uniform_mutation_distribution"].GetBool();
+    occp.uniform_group_size_distribution   = d["uniform_group_size_distribution"].GetBool();
+    occp.uniform_occ_instructions_mutation = d["uniform_occ_instructions_mutation"].GetBool();
+    occp.uniform_move_distance             = d["uniform_move_distance"].GetBool();
+
+    int i = 0;
+    std::vector<int> temp_weights{};
+    temp_weights.clear();
+    for (auto & value: d["mutation_type_weights"].GetArray()) {
+        occp.mutation_type_weights[i] = value.GetInt();
+        i++;
+    }
+
+    temp_weights.clear();
+    for (auto & value: d["group_size_weights"].GetArray()) {
+        temp_weights.emplace_back(value.GetInt());
+    }
+    occp.group_size_weights = std::vector(temp_weights);
+    occp.max_group_size = temp_weights.size();
+
+    temp_weights.clear();
+    for (auto & value: d["occ_instructions_mutation_weights"].GetArray()) {
+        temp_weights.emplace_back(value.GetInt());
+    }
+    occp.occ_instructions_mutation_weights = std::vector(temp_weights);
+
+    temp_weights.clear();
+    for (auto & value: d["move_distance_mutation_weights"].GetArray()) {
+        temp_weights.emplace_back(value.GetInt());
+    }
+    occp.move_distance_mutation_weights = std::vector(temp_weights);
+    occp.max_distance = temp_weights.size();
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};

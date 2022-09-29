@@ -57,9 +57,10 @@ void OCCParametersWindow::create_mutation_type_distribution() {
     };
 
     for (int i = 0; i < occp.mutation_type_weights.size(); i++) {
+        auto val = occp.mutation_type_weights[i];
         auto * new_layout = new QHBoxLayout{};
         auto * label = new QLabel(QString::fromStdString("\""+mutation_types[i]+"\" weight "), ui.mutation_types_widget);
-        auto * line_edit = new QLineEdit(QString::fromStdString("1"), ui.mutation_types_widget);
+        auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string(val)), ui.mutation_types_widget);
 
         auto * p_occp = &occp;
         auto * p_engine = &engine;
@@ -89,9 +90,10 @@ void OCCParametersWindow::create_group_size_distribution() {
     auto *layout = prepare_layout(ui.group_size_layout);
 
     for (int i = 0; i < occp.group_size_weights.size(); i++) {
+        auto val = occp.group_size_weights[i];
         auto * new_layout = new QHBoxLayout{};
         auto * label = new QLabel(QString::fromStdString("\""+std::to_string(i+1)+"\" weight "), ui.group_size_widget);
-        auto * line_edit = new QLineEdit(QString::fromStdString("1"), ui.group_size_widget);
+        auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string(val)), ui.group_size_widget);
 
         auto * p_occp = &occp;
         auto * p_engine = &engine;
@@ -117,24 +119,26 @@ void OCCParametersWindow::create_group_size_distribution() {
     occp.group_size_discrete_distribution = std::discrete_distribution<int>(occp.group_size_weights.begin(), occp.group_size_weights.end());
 }
 
-void OCCParametersWindow::create_occ_instructions_distribution() {
+void OCCParametersWindow::create_occ_instructions_distribution(bool no_reset) {
     auto *layout = ui.occ_instructions_weights_layout;
 
     occp.occ_instructions_mutation_weights.resize(OCC_INSTRUCTIONS_NAME.size(), 1);
 
-    //To balance the distribution.
-    for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
-        if (i < NON_SET_BLOCK_OCC_INSTRUCTIONS) {
-            occp.occ_instructions_mutation_weights[i] = 2;
-        } else {
-            occp.occ_instructions_mutation_weights[i] = 1;
+    if (!no_reset) {
+        //To balance the distribution.
+        for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
+            if (i < NON_SET_BLOCK_OCC_INSTRUCTIONS) {
+                occp.occ_instructions_mutation_weights[i] = 2;
+            } else {
+                occp.occ_instructions_mutation_weights[i] = 1;
+            }
         }
     }
 
     for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
         auto * new_layout = new QHBoxLayout{};
         auto * label = new QLabel(QString::fromStdString("\""+OCC_INSTRUCTIONS_NAME[i])+"\" weight ", ui.occ_mutation_type_widget);
-        auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string((int)occp.occ_instructions_mutation_weights[i])), ui.occ_mutation_type_widget);
+        auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string(occp.occ_instructions_mutation_weights[i])), ui.occ_mutation_type_widget);
 
         auto * p_occp = &occp;
         auto * p_engine = &engine;
@@ -164,9 +168,10 @@ void OCCParametersWindow::create_move_distance_distribution() {
     auto *layout = prepare_layout(ui.move_distance_layout);
 
     for (int i = 0; i < occp.move_distance_mutation_weights.size(); i++) {
+        auto val = occp.move_distance_mutation_weights[i];
         auto * new_layout = new QHBoxLayout{};
         auto * label = new QLabel(QString::fromStdString("\""+std::to_string(i+1)+"\" weight "), ui.move_distance_widget);
-        auto * line_edit = new QLineEdit(QString::fromStdString("1"), ui.move_distance_widget);
+        auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string(val)), ui.move_distance_widget);
 
         auto * p_occp = &occp;
         auto * p_engine = &engine;
@@ -192,9 +197,9 @@ void OCCParametersWindow::create_move_distance_distribution() {
     occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
 }
 
-void OCCParametersWindow::reinit_gui() {
+void OCCParametersWindow::reinit_gui(bool just_reinit_gui) {
     init_gui();
-    create_occ_instructions_distribution();
+    create_occ_instructions_distribution(just_reinit_gui);
     create_mutation_type_distribution();
     create_move_distance_distribution();
     create_group_size_distribution();
