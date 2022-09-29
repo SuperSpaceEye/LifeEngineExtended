@@ -23,7 +23,7 @@ void OCCParametersWindow::init_gui() {
     ui.cb_use_uniform_mutation_type   ->setChecked(occp.uniform_mutation_distribution);
     ui.cb_use_uniform_group_size      ->setChecked(occp.uniform_group_size_distribution);
     ui.cb_use_uniform_occ_instructions->setChecked(occp.uniform_occ_instructions_mutation);
-    ui.cb_use_uniform_move_distance   ->setChecked(occp.uniform_move_distance);
+    ui.cb_use_uniform_move_distance   ->setChecked(occp.uniform_swap_distance);
 
     ui.le_max_group_size   ->setText(QString::fromStdString(std::to_string(occp.max_group_size)));
     ui.le_max_move_distance->setText(QString::fromStdString(std::to_string(occp.max_distance)));
@@ -167,8 +167,8 @@ void OCCParametersWindow::create_occ_instructions_distribution(bool no_reset) {
 void OCCParametersWindow::create_move_distance_distribution() {
     auto *layout = prepare_layout(ui.move_distance_layout);
 
-    for (int i = 0; i < occp.move_distance_mutation_weights.size(); i++) {
-        auto val = occp.move_distance_mutation_weights[i];
+    for (int i = 0; i < occp.swap_distance_mutation_weights.size(); i++) {
+        auto val = occp.swap_distance_mutation_weights[i];
         auto * new_layout = new QHBoxLayout{};
         auto * label = new QLabel(QString::fromStdString("\""+std::to_string(i+1)+"\" weight "), ui.move_distance_widget);
         auto * line_edit = new QLineEdit(QString::fromStdString(std::to_string(val)), ui.move_distance_widget);
@@ -180,8 +180,8 @@ void OCCParametersWindow::create_move_distance_distribution() {
             auto & occp = *p_occp;
             auto & engine = *p_engine;
             engine.pause();
-            le_slot_lower_bound<int>(occp.move_distance_mutation_weights[i], occp.move_distance_mutation_weights[i], "int", line_edit, 0, "0");
-            occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
+            le_slot_lower_bound<int>(occp.swap_distance_mutation_weights[i], occp.swap_distance_mutation_weights[i], "int", line_edit, 0, "0");
+            occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end());
             engine.unpause();
         });
 
@@ -194,7 +194,7 @@ void OCCParametersWindow::create_move_distance_distribution() {
         layout->addItem(new_layout);
     }
 
-    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
+    occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end());
 }
 
 void OCCParametersWindow::reinit_gui(bool just_reinit_gui) {

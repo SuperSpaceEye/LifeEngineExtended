@@ -7,7 +7,7 @@
 
 void OCCParametersWindow::cb_use_uniform_group_size_slot      (bool state) { occp.uniform_group_size_distribution = state;}
 
-void OCCParametersWindow::cb_use_uniform_move_distance_slot   (bool state) { occp.uniform_move_distance = state;}
+void OCCParametersWindow::cb_use_uniform_move_distance_slot   (bool state) { occp.uniform_swap_distance = state;}
 
 void OCCParametersWindow::cb_use_uniform_mutation_type_slot   (bool state) { occp.uniform_mutation_distribution = state;}
 
@@ -29,8 +29,8 @@ void OCCParametersWindow::le_max_move_distance_slot() {
     engine.pause();
 
     le_slot_lower_bound(occp.max_distance, occp.max_distance, "int", ui.le_max_move_distance, 1, "1");
-    occp.move_distance_mutation_weights.resize(occp.max_distance, 1);
-    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end());
+    occp.swap_distance_mutation_weights.resize(occp.max_distance, 1);
+    occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>(occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end());
 
     create_move_distance_distribution();
     engine.unpause();

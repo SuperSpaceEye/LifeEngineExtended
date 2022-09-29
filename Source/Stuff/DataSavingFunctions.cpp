@@ -831,7 +831,7 @@ void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
     os.write((char*)&occp.uniform_mutation_distribution, sizeof(bool));
     os.write((char*)&occp.uniform_group_size_distribution, sizeof(bool));
     os.write((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
-    os.write((char*)&occp.uniform_move_distance, sizeof(bool));
+    os.write((char*)&occp.uniform_swap_distance, sizeof(bool));
 
     int size = occp.mutation_type_weights.size();
     os.write((char*)&size, sizeof(int));
@@ -847,14 +847,14 @@ void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
 
     size = occp.max_distance;
     os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.move_distance_mutation_weights.data(), sizeof(int)*size);
+    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
 }
 
 void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
     is.read((char*)&occp.uniform_mutation_distribution, sizeof(bool));
     is.read((char*)&occp.uniform_group_size_distribution, sizeof(bool));
     is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
-    is.read((char*)&occp.uniform_move_distance, sizeof(bool));
+    is.read((char*)&occp.uniform_swap_distance, sizeof(bool));
 
     int size;
     is.read((char*)&size, sizeof(int));
@@ -874,19 +874,19 @@ void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
 
     is.read((char*)&size, sizeof(int));
     occp.max_distance = size;
-    is.read((char*)occp.move_distance_mutation_weights.data(), sizeof(int)*size);
+    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
     occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>{occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end()};
-    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end()};
+    occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end()};
 }
 
 void DataSavingFunctions::write_json_occp(Document & d, OCCParameters & occp) {
     d.AddMember("uniform_mutation_distribution",     Value(occp.uniform_mutation_distribution), d.GetAllocator());
     d.AddMember("uniform_group_size_distribution",   Value(occp.uniform_group_size_distribution), d.GetAllocator());
     d.AddMember("uniform_occ_instructions_mutation", Value(occp.uniform_occ_instructions_mutation), d.GetAllocator());
-    d.AddMember("uniform_move_distance",             Value(occp.uniform_move_distance), d.GetAllocator());
+    d.AddMember("uniform_swap_distance",             Value(occp.uniform_swap_distance), d.GetAllocator());
 
     Value mtw(kArrayType);
     for (auto & value: occp.mutation_type_weights) {
@@ -907,17 +907,17 @@ void DataSavingFunctions::write_json_occp(Document & d, OCCParameters & occp) {
     d.AddMember("occ_instructions_mutation_weights", imw, d.GetAllocator());
 
     Value mdw(kArrayType);
-    for (auto & value: occp.move_distance_mutation_weights) {
+    for (auto & value: occp.swap_distance_mutation_weights) {
         mdw.PushBack(Value(value), d.GetAllocator());
     }
-    d.AddMember("move_distance_mutation_weights", mdw, d.GetAllocator());
+    d.AddMember("swap_distance_mutation_weights", mdw, d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_occp(Document & d, OCCParameters & occp) {
     occp.uniform_mutation_distribution     = d["uniform_mutation_distribution"].GetBool();
     occp.uniform_group_size_distribution   = d["uniform_group_size_distribution"].GetBool();
     occp.uniform_occ_instructions_mutation = d["uniform_occ_instructions_mutation"].GetBool();
-    occp.uniform_move_distance             = d["uniform_move_distance"].GetBool();
+    occp.uniform_swap_distance             = d["uniform_swap_distance"].GetBool();
 
     int i = 0;
     std::vector<int> temp_weights{};
@@ -941,16 +941,16 @@ void DataSavingFunctions::read_json_occp(Document & d, OCCParameters & occp) {
     occp.occ_instructions_mutation_weights = std::vector(temp_weights);
 
     temp_weights.clear();
-    for (auto & value: d["move_distance_mutation_weights"].GetArray()) {
+    for (auto & value: d["swap_distance_mutation_weights"].GetArray()) {
         temp_weights.emplace_back(value.GetInt());
     }
-    occp.move_distance_mutation_weights = std::vector(temp_weights);
+    occp.swap_distance_mutation_weights = std::vector(temp_weights);
     occp.max_distance = temp_weights.size();
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
     occp.occ_instructions_mutation_discrete_distribution = std::discrete_distribution<int>{occp.occ_instructions_mutation_weights.begin(), occp.occ_instructions_mutation_weights.end()};
-    occp.move_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.move_distance_mutation_weights.begin(), occp.move_distance_mutation_weights.end()};
+    occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end()};
 }
 
 void DataSavingFunctions::write_organism_occ(std::ofstream &os, OrganismConstructionCode &occ) {

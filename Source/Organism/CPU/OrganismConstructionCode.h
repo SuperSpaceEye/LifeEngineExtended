@@ -18,7 +18,7 @@ enum class OCCMutations {
     InsertRandom,
     ChangeRandom,
     DeleteRandom,
-    MoveRandom
+    SwapRandom
 };
 
 class OrganismConstructionCode {

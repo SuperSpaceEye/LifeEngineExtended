@@ -450,7 +450,6 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             break;
         //Overwrite existing part of a sequence with a group
         case OCCMutations::ChangeRandom: {
-            if (child_code.occ_vector.size() == 1) { break;}
             auto group = create_random_group(group_size, occp, gen);
             int starting_position = 1;
             switch (group[0]) {
@@ -476,24 +475,23 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             break;
         //delete part of a sequence with group_size
         case OCCMutations::DeleteRandom: {
-            if (child_code.occ_vector.size() == 1) { break;}
-            int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
+            int position = std::uniform_int_distribution<int>(0, child_code.occ_vector.size()-1)(gen);
             int allowed_erasing = std::min<int>(group_size, child_code.occ_vector.size()-position-1);
 
             auto position_iterator = child_code.occ_vector.begin()+position;
             child_code.occ_vector.erase(position_iterator, position_iterator+allowed_erasing);
         }
             break;
-        //shift instructions with size of group_size to the left or right by some distance
-        case OCCMutations::MoveRandom: {
+        //swap instructions with size of group_size to the left or right by some distance
+        case OCCMutations::SwapRandom: {
             if (child_code.occ_vector.size() == 1) { break;}
-            int position = std::uniform_int_distribution<int>(1, child_code.occ_vector.size()-1)(gen);
+            int position = std::uniform_int_distribution<int>(0, child_code.occ_vector.size()-1)(gen);
             int distance;
 
-            if (occp.uniform_move_distance) {
+            if (occp.uniform_swap_distance) {
                 distance = std::uniform_int_distribution<int>(1, occp.max_distance)(gen);
             } else {
-                distance = occp.move_distance_mutation_discrete_distribution(gen);
+                distance = occp.swap_distance_mutation_discrete_distribution(gen);
             }
 
             //will determine whenever the shift is left or right
@@ -501,7 +499,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
 
             int second_position = position + distance * (modifier ? -1 : 1);
             //will clamp the value between first and last vector positions
-            second_position = std::min<int>(std::max<int>(1, second_position), child_code.occ_vector.size()-1);
+            second_position = std::min<int>(std::max<int>(0, second_position), child_code.occ_vector.size()-1);
 
             auto first_iterator  = child_code.occ_vector.begin() + position;
             auto second_iterator = child_code.occ_vector.begin() + second_position;

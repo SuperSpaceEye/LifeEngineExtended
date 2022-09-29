@@ -24,10 +24,10 @@ struct OCCParameters {
     std::vector<int> occ_instructions_mutation_weights{1};
     std::discrete_distribution<int> occ_instructions_mutation_discrete_distribution{occ_instructions_mutation_weights.begin(), occ_instructions_mutation_weights.end()};
 
-    bool uniform_move_distance = true;
+    bool uniform_swap_distance = true;
     int max_distance = 5;
-    std::vector<int> move_distance_mutation_weights{1, 1, 1, 1, 1};
-    std::discrete_distribution<int> move_distance_mutation_discrete_distribution{move_distance_mutation_weights.begin(), move_distance_mutation_weights.end()};
+    std::vector<int> swap_distance_mutation_weights{1, 1, 1, 1, 1};
+    std::discrete_distribution<int> swap_distance_mutation_discrete_distribution{swap_distance_mutation_weights.begin(), swap_distance_mutation_weights.end()};
 };
 
 #endif //LIFEENGINEEXTENDED_ORGANISMCONSTRUCTIONCODEPARAMETERS_H
