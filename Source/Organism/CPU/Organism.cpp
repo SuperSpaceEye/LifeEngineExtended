@@ -22,6 +22,7 @@ Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain
                                 move_range,
                                 anatomy_mutation_rate,
                                 brain_mutation_rate) {
+    last_recenter = sp->recenter_to_imaginary_pos;
     init_values();
 }
 
@@ -33,6 +34,7 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
                                                      organism->move_range,
                                                      organism->anatomy_mutation_rate,
                                                      organism->brain_mutation_rate) {
+    last_recenter = sp->recenter_to_imaginary_pos;
     init_values();
 }
 
@@ -40,7 +42,18 @@ void Organism::init_values() {
     calculate_max_life();
     calculate_organism_lifetime();
     calculate_food_needed();
-    anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
+    auto vec = anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
+
+    //TODO
+    if (sp->recenter_to_imaginary_pos && !last_recenter) {
+        x -= vec.x;
+        y -= vec.y;
+    }
+    if (!sp->recenter_to_imaginary_pos && !last_recenter) {
+        x += vec.x;
+        y += vec.y;
+    }
+    last_recenter = sp->recenter_to_imaginary_pos;
 
     multiplier = 1;
 

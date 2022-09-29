@@ -380,6 +380,7 @@ private slots:
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);
     void cb_use_occ_slot(bool state);
+    void cb_recenter_to_imaginary_slot(bool state);
     //Other
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);

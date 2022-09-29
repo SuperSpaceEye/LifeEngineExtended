@@ -516,11 +516,11 @@ Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
     return *this;
 }
 
-void Anatomy::recenter_blocks(bool imaginary_center) {
+Vector2<int> Anatomy::recenter_blocks(bool imaginary_center) {
     if (imaginary_center) {
-        recenter_to_imaginary();
+        return recenter_to_imaginary();
     } else {
-        recenter_to_existing();
+        return recenter_to_existing();
     }
 }
 
@@ -548,8 +548,8 @@ void Anatomy::subtract_difference(int x, int y) {
     }
 }
 
-void Anatomy::recenter_to_existing() {
-    if (_organism_blocks.empty()) { return;}
+Vector2<int> Anatomy::recenter_to_existing() {
+    if (_organism_blocks.empty()) { return {0, 0};}
     int block_pos_in_vec = 0;
     //the position of a block will definitely never be bigger than this.
     Vector2<int32_t> abs_pos{INT32_MAX/4, INT32_MAX/4};
@@ -567,10 +567,11 @@ void Anatomy::recenter_to_existing() {
     Vector2<int32_t> new_center_pos = {_organism_blocks[block_pos_in_vec].relative_x, _organism_blocks[block_pos_in_vec].relative_y};
 
     subtract_difference(new_center_pos.x, new_center_pos.y);
+    return {new_center_pos.x, new_center_pos.y};
 }
 
-void Anatomy::recenter_to_imaginary() {
-    if (_organism_blocks.empty()) { return;}
+Vector2<int> Anatomy::recenter_to_imaginary() {
+    if (_organism_blocks.empty()) { return {0, 0};}
     Vector2 min{0, 0};
     Vector2 max{0, 0};
 
@@ -585,4 +586,6 @@ void Anatomy::recenter_to_imaginary() {
     auto diff_y = (max.y - min.y) / 2 + min.y;
 
     subtract_difference(diff_x, diff_y);
+
+    return {diff_x, diff_y};
 }

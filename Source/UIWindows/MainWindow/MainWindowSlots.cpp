@@ -774,6 +774,17 @@ void MainWindow::cb_use_occ_slot(bool state) {
     engine.unpause();
 }
 
+void MainWindow::cb_recenter_to_imaginary_slot(bool state) {
+    if (state == sp.recenter_to_imaginary_pos) { return;}
+
+    engine.pause();
+
+    sp.recenter_to_imaginary_pos = state;
+    engine.reinit_organisms();
+
+    engine.unpause();
+}
+
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void MainWindow::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}

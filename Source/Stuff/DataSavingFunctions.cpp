@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 7;
+const uint32_t SAVE_VERSION = 8;
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -578,7 +578,7 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
 }
 
 
-const uint32_t STATE_SAVE_VERSION = 1;
+const uint32_t STATE_SAVE_VERSION = 2;
 
 void DataSavingFunctions::write_json_version(rapidjson::Document & d) {
     d.AddMember("save_version", Value(STATE_SAVE_VERSION), d.GetAllocator());
@@ -655,6 +655,8 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
     d.AddMember("use_new_child_pos_calculator",     Value(sp.use_new_child_pos_calculator), d.GetAllocator());
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
+    d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
+    d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -722,6 +724,8 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
     sp.use_new_child_pos_calculator     = d["use_new_child_pos_calculator"].GetBool();
     sp.no_random_decisions              = d["no_random_decisions"].GetBool();
+    sp.use_occ                          = d["use_occ"].GetBool();
+    sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
 }
 
 
