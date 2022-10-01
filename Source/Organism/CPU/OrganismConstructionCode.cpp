@@ -437,7 +437,6 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
         //just append group to the end
         case OCCMutations::AppendRandom: {
             auto group = create_random_group(group_size, occp, gen);
-            child_code.occ_vector.reserve(child_code.occ_vector.size() + group.size());
             child_code.occ_vector.insert(child_code.occ_vector.end(), group.begin(), group.end());
         }
         //insert group into sequence
@@ -451,25 +450,17 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
         //Overwrite existing part of a sequence with a group
         case OCCMutations::ChangeRandom: {
             auto group = create_random_group(group_size, occp, gen);
-            int starting_position = 1;
-            switch (group[0]) {
-                case OCCInstruction::SetBlockMouth:
-                case OCCInstruction::SetBlockProducer:
-                case OCCInstruction::SetBlockMover:
-                case OCCInstruction::SetBlockKiller:
-                case OCCInstruction::SetBlockArmor:
-                case OCCInstruction::SetBlockEye:
-                    starting_position = 0;
-                    break;
-                default: break;
-            }
 
-            int position = std::uniform_int_distribution<int>(starting_position, child_code.occ_vector.size()-1)(gen);
+            int position = std::uniform_int_distribution<int>(0, child_code.occ_vector.size()-1)(gen);
 
             int iterated = 0;
-            for (auto iterator = child_code.occ_vector.begin()+position; iterator != child_code.occ_vector.end() && iterated < group.size(); iterator++) {
+            auto iterator = child_code.occ_vector.begin()+position;
+
+            while (iterator != child_code.occ_vector.end() && iterated < group.size()) {
+                (*iterator) = group[iterated];
+
                 iterated++;
-                (*iterator) = group[iterated-1];
+                iterator++;
             }
         }
             break;
@@ -489,7 +480,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             int distance;
 
             if (occp.uniform_swap_distance) {
-                distance = std::uniform_int_distribution<int>(1, occp.max_distance)(gen);
+                distance = std::uniform_int_distribution<int>(0, occp.max_distance)(gen);
             } else {
                 distance = occp.swap_distance_mutation_discrete_distribution(gen);
             }

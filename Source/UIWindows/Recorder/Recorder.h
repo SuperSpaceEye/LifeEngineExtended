@@ -25,6 +25,8 @@
 #include "../../Stuff/ImageCreation.h"
 #include "../../Containers/CPU/OrganismInfoContainer.h"
 
+#include "../../Stuff/moviemaker/include/movie.h"
+
 #if defined(__WIN32)
 #include <windows.h>
 #include <cwchar>

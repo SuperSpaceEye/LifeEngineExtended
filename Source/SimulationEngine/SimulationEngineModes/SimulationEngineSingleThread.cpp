@@ -36,13 +36,6 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     //https://en.wikipedia.org/wiki/Partial_sorting
     OrganismsController::precise_sort_high_to_low_dead_organisms_positions(*dc);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {try_make_child(dc, sp, &organism, gen);}}
-
-    //Possible optimization
-    //1. collect organisms that are going to reproduce
-    //2. partially sort outside dead organisms of amount num_organisms_to_reproduce - dead_inside.
-    //3. reproduce organisms.
-    //Because it is possible that organisms will "jump" over dead organisms, there will be needed some algorithm that will
-    //detect jumping and compute accurate dead_organisms_before_last_alive_position.
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {

@@ -198,59 +198,82 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
     //Will be loaded from disk
     recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc->simulation_width, edc->simulation_height, recd->second_simulation_grid_buffer);
 
-    std::thread thr([this](
-            std::string path_to_save,
-            int simulation_width,
-            int simulation_height,
-            int num_pixels_per_block,
-            int recorded_states,
-            int buffer_size,
-            int * video_fps
-            ) {
+    std::thread thr2([this](std::string path_to_save,
+                            int simulation_width,
+                            int simulation_height,
+                            int num_pixels_per_block,
+                            int recorded_states,
+                            int buffer_size,
+                            int video_fps) {
         std::vector<unsigned char> image_vec(
-                simulation_width * simulation_height * num_pixels_per_block * num_pixels_per_block * 4);
+             simulation_width * simulation_height * num_pixels_per_block * num_pixels_per_block * 4);
 
         std::vector<std::vector<BaseGridBlock>> local_buffer;
 
-        std::string images_path_to_save = path_to_save + "_img";
-        std::filesystem::create_directory(images_path_to_save);
-
-        std::filesystem::path p(path_to_save);
-        std::string dir_name = p.filename().string();
-
         auto point = std::chrono::high_resolution_clock::now();
-#if defined(__WIN32)
-        ShowWindow(GetConsoleWindow(), SW_SHOW);
-        auto console = GetConsoleWindow();
-        RECT r;
-        GetWindowRect(console, &r);
-
-        MoveWindow(console, r.left, r.top, 200, 100, TRUE);
-
-        CONSOLE_FONT_INFOEX cfi;
-        cfi.cbSize = sizeof(cfi);
-        cfi.nFont = 0;
-        cfi.dwFontSize.X = 0;                   // Width of each character in the font
-        cfi.dwFontSize.Y = 24;                  // Height
-        cfi.FontFamily = FF_DONTCARE;
-        cfi.FontWeight = FW_NORMAL;
-        std::wcscpy(cfi.FaceName, L"Consolas"); // Choose your font
-        SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);
-#endif
 
         std::vector<std::pair<int, std::string>> directories;
 
         for (auto &file: std::filesystem::directory_iterator(path_to_save)) {
-            directories.emplace_back(std::stoi(file.path().filename().string()), file.path().string());
+         directories.emplace_back(std::stoi(file.path().filename().string()), file.path().string());
         }
 
         //file paths do not come out in order, so they need to be sorted first
         std::sort(directories.begin(), directories.end(),
-                  [](std::pair<int, std::string> &a, std::pair<int, std::string> &b) {
-                      return a.first < b.first;
-                  });
+               [](std::pair<int, std::string> &a, std::pair<int, std::string> &b) {
+                   return a.first < b.first;
+               });
 
-        int nums = std::to_string(recorded_states).length();
+
+        std::filesystem::path p(path_to_save);
+        std::string dir_name = p.filename().string();
+        auto program_root = QCoreApplication::applicationDirPath().toStdString();
+        std::string movie_name = program_root + "/videos/" + dir_name;
+
+        int loaded_frames = 0;
+//        bool finish_compilation = false;
+//        if (std::filesystem::exists(movie_name+".mp4")) {
+//            std::filesystem::rename(movie_name+".mp4", movie_name+"_temp.mp4");
+//            finish_compilation = true;
+//        }
+//
+//        MovieReader reader(movie_name+"_temp", static_cast<unsigned int>(simulation_width * num_pixels_per_block),
+//                           static_cast<unsigned int>(simulation_height * num_pixels_per_block));
+
+//        MovieWriter writer(movie_name, simulation_width * num_pixels_per_block, simulation_height * num_pixels_per_block, video_fps);
+
+        MovieWriter writer;
+//        if (finish_compilation) {
+//            while (reader.getFrame(image_vec)) {
+//                    writer.addFrame(&image_vec[0]);
+//                    loaded_frames++;
+//                }
+//        }
+//
+//        reader.stop_reading();
+//        std::filesystem::remove(movie_name+"_temp.mp4");
+
+        if (std::filesystem::exists(movie_name+".mp4")) {
+            std::filesystem::rename(movie_name+".mp4", movie_name+"_temp.mp4");
+            writer.start_writing(movie_name, simulation_width * num_pixels_per_block,
+                                 simulation_height * num_pixels_per_block, video_fps);
+            {
+                MovieReader reader(movie_name + "_temp", simulation_width * num_pixels_per_block,
+                                   simulation_height * num_pixels_per_block);
+
+                while (reader.getFrame(image_vec)) {
+                    writer.addFrame(&image_vec[0]);
+                    loaded_frames++;
+                }
+
+                reader.stop_reading();
+            }
+
+            std::filesystem::remove(movie_name+"_temp.mp4");
+        } else {
+            writer.start_writing(movie_name, simulation_width * num_pixels_per_block,
+                                 simulation_height * num_pixels_per_block, video_fps);
+        }
 
         int frame_num = 0;
         int last_frame_num = 0;
@@ -269,36 +292,15 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
             }
             RecordingData::load_buffer_from_disk(path, width, height, buffer_size, len, local_buffer);
 
-
-
             for (int i = 0; i < len; i++) {
                 frame_num++;
 
-                //Constructing filepath.
-                //Because windows has no glob, I need to use %nd thing. To use %nd thing every picture should be
-                //n num long. For example if I want to use %4d files need to be 0001.png, 0002.png ...
-                //It also needs to be consistent, so I am first creating padding, and add it to the string num.
-                std::string padding = std::to_string(frame_num);
-                std::string frame_str;
-                for (int i = 0; i < nums - padding.length(); i++) { frame_str += "0"; }
-                frame_str += padding;
-                std::string image_path;
-                image_path.append(images_path_to_save);
-                image_path.append("/");
-                image_path.append(frame_str);
-                image_path.append(".png");
-//            image_path = image_path+images_path_to_save+"/"+frame_str+".png";
-
-                if (std::filesystem::exists(image_path)) { continue; }
+                if (frame_num <= loaded_frames) { continue;}
 
                 Recorder::create_image(image_vec, local_buffer[i], simulation_width, simulation_height, num_pixels_per_block);
 
-                QImage image(image_vec.data(),
-                             simulation_width * num_pixels_per_block,
-                             simulation_height * num_pixels_per_block,
-                             QImage::Format_RGB32);
+                writer.addFrame(&image_vec[0]);
 
-                image.save(QString::fromStdString(image_path), "PNG");
                 auto point2 = std::chrono::high_resolution_clock::now();
                 if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
                     int frame_diff = frame_num - last_frame_num;
@@ -317,30 +319,11 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                 }
             }
         }
+    }, recd->path_to_save, edc->simulation_width, edc->simulation_height,
+       num_pixels_per_block, recd->recorded_states, recd->buffer_size, video_fps);
 
-        clear_console();
-        std::cout << "Video is being created. Do not turn off the program.\n";
+    thr2.detach();
 
-        auto program_root = QCoreApplication::applicationDirPath().toStdString();
-
-        std::string ffmpeg_command =
-                ffmpeg_path + " -framerate " + std::to_string(*video_fps) + " -start_number 1 -i \"" +
-                images_path_to_save + "/%" + std::to_string(nums) + "d.png\" -c:v libx264 -pix_fmt yuv420p " +
-                program_root + "/videos/" + dir_name + ".mp4 -y";
-
-//    #ifdef __WIN32
-//    _popen(ffmpeg_command.c_str(), "rt");
-//    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
-//    system(ffmpeg_command.c_str());
-//    #endif
-
-        auto a = system(ffmpeg_command.c_str());
-
-//        lock_recording = false;
-    },
-                    recd->path_to_save, edc->simulation_width, edc->simulation_height,
-                    num_pixels_per_block, recd->recorded_states, recd->buffer_size, &video_fps);
-    thr.detach();
     b_stop_recording_slot();
 
 #if defined(__WIN32)
