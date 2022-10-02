@@ -18,6 +18,7 @@
 #include "../../Organism/CPU/ObservationStuff.h"
 #include "../../Organism/CPU/Organism.h"
 #include "OCCLogicContainer.h"
+#include "../../WorldRecorder/WorldRecorder.h"
 
 struct EngineDataContainer {
     uint64_t delta_time = 0;
@@ -56,6 +57,8 @@ struct EngineDataContainer {
         std::vector<std::vector<Observation>> organisms_observations{};
 
         OCCLogicContainer occl{};
+
+        TransactionBuffer buffer{};
     };
     SingleThreadContainer stc{};
 
@@ -65,6 +68,8 @@ struct EngineDataContainer {
     Organism * chosen_organism = nullptr;
 
     int auto_reset_counter = 0;
+
+    bool record_data = false;
 
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> ui_user_actions_pool;

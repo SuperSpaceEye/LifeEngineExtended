@@ -24,7 +24,7 @@ class MovieWriter
     unsigned int iframe;
     int frameRate;
 
-    bool writing=false;
+    bool writing = false;
 
     SwsContext* swsCtx;
     AVOutputFormat* fmt;

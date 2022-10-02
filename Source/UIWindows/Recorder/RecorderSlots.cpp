@@ -231,27 +231,8 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         std::string movie_name = program_root + "/videos/" + dir_name;
 
         int loaded_frames = 0;
-//        bool finish_compilation = false;
-//        if (std::filesystem::exists(movie_name+".mp4")) {
-//            std::filesystem::rename(movie_name+".mp4", movie_name+"_temp.mp4");
-//            finish_compilation = true;
-//        }
-//
-//        MovieReader reader(movie_name+"_temp", static_cast<unsigned int>(simulation_width * num_pixels_per_block),
-//                           static_cast<unsigned int>(simulation_height * num_pixels_per_block));
-
-//        MovieWriter writer(movie_name, simulation_width * num_pixels_per_block, simulation_height * num_pixels_per_block, video_fps);
 
         MovieWriter writer;
-//        if (finish_compilation) {
-//            while (reader.getFrame(image_vec)) {
-//                    writer.addFrame(&image_vec[0]);
-//                    loaded_frames++;
-//                }
-//        }
-//
-//        reader.stop_reading();
-//        std::filesystem::remove(movie_name+"_temp.mp4");
 
         if (std::filesystem::exists(movie_name+".mp4")) {
             std::filesystem::rename(movie_name+".mp4", movie_name+"_temp.mp4");
@@ -264,6 +245,13 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                 while (reader.getFrame(image_vec)) {
                     writer.addFrame(&image_vec[0]);
                     loaded_frames++;
+
+                    auto point2 = std::chrono::high_resolution_clock::now();
+                    if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
+                        point = std::chrono::high_resolution_clock::now();
+                        clear_console();
+                        std::cout << "Loading frames " << loaded_frames << ". Do not turn off program.\n";
+                    }
                 }
 
                 reader.stop_reading();

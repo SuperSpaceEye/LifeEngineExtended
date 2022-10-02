@@ -25,7 +25,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     dc->stc.organisms_observations.clear();
 
     reserve_observations(dc->stc.organisms_observations, dc->stc.organisms, dc);
-    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) { get_observations(dc, sp, &organism, dc->stc.organisms_observations);}}
+    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {get_observations(dc, sp, &organism, dc->stc.organisms_observations);}}
 
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(dc->stc.organisms_observations[i], gen);}}
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {make_decision(dc, sp, &organism, gen);}}
@@ -39,6 +39,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
+    if (dc->record_data) {dc->stc.buffer.record_new_organism(*organism);}
     for (auto &block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
         auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
@@ -64,10 +65,14 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *
                                                            Organism *organism, lehmer64 &gen, float multiplier) {
     for (auto & pr: organism->anatomy._producing_space) {
         for (auto &pc: pr) {
-            auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
+            auto x = organism->x + pc.get_pos(organism->rotation).x;
+            auto y = organism->y + pc.get_pos(organism->rotation).y;
+
+            auto * w_block = &dc->CPU_simulation_grid[x][y];
             if (w_block->type != BlockTypes::EmptyBlock) {continue;}
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
                 w_block->type = BlockTypes::FoodBlock;
+                if (dc->record_data) {dc->stc.buffer.record_food_change(x, y, true);}
                 if (sp->stop_when_one_food_generated) { return;}
                 continue;
             }
@@ -84,19 +89,27 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc,
         //Then selects one space to produce food.
         auto & pc = pr[std::uniform_int_distribution<int>(0, pr.size()-1)(gen)];
 
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
+        auto x = organism->x + pc.get_pos(organism->rotation).x;
+        auto y = organism->y + pc.get_pos(organism->rotation).y;
+
+        auto * w_block = &dc->CPU_simulation_grid[x][y];
 
         //if space is occupied, then do nothing
         if (w_block->type != BlockTypes::EmptyBlock) { continue;}
         w_block->type = BlockTypes::FoodBlock;
+        if (dc->record_data) {dc->stc.buffer.record_food_change(x, y, true);}
         if (sp->stop_when_one_food_generated) { return;}
     }
 }
 
 void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
     for (auto & pc: organism->anatomy._eating_space) {
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pc.get_pos(organism->rotation).x][organism->y + pc.get_pos(organism->rotation).y];
+        auto x = organism->x + pc.get_pos(organism->rotation).x;
+        auto y = organism->y + pc.get_pos(organism->rotation).y;
+
+        auto * w_block = &dc->CPU_simulation_grid[x][y];
         if (w_block->type == BlockTypes::FoodBlock) {
+            if (dc->record_data) {dc->stc.buffer.record_food_change(x, y, false);}
             w_block->type = BlockTypes::EmptyBlock;
             organism->food_collected++;
         }
@@ -107,6 +120,7 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, Organi
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
         organism->kill_organism(*dc);
+        if (dc->record_data) {dc->stc.buffer.record_organism_dying(organism->vector_index);}
         for (auto & block: organism->anatomy._organism_blocks) {
             auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
             w_block->type = BlockTypes::FoodBlock;
@@ -135,8 +149,6 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
     }
 }
 
-//TODO reserve_observations and .clear() take like 5.5% of execution time. Maybe do not clear and reserve, and instead
-// expand observations as needed, while keeping some int to keep track of how many observations took place?
 void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<Observation>> &observations,
                                                         std::vector<Organism> &organisms,
                                                         EngineDataContainer *dc) {
@@ -263,6 +275,8 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
         w_block->rotation = get_global_rotation(block.rotation, organism->rotation);
         w_block->organism_index = organism->vector_index;
     }
+
+    if (dc->record_data) {dc->stc.buffer.record_organism_move_change(organism->vector_index, organism->x, organism->y, organism->rotation);}
 }
 
 void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
