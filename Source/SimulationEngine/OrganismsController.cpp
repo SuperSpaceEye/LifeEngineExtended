@@ -61,10 +61,13 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
     organism->child_pattern_index = -1;
 
     organism->is_dead = true;
-    edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
 
-    if (organism->vector_index < edc.stc.last_alive_position) {
-        edc.stc.dead_organisms_before_last_alive_position++;
+    { //TODO New version. Comment it.
+        edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
+
+        if (organism->vector_index < edc.stc.last_alive_position) {
+            edc.stc.dead_organisms_before_last_alive_position++;
+        }
     }
 
     edc.stc.num_dead_organisms++;

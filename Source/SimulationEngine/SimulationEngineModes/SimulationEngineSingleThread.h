@@ -39,7 +39,7 @@ public:
 
     static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 
-    static void tick_lifetime(EngineDataContainer *dc, Organism *organism);
+    static void tick_lifetime(EngineDataContainer *dc, Organism *organism, int &i);
 
     static void apply_damage    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
 

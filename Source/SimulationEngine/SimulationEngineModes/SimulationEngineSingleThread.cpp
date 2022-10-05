@@ -20,7 +20,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
 
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {apply_damage(dc, sp, &organism);}}
 
-    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {tick_lifetime(dc, &organism);}}
+    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {tick_lifetime(dc, &organism, i);}}
 
     dc->stc.organisms_observations.clear();
 
@@ -36,6 +36,36 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     //https://en.wikipedia.org/wiki/Partial_sorting
     OrganismsController::precise_sort_high_to_low_dead_organisms_positions(*dc);
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {try_make_child(dc, sp, &organism, gen);}}
+
+
+    //TODO new version. Should be a bit faster than version above, but i can't really benchmark it because call order of random generator changes.
+    // Also, for some reason the organisms with a mouth at 0,0 and producers at the edges become extinct much more easily than when the above version is used. IDK why.
+//    if (sp->eat_then_produce) {
+//        for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; eat_food(dc, sp, &organism);}
+//        for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; produce_food(dc, sp, &organism, *gen);}
+//    } else {
+//        for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; produce_food(dc, sp, &organism, *gen);}
+//        for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; eat_food(dc, sp, &organism);}
+//    }
+//
+//    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; apply_damage(dc, sp, &organism);}
+//
+//    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; tick_lifetime(dc, &organism, i);}
+//
+//    dc->stc.organisms_observations.clear();
+//
+//    reserve_observations(dc->stc.organisms_observations, dc->stc.organisms, dc);
+//    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; get_observations(dc, sp, &organism, dc->stc.organisms_observations);}
+//
+//    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; organism.think_decision(dc->stc.organisms_observations[i], gen);}
+//    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; make_decision(dc, sp, &organism, gen);}
+//
+//    //TODO the result of sorting doesn't need to be perfect, just good enough.
+//    //https://en.wikipedia.org/wiki/K-sorted_sequence#Algorithms
+//    //https://en.wikipedia.org/wiki/Partial_sorting
+//    OrganismsController::precise_sort_high_to_low_dead_organisms_positions(*dc);
+//    for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; try_make_child(dc, sp, &organism, gen);}
+
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organism *organism) {
@@ -116,7 +146,7 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, Simulation
     }
 }
 
-void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, Organism *organism) {
+void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, Organism *organism, int &i) {
     organism->lifetime++;
     if (organism->lifetime > organism->max_lifetime || organism->damage > organism->life_points) {
         organism->kill_organism(*dc);
@@ -126,6 +156,16 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, Organi
             w_block->type = BlockTypes::FoodBlock;
             w_block->organism_index = -1;
         }
+
+
+        //TODO New version.
+//        auto * second_organism = &dc->stc.organisms[dc->stc.last_alive_position];
+//
+//        std::swap(*organism, *second_organism);
+//        std::swap(organism->vector_index, second_organism->vector_index);
+//        dc->stc.last_alive_position--;
+//        dc->stc.dead_organisms_positions.emplace_back(second_organism->vector_index);
+//        i--;
     }
 }
 
