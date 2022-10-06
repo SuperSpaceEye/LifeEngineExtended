@@ -53,11 +53,13 @@ void MainWindow::tb_open_info_window_slot(bool state) {
 }
 
 void MainWindow::tb_open_recorder_window_slot(bool state) {
+#ifndef __EMSCRIPTEN_COMPILATION__
     if (state) {
         rc.show();
     } else {
         rc.close();
     }
+#endif
 }
 
 void MainWindow::tb_open_world_events_slot(bool state) {
@@ -685,6 +687,7 @@ void MainWindow::cb_info_window_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
+#ifndef __EMSCRIPTEN_COMPILATION__
     if (is_fullscreen) {return;}
     auto hidden = rc.isHidden();
 
@@ -695,6 +698,7 @@ void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
     if (!hidden) {
         rc.show();
     }
+#endif
 }
 
 void MainWindow::cb_world_events_always_on_top_slot(bool state) {

@@ -35,7 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     engine.make_walls();
 
+    #ifndef __EMSCRIPTEN_COMPILATION__
     rc.set_engine(&engine);
+    #endif
 
     //In mingw compiler std::random_device is deterministic?
     //https://stackoverflow.com/questions/18880654/why-do-i-get-the-same-sequence-for-every-run-with-stdrandom-device-with-mingw
@@ -186,7 +188,9 @@ void MainWindow::ui_tick() {
 
     bs.update_();
 
+    #ifndef __EMSCRIPTEN_COMPILATION__
     rc.update_label();
+    #endif
 
     window_frames++;
 #if __VALGRIND_MODE__ == 1
@@ -623,6 +627,11 @@ void MainWindow::initialize_gui() {
     st.ui.lb_organisms_memory_consumption->hide();
 
     ee.occ_mode(sp.use_occ);
+
+    #ifdef __EMSCRIPTEN_COMPILATION__
+    ui.cb_recorder_window_always_on_top->hide();
+    ui.tb_open_recorder_window->hide();
+    #endif
 }
 
 void MainWindow::get_current_font_size() {
@@ -832,7 +841,9 @@ void MainWindow::set_child_windows_always_on_top(bool state) {
     st.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     ee.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     iw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    #ifndef __EMSCRIPTEN_COMPILATION__
     rc.setWindowFlag(Qt::WindowStaysOnTopHint, state);
+    #endif
     we.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     bs.setWindowFlag(Qt::WindowStaysOnTopHint, state);
     occpw.setWindowFlag(Qt::WindowStaysOnTopHint, state);
@@ -843,7 +854,9 @@ void MainWindow::apply_font_to_windows(const QFont &_font) {
     ee.setFont(_font);
     st.setFont(_font);
     iw.setFont(_font);
+    #ifndef __EMSCRIPTEN_COMPILATION__
     rc.setFont(_font);
+    #endif
     we.setFont(_font);
     bs.setFont(_font);
     occpw.setFont(_font);
