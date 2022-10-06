@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION ${MIN_VERSION})
 set(PROJECT_NAME LifeEngineExtended)
 project(${PROJECT_NAME})
 
+#option(JS_ONLY "Compile to native JS (No WASM)" OFF)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -131,6 +133,17 @@ set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/S
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES})
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
 
+#if(JS_ONLY)
+#    message(STATUS "Setting compilation target to native JavaScript")
+#    set(CMAKE_EXECUTABLE_SUFFIX ".js")
+#    set_target_properties(${PROJECT_NAME}
+#            PROPERTIES LINK_FLAGS "-s WASM=0 -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'")
+#else(JS_ONLY)
+message(STATUS "Setting compilation target to WASM")
+set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'")
+#endif(JS_ONLY)
+
 #if (WIN_USE_CUDA_LIBS)
 #    foreach(ITEM IN LISTS CUDA_SOURCES)
 #        set(CUDA_LIST_SOURCES "${CUDA_LIST_SOURCES}${ITEM} ")
@@ -155,6 +168,8 @@ add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJE
 #    )
 #    add_dependencies(${PROJECT_NAME} run_CUDA_build)
 #endif ()
+
+
 
 if(CUDAToolkit_FOUND)
     message(STATUS "Found CUDAToolkit version ${CUDAToolkit_VERSION}")
