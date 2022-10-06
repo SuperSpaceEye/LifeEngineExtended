@@ -30,17 +30,23 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
-set(WIN_COMPILATION 0)
+set(EMSCRIPTEN_COMPILATION 1)
 
+set(WIN_COMPILATION 0)
 set(WIN_USE_CUDA_LIBS 0)
 
-if(NOT WIN_COMPILATION)
+if(EMSCRIPTEN_COMPILATION)
+    set(WIN_COMPILATION 0)
+    set(WIN_USE_CUDA_LIBS 0)
+endif()
+
+if(NOT WIN_COMPILATION AND NOT EMSCRIPTEN_COMPILATION)
     set(WIN_USE_CUDA_LIBS 0)
     set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
     set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 endif()
 
-if (NOT WIN_USE_CUDA_LIBS AND NOT WIN_COMPILATION)
+if (NOT WIN_USE_CUDA_LIBS AND NOT WIN_COMPILATION AND NOT EMSCRIPTEN_COMPILATION)
     find_package(CUDAToolkit)
 endif()
 
@@ -58,38 +64,42 @@ if (WIN_COMPILATION)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 
-find_package(Qt5 COMPONENTS
-        Core
-        Gui
-        Widgets
-#        Charts
-        REQUIRED)
+if(NOT EMSCRIPTEN_COMPILATION)
+    find_package(Qt5 COMPONENTS
+            Core
+            Gui
+            Widgets
+    #        Charts
+            REQUIRED)
 
-find_package(Boost COMPONENTS random REQUIRED)
+    find_package(Boost COMPONENTS random REQUIRED)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-find_package(FFmpeg REQUIRED)
-if(NOT WIN_COMPILATION)
-    find_package(Numa REQUIRED)
-else()
-    set(NUMA_LIBRARY "")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+    find_package(FFmpeg REQUIRED)
+    if(NOT WIN_COMPILATION)
+        find_package(Numa REQUIRED)
+    else()
+        set(NUMA_LIBRARY "")
+    endif()
+    find_package(PkgConfig REQUIRED)
+    find_package(RSVG REQUIRED)
+    find_package(Threads REQUIRED)
+    find_package(x264 REQUIRED)
+    pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Source/Stuff/moviemaker/include)
+    include_directories(${FFMPEG_INCLUDE_DIRS})
+    include_directories(${GTK3_INCLUDE_DIRS})
+    include_directories(${RSVG_INCLUDE_DIR})
+    include_directories(${SWSCALE_INCLUDE_DIRS})
+    include_directories(${X264_INCLUDE_DIR})
+
+    message(STATUS ${Boost_VERSION})
+#else()
 endif()
-find_package(PkgConfig REQUIRED)
-find_package(RSVG REQUIRED)
-find_package(Threads REQUIRED)
-find_package(x264 REQUIRED)
-pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Source/Stuff/moviemaker/include)
-include_directories(${FFMPEG_INCLUDE_DIRS})
-include_directories(${GTK3_INCLUDE_DIRS})
-include_directories(${RSVG_INCLUDE_DIR})
-include_directories(${SWSCALE_INCLUDE_DIRS})
-include_directories(${X264_INCLUDE_DIR})
-
-message(STATUS ${Boost_VERSION})
 
 add_compile_definitions(__VALGRIND_MODE__=0)
+add_compile_definitions(__EMSCRIPTEN_COMPILATION__)
 
 #find_package(OpenMP)
 
@@ -172,8 +182,10 @@ if(Boost_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 endif()
 
-if (WIN_COMPILATION)
-    target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
-else()
-    target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+if(NOT EMSCRIPTEN_COMPILATION)
+    if (WIN_COMPILATION)
+        target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+    else()
+        target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+    endif()
 endif()

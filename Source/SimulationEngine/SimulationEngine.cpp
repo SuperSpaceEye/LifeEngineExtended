@@ -15,8 +15,11 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
                                    RecordingData *recording_data, OCCParameters &occp) :
         edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters),
         recd(recording_data), occp(occp) {
-
+#ifndef __EMSCRIPTEN_COMPILATION__
     boost::random_device rd;
+#else
+    std::random_device rd;
+#endif
 //    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
     //TODO only do if enabled?
