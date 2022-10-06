@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'recorder.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.8
+** Created by: Qt User Interface Compiler version 6.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -59,30 +59,30 @@ public:
     void setupUi(QWidget *Recorder)
     {
         if (Recorder->objectName().isEmpty())
-            Recorder->setObjectName(QString::fromUtf8("Recorder"));
+            Recorder->setObjectName("Recorder");
         Recorder->resize(900, 674);
         verticalLayout = new QVBoxLayout(Recorder);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         tabWidget = new QTabWidget(Recorder);
-        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+        tabWidget->setObjectName("tabWidget");
         full_video_image_creator = new QWidget();
-        full_video_image_creator->setObjectName(QString::fromUtf8("full_video_image_creator"));
+        full_video_image_creator->setObjectName("full_video_image_creator");
         verticalLayout_2 = new QVBoxLayout(full_video_image_creator);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName("verticalLayout_2");
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer);
 
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName("horizontalLayout");
         label = new QLabel(full_video_image_creator);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName("label");
 
         horizontalLayout->addWidget(label);
 
         le_number_or_pixels_per_block = new QLineEdit(full_video_image_creator);
-        le_number_or_pixels_per_block->setObjectName(QString::fromUtf8("le_number_or_pixels_per_block"));
+        le_number_or_pixels_per_block->setObjectName("le_number_or_pixels_per_block");
 
         horizontalLayout->addWidget(le_number_or_pixels_per_block);
 
@@ -90,7 +90,7 @@ public:
         verticalLayout_2->addLayout(horizontalLayout);
 
         b_create_image = new QPushButton(full_video_image_creator);
-        b_create_image->setObjectName(QString::fromUtf8("b_create_image"));
+        b_create_image->setObjectName("b_create_image");
 
         verticalLayout_2->addWidget(b_create_image);
 
@@ -99,14 +99,14 @@ public:
         verticalLayout_2->addItem(verticalSpacer_3);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         label_2 = new QLabel(full_video_image_creator);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName("label_2");
 
         horizontalLayout_2->addWidget(label_2);
 
         le_first_grid_buffer_size = new QLineEdit(full_video_image_creator);
-        le_first_grid_buffer_size->setObjectName(QString::fromUtf8("le_first_grid_buffer_size"));
+        le_first_grid_buffer_size->setObjectName("le_first_grid_buffer_size");
 
         horizontalLayout_2->addWidget(le_first_grid_buffer_size);
 
@@ -114,14 +114,14 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
         label_3 = new QLabel(full_video_image_creator);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName("label_3");
 
         horizontalLayout_4->addWidget(label_3);
 
         le_log_every_n_tick = new QLineEdit(full_video_image_creator);
-        le_log_every_n_tick->setObjectName(QString::fromUtf8("le_log_every_n_tick"));
+        le_log_every_n_tick->setObjectName("le_log_every_n_tick");
 
         horizontalLayout_4->addWidget(le_log_every_n_tick);
 
@@ -129,14 +129,14 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_4);
 
         horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
         label_4 = new QLabel(full_video_image_creator);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setObjectName("label_4");
 
         horizontalLayout_5->addWidget(label_4);
 
         le_video_fps = new QLineEdit(full_video_image_creator);
-        le_video_fps->setObjectName(QString::fromUtf8("le_video_fps"));
+        le_video_fps->setObjectName("le_video_fps");
 
         horizontalLayout_5->addWidget(le_video_fps);
 
@@ -144,24 +144,24 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_5);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
         b_new_recording = new QPushButton(full_video_image_creator);
-        b_new_recording->setObjectName(QString::fromUtf8("b_new_recording"));
+        b_new_recording->setObjectName("b_new_recording");
 
         horizontalLayout_3->addWidget(b_new_recording);
 
         b_start_recording = new QPushButton(full_video_image_creator);
-        b_start_recording->setObjectName(QString::fromUtf8("b_start_recording"));
+        b_start_recording->setObjectName("b_start_recording");
 
         horizontalLayout_3->addWidget(b_start_recording);
 
         b_pause_recording = new QPushButton(full_video_image_creator);
-        b_pause_recording->setObjectName(QString::fromUtf8("b_pause_recording"));
+        b_pause_recording->setObjectName("b_pause_recording");
 
         horizontalLayout_3->addWidget(b_pause_recording);
 
         b_stop_recording = new QPushButton(full_video_image_creator);
-        b_stop_recording->setObjectName(QString::fromUtf8("b_stop_recording"));
+        b_stop_recording->setObjectName("b_stop_recording");
 
         horizontalLayout_3->addWidget(b_stop_recording);
 
@@ -169,28 +169,28 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_3);
 
         lb_recording_information = new QLabel(full_video_image_creator);
-        lb_recording_information->setObjectName(QString::fromUtf8("lb_recording_information"));
+        lb_recording_information->setObjectName("lb_recording_information");
         lb_recording_information->setAlignment(Qt::AlignCenter);
 
         verticalLayout_2->addWidget(lb_recording_information);
 
         b_load_intermediate_data_location = new QPushButton(full_video_image_creator);
-        b_load_intermediate_data_location->setObjectName(QString::fromUtf8("b_load_intermediate_data_location"));
+        b_load_intermediate_data_location->setObjectName("b_load_intermediate_data_location");
 
         verticalLayout_2->addWidget(b_load_intermediate_data_location);
 
         b_compile_intermediate_data_into_video = new QPushButton(full_video_image_creator);
-        b_compile_intermediate_data_into_video->setObjectName(QString::fromUtf8("b_compile_intermediate_data_into_video"));
+        b_compile_intermediate_data_into_video->setObjectName("b_compile_intermediate_data_into_video");
 
         verticalLayout_2->addWidget(b_compile_intermediate_data_into_video);
 
         b_clear_intermediate_data = new QPushButton(full_video_image_creator);
-        b_clear_intermediate_data->setObjectName(QString::fromUtf8("b_clear_intermediate_data"));
+        b_clear_intermediate_data->setObjectName("b_clear_intermediate_data");
 
         verticalLayout_2->addWidget(b_clear_intermediate_data);
 
         b_delete_all_intermediate_data_from_disk = new QPushButton(full_video_image_creator);
-        b_delete_all_intermediate_data_from_disk->setObjectName(QString::fromUtf8("b_delete_all_intermediate_data_from_disk"));
+        b_delete_all_intermediate_data_from_disk->setObjectName("b_delete_all_intermediate_data_from_disk");
 
         verticalLayout_2->addWidget(b_delete_all_intermediate_data_from_disk);
 
@@ -226,22 +226,22 @@ public:
 
     void retranslateUi(QWidget *Recorder)
     {
-        Recorder->setWindowTitle(QApplication::translate("Recorder", "Recorder", nullptr));
-        label->setText(QApplication::translate("Recorder", "Number of pixels per world block", nullptr));
-        b_create_image->setText(QApplication::translate("Recorder", "Create image", nullptr));
-        label_2->setText(QApplication::translate("Recorder", "Grid buffer size", nullptr));
-        label_3->setText(QApplication::translate("Recorder", "Log every n tick", nullptr));
-        label_4->setText(QApplication::translate("Recorder", "Video output FPS", nullptr));
-        b_new_recording->setText(QApplication::translate("Recorder", "New recording", nullptr));
-        b_start_recording->setText(QApplication::translate("Recorder", "Start recording", nullptr));
-        b_pause_recording->setText(QApplication::translate("Recorder", "Pause recording", nullptr));
-        b_stop_recording->setText(QApplication::translate("Recorder", "Stop recording", nullptr));
-        lb_recording_information->setText(QApplication::translate("Recorder", "Status: Stopped ||| Recorded 0 ticks", nullptr));
-        b_load_intermediate_data_location->setText(QApplication::translate("Recorder", "Load intermediate data location", nullptr));
-        b_compile_intermediate_data_into_video->setText(QApplication::translate("Recorder", "Compile intermediate data into video", nullptr));
-        b_clear_intermediate_data->setText(QApplication::translate("Recorder", "Clear intermediate data", nullptr));
-        b_delete_all_intermediate_data_from_disk->setText(QApplication::translate("Recorder", "Delete all intermediate data from disk", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(full_video_image_creator), QApplication::translate("Recorder", "Full grid video/Image creator", nullptr));
+        Recorder->setWindowTitle(QCoreApplication::translate("Recorder", "Recorder", nullptr));
+        label->setText(QCoreApplication::translate("Recorder", "Number of pixels per world block", nullptr));
+        b_create_image->setText(QCoreApplication::translate("Recorder", "Create image", nullptr));
+        label_2->setText(QCoreApplication::translate("Recorder", "Grid buffer size", nullptr));
+        label_3->setText(QCoreApplication::translate("Recorder", "Log every n tick", nullptr));
+        label_4->setText(QCoreApplication::translate("Recorder", "Video output FPS", nullptr));
+        b_new_recording->setText(QCoreApplication::translate("Recorder", "New recording", nullptr));
+        b_start_recording->setText(QCoreApplication::translate("Recorder", "Start recording", nullptr));
+        b_pause_recording->setText(QCoreApplication::translate("Recorder", "Pause recording", nullptr));
+        b_stop_recording->setText(QCoreApplication::translate("Recorder", "Stop recording", nullptr));
+        lb_recording_information->setText(QCoreApplication::translate("Recorder", "Status: Stopped ||| Recorded 0 ticks", nullptr));
+        b_load_intermediate_data_location->setText(QCoreApplication::translate("Recorder", "Load intermediate data location", nullptr));
+        b_compile_intermediate_data_into_video->setText(QCoreApplication::translate("Recorder", "Compile intermediate data into video", nullptr));
+        b_clear_intermediate_data->setText(QCoreApplication::translate("Recorder", "Clear intermediate data", nullptr));
+        b_delete_all_intermediate_data_from_disk->setText(QCoreApplication::translate("Recorder", "Delete all intermediate data from disk", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(full_video_image_creator), QCoreApplication::translate("Recorder", "Full grid video/Image creator", nullptr));
     } // retranslateUi
 
 };

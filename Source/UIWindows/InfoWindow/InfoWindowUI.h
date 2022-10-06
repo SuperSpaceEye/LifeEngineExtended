@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'info.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.8
+** Created by: Qt User Interface Compiler version 6.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -49,86 +49,86 @@ public:
     void setupUi(QWidget *Info)
     {
         if (Info->objectName().isEmpty())
-            Info->setObjectName(QString::fromUtf8("Info"));
+            Info->setObjectName("Info");
         Info->resize(855, 739);
         verticalLayout = new QVBoxLayout(Info);
         verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         OCC = new QTabWidget(Info);
-        OCC->setObjectName(QString::fromUtf8("OCC"));
+        OCC->setObjectName("OCC");
         about_tab = new QWidget();
-        about_tab->setObjectName(QString::fromUtf8("about_tab"));
+        about_tab->setObjectName("about_tab");
         horizontalLayout = new QHBoxLayout(about_tab);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName("horizontalLayout");
         textEdit = new QTextEdit(about_tab);
-        textEdit->setObjectName(QString::fromUtf8("textEdit"));
+        textEdit->setObjectName("textEdit");
         textEdit->setReadOnly(true);
 
         horizontalLayout->addWidget(textEdit);
 
         OCC->addTab(about_tab, QString());
         evolution_controls_tab = new QWidget();
-        evolution_controls_tab->setObjectName(QString::fromUtf8("evolution_controls_tab"));
+        evolution_controls_tab->setObjectName("evolution_controls_tab");
         verticalLayout_2 = new QVBoxLayout(evolution_controls_tab);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName("verticalLayout_2");
         textEdit_2 = new QTextEdit(evolution_controls_tab);
-        textEdit_2->setObjectName(QString::fromUtf8("textEdit_2"));
+        textEdit_2->setObjectName("textEdit_2");
         textEdit_2->setReadOnly(true);
 
         verticalLayout_2->addWidget(textEdit_2);
 
         OCC->addTab(evolution_controls_tab, QString());
         settings_tab = new QWidget();
-        settings_tab->setObjectName(QString::fromUtf8("settings_tab"));
+        settings_tab->setObjectName("settings_tab");
         verticalLayout_3 = new QVBoxLayout(settings_tab);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setObjectName("verticalLayout_3");
         textEdit_3 = new QTextEdit(settings_tab);
-        textEdit_3->setObjectName(QString::fromUtf8("textEdit_3"));
+        textEdit_3->setObjectName("textEdit_3");
         textEdit_3->setReadOnly(true);
 
         verticalLayout_3->addWidget(textEdit_3);
 
         OCC->addTab(settings_tab, QString());
         recorder_tab = new QWidget();
-        recorder_tab->setObjectName(QString::fromUtf8("recorder_tab"));
+        recorder_tab->setObjectName("recorder_tab");
         verticalLayout_4 = new QVBoxLayout(recorder_tab);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setObjectName("verticalLayout_4");
         textEdit_4 = new QTextEdit(recorder_tab);
-        textEdit_4->setObjectName(QString::fromUtf8("textEdit_4"));
+        textEdit_4->setObjectName("textEdit_4");
         textEdit_4->setReadOnly(true);
 
         verticalLayout_4->addWidget(textEdit_4);
 
         OCC->addTab(recorder_tab, QString());
         world_events_tab = new QWidget();
-        world_events_tab->setObjectName(QString::fromUtf8("world_events_tab"));
+        world_events_tab->setObjectName("world_events_tab");
         verticalLayout_5 = new QVBoxLayout(world_events_tab);
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_5->setObjectName("verticalLayout_5");
         textEdit_5 = new QTextEdit(world_events_tab);
-        textEdit_5->setObjectName(QString::fromUtf8("textEdit_5"));
+        textEdit_5->setObjectName("textEdit_5");
         textEdit_5->setReadOnly(true);
 
         verticalLayout_5->addWidget(textEdit_5);
 
         OCC->addTab(world_events_tab, QString());
         tab = new QWidget();
-        tab->setObjectName(QString::fromUtf8("tab"));
+        tab->setObjectName("tab");
         verticalLayout_7 = new QVBoxLayout(tab);
-        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
+        verticalLayout_7->setObjectName("verticalLayout_7");
         textEdit_7 = new QTextEdit(tab);
-        textEdit_7->setObjectName(QString::fromUtf8("textEdit_7"));
+        textEdit_7->setObjectName("textEdit_7");
         textEdit_7->setReadOnly(true);
 
         verticalLayout_7->addWidget(textEdit_7);
 
         OCC->addTab(tab, QString());
         custom_textures_tab = new QWidget();
-        custom_textures_tab->setObjectName(QString::fromUtf8("custom_textures_tab"));
+        custom_textures_tab->setObjectName("custom_textures_tab");
         verticalLayout_6 = new QVBoxLayout(custom_textures_tab);
-        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        verticalLayout_6->setObjectName("verticalLayout_6");
         textEdit_6 = new QTextEdit(custom_textures_tab);
-        textEdit_6->setObjectName(QString::fromUtf8("textEdit_6"));
+        textEdit_6->setObjectName("textEdit_6");
         textEdit_6->setReadOnly(true);
 
         verticalLayout_6->addWidget(textEdit_6);
@@ -148,8 +148,8 @@ public:
 
     void retranslateUi(QWidget *Info)
     {
-        Info->setWindowTitle(QApplication::translate("Info", "Info Window", nullptr));
-        textEdit->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        Info->setWindowTitle(QCoreApplication::translate("Info", "Info Window", nullptr));
+        textEdit->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -201,8 +201,8 @@ public:
 "<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Saving and loading will not work correctly unless your path contains only english letters.</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; "
                         "margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The program will crash sometimes.</li></ul></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(about_tab), QApplication::translate("Info", "About", nullptr));
-        textEdit_2->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        OCC->setTabText(OCC->indexOf(about_tab), QCoreApplication::translate("Info", "About", nullptr));
+        textEdit_2->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -236,8 +236,8 @@ public:
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inde"
                         "nt:0px;\"><span style=\" font-weight:600;\">\342\200\234Lifetime weight\342\200\235</span> - The amount of lifetime this cell will give to organism</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Chance Weight\342\200\235</span> - Controls how likely this cell will be picked during reproduction compared to others. If 0, the cell will never get picked.</li></ul></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(evolution_controls_tab), QApplication::translate("Info", "Evolution Controls", nullptr));
-        textEdit_3->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        OCC->setTabText(OCC->indexOf(evolution_controls_tab), QCoreApplication::translate("Info", "Evolution Controls", nullptr));
+        textEdit_3->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -247,8 +247,8 @@ public:
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Wait for engine to stop to render\342\200\235</span> - If enabled, will send an engine a signal to stop before rendering simulation grid.</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Really stop render\342\200\235</span>- To render an image, the program first calculates what cells will be seen by user, and then it copies them to the secondary grid containing only cell type and rotation, from which the image is constructed. If disabled, will parse the whole grid when \342\200\234Stop render\342\200\235 button is pressed, which will allow to move and scale the view. If enabled, will not parse the grid or construct an image when \342\200\234Stop render\342\200\235 is pressed."
                         "</li></ul></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(settings_tab), QApplication::translate("Info", "Settings", nullptr));
-        textEdit_4->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        OCC->setTabText(OCC->indexOf(settings_tab), QCoreApplication::translate("Info", "Settings", nullptr));
+        textEdit_4->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -280,8 +280,8 @@ public:
                         "k-indent:0; text-indent:0px;\">Convert recording data into a series of images in /temp/ folder. This stage is the slowest, though you can stop the compilation and continue later.</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Convert series of images into video. This stage is magnitudes faster than the previous, but cannot be stopped without losing the progress.</li></ol>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">\342\200\234Load intermediate data location\342\200\235</span> - Choose the folder with the recording.</li></ul></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(recorder_tab), QApplication::translate("Info", "Recorder", nullptr));
-        textEdit_5->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        OCC->setTabText(OCC->indexOf(recorder_tab), QCoreApplication::translate("Info", "Recorder", nullptr));
+        textEdit_5->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -317,8 +317,8 @@ public:
 ""
                         "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If simulation resets, world events will also automatically reset and start from the beginning. If execution of world events is stopped or the simulation resets, the simulation settings will be set to the state they were before the execution of world events started, unless you stop them with \342\200\234Stop Events No Setting Reset\342\200\235.</p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can pause/resume execution of world events with buttons \342\200\234Pause events\342\200\235/\342\200\234Resume events\342\200\235. These buttons will not reset world events.<br />If world events are already applied and were stopped, you can use \342\200\234Start Events\342\200\235 button to re-enable already applied world events.</p></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(world_events_tab), QApplication::translate("Info", "World Events", nullptr));
-        textEdit_7->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        OCC->setTabText(OCC->indexOf(world_events_tab), QCoreApplication::translate("Info", "World Events", nullptr));
+        textEdit_7->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -392,15 +392,15 @@ public:
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">SetUnderBlockArmor or SUBA</li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">SetUnderBl"
                         "ockEye or SUBE</li></ul></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(tab), QApplication::translate("Info", "OCC", nullptr));
-        textEdit_6->setHtml(QApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        OCC->setTabText(OCC->indexOf(tab), QCoreApplication::translate("Info", "OCC", nullptr));
+        textEdit_6->setHtml(QCoreApplication::translate("Info", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"Custom_Textures_0\"></a><span style=\" font-size:xx-large; font-weight:600;\">C</span><span style=\" font-size:xx-large; font-weight:600;\">ustom Textures</span></h1>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Life Engine Extended allows you to set arbitrary images as textures for organism cells, food, walls and empty space.<br />For image to be usable by program, it needs to be renamed to one of these titles: <span style=\" font-weight:600;\">(\342\200\234empty\342\200"
                         "\235, \342\200\234mouth\342\200\235, \342\200\234producer\342\200\235, \342\200\234mover\342\200\235, \342\200\234killer\342\200\235, \342\200\234armor\342\200\235, \342\200\234eye\342\200\235, \342\200\234food\342\200\235, \342\200\234wall\342\200\235)</span> and be placed into <span style=\" font-weight:600;\">\342\200\234/textures/\342\200\235</span> folder.<br />These textures will be loaded upon program loading, or if you click <span style=\" font-weight:600;\">\342\200\234Update textures\342\200\235</span>.<br />If there is no image with type in <span style=\" font-weight:600;\">\342\200\234/textures/\342\200\235</span> folder, the program will revert to base texture.<br />The images can be of any size, but the program will stretch them to box shape.</p></body></html>", nullptr));
-        OCC->setTabText(OCC->indexOf(custom_textures_tab), QApplication::translate("Info", "Custom Textures", nullptr));
+        OCC->setTabText(OCC->indexOf(custom_textures_tab), QCoreApplication::translate("Info", "Custom Textures", nullptr));
     } // retranslateUi
 
 };

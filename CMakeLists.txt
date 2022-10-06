@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_PREFIX_PATH "/home/spaceeye/Qt/6.4.0/gcc_64")
 
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
@@ -64,7 +65,7 @@ if (WIN_COMPILATION)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 
-find_package(Qt5 COMPONENTS
+find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
@@ -72,7 +73,7 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 if(NOT EMSCRIPTEN_COMPILATION)
-    find_package(Qt5 COMPONENTS
+    find_package(Qt6 COMPONENTS
             Core
             Gui
             Widgets
@@ -168,21 +169,21 @@ else()
     add_compile_definitions(__CUDA_USED__=0)
 endif()
 
-if (Qt5_FOUND)
-    if(NOT WIN_COMPILATION)
-        #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
-        get_property( core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
-        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
-        set_property( TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
-        set_property( TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
-        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
-    endif()
+if (Qt6_FOUND)
+#    if(NOT WIN_COMPILATION)
+#        #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
+#        get_property( core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
+#        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+#        set_property( TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+#        set_property( TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+#        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
+#    endif()
 
-    target_link_libraries(${PROJECT_NAME}
-            Qt5::Core
-            Qt5::Gui
-            Qt5::Widgets
-#            Qt5::Charts
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+            Qt6::Core
+            Qt6::Gui
+            Qt6::Widgets
+#            Qt6::Charts
             )
 endif()
 

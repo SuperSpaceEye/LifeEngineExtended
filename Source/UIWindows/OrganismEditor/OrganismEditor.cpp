@@ -155,7 +155,7 @@ void OrganismEditor::resizeEvent(QResizeEvent *event) {
 
 void OrganismEditor::wheelEvent(QWheelEvent *event) {
     if (ui.editor_graphicsView->underMouse()) {
-        if (event->delta() > 0) {
+        if ((event->angleDelta().x() + event->angleDelta().y()) > 0) {
             scaling_zoom /= scaling_coefficient;
         } else {
             scaling_zoom *= scaling_coefficient;
