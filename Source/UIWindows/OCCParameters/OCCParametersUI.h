@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'OCCParameters.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.8
+** Created by: Qt User Interface Compiler version 6.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -68,39 +68,39 @@ public:
     void setupUi(QWidget *OCCParametes)
     {
         if (OCCParametes->objectName().isEmpty())
-            OCCParametes->setObjectName(QString::fromUtf8("OCCParametes"));
+            OCCParametes->setObjectName("OCCParametes");
         OCCParametes->resize(808, 746);
         verticalLayout = new QVBoxLayout(OCCParametes);
         verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         scrollArea = new QScrollArea(OCCParametes);
-        scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+        scrollArea->setObjectName("scrollArea");
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
-        scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 806, 744));
         verticalLayout_2 = new QVBoxLayout(scrollAreaWidgetContents);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName("verticalLayout_2");
         cb_use_uniform_mutation_type = new QCheckBox(scrollAreaWidgetContents);
-        cb_use_uniform_mutation_type->setObjectName(QString::fromUtf8("cb_use_uniform_mutation_type"));
+        cb_use_uniform_mutation_type->setObjectName("cb_use_uniform_mutation_type");
 
         verticalLayout_2->addWidget(cb_use_uniform_mutation_type);
 
         scrollArea_4 = new QScrollArea(scrollAreaWidgetContents);
-        scrollArea_4->setObjectName(QString::fromUtf8("scrollArea_4"));
+        scrollArea_4->setObjectName("scrollArea_4");
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
-        scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
+        scrollAreaWidgetContents_4->setObjectName("scrollAreaWidgetContents_4");
         scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 786, 95));
         verticalLayout_5 = new QVBoxLayout(scrollAreaWidgetContents_4);
         verticalLayout_5->setSpacing(0);
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_5->setObjectName("verticalLayout_5");
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         mutation_types_widget = new QWidget(scrollAreaWidgetContents_4);
-        mutation_types_widget->setObjectName(QString::fromUtf8("mutation_types_widget"));
+        mutation_types_widget->setObjectName("mutation_types_widget");
         verticalLayout_7 = new QVBoxLayout(mutation_types_widget);
-        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
+        verticalLayout_7->setObjectName("verticalLayout_7");
 
         verticalLayout_5->addWidget(mutation_types_widget);
 
@@ -113,19 +113,19 @@ public:
         verticalLayout_2->addItem(verticalSpacer);
 
         cb_use_uniform_group_size = new QCheckBox(scrollAreaWidgetContents);
-        cb_use_uniform_group_size->setObjectName(QString::fromUtf8("cb_use_uniform_group_size"));
+        cb_use_uniform_group_size->setObjectName("cb_use_uniform_group_size");
 
         verticalLayout_2->addWidget(cb_use_uniform_group_size);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         label = new QLabel(scrollAreaWidgetContents);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName("label");
 
         horizontalLayout_2->addWidget(label);
 
         le_max_group_size = new QLineEdit(scrollAreaWidgetContents);
-        le_max_group_size->setObjectName(QString::fromUtf8("le_max_group_size"));
+        le_max_group_size->setObjectName("le_max_group_size");
 
         horizontalLayout_2->addWidget(le_max_group_size);
 
@@ -133,23 +133,23 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         scrollArea_3 = new QScrollArea(scrollAreaWidgetContents);
-        scrollArea_3->setObjectName(QString::fromUtf8("scrollArea_3"));
+        scrollArea_3->setObjectName("scrollArea_3");
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
-        scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
+        scrollAreaWidgetContents_3->setObjectName("scrollAreaWidgetContents_3");
         scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 786, 95));
         verticalLayout_4 = new QVBoxLayout(scrollAreaWidgetContents_3);
         verticalLayout_4->setSpacing(0);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setObjectName("verticalLayout_4");
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
         group_size_widget = new QWidget(scrollAreaWidgetContents_3);
-        group_size_widget->setObjectName(QString::fromUtf8("group_size_widget"));
+        group_size_widget->setObjectName("group_size_widget");
         verticalLayout_6 = new QVBoxLayout(group_size_widget);
         verticalLayout_6->setSpacing(6);
-        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        verticalLayout_6->setObjectName("verticalLayout_6");
         verticalLayout_6->setContentsMargins(0, 0, 0, 0);
         group_size_layout = new QVBoxLayout();
-        group_size_layout->setObjectName(QString::fromUtf8("group_size_layout"));
+        group_size_layout->setObjectName("group_size_layout");
         group_size_layout->setContentsMargins(9, 9, 9, 9);
 
         verticalLayout_6->addLayout(group_size_layout);
@@ -166,12 +166,12 @@ public:
         verticalLayout_2->addItem(verticalSpacer_2);
 
         cb_use_uniform_occ_instructions = new QCheckBox(scrollAreaWidgetContents);
-        cb_use_uniform_occ_instructions->setObjectName(QString::fromUtf8("cb_use_uniform_occ_instructions"));
+        cb_use_uniform_occ_instructions->setObjectName("cb_use_uniform_occ_instructions");
 
         verticalLayout_2->addWidget(cb_use_uniform_occ_instructions);
 
         scrollArea_2 = new QScrollArea(scrollAreaWidgetContents);
-        scrollArea_2->setObjectName(QString::fromUtf8("scrollArea_2"));
+        scrollArea_2->setObjectName("scrollArea_2");
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -179,7 +179,7 @@ public:
         scrollArea_2->setSizePolicy(sizePolicy);
         scrollArea_2->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
-        scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
+        scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
         scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 786, 95));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
@@ -188,17 +188,17 @@ public:
         scrollAreaWidgetContents_2->setSizePolicy(sizePolicy1);
         verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents_2);
         verticalLayout_3->setSpacing(0);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setObjectName("verticalLayout_3");
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         occ_mutation_type_widget = new QWidget(scrollAreaWidgetContents_2);
-        occ_mutation_type_widget->setObjectName(QString::fromUtf8("occ_mutation_type_widget"));
+        occ_mutation_type_widget->setObjectName("occ_mutation_type_widget");
         QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy2.setHorizontalStretch(40);
         sizePolicy2.setVerticalStretch(40);
         sizePolicy2.setHeightForWidth(occ_mutation_type_widget->sizePolicy().hasHeightForWidth());
         occ_mutation_type_widget->setSizePolicy(sizePolicy2);
         occ_instructions_weights_layout = new QVBoxLayout(occ_mutation_type_widget);
-        occ_instructions_weights_layout->setObjectName(QString::fromUtf8("occ_instructions_weights_layout"));
+        occ_instructions_weights_layout->setObjectName("occ_instructions_weights_layout");
 
         verticalLayout_3->addWidget(occ_mutation_type_widget);
 
@@ -211,19 +211,19 @@ public:
         verticalLayout_2->addItem(verticalSpacer_3);
 
         cb_use_uniform_move_distance = new QCheckBox(scrollAreaWidgetContents);
-        cb_use_uniform_move_distance->setObjectName(QString::fromUtf8("cb_use_uniform_move_distance"));
+        cb_use_uniform_move_distance->setObjectName("cb_use_uniform_move_distance");
 
         verticalLayout_2->addWidget(cb_use_uniform_move_distance);
 
         horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
         label_2 = new QLabel(scrollAreaWidgetContents);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName("label_2");
 
         horizontalLayout_5->addWidget(label_2);
 
         le_max_move_distance = new QLineEdit(scrollAreaWidgetContents);
-        le_max_move_distance->setObjectName(QString::fromUtf8("le_max_move_distance"));
+        le_max_move_distance->setObjectName("le_max_move_distance");
 
         horizontalLayout_5->addWidget(le_max_move_distance);
 
@@ -231,23 +231,23 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_5);
 
         scrollArea_5 = new QScrollArea(scrollAreaWidgetContents);
-        scrollArea_5->setObjectName(QString::fromUtf8("scrollArea_5"));
+        scrollArea_5->setObjectName("scrollArea_5");
         scrollArea_5->setWidgetResizable(true);
         scrollAreaWidgetContents_5 = new QWidget();
-        scrollAreaWidgetContents_5->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_5"));
+        scrollAreaWidgetContents_5->setObjectName("scrollAreaWidgetContents_5");
         scrollAreaWidgetContents_5->setGeometry(QRect(0, 0, 786, 95));
         verticalLayout_8 = new QVBoxLayout(scrollAreaWidgetContents_5);
         verticalLayout_8->setSpacing(0);
-        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
+        verticalLayout_8->setObjectName("verticalLayout_8");
         verticalLayout_8->setContentsMargins(0, 0, 0, 0);
         move_distance_widget = new QWidget(scrollAreaWidgetContents_5);
-        move_distance_widget->setObjectName(QString::fromUtf8("move_distance_widget"));
+        move_distance_widget->setObjectName("move_distance_widget");
         verticalLayout_9 = new QVBoxLayout(move_distance_widget);
         verticalLayout_9->setSpacing(6);
-        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
+        verticalLayout_9->setObjectName("verticalLayout_9");
         verticalLayout_9->setContentsMargins(0, 0, 0, 0);
         move_distance_layout = new QVBoxLayout();
-        move_distance_layout->setObjectName(QString::fromUtf8("move_distance_layout"));
+        move_distance_layout->setObjectName("move_distance_layout");
         move_distance_layout->setContentsMargins(9, 9, 9, 9);
 
         verticalLayout_9->addLayout(move_distance_layout);
@@ -277,13 +277,13 @@ public:
 
     void retranslateUi(QWidget *OCCParametes)
     {
-        OCCParametes->setWindowTitle(QApplication::translate("OCCParametes", "Organisms Construction Code Parameters", nullptr));
-        cb_use_uniform_mutation_type->setText(QApplication::translate("OCCParametes", "Use uniform mutation type distribution", nullptr));
-        cb_use_uniform_group_size->setText(QApplication::translate("OCCParametes", "Use uniform group size distribution", nullptr));
-        label->setText(QApplication::translate("OCCParametes", "Max group size", nullptr));
-        cb_use_uniform_occ_instructions->setText(QApplication::translate("OCCParametes", "Use uniform occ instructions distribution", nullptr));
-        cb_use_uniform_move_distance->setText(QApplication::translate("OCCParametes", "Use uniform move distance distribution", nullptr));
-        label_2->setText(QApplication::translate("OCCParametes", "Max move distance", nullptr));
+        OCCParametes->setWindowTitle(QCoreApplication::translate("OCCParametes", "Organisms Construction Code Parameters", nullptr));
+        cb_use_uniform_mutation_type->setText(QCoreApplication::translate("OCCParametes", "Use uniform mutation type distribution", nullptr));
+        cb_use_uniform_group_size->setText(QCoreApplication::translate("OCCParametes", "Use uniform group size distribution", nullptr));
+        label->setText(QCoreApplication::translate("OCCParametes", "Max group size", nullptr));
+        cb_use_uniform_occ_instructions->setText(QCoreApplication::translate("OCCParametes", "Use uniform occ instructions distribution", nullptr));
+        cb_use_uniform_move_distance->setText(QCoreApplication::translate("OCCParametes", "Use uniform move distance distribution", nullptr));
+        label_2->setText(QCoreApplication::translate("OCCParametes", "Max move distance", nullptr));
     } // retranslateUi
 
 };
