@@ -6,8 +6,8 @@
 #include "LegacyAnatomyMutationLogic.h"
 
 void LegacyAnatomyMutationLogic::set_single_adjacent(int x, int y, int x_offset, int y_offset,
-                                                     boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                                     boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
+                                                     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                                     boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
                                                      const BaseGridBlock &block) {
     if (!organism_blocks[x+x_offset].count(y+y_offset)       &&
         !single_adjacent_space[x+x_offset].count(y+y_offset)) {
@@ -16,8 +16,8 @@ void LegacyAnatomyMutationLogic::set_single_adjacent(int x, int y, int x_offset,
 }
 
 void LegacyAnatomyMutationLogic::create_single_adjacent_space(
-        boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-        boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space) {
+        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+        boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space) {
     for (auto const &xmap: organism_blocks) {
         for (auto const &yxmap: xmap.second) {
             set_single_adjacent(xmap.first, yxmap.first,  1, 0, organism_blocks, single_adjacent_space, yxmap.second);
@@ -29,9 +29,9 @@ void LegacyAnatomyMutationLogic::create_single_adjacent_space(
 }
 
 void LegacyAnatomyMutationLogic::set_single_diagonal_adjacent(int x, int y, int x_offset, int y_offset,
-                                                              boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                                              boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                                              boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
+                                                              boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                                              boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+                                                              boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
     if (!organism_blocks[x+x_offset].count(y+y_offset)       &&
         !single_adjacent_space[x+x_offset].count(y+y_offset) &&
         !single_diagonal_adjacent_space[x+x_offset].count(y+y_offset))
@@ -39,9 +39,9 @@ void LegacyAnatomyMutationLogic::set_single_diagonal_adjacent(int x, int y, int 
 }
 
 void LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(
-        boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-        boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-        boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
+        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+        boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+        boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
     for (auto const &xmap: organism_blocks) {
         for (auto const &yxmap: xmap.second) {
             set_single_diagonal_adjacent(xmap.first, yxmap.first, 1,   1, organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
@@ -53,9 +53,9 @@ void LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(
 }
 
 void LegacyAnatomyMutationLogic::create_producing_space(
-        boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-        boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>> &producing_space,
-        boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+        boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,
+        boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
         std::vector<int> & num_producing_space,
         int32_t producer_blocks) {
     if (producer_blocks > 0) {
@@ -79,9 +79,9 @@ void LegacyAnatomyMutationLogic::create_producing_space(
     }
 }
 
-void LegacyAnatomyMutationLogic::create_eating_space(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                                     boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
-                                                     boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>&single_adjacent_space,
+void LegacyAnatomyMutationLogic::create_eating_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                                     boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
+                                                     boost::unordered_map<int, boost::unordered_map<int, bool>>&single_adjacent_space,
                                                      int32_t mouth_blocks) {
     if (mouth_blocks > 0) {
         for (auto &xmap: organism_blocks) {
@@ -99,9 +99,9 @@ void LegacyAnatomyMutationLogic::create_eating_space(boost::unordered::unordered
     }
 }
 
-void LegacyAnatomyMutationLogic::create_killing_space(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                                      boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
-                                                      boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+void LegacyAnatomyMutationLogic::create_killing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                                      boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
+                                                      boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
                                                       int32_t killer_blocks) {
     if (killer_blocks > 0) {
         for (auto &xmap: organism_blocks) {
@@ -120,10 +120,10 @@ void LegacyAnatomyMutationLogic::create_killing_space(boost::unordered::unordere
 }
 
 SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
-        const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-        const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>>& producing_space,
-        const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-        const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
+        const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+        const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>>& producing_space,
+        const boost::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
+        const boost::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
 
         const std::vector<int> & num_producing_space,
         int32_t mouth_blocks,
@@ -167,7 +167,7 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
 }
 
 void
-LegacyAnatomyMutationLogic::serialize_killing_space(const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
+LegacyAnatomyMutationLogic::serialize_killing_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
                                                     std::vector<SerializedAdjacentSpaceContainer> &_killing_space) {
     for (auto const &xmap: killing_space) {
         for (auto const &yxmap: xmap.second) {
@@ -177,7 +177,7 @@ LegacyAnatomyMutationLogic::serialize_killing_space(const boost::unordered::unor
 }
 
 void
-LegacyAnatomyMutationLogic::serialize_eating_space(const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
+LegacyAnatomyMutationLogic::serialize_eating_space(const boost::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
                                                    std::vector<SerializedAdjacentSpaceContainer> &_eating_space) {
     for (auto const &xmap: eating_space) {
         for (auto const &yxmap: xmap.second) {
@@ -187,7 +187,7 @@ LegacyAnatomyMutationLogic::serialize_eating_space(const boost::unordered::unord
 }
 
 void LegacyAnatomyMutationLogic::serialize_organism_blocks(
-        const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
+        const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
         std::vector<SerializedOrganismBlockContainer> &_organism_blocks) {//item.first = position in map, item.second = content
     for (auto const &xmap: organism_blocks) {
         for (auto const &yxmap: xmap.second) {
@@ -197,7 +197,7 @@ void LegacyAnatomyMutationLogic::serialize_organism_blocks(
 }
 
 void LegacyAnatomyMutationLogic::serialize_producing_space(
-        const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>> &producing_space,
+        const boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> &producing_space,
         const std::vector<int> &num_producing_space,
         std::vector<std::vector<SerializedAdjacentSpaceContainer>> &_producing_space) {
 
@@ -227,7 +227,7 @@ void LegacyAnatomyMutationLogic::serialize_producing_space(
 }
 
 template<typename T>
-int LegacyAnatomyMutationLogic::get_map_size(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, T>> map) {
+int LegacyAnatomyMutationLogic::get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map) {
     int total_size = 0;
     for (auto & xmap: map) {
         total_size += xmap.second.size();

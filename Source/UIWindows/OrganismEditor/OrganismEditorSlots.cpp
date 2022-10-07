@@ -24,33 +24,33 @@ void OrganismEditor::b_resize_editing_grid_slot() {
 }
 
 void OrganismEditor::b_load_organism_slot() {
-    QString selected_filter;
-    auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism"), "",
-                                                  tr("Custom save type (*.lfeo);;JSON (*.json)"), &selected_filter);
-    std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
-        filetype = ".lfeo";
-    } else if (selected_filter.toStdString() == "JSON (*.json)"){
-        filetype = ".json";
-    } else {
-        return;
-    }
-
-    std::string full_path = file_name.toStdString();
-
-    try {
-        if (filetype == ".lfeo") {
-            std::ifstream in(full_path, std::ios::in | std::ios::binary);
-            read_organism(in);
-            in.close();
-
-        } else if (filetype == ".json") {
-            read_json_organism(full_path);
-        }
-    } catch (std::string & _) {
-        display_message("Loading of organism was unsuccessful.");
-    }
-    finalize_chosen_organism();
+//    QString selected_filter;
+//    auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism"), "",
+//                                                  tr("Custom save type (*.lfeo);;JSON (*.json)"), &selected_filter);
+//    std::string filetype;
+//    if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
+//        filetype = ".lfeo";
+//    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+//        filetype = ".json";
+//    } else {
+//        return;
+//    }
+//
+//    std::string full_path = file_name.toStdString();
+//
+//    try {
+//        if (filetype == ".lfeo") {
+//            std::ifstream in(full_path, std::ios::in | std::ios::binary);
+//            read_organism(in);
+//            in.close();
+//
+//        } else if (filetype == ".json") {
+//            read_json_organism(full_path);
+//        }
+//    } catch (std::string & _) {
+//        display_message("Loading of organism was unsuccessful.");
+//    }
+//    finalize_chosen_organism();
 }
 
 void OrganismEditor::b_save_organism_slot() {

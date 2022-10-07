@@ -52,6 +52,9 @@ enum class OCCInstruction {
     SetUnderBlockEye
 };
 
+#include <string>
+#include <array>
+
 const std::array<std::string, 30> OCC_INSTRUCTIONS_NAME {
         "Shift Up",
         "Shift Up Left",

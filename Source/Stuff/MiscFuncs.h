@@ -12,8 +12,8 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <boost/lexical_cast.hpp>
-#include <boost/lexical_cast/try_lexical_convert.hpp>
+//#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast/try_lexical_convert.hpp>
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -79,14 +79,15 @@ void display_message(const std::string &message);
 
 template<typename T>
 result_struct<T> try_convert_message_box_template(const std::string& message, QLineEdit *line_edit, T &fallback_value) {
-    T result;
-    if (boost::conversion::detail::try_lexical_convert<T>(line_edit->text().toStdString(), result)) {
-        return result_struct<T>{true, result};
-    } else {
-        display_message(message);
-        line_edit->setText(QString::fromStdString(to_str(fallback_value, 5)));
-        return result_struct<T>{false, result};
-    }
+//    T result;
+//    if (boost::conversion::detail::try_lexical_convert<T>(line_edit->text().toStdString(), result)) {
+//        return result_struct<T>{true, result};
+//    } else {
+//        display_message(message);
+//        line_edit->setText(QString::fromStdString(to_str(fallback_value, 5)));
+//        return result_struct<T>{false, result};
+//    }
+    return result_struct<T>{};
 }
 
 template<typename T>

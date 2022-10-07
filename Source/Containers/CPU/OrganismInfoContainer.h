@@ -179,22 +179,22 @@ private:
         info.total_avg.brain_mutation_rate   /= info.total_avg.total;
         info.total_avg.anatomy_mutation_rate /= info.total_avg.total;
 
-        if (std::isnan(info.total_avg.size))             {info.total_avg.size = 0;}
-        if (std::isnan(info.move_range))                 {info.move_range     = 0;}
+        if (isnan(info.total_avg.size))             {info.total_avg.size = 0;}
+        if (isnan(info.move_range))                 {info.move_range     = 0;}
 
-        if (std::isnan(info.total_avg._organism_lifetime)) {info.total_avg._organism_lifetime = 0;}
-        if (std::isnan(info.total_avg._organism_age))      {info.total_avg._organism_age      = 0;}
-        if (std::isnan(info.total_avg._gathered_food))     {info.total_avg._gathered_food     = 0;}
-        if (std::isnan(info.total_avg._mouth_blocks))      {info.total_avg._mouth_blocks      = 0;}
-        if (std::isnan(info.total_avg._producer_blocks))   {info.total_avg._producer_blocks   = 0;}
-        if (std::isnan(info.total_avg._mover_blocks))      {info.total_avg._mover_blocks      = 0;}
-        if (std::isnan(info.total_avg._killer_blocks))     {info.total_avg._killer_blocks     = 0;}
-        if (std::isnan(info.total_avg._armor_blocks))      {info.total_avg._armor_blocks      = 0;}
-        if (std::isnan(info.total_avg._eye_blocks))        {info.total_avg._eye_blocks        = 0;}
-        if (std::isnan(info.total_avg.occ_instructions_num)) {info.total_avg.occ_instructions_num = 0;}
+        if (isnan(info.total_avg._organism_lifetime)) {info.total_avg._organism_lifetime = 0;}
+        if (isnan(info.total_avg._organism_age))      {info.total_avg._organism_age      = 0;}
+        if (isnan(info.total_avg._gathered_food))     {info.total_avg._gathered_food     = 0;}
+        if (isnan(info.total_avg._mouth_blocks))      {info.total_avg._mouth_blocks      = 0;}
+        if (isnan(info.total_avg._producer_blocks))   {info.total_avg._producer_blocks   = 0;}
+        if (isnan(info.total_avg._mover_blocks))      {info.total_avg._mover_blocks      = 0;}
+        if (isnan(info.total_avg._killer_blocks))     {info.total_avg._killer_blocks     = 0;}
+        if (isnan(info.total_avg._armor_blocks))      {info.total_avg._armor_blocks      = 0;}
+        if (isnan(info.total_avg._eye_blocks))        {info.total_avg._eye_blocks        = 0;}
+        if (isnan(info.total_avg.occ_instructions_num)) {info.total_avg.occ_instructions_num = 0;}
 
-        if (std::isnan(info.total_avg.brain_mutation_rate))   {info.total_avg.brain_mutation_rate   = 0;}
-        if (std::isnan(info.total_avg.anatomy_mutation_rate)) {info.total_avg.anatomy_mutation_rate = 0;}
+        if (isnan(info.total_avg.brain_mutation_rate))   {info.total_avg.brain_mutation_rate   = 0;}
+        if (isnan(info.total_avg.anatomy_mutation_rate)) {info.total_avg.anatomy_mutation_rate = 0;}
 
 
         info.moving_avg.size /= info.moving_avg.total;
@@ -213,21 +213,21 @@ private:
         info.moving_avg.brain_mutation_rate   /= info.moving_avg.total;
         info.moving_avg.anatomy_mutation_rate /= info.moving_avg.total;
 
-        if (std::isnan(info.moving_avg.size))               {info.moving_avg.size               = 0;}
+        if (isnan(info.moving_avg.size))               {info.moving_avg.size               = 0;}
 
-        if (std::isnan(info.moving_avg._organism_lifetime)) {info.moving_avg._organism_lifetime = 0;}
-        if (std::isnan(info.moving_avg._organism_age))      {info.moving_avg._organism_age      = 0;}
-        if (std::isnan(info.moving_avg._gathered_food))     {info.moving_avg._gathered_food     = 0;}
-        if (std::isnan(info.moving_avg._mouth_blocks))      {info.moving_avg._mouth_blocks      = 0;}
-        if (std::isnan(info.moving_avg._producer_blocks))   {info.moving_avg._producer_blocks   = 0;}
-        if (std::isnan(info.moving_avg._mover_blocks))      {info.moving_avg._mover_blocks      = 0;}
-        if (std::isnan(info.moving_avg._killer_blocks))     {info.moving_avg._killer_blocks     = 0;}
-        if (std::isnan(info.moving_avg._armor_blocks))      {info.moving_avg._armor_blocks      = 0;}
-        if (std::isnan(info.moving_avg._eye_blocks))        {info.moving_avg._eye_blocks        = 0;}
-        if (std::isnan(info.moving_avg.occ_instructions_num)) {info.moving_avg.occ_instructions_num = 0;}
+        if (isnan(info.moving_avg._organism_lifetime)) {info.moving_avg._organism_lifetime = 0;}
+        if (isnan(info.moving_avg._organism_age))      {info.moving_avg._organism_age      = 0;}
+        if (isnan(info.moving_avg._gathered_food))     {info.moving_avg._gathered_food     = 0;}
+        if (isnan(info.moving_avg._mouth_blocks))      {info.moving_avg._mouth_blocks      = 0;}
+        if (isnan(info.moving_avg._producer_blocks))   {info.moving_avg._producer_blocks   = 0;}
+        if (isnan(info.moving_avg._mover_blocks))      {info.moving_avg._mover_blocks      = 0;}
+        if (isnan(info.moving_avg._killer_blocks))     {info.moving_avg._killer_blocks     = 0;}
+        if (isnan(info.moving_avg._armor_blocks))      {info.moving_avg._armor_blocks      = 0;}
+        if (isnan(info.moving_avg._eye_blocks))        {info.moving_avg._eye_blocks        = 0;}
+        if (isnan(info.moving_avg.occ_instructions_num)) {info.moving_avg.occ_instructions_num = 0;}
 
-        if (std::isnan(info.moving_avg.brain_mutation_rate))   {info.moving_avg.brain_mutation_rate   = 0;}
-        if (std::isnan(info.moving_avg.anatomy_mutation_rate)) {info.moving_avg.anatomy_mutation_rate = 0;}
+        if (isnan(info.moving_avg.brain_mutation_rate))   {info.moving_avg.brain_mutation_rate   = 0;}
+        if (isnan(info.moving_avg.anatomy_mutation_rate)) {info.moving_avg.anatomy_mutation_rate = 0;}
 
 
         info.station_avg.size /= info.station_avg.total;
@@ -246,21 +246,21 @@ private:
         info.station_avg.brain_mutation_rate   /= info.station_avg.total;
         info.station_avg.anatomy_mutation_rate /= info.station_avg.total;
 
-        if (std::isnan(info.station_avg.size))               {info.station_avg.size               = 0;}
+        if (isnan(info.station_avg.size))               {info.station_avg.size               = 0;}
 
-        if (std::isnan(info.station_avg._organism_lifetime)) {info.station_avg._organism_lifetime = 0;}
-        if (std::isnan(info.station_avg._organism_age))      {info.station_avg._organism_age      = 0;}
-        if (std::isnan(info.station_avg._gathered_food))     {info.station_avg._gathered_food     = 0;}
-        if (std::isnan(info.station_avg._mouth_blocks))      {info.station_avg._mouth_blocks      = 0;}
-        if (std::isnan(info.station_avg._producer_blocks))   {info.station_avg._producer_blocks   = 0;}
-        if (std::isnan(info.station_avg._mover_blocks))      {info.station_avg._mover_blocks      = 0;}
-        if (std::isnan(info.station_avg._killer_blocks))     {info.station_avg._killer_blocks     = 0;}
-        if (std::isnan(info.station_avg._armor_blocks))      {info.station_avg._armor_blocks      = 0;}
-        if (std::isnan(info.station_avg._eye_blocks))        {info.station_avg._eye_blocks        = 0;}
-        if (std::isnan(info.station_avg.occ_instructions_num)) {info.station_avg.occ_instructions_num = 0;}
+        if (isnan(info.station_avg._organism_lifetime)) {info.station_avg._organism_lifetime = 0;}
+        if (isnan(info.station_avg._organism_age))      {info.station_avg._organism_age      = 0;}
+        if (isnan(info.station_avg._gathered_food))     {info.station_avg._gathered_food     = 0;}
+        if (isnan(info.station_avg._mouth_blocks))      {info.station_avg._mouth_blocks      = 0;}
+        if (isnan(info.station_avg._producer_blocks))   {info.station_avg._producer_blocks   = 0;}
+        if (isnan(info.station_avg._mover_blocks))      {info.station_avg._mover_blocks      = 0;}
+        if (isnan(info.station_avg._killer_blocks))     {info.station_avg._killer_blocks     = 0;}
+        if (isnan(info.station_avg._armor_blocks))      {info.station_avg._armor_blocks      = 0;}
+        if (isnan(info.station_avg._eye_blocks))        {info.station_avg._eye_blocks        = 0;}
+        if (isnan(info.station_avg.occ_instructions_num)) {info.station_avg.occ_instructions_num = 0;}
 
-        if (std::isnan(info.station_avg.brain_mutation_rate))   {info.station_avg.brain_mutation_rate   = 0;}
-        if (std::isnan(info.station_avg.anatomy_mutation_rate)) {info.station_avg.anatomy_mutation_rate = 0;}
+        if (isnan(info.station_avg.brain_mutation_rate))   {info.station_avg.brain_mutation_rate   = 0;}
+        if (isnan(info.station_avg.anatomy_mutation_rate)) {info.station_avg.anatomy_mutation_rate = 0;}
     }
 };
 #endif //LIFEENGINEEXTENDED_ORGANISMINFOCONTAINER_H

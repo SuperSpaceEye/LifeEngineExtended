@@ -20,9 +20,9 @@
 #include <fstream>
 #include <filesystem>
 
+#ifndef __EMSCRIPTEN_COMPILATION__
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
-#ifndef __EMSCRIPTEN_COMPILATION__
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 #endif

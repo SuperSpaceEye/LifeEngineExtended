@@ -345,8 +345,8 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
 
     bool continue_flag = false;
 
-    int x_step = std::abs(dimensions[0]) + dimensions[2] + 2 + additional_distance;
-    int y_step = std::abs(dimensions[1]) + dimensions[3] + 2 + additional_distance;
+    int x_step = abs(dimensions[0]) + dimensions[2] + 2 + additional_distance;
+    int y_step = abs(dimensions[1]) + dimensions[3] + 2 + additional_distance;
 
     int x = 1;
     int y = 1;

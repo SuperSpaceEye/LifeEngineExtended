@@ -5,13 +5,28 @@ project(${PROJECT_NAME})
 
 #option(JS_ONLY "Compile to native JS (No WASM)" OFF)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CUDA_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(EMSCRIPTEN_COMPILATION 1)
+set(WIN_COMPILATION 0)
+set(WIN_USE_CUDA_LIBS 0)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CUDA_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_PREFIX_PATH "/home/spaceeye/Qt/6.4.0/gcc_64")
+
+if(EMSCRIPTEN_COMPILATION)
+    set(CMAKE_PREFIX_PATH "/home/spaceeye/Qt/6.4.0/wasm_32")
+    set(CMAKE_FIND_ROOT_PATH "/home/spaceeye/Qt/6.4.0/wasm_32")
+    set(CMAKE_TOOLCHAIN_FILE "/home/spaceeye/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    set(CMAKE_CROSSCOMPILING_EMULATOR "/home/spaceeye/emsdk/node/14.18.2_64bit/bin/node")
+#    set(FEATURE_threads ON)
+    set(-DQT_DEBUG_FIND_PACKAGE=ON)
+#    -DCMAKE_TOOLCHAIN_FILE=/home/spaceeye/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/home/spaceeye/emsdk/node/14.18.2_64bit/bin/node -DQT_HOST_PATH=/home/spaceeye/Qt/6.4.0/wasm_32 -DFEATURE_threads=ON
+else()
+    set(CMAKE_PREFIX_PATH "/home/spaceeye/Qt/6.4.0/gcc_64")
+endif()
 
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
@@ -19,7 +34,7 @@ set(CMAKE_CUDA_ARCHITECTURES 61)
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -03")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
+#set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 
 #for perf
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
@@ -32,11 +47,6 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 
 set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
-
-set(EMSCRIPTEN_COMPILATION 1)
-
-set(WIN_COMPILATION 0)
-set(WIN_USE_CUDA_LIBS 0)
 
 if(EMSCRIPTEN_COMPILATION)
     set(WIN_COMPILATION 0)
@@ -66,6 +76,18 @@ if (WIN_COMPILATION)
     set(Boost_USE_MULTITHREADED ON)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
+
+#include_directories(/usr/include/GLES2)
+
+#set(GLESv2_INCLUDE_DIR "/usr/include")
+#find_path(INCDIR NAMES "GLES2/gl2.h")
+#message(STATUS ${INCDIR})
+set(GLESv2_LIBRARY "/usr/lib/x86_64-linux-gnu/libGLESv2.so")
+#message(STATUS ${GLESv2_LIBRARY})
+#set(HAVE_GLESv2 ON)
+
+#set(GLESv2_INCLUDE_DIR /home/spaceeye/Qt/6.4.0/wasm_32/mkspecs/common/uikit/GLES2/)
+#set(GLESv2_LIBRARY "/home/spaceeye/Qt/6.4.0/wasm_32/mkspecs/common/uikit/GLES2/gl2.h")
 
 find_package(Qt6 COMPONENTS
         Core
@@ -133,6 +155,8 @@ set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/S
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES})
 #target_link_libraries(${PROJECT_NAME} CUDAFunctions)
 
+
+if (EMSCRIPTEN_COMPILATION)
 #if(JS_ONLY)
 #    message(STATUS "Setting compilation target to native JavaScript")
 #    set(CMAKE_EXECUTABLE_SUFFIX ".js")
@@ -142,7 +166,9 @@ add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJE
 message(STATUS "Setting compilation target to WASM")
 set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'")
+
 #endif(JS_ONLY)
+endif()
 
 #if (WIN_USE_CUDA_LIBS)
 #    foreach(ITEM IN LISTS CUDA_SOURCES)
@@ -193,6 +219,9 @@ if (Qt6_FOUND)
 #        set_property( TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
 #        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
 #    endif()
+#    string(REPLACE "" "" ${CMAKE_CXX_COMPILE})
+
+
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
             Qt6::Core

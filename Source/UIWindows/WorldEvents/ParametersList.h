@@ -7,7 +7,12 @@
 
 #include <vector>
 #include <string>
+#ifndef __EMSCRIPTEN_COMPILATION__
 #include <boost/unordered_map.hpp>
+#else
+#include <unordered_map>
+#define boost std
+#endif
 
 #include "../../Containers/CPU/SimulationParameters.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"

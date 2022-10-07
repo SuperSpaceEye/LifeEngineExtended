@@ -90,8 +90,8 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
     auto * container = new SerializedOrganismStructureContainer();
 
     auto edges = calculate_construction_edges();
-    auto edge_width = std::abs(edges[0]) + std::abs(edges[1]) + 1;
-    auto edge_height = std::abs(edges[2]) + std::abs(edges[3]) + 1;
+    auto edge_width = abs(edges[0]) + abs(edges[1]) + 1;
+    auto edge_height = abs(edges[2]) + abs(edges[3]) + 1;
     if (edge_width > occ_c.occ_width || edge_height > occ_c.occ_height) {
         occ_c.occ_width  = edge_width;
         occ_c.occ_height = edge_height;
@@ -187,8 +187,8 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
     auto shift = shift_values[0];
 
     Rotation base_rotation = Rotation::UP;
-    int cursor_x = std::abs(edges[0]);
-    int cursor_y = std::abs(edges[2]);
+    int cursor_x = abs(edges[0]);
+    int cursor_y = abs(edges[2]);
 
     //actual center
     int center_x = cursor_x;
@@ -328,8 +328,8 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
 
     int producer = -1;
 
-    auto center_x = std::abs(edges[0]);
-    auto center_y = std::abs(edges[2]);
+    auto center_x = abs(edges[0]);
+    auto center_y = abs(edges[2]);
 
     for (auto & block: organism_blocks) {
         auto x = block.relative_x + center_x;

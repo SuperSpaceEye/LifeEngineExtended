@@ -10,7 +10,14 @@
 #define THELIFEENGINECPP_ANATOMY_H
 
 #include <utility>
+
+#ifndef __EMSCRIPTEN_COMPILATION__
 #include <boost/unordered_map.hpp>
+#else
+#include "unordered_map"
+#define boost std
+#endif
+
 #include <random>
 
 #include "Rotation.h"

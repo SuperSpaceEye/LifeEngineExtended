@@ -16,8 +16,10 @@
 #include <atomic>
 #include <algorithm>
 
+#ifndef __EMSCRIPTEN_COMPILATION__
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
+#endif
 
 #include "../GridBlocks/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"

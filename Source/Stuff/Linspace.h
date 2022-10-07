@@ -23,7 +23,8 @@ std::vector<T> linspace(double start, double end, int num) {
     //If range contains 0, then strange things happens, so I displace range by start to calculate delta and then subtract it from result.
     double displacement = 0;
 
-    if (start <= 0) { displacement = std::abs(start) + 1;}
+    //TODO
+    if (start <= 0) { displacement = abs(start) + 1;}
 
     start += displacement;
     end += displacement;

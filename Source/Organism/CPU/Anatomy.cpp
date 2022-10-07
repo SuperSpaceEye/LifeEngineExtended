@@ -557,8 +557,8 @@ Vector2<int> Anatomy::recenter_to_existing() {
     //will find the closest cell to the center
     int i = 0;
     for (auto & block: _organism_blocks) {
-        if (std::abs(block.relative_x) + std::abs(block.relative_y) < abs_pos.x + abs_pos.y) {
-            abs_pos = {std::abs(block.relative_x), std::abs(block.relative_y)};
+        if (abs(block.relative_x) + abs(block.relative_y) < abs_pos.x + abs_pos.y) {
+            abs_pos = {abs(block.relative_x), abs(block.relative_y)};
             block_pos_in_vec = i;
         }
         i++;

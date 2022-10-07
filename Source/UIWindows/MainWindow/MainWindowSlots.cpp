@@ -135,7 +135,7 @@ void MainWindow::b_save_world_slot() {
     QFileDialog file_dialog{};
 
     std::atomic_thread_fence(std::memory_order_release);
-    auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
+    auto file_name = file_dialog.getSaveFileName(dynamic_cast<QWidget*>(this), tr("Save world"), "",
                                                  "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
     std::atomic_thread_fence(std::memory_order_release);
 #ifndef __WIN32
@@ -179,51 +179,51 @@ void MainWindow::b_save_world_slot() {
 }
 
 void MainWindow::b_load_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    bool flag2 = sp.reset_on_total_extinction;
-    ecp.synchronise_simulation_and_window = false;
-    sp.reset_on_total_extinction = false;
-    engine.pause();
-    ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
-
-    std::atomic_thread_fence(std::memory_order_release);
-    QString selected_filter;
-    auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
-                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
-    std::atomic_thread_fence(std::memory_order_release);
-    std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
-        filetype = ".lfew";
-    } else if (selected_filter.toStdString() == "JSON (*.json)"){
-        filetype = ".json";
-    } else {
-        ecp.synchronise_simulation_and_window = flag;
-        ecp.engine_global_pause = false;
-        engine.unpause();
-        return;
-    }
-
-    std::string full_path = file_name.toStdString();
-
-    if (filetype == ".lfew") {
-        std::ifstream in(full_path, std::ios::in | std::ios::binary);
-        read_data(in);
-        in.close();
-
-    } else if (filetype == ".json") {
-        sp.use_occ = false;
-        read_json_data(full_path);
-    }
-
-    ecp.synchronise_simulation_and_window = flag;
-    sp.reset_on_total_extinction = flag;
-    ecp.engine_global_pause = false;
-    engine.unpause();
-    initialize_gui();
-    update_table_values();
-
-    occpw.reinit_gui(true);
+//    bool flag = ecp.synchronise_simulation_and_window;
+//    bool flag2 = sp.reset_on_total_extinction;
+//    ecp.synchronise_simulation_and_window = false;
+//    sp.reset_on_total_extinction = false;
+//    engine.pause();
+//    ecp.engine_global_pause = true;
+//    engine.wait_for_engine_to_pause_force();
+//
+//    std::atomic_thread_fence(std::memory_order_release);
+//    QString selected_filter;
+//    auto file_name = QFileDialog::getOpenFileName(dynamic_cast<QWidget*>(this), tr("Load world"), "",
+//                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
+//    std::atomic_thread_fence(std::memory_order_release);
+//    std::string filetype;
+//    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
+//        filetype = ".lfew";
+//    } else if (selected_filter.toStdString() == "JSON (*.json)"){
+//        filetype = ".json";
+//    } else {
+//        ecp.synchronise_simulation_and_window = flag;
+//        ecp.engine_global_pause = false;
+//        engine.unpause();
+//        return;
+//    }
+//
+//    std::string full_path = file_name.toStdString();
+//
+//    if (filetype == ".lfew") {
+//        std::ifstream in(full_path, std::ios::in | std::ios::binary);
+//        read_data(in);
+//        in.close();
+//
+//    } else if (filetype == ".json") {
+//        sp.use_occ = false;
+//        read_json_data(full_path);
+//    }
+//
+//    ecp.synchronise_simulation_and_window = flag;
+//    sp.reset_on_total_extinction = flag;
+//    ecp.engine_global_pause = false;
+//    engine.unpause();
+//    initialize_gui();
+//    update_table_values();
+//
+//    occpw.reinit_gui(true);
 }
 
 void MainWindow::b_pass_one_tick_slot() {
@@ -392,6 +392,8 @@ void MainWindow::le_brain_mutation_rate_delimiter_slot() {
                                      ui.le_brain_mutation_rate_delimiter, 0, "0",
                                      1, "1");
 }
+
+#define font dynamic_cast<QWidget*>(this)->font
 
 void MainWindow::le_font_size_slot() {
     auto _font = font();
@@ -849,11 +851,11 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     auto item = ui.table_organism_block_parameters->item(row, col);
     float result;
     bool set_result = false;
-    if (boost::conversion::try_lexical_convert<float>(item->text().toStdString(), result)) {
-        set_result = true;
-    } else {
+//    if (boost::conversion::try_lexical_convert<float>(item->text().toStdString(), result)) {
+//        set_result = true;
+//    } else {
         if (!disable_warnings) {display_message("Value should be float.");}
-    }
+//    }
     BParameters * type;
     switch (static_cast<BlocksNames>(row)) {
         case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
