@@ -31,10 +31,8 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
-
 set(WIN_COMPILATION 0)
 set(WIN_USE_CUDA_LIBS 0)
-
 
 if(NOT WIN_COMPILATION)
     set(WIN_USE_CUDA_LIBS 0)
@@ -118,14 +116,25 @@ else()
 endif()
 
 if (Qt6_FOUND)
-#    if(NOT WIN_COMPILATION)
-#        #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
-#        get_property( core_options TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
-#        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
-#        set_property( TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
-#        set_property( TARGET Qt6::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
-#        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
-#    endif()
+    if(NOT WIN_COMPILATION)
+        #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
+        get_property( core_options TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
+        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+        set_property( TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+        set_property( TARGET Qt6::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+
+        get_property( core_options TARGET Qt6::Gui PROPERTY INTERFACE_COMPILE_OPTIONS )
+        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+        set_property( TARGET Qt6::Gui PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+        set_property( TARGET Qt6::Gui PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+
+        get_property( core_options TARGET Qt6::Widgets PROPERTY INTERFACE_COMPILE_OPTIONS )
+        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+        set_property( TARGET Qt6::Widgets PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+        set_property( TARGET Qt6::Widgets PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+
+        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
+    endif()
 
     target_link_libraries(${PROJECT_NAME}
             Qt6::Core
@@ -140,10 +149,8 @@ if(Boost_FOUND)
     target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 endif()
 
-if(NOT EMSCRIPTEN_COMPILATION)
-    if (WIN_COMPILATION)
-        target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
-    else()
-        target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
-    endif()
+if (WIN_COMPILATION)
+    target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+else()
+    target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
 endif()
