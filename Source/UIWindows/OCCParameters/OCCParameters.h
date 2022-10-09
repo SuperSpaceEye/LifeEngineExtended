@@ -5,6 +5,8 @@
 #ifndef LIFEENGINEEXTENDED_OCCPARAMETERS_H
 #define LIFEENGINEEXTENDED_OCCPARAMETERS_H
 
+#include <QKeyEvent>
+
 #include "OCCParametersUI.h"
 #include "../MainWindow/WindowUI.h"
 #include "../../Containers/CPU/OrganismConstructionCodeParameters.h"
@@ -23,6 +25,11 @@ private:
     SimulationEngine & engine;
 
     void closeEvent(QCloseEvent * event) override;
+    void keyPressEvent(QKeyEvent * event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+        }
+    }
 
     void init_gui();
 

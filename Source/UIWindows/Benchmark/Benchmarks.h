@@ -6,6 +6,7 @@
 #define LIFEENGINEEXTENDED_BENCHMARKS_H
 
 #include <QScrollBar>
+#include <QKeyEvent>
 
 #include "BenchmarkUI.h"
 #include "../MainWindow/WindowUI.h"
@@ -28,6 +29,11 @@ private:
     void update_result_info();
 
     void closeEvent(QCloseEvent * event) override;
+    void keyPressEvent(QKeyEvent * event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+        }
+    }
 public:
     explicit Benchmarks(Ui::MainWindow & parent_window);
 

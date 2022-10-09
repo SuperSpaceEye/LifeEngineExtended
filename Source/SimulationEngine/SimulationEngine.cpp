@@ -433,7 +433,8 @@ void SimulationEngine::init_auto_food_drop(int width, int height) {
 
 //Will always wait for engine to pause
 bool SimulationEngine::wait_for_engine_to_pause_force() {
-    while (!ecp.engine_paused) {}
+    int i = 0;
+    while (!ecp.engine_paused) {std::cout << "waiting_to_stop " << i++ << "\n";}
     return ecp.engine_paused;
 }
 

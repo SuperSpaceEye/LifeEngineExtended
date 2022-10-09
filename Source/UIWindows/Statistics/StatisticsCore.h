@@ -8,13 +8,16 @@
 
 #ifndef THELIFEENGINECPP_STATISTICSCORE_H
 #define THELIFEENGINECPP_STATISTICSCORE_H
+
+#include <QKeyEvent>
+
 #include "StatisticsUI.h"
 #include "../MainWindow/WindowUI.h"
 
 class StatisticsCore: public QWidget {
     Q_OBJECT
 public:
-    Ui::Statistics ui;
+    Ui::Statistics ui{};
     Ui::MainWindow * parent_ui = nullptr;
     StatisticsCore()=default;
     StatisticsCore(Ui::MainWindow * parent_ui): parent_ui(parent_ui) {
@@ -24,6 +27,12 @@ public:
     void closeEvent(QCloseEvent * event) override {
         parent_ui->tb_open_statisctics->setChecked(false);
         QWidget::closeEvent(event);
+    }
+
+    void keyPressEvent(QKeyEvent * event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+        }
     }
 };
 

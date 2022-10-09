@@ -10,6 +10,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
         QWidget(parent){
+    std::cout << "constructor 1\n";
     ui.setupUi(this);
 
     ui.simulation_graphicsView->show();
@@ -133,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     load_textures_from_disk();
+    std::cout << "constructor 2\n";
 }
 
 void MainWindow::mainloop_tick() {
@@ -193,9 +195,9 @@ void MainWindow::ui_tick() {
     #endif
 
     window_frames++;
-#if __VALGRIND_MODE__ == 1
-    return;
-#endif
+//#if __VALGRIND_MODE__ == 1
+//    return;
+//#endif
     if (pause_grid_parsing && really_stop_render) { return;}
     create_image();
 }

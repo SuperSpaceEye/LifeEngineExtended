@@ -87,7 +87,30 @@ result_struct<T> try_convert_message_box_template(const std::string& message, QL
 //        line_edit->setText(QString::fromStdString(to_str(fallback_value, 5)));
 //        return result_struct<T>{false, result};
 //    }
-    return result_struct<T>{};
+//    line_edit->setText(Qstring::fromStdString(line_ed))
+
+
+    auto str = line_edit->text().toStdString();
+
+    if (str.empty()) {
+        return result_struct<T>{false, static_cast<T>(0)};
+    }
+
+    bool not_valid = false;
+
+    for (auto chr: str) {
+        std::string s;
+        s += chr;
+        if (s!="0"&&s!="1"&&s!="2"&&s!="3"&&s!="3"&&s!="4"&&s!="5"&&s!="6"&&s!="7"&&s!="8"&&s!="9"&&s!="."&&s!="-") {
+            not_valid = true;
+            break;
+        }
+    }
+    if (not_valid) {
+        return result_struct<T>{false, static_cast<T>(0)};
+    }
+
+    return result_struct<T>{true, static_cast<T>(std::stod(str))};
 }
 
 template<typename T>

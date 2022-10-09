@@ -41,6 +41,11 @@ private:
     std::vector<char*> repeating_branch;
 
     void closeEvent(QCloseEvent * event) override;
+    void keyPressEvent(QKeyEvent * event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+        }
+    }
 
     void button_add_new_branch();
     QWidget * node_chooser(QHBoxLayout * widget_layout);

@@ -23,7 +23,7 @@ WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
 }
 
 void WorldEvents::closeEvent(QCloseEvent *event) {
-    parent_ui->tb_open_info_window->setChecked(false);
+    parent_ui->tb_open_world_events->setChecked(false);
     QWidget::closeEvent(event);
 }
 

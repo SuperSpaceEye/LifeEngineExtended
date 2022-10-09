@@ -6,6 +6,7 @@
 #define LIFEENGINEEXTENDED_INFOWINDOW_H
 
 #include "InfoWindowUI.h"
+#include <QKeyEvent>
 #include "../MainWindow/WindowUI.h"
 
 class InfoWindow: public QWidget {
@@ -15,6 +16,11 @@ private:
     Ui::MainWindow * _parent_ui = nullptr;
 
     void closeEvent(QCloseEvent * event) override;
+    void keyPressEvent(QKeyEvent * event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+        }
+    }
 public:
     InfoWindow(Ui::MainWindow * parent_ui);
 };

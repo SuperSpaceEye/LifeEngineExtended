@@ -20,6 +20,7 @@
 #include <QTimer>
 #include <QWheelEvent>
 #include <QFileDialog>
+#include <QKeyEvent>
 
 #include "../../Stuff/rapidjson/document.h"
 #include "../../Stuff/rapidjson/writer.h"
@@ -92,6 +93,11 @@ public:
     void closeEvent(QCloseEvent * event) override;
     void resizeEvent(QResizeEvent * event) override;
     void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent * event) override {
+        if (event->key() == Qt::Key_Escape) {
+            close();
+        }
+    }
 
     void place_organism_on_a_grid();
     void clear_grid();
