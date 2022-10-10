@@ -148,10 +148,10 @@ public:
     void finalize_chosen_organism();
     void load_chosen_organism();
 
-    void read_organism(std::ifstream & is);
+    void read_organism(QDataStream &is);
 
-    void read_json_organism(std::string & full_path);
-    void write_json_organism(std::string &full_path);
+    void read_json_organism(std::string & json);
+    void write_json_organism(std::string &json);
 
     void clear_occ();
     void load_occ();

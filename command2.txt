@@ -1,4 +1,7 @@
 source /home/spaceeye/emsdk/emsdk_env.sh
 /home/spaceeye/QtSource/6.4.0/SrcWASM/qtbase/bin/qt-cmake .
 cmake --build . --parallel 4
+
 /home/spaceeye/QtSource/6.4.0/SrcWASM/qtbase/util/wasm/qtwasmserver/qtwasmserver.py
+
+./configure -qt-host-path /home/spaceeye/QtSource/6.4.0/Src/qtbase -feature-thread -device-option QT_EMSCRIPTEN_ASYNCIFY=1 -platform wasm-emscripten -prefix $PWD/qtbase

@@ -140,7 +140,7 @@ set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/S
 add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES})
 
 message(STATUS "Setting compilation target to WASM")
-set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-s WASM=1 -s USE_PTHREADS -s ALLOW_MEMORY_GROWTH -sPTHREAD_POOL_SIZE=10 -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\", \"stringToUTF16\"]'")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-s WASM=1 -s USE_PTHREADS -s ALLOW_MEMORY_GROWTH -sPTHREAD_POOL_SIZE=10 -s ASYNCIFY -s EXPORTED_RUNTIME_METHODS='[\"cwrap\", \"stringToUTF16\"]'")
 
 if(CUDAToolkit_FOUND)
     message(STATUS "Found CUDAToolkit version ${CUDAToolkit_VERSION}")

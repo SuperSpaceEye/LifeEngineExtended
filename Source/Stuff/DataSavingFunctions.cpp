@@ -7,25 +7,25 @@
 //TODO increment every time saving logic changes
 const uint32_t SAVE_VERSION = 8;
 
-void DataSavingFunctions::write_version(std::ofstream &os) {
-    os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
+void DataSavingFunctions::write_version(QDataStream &os) {
+    os.writeRawData((char*)&SAVE_VERSION, sizeof(uint32_t));
 }
 
-void DataSavingFunctions::write_simulation_parameters(std::ofstream & os, SimulationParameters &sp) {
-    os.write((char*)&sp, sizeof(SimulationParameters));
+void DataSavingFunctions::write_simulation_parameters(QDataStream & os, SimulationParameters &sp) {
+    os.writeRawData((char*)&sp, sizeof(SimulationParameters));
 }
 
-void DataSavingFunctions::write_organisms_block_parameters(std::ofstream & os, OrganismBlockParameters &bp) {
-    os.write((char*)&bp, sizeof(OrganismBlockParameters));
+void DataSavingFunctions::write_organisms_block_parameters(QDataStream & os, OrganismBlockParameters &bp) {
+    os.writeRawData((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
-void DataSavingFunctions::write_data_container_data(std::ofstream & os, EngineDataContainer &edc) {
-    os.write((char*)&edc.total_engine_ticks, sizeof(uint32_t));
-    os.write((char*)&edc.simulation_width,   sizeof(uint32_t));
-    os.write((char*)&edc.simulation_height,  sizeof(uint32_t));
+void DataSavingFunctions::write_data_container_data(QDataStream & os, EngineDataContainer &edc) {
+    os.writeRawData((char*)&edc.total_engine_ticks, sizeof(uint32_t));
+    os.writeRawData((char*)&edc.simulation_width,   sizeof(uint32_t));
+    os.writeRawData((char*)&edc.simulation_height,  sizeof(uint32_t));
 }
 
-void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataContainer &edc) {
+void DataSavingFunctions::write_simulation_grid(QDataStream & os, EngineDataContainer &edc) {
     std::vector<WorldBlocks> blocks{};
 
     for (uint32_t x = 0; x < edc.simulation_width; x++) {
@@ -43,20 +43,20 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
 
     auto size = blocks.size();
 
-    os.write((char*)&size, sizeof(std::size_t));
-    os.write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
+    os.writeRawData((char*)&size, sizeof(std::size_t));
+    os.writeRawData((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
 }
 
-void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) {
+void DataSavingFunctions::write_organism(QDataStream &os, Organism *organism) {
     write_organism_brain(os,   &organism->brain);
     write_organism_anatomy(os, &organism->anatomy);
     write_organism_occ(os,      organism->occ);
     write_organism_data(os,     organism);
 }
 
-void DataSavingFunctions::write_organisms(std::ofstream & os, EngineDataContainer &edc) {
+void DataSavingFunctions::write_organisms(QDataStream & os, EngineDataContainer &edc) {
     uint32_t size = edc.stc.num_alive_organisms;
-    os.write((char*)&size, sizeof(uint32_t));
+    os.writeRawData((char*)&size, sizeof(uint32_t));
 //    for (auto & organism_index: edc.stc.organisms) {
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         auto & organism = edc.stc.organisms[i];
@@ -65,80 +65,80 @@ void DataSavingFunctions::write_organisms(std::ofstream & os, EngineDataContaine
     }
 }
 
-void DataSavingFunctions::write_organism_data(std::ofstream & os, Organism * organism) {
-    os.write((char*)static_cast<OrganismData*>(organism), sizeof(OrganismData));
+void DataSavingFunctions::write_organism_data(QDataStream & os, Organism * organism) {
+    os.writeRawData((char*)static_cast<OrganismData*>(organism), sizeof(OrganismData));
 }
 
-void DataSavingFunctions::write_organism_brain(std::ofstream & os, Brain * brain) {
-    os.write((char*)brain, sizeof(Brain));
+void DataSavingFunctions::write_organism_brain(QDataStream & os, Brain * brain) {
+    os.writeRawData((char*)brain, sizeof(Brain));
 }
 
-void DataSavingFunctions::write_organism_anatomy(std::ofstream & os, Anatomy * anatomy) {
+void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * anatomy) {
     uint32_t organism_blocks_size = anatomy->_organism_blocks.size();
     uint32_t producing_space_size = anatomy->_producing_space.size();
     uint32_t eating_space_size    = anatomy->_eating_space.size();
     uint32_t killing_space_size   = anatomy->_killing_space.size();
 
-    os.write((char*)&organism_blocks_size, sizeof(uint32_t));
-    os.write((char*)&producing_space_size, sizeof(uint32_t));
-    os.write((char*)&eating_space_size,    sizeof(uint32_t));
-    os.write((char*)&killing_space_size,   sizeof(uint32_t));
+    os.writeRawData((char*)&organism_blocks_size, sizeof(uint32_t));
+    os.writeRawData((char*)&producing_space_size, sizeof(uint32_t));
+    os.writeRawData((char*)&eating_space_size,    sizeof(uint32_t));
+    os.writeRawData((char*)&killing_space_size,   sizeof(uint32_t));
 
-    os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    os.write((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    os.writeRawData((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
+    os.writeRawData((char*)&anatomy->_producer_blocks, sizeof(int32_t));
+    os.writeRawData((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
+    os.writeRawData((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
+    os.writeRawData((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
+    os.writeRawData((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    os.write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.writeRawData((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    os.writeRawData((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    os.writeRawData((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
-        os.write((char*)&space_size, sizeof(uint32_t));
-        os.write((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        os.writeRawData((char*)&space_size, sizeof(uint32_t));
+        os.writeRawData((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
 
 
-bool DataSavingFunctions::read_version(std::ifstream &is) {
+bool DataSavingFunctions::read_version(QDataStream &is) {
     int save_version;
-    is.read((char*)&save_version, sizeof(int));
+    is.readRawData((char*)&save_version, sizeof(int));
     return save_version == SAVE_VERSION;
 }
 
-void DataSavingFunctions::read_simulation_parameters(std::ifstream& is, SimulationParameters &sp) {
-    is.read((char*)&sp, sizeof(SimulationParameters));
+void DataSavingFunctions::read_simulation_parameters(QDataStream &is, SimulationParameters &sp) {
+    is.readRawData((char*)&sp, sizeof(SimulationParameters));
 }
 
-void DataSavingFunctions::read_organisms_block_parameters(std::ifstream& is, OrganismBlockParameters &bp) {
-    is.read((char*)&bp, sizeof(OrganismBlockParameters));
+void DataSavingFunctions::read_organisms_block_parameters(QDataStream &is, OrganismBlockParameters &bp) {
+    is.readRawData((char*)&bp, sizeof(OrganismBlockParameters));
 }
 
-void DataSavingFunctions::read_data_container_data(std::ifstream& is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height) {
-    is.read((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&sim_width,    sizeof(uint32_t));
-    is.read((char*)&sim_height,   sizeof(uint32_t));
+void DataSavingFunctions::read_data_container_data(QDataStream &is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height) {
+    is.readRawData((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
+    is.readRawData((char*)&sim_width,    sizeof(uint32_t));
+    is.readRawData((char*)&sim_height,   sizeof(uint32_t));
 }
 
-void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataContainer &edc) {
+void DataSavingFunctions::read_simulation_grid(QDataStream &is, EngineDataContainer &edc) {
     std::vector<WorldBlocks> blocks{};
     std::size_t size;
 
-    is.read((char*)&size, sizeof(std::size_t));
+    is.readRawData((char*)&size, sizeof(std::size_t));
     blocks.resize(size);
 
-    is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
+    is.readRawData((char*)&blocks[0], sizeof(WorldBlocks)*size);
 
     for (auto & block: blocks) {
         edc.CPU_simulation_grid[block.x][block.y].type = block.type;
     }
 }
 
-void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
+void DataSavingFunctions::read_organism(QDataStream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
                                         Organism *organism, OCCParameters &occp, OCCLogicContainer &occl) {
     auto brain = Brain();
     auto anatomy = Anatomy();
@@ -162,7 +162,7 @@ void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters 
 }
 
 //TODO save child patterns?
-bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer &edc, SimulationParameters &sp,
+bool DataSavingFunctions::read_organisms(QDataStream &is, EngineDataContainer &edc, SimulationParameters &sp,
                                          OrganismBlockParameters &bp, uint32_t num_organisms, OCCParameters &occp,
                                          OCCLogicContainer &occl) {
     edc.stc.organisms.reserve(num_organisms);
@@ -177,52 +177,52 @@ bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer 
     return false;
 }
 
-void DataSavingFunctions::read_organism_data(std::ifstream& is, OrganismData & data) {
-    is.read((char*)&data, sizeof(OrganismData));
+void DataSavingFunctions::read_organism_data(QDataStream &is, OrganismData & data) {
+    is.readRawData((char*)&data, sizeof(OrganismData));
 }
 
-void DataSavingFunctions::read_organism_brain(std::ifstream& is, Brain * brain) {
-    is.read((char*)brain, sizeof(Brain));
+void DataSavingFunctions::read_organism_brain(QDataStream &is, Brain * brain) {
+    is.readRawData((char*)brain, sizeof(Brain));
 }
 
-void DataSavingFunctions::read_organism_anatomy(std::ifstream& is, Anatomy * anatomy) {
+void DataSavingFunctions::read_organism_anatomy(QDataStream &is, Anatomy * anatomy) {
     uint32_t organism_blocks_size = 0;
     uint32_t producing_space_size = 0;
     uint32_t eating_space_size    = 0;
     uint32_t killing_space_size   = 0;
 
-    is.read((char*)&organism_blocks_size, sizeof(uint32_t));
-    is.read((char*)&producing_space_size, sizeof(uint32_t));
-    is.read((char*)&eating_space_size,    sizeof(uint32_t));
-    is.read((char*)&killing_space_size,   sizeof(uint32_t));
+    is.readRawData((char*)&organism_blocks_size, sizeof(uint32_t));
+    is.readRawData((char*)&producing_space_size, sizeof(uint32_t));
+    is.readRawData((char*)&eating_space_size,    sizeof(uint32_t));
+    is.readRawData((char*)&killing_space_size,   sizeof(uint32_t));
 
     anatomy->_organism_blocks.resize(organism_blocks_size);
     anatomy->_producing_space.resize(producing_space_size);
     anatomy->_eating_space   .resize(eating_space_size);
     anatomy->_killing_space  .resize(killing_space_size);
 
-    is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    is.read((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    is.readRawData((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
+    is.readRawData((char*)&anatomy->_producer_blocks, sizeof(int32_t));
+    is.readRawData((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
+    is.readRawData((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
+    is.readRawData((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
+    is.readRawData((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    is.read((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.read((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.read((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.readRawData((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    is.readRawData((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    is.readRawData((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;
-        is.read((char*)&space_size, sizeof(uint32_t));
+        is.readRawData((char*)&space_size, sizeof(uint32_t));
         space.resize(space_size);
-        is.read((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        is.readRawData((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
-void DataSavingFunctions::write_json_data(const std::string &path, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate) {
+void DataSavingFunctions::write_json_data(QDataStream &stream, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate) {
     Document d;
     d.SetObject();
 
@@ -243,10 +243,7 @@ void DataSavingFunctions::write_json_data(const std::string &path, EngineDataCon
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
 
-    std::fstream file;
-    file.open(path, std::ios_base::out);
-    file << buffer.GetString();
-    file.close();
+    stream << buffer.GetString();
 }
 
 void DataSavingFunctions::json_write_grid(Document & d, EngineDataContainer &edc) {
@@ -827,54 +824,54 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     return true;
 }
 
-void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
-    os.write((char*)&occp.uniform_mutation_distribution, sizeof(bool));
-    os.write((char*)&occp.uniform_group_size_distribution, sizeof(bool));
-    os.write((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
-    os.write((char*)&occp.uniform_swap_distance, sizeof(bool));
+void DataSavingFunctions::write_occp(QDataStream &os, OCCParameters &occp) {
+    os.writeRawData((char*)&occp.uniform_mutation_distribution, sizeof(bool));
+    os.writeRawData((char*)&occp.uniform_group_size_distribution, sizeof(bool));
+    os.writeRawData((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
+    os.writeRawData((char*)&occp.uniform_swap_distance, sizeof(bool));
 
     int size = occp.mutation_type_weights.size();
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    os.writeRawData((char*)&size, sizeof(int));
+    os.writeRawData((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
 
     size = occp.max_group_size;
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    os.writeRawData((char*)&size, sizeof(int));
+    os.writeRawData((char*)occp.group_size_weights.data(), sizeof(int)*size);
 
     size = occp.occ_instructions_mutation_weights.size();
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
+    os.writeRawData((char*)&size, sizeof(int));
+    os.writeRawData((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
 
     size = occp.max_distance;
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    os.writeRawData((char*)&size, sizeof(int));
+    os.writeRawData((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
 }
 
-void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
-    is.read((char*)&occp.uniform_mutation_distribution, sizeof(bool));
-    is.read((char*)&occp.uniform_group_size_distribution, sizeof(bool));
-    is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
-    is.read((char*)&occp.uniform_swap_distance, sizeof(bool));
+void DataSavingFunctions::read_occp(QDataStream &is, OCCParameters &occp) {
+    is.readRawData((char*)&occp.uniform_mutation_distribution, sizeof(bool));
+    is.readRawData((char*)&occp.uniform_group_size_distribution, sizeof(bool));
+    is.readRawData((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
+    is.readRawData((char*)&occp.uniform_swap_distance, sizeof(bool));
 
     int size;
-    is.read((char*)&size, sizeof(int));
-    is.read((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    is.readRawData((char*)&size, sizeof(int));
+    is.readRawData((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
 
-    is.read((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(int));
     occp.max_group_size = size;
     occp.group_size_weights.resize(occp.max_group_size);
-    is.read((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    is.readRawData((char*)occp.group_size_weights.data(), sizeof(int)*size);
 
-    is.read((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(int));
     if (size != occp.occ_instructions_mutation_weights.size()) {
         //TODO throw error
         throw "";
     }
-    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
+    is.readRawData((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
 
-    is.read((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(int));
     occp.max_distance = size;
-    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    is.readRawData((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};
@@ -953,19 +950,19 @@ void DataSavingFunctions::read_json_occp(Document & d, OCCParameters & occp) {
     occp.swap_distance_mutation_discrete_distribution = std::discrete_distribution<int>{occp.swap_distance_mutation_weights.begin(), occp.swap_distance_mutation_weights.end()};
 }
 
-void DataSavingFunctions::write_organism_occ(std::ofstream &os, OrganismConstructionCode &occ) {
+void DataSavingFunctions::write_organism_occ(QDataStream &os, OrganismConstructionCode &occ) {
     int size = occ.get_code_const_ref().size();
-    os.write((char*)&size, sizeof(int));
+    os.writeRawData((char*)&size, sizeof(int));
     if (size > 0) {
-        os.write((char*)occ.get_code_const_ref().data(), sizeof(OCCInstruction)*size);
+        os.writeRawData((char*)occ.get_code_const_ref().data(), sizeof(OCCInstruction)*size);
     }
 }
 
-void DataSavingFunctions::read_organism_occ(std::ifstream &is, OrganismConstructionCode &occ) {
+void DataSavingFunctions::read_organism_occ(QDataStream &is, OrganismConstructionCode &occ) {
     int size = 0;
-    is.read((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(int));
     occ.get_code_ref().resize(size);
     if (size > 0) {
-        is.read((char*)occ.get_code_ref().data(), sizeof(OCCInstruction)*size);
+        is.readRawData((char*)occ.get_code_ref().data(), sizeof(OCCInstruction)*size);
     }
 }

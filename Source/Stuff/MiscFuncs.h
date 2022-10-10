@@ -75,6 +75,8 @@ public:
 
 bool display_dialog_message(const std::string &message, bool disable_warnings);
 
+bool display_save_type_dialog_message(int &result, bool use_lfew = true);
+
 void display_message(const std::string &message);
 
 template<typename T>

@@ -14,6 +14,51 @@ bool display_dialog_message(const std::string &message, bool disable_warnings) {
     return msg.exec();
 }
 
+bool display_save_type_dialog_message(int &result, bool use_lfew) {
+    QDialog main_dialog;
+
+    result = 2;
+    std::string str = use_lfew ? "lfew" : "lfeo";
+
+    auto lfew = new QPushButton(QString::fromStdString("Save as " + str));
+    QObject::connect(lfew, &QPushButton::clicked, [&result, &main_dialog]{
+        result = 0;
+        main_dialog.accept();
+    });
+
+    auto json = new QPushButton("Save as json");
+    QObject::connect(json, &QPushButton::clicked, [&result, &main_dialog]{
+        result = 1;
+        main_dialog.accept();
+    });
+
+    auto cancel = new QPushButton("Cancel");
+    QObject::connect(cancel, &QPushButton::clicked, [&result, &main_dialog]{
+        result = 2;
+        main_dialog.accept();
+    });
+
+    QDialogButtonBox dialog(&main_dialog);
+    dialog.addButton(lfew,   QDialogButtonBox::AcceptRole);
+    dialog.addButton(json,   QDialogButtonBox::AcceptRole);
+    dialog.addButton(cancel, QDialogButtonBox::AcceptRole);
+
+    dialog.setCenterButtons(true);
+
+    dialog.setMinimumSize(500, 100);
+
+    main_dialog.setFixedSize(500, 100);
+
+    auto * screen = QGuiApplication::primaryScreen();
+    auto screen_geometry = screen->geometry();
+    int width = screen_geometry.width();
+    int height = screen_geometry.height();
+
+    main_dialog.move(width/2-250, height/2-50-20);
+
+    return main_dialog.exec();
+}
+
 void display_message(const std::string &message) {
     QMessageBox msg;
     msg.setText(QString::fromStdString(message));

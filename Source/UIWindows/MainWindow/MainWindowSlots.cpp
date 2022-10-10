@@ -131,47 +131,43 @@ void MainWindow::b_save_world_slot() {
     ecp.engine_global_pause = true;
     engine.wait_for_engine_to_pause_force();
 
-    QString selected_filter;
-    QFileDialog file_dialog{};
+    std::string filter;
+    QByteArray data;
+    QByteArray data2;
 
-    std::atomic_thread_fence(std::memory_order_release);
-    auto file_name = file_dialog.getSaveFileName(dynamic_cast<QWidget*>(this), tr("Save world"), "",
-                                                 "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
-    std::atomic_thread_fence(std::memory_order_release);
-#ifndef __WIN32
-    bool file_exists = std::filesystem::exists(file_name.toStdString());
-#endif
-    std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
-        filetype = ".lfew";
-    } else if (selected_filter.toStdString() == "JSON (*.json)") {
-        filetype = ".json";
-    } else {
+    QDataStream stream(data);
+
+    int result = 2;
+
+    auto _ = display_save_type_dialog_message(result);
+
+    //lfew
+    if        (result == 0) {
+        filter = "Custom save type (*.lfew)";
+        write_data(stream);
+    //json
+    } else if (result == 1) {
+        filter = "JSON (*.json)";
+        if (!sp.use_occ) {
+            auto info = engine.get_info();
+            DataSavingFunctions::write_json_data(stream, edc, sp, info.total_total_mutation_rate);
+        } else {
+            display_message("Worlds cannot be saved in json format with OCC enabled.");
+            ecp.synchronise_simulation_and_window = flag;
+            ecp.engine_global_pause = false;
+            engine.unpause();
+            return;
+        }
+    } else if (result == 2) {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
     }
-    std::string full_path = file_name.toStdString();
 
-#ifndef __WIN32
-    if (!file_exists) {
-        full_path = file_name.toStdString() + filetype;
-    }
-#endif
+    stream >> data2;
 
-    if (filetype == ".lfew") {
-        std::ofstream out(full_path, std::ios::out | std::ios::binary);
-        write_data(out);
-        out.close();
-    } else {
-        if (!sp.use_occ) {
-            auto info = engine.get_info();
-            DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
-        } else {
-            display_message("Worlds cannot be saved in json format with OCC enabled.");
-        }
-    }
+    QFileDialog::saveFileContent(data2, QString::fromStdString(filter));
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
@@ -179,51 +175,38 @@ void MainWindow::b_save_world_slot() {
 }
 
 void MainWindow::b_load_world_slot() {
-//    bool flag = ecp.synchronise_simulation_and_window;
-//    bool flag2 = sp.reset_on_total_extinction;
-//    ecp.synchronise_simulation_and_window = false;
-//    sp.reset_on_total_extinction = false;
-//    engine.pause();
-//    ecp.engine_global_pause = true;
-//    engine.wait_for_engine_to_pause_force();
-//
-//    std::atomic_thread_fence(std::memory_order_release);
-//    QString selected_filter;
-//    auto file_name = QFileDialog::getOpenFileName(dynamic_cast<QWidget*>(this), tr("Load world"), "",
-//                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
-//    std::atomic_thread_fence(std::memory_order_release);
-//    std::string filetype;
-//    if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
-//        filetype = ".lfew";
-//    } else if (selected_filter.toStdString() == "JSON (*.json)"){
-//        filetype = ".json";
-//    } else {
-//        ecp.synchronise_simulation_and_window = flag;
-//        ecp.engine_global_pause = false;
-//        engine.unpause();
-//        return;
-//    }
-//
-//    std::string full_path = file_name.toStdString();
-//
-//    if (filetype == ".lfew") {
-//        std::ifstream in(full_path, std::ios::in | std::ios::binary);
-//        read_data(in);
-//        in.close();
-//
-//    } else if (filetype == ".json") {
-//        sp.use_occ = false;
-//        read_json_data(full_path);
-//    }
-//
-//    ecp.synchronise_simulation_and_window = flag;
-//    sp.reset_on_total_extinction = flag;
-//    ecp.engine_global_pause = false;
-//    engine.unpause();
-//    initialize_gui();
-//    update_table_values();
-//
-//    occpw.reinit_gui(true);
+    bool flag = ecp.synchronise_simulation_and_window;
+    bool flag2 = sp.reset_on_total_extinction;
+    ecp.synchronise_simulation_and_window = false;
+    sp.reset_on_total_extinction = false;
+    engine.pause();
+    ecp.engine_global_pause = true;
+    engine.wait_for_engine_to_pause_force();
+
+    auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
+        if (!fileName.isEmpty()) {
+            std::filesystem::path filePath = fileName.toStdString();
+            auto extension = filePath.extension();
+            if (extension == ".lfew") {
+                QDataStream stream(fileContent);
+                read_data(stream);
+            } else if (extension == ".json") {
+                sp.use_occ = false;
+                std::string str(fileContent.constData(), fileContent.length());
+                read_json_data(str);
+            }
+        }
+        ecp.synchronise_simulation_and_window = flag;
+        sp.reset_on_total_extinction = flag;
+        ecp.engine_global_pause = false;
+        engine.unpause();
+        initialize_gui();
+        update_table_values();
+
+        occpw.reinit_gui(true);
+    };
+
+    QFileDialog::getOpenFileContent(tr("Custom save type (*.lfew);;JSON (*.json)"), fileContentReady);
 }
 
 void MainWindow::b_pass_one_tick_slot() {

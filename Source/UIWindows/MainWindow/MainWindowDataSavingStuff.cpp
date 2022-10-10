@@ -8,7 +8,7 @@
 
 #include "MainWindow.h"
 
-void MainWindow::write_data(std::ofstream &os) {
+void MainWindow::write_data(QDataStream &os) {
     DataSavingFunctions::write_version(os);
     DataSavingFunctions::write_simulation_parameters(os, sp);
     DataSavingFunctions::write_organisms_block_parameters(os, bp);
@@ -31,7 +31,7 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     engine.unpause();
 }
 
-void MainWindow::read_data(std::ifstream &is) {
+void MainWindow::read_data(QDataStream &is) {
     //If save version is incompatible
     if (!DataSavingFunctions::read_version(is)) {
         display_message("Save version is incompatible with current program version.");
@@ -62,7 +62,7 @@ void MainWindow::read_data(std::ifstream &is) {
     edc.total_engine_ticks = edc.loaded_engine_ticks;
 }
 
-bool MainWindow::read_data_container_data(std::ifstream &is) {
+bool MainWindow::read_data_container_data(QDataStream &is) {
     uint32_t sim_width;
     uint32_t sim_height;
 
@@ -91,15 +91,15 @@ bool MainWindow::read_data_container_data(std::ifstream &is) {
     return false;
 }
 
-void MainWindow::read_simulation_grid(std::ifstream &is) {
+void MainWindow::read_simulation_grid(QDataStream &is) {
     just_resize_simulation_grid();
 
     DataSavingFunctions::read_simulation_grid(is, edc);
 }
 
-bool MainWindow::read_organisms(std::ifstream &is) {
+bool MainWindow::read_organisms(QDataStream &is) {
     uint32_t num_organisms;
-    is.read((char*)&num_organisms, sizeof(uint32_t));
+    is.readRawData((char*)&num_organisms, sizeof(uint32_t));
 
     if (num_organisms > max_loaded_num_organisms) {
         if (!display_dialog_message("The loaded number of organisms is " + std::to_string(num_organisms) +
@@ -185,20 +185,7 @@ bool try_and_catch_abort(std::function<void(A...)> f, A... args)
     }
 }
 
-void MainWindow::read_json_data(const std::string &path) {
-    std::string json;
-    auto ss = std::ostringstream();
-    std::ifstream file;
-    file.open(path);
-    if (!file.is_open()) {
-        return;
-    }
-
-    ss << file.rdbuf();
-    json = ss.str();
-
-    file.close();
-
+void MainWindow::read_json_data(const std::string &json) {
     Document document;
     document.Parse(json.c_str());
 

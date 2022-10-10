@@ -24,71 +24,46 @@ void OrganismEditor::b_resize_editing_grid_slot() {
 }
 
 void OrganismEditor::b_load_organism_slot() {
-//    QString selected_filter;
-//    auto file_name = QFileDialog::getOpenFileName(this, tr("Load organism"), "",
-//                                                  tr("Custom save type (*.lfeo);;JSON (*.json)"), &selected_filter);
-//    std::string filetype;
-//    if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
-//        filetype = ".lfeo";
-//    } else if (selected_filter.toStdString() == "JSON (*.json)"){
-//        filetype = ".json";
-//    } else {
-//        return;
-//    }
-//
-//    std::string full_path = file_name.toStdString();
-//
-//    try {
-//        if (filetype == ".lfeo") {
-//            std::ifstream in(full_path, std::ios::in | std::ios::binary);
-//            read_organism(in);
-//            in.close();
-//
-//        } else if (filetype == ".json") {
-//            read_json_organism(full_path);
-//        }
-//    } catch (std::string & _) {
-//        display_message("Loading of organism was unsuccessful.");
-//    }
-//    finalize_chosen_organism();
+    auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
+        if (!fileName.isEmpty()) {
+            std::filesystem::path filePath = fileName.toStdString();
+            auto extension = filePath.extension();
+            if (extension == ".lfeo") {
+                QDataStream stream(fileContent);
+                read_organism(stream);
+            } else if (extension == ".json") {
+                std::string str(fileContent.constData(), fileContent.length());
+                read_json_organism(str);
+            }
+        } else {return;}
+        finalize_chosen_organism();
+    };
+
+    QFileDialog::getOpenFileContent(tr("Custom save type (*.lfeo);;JSON (*.json)"), fileContentReady);
 }
 
 void OrganismEditor::b_save_organism_slot() {
-    QString selected_filter;
-    QFileDialog file_dialog{};
+    std::string filter;
+    QByteArray data;
+    QDataStream stream(data);
 
-    auto file_name = file_dialog.getSaveFileName(this, tr("Save organism"), "",
-                                                 "Custom save type (*.lfeo);;JSON (*.json)", &selected_filter);
-#ifndef __WIN32
-    bool file_exists = std::filesystem::exists(file_name.toStdString());
-#endif
-    std::string filetype;
-    if (selected_filter.toStdString() == "Custom save type (*.lfeo)") {
-        filetype = ".lfeo";
-    } else if (selected_filter.toStdString() == "JSON (*.json)") {
-        filetype = ".json";
-    } else {
+    int result = 2;
+
+    auto _ = display_save_type_dialog_message(result, false);
+
+    if        (result == 0) {
+        filter = "Custom save type (*.lfeo)";
+        DataSavingFunctions::write_organism(stream, editor_organism);
+    } else if (result == 1) {
+        filter = "JSON (*.json)";
+        std::string str;
+        write_json_organism(str);
+        data = QByteArray(str.c_str(), str.length());
+    } else if (result == 2) {
         return;
     }
-    std::string full_path = file_name.toStdString();
 
-#ifndef __WIN32
-    if (!file_exists) {
-        full_path = file_name.toStdString() + filetype;
-    }
-#endif
-
-    if (filetype == ".lfeo") {
-        std::ofstream out(full_path, std::ios::out | std::ios::binary);
-        DataSavingFunctions::write_organism(out, editor_organism);
-        out.close();
-
-    } else {
-        rapidjson::Document j_organism;
-        j_organism.SetObject();
-
-        write_json_organism(full_path);
-    }
+    QFileDialog::saveFileContent(data, QString::fromStdString(filter));
 }
 
 void OrganismEditor::b_reset_organism_slot() {

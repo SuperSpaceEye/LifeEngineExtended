@@ -6,9 +6,8 @@
 #define LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H
 
 #include <cstdint>
-#include <ostream>
-#include <fstream>
 #include <filesystem>
+#include <QDataStream>
 
 #include "../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "BlockTypes.hpp"
@@ -53,37 +52,37 @@ namespace DataSavingFunctions {
         bool & use_point_size;
     };
 
-    void write_version(std::ofstream &os);
-    void write_simulation_parameters(std::ofstream & os, SimulationParameters &sp);
-    void write_organisms_block_parameters(std::ofstream & os, OrganismBlockParameters &bp);
-    void write_occp(std::ofstream & os, OCCParameters & occp);
-    void write_data_container_data(std::ofstream & os, EngineDataContainer &edc);
-    void write_simulation_grid(std::ofstream & os, EngineDataContainer &edc);
-    void write_organism(std::ofstream& os, Organism * organism);
-    void write_organisms(std::ofstream & os, EngineDataContainer &edc);
-    void write_organism_data(std::ofstream & os, Organism * organism);
-    void write_organism_brain(std::ofstream & os, Brain * brain);
-    void write_organism_anatomy(std::ofstream & os, Anatomy * anatomy);
-    void write_organism_occ(std::ofstream& os, OrganismConstructionCode & occ);
+    void write_version(QDataStream &os);
+    void write_simulation_parameters(QDataStream & os, SimulationParameters &sp);
+    void write_organisms_block_parameters(QDataStream & os, OrganismBlockParameters &bp);
+    void write_occp(QDataStream & os, OCCParameters & occp);
+    void write_data_container_data(QDataStream & os, EngineDataContainer &edc);
+    void write_simulation_grid(QDataStream & os, EngineDataContainer &edc);
+    void write_organism(QDataStream& os, Organism * organism);
+    void write_organisms(QDataStream & os, EngineDataContainer &edc);
+    void write_organism_data(QDataStream & os, Organism * organism);
+    void write_organism_brain(QDataStream & os, Brain * brain);
+    void write_organism_anatomy(QDataStream & os, Anatomy * anatomy);
+    void write_organism_occ(QDataStream& os, OrganismConstructionCode & occ);
 
-    bool read_version(std::ifstream &is);
-    void read_simulation_parameters(std::ifstream& is, SimulationParameters &sp);
-    void read_organisms_block_parameters(std::ifstream& is, OrganismBlockParameters &bp);
-    void read_data_container_data(std::ifstream& is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height);
-    void read_occp(std::ifstream& is, OCCParameters & occp);
-    void read_simulation_grid(std::ifstream& is, EngineDataContainer &edc);
-    void read_organism(std::ifstream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
+    bool read_version(QDataStream &is);
+    void read_simulation_parameters(QDataStream &is, SimulationParameters &sp);
+    void read_organisms_block_parameters(QDataStream &is, OrganismBlockParameters &bp);
+    void read_data_container_data(QDataStream &is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height);
+    void read_occp(QDataStream &is, OCCParameters & occp);
+    void read_simulation_grid(QDataStream &is, EngineDataContainer &edc);
+    void read_organism(QDataStream &is, SimulationParameters &sp, OrganismBlockParameters &bp,
                        Organism *organism, OCCParameters &occp, OCCLogicContainer &occl);
-    bool read_organisms(std::ifstream &is, EngineDataContainer &edc, SimulationParameters &sp,
+    bool read_organisms(QDataStream &is, EngineDataContainer &edc, SimulationParameters &sp,
                         OrganismBlockParameters &bp, uint32_t num_organisms, OCCParameters &occp,
                         OCCLogicContainer &occl);
-    void read_organism_data(std::ifstream& is, OrganismData & data);
-    void read_organism_brain(std::ifstream& is, Brain * brain);
-    void read_organism_anatomy(std::ifstream& is, Anatomy * anatomy);
-    void read_organism_occ(std::ifstream& is, OrganismConstructionCode & occ);
+    void read_organism_data(QDataStream &is, OrganismData & data);
+    void read_organism_brain(QDataStream &is, Brain * brain);
+    void read_organism_anatomy(QDataStream &is, Anatomy * anatomy);
+    void read_organism_occ(QDataStream &is, OrganismConstructionCode & occ);
 
 
-    void write_json_data(const std::string &path, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate);
+    void write_json_data(QDataStream &stream, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate);
     void json_write_grid(rapidjson::Document &d, EngineDataContainer &edc);
     void json_write_organisms(rapidjson::Document &d, EngineDataContainer &edc, SimulationParameters &sp);
     void write_json_organism(rapidjson::Document &d, Organism * organism, rapidjson::Value &j_organism, SimulationParameters &sp);

@@ -4,7 +4,7 @@
 
 #include "OrganismEditor.h"
 
-void OrganismEditor::read_organism(std::ifstream &is) {
+void OrganismEditor::read_organism(QDataStream &is) {
     OCCParameters p{};
     OCCLogicContainer l{};
 
@@ -16,20 +16,7 @@ void OrganismEditor::read_organism(std::ifstream &is) {
 
 using rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer;
 
-void OrganismEditor::read_json_organism(std::string &full_path) {
-    std::string json;
-    auto ss = std::ostringstream();
-    std::ifstream file;
-    file.open(full_path);
-    if (!file.is_open()) {
-        return;
-    }
-
-    ss << file.rdbuf();
-    json = ss.str();
-
-    file.close();
-
+void OrganismEditor::read_json_organism(std::string &json) {
     Document organism;
     organism.Parse(json.c_str());
 
@@ -44,7 +31,7 @@ void OrganismEditor::read_json_organism(std::string &full_path) {
     load_chosen_organism();
 }
 
-void OrganismEditor::write_json_organism(std::string &full_path) {
+void OrganismEditor::write_json_organism(std::string &json) {
     Document j_organism;
     j_organism.SetObject();
 
@@ -55,7 +42,7 @@ void OrganismEditor::write_json_organism(std::string &full_path) {
     j_organism.Accept(writer);
 
     std::fstream file;
-    file.open(full_path, std::ios_base::out);
+    file.open(json, std::ios_base::out);
     file << buffer.GetString();
     file.close();
 }

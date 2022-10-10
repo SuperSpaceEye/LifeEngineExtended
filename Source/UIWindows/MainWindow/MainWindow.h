@@ -188,23 +188,23 @@ private:
     void move_center(int delta_x, int delta_y);
     void reset_scale_view();
 
-    void read_json_data(const std::string &path);
+    void read_json_data(const std::string &json);
     void json_resize_and_make_walls(rapidjson::Document & d);
     static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
     static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
 
     //https://stackoverflow.com/questions/28492517/write-and-load-vector-of-structs-in-a-binary-file-c
-    void write_data(std::ofstream& os);
+    void write_data(QDataStream &os);
 
     void recover_state(const SimulationParameters &recovery_sp,
                        const OrganismBlockParameters &recovery_bp,
                        uint32_t recovery_simulation_width,
                        uint32_t recovery_simulation_height);
 
-    void read_data(std::ifstream& is);
-    bool read_data_container_data(std::ifstream &is);
-    void read_simulation_grid(std::ifstream& is);
-    bool read_organisms(std::ifstream& is);
+    void read_data(QDataStream &is);
+    bool read_data_container_data(QDataStream &is);
+    void read_simulation_grid(QDataStream &is);
+    bool read_organisms(QDataStream &is);
 
     void update_table_values();
 
