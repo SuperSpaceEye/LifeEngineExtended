@@ -40,7 +40,9 @@ public:
     QHBoxLayout *horizontalLayout;
     QFrame *frame_2;
     QVBoxLayout *verticalLayout_6;
+    QHBoxLayout *horizontalLayout_58;
     QLabel *lb_fps;
+    QLabel *lb_ups;
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_2;
     QLineEdit *le_fps;
@@ -291,6 +293,9 @@ public:
     QLabel *label_39;
     QLineEdit *le_random_seed;
     QCheckBox *cb_load_evolution_controls_from_state;
+    QHBoxLayout *horizontalLayout_59;
+    QLabel *label_48;
+    QLineEdit *le_set_ups;
     QSpacerItem *verticalSpacer_2;
     QLabel *label_22;
     QHBoxLayout *horizontalLayout_20;
@@ -375,10 +380,20 @@ public:
         verticalLayout_6->setSpacing(0);
         verticalLayout_6->setObjectName("verticalLayout_6");
         verticalLayout_6->setContentsMargins(9, 9, 9, 9);
+        horizontalLayout_58 = new QHBoxLayout();
+        horizontalLayout_58->setObjectName("horizontalLayout_58");
         lb_fps = new QLabel(frame_2);
         lb_fps->setObjectName("lb_fps");
 
-        verticalLayout_6->addWidget(lb_fps);
+        horizontalLayout_58->addWidget(lb_fps);
+
+        lb_ups = new QLabel(frame_2);
+        lb_ups->setObjectName("lb_ups");
+
+        horizontalLayout_58->addWidget(lb_ups);
+
+
+        verticalLayout_6->addLayout(horizontalLayout_58);
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName("horizontalLayout_6");
@@ -921,7 +936,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1231, 606, 1620));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1620));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1597,7 +1612,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 803));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -529, 606, 832));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1828,6 +1843,21 @@ public:
         cb_load_evolution_controls_from_state->setObjectName("cb_load_evolution_controls_from_state");
 
         verticalLayout_19->addWidget(cb_load_evolution_controls_from_state);
+
+        horizontalLayout_59 = new QHBoxLayout();
+        horizontalLayout_59->setObjectName("horizontalLayout_59");
+        label_48 = new QLabel(widget_2);
+        label_48->setObjectName("label_48");
+
+        horizontalLayout_59->addWidget(label_48);
+
+        le_set_ups = new QLineEdit(widget_2);
+        le_set_ups->setObjectName("le_set_ups");
+
+        horizontalLayout_59->addWidget(le_set_ups);
+
+
+        verticalLayout_19->addLayout(horizontalLayout_59);
 
         verticalSpacer_2 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -2074,6 +2104,7 @@ public:
         QObject::connect(tb_open_occ_parameters, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_open_occ_parameters_slot(bool)));
         QObject::connect(cb_use_organism_construction_code, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_occ_slot(bool)));
         QObject::connect(cb_recenter_to_imaginary, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_recenter_to_imaginary_slot(bool)));
+        QObject::connect(le_set_ups, SIGNAL(returnPressed()), MainWindow, SLOT(le_set_ups_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -2085,10 +2116,11 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         lb_fps->setText(QCoreApplication::translate("MainWindow", "fps:", nullptr));
+        lb_ups->setText(QCoreApplication::translate("MainWindow", "ups:", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "Set max fps:", nullptr));
         le_fps->setText(QCoreApplication::translate("MainWindow", "60", nullptr));
         lb_sps->setText(QCoreApplication::translate("MainWindow", "sps:", nullptr));
-        label_3->setText(QCoreApplication::translate("MainWindow", "Set max sps:", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "Set max tps:", nullptr));
         le_sps->setText(QCoreApplication::translate("MainWindow", "60", nullptr));
         b_reset->setText(QCoreApplication::translate("MainWindow", "Reset", nullptr));
         b_reset_view->setText(QCoreApplication::translate("MainWindow", "Reset view", nullptr));
@@ -2300,6 +2332,7 @@ public:
         label_38->setText(QCoreApplication::translate("MainWindow", "Memory allocation strategy modifier", nullptr));
         label_39->setText(QCoreApplication::translate("MainWindow", "Random seed", nullptr));
         cb_load_evolution_controls_from_state->setText(QCoreApplication::translate("MainWindow", "Save/Load evolution controls upon program loading.", nullptr));
+        label_48->setText(QCoreApplication::translate("MainWindow", "Set max ups:", nullptr));
         label_22->setText(QCoreApplication::translate("MainWindow", "Perlin Settings:", nullptr));
         label_26->setText(QCoreApplication::translate("MainWindow", "Octaves: ", nullptr));
         label_27->setText(QCoreApplication::translate("MainWindow", "Persistence: ", nullptr));

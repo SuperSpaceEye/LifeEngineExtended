@@ -157,14 +157,25 @@
           <number>9</number>
          </property>
          <item>
-          <widget class="QLabel" name="lb_fps">
-           <property name="text">
-            <string>fps:</string>
-           </property>
-           <property name="buddy">
-            <cstring>le_fps</cstring>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_58">
+           <item>
+            <widget class="QLabel" name="lb_fps">
+             <property name="text">
+              <string>fps:</string>
+             </property>
+             <property name="buddy">
+              <cstring>le_fps</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lb_ups">
+             <property name="text">
+              <string>ups:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -196,7 +207,7 @@
            <item>
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Set max sps:</string>
+              <string>Set max tps:</string>
              </property>
             </widget>
            </item>
@@ -1070,7 +1081,7 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-1231</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>1620</height>
                  </rect>
@@ -2083,9 +2094,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-529</y>
                   <width>606</width>
-                  <height>803</height>
+                  <height>832</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2397,6 +2408,20 @@
                        <string>Save/Load evolution controls upon program loading.</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_59">
+                      <item>
+                       <widget class="QLabel" name="label_48">
+                        <property name="text">
+                         <string>Set max ups:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_set_ups"/>
+                      </item>
+                     </layout>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -4416,6 +4441,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_set_ups</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_set_ups_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>726</x>
+     <y>839</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4538,6 +4579,7 @@
   <slot>cb_occp_always_on_top_slot(bool)</slot>
   <slot>cb_use_occ_slot(bool)</slot>
   <slot>cb_recenter_to_imaginary_slot(bool)</slot>
+  <slot>le_set_ups_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

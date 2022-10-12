@@ -89,10 +89,14 @@ MainWindow::MainWindow(QWidget *parent) :
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, std::ref(engine)};
         engine_thread.detach();
 
+        create_image_creation_thread();
+
         fps_timer = clock_now();
 
         scene.addItem(&pixmap_item);
         ui.simulation_graphicsView->setScene(&scene);
+
+        timer->start();
 
         reset_scale_view();
         get_current_font_size();
@@ -108,12 +112,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //Will execute as fast as possible
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
 
-    set_window_interval(60);
+    set_image_creator_interval(60);
     set_simulation_interval(60);
 
     cb_show_extended_statistics_slot(false);
-
-    timer->start();
 #if __VALGRIND_MODE__ == 1
     cb_synchronise_simulation_and_window_slot(false);
     ui.cb_synchronise_sim_and_win->setChecked(false);
@@ -152,17 +154,19 @@ void MainWindow::mainloop_tick() {
         engine.update_info();
         auto info = engine.get_info();
 
-        update_fps_labels(window_frames/scale, simulation_frames/scale);
+        update_fps_labels(image_frames / scale, simulation_frames / scale, window_frames / scale);
         update_statistics_info(info);
 
+        image_frames = 0;
         window_frames = 0;
         fps_timer = clock_now();
     }
 }
 
-void MainWindow::update_fps_labels(int fps, int sps) {
+void MainWindow::update_fps_labels(int fps, int tps, int ups) {
     ui.lb_fps->setText(QString::fromStdString("fps: " + std::to_string(fps)));
-    ui.lb_sps->setText(QString::fromStdString("sps: " + std::to_string(sps)));
+    ui.lb_sps->setText(QString::fromStdString("tps: " + std::to_string(tps)));
+    ui.lb_ups->setText(QString::fromStdString("ups: " + std::to_string(ups)));
 }
 
 void MainWindow::ui_tick() {
@@ -188,16 +192,19 @@ void MainWindow::ui_tick() {
 
     bs.update_();
 
-    #ifndef __EMSCRIPTEN_COMPILATION__
     rc.update_label();
-    #endif
 
     window_frames++;
+
 #if __VALGRIND_MODE__ == 1
     return;
 #endif
     if (pause_grid_parsing && really_stop_render) { return;}
-    create_image();
+
+    if (do_not_parse_image_data_ct) { return;}
+    do_not_parse_image_data_mt.store(true);
+    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
+    do_not_parse_image_data_mt.store(false);
 }
 
 void MainWindow::resize_image() {
@@ -244,8 +251,9 @@ void MainWindow::reset_scale_view() {
 
 
 void MainWindow::create_image() {
-    int image_width;
-    int image_height;
+    while (!do_not_parse_image_data_mt.load(std::memory_order_acquire)) {}
+    do_not_parse_image_data_ct.store(true);
+
     std::vector<int> lin_width;
     std::vector<int> lin_height;
     std::vector<int> truncated_lin_width;
@@ -276,7 +284,7 @@ void MainWindow::create_image() {
                                        edc, 32, truncated_lin_width, truncated_lin_height);
 #endif
     }
-    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
+    do_not_parse_image_data_ct.store(false);
 }
 
 void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
@@ -313,14 +321,17 @@ void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_he
     ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 }
 
-void MainWindow::set_window_interval(int max_window_fps) {
+void MainWindow::set_image_creator_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
-        window_interval = 0.;
-        timer->setInterval(0);
+        image_creation_interval = 0.;
         return;
     }
-    window_interval = 1. / max_window_fps;
-    timer->setInterval(1000/max_window_fps);
+    image_creation_interval = 1. / max_window_fps;
+    if (max_window_fps > max_ups) {
+        timer->setInterval(1000./max_window_fps);
+    } else {
+        timer->setInterval(1000./max_ups);
+    }
 }
 
 void MainWindow::set_simulation_interval(int max_simulation_fps) {
@@ -628,6 +639,8 @@ void MainWindow::initialize_gui() {
 
     ee.occ_mode(sp.use_occ);
 
+    ui.le_set_ups->setText(QString::fromStdString(std::to_string(max_ups)));
+
     #ifdef __EMSCRIPTEN_COMPILATION__
     ui.cb_recorder_window_always_on_top->hide();
     ui.tb_open_recorder_window->hide();
@@ -902,4 +915,23 @@ void MainWindow::apply_font_size() {
     }
 
     apply_font_to_windows(_font);
+}
+
+void MainWindow::create_image_creation_thread() {
+    image_creation_thread = std::thread{[&](){
+        auto point1 = std::chrono::high_resolution_clock::now();
+        auto point2 = std::chrono::high_resolution_clock::now();
+        while (true) {
+            point1 = std::chrono::high_resolution_clock::now();
+            if (!pause_grid_parsing || !really_stop_render) { create_image(); image_frames++;}
+            point2 = std::chrono::high_resolution_clock::now();
+            std::this_thread::sleep_for(std::chrono::microseconds(
+                    std::max<long>(
+                            int(image_creation_interval * 1000000) -
+                            std::chrono::duration_cast<std::chrono::microseconds>(point2 - point1).count()
+            , 0)));
+        }
+    }};
+
+    image_creation_thread.detach();
 }
