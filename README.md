@@ -1,5 +1,7 @@
 # LifeEngine Extended
-C++ implementation of https://github.com/MaxRobinsonTheGreat/LifeEngine that extends the original version with new features.
+Web Version: https://lifeengineextended.github.io/
+
+Idea for this project is based on https://github.com/MaxRobinsonTheGreat/LifeEngine.
 
 **The program needs to be placed in path with only english letters.**
 
