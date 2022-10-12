@@ -1,6 +1,6 @@
 source /home/spaceeye/emsdk/emsdk_env.sh
 /home/spaceeye/QtSource/6.4.0/SrcWASM/qtbase/bin/qt-cmake .
-cmake --build . --parallel 4
+cmake --build . --parallel 4 --clean-first
 
 /home/spaceeye/QtSource/6.4.0/SrcWASM/qtbase/util/wasm/qtwasmserver/qtwasmserver.py
 

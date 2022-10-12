@@ -93,6 +93,11 @@ void ImageCreation::ImageCreationTools::set_image_pixel(int x,
                                                         const color &color,
                                                         std::vector<unsigned char> &image_vector) {
     auto index = 4 * (y * image_width + x);
+
+    if (image_vector[index+2] == color.r && image_vector[index+1] == color.g && image_vector[index] == color.b) {
+        return;
+    }
+
     image_vector[index+2] = color.r;
     image_vector[index+1] = color.g;
     image_vector[index  ] = color.b;

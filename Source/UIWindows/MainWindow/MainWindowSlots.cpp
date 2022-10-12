@@ -132,22 +132,24 @@ void MainWindow::b_save_world_slot() {
     engine.wait_for_engine_to_pause_force();
 
     std::string filter;
-    QByteArray data;
-    QByteArray data2;
+    QByteArray data{};
 
-    QDataStream stream(data);
+    QDataStream stream(&data, QIODeviceBase::OpenModeFlag::WriteOnly);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream.setByteOrder(QDataStream::LittleEndian);
 
     int result = 2;
 
-    auto _ = display_save_type_dialog_message(result);
+    display_save_type_dialog_message(result);
+//    stream.startTransaction();
 
     //lfew
     if        (result == 0) {
-        filter = "Custom save type (*.lfew)";
+        filter = "save_file.lfew";
         write_data(stream);
     //json
     } else if (result == 1) {
-        filter = "JSON (*.json)";
+        filter = "save_file.json";
         if (!sp.use_occ) {
             auto info = engine.get_info();
             DataSavingFunctions::write_json_data(stream, edc, sp, info.total_total_mutation_rate);
@@ -164,10 +166,12 @@ void MainWindow::b_save_world_slot() {
         engine.unpause();
         return;
     }
+//    std::cout << "start_length" << data.length() << "\n";
+//    stream.commitTransaction();
+//    std::cout << "end_length" << data.length() << "\n";
+//    stream >> data2;
 
-    stream >> data2;
-
-    QFileDialog::saveFileContent(data2, QString::fromStdString(filter));
+    QFileDialog::saveFileContent(data, QString::fromStdString(filter));
 
     ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
@@ -182,13 +186,13 @@ void MainWindow::b_load_world_slot() {
     engine.pause();
     ecp.engine_global_pause = true;
     engine.wait_for_engine_to_pause_force();
-
     auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
         if (!fileName.isEmpty()) {
             std::filesystem::path filePath = fileName.toStdString();
             auto extension = filePath.extension();
             if (extension == ".lfew") {
                 QDataStream stream(fileContent);
+                stream.setByteOrder(QDataStream::LittleEndian);
                 read_data(stream);
             } else if (extension == ".json") {
                 sp.use_occ = false;
@@ -197,7 +201,7 @@ void MainWindow::b_load_world_slot() {
             }
         }
         ecp.synchronise_simulation_and_window = flag;
-        sp.reset_on_total_extinction = flag;
+        sp.reset_on_total_extinction = flag2;
         ecp.engine_global_pause = false;
         engine.unpause();
         initialize_gui();
@@ -205,7 +209,6 @@ void MainWindow::b_load_world_slot() {
 
         occpw.reinit_gui(true);
     };
-
     QFileDialog::getOpenFileContent(tr("Custom save type (*.lfew);;JSON (*.json)"), fileContentReady);
 }
 
@@ -834,11 +837,14 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     auto item = ui.table_organism_block_parameters->item(row, col);
     float result;
     bool set_result = false;
-//    if (boost::conversion::try_lexical_convert<float>(item->text().toStdString(), result)) {
-//        set_result = true;
-//    } else {
+    auto str = item->text().toStdString();
+    auto temp = try_convert_string<float>(str);
+    if (temp.is_valid) {
+        set_result = true;
+        result = temp.result;
+    } else {
         if (!disable_warnings) {display_message("Value should be float.");}
-//    }
+    }
     BParameters * type;
     switch (static_cast<BlocksNames>(row)) {
         case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
