@@ -41,7 +41,7 @@ void DataSavingFunctions::write_simulation_grid(QDataStream & os, EngineDataCont
         }
     }
 
-    auto size = blocks.size();
+    uint64_t size = blocks.size();
 
     os.device()->write((char*)&size, sizeof(std::uint64_t));
     os.device()->write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());

@@ -141,7 +141,6 @@ void MainWindow::b_save_world_slot() {
     int result = 2;
 
     display_save_type_dialog_message(result);
-//    stream.startTransaction();
 
     //lfew
     if        (result == 0) {
@@ -153,6 +152,10 @@ void MainWindow::b_save_world_slot() {
         if (!sp.use_occ) {
             auto info = engine.get_info();
             DataSavingFunctions::write_json_data(stream, edc, sp, info.total_total_mutation_rate);
+
+            //removes extra data that qstream adds.
+            data.erase(data.begin(), data.begin()+4);
+            data.erase(data.end()-1, data.end());
         } else {
             display_message("Worlds cannot be saved in json format with OCC enabled.");
             ecp.synchronise_simulation_and_window = flag;
@@ -160,16 +163,13 @@ void MainWindow::b_save_world_slot() {
             engine.unpause();
             return;
         }
+    //cancel
     } else if (result == 2) {
         ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
     }
-//    std::cout << "start_length" << data.length() << "\n";
-//    stream.commitTransaction();
-//    std::cout << "end_length" << data.length() << "\n";
-//    stream >> data2;
 
     QFileDialog::saveFileContent(data, QString::fromStdString(filter));
 
