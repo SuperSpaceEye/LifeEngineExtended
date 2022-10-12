@@ -41,8 +41,5 @@ void OrganismEditor::write_json_organism(std::string &json) {
     Writer<StringBuffer> writer(buffer);
     j_organism.Accept(writer);
 
-    std::fstream file;
-    file.open(json, std::ios_base::out);
-    file << buffer.GetString();
-    file.close();
+    json = buffer.GetString();
 }

@@ -44,21 +44,28 @@ void OrganismEditor::b_load_organism_slot() {
 
 void OrganismEditor::b_save_organism_slot() {
     std::string filter;
-    QByteArray data;
-    QDataStream stream(data);
+    QByteArray data{};
+
+    QDataStream stream(&data, QIODeviceBase::OpenModeFlag::WriteOnly);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream.setByteOrder(QDataStream::LittleEndian);
 
     int result = 2;
 
-    auto _ = display_save_type_dialog_message(result, false);
+    display_save_type_dialog_message(result, false);
 
     if        (result == 0) {
-        filter = "Custom save type (*.lfeo)";
+        filter = "save_organism.lfeo";
         DataSavingFunctions::write_organism(stream, editor_organism);
     } else if (result == 1) {
-        filter = "JSON (*.json)";
+        filter = "save_organism.json";
         std::string str;
         write_json_organism(str);
-        data = QByteArray(str.c_str(), str.length());
+        stream << str.c_str();
+
+        //removes extra data that qstream adds.
+        data.erase(data.begin(), data.begin()+4);
+        data.erase(data.end()-1, data.end());
     } else if (result == 2) {
         return;
     }
