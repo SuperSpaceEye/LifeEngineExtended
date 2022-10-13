@@ -693,64 +693,101 @@ void MainWindow::change_main_grid_left_click() {
     while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
 
+    if (update_last_cursor_pos) {
+        last_last_cursor_x_pos = last_mouse_x_pos;
+        last_last_cursor_y_pos = last_mouse_y_pos;
+
+        update_last_cursor_pos = false;
+    }
+
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-//    ecp.pause_processing_user_action = true;
-//    wait_for_engine_to_pause_processing_user_actions();
-    for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
-        for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
-            switch (cursor_mode) {
-                case CursorMode::ModifyFood:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ModifyWall:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::KillOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ChooseOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::PlaceOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
-                    goto endfor;
-                default: break;
+    auto cpg2 = calculate_cursor_pos_on_grid(last_last_cursor_x_pos, last_last_cursor_y_pos);
+
+    std::vector<Vector2<int>> points;
+
+    if (cursor_mode == CursorMode::ModifyFood || cursor_mode == CursorMode::ModifyWall || cursor_mode == CursorMode::KillOrganism) {
+        points = iterate_between_two_points(cpg, cpg2);
+    } else {
+        points.emplace_back(cpg);
+    }
+
+    for (auto & pt: points) {
+        for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
+            for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
+                switch (cursor_mode) {
+                    case CursorMode::ModifyFood:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ModifyWall:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryAddWall, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::KillOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ChooseOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, pt.x + x, pt.y + y);
+                        goto endfor;
+                        break;
+                    case CursorMode::PlaceOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, pt.x, pt.y);
+                        goto endfor;
+                    default:
+                        break;
+                }
             }
         }
     }
     endfor:
     ecp.do_not_use_user_actions_ui = false;
+
+    last_last_cursor_x_pos = last_mouse_x_pos;
+    last_last_cursor_y_pos = last_mouse_y_pos;
 }
 
 void MainWindow::change_main_grid_right_click() {
     while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
 
+    if (update_last_cursor_pos) {
+        last_last_cursor_x_pos = last_mouse_x_pos;
+        last_last_cursor_y_pos = last_mouse_y_pos;
+
+        update_last_cursor_pos = false;
+    }
+
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-//    ecp.pause_processing_user_action = true;
-//    wait_for_engine_to_pause_processing_user_actions();
-    for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
-        for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
-            switch (cursor_mode) {
-                case CursorMode::ModifyFood:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ModifyWall:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::KillOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ChooseOrganism:
-                    break;
-                case CursorMode::PlaceOrganism:
-                    break;
-                default: break;
+    auto cpg2 = calculate_cursor_pos_on_grid(last_last_cursor_x_pos, last_last_cursor_y_pos);
+
+    std::vector<Vector2<int>> points;
+
+    points = iterate_between_two_points(cpg, cpg2);
+
+    for (auto & pt: points) {
+        for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
+            for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
+                switch (cursor_mode) {
+                    case CursorMode::ModifyFood:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveFood, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ModifyWall:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveWall, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::KillOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ChooseOrganism:
+                    case CursorMode::PlaceOrganism:
+                    default:
+                        break;
+                }
             }
         }
     }
     ecp.do_not_use_user_actions_ui = false;
+
+    last_last_cursor_x_pos = last_mouse_x_pos;
+    last_last_cursor_y_pos = last_mouse_y_pos;
 }
 
 void MainWindow::change_editing_grid_left_click() {
@@ -934,4 +971,45 @@ void MainWindow::create_image_creation_thread() {
     }};
 
     image_creation_thread.detach();
+}
+
+//https://gist.github.com/DavidMcLaughlin208/60e69e698e3858617c322d80a8f174e2
+std::vector<Vector2<int>> MainWindow::iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2) {
+    if (pos1.x == pos2.x && pos1.y == pos2.y) {return {pos1};}
+
+    std::vector<Vector2<int>> points;
+    int matrixX1 = pos1.x;
+    int matrixY1 = pos1.y;
+    int matrixX2 = pos2.x;
+    int matrixY2 = pos2.y;
+
+    int x_diff = matrixX1 - matrixX2;
+    int y_diff = matrixY1 - matrixY2;
+    bool x_diff_is_larger = std::abs(x_diff) > std::abs(y_diff);
+
+    int x_modifier = x_diff < 0 ? 1 : -1;
+    int y_modifier = y_diff < 0 ? 1 : -1;
+
+    int longer_side_length  = std::max(std::abs(x_diff), std::abs(y_diff));
+    int shorter_side_length = std::min(std::abs(x_diff), std::abs(y_diff));
+
+    float slope = (shorter_side_length == 0 || longer_side_length == 0) ? 0 : ((float) (shorter_side_length) / (longer_side_length));
+
+    int shorter_side_increase;
+    for (int i = 1; i <= longer_side_length; i++) {
+        shorter_side_increase = std::round(i * slope);
+        int yIncrease, xIncrease;
+        if (x_diff_is_larger) {
+            xIncrease = i;
+            yIncrease = shorter_side_increase;
+        } else {
+            yIncrease = i;
+            xIncrease = shorter_side_increase;
+        }
+        int currentY = matrixY1 + (yIncrease * y_modifier);
+        int currentX = matrixX1 + (xIncrease * x_modifier);
+        points.emplace_back(currentX, currentY);
+    }
+
+    return points;
 }

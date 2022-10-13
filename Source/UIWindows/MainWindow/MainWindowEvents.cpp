@@ -76,6 +76,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
             change_editing_grid = false;
             change_main_simulation_grid = false;
+            update_last_cursor_pos = true;
         } break;
         case QEvent::Resize: {
             auto resize_event = dynamic_cast<QResizeEvent*>(event);

@@ -161,6 +161,7 @@ private:
     bool is_fullscreen = false;
     bool save_simulation_settings = true;
     bool uses_point_size = false;
+    bool update_last_cursor_pos = true;
 
     std::atomic<bool> do_not_parse_image_data_ct = false;
     std::atomic<bool> do_not_parse_image_data_mt = false;
@@ -190,6 +191,8 @@ private:
     int font_size = 0;
     int image_width;
     int image_height;
+    int last_last_cursor_x_pos = 0;
+    int last_last_cursor_y_pos = 0;
 
     static auto clock_now() {return std::chrono::high_resolution_clock::now();}
 
@@ -218,6 +221,8 @@ private:
     bool read_organisms(std::ifstream& is);
 
     void update_table_values();
+
+    static std::vector<Vector2<int>> iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2);
 
     void mainloop_tick();
     void ui_tick();
