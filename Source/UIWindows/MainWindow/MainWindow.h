@@ -22,10 +22,8 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
-#ifndef __EMSCRIPTEN_COMPILATION__
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
-#endif
 
 #include <QApplication>
 #include <QWidget>
@@ -67,7 +65,7 @@
 #include "../Statistics/StatisticsCore.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
-#ifndef __EMSCRIPTEN_COMPILATION__
+#ifndef __NO_RECORDER__
 #include "../Recorder/Recorder.h"
 #endif
 #include "../../UIWindows/WorldEvents/WorldEvents.h"
@@ -122,7 +120,7 @@ private:
     OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp};
     StatisticsCore st{&ui};
     InfoWindow iw{&ui};
-    #ifndef __EMSCRIPTEN_COMPILATION__
+    #ifndef __NO_RECORDER__
     Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};
     #endif
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
