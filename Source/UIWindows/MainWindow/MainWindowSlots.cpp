@@ -53,7 +53,7 @@ void MainWindow::tb_open_info_window_slot(bool state) {
 }
 
 void MainWindow::tb_open_recorder_window_slot(bool state) {
-#ifndef __EMSCRIPTEN_COMPILATION__
+#ifndef __NO_RECORDER__
     if (state) {
         rc.show();
     } else {
@@ -692,7 +692,7 @@ void MainWindow::cb_info_window_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
-#ifndef __EMSCRIPTEN_COMPILATION__
+#ifndef __NO_RECORDER__
     if (is_fullscreen) {return;}
     auto hidden = rc.isHidden();
 

@@ -3,13 +3,19 @@ cmake_minimum_required(VERSION ${MIN_VERSION})
 set(PROJECT_NAME LifeEngineExtended)
 project(${PROJECT_NAME})
 
+option(WIN_COMPILATION "If compiling for windows" OFF)
+option(NO_RECORDER "If you don't want recorder" OFF)
+option(CMAKE_PREFIX_PATH "Set path to qt6 binary" "/home/spaceeye/Qt/6.4.0/Src/qtbase")
+
+option(BOOST_ROOT "If on windows, set path to boost root directory" "C:\\libs\\boost\\boost_1_79_0")
+option(BOOST_LIBRARYDIR "If on windows, set path to compiled libraries, like 'boost\\stage\\libs'" "C:\\libs\\boost\\boost_1_79_0\\stage\\libs")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_PREFIX_PATH "/home/spaceeye/Qt/6.4.0/Src/qtbase")
 
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)
@@ -31,22 +37,16 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
-set(WIN_COMPILATION 0)
-set(WIN_USE_CUDA_LIBS 0)
-
 if(NOT WIN_COMPILATION)
-    set(WIN_USE_CUDA_LIBS 0)
     set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
     set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
 endif()
 
-if (NOT WIN_USE_CUDA_LIBS AND NOT WIN_COMPILATION)
+if (NOT WIN_COMPILATION)
     find_package(CUDAToolkit)
 endif()
 
 if (WIN_COMPILATION)
-    set(BOOST_ROOT "C:\\libs\\boost\\boost_1_79_0")
-    set(BOOST_LIBRARYDIR "C:\\libs\\boost\\boost_1_79_0\\stage\\libs")
     set(Boost_DEBUG 0)
     set(Boost_ARCHITECTURE -x64)
     set(Boost_LIB_PREFIX lib)
@@ -69,28 +69,32 @@ find_package(Boost COMPONENTS random REQUIRED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(PkgConfig REQUIRED)
-if(NOT WIN_COMPILATION)
-    find_package(Numa REQUIRED)
-else()
-    set(NUMA_LIBRARY "")
+if (NO_RECORDER)
+    add_compile_definitions(__NO_RECORDER__)
 endif()
-find_package(FFmpeg REQUIRED)
-find_package(RSVG REQUIRED)
-find_package(Threads REQUIRED)
-find_package(x264 REQUIRED)
-pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Source/Stuff/moviemaker/include)
-include_directories(${FFMPEG_INCLUDE_DIRS})
-include_directories(${GTK3_INCLUDE_DIRS})
-include_directories(${RSVG_INCLUDE_DIR})
-include_directories(${SWSCALE_INCLUDE_DIRS})
-include_directories(${X264_INCLUDE_DIR})
+if (NOT NO_RECORDER)
+    find_package(PkgConfig REQUIRED)
+    if(NOT WIN_COMPILATION)
+        find_package(Numa REQUIRED)
+    else()
+        set(NUMA_LIBRARY "")
+    endif()
+    find_package(FFmpeg REQUIRED)
+    find_package(RSVG REQUIRED)
+    find_package(Threads REQUIRED)
+    find_package(x264 REQUIRED)
+    pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
-message(STATUS ${Boost_VERSION})
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Source/Stuff/moviemaker/include)
+    include_directories(${FFMPEG_INCLUDE_DIRS})
+    include_directories(${GTK3_INCLUDE_DIRS})
+    include_directories(${RSVG_INCLUDE_DIR})
+    include_directories(${SWSCALE_INCLUDE_DIRS})
+    include_directories(${X264_INCLUDE_DIR})
 
-set(ADDITIONAL_PROJECT_FILES Source/Stuff/moviemaker/include/movie.h Source/Stuff/moviemaker/src/reader.cpp Source/Stuff/moviemaker/src/writer.cpp Source/UIWindows/Recorder/RecorderWindowUI.h Source/UIWindows/Recorder/Recorder.cpp Source/UIWindows/Recorder/Recorder.h Source/UIWindows/Recorder/RecorderSlots.cpp)
+    set(ADDITIONAL_PROJECT_FILES Source/Stuff/moviemaker/include/movie.h Source/Stuff/moviemaker/src/reader.cpp Source/Stuff/moviemaker/src/writer.cpp Source/UIWindows/Recorder/RecorderWindowUI.h Source/UIWindows/Recorder/Recorder.cpp Source/UIWindows/Recorder/Recorder.h Source/UIWindows/Recorder/RecorderSlots.cpp)
+endif()
 
 add_compile_definitions(__VALGRIND_MODE__=0)
 
@@ -108,49 +112,48 @@ if(CUDAToolkit_FOUND)
 
     add_compile_definitions(__CUDA_USED__=1)
     set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-elseif(WIN_USE_CUDA_LIBS)
-    add_compile_definitions(__CUDA_USED__=1)
 else()
     message(STATUS "No CUDAToolkit found.")
     add_compile_definitions(__CUDA_USED__=0)
 endif()
 
-if (Qt6_FOUND)
-    if(NOT WIN_COMPILATION)
-        #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
-        get_property( core_options TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
-        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
-        set_property( TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
-        set_property( TARGET Qt6::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+if(CUDAToolkit_FOUND)
+    #should be set for each qt6 component for some reason
+    #https://gitlab.kitware.com/cmake/cmake/-/issues/16915
+    get_property( core_options TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
+    string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+    set_property( TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+    set_property( TARGET Qt6::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
 
-        get_property( core_options TARGET Qt6::Gui PROPERTY INTERFACE_COMPILE_OPTIONS )
-        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
-        set_property( TARGET Qt6::Gui PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
-        set_property( TARGET Qt6::Gui PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+    get_property( core_options TARGET Qt6::Gui PROPERTY INTERFACE_COMPILE_OPTIONS )
+    string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+    set_property( TARGET Qt6::Gui PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+    set_property( TARGET Qt6::Gui PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
 
-        get_property( core_options TARGET Qt6::Widgets PROPERTY INTERFACE_COMPILE_OPTIONS )
-        string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
-        set_property( TARGET Qt6::Widgets PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
-        set_property( TARGET Qt6::Widgets PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+    get_property( core_options TARGET Qt6::Widgets PROPERTY INTERFACE_COMPILE_OPTIONS )
+    string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+    set_property( TARGET Qt6::Widgets PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+    set_property( TARGET Qt6::Widgets PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
 
-        set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
-    endif()
-
-    target_link_libraries(${PROJECT_NAME}
-            Qt6::Core
-            Qt6::Gui
-            Qt6::Widgets
-#            Qt6::Charts
-            )
+    set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
 endif()
+
+target_link_libraries(${PROJECT_NAME}
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+#            Qt6::Charts
+        )
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 endif()
 
-if (WIN_COMPILATION)
-    target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
-else()
-    target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+if (NOT NO_RECORDER)
+    if (WIN_COMPILATION)
+        target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+    else()
+        target_link_libraries(${PROJECT_NAME} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${FFMPEG_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY})
+    endif()
 endif()
