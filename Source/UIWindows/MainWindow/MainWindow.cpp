@@ -10,7 +10,6 @@
 
 MainWindow::MainWindow(QWidget *parent) :
         QWidget(parent){
-    std::cout << "constructor 1\n";
     ui.setupUi(this);
 
     ui.simulation_graphicsView->show();
@@ -90,10 +89,14 @@ MainWindow::MainWindow(QWidget *parent) :
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, std::ref(engine)};
         engine_thread.detach();
 
+        create_image_creation_thread();
+
         fps_timer = clock_now();
 
         scene.addItem(&pixmap_item);
         ui.simulation_graphicsView->setScene(&scene);
+
+        timer->start();
 
         reset_scale_view();
         get_current_font_size();
@@ -109,12 +112,10 @@ MainWindow::MainWindow(QWidget *parent) :
     //Will execute as fast as possible
     connect(timer, &QTimer::timeout, [&]{mainloop_tick();});
 
-    set_window_interval(60);
+    set_image_creator_interval(60);
     set_simulation_interval(60);
 
     cb_show_extended_statistics_slot(false);
-
-    timer->start();
 #if __VALGRIND_MODE__ == 1
     cb_synchronise_simulation_and_window_slot(false);
     ui.cb_synchronise_sim_and_win->setChecked(false);
@@ -134,7 +135,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     load_textures_from_disk();
-    std::cout << "constructor 2\n";
 }
 
 void MainWindow::mainloop_tick() {
@@ -154,17 +154,19 @@ void MainWindow::mainloop_tick() {
         engine.update_info();
         auto info = engine.get_info();
 
-        update_fps_labels(window_frames/scale, simulation_frames/scale);
+        update_fps_labels(image_frames / scale, simulation_frames / scale, window_frames / scale);
         update_statistics_info(info);
 
+        image_frames = 0;
         window_frames = 0;
         fps_timer = clock_now();
     }
 }
 
-void MainWindow::update_fps_labels(int fps, int sps) {
+void MainWindow::update_fps_labels(int fps, int tps, int ups) {
     ui.lb_fps->setText(QString::fromStdString("fps: " + std::to_string(fps)));
-    ui.lb_sps->setText(QString::fromStdString("sps: " + std::to_string(sps)));
+    ui.lb_sps->setText(QString::fromStdString("tps: " + std::to_string(tps)));
+    ui.lb_ups->setText(QString::fromStdString("ups: " + std::to_string(ups)));
 }
 
 void MainWindow::ui_tick() {
@@ -195,11 +197,13 @@ void MainWindow::ui_tick() {
     #endif
 
     window_frames++;
-//#if __VALGRIND_MODE__ == 1
-//    return;
-//#endif
+
     if (pause_grid_parsing && really_stop_render) { return;}
-    create_image();
+
+    if (do_not_parse_image_data_ct) { return;}
+    do_not_parse_image_data_mt.store(true);
+    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
+    do_not_parse_image_data_mt.store(false);
 }
 
 void MainWindow::resize_image() {
@@ -246,8 +250,9 @@ void MainWindow::reset_scale_view() {
 
 
 void MainWindow::create_image() {
-    int image_width;
-    int image_height;
+    while (!do_not_parse_image_data_mt.load(std::memory_order_acquire)) {}
+    do_not_parse_image_data_ct.store(true);
+
     std::vector<int> lin_width;
     std::vector<int> lin_height;
     std::vector<int> truncated_lin_width;
@@ -278,7 +283,7 @@ void MainWindow::create_image() {
                                        edc, 32, truncated_lin_width, truncated_lin_height);
 #endif
     }
-    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
+    do_not_parse_image_data_ct.store(false);
 }
 
 void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
@@ -315,14 +320,17 @@ void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_he
     ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 }
 
-void MainWindow::set_window_interval(int max_window_fps) {
+void MainWindow::set_image_creator_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
-        window_interval = 0.;
-        timer->setInterval(0);
+        image_creation_interval = 0.;
         return;
     }
-    window_interval = 1. / max_window_fps;
-    timer->setInterval(1000/max_window_fps);
+    image_creation_interval = 1. / max_window_fps;
+    if (max_window_fps > max_ups) {
+        timer->setInterval(1000./max_window_fps);
+    } else {
+        timer->setInterval(1000./max_ups);
+    }
 }
 
 void MainWindow::set_simulation_interval(int max_simulation_fps) {
@@ -630,6 +638,8 @@ void MainWindow::initialize_gui() {
 
     ee.occ_mode(sp.use_occ);
 
+    ui.le_set_ups->setText(QString::fromStdString(std::to_string(max_ups)));
+
     #ifdef __EMSCRIPTEN_COMPILATION__
     ui.cb_recorder_window_always_on_top->hide();
     ui.tb_open_recorder_window->hide();
@@ -682,64 +692,101 @@ void MainWindow::change_main_grid_left_click() {
     while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
 
+    if (update_last_cursor_pos) {
+        last_last_cursor_x_pos = last_mouse_x_pos;
+        last_last_cursor_y_pos = last_mouse_y_pos;
+
+        update_last_cursor_pos = false;
+    }
+
     //cursor Vector2 on grid
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-//    ecp.pause_processing_user_action = true;
-//    wait_for_engine_to_pause_processing_user_actions();
-    for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
-        for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
-            switch (cursor_mode) {
-                case CursorMode::ModifyFood:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ModifyWall:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddWall, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::KillOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ChooseOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::PlaceOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, cpg.x, cpg.y);
-                    goto endfor;
-                default: break;
+    auto cpg2 = calculate_cursor_pos_on_grid(last_last_cursor_x_pos, last_last_cursor_y_pos);
+
+    std::vector<Vector2<int>> points;
+
+    if (cursor_mode == CursorMode::ModifyFood || cursor_mode == CursorMode::ModifyWall || cursor_mode == CursorMode::KillOrganism) {
+        points = iterate_between_two_points(cpg, cpg2);
+    } else {
+        points.emplace_back(cpg);
+    }
+
+    for (auto & pt: points) {
+        for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
+            for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
+                switch (cursor_mode) {
+                    case CursorMode::ModifyFood:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryAddFood, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ModifyWall:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryAddWall, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::KillOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ChooseOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, pt.x + x, pt.y + y);
+                        goto endfor;
+                        break;
+                    case CursorMode::PlaceOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, pt.x, pt.y);
+                        goto endfor;
+                    default:
+                        break;
+                }
             }
         }
     }
     endfor:
     ecp.do_not_use_user_actions_ui = false;
+
+    last_last_cursor_x_pos = last_mouse_x_pos;
+    last_last_cursor_y_pos = last_mouse_y_pos;
 }
 
 void MainWindow::change_main_grid_right_click() {
     while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
 
+    if (update_last_cursor_pos) {
+        last_last_cursor_x_pos = last_mouse_x_pos;
+        last_last_cursor_y_pos = last_mouse_y_pos;
+
+        update_last_cursor_pos = false;
+    }
+
     auto cpg = calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
-//    ecp.pause_processing_user_action = true;
-//    wait_for_engine_to_pause_processing_user_actions();
-    for (int x = -brush_size/2; x < float(brush_size)/2; x++) {
-        for (int y = -brush_size/2; y < float(brush_size)/2; y++) {
-            switch (cursor_mode) {
-                case CursorMode::ModifyFood:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveFood, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ModifyWall:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveWall, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::KillOrganism:
-                    edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, cpg.x + x, cpg.y + y);
-                    break;
-                case CursorMode::ChooseOrganism:
-                    break;
-                case CursorMode::PlaceOrganism:
-                    break;
-                default: break;
+    auto cpg2 = calculate_cursor_pos_on_grid(last_last_cursor_x_pos, last_last_cursor_y_pos);
+
+    std::vector<Vector2<int>> points;
+
+    points = iterate_between_two_points(cpg, cpg2);
+
+    for (auto & pt: points) {
+        for (int x = -brush_size / 2; x < float(brush_size) / 2; x++) {
+            for (int y = -brush_size / 2; y < float(brush_size) / 2; y++) {
+                switch (cursor_mode) {
+                    case CursorMode::ModifyFood:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveFood, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ModifyWall:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryRemoveWall, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::KillOrganism:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::TryKillOrganism, pt.x + x, pt.y + y);
+                        break;
+                    case CursorMode::ChooseOrganism:
+                    case CursorMode::PlaceOrganism:
+                    default:
+                        break;
+                }
             }
         }
     }
     ecp.do_not_use_user_actions_ui = false;
+
+    last_last_cursor_x_pos = last_mouse_x_pos;
+    last_last_cursor_y_pos = last_mouse_y_pos;
 }
 
 void MainWindow::change_editing_grid_left_click() {
@@ -904,4 +951,64 @@ void MainWindow::apply_font_size() {
     }
 
     apply_font_to_windows(_font);
+}
+
+void MainWindow::create_image_creation_thread() {
+    image_creation_thread = std::thread{[&](){
+        auto point1 = std::chrono::high_resolution_clock::now();
+        auto point2 = std::chrono::high_resolution_clock::now();
+        while (true) {
+            point1 = std::chrono::high_resolution_clock::now();
+            if (!pause_grid_parsing || !really_stop_render) { create_image(); image_frames++;}
+            point2 = std::chrono::high_resolution_clock::now();
+            std::this_thread::sleep_for(std::chrono::microseconds(
+                    std::max<long>(
+                            int(image_creation_interval * 1000000) -
+                            std::chrono::duration_cast<std::chrono::microseconds>(point2 - point1).count()
+            , 0)));
+        }
+    }};
+
+    image_creation_thread.detach();
+}
+
+//https://gist.github.com/DavidMcLaughlin208/60e69e698e3858617c322d80a8f174e2
+std::vector<Vector2<int>> MainWindow::iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2) {
+    if (pos1.x == pos2.x && pos1.y == pos2.y) {return {pos1};}
+
+    std::vector<Vector2<int>> points;
+    int matrixX1 = pos1.x;
+    int matrixY1 = pos1.y;
+    int matrixX2 = pos2.x;
+    int matrixY2 = pos2.y;
+
+    int x_diff = matrixX1 - matrixX2;
+    int y_diff = matrixY1 - matrixY2;
+    bool x_diff_is_larger = std::abs(x_diff) > std::abs(y_diff);
+
+    int x_modifier = x_diff < 0 ? 1 : -1;
+    int y_modifier = y_diff < 0 ? 1 : -1;
+
+    int longer_side_length  = std::max(std::abs(x_diff), std::abs(y_diff));
+    int shorter_side_length = std::min(std::abs(x_diff), std::abs(y_diff));
+
+    float slope = (shorter_side_length == 0 || longer_side_length == 0) ? 0 : ((float) (shorter_side_length) / (longer_side_length));
+
+    int shorter_side_increase;
+    for (int i = 1; i <= longer_side_length; i++) {
+        shorter_side_increase = std::round(i * slope);
+        int yIncrease, xIncrease;
+        if (x_diff_is_larger) {
+            xIncrease = i;
+            yIncrease = shorter_side_increase;
+        } else {
+            yIncrease = i;
+            xIncrease = shorter_side_increase;
+        }
+        int currentY = matrixY1 + (yIncrease * y_modifier);
+        int currentX = matrixX1 + (xIncrease * x_modifier);
+        points.emplace_back(currentX, currentY);
+    }
+
+    return points;
 }

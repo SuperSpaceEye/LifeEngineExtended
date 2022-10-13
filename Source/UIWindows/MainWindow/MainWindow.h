@@ -94,6 +94,8 @@ private:
 #endif
 
     std::thread engine_thread;
+    std::thread image_creation_thread;
+
     TexturesContainer textures{};
 
     std::vector<unsigned char> image_vector;
@@ -133,7 +135,7 @@ private:
     float scaling_zoom = 1;
     float center_x = 0;
     float center_y = 0;
-    float window_interval = 0.;
+    float image_creation_interval = 0.;
     float keyboard_movement_amount = 0.5;
     float SHIFT_keyboard_movement_multiplier = 2;
 
@@ -159,6 +161,10 @@ private:
     bool is_fullscreen = false;
     bool save_simulation_settings = true;
     bool uses_point_size = false;
+    bool update_last_cursor_pos = true;
+
+    std::atomic<bool> do_not_parse_image_data_ct = false;
+    std::atomic<bool> do_not_parse_image_data_mt = false;
 
     bool W_pressed = false;
     bool A_pressed = false;
@@ -168,7 +174,9 @@ private:
 
     int last_mouse_x_pos = 0;
     int last_mouse_y_pos = 0;
+    int image_frames = 0;
     int window_frames = 0;
+    int max_ups = 100;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
     int32_t new_simulation_width = 200;
@@ -181,6 +189,10 @@ private:
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
     int font_size = 0;
+    int image_width;
+    int image_height;
+    int last_last_cursor_x_pos = 0;
+    int last_last_cursor_y_pos = 0;
 
     static auto clock_now() {return std::chrono::high_resolution_clock::now();}
 
@@ -189,6 +201,8 @@ private:
     void reset_scale_view();
 
     void read_json_data(const std::string &json);
+    void create_image_creation_thread();
+
     void json_resize_and_make_walls(rapidjson::Document & d);
     static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
     static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
@@ -208,11 +222,13 @@ private:
 
     void update_table_values();
 
+    static std::vector<Vector2<int>> iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2);
+
     void mainloop_tick();
     void ui_tick();
     void set_simulation_interval(int max_simulation_fps);
-    void set_window_interval(int max_window_fps);
-    void update_fps_labels(int fps, int sps);
+    void set_image_creator_interval(int max_window_fps);
+    void update_fps_labels(int fps, int tps, int ups);
     void resize_image();
 
     // for fill_view
@@ -350,6 +366,7 @@ private slots:
     void le_scaling_coefficient_slot();
     void le_memory_allocation_strategy_modifier_slot();
     void le_random_seed_slot();
+    void le_set_ups_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();

@@ -244,11 +244,11 @@ void MainWindow::le_max_sps_slot() {
 }
 
 void MainWindow::le_max_fps_slot() {
-    int fallback = int(1/window_interval);
+    int fallback = int(1 / image_creation_interval);
     if (fallback < 0) {fallback = -1;}
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", ui.le_fps, fallback);
     if (!result.is_valid) {return;}
-    set_window_interval(result.result);
+    set_image_creator_interval(result.result);
 }
 
 void MainWindow::le_num_threads_slot() {
@@ -527,6 +527,11 @@ void MainWindow::le_random_seed_slot() {
     if (!temp) { return;}
 
     engine.set_seed(temp);
+}
+
+void MainWindow::le_set_ups_slot() {
+    le_slot_lower_bound(max_ups, max_ups, "int", ui.le_set_ups, 10, "10");
+    set_image_creator_interval(1./image_creation_interval+1);
 }
 
 //==================== Radio button ====================
