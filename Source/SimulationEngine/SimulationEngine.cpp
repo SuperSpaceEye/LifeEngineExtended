@@ -136,7 +136,7 @@ void SimulationEngine::simulation_tick() {
 void SimulationEngine::process_user_action_pool() {
     if (!edc.ui_user_actions_pool.empty() && !ecp.do_not_use_user_actions_ui) {
         ecp.do_not_use_user_actions_engine = true;
-        edc.engine_user_actions_pool.resize(edc.ui_user_actions_pool.size());
+        edc.engine_user_actions_pool.resize(edc.ui_user_actions_pool.size()+1);
         std::copy(edc.ui_user_actions_pool.begin(), edc.ui_user_actions_pool.end(), edc.engine_user_actions_pool.begin());
         edc.ui_user_actions_pool.clear();
         ecp.do_not_use_user_actions_engine = false;
@@ -434,15 +434,22 @@ void SimulationEngine::init_auto_food_drop(int width, int height) {
 //Will always wait for engine to pause
 bool SimulationEngine::wait_for_engine_to_pause_force() {
     while (!ecp.engine_paused) {}
+    std::atomic_thread_fence(std::memory_order_release);
+    do_not_unpause = false;
     return ecp.engine_paused;
 }
 
 void SimulationEngine::pause() {
+    do_not_unpause = true;
+    std::atomic_thread_fence(std::memory_order_release);
     ecp.engine_pause = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     wait_for_engine_to_pause_force();
 }
 
 void SimulationEngine::unpause() {
+    if (do_not_unpause) { return;}
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     if (!ecp.synchronise_simulation_and_window) {
         ecp.engine_pause = false;
     }

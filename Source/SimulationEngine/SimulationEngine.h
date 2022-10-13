@@ -57,6 +57,8 @@ class SimulationEngine {
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
 
+    bool do_not_unpause = false;
+
     void process_user_action_pool();
 
     void simulation_tick();
