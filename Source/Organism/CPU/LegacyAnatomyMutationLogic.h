@@ -42,6 +42,10 @@ class LegacyAnatomyMutationLogic {
                                                  const std::vector<int> &num_producing_space,
                                                  std::vector<std::vector<SerializedAdjacentSpaceContainer>> &_producing_space);
 
+    static inline void serialize_eye_blocks(const std::vector<SerializedOrganismBlockContainer> &organism_blocks,
+                                            std::vector<SerializedOrganismBlockContainer> &eye_blocks_vector,
+                                            int eye_blocks);
+
     template<typename T>
     static int get_map_size(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, T>> map);
 

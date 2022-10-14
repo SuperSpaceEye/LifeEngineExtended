@@ -211,11 +211,11 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                                                     std::vector<std::vector<Observation>> &organism_observations) {
     if (organism->anatomy._eye_blocks <= 0 || organism->anatomy._mover_blocks <= 0) {return;}
     if (organism->move_counter != 0) {return;}
-    auto eye_i = -1;
-    //TODO inefficient
-    for (auto & block: organism->anatomy._organism_blocks) {
-        if (block.type != BlockTypes::EyeBlock) {continue;}
-        eye_i++;
+
+    for (int eye_i = 0; eye_i < organism->anatomy._eye_blocks; eye_i++) {
+        auto & block = organism->anatomy._eye_block_vec[eye_i];
+//        if (block.type != BlockTypes::EyeBlock) {continue;}
+
         auto pos_x = organism->x + block.get_pos(organism->rotation).x;
         auto pos_y = organism->y + block.get_pos(organism->rotation).y;
         // getting global rotation on a simulation grid

@@ -15,6 +15,7 @@ Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
     _producing_space = std::move(structure->producing_space);
     _eating_space    = std::move(structure->eating_space);
     _killing_space   = std::move(structure->killing_space);
+    _eye_block_vec= std::move(structure->eye_blocks_vec);
 
     _mouth_blocks    = structure->mouth_blocks;
     _producer_blocks = structure->producer_blocks;
@@ -31,6 +32,7 @@ Anatomy::Anatomy(const Anatomy & anatomy) {
     _producing_space = std::vector(anatomy._producing_space);
     _eating_space    = std::vector(anatomy._eating_space);
     _killing_space   = std::vector(anatomy._killing_space);
+    _eye_block_vec= std::vector(anatomy._eye_block_vec);
 
     _mouth_blocks    = anatomy._mouth_blocks;
     _producer_blocks = anatomy._producer_blocks;
@@ -489,6 +491,7 @@ void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blo
 
     _producing_space = std::move(new_structure->producing_space);
     _eating_space    = std::move(new_structure->eating_space);
+    _eye_block_vec   = std::move(new_structure->eye_blocks_vec);
 
     _mouth_blocks    = new_structure->mouth_blocks;
     _producer_blocks = new_structure->producer_blocks;

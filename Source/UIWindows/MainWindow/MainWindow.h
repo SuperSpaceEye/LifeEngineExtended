@@ -142,7 +142,7 @@ private:
     bool left_mouse_button_pressed = false;
     bool change_main_simulation_grid = false;
     bool change_editing_grid = false;
-    bool use_cuda = true;
+    bool use_cuda = false;
     bool synchronise_info_update_with_window_update = false;
     bool wait_for_engine_to_stop_to_render = false;
     bool resize_simulation_grid_flag = false;
