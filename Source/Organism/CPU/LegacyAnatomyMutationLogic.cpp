@@ -235,9 +235,8 @@ LegacyAnatomyMutationLogic::serialize_eye_blocks(const std::vector<SerializedOrg
                                                  std::vector<SerializedOrganismBlockContainer> &eye_blocks_vector,
                                                  int eye_blocks) {
     eye_blocks_vector.reserve(eye_blocks);
-    for (auto & block: organism_blocks) {
+    for (const auto & block: organism_blocks) {
         if (block.type == BlockTypes::EyeBlock) {
-            volatile int a = 0;
             eye_blocks_vector.emplace_back(block);
         }
     }

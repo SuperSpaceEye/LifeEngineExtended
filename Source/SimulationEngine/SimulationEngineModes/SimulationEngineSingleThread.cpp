@@ -206,9 +206,12 @@ void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<
     }
 }
 
+
+__attribute__((optimize(0)))
 void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, SimulationParameters *sp,
                                                     Organism *organism,
-                                                    std::vector<std::vector<Observation>> &organism_observations) {
+                                                    std::vector<std::vector<Observation>> &organism_observations)
+                                                    {
     if (organism->anatomy._eye_blocks <= 0 || organism->anatomy._mover_blocks <= 0) {return;}
     if (organism->move_counter != 0) {return;}
 
