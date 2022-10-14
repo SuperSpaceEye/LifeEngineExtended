@@ -44,7 +44,6 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
     OCCParameters &occp;
-    RecordingData * recd;
 //    OrganismInfoContainer info{};
     WorldEventsController world_events_controller{};
     SimulationParameters sp_copy;
@@ -77,8 +76,7 @@ public:
     OrganismInfoContainer info{};
 
     SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
-                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters,
-                     RecordingData *recording_data, OCCParameters &occp);
+                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters, OCCParameters &occp);
     void threaded_mainloop();
 
     void make_random_walls();

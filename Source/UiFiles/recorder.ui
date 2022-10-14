@@ -94,7 +94,7 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Grid buffer size</string>
+            <string>Grid tbuffer size</string>
            </property>
           </widget>
          </item>

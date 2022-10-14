@@ -58,7 +58,7 @@ struct EngineDataContainer {
 
         OCCLogicContainer occl{};
 
-        TransactionBuffer buffer{};
+        TransactionBuffer tbuffer{};
     };
     SingleThreadContainer stc{};
 

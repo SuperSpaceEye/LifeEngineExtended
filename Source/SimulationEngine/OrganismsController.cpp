@@ -27,8 +27,6 @@ void OrganismsController::free_child_organism(Organism *child_organism, EngineDa
     edc.stc.free_child_organisms_positions.emplace_back(child_organism->vector_index);
 }
 
-
-
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
     // If there are organisms not in use, take them.
     edc.stc.num_alive_organisms++;

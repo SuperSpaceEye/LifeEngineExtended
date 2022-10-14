@@ -52,10 +52,10 @@ public:
                                  std::vector<std::vector<Observation>> &organism_observations);
 
     static void rotate_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
-                                SimulationParameters *sp);
+                                SimulationParameters *sp, bool &moved);
 
     static void move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
-                              SimulationParameters *sp);
+                              SimulationParameters *sp, bool &moved);
 
     static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen);
 
