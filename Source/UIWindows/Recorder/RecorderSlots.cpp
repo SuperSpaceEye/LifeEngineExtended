@@ -104,7 +104,7 @@ void Recorder::b_start_recording_slot() {
     }
 
     for (int x = 0; x < edc->simulation_width; x++) {
-        for (int y = 0; y > edc->simulation_height; y++) {
+        for (int y = 0; y < edc->simulation_height; y++) {
             auto & block = edc->CPU_simulation_grid[x][y];
             if (block.type == BlockTypes::FoodBlock) {
                 tbuffer->record_food_change(x, y, true);
@@ -148,50 +148,49 @@ void Recorder::b_pause_recording_slot() {
 }
 
 void Recorder::b_load_intermediate_data_location_slot() {
-//    if (ecp->record_full_grid && !recording_paused) {
-//        display_message("Program is still recording. Stop the recording first to load intermediate data.");
-//        return;
-//    }
-//    QFileDialog file_dialog{};
-//    auto dir = QCoreApplication::applicationDirPath() + "/temp";
-//
-//    auto dir_name = file_dialog.getExistingDirectory(this, tr("Open directory"), dir);
-//    if (dir_name.toStdString().empty()) {
-//        return;
-//    }
-//
-//    int number_of_files = 0;
-//    int total_recorded = 0;
-//    int largest_buffer = 0;
-//
-//    for (auto & file: std::filesystem::directory_iterator(dir_name.toStdString())) {
-//        int width;
-//        int height;
-//        int pos;
-//        auto path = file.path().string();
-//        recd->load_info_buffer_data(path, width, height, pos);
-//        if (width != edc->simulation_width || height != edc->simulation_height) {
-//            display_message("Loaded recording has dimensions: " + std::to_string(width) + "x" +
-//            std::to_string(height) + ". Resize simulation grid to load this recording.");
-//            return;
-//        }
-//
-//        if (largest_buffer < pos) {largest_buffer = pos;}
-//        number_of_files++;
-//        total_recorded+=pos;
-//    }
-//
-//    recd->buffer_size = largest_buffer;
-//    recd->buffer_pos = 0;
-//    _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(recd->buffer_size)));
-//
-//    recd->second_simulation_grid_buffer.clear();
-//    recd->second_simulation_grid_buffer.resize(recd->buffer_size, std::vector<BaseGridBlock>(edc->simulation_height*edc->simulation_width));
-//    recd->path_to_save = dir_name.toStdString();
-//    recd->saved_buffers = number_of_files;
-//
-//    recd->recorded_states = total_recorded;
-//    recording_paused = true;
+    if (edc->record_data && !recording_paused) {
+        display_message("Program is still recording. Stop the recording first to load intermediate data.");
+        return;
+    }
+    QFileDialog file_dialog{};
+    auto dir = QCoreApplication::applicationDirPath() + "/temp";
+
+    auto dir_name = file_dialog.getExistingDirectory(this, tr("Open directory"), dir);
+    if (dir_name.toStdString().empty()) {
+        return;
+    }
+
+    tbuffer->finish_recording();
+
+    int number_of_files = 0;
+    int total_recorded = 0;
+    int largest_buffer = 0;
+
+    for (auto & file: std::filesystem::directory_iterator(dir_name.toStdString())) {
+        int width;
+        int height;
+        int pos;
+        auto path = file.path().string();
+        tbuffer->load_buffer_metadata(path, width, height, pos);
+        if (width != edc->simulation_width || height != edc->simulation_height) {
+            display_message("Loaded recording has dimensions: " + std::to_string(width) + "x" +
+            std::to_string(height) + ". Resize simulation grid to load this recording.");
+            return;
+        }
+
+        if (largest_buffer < pos) {largest_buffer = pos;}
+        number_of_files++;
+        total_recorded+=pos;
+    }
+
+    tbuffer->resize_buffer(largest_buffer);
+    tbuffer->start_recording(dir_name.toStdString(), edc->simulation_width, edc->simulation_height, tbuffer->buffer_size);
+    tbuffer->recorded_transactions = total_recorded;
+    tbuffer->saved_buffers = number_of_files;
+
+    _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(tbuffer->buffer_size)));
+
+    recording_paused = true;
 }
 
 void Recorder::b_compile_intermediate_data_into_video_slot() {
