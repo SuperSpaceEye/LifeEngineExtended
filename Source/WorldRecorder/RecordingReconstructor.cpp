@@ -13,17 +13,17 @@ void RecordingReconstructor::start_reconstruction(int width, int height) {
 }
 
 void RecordingReconstructor::apply_transaction(Transaction &transaction) {
-    if (!transaction.starting_point) {
-        apply_normal(transaction);
+    if (transaction.reset) {
+        apply_reset(transaction);
     } else if (transaction.starting_point) {
         apply_starting_point(transaction);
-    } else if (transaction.reset) {
-        apply_reset(transaction);
+    } else {
+        apply_normal(transaction);
     }
 }
 
 void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
-    rec_grid = std::vector<BaseGridBlock>(width*height);
+    rec_grid = std::vector<BaseGridBlock>(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
     rec_orgs = std::vector<Organism>();
     recenter_to_imaginary_pos = transaction.recenter_to_imaginary_pos;
 
@@ -31,21 +31,23 @@ void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
 }
 
 void RecordingReconstructor::apply_reset(Transaction & transaction) {
-    rec_grid = std::vector<BaseGridBlock>(width*height);
+    rec_grid = std::vector<BaseGridBlock>(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
     rec_orgs = std::vector<Organism>();
     recenter_to_imaginary_pos = transaction.recenter_to_imaginary_pos;
+    transaction.dead_organisms.clear();
 
     apply_normal(transaction);
 }
 
 
 void RecordingReconstructor::apply_normal(Transaction &transaction) {
-    apply_organism_change(transaction);
     apply_food_change(transaction);
     apply_recenter(transaction);
     apply_dead_organisms(transaction);
+    apply_compressed_change(transaction);
     apply_move_change(transaction);
     apply_wall_change(transaction);
+    apply_organism_change(transaction);
 }
 
 void RecordingReconstructor::apply_wall_change(Transaction &transaction) {
@@ -113,8 +115,23 @@ void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
             wb.rotation = b.rotation;
         }
         auto temp = o.vector_index;
-        rec_orgs[o.vector_index] = o;
-        rec_orgs[o.vector_index].vector_index = temp;
+        rec_orgs[temp] = o;
+        rec_orgs[temp].vector_index = temp;
+    }
+}
+
+void RecordingReconstructor::apply_compressed_change(Transaction &transaction) {
+    for (auto & pair: transaction.compressed_change) {
+        auto & left_organism  = rec_orgs[pair.first];
+        auto & right_organism = rec_orgs[pair.second];
+
+        auto left_index  = left_organism.vector_index;
+        auto right_index = right_organism.vector_index;
+
+        std::swap(left_organism, right_organism);
+
+        left_organism.vector_index  = left_index;
+        right_organism.vector_index = right_index;
     }
 }
 

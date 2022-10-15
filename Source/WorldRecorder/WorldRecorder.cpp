@@ -53,6 +53,10 @@ void TransactionBuffer::record_reset() {
     transactions[buffer_pos].reset = true;
 }
 
+void TransactionBuffer::record_compressed(int pos1, int pos2) {
+    transactions[buffer_pos].compressed_change.emplace_back(std::pair<int, int>{pos1, pos2});
+}
+
 void TransactionBuffer::record_transaction() {
     if (transactions.size() < buffer_size) {
         transactions.emplace_back();
@@ -77,6 +81,7 @@ void TransactionBuffer::flush_transactions() {
 
     for (auto & transaction: transactions) {
         out.write((char*)&transaction.starting_point, sizeof(bool));
+        out.write((char*)&transaction.reset, sizeof(bool));
         out.write((char*)&transaction.recenter_to_imaginary_pos, sizeof(bool));
         out.write((char*)&transaction.uses_occ, sizeof(bool));
 
@@ -102,6 +107,10 @@ void TransactionBuffer::flush_transactions() {
         size = transaction.wall_change.size();
         out.write((char*)&size, sizeof(int));
         out.write((char*)transaction.wall_change.data(), sizeof(WallChange)*size);
+
+        size = transaction.compressed_change.size();
+        out.write((char*)&size, sizeof(int));
+        out.write((char*)transaction.compressed_change.data(), sizeof(std::pair<int, int>)*size);
     }
 
     out.close();
@@ -171,6 +180,7 @@ bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
 
     for (auto & transaction: transactions) {
         in.read((char*)&transaction.starting_point, sizeof(bool));
+        in.read((char*)&transaction.reset, sizeof(bool));
         in.read((char*)&transaction.recenter_to_imaginary_pos, sizeof(bool));
         in.read((char*)&transaction.uses_occ, sizeof(bool));
         sp.use_occ = transaction.uses_occ;
@@ -199,6 +209,10 @@ bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
         in.read((char*)&size, sizeof(int));
         transaction.wall_change.resize(size);
         in.read((char*)transaction.wall_change.data(), sizeof(WallChange)*size);
+
+        in.read((char*)&size, sizeof(int));
+        transaction.compressed_change.resize(size);
+        in.read((char*)transaction.compressed_change.data(), sizeof(std::pair<int, int>)*size);
     }
 
     in.close();

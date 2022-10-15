@@ -133,6 +133,8 @@ void OrganismsController::compress_organisms(EngineDataContainer &edc) {
         //while left organism is alive, go right until it is dead
         while (!(left_organism = &edc.stc.organisms[left_index])->is_dead)  {left_index++;  if (left_index >= right_index) { goto endlogic_left;}}
 
+        if (edc.record_data) {edc.stc.tbuffer.record_compressed(right_organism->vector_index, left_organism->vector_index);}
+
         //If left organism is dead, and right one is alive, then swap them, update positions, and repeat the process.
         std::swap(*right_organism, *left_organism);
         right_organism->vector_index = right_index;

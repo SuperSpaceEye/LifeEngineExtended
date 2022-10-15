@@ -24,6 +24,7 @@ private:
     void apply_dead_organisms(Transaction &transaction);
     void apply_move_change(Transaction &transaction);
     void apply_wall_change(Transaction &transaction);
+    void apply_compressed_change(Transaction &transaction);
 public:
     RecordingReconstructor()=default;
 
