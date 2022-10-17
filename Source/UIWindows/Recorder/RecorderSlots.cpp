@@ -197,7 +197,7 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
     if (!display_dialog_message("Compile recording into video?", false)) {return;}
 
     if (!recording_paused) {
-        display_message("Program is still recording. Pause the recording first to compile intermediate data into video.");
+        display_message("Program is still recording. Pause the recording first to compile recording into video.");
         return;
     }
 
@@ -249,34 +249,35 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 
         MovieWriter writer;
 
-        if (std::filesystem::exists(movie_name+".mp4")) {
-            std::filesystem::rename(movie_name+".mp4", movie_name+"_temp.mp4");
+        //TODO
+//        if (std::filesystem::exists(movie_name+".mp4")) {
+//            std::filesystem::rename(movie_name+".mp4", movie_name+"_temp.mp4");
+//            writer.start_writing(movie_name, simulation_width * num_pixels_per_block,
+//                                 simulation_height * num_pixels_per_block, video_fps);
+//            {
+//                MovieReader reader(movie_name + "_temp", simulation_width * num_pixels_per_block,
+//                                   simulation_height * num_pixels_per_block);
+//
+//                while (reader.getFrame(image_vec)) {
+//                    writer.addFrame(&image_vec[0]);
+//                    loaded_frames++;
+//
+//                    auto point2 = std::chrono::high_resolution_clock::now();
+//                    if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
+//                        point = std::chrono::high_resolution_clock::now();
+//                        clear_console();
+//                        std::cout << "Loading frames " << loaded_frames << ". Do not turn off program.\n";
+//                    }
+//                }
+//
+//                reader.stop_reading();
+//            }
+//
+//            std::filesystem::remove(movie_name+"_temp.mp4");
+//        } else {
             writer.start_writing(movie_name, simulation_width * num_pixels_per_block,
                                  simulation_height * num_pixels_per_block, video_fps);
-            {
-                MovieReader reader(movie_name + "_temp", simulation_width * num_pixels_per_block,
-                                   simulation_height * num_pixels_per_block);
-
-                while (reader.getFrame(image_vec)) {
-                    writer.addFrame(&image_vec[0]);
-                    loaded_frames++;
-
-                    auto point2 = std::chrono::high_resolution_clock::now();
-                    if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
-                        point = std::chrono::high_resolution_clock::now();
-                        clear_console();
-                        std::cout << "Loading frames " << loaded_frames << ". Do not turn off program.\n";
-                    }
-                }
-
-                reader.stop_reading();
-            }
-
-            std::filesystem::remove(movie_name+"_temp.mp4");
-        } else {
-            writer.start_writing(movie_name, simulation_width * num_pixels_per_block,
-                                 simulation_height * num_pixels_per_block, video_fps);
-        }
+//        }
 
         int processed_transactions = 0;
         int frame_num = 0;
@@ -319,7 +320,7 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                     point = std::chrono::high_resolution_clock::now();
                     clear_console();
                     std::cout << "Processed transactions " << processed_transactions << "/" << recorded_states <<
-                    ". Compiled images " << frame_num << "/" << recorded_states/parse_every << ". Expected time until completion: " << time
+                    ". Compiled frames " << frame_num << "/" << recorded_states/parse_every << ". Expected time until completion: " << time
                               << ". Do not turn off program.\n";
                 }
             }
@@ -342,18 +343,18 @@ void Recorder::b_clear_intermediate_data_slot() {
     if (!display_dialog_message("Clear intermediate data?", false)) {return;}
 
     if (edc->record_data && !recording_paused) {
-        display_message("Program is still recording. Stop the recording first to clear intermediate data.");
+        display_message("Program is still recording. Stop the recording first to clear saved recording.");
         return;
     }
     clear_data();
 }
 
 void Recorder::b_delete_all_intermediate_data_from_disk_slot() {
-    if (!display_dialog_message("Delete intermediate data from disk?", false)) {return;}
-    if (!display_dialog_message("Are you sure? It will delete all recording and partially compiled videos.", false)) {return;}
+    if (!display_dialog_message("Delete the recording from disk?", false)) {return;}
+    if (!display_dialog_message("Are you sure?", false)) {return;}
 
     if (edc->record_data && !recording_paused) {
-        display_message("Program is still recording. Stop the recording first to delete intermediate data.");
+        display_message("Program is still recording. Stop the recording first to delete the recording.");
         return;
     }
     clear_data();

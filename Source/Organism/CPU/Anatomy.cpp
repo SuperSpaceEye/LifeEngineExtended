@@ -422,6 +422,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     _organism_blocks = std::move(new_structure->organism_blocks);
 
     _producing_space = std::move(new_structure->producing_space);
+    _killing_space   = std::move(new_structure->killing_space);
     _eating_space    = std::move(new_structure->eating_space);
     _eye_block_vec   = std::move(new_structure->eye_blocks_vec);
 

@@ -468,24 +468,6 @@ void SimulationEngine::parse_full_simulation_grid() {
     }
 }
 
-void SimulationEngine::parse_full_simulation_grid_to_buffer() {
-//    while (ecp.pause_buffer_filling) {}
-//    ecp.recording_full_grid = true;
-//    for (int x = 0; x < edc.simulation_width; x++) {
-//        for (int y = 0; y < edc.simulation_height; y++) {
-//            recd->second_simulation_grid_buffer[recd->buffer_pos][x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-//            recd->second_simulation_grid_buffer[recd->buffer_pos][x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
-//        }
-//    }
-//    recd->buffer_pos++;
-//    recd->recorded_states++;
-//    if (recd->buffer_pos >= recd->buffer_size) {
-//        recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc.simulation_width, edc.simulation_height, recd->second_simulation_grid_buffer);
-//        recd->buffer_pos = 0;
-//    }
-//    ecp.recording_full_grid = false;
-}
-
 void SimulationEngine::update_info() {
     info.parse_info(&edc, &ecp);
 }
@@ -497,7 +479,7 @@ const OrganismInfoContainer & SimulationEngine::get_info() {
 void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nodes,
                                           std::vector<char> repeating_branch,
                                           std::vector<BaseEventNode *> node_storage) {
-    stop_world_events();
+    stop_world_events_no_setting_reset();
     world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
     unpause();
 }

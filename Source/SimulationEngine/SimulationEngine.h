@@ -100,7 +100,6 @@ public:
     //Will always wait for engine to pause
     bool wait_for_engine_to_pause_force();
     void parse_full_simulation_grid();
-    void parse_full_simulation_grid_to_buffer();
 
     void update_info();
     const OrganismInfoContainer & get_info();
