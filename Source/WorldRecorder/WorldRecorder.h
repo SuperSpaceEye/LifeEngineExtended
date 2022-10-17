@@ -11,10 +11,6 @@
 
 #include "../Organism/CPU/Organism.h"
 
-struct OrganismChange {
-    Organism organism;
-};
-
 struct FoodChange {
     int x;
     int y;
@@ -44,20 +40,22 @@ struct MoveChange {
 };
 
 struct Transaction {
-    std::vector<OrganismChange> organism_change;
+    std::vector<Organism> organism_change;
     std::vector<FoodChange> food_change;
     std::vector<int> dead_organisms;
     std::vector<MoveChange> move_change;
     std::vector<WallChange> wall_change;
+    std::vector<std::pair<int, int>> compressed_change;
     bool starting_point;
     bool recenter_to_imaginary_pos;
     bool reset = false;
+    bool uses_occ = false;
 };
 
 struct TransactionBuffer {
     std::vector<Transaction> transactions;
     std::string path_to_save;
-    int buffer_size = 2000;
+    int buffer_size = 5000;
     int buffer_pos = 0;
     int recorded_transactions = 0;
     int saved_buffers = 1;
@@ -73,8 +71,12 @@ struct TransactionBuffer {
     void record_recenter_to_imaginary_pos(bool state);
     void record_wall_changes(int x, int y, bool added);
     void record_reset();
+    void record_compressed(int pos1, int pos2);
 
+    void resize_buffer(int new_buffer_size);
     void flush_transactions();
+    static bool load_buffer_metadata(std::string & path_to_buffer, int & width, int & height, int & piece_len);
+    bool load_buffer(std::string & path_to_buffer);
     void record_transaction();
     void finish_recording();
 };

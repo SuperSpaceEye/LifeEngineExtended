@@ -79,6 +79,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
+    std::vector<SerializedOrganismBlockContainer> eye_blocks_vec;
 
     int32_t mouth_blocks{};
     int32_t producer_blocks{};
@@ -93,6 +94,7 @@ struct SerializedOrganismStructureContainer {
             std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space,
             std::vector<SerializedAdjacentSpaceContainer> eating_space,
             std::vector<SerializedAdjacentSpaceContainer> killing_space,
+            std::vector<SerializedOrganismBlockContainer> eye_block_vector,
 
             int32_t mouth_blocks,
             int32_t producer_blocks,
@@ -104,6 +106,7 @@ struct SerializedOrganismStructureContainer {
             producing_space                (std::move(producing_space)),
             eating_space                   (std::move(eating_space)),
             killing_space                  (std::move(killing_space)),
+            eye_blocks_vec                 (std::move(eye_block_vector)),
 
             mouth_blocks(mouth_blocks),
             producer_blocks(producer_blocks),
@@ -135,6 +138,7 @@ public:
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
     std::vector<SerializedAdjacentSpaceContainer> _eating_space;
     std::vector<SerializedAdjacentSpaceContainer> _killing_space;
+    std::vector<SerializedOrganismBlockContainer> _eye_block_vec;
 
     int32_t _mouth_blocks    = 0;
     int32_t _producer_blocks = 0;

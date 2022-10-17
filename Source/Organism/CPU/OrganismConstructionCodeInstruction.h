@@ -157,7 +157,7 @@ const std::array<std::string, 30> OCC_INSTRUCTIONS_SHORT {
         "SBM",
         "SBP",
         "SBMV",
-        "SRK",
+        "SBK",
         "SBA",
         "SBE",
 

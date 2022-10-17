@@ -5,8 +5,8 @@
 #include "Recorder.h"
 
 Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, TexturesContainer * textures,
-                   RecordingData * recording_data):
-    parent_ui(_parent_ui), edc(edc), ecp(ecp), cc(cc), textures(textures), recd(recording_data) {
+                   TransactionBuffer *tbuffer):
+    parent_ui(_parent_ui), edc(edc), ecp(ecp), cc(cc), textures(textures), tbuffer(tbuffer) {
     _ui.setupUi(this);
     init_gui();
 }
@@ -20,7 +20,7 @@ void Recorder::closeEvent(QCloseEvent *event) {
     QWidget::closeEvent(event);
 }
 
-void Recorder::create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid,
+void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                             int simulation_width, int simulation_height, int num_pixels_per_block) {
     auto image_width  = simulation_width  * num_pixels_per_block;
     auto image_height = simulation_height * num_pixels_per_block;
@@ -51,7 +51,7 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data, std::vec
 void Recorder::init_gui() {
     _ui.le_number_or_pixels_per_block->setText(QString::fromStdString(std::to_string(num_pixels_per_block)));
     _ui.le_log_every_n_tick->setText(QString::fromStdString(std::to_string(ecp->parse_full_grid_every_n)));
-    _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(recd->buffer_size)));
+    _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(tbuffer->buffer_size)));
     _ui.le_video_fps->setText(QString::fromStdString(std::to_string(video_fps)));
 }
 
@@ -75,40 +75,37 @@ std::string Recorder::get_string_date() {
 
 void Recorder::update_label() {
     std::string status;
-    if (ecp->record_full_grid) {
+    if (edc->record_data) {
         status = "Recording";
     } else {
         if (recording_paused) {
             status = "Paused";
         } else {
-            if (recd->path_to_save.empty()) {
+            if (tbuffer->path_to_save.empty()) {
                 status = "No recording";
             } else {
                 status = "Stopped";
             }
         }
     }
-    std::string rec_states = std::to_string(recd->recorded_states);
-    std::string buffer_filling = std::to_string(recd->buffer_pos) + "/" + std::to_string(recd->buffer_size);
+    std::string rec_states = std::to_string(tbuffer->recorded_transactions);
+    std::string rec_video_states = std::to_string(int(tbuffer->recorded_transactions/ecp->parse_full_grid_every_n));
+    std::string buffer_filling = std::to_string(tbuffer->buffer_pos) + "/" + std::to_string(tbuffer->buffer_size);
     std::string size_of_recording = "0 B";
-    if (ecp->record_full_grid || recording_paused) {
+    if (edc->record_data || recording_paused) {
         uint64_t size = 0;
-        for (auto & entry: std::filesystem::directory_iterator(recd->path_to_save)) {
-            size += entry.file_size();
+        if (!tbuffer->path_to_save.empty()) {
+            for (auto &entry: std::filesystem::directory_iterator(tbuffer->path_to_save)) {
+                size += entry.file_size();
+            }
         }
         size_of_recording = convert_num_bytes(size);
     }
-    std::string time_length_of_recording = convert_seconds(recd->recorded_states / video_fps);
-    std::string str = "Status: " + status + " ||| Recorded " + rec_states + " ticks ||| Buffer filling: " + buffer_filling  + " ||| Recording size on disk: " + size_of_recording + " ||| Time length of recording with " + std::to_string(video_fps) + " fps: " + time_length_of_recording;
+    std::string time_length_of_recording = convert_seconds(tbuffer->recorded_transactions / ecp->parse_full_grid_every_n / video_fps);
+    std::string str = "Status: " + status + " ||| Recorded " + rec_states + " ticks ||| Video ticks " + rec_video_states  + " ||| Buffer filling: " + buffer_filling  + " ||| Recording size on disk: " + size_of_recording + " ||| Time length of recording with " + std::to_string(video_fps) + " fps: " + time_length_of_recording;
     _ui.lb_recording_information->setText(QString::fromStdString(str));
 }
 
 void Recorder::clear_data() {
-    recd->buffer_pos = 0;
-    recd->recorded_states = 0;
-    recd->path_to_save = "";
-    recording_paused = false;
-
-    recd->second_simulation_grid_buffer.clear();
-    recd->second_simulation_grid_buffer.shrink_to_fit();
+    tbuffer->finish_recording();
 }

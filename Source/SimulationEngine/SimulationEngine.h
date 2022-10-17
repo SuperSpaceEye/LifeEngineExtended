@@ -46,7 +46,6 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
     OCCParameters &occp;
-    RecordingData * recd;
 //    OrganismInfoContainer info{};
     WorldEventsController world_events_controller{};
     SimulationParameters sp_copy;
@@ -58,6 +57,8 @@ class SimulationEngine {
 
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
+
+    bool do_not_unpause = false;
 
     void process_user_action_pool();
 
@@ -77,8 +78,7 @@ public:
     OrganismInfoContainer info{};
 
     SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
-                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters,
-                     RecordingData *recording_data, OCCParameters &occp);
+                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters, OCCParameters &occp);
     void threaded_mainloop();
 
     void make_random_walls();
@@ -102,7 +102,6 @@ public:
     //Will always wait for engine to pause
     bool wait_for_engine_to_pause_force();
     void parse_full_simulation_grid();
-    void parse_full_simulation_grid_to_buffer();
 
     void update_info();
     const OrganismInfoContainer & get_info();

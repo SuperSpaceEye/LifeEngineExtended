@@ -24,6 +24,7 @@
 #include "../../Stuff/textures.h"
 #include "../../Stuff/ImageCreation.h"
 #include "../../Containers/CPU/OrganismInfoContainer.h"
+#include "../../WorldRecorder/RecordingReconstructor.h"
 
 #include "../../Stuff/moviemaker/include/movie.h"
 
@@ -42,17 +43,18 @@ private:
     SimulationEngine * engine = nullptr;
     ColorContainer * cc = nullptr;
     TexturesContainer * textures = nullptr;
-    RecordingData * recd;
+    TransactionBuffer * tbuffer = nullptr;
 
-    std::string ffmpeg_path = "ffmpeg";
+    RecordingReconstructor reconstructor;
 
     int num_pixels_per_block = 5;
     bool recording_paused = false;
     int video_fps = 60;
+    int buffer_size = 5000;
 
     void closeEvent(QCloseEvent * event) override;
 
-    void create_image(std::vector<unsigned char> &raw_image_data, std::vector<BaseGridBlock> &grid,
+    void create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                       int simulation_width, int simulation_height, int num_pixels_per_block);
 
     void init_gui();
@@ -65,7 +67,7 @@ private:
 
 public:
     Recorder(Ui::MainWindow * _parent_ui, EngineDataContainer * edc, EngineControlParameters * ecp, ColorContainer * cc, TexturesContainer * textures,
-             RecordingData * recording_data);
+             TransactionBuffer *tbuffer);
 
     void set_engine(SimulationEngine * engine);
 

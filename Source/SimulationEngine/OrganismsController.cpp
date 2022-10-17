@@ -27,8 +27,6 @@ void OrganismsController::free_child_organism(Organism *child_organism, EngineDa
     edc.stc.free_child_organisms_positions.emplace_back(child_organism->vector_index);
 }
 
-
-
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
     // If there are organisms not in use, take them.
     edc.stc.num_alive_organisms++;
@@ -134,6 +132,8 @@ void OrganismsController::compress_organisms(EngineDataContainer &edc) {
         while ((right_organism = &edc.stc.organisms[right_index])->is_dead) {right_index--; if (right_index <= left_index) { goto endlogic_right;}}
         //while left organism is alive, go right until it is dead
         while (!(left_organism = &edc.stc.organisms[left_index])->is_dead)  {left_index++;  if (left_index >= right_index) { goto endlogic_left;}}
+
+        if (edc.record_data) {edc.stc.tbuffer.record_compressed(right_organism->vector_index, left_organism->vector_index);}
 
         //If left organism is dead, and right one is alive, then swap them, update positions, and repeat the process.
         std::swap(*right_organism, *left_organism);

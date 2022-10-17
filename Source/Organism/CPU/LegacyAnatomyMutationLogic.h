@@ -90,6 +90,10 @@ public:
             int32_t killer_blocks,
             int32_t armor_blocks,
             int32_t eye_blocks);
+
+    static inline void serialize_eye_blocks(const std::vector<SerializedOrganismBlockContainer> &organism_blocks,
+                                            std::vector<SerializedOrganismBlockContainer> &eye_blocks_vector,
+                                            int eye_blocks);
 };
 
 

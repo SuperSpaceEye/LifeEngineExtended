@@ -109,6 +109,7 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
     container->producing_space = std::move(std::get<0>(spaces));
     container->eating_space    = std::move(std::get<1>(spaces));
     container->killing_space   = std::move(std::get<2>(spaces));
+    container->eye_blocks_vec  = std::move(std::get<3>(spaces));
 
     return container;
 }
@@ -300,11 +301,14 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
 }
 
 //Will compile spaces all at the same time in one go.
-std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>>
+std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedOrganismBlockContainer>>
 OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<int, 4> edges,
                                          std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                                          SerializedOrganismStructureContainer *container) {
-    std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>> spaces;
+    std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>,
+               std::vector<SerializedAdjacentSpaceContainer>,
+               std::vector<SerializedAdjacentSpaceContainer>,
+               std::vector<SerializedOrganismBlockContainer>> spaces;
 
     auto shifting_positions = std::array<std::array<int, 2>, 4> {
         std::array<int, 2>{ 0,-1},
@@ -318,6 +322,9 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
     auto &producing_space = std::get<0>(spaces);
     auto &eating_space    = std::get<1>(spaces);
     auto &killer_space    = std::get<2>(spaces);
+    auto &eye_blocks_vec  = std::get<3>(spaces);
+
+    eye_blocks_vec.reserve(container->eye_blocks);
 
     auto temp_producing_space = std::vector<OCCSerializedProducingSpace>();
 
@@ -377,6 +384,9 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                         occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = killer_space.size() - 1;
                     }
                 }
+                break;
+            case BlockTypes::EyeBlock:
+                eye_blocks_vec.emplace_back(block);
                 break;
             default: break;
         }

@@ -25,7 +25,6 @@
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
-#endif
 
 #include <QApplication>
 #include <QWidget>
@@ -67,7 +66,7 @@
 #include "../Statistics/StatisticsCore.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
-#ifndef __EMSCRIPTEN_COMPILATION__
+#ifndef __NO_RECORDER__
 #include "../Recorder/Recorder.h"
 #endif
 #include "../../UIWindows/WorldEvents/WorldEvents.h"
@@ -107,7 +106,6 @@ private:
     EngineControlParameters ecp;
     EngineDataContainer edc;
     OrganismBlockParameters bp;
-    RecordingData recd;
     OCCParameters occp;
 
     Ui::MainWindow ui{};
@@ -118,12 +116,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
-    SimulationEngine engine{edc, ecp, bp, sp, &recd, occp};
+    SimulationEngine engine{edc, ecp, bp, sp, occp};
     OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp};
     StatisticsCore st{&ui};
     InfoWindow iw{&ui};
-    #ifndef __EMSCRIPTEN_COMPILATION__
-    Recorder rc{&ui, &edc, &ecp, &cc, &textures, &recd};
+    #ifndef __NO_RECORDER__
+    Recorder rc{&ui, &edc, &ecp, &cc, &textures, &edc.stc.tbuffer};
     #endif
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
     Benchmarks bs{ui};
@@ -144,7 +142,7 @@ private:
     bool left_mouse_button_pressed = false;
     bool change_main_simulation_grid = false;
     bool change_editing_grid = false;
-    bool use_cuda = true;
+    bool use_cuda = false;
     bool synchronise_info_update_with_window_update = false;
     bool wait_for_engine_to_stop_to_render = false;
     bool resize_simulation_grid_flag = false;

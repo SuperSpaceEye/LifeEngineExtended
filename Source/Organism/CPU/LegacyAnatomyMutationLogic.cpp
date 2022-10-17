@@ -137,6 +137,7 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
     std::vector<SerializedAdjacentSpaceContainer> _eating_space;
     std::vector<SerializedAdjacentSpaceContainer> _killing_space;
+    std::vector<SerializedOrganismBlockContainer> _eye_blocks_vector;
 
     _organism_blocks.reserve(get_map_size(organism_blocks));
 
@@ -152,11 +153,14 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
 
     serialize_killing_space(killing_space, _killing_space);
 
+    serialize_eye_blocks(_organism_blocks, _eye_blocks_vector, eye_blocks);
+
     return new SerializedOrganismStructureContainer{_organism_blocks,
 
                                                     _producing_space,
                                                     _eating_space,
                                                     _killing_space,
+                                                    _eye_blocks_vector,
 
                                                     mouth_blocks,
                                                     producer_blocks,
@@ -224,6 +228,18 @@ void LegacyAnatomyMutationLogic::serialize_producing_space(
 
     //TODO downsizing vector?
 //    std::vector<std::vector<SerializedAdjacentSpaceContainer>>(_producing_space).swap(_producing_space);
+}
+
+void
+LegacyAnatomyMutationLogic::serialize_eye_blocks(const std::vector<SerializedOrganismBlockContainer> &organism_blocks,
+                                                 std::vector<SerializedOrganismBlockContainer> &eye_blocks_vector,
+                                                 int eye_blocks) {
+    eye_blocks_vector.reserve(eye_blocks);
+    for (const auto & block: organism_blocks) {
+        if (block.type == BlockTypes::EyeBlock) {
+            eye_blocks_vector.emplace_back(block);
+        }
+    }
 }
 
 template<typename T>

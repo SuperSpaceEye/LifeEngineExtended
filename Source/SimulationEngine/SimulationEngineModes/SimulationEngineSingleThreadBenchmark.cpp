@@ -585,11 +585,13 @@ void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkRe
 void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
+    bool _;
 
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp,
+                                                          _);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -598,7 +600,8 @@ void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkR
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp,
+                                                          _);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -610,12 +613,13 @@ void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkR
 void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
+    bool _;
 
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
             start = NOW();
-            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp, _);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -627,7 +631,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkRes
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
             decision = BrainDecision(((int)decision+1)%4);
-            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp, _);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();

@@ -12,14 +12,14 @@ Warning! The recorder right now is pretty inefficient. During the recording it w
 You can compile several videos in parallel, but it is not recommended.
 
 ### Various setting.
-* **"Grid buffer size"** - The size of a buffer. The program will first write grid states to the buffer, before writing all at once to the drive.
+* **"Grid tbuffer size"** - The size of a tbuffer. The program will first write grid states to the tbuffer, before writing all at once to the drive.
 * **"Log every n tick"** - Will log every n tick.
 * **"Video output FPS"** - FPS that will be set during video construction.
 
 ### Various buttons.
 * **"New recording"** - Will create new folder in /temp/ with timestamp where recording will be stored.
-* **"Stop recording"** - Will stop the recording, flushing data in the buffer to the disk.
-* **"Clear intermediate data"** - Will stop the recording before freeing the buffer space.
+* **"Stop recording"** - Will stop the recording, flushing data in the tbuffer to the disk.
+* **"Clear intermediate data"** - Will stop the recording before freeing the tbuffer space.
 * **"Delete all intermediate data from disk"** - Will delete everything in the /temp/ folder.
 * **"Compile intermediate data into video"** - The output will be in /videos/ folder. Compilation is done in two stages:
   1. Convert recording data into a series of images in /temp/ folder. This stage is the slowest, though you can stop the compilation and continue later.
