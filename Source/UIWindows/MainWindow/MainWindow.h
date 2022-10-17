@@ -20,12 +20,6 @@
 #include <fstream>
 #include <filesystem>
 
-#ifndef __EMSCRIPTEN_COMPILATION__
-#include <boost/lexical_cast.hpp>
-#include <boost/lexical_cast/try_lexical_convert.hpp>
-#include <boost/nondet_random.hpp>
-#include <boost/random.hpp>
-
 #include <QApplication>
 #include <QWidget>
 #include <QTimer>
