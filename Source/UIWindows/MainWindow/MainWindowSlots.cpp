@@ -846,6 +846,8 @@ void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.rese
 
 void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_random_decisions = state;}
 
+void MainWindow::cb_do_not_mutate_brain_of_plants_slot   (bool state) { sp.do_not_mutate_brains_of_plants = state;}
+
 void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 
 //==================== Table ====================

@@ -78,6 +78,7 @@ struct SimulationParameters {
     bool no_random_decisions = false;
     bool use_occ = true;
     bool recenter_to_imaginary_pos = false;
+    bool do_not_mutate_brains_of_plants = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

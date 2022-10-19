@@ -243,6 +243,7 @@ public:
     QCheckBox *cb_no_random_decisions;
     QCheckBox *cb_use_organism_construction_code;
     QCheckBox *cb_recenter_to_imaginary;
+    QCheckBox *cb_do_not_mutate_brain_of_plants;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -316,8 +317,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -936,7 +937,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1620));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1308, 606, 1649));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1477,6 +1478,11 @@ public:
 
         verticalLayout_20->addWidget(cb_recenter_to_imaginary);
 
+        cb_do_not_mutate_brain_of_plants = new QCheckBox(widget);
+        cb_do_not_mutate_brain_of_plants->setObjectName("cb_do_not_mutate_brain_of_plants");
+
+        verticalLayout_20->addWidget(cb_do_not_mutate_brain_of_plants);
+
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
         verticalLayout_20->addItem(verticalSpacer);
@@ -1520,7 +1526,7 @@ public:
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
         table_organism_block_parameters->setVerticalHeaderItem(5, __qtablewidgetitem9);
         QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
-        __qtablewidgetitem10->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsUserTristate);
+        __qtablewidgetitem10->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
         table_organism_block_parameters->setItem(0, 0, __qtablewidgetitem10);
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
         table_organism_block_parameters->setItem(0, 1, __qtablewidgetitem11);
@@ -1612,7 +1618,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, -529, 606, 832));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 832));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -2105,6 +2111,7 @@ public:
         QObject::connect(cb_use_organism_construction_code, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_occ_slot(bool)));
         QObject::connect(cb_recenter_to_imaginary, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_recenter_to_imaginary_slot(bool)));
         QObject::connect(le_set_ups, SIGNAL(returnPressed()), MainWindow, SLOT(le_set_ups_slot()));
+        QObject::connect(cb_do_not_mutate_brain_of_plants, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_do_not_mutate_brain_of_plants_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2234,6 +2241,7 @@ public:
         cb_no_random_decisions->setText(QCoreApplication::translate("MainWindow", "No random decisions", nullptr));
         cb_use_organism_construction_code->setText(QCoreApplication::translate("MainWindow", "Use Organism Construction Code", nullptr));
         cb_recenter_to_imaginary->setText(QCoreApplication::translate("MainWindow", "Recenter organisms to imaginary position", nullptr));
+        cb_do_not_mutate_brain_of_plants->setText(QCoreApplication::translate("MainWindow", "Do not mutate brain of plants/simple movers", nullptr));
         label_45->setText(QCoreApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "Food Cost", nullptr));

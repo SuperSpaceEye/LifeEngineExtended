@@ -157,6 +157,11 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
 
 void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 *gen) {
+    // movers without eyes as well.
+    if (sp->do_not_mutate_brains_of_plants && (new_anatomy._mover_blocks == 0 || new_anatomy._eye_blocks == 0)) {
+        return;
+    }
+
     if (new_anatomy._eye_blocks == 0 && new_anatomy._mover_blocks == 0) {
         new_brain.set_simple_action_table(brain);
     }
@@ -205,7 +210,7 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
 
 int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     Anatomy new_anatomy;
-    Brain new_brain;
+    Brain new_brain{};
     OrganismConstructionCode new_occ;
 
     float _anatomy_mutation_rate = 0;
