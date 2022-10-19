@@ -46,7 +46,7 @@ QLayout *OCCParametersWindow::prepare_layout(QLayout *layout) {
 }
 
 void OCCParametersWindow::create_mutation_type_distribution() {
-    auto *layout = ui.mutation_types_widget->layout();
+    auto *layout = prepare_layout(ui.mutation_types_widget->layout());
 
     std::array<std::string, 5> mutation_types{
         "Append Random",
@@ -120,7 +120,7 @@ void OCCParametersWindow::create_group_size_distribution() {
 }
 
 void OCCParametersWindow::create_occ_instructions_distribution(bool no_reset) {
-    auto *layout = ui.occ_instructions_weights_layout;
+    auto *layout = prepare_layout(ui.occ_instructions_weights_layout);
 
     occp.occ_instructions_mutation_weights.resize(OCC_INSTRUCTIONS_NAME.size(), 1);
 
