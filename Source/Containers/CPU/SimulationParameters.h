@@ -22,6 +22,7 @@ struct SimulationParameters {
     float global_anatomy_mutation_rate = 0.05;
     float global_brain_mutation_rate = 0.1;
     float killer_damage_amount = 1;
+    float threshold_move = 0.1;
 
     int   min_reproducing_distance = 0;
     int   max_reproducing_distance = 3;
@@ -79,6 +80,7 @@ struct SimulationParameters {
     bool use_occ = true;
     bool recenter_to_imaginary_pos = false;
     bool do_not_mutate_brains_of_plants = true;
+    bool use_weighted_brain = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

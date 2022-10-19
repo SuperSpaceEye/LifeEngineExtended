@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 8;
+const uint32_t SAVE_VERSION = 9;
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -602,6 +602,7 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("global_anatomy_mutation_rate",    Value(sp.global_anatomy_mutation_rate), d.GetAllocator());
     d.AddMember("global_brain_mutation_rate",      Value(sp.global_brain_mutation_rate), d.GetAllocator());
     d.AddMember("killer_damage_amount",            Value(sp.killer_damage_amount), d.GetAllocator());
+    d.AddMember("threshold_move",                  Value(sp.threshold_move), d.GetAllocator());
 
     d.AddMember("min_reproducing_distance", Value(sp.min_reproducing_distance), d.GetAllocator());
     d.AddMember("max_reproducing_distance", Value(sp.max_reproducing_distance), d.GetAllocator());
@@ -658,6 +659,7 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
     d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
     d.AddMember("do_not_mutate_brains_of_plants",   Value(sp.do_not_mutate_brains_of_plants), d.GetAllocator());
+    d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -672,6 +674,7 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.global_anatomy_mutation_rate    = d["global_anatomy_mutation_rate"].GetFloat();
     sp.global_brain_mutation_rate      = d["global_brain_mutation_rate"].GetFloat();
     sp.killer_damage_amount            = d["killer_damage_amount"].GetFloat();
+    sp.threshold_move                  = d["threshold_move"].GetFloat();
 
     sp.min_reproducing_distance    = d["min_reproducing_distance"].GetInt();
     sp.max_reproducing_distance    = d["max_reproducing_distance"].GetInt();
@@ -728,6 +731,7 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.use_occ                          = d["use_occ"].GetBool();
     sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
     sp.do_not_mutate_brains_of_plants   = d["do_not_mutate_brains_of_plants"].GetBool();
+    sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
 }
 
 
