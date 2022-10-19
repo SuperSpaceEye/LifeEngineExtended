@@ -61,8 +61,33 @@ SimpleActionTable Brain::mutate_simple_action_table(SimpleActionTable &parents_s
     return new_simple_action_table;
 }
 
-WeightedActionTable Brain::mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt) {
+WeightedActionTable Brain::mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp) {
+    auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
+    auto new_weighted_action_table = WeightedActionTable{parent_action_table};
 
+    float modif = sp.weighted_brain_mutation_step * (std::uniform_int_distribution<int>(0, 1)(mt) ? 1. : -1.);
+
+    float * value;
+
+    switch (mutate_type){
+        case BlockTypes::MouthBlock:    value = &new_weighted_action_table.MouthBlock    ;break;
+        case BlockTypes::ProducerBlock: value = &new_weighted_action_table.ProducerBlock ;break;
+        case BlockTypes::MoverBlock:    value = &new_weighted_action_table.MoverBlock    ;break;
+        case BlockTypes::KillerBlock:   value = &new_weighted_action_table.KillerBlock   ;break;
+        case BlockTypes::ArmorBlock:    value = &new_weighted_action_table.ArmorBlock    ;break;
+        case BlockTypes::EyeBlock:      value = &new_weighted_action_table.EyeBlock      ;break;
+        case BlockTypes::FoodBlock:     value = &new_weighted_action_table.FoodBlock     ;break;
+        case BlockTypes::WallBlock:     value = &new_weighted_action_table.WallBlock     ;break;
+        default: break;
+    }
+
+    if (modif > 0) {
+        *value = std::min<float>(1.,  *value+modif);
+    } else {
+        *value = std::max<float>(-1., *value+modif);
+    }
+
+    return new_weighted_action_table;
 }
 
 
@@ -217,8 +242,15 @@ Brain::get_decision(std::vector<Observation> &observation_vector, Rotation organ
     return action;
 }
 
-Brain Brain::mutate(lehmer64 &mt) {
+Brain Brain::mutate(lehmer64 &mt, SimulationParameters sp) {
     auto new_brain = Brain(brain_type);
-    new_brain.simple_action_table = mutate_simple_action_table(simple_action_table, mt);
+    switch (brain_type) {
+        case BrainTypes::SimpleBrain:
+            new_brain.simple_action_table = mutate_simple_action_table(simple_action_table, mt);
+            break;
+        case BrainTypes::WeightedBrain:
+            new_brain.weighted_action_table = mutate_weighted_action_table(weighted_action_table, mt, sp);
+            break;
+    }
     return new_brain;
 }

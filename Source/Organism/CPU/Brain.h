@@ -18,6 +18,7 @@
 #include "../../Stuff/BlockTypes.hpp"
 #include "Rotation.h"
 #include "ObservationStuff.h"
+#include "../../Containers/CPU/SimulationParameters.h"
 
 enum class BrainDecision {
     //Movement and rotation from organism viewpoint.
@@ -95,7 +96,8 @@ class Brain {
 private:
     static SimpleActionTable copy_parents_table(const SimpleActionTable & parents_simple_action_table);
     static SimpleActionTable mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
-    static WeightedActionTable mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt);
+    static WeightedActionTable
+    mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);
 
     DecisionObservation get_simple_action(std::vector<Observation> &observations_vector);
     DecisionObservation get_weighted_action(std::vector<Observation> &observations_vector, int look_range,
@@ -121,7 +123,7 @@ public:
     get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,
                  int look_range, float threshold_move);
 
-    Brain mutate(lehmer64 &mt);
+    Brain mutate(lehmer64 &mt, SimulationParameters sp);
 
     void set_simple_action_table(Brain brain);
 };

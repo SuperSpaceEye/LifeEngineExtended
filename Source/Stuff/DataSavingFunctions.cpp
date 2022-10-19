@@ -602,7 +602,6 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("global_anatomy_mutation_rate",    Value(sp.global_anatomy_mutation_rate), d.GetAllocator());
     d.AddMember("global_brain_mutation_rate",      Value(sp.global_brain_mutation_rate), d.GetAllocator());
     d.AddMember("killer_damage_amount",            Value(sp.killer_damage_amount), d.GetAllocator());
-    d.AddMember("threshold_move",                  Value(sp.threshold_move), d.GetAllocator());
 
     d.AddMember("min_reproducing_distance", Value(sp.min_reproducing_distance), d.GetAllocator());
     d.AddMember("max_reproducing_distance", Value(sp.max_reproducing_distance), d.GetAllocator());
@@ -614,6 +613,9 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("brain_mutation_rate_mutation_step", Value(sp.brain_mutation_rate_mutation_step), d.GetAllocator());
     d.AddMember("brain_min_possible_mutation_rate",  Value(sp.brain_min_possible_mutation_rate), d.GetAllocator());
     d.AddMember("brain_mutation_rate_delimiter",     Value(sp.brain_mutation_rate_delimiter), d.GetAllocator());
+
+    d.AddMember("weighted_brain_mutation_step", Value(sp.weighted_brain_mutation_step), d.GetAllocator());
+    d.AddMember("threshold_move",               Value(sp.threshold_move), d.GetAllocator());
 
     d.AddMember("min_move_range",       Value(sp.min_move_range), d.GetAllocator());
     d.AddMember("max_move_range",       Value(sp.max_move_range), d.GetAllocator());
@@ -674,7 +676,6 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.global_anatomy_mutation_rate    = d["global_anatomy_mutation_rate"].GetFloat();
     sp.global_brain_mutation_rate      = d["global_brain_mutation_rate"].GetFloat();
     sp.killer_damage_amount            = d["killer_damage_amount"].GetFloat();
-    sp.threshold_move                  = d["threshold_move"].GetFloat();
 
     sp.min_reproducing_distance    = d["min_reproducing_distance"].GetInt();
     sp.max_reproducing_distance    = d["max_reproducing_distance"].GetInt();
@@ -686,6 +687,9 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.brain_mutation_rate_mutation_step = d["brain_mutation_rate_mutation_step"].GetFloat();
     sp.brain_min_possible_mutation_rate  = d["brain_min_possible_mutation_rate"].GetFloat();
     sp.brain_mutation_rate_delimiter     = d["brain_mutation_rate_delimiter"].GetFloat();
+
+    sp.weighted_brain_mutation_step = d["weighted_brain_mutation_step"].GetFloat();
+    sp.threshold_move               = d["threshold_move"].GetFloat();
 
     sp.min_move_range       = d["min_move_range"].GetInt();
     sp.max_move_range       = d["max_move_range"].GetInt();

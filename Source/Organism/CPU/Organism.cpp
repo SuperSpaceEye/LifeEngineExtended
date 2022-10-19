@@ -186,7 +186,7 @@ void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
 
     // if mutate brain
     if (mutate_brain) {
-        new_brain.set_simple_action_table(brain.mutate(*gen));
+        new_brain.set_simple_action_table(brain.mutate(*gen, *sp));
     } else {
         // just copy brain from parent
         new_brain.set_simple_action_table(brain);

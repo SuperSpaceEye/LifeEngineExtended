@@ -22,7 +22,6 @@ struct SimulationParameters {
     float global_anatomy_mutation_rate = 0.05;
     float global_brain_mutation_rate = 0.1;
     float killer_damage_amount = 1;
-    float threshold_move = 0.1;
 
     int   min_reproducing_distance = 0;
     int   max_reproducing_distance = 3;
@@ -34,6 +33,9 @@ struct SimulationParameters {
     float brain_mutation_rate_mutation_step = 0.01;
     float brain_min_possible_mutation_rate = 0.01;
     float brain_mutation_rate_delimiter = 0.5;
+
+    float weighted_brain_mutation_step = 0.1;
+    float threshold_move = 0.1;
 
     int   min_move_range = 1;
     int   max_move_range = 5;
