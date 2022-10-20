@@ -75,6 +75,7 @@ void OrganismEditor::initialize_gui() {
     for (auto & observation: observations) {
         auto * horizontal_layout = new QHBoxLayout{};
         auto * b_group = new QButtonGroup(this);
+        auto * weight_le = new QLineEdit(ui.widget_2);
 
         horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation), ui.widget_2));
         for (auto & decision: decisions) {
@@ -86,6 +87,9 @@ void OrganismEditor::initialize_gui() {
 
             brain_checkboxes[observation][decision] = cb;
         }
+        connect(weight_le, &QLineEdit::returnPressed, [&, observation, weight_le](){brain_weight_chooser(observation, weight_le);});
+        horizontal_layout->addWidget(weight_le);
+        brain_line_edits[observation] = weight_le;
 
         ui.brain_vertical_layout->addItem(horizontal_layout);
     }
@@ -100,13 +104,13 @@ void OrganismEditor::initialize_gui() {
     mapped_block_types_s_to_type["Killer Cell"]   = BlockTypes::KillerBlock;
     mapped_block_types_s_to_type["Armor Cell"]    = BlockTypes::ArmorBlock;
     mapped_block_types_s_to_type["Eye Cell"]      = BlockTypes::EyeBlock;
-    mapped_block_types_s_to_type["Food"]     = BlockTypes::FoodBlock;
+    mapped_block_types_s_to_type["Food"]          = BlockTypes::FoodBlock;
     mapped_block_types_s_to_type["Wall"]          = BlockTypes::WallBlock;
 
     for (auto & pair: mapped_decisions_s_to_type)   {mapped_decisions_type_to_s  [pair.second] = pair.first;}
     for (auto & pair: mapped_block_types_s_to_type) {mapped_block_types_type_to_s[pair.second] = pair.first;}
 
-    update_brain_checkboxes();
+    update_brain_state();
 }
 
 void OrganismEditor::brain_cb_chooser(std::string observation, std::string action) {
@@ -131,6 +135,47 @@ void OrganismEditor::brain_cb_chooser(std::string observation, std::string actio
         case SimpleDecision::GoAway:    *brain_decision = SimpleDecision::GoAway;   break;
         case SimpleDecision::GoTowards: *brain_decision = SimpleDecision::GoTowards;break;
     }
+}
+
+void OrganismEditor::brain_weight_chooser(std::string observation, QLineEdit *le) {
+    auto observation_type = mapped_block_types_s_to_type[observation];
+
+    float * weight;
+
+    switch (observation_type) {
+        case BlockTypes::MouthBlock:    weight = &editor_organism->brain.weighted_action_table.MouthBlock;    break;
+        case BlockTypes::ProducerBlock: weight = &editor_organism->brain.weighted_action_table.ProducerBlock; break;
+        case BlockTypes::MoverBlock:    weight = &editor_organism->brain.weighted_action_table.MoverBlock;    break;
+        case BlockTypes::KillerBlock:   weight = &editor_organism->brain.weighted_action_table.KillerBlock;   break;
+        case BlockTypes::ArmorBlock:    weight = &editor_organism->brain.weighted_action_table.ArmorBlock;    break;
+        case BlockTypes::EyeBlock:      weight = &editor_organism->brain.weighted_action_table.EyeBlock;      break;
+        case BlockTypes::FoodBlock:     weight = &editor_organism->brain.weighted_action_table.FoodBlock;     break;
+        case BlockTypes::WallBlock:     weight = &editor_organism->brain.weighted_action_table.WallBlock;     break;
+    }
+
+    le_slot_lower_upper_bound<float>(*weight, *weight, "float", le, -1., "-1", 1., "1");
+}
+
+void OrganismEditor::update_brain_state() {
+    for (int i = 0; i < 8; i++) {
+        float * val = (float*)&editor_organism->brain.weighted_action_table;
+        std::cout << *(val + i) << "\n";
+    }
+    std::cout << "==========\n";
+
+    update_brain_checkboxes();
+    update_brain_line_edits();
+}
+
+void OrganismEditor::update_brain_line_edits() {
+    brain_line_edits["Mouth Cell"]   ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.MouthBlock)));
+    brain_line_edits["Producer Cell"]->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.ProducerBlock)));
+    brain_line_edits["Mover Cell"]   ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.MoverBlock)));
+    brain_line_edits["Killer Cell"]  ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.KillerBlock)));
+    brain_line_edits["Armor Cell"]   ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.ArmorBlock)));
+    brain_line_edits["Eye Cell"]     ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.EyeBlock)));
+    brain_line_edits["Food"]         ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.FoodBlock)));
+    brain_line_edits["Wall"]         ->setText(QString::fromStdString(std::to_string(editor_organism->brain.weighted_action_table.WallBlock)));
 }
 
 void OrganismEditor::update_brain_checkboxes() {
@@ -355,7 +400,7 @@ void OrganismEditor::load_chosen_organism() {
     update_gui();
     clear_occ();
     load_occ();
-    update_brain_checkboxes();
+    update_brain_state();
 }
 
 bool OrganismEditor::check_edit_area() {

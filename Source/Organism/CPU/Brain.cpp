@@ -10,10 +10,10 @@
 #include "ObservationStuff.h"
 
 Brain::Brain(Brain & brain): brain_type(brain.brain_type),
-simple_action_table(copy_parents_table(brain.simple_action_table)), weighted_action_table(brain.weighted_action_table) {}
+simple_action_table(SimpleActionTable{brain.simple_action_table}), weighted_action_table(brain.weighted_action_table) {}
 
 Brain::Brain(const Brain &brain): brain_type(brain.brain_type),
-simple_action_table(copy_parents_table(brain.simple_action_table)), weighted_action_table(brain.weighted_action_table) {}
+simple_action_table(SimpleActionTable{brain.simple_action_table}), weighted_action_table(brain.weighted_action_table) {}
 
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
@@ -23,27 +23,13 @@ void Brain::set_simple_action_table(Brain brain) {
 }
 
 DecisionObservation Brain::get_random_action(lehmer64 &mt) {
-//    return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(gen));
     return DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(mt)), Observation(), 0};
 }
 
 
-SimpleActionTable Brain::copy_parents_table(const SimpleActionTable &parents_simple_action_table) {
-    auto simple_action_table = SimpleActionTable{};
-    simple_action_table.MouthBlock    = parents_simple_action_table.MouthBlock;
-    simple_action_table.ProducerBlock = parents_simple_action_table.ProducerBlock;
-    simple_action_table.MoverBlock    = parents_simple_action_table.MoverBlock;
-    simple_action_table.KillerBlock   = parents_simple_action_table.KillerBlock;
-    simple_action_table.ArmorBlock    = parents_simple_action_table.ArmorBlock;
-    simple_action_table.EyeBlock      = parents_simple_action_table.EyeBlock;
-    simple_action_table.FoodBlock     = parents_simple_action_table.FoodBlock;
-    simple_action_table.WallBlock     = parents_simple_action_table.WallBlock;
-    return simple_action_table;
-}
-
 SimpleActionTable Brain::mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt) {
     auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
-    auto new_simple_action_table = copy_parents_table(parents_simple_action_table);
+    auto new_simple_action_table = SimpleActionTable{parents_simple_action_table};
 
     auto new_decision = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
 

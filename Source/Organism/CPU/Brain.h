@@ -94,7 +94,6 @@ struct BrainWeightedDecision {
 
 class Brain {
 private:
-    static SimpleActionTable copy_parents_table(const SimpleActionTable & parents_simple_action_table);
     static SimpleActionTable mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
     static WeightedActionTable
     mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);

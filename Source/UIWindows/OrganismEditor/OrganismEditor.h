@@ -56,6 +56,7 @@ public:
     std::vector<std::string> decisions{"Do Nothing", "Go Away", "Go Towards"};
     std::vector<std::string> observations{"Mouth Cell", "Producer Cell", "Mover Cell", "Killer Cell", "Armor Cell", "Eye Cell", "Food", "Wall"};
     std::map<std::string, std::map<std::string, QCheckBox*>> brain_checkboxes;
+    std::map<std::string, QLineEdit*> brain_line_edits;
     std::map<std::string, BlockTypes>     mapped_block_types_s_to_type;
     std::map<std::string, SimpleDecision> mapped_decisions_s_to_type;
     std::map<BlockTypes,     std::string> mapped_block_types_type_to_s;
@@ -103,7 +104,11 @@ public:
     void occ_mode(bool state);
 
     void brain_cb_chooser(std::string observation, std::string action);
+    void brain_weight_chooser(std::string observation, QLineEdit * le);
+
+    void update_brain_state();
     void update_brain_checkboxes();
+    void update_brain_line_edits();
 
     QLabel actual_cursor;
 
