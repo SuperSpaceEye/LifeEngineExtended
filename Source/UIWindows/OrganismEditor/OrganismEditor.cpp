@@ -77,7 +77,7 @@ void OrganismEditor::initialize_gui() {
         auto * b_group = new QButtonGroup(this);
         auto * weight_le = new QLineEdit(ui.widget_2);
 
-        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation), ui.widget_2));
+        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation + " "), ui.widget_2));
         for (auto & decision: decisions) {
             auto * cb = new QCheckBox(QString::fromStdString(decision), ui.widget_2);
             connect(cb, &QCheckBox::clicked, [&, decision, observation](){brain_cb_chooser(observation, decision);});
@@ -157,12 +157,6 @@ void OrganismEditor::brain_weight_chooser(std::string observation, QLineEdit *le
 }
 
 void OrganismEditor::update_brain_state() {
-    for (int i = 0; i < 8; i++) {
-        float * val = (float*)&editor_organism->brain.weighted_action_table;
-        std::cout << *(val + i) << "\n";
-    }
-    std::cout << "==========\n";
-
     update_brain_checkboxes();
     update_brain_line_edits();
 }
@@ -386,6 +380,7 @@ Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
 void OrganismEditor::finalize_chosen_organism() {
     delete *chosen_organism;
     *chosen_organism = new Organism(editor_organism);
+    (*chosen_organism)->rotation = choosen_rotation;
 }
 
 void OrganismEditor::load_chosen_organism() {
@@ -480,5 +475,29 @@ void OrganismEditor::load_occ() {
 
     ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism->occ.get_code_const_ref(), short_instructions)));
     ui.label_occ_count->setText(QString::fromStdString("OCC instruction count: " + std::to_string(editor_organism->occ.get_code_const_ref().size())));
+}
+
+void OrganismEditor::update_brain_edit_visibility(bool weighted_edits_visible) {
+    if (weighted_edits_visible) {
+        for (auto & first: brain_checkboxes) {
+            for (auto & second: first.second) {
+                second.second->hide();
+            }
+        }
+
+        for (auto & first: brain_line_edits) {
+            first.second->show();
+        }
+    } else {
+        for (auto & first: brain_checkboxes) {
+            for (auto & second: first.second) {
+                second.second->show();
+            }
+        }
+
+        for (auto & first: brain_line_edits) {
+            first.second->hide();
+        }
+    }
 }
 

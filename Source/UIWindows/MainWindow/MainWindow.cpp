@@ -591,6 +591,7 @@ void MainWindow::initialize_gui() {
     ui.cb_use_organism_construction_code    ->setChecked(sp.use_occ);
     ui.cb_recenter_to_imaginary             ->setChecked(sp.recenter_to_imaginary_pos);
     ui.cb_do_not_mutate_brain_of_plants     ->setChecked(sp.do_not_mutate_brains_of_plants);
+    ui.cb_use_weighted_brain                ->setChecked(sp.use_weighted_brain);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
@@ -648,6 +649,8 @@ void MainWindow::initialize_gui() {
     ui.cb_recorder_window_always_on_top->hide();
     ui.tb_open_recorder_window->hide();
     #endif
+
+    ee.update_brain_edit_visibility(sp.use_weighted_brain);
 }
 
 void MainWindow::get_current_font_size() {

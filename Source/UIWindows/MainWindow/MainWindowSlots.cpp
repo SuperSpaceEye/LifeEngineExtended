@@ -794,6 +794,12 @@ void MainWindow::cb_recenter_to_imaginary_slot(bool state) {
     engine.unpause();
 }
 
+void MainWindow::cb_use_weighted_brain_slot(bool state) {
+    sp.use_weighted_brain = state;
+    engine.reinit_organisms();
+    ee.update_brain_edit_visibility(state);
+}
+
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void MainWindow::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}

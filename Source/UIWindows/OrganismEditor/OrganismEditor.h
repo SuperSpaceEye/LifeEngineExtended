@@ -127,6 +127,8 @@ public:
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
     Rotation chosen_block_rotation = Rotation::UP;
 
+    Rotation choosen_rotation = Rotation::UP;
+
     OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                    SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
                    Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
@@ -156,6 +158,8 @@ public:
     void load_occ();
 
     bool check_edit_area();
+
+    void update_brain_edit_visibility(bool weighted_edits_visible);
 
 private slots:
     void b_load_organism_slot();

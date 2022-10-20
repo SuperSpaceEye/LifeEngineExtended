@@ -399,6 +399,7 @@ private slots:
     void cb_use_occ_slot(bool state);
     void cb_recenter_to_imaginary_slot(bool state);
     void cb_do_not_mutate_brain_of_plants_slot(bool state);
+    void cb_use_weighted_brain_slot(bool state);
     //Other
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);

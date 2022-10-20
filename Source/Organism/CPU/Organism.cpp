@@ -53,6 +53,12 @@ void Organism::init_values() {
     if (sp->multiply_food_production_prob) {
         multiplier *= anatomy._producer_blocks;
     }
+
+    if (sp->use_weighted_brain && brain.brain_type != BrainTypes::WeightedBrain) {
+        brain.convert_simple_to_weighted();
+    } else if (!sp->use_weighted_brain && brain.brain_type != BrainTypes::SimpleBrain) {
+        brain.convert_weighted_to_simple(sp->threshold_move);
+    }
 }
 
 //TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.

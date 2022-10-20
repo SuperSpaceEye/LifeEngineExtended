@@ -240,3 +240,30 @@ Brain Brain::mutate(lehmer64 &mt, SimulationParameters sp) {
     }
     return new_brain;
 }
+
+//TODO
+void Brain::convert_simple_to_weighted() {
+    auto * simple_decision = (SimpleDecision*)&simple_action_table;
+    auto * weight = (float*)&weighted_action_table;
+
+    for (int i = 0; i < 8; i++) {
+        switch (*(simple_decision+i)) {
+            case SimpleDecision::DoNothing: *(weight+i) = 0; break;
+            case SimpleDecision::GoAway:    *(weight+i) = -1; break;
+            case SimpleDecision::GoTowards: *(weight+i) = 1; break;
+        }
+    }
+}
+
+void Brain::convert_weighted_to_simple(float threshold_move) {
+    auto * simple_decision = (SimpleDecision*)&simple_action_table;
+    auto * weight = (float*)&weighted_action_table;
+
+    for (int i = 0; i < 8; i++) {
+        float tw = *(weight+i);
+
+        if (std::abs(tw) < threshold_move) {*(simple_decision+i) = SimpleDecision::DoNothing;}
+        else if (tw > 0) {*(simple_decision+i) = SimpleDecision::GoTowards;}
+        else {*(simple_decision+i) = SimpleDecision::GoAway;}
+    }
+}

@@ -64,6 +64,7 @@ struct DecisionObservation {
     int time = 0;
 };
 
+//TODO remember convert
 struct SimpleActionTable {
     SimpleDecision MouthBlock    = SimpleDecision::DoNothing;
     SimpleDecision ProducerBlock = SimpleDecision::DoNothing;
@@ -118,9 +119,12 @@ public:
     BrainTypes brain_type;
 
     static DecisionObservation get_random_action(lehmer64 &mt);
-    DecisionObservation
-    get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,
-                 int look_range, float threshold_move);
+    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,
+                                     int look_range, float threshold_move);
+
+    void convert_simple_to_weighted();
+    void convert_weighted_to_simple(float threshold_move);
+
 
     Brain mutate(lehmer64 &mt, SimulationParameters sp);
 
