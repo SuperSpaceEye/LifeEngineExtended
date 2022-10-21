@@ -34,6 +34,9 @@ struct SimulationParameters {
     float brain_min_possible_mutation_rate = 0.01;
     float brain_mutation_rate_delimiter = 0.5;
 
+    float weighted_brain_mutation_step = 0.1;
+    float threshold_move = 0.1;
+
     int   min_move_range = 1;
     int   max_move_range = 5;
     float move_range_delimiter = 0.5;
@@ -78,6 +81,8 @@ struct SimulationParameters {
     bool no_random_decisions = false;
     bool use_occ = true;
     bool recenter_to_imaginary_pos = false;
+    bool do_not_mutate_brains_of_plants = true;
+    bool use_weighted_brain = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

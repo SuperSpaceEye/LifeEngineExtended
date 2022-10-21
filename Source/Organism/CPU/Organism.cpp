@@ -53,6 +53,12 @@ void Organism::init_values() {
     if (sp->multiply_food_production_prob) {
         multiplier *= anatomy._producer_blocks;
     }
+
+    if (sp->use_weighted_brain && brain.brain_type != BrainTypes::WeightedBrain) {
+        brain.convert_simple_to_weighted();
+    } else if (!sp->use_weighted_brain && brain.brain_type != BrainTypes::SimpleBrain) {
+        brain.convert_weighted_to_simple(sp->threshold_move);
+    }
 }
 
 //TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
@@ -157,6 +163,11 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
 
 void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 *gen) {
+    // movers without eyes as well.
+    if (sp->do_not_mutate_brains_of_plants && (new_anatomy._mover_blocks == 0 || new_anatomy._eye_blocks == 0)) {
+        return;
+    }
+
     if (new_anatomy._eye_blocks == 0 && new_anatomy._mover_blocks == 0) {
         new_brain.set_simple_action_table(brain);
     }
@@ -181,10 +192,10 @@ void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
 
     // if mutate brain
     if (mutate_brain) {
-        new_brain.set_simple_action_table(brain.mutate(*gen));
+        new_brain = brain.mutate(*gen, *sp);
     } else {
         // just copy brain from parent
-        new_brain.set_simple_action_table(brain);
+        new_brain = Brain{brain};
     }
 }
 
@@ -205,7 +216,7 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
 
 int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     Anatomy new_anatomy;
-    Brain new_brain;
+    Brain new_brain{};
     OrganismConstructionCode new_occ;
 
     float _anatomy_mutation_rate = 0;
@@ -215,7 +226,13 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
     auto child_move_range = mutate_move_range(sp, gen, move_range);
 
-    if (new_anatomy._eye_blocks > 0 && new_anatomy._mover_blocks > 0) {new_brain.brain_type = BrainTypes::SimpleBrain;}
+    if (new_anatomy._eye_blocks > 0 && new_anatomy._mover_blocks > 0) {
+        if (!sp->use_weighted_brain) {
+            new_brain.brain_type = BrainTypes::SimpleBrain;
+        } else {
+            new_brain.brain_type = BrainTypes::WeightedBrain;
+        }
+    }
     else {new_brain.brain_type = BrainTypes::RandomActions;}
 
     auto * child_ptr = OrganismsController::get_new_child_organism(edc);
@@ -238,7 +255,7 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
     if (anatomy._mover_blocks == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
-        auto new_decision = brain.get_decision(organism_observations, rotation, *mt);
+        auto new_decision = brain.get_decision(organism_observations, rotation, *mt, sp->look_range, sp->threshold_move);
         if (new_decision.decision != BrainDecision::DoNothing) {
             last_decision_observation = new_decision;
         } else {

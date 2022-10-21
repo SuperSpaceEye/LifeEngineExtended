@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 8;
+const uint32_t SAVE_VERSION = 9;
 
 void DataSavingFunctions::write_version(QDataStream &os) {
     os.device()->write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -615,6 +615,9 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("brain_min_possible_mutation_rate",  Value(sp.brain_min_possible_mutation_rate), d.GetAllocator());
     d.AddMember("brain_mutation_rate_delimiter",     Value(sp.brain_mutation_rate_delimiter), d.GetAllocator());
 
+    d.AddMember("weighted_brain_mutation_step", Value(sp.weighted_brain_mutation_step), d.GetAllocator());
+    d.AddMember("threshold_move",               Value(sp.threshold_move), d.GetAllocator());
+
     d.AddMember("min_move_range",       Value(sp.min_move_range), d.GetAllocator());
     d.AddMember("max_move_range",       Value(sp.max_move_range), d.GetAllocator());
     d.AddMember("move_range_delimiter", Value(sp.move_range_delimiter), d.GetAllocator());
@@ -658,6 +661,8 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
     d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
     d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
+    d.AddMember("do_not_mutate_brains_of_plants",   Value(sp.do_not_mutate_brains_of_plants), d.GetAllocator());
+    d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -683,6 +688,9 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.brain_mutation_rate_mutation_step = d["brain_mutation_rate_mutation_step"].GetFloat();
     sp.brain_min_possible_mutation_rate  = d["brain_min_possible_mutation_rate"].GetFloat();
     sp.brain_mutation_rate_delimiter     = d["brain_mutation_rate_delimiter"].GetFloat();
+
+    sp.weighted_brain_mutation_step = d["weighted_brain_mutation_step"].GetFloat();
+    sp.threshold_move               = d["threshold_move"].GetFloat();
 
     sp.min_move_range       = d["min_move_range"].GetInt();
     sp.max_move_range       = d["max_move_range"].GetInt();
@@ -727,6 +735,8 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.no_random_decisions              = d["no_random_decisions"].GetBool();
     sp.use_occ                          = d["use_occ"].GetBool();
     sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
+    sp.do_not_mutate_brains_of_plants   = d["do_not_mutate_brains_of_plants"].GetBool();
+    sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
 }
 
 

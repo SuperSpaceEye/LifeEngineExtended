@@ -463,8 +463,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>606</width>
-                  <height>233</height>
+                  <width>631</width>
+                  <height>219</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -771,8 +771,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>606</width>
-                  <height>270</height>
+                  <width>617</width>
+                  <height>254</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1081,9 +1081,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>606</width>
-                  <height>1620</height>
+                  <y>-1255</y>
+                  <width>617</width>
+                  <height>1582</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1122,7 +1122,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1767,6 +1767,20 @@
                      </widget>
                     </item>
                     <item>
+                     <widget class="QCheckBox" name="cb_do_not_mutate_brain_of_plants">
+                      <property name="text">
+                       <string>Do not mutate brain of plants/simple movers</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_use_weighted_brain">
+                      <property name="text">
+                       <string>Use weighted brain</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
                      <spacer name="verticalSpacer">
                       <property name="orientation">
                        <enum>Qt::Vertical</enum>
@@ -2094,9 +2108,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-529</y>
-                  <width>606</width>
-                  <height>832</height>
+                  <y>0</y>
+                  <width>617</width>
+                  <height>774</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -4457,6 +4471,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_do_not_mutate_brain_of_plants</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_do_not_mutate_brain_of_plants_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>802</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_weighted_brain</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_weighted_brain_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>789</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4580,13 +4626,15 @@
   <slot>cb_use_occ_slot(bool)</slot>
   <slot>cb_recenter_to_imaginary_slot(bool)</slot>
   <slot>le_set_ups_slot()</slot>
+  <slot>cb_do_not_mutate_brain_of_plants_slot(bool)</slot>
+  <slot>cb_use_weighted_brain_slot(bool)</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

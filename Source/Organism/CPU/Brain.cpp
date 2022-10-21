@@ -9,9 +9,11 @@
 #include "Brain.h"
 #include "ObservationStuff.h"
 
-Brain::Brain(Brain & brain): brain_type(brain.brain_type), simple_action_table(copy_parents_table(brain.simple_action_table)) {}
+Brain::Brain(Brain & brain): brain_type(brain.brain_type),
+simple_action_table(SimpleActionTable{brain.simple_action_table}), weighted_action_table(brain.weighted_action_table) {}
 
-Brain::Brain(const Brain &brain): brain_type(brain.brain_type), simple_action_table(copy_parents_table(brain.simple_action_table)) {}
+Brain::Brain(const Brain &brain): brain_type(brain.brain_type),
+simple_action_table(SimpleActionTable{brain.simple_action_table}), weighted_action_table(brain.weighted_action_table) {}
 
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
@@ -21,27 +23,13 @@ void Brain::set_simple_action_table(Brain brain) {
 }
 
 DecisionObservation Brain::get_random_action(lehmer64 &mt) {
-//    return static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 6)(gen));
     return DecisionObservation{static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(mt)), Observation(), 0};
 }
 
 
-SimpleActionTable Brain::copy_parents_table(const SimpleActionTable &parents_simple_action_table) {
-    auto simple_action_table = SimpleActionTable{};
-    simple_action_table.MouthBlock    = parents_simple_action_table.MouthBlock;
-    simple_action_table.ProducerBlock = parents_simple_action_table.ProducerBlock;
-    simple_action_table.MoverBlock    = parents_simple_action_table.MoverBlock;
-    simple_action_table.KillerBlock   = parents_simple_action_table.KillerBlock;
-    simple_action_table.ArmorBlock    = parents_simple_action_table.ArmorBlock;
-    simple_action_table.EyeBlock      = parents_simple_action_table.EyeBlock;
-    simple_action_table.FoodBlock     = parents_simple_action_table.FoodBlock;
-    simple_action_table.WallBlock     = parents_simple_action_table.WallBlock;
-    return simple_action_table;
-}
-
-SimpleActionTable Brain::mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt) {
+SimpleActionTable Brain::mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt) {
     auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
-    auto new_simple_action_table = copy_parents_table(parents_simple_action_table);
+    auto new_simple_action_table = SimpleActionTable{parents_simple_action_table};
 
     auto new_decision = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
 
@@ -59,20 +47,37 @@ SimpleActionTable Brain::mutate_action_table(SimpleActionTable &parents_simple_a
     return new_simple_action_table;
 }
 
-SimpleActionTable Brain::get_random_action_table(lehmer64 &mt) {
-    auto new_simple_action_table = SimpleActionTable{};
-    new_simple_action_table.MouthBlock    = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.ProducerBlock = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.MoverBlock    = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.KillerBlock   = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.ArmorBlock    = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.EyeBlock      = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.FoodBlock     = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    new_simple_action_table.WallBlock     = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
-    return new_simple_action_table;
+WeightedActionTable Brain::mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp) {
+    auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
+    auto new_weighted_action_table = WeightedActionTable{parent_action_table};
+
+    float modif = sp.weighted_brain_mutation_step * (std::uniform_int_distribution<int>(0, 1)(mt) ? 1. : -1.);
+
+    float * value;
+
+    switch (mutate_type){
+        case BlockTypes::MouthBlock:    value = &new_weighted_action_table.MouthBlock    ;break;
+        case BlockTypes::ProducerBlock: value = &new_weighted_action_table.ProducerBlock ;break;
+        case BlockTypes::MoverBlock:    value = &new_weighted_action_table.MoverBlock    ;break;
+        case BlockTypes::KillerBlock:   value = &new_weighted_action_table.KillerBlock   ;break;
+        case BlockTypes::ArmorBlock:    value = &new_weighted_action_table.ArmorBlock    ;break;
+        case BlockTypes::EyeBlock:      value = &new_weighted_action_table.EyeBlock      ;break;
+        case BlockTypes::FoodBlock:     value = &new_weighted_action_table.FoodBlock     ;break;
+        case BlockTypes::WallBlock:     value = &new_weighted_action_table.WallBlock     ;break;
+        default: break;
+    }
+
+    if (modif > 0) {
+        *value = std::min<float>(1.,  *value+modif);
+    } else {
+        *value = std::max<float>(-1., *value+modif);
+    }
+
+    return new_weighted_action_table;
 }
 
-DecisionObservation Brain::get_simple_action(std::vector<Observation> &observations_vector, lehmer64 &mt) {
+
+DecisionObservation Brain::get_simple_action(std::vector<Observation> &observations_vector) {
     auto min_distance = INT32_MAX;
     auto observation_i = -1;
 
@@ -129,14 +134,84 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
     throw "bad";
 }
 
-DecisionObservation Brain::get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt) {
+DecisionObservation Brain::get_weighted_action(std::vector<Observation> &observations_vector, int look_range, float threshold_move) {
+    //up, left, down, right
+    std::array<float, 4> weighted_directions{0, 0, 0, 0};
+
+    for (auto & observation: observations_vector) {
+        if (observation.distance == 0) {continue;}
+
+        auto wd = calculate_weighted_action(observation, look_range);
+        weighted_directions[static_cast<int>(wd.decision)] += wd.weight;
+    }
+
+    float max_weight = 0;
+    int direction = 0;
+
+    for (int i = 0; i < weighted_directions.size(); i++) {
+        if (std::abs(weighted_directions[i]) > std::abs(max_weight)) {
+            max_weight = weighted_directions[i];
+            direction = i;
+        }
+    }
+
+    if (std::abs(max_weight) < threshold_move) {return DecisionObservation{BrainDecision::DoNothing, observations_vector[0], 0};}
+
+    return DecisionObservation{static_cast<BrainDecision>(direction), observations_vector[0], 0};
+}
+
+BrainWeightedDecision Brain::calculate_weighted_action(Observation &observation, int look_range) const{
+    float distance_modifier = (float)std::abs(observation.distance - look_range - 1) / look_range;
+    float weight;
+
+    switch (observation.type) {
+        case BlockTypes::EmptyBlock:    weight = 0; break;
+        case BlockTypes::MouthBlock:    weight = weighted_action_table.MouthBlock; break;
+        case BlockTypes::ProducerBlock: weight = weighted_action_table.ProducerBlock; break;
+        case BlockTypes::MoverBlock:    weight = weighted_action_table.MoverBlock; break;
+        case BlockTypes::KillerBlock:   weight = weighted_action_table.KillerBlock; break;
+        case BlockTypes::ArmorBlock:    weight = weighted_action_table.ArmorBlock; break;
+        case BlockTypes::EyeBlock:      weight = weighted_action_table.EyeBlock; break;
+        case BlockTypes::FoodBlock:     weight = weighted_action_table.FoodBlock; break;
+        case BlockTypes::WallBlock:     weight = weighted_action_table.WallBlock; break;
+    }
+
+    weight *= distance_modifier;
+
+    SimpleDecision action = weight > 0 ? SimpleDecision::GoTowards : SimpleDecision::GoAway;
+    switch (action) {
+        case SimpleDecision::GoAway:
+            switch (observation.eye_rotation)
+            {   //local movement
+                case Rotation::UP:    return BrainWeightedDecision{BrainDecision::MoveDown, weight};
+                case Rotation::LEFT:  return BrainWeightedDecision{BrainDecision::MoveRight, weight};
+                case Rotation::DOWN:  return BrainWeightedDecision{BrainDecision::MoveUp, weight};
+                case Rotation::RIGHT: return BrainWeightedDecision{BrainDecision::MoveLeft, weight};
+            }
+        case SimpleDecision::GoTowards:
+            switch (observation.eye_rotation) {
+                case Rotation::UP:    return BrainWeightedDecision{BrainDecision::MoveUp, weight};
+                case Rotation::LEFT:  return BrainWeightedDecision{BrainDecision::MoveLeft, weight};
+                case Rotation::DOWN:  return BrainWeightedDecision{BrainDecision::MoveDown, weight};
+                case Rotation::RIGHT: return BrainWeightedDecision{BrainDecision::MoveRight, weight};
+            }
+    }
+}
+
+
+DecisionObservation
+Brain::get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,
+                    int look_range, float threshold_move) {
     DecisionObservation action;
     switch (brain_type) {
         case BrainTypes::RandomActions:
             action = get_random_action(mt);
             break;
         case BrainTypes::SimpleBrain:
-            action = get_simple_action(observation_vector, mt);
+            action = get_simple_action(observation_vector);
+            break;
+        case BrainTypes::WeightedBrain:
+            action = get_weighted_action(observation_vector, look_range, threshold_move);
             break;
         case BrainTypes::BehaviourTreeBrain:
             break;
@@ -153,8 +228,42 @@ DecisionObservation Brain::get_decision(std::vector<Observation> &observation_ve
     return action;
 }
 
-Brain Brain::mutate(lehmer64 &mt) {
+Brain Brain::mutate(lehmer64 &mt, SimulationParameters sp) {
     auto new_brain = Brain(brain_type);
-    new_brain.simple_action_table = mutate_action_table(simple_action_table, mt);
+    switch (brain_type) {
+        case BrainTypes::SimpleBrain:
+            new_brain.simple_action_table = mutate_simple_action_table(simple_action_table, mt);
+            break;
+        case BrainTypes::WeightedBrain:
+            new_brain.weighted_action_table = mutate_weighted_action_table(weighted_action_table, mt, sp);
+            break;
+    }
     return new_brain;
+}
+
+//TODO
+void Brain::convert_simple_to_weighted() {
+    auto * simple_decision = (SimpleDecision*)&simple_action_table;
+    auto * weight = (float*)&weighted_action_table;
+
+    for (int i = 0; i < 8; i++) {
+        switch (*(simple_decision+i)) {
+            case SimpleDecision::DoNothing: *(weight+i) = 0; break;
+            case SimpleDecision::GoAway:    *(weight+i) = -1; break;
+            case SimpleDecision::GoTowards: *(weight+i) = 1; break;
+        }
+    }
+}
+
+void Brain::convert_weighted_to_simple(float threshold_move) {
+    auto * simple_decision = (SimpleDecision*)&simple_action_table;
+    auto * weight = (float*)&weighted_action_table;
+
+    for (int i = 0; i < 8; i++) {
+        float tw = *(weight+i);
+
+        if (std::abs(tw) < threshold_move) {*(simple_decision+i) = SimpleDecision::DoNothing;}
+        else if (tw > 0) {*(simple_decision+i) = SimpleDecision::GoTowards;}
+        else {*(simple_decision+i) = SimpleDecision::GoAway;}
+    }
 }

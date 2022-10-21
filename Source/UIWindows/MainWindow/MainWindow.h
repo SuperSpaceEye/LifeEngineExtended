@@ -91,7 +91,10 @@ private:
 
     TexturesContainer textures{};
 
-    std::vector<unsigned char> image_vector;
+    std::array<std::vector<unsigned char>, 2> image_vectors{std::vector<unsigned char>{}, std::vector<unsigned char>{}};
+    volatile int ready_buffer = 0;
+    volatile bool have_read_buffer = false;
+
     QGraphicsScene scene;
     QGraphicsPixmapItem pixmap_item;
 
@@ -393,6 +396,8 @@ private slots:
     void cb_no_random_decisions_slot(bool state);
     void cb_use_occ_slot(bool state);
     void cb_recenter_to_imaginary_slot(bool state);
+    void cb_do_not_mutate_brain_of_plants_slot(bool state);
+    void cb_use_weighted_brain_slot(bool state);
     //Other
     void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);

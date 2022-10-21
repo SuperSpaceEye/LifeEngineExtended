@@ -18,6 +18,7 @@
 #include "../../Stuff/BlockTypes.hpp"
 #include "Rotation.h"
 #include "ObservationStuff.h"
+#include "../../Containers/CPU/SimulationParameters.h"
 
 enum class BrainDecision {
     //Movement and rotation from organism viewpoint.
@@ -41,6 +42,7 @@ enum class BrainTypes {
     // chooses the closest observation to an editor_organism, and acts upon it. If do nothing, then returns random action.
     // If no meaningful action, then returns random action.
     SimpleBrain,
+    WeightedBrain,
     //TODO will try to implement in the future
     //https://gamedev.stackexchange.com/questions/51693/difference-between-decision-trees-behavior-trees-for-game-ai
     //https://www.behaviortree.dev/
@@ -62,6 +64,7 @@ struct DecisionObservation {
     int time = 0;
 };
 
+//TODO remember convert
 struct SimpleActionTable {
     SimpleDecision MouthBlock    = SimpleDecision::DoNothing;
     SimpleDecision ProducerBlock = SimpleDecision::DoNothing;
@@ -73,13 +76,35 @@ struct SimpleActionTable {
     SimpleDecision WallBlock     = SimpleDecision::DoNothing;
 };
 
+// "-1" - go away, "1" - go towards, "0" - neutral
+struct WeightedActionTable {
+    float MouthBlock    = 0;
+    float ProducerBlock = 0;
+    float MoverBlock    = 0;
+    float KillerBlock   = -1;
+    float ArmorBlock    = 0;
+    float EyeBlock      = 0;
+    float FoodBlock     = 1;
+    float WallBlock     = 0;
+};
+
+struct BrainWeightedDecision {
+    BrainDecision decision = BrainDecision::MoveUp;
+    float weight = 0;
+};
+
 class Brain {
 private:
-    static SimpleActionTable copy_parents_table(const SimpleActionTable & parents_simple_action_table);
-    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
-    static SimpleActionTable get_random_action_table(lehmer64 &mt);
-    DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, lehmer64 &mt);
+    static SimpleActionTable mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
+    static WeightedActionTable
+    mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);
+
+    DecisionObservation get_simple_action(std::vector<Observation> &observations_vector);
+    DecisionObservation get_weighted_action(std::vector<Observation> &observations_vector, int look_range,
+                                      float threshold_move);
+
     BrainDecision calculate_simple_action(Observation &observation) const;
+    BrainWeightedDecision calculate_weighted_action(Observation &observation, int look_range) const;
 public:
     Brain()=default;
     Brain(Brain & brain);
@@ -89,13 +114,19 @@ public:
     Brain & operator=(const Brain & brain)=default;
 
     SimpleActionTable simple_action_table;
+    WeightedActionTable weighted_action_table;
 
     BrainTypes brain_type;
 
     static DecisionObservation get_random_action(lehmer64 &mt);
-    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt);
+    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,
+                                     int look_range, float threshold_move);
 
-    Brain mutate(lehmer64 &mt);
+    void convert_simple_to_weighted();
+    void convert_weighted_to_simple(float threshold_move);
+
+
+    Brain mutate(lehmer64 &mt, SimulationParameters sp);
 
     void set_simple_action_table(Brain brain);
 };

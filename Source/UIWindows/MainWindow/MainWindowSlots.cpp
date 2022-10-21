@@ -782,6 +782,12 @@ void MainWindow::cb_recenter_to_imaginary_slot(bool state) {
     engine.unpause();
 }
 
+void MainWindow::cb_use_weighted_brain_slot(bool state) {
+    sp.use_weighted_brain = state;
+    engine.reinit_organisms();
+    ee.update_brain_edit_visibility(state);
+}
+
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void MainWindow::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -833,6 +839,8 @@ void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
 void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_random_decisions = state;}
+
+void MainWindow::cb_do_not_mutate_brain_of_plants_slot   (bool state) { sp.do_not_mutate_brains_of_plants = state;}
 
 void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 
