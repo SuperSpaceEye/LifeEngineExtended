@@ -38,8 +38,8 @@ set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/SimulationEngineC
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
 
 if(NOT WIN_COMPILATION)
-    set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.7/bin/nvcc")
-    set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.7/bin")
+    set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.8/bin/nvcc")
+    set(CMAKE_NVCC_EXECUTABLE "/usr/local/cuda-11.8/bin")
 endif()
 
 if (NOT WIN_COMPILATION)

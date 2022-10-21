@@ -96,7 +96,10 @@ private:
 
     TexturesContainer textures{};
 
-    std::vector<unsigned char> image_vector;
+    std::array<std::vector<unsigned char>, 2> image_vectors{std::vector<unsigned char>{}, std::vector<unsigned char>{}};
+    volatile int ready_buffer = 0;
+    volatile bool have_read_buffer = false;
+
     QGraphicsScene scene;
     QGraphicsPixmapItem pixmap_item;
 

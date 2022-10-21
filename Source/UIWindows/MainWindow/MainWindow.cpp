@@ -205,13 +205,16 @@ void MainWindow::ui_tick() {
 
     if (do_not_parse_image_data_ct) { return;}
     do_not_parse_image_data_mt.store(true);
-    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vector.data(), image_width, image_height, QImage::Format_RGB32)));
+    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vectors[ready_buffer].data(), image_width, image_height, QImage::Format_RGB32)));
+    have_read_buffer = true;
     do_not_parse_image_data_mt.store(false);
 }
 
 void MainWindow::resize_image() {
-    image_vector.clear();
-    image_vector.reserve(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
+    image_vectors[0].clear();
+    image_vectors[1].clear();
+    image_vectors[0].reserve(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
+    image_vectors[1].reserve(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
 }
 
 void MainWindow::move_center(int delta_x, int delta_y) {
@@ -253,7 +256,7 @@ void MainWindow::reset_scale_view() {
 
 
 void MainWindow::create_image() {
-    while (!do_not_parse_image_data_mt.load(std::memory_order_acquire)) {}
+    while (do_not_parse_image_data_mt) {}
     do_not_parse_image_data_ct.store(true);
 
     std::vector<int> lin_width;
@@ -265,6 +268,8 @@ void MainWindow::create_image() {
 
     parse_simulation_grid_stage(truncated_lin_width, truncated_lin_height);
 
+    int new_buffer = !bool(ready_buffer);
+
     if (!use_cuda) {
         ImageCreation::ImageCreationTools::complex_image_creation(lin_width,
                                                                   lin_height,
@@ -273,7 +278,7 @@ void MainWindow::create_image() {
                                                                   cc,
                                                                   textures,
                                                                   ui.simulation_graphicsView->width(),
-                                                                  image_vector,
+                                                                  image_vectors[new_buffer],
                                                                   edc.simple_state_grid);
     } else {
 #if __CUDA_USED__
@@ -281,11 +286,12 @@ void MainWindow::create_image() {
                                        image_height,
                                        lin_width,
                                        lin_height,
-                                       image_vector,
+                                       image_vectors[new_buffer],
                                        cc,
                                        edc, 32, truncated_lin_width, truncated_lin_height);
 #endif
     }
+    ready_buffer = new_buffer;
     do_not_parse_image_data_ct.store(false);
 }
 
@@ -326,6 +332,7 @@ void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_he
 void MainWindow::set_image_creator_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
         image_creation_interval = 0.;
+        timer->setInterval(1000./max_ups);
         return;
     }
     image_creation_interval = 1. / max_window_fps;
@@ -966,7 +973,13 @@ void MainWindow::create_image_creation_thread() {
         auto point2 = std::chrono::high_resolution_clock::now();
         while (true) {
             point1 = std::chrono::high_resolution_clock::now();
-            if (!pause_grid_parsing || !really_stop_render) { create_image(); image_frames++;}
+            if (!pause_grid_parsing || !really_stop_render) {
+                if (have_read_buffer) {
+                    have_read_buffer = false;
+                    create_image();
+                    image_frames++;
+                }
+            }
             point2 = std::chrono::high_resolution_clock::now();
             std::this_thread::sleep_for(std::chrono::microseconds(
                     std::max<long>(
