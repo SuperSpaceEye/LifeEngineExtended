@@ -8,18 +8,6 @@ void ImageCreation::calculate_linspace(std::vector<int> &lin_width, std::vector<
                                        int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width  = linspace<int>(start_x, end_x, image_width);
     lin_height = linspace<int>(start_y, end_y, image_height);
-
-    //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
-    // n pixels
-    int max_x = lin_width[lin_width.size()-1];
-    int max_y = lin_height[lin_height.size()-1];
-    int del_x = 0;
-    int del_y = 0;
-    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
-    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
-
-    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
-    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
 }
 
 void ImageCreation::calculate_truncated_linspace(int image_width, int image_height, const std::vector<int> &lin_width,

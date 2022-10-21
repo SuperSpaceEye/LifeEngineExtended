@@ -136,7 +136,7 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
 
 DecisionObservation Brain::get_weighted_action(std::vector<Observation> &observations_vector, int look_range, float threshold_move) {
     //up, left, down, right
-    std::array<float, 4> weighted_directions{0, 0, 0, 0};
+    std::vector<float> weighted_directions{0, 0, 0, 0};
 
     for (auto & observation: observations_vector) {
         if (observation.distance == 0) {continue;}
@@ -149,19 +149,19 @@ DecisionObservation Brain::get_weighted_action(std::vector<Observation> &observa
     int direction = 0;
 
     for (int i = 0; i < weighted_directions.size(); i++) {
-        if (std::abs(weighted_directions[i]) > std::abs(max_weight)) {
+        if (abs(weighted_directions[i]) > abs(max_weight)) {
             max_weight = weighted_directions[i];
             direction = i;
         }
     }
 
-    if (std::abs(max_weight) < threshold_move) {return DecisionObservation{BrainDecision::DoNothing, observations_vector[0], 0};}
+    if (abs(max_weight) < threshold_move) {return DecisionObservation{BrainDecision::DoNothing, observations_vector[0], 0};}
 
     return DecisionObservation{static_cast<BrainDecision>(direction), observations_vector[0], 0};
 }
 
 BrainWeightedDecision Brain::calculate_weighted_action(Observation &observation, int look_range) const{
-    float distance_modifier = (float)std::abs(observation.distance - look_range - 1) / look_range;
+    float distance_modifier = (float)abs(observation.distance - look_range - 1) / look_range;
     float weight;
 
     switch (observation.type) {
@@ -262,7 +262,7 @@ void Brain::convert_weighted_to_simple(float threshold_move) {
     for (int i = 0; i < 8; i++) {
         float tw = *(weight+i);
 
-        if (std::abs(tw) < threshold_move) {*(simple_decision+i) = SimpleDecision::DoNothing;}
+        if (abs(tw) < threshold_move) {*(simple_decision+i) = SimpleDecision::DoNothing;}
         else if (tw > 0) {*(simple_decision+i) = SimpleDecision::GoTowards;}
         else {*(simple_decision+i) = SimpleDecision::GoAway;}
     }
