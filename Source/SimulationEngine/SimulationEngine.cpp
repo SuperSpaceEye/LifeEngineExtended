@@ -41,7 +41,6 @@ void SimulationEngine::threaded_mainloop() {
             ecp.engine_paused = false;
             ecp.engine_pass_tick = false;
             ecp.pass_tick = false;
-            ecp.synchronise_simulation_tick = false;
 //            if (ecp.record_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (edc.record_data) {
@@ -335,9 +334,7 @@ void SimulationEngine::reset_world() {
 
     if (ecp.execute_world_events) { stop_world_events(true); start_world_events();}
 
-    //Just in case
     ecp.engine_pass_tick = true;
-    ecp.synchronise_simulation_tick = true;
 }
 
 void SimulationEngine::partial_clear_world() {
@@ -454,9 +451,7 @@ void SimulationEngine::pause() {
 void SimulationEngine::unpause() {
     if (do_not_unpause) { return;}
     std::atomic_thread_fence(std::memory_order_seq_cst);
-    if (!ecp.synchronise_simulation_and_window) {
-        ecp.engine_pause = false;
-    }
+    ecp.engine_pause = false;
 }
 
 void SimulationEngine::parse_full_simulation_grid() {

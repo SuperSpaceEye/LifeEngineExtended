@@ -160,31 +160,6 @@ void MainWindow::update_table_values() {
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
-#include <csetjmp>
-#include <csignal>
-
-jmp_buf env;
-
-void on_sigabrt (int signum)
-{
-    signal (signum, SIG_DFL);
-    longjmp (env, 1);
-}
-
-template <typename ...A>
-bool try_and_catch_abort(std::function<void(A...)> f, A... args)
-{
-    if (setjmp (env) == 0) {
-        signal(SIGABRT, &on_sigabrt);
-        f(args...);
-        signal (SIGABRT, SIG_DFL);
-        return false;
-    }
-    else {
-        return true;
-    }
-}
-
 void MainWindow::read_json_data(const std::string &path) {
     std::string json;
     auto ss = std::ostringstream();
@@ -219,7 +194,7 @@ void MainWindow::read_json_data(const std::string &path) {
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
         return;
     }
-    json_resize_and_make_walls(document);
+    json_resize_and_make_walls();
     std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, EngineDataContainer*)> func2 = &json_read_ticks_food_walls;
     if (try_and_catch_abort(func2, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &edc)) {
         display_message("Failed to read positions of walls or food.");
@@ -250,7 +225,7 @@ void MainWindow::json_read_sim_width_height(Document * d_, int32_t * new_width, 
     *new_width  = d["grid"]["cols"].GetInt() + 2;
 }
 
-void MainWindow::json_resize_and_make_walls(Document &d) {
+void MainWindow::json_resize_and_make_walls() {
     new_simulation_width = edc.simulation_width;
     new_simulation_height = edc.simulation_height;
 

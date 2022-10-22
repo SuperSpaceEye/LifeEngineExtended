@@ -39,9 +39,6 @@ void Recorder::le_video_fps_slot() {
 void Recorder::b_create_image_slot() {
     engine->pause();
 
-    bool flag = ecp->synchronise_simulation_and_window;
-    ecp->synchronise_simulation_and_window = false;
-
     QString selected_filter;
     QFileDialog file_dialog{};
 
@@ -55,7 +52,6 @@ void Recorder::b_create_image_slot() {
     if (selected_filter.toStdString() == "PNG (*.png)") {
         filetype = ".png";
     } else {
-        ecp->synchronise_simulation_and_window = flag;
         engine->unpause();
         return;
     }
@@ -80,7 +76,6 @@ void Recorder::b_create_image_slot() {
 
     image.save(QString::fromStdString(full_path), "PNG");
 
-    ecp->synchronise_simulation_and_window = flag;
     engine->unpause();
 }
 

@@ -14,6 +14,8 @@
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
+#include <csetjmp>
+#include <csignal>
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -157,5 +159,22 @@ std::string convert_seconds(uint64_t num_seconds);
 bool choose_node_window(NodeType &new_node_type);
 
 bool cuda_is_available();
+
+void on_sigabrt(int signum);
+
+template <typename ...A>
+bool try_and_catch_abort(std::function<void(A...)> f, A... args)
+{
+    extern jmp_buf env;
+    if (setjmp (env) == 0) {
+        signal(SIGABRT, &on_sigabrt);
+        f(args...);
+        signal (SIGABRT, SIG_DFL);
+        return false;
+    }
+    else {
+        return true;
+    }
+}
 
 #endif //THELIFEENGINECPP_MISCFUNCS_H

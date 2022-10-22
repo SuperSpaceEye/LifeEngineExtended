@@ -115,3 +115,10 @@ bool cuda_is_available() {
     return false;
 #endif
 }
+
+jmp_buf env;
+
+void on_sigabrt(int signum) {
+    signal (signum, SIG_DFL);
+    longjmp (env, 1);
+}

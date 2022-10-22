@@ -750,7 +750,6 @@ void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, Da
     d.AddMember("update_info_every_n_milliseconds", Value(state.update_info_every_n_milliseconds), d.GetAllocator());
 
     d.AddMember("use_cuda",                          Value(state.use_cuda), d.GetAllocator());
-    d.AddMember("wait_for_engine_to_stop_to_render", Value(state.wait_for_engine_to_stop_to_render), d.GetAllocator());
     d.AddMember("disable_warnings",                  Value(state.disable_warnings), d.GetAllocator());
     d.AddMember("really_stop_render",                Value(state.really_stop_render), d.GetAllocator());
     d.AddMember("save_simulation_settings",          Value(state.save_simulation_settings), d.GetAllocator());
@@ -767,7 +766,6 @@ void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, Dat
     state.brush_size                       = d["brush_size"].GetInt();
     state.update_info_every_n_milliseconds = d["update_info_every_n_milliseconds"].GetInt();
 
-    state.wait_for_engine_to_stop_to_render = d["wait_for_engine_to_stop_to_render"].GetBool();
     state.disable_warnings                  = d["disable_warnings"].GetBool();
     state.really_stop_render                = d["really_stop_render"].GetBool();
     state.save_simulation_settings          = d["save_simulation_settings"].GetBool();
@@ -801,11 +799,26 @@ void DataSavingFunctions::write_json_state(const std::string &path, ProgramState
     file.close();
 }
 
-bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+void DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
                                           OCCParameters &occp) {
+
+    std::function<void(const std::string *, ProgramState, SimulationParameters *, OCCParameters *)> func = &read_json_state_private;
+
+    //if during loading function crashes (incompatible settings), then overwrite them with current version of setting.
+    if (try_and_catch_abort(func, &path, state, &sp, &occp)) {
+        write_json_state(path, state, sp, occp);
+    }
+}
+
+void DataSavingFunctions::read_json_state_private(const std::string *path_, ProgramState state,
+                                                  SimulationParameters *sp_, OCCParameters *occp_) {
+    auto & path = *path_;
+    auto & sp = *sp_;
+    auto & occp = *occp_;
+
     if (!std::filesystem::exists(path)) {
         write_json_state(path, state, sp, occp);
-        return false;
+        return;
     }
 
     std::string json;
@@ -813,7 +826,7 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     std::ifstream file;
     file.open(path);
     if (!file.is_open()) {
-        return false;
+        return;
     }
 
     ss << file.rdbuf();
@@ -825,7 +838,7 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     d.Parse(json.c_str());
 
     if (!read_json_version(d)) {
-        return false;
+        return;
     }
 
     read_json_program_settings(d, state);
@@ -833,8 +846,6 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
         read_json_extended_simulation_parameters(d, sp);
         read_json_occp(d, occp);
     }
-
-    return true;
 }
 
 void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {

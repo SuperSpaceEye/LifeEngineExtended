@@ -8,18 +8,6 @@ void ImageCreation::calculate_linspace(std::vector<int> &lin_width, std::vector<
                                        int end_x, int start_y, int end_y, int image_width, int image_height) {
     lin_width  = linspace<int>(start_x, end_x, image_width);
     lin_height = linspace<int>(start_y, end_y, image_height);
-
-    //when zoomed, boundaries of simulation grid are more than could be displayed by 1, so we need to delete the last
-    // n pixels
-    int max_x = lin_width[lin_width.size()-1];
-    int max_y = lin_height[lin_height.size()-1];
-    int del_x = 0;
-    int del_y = 0;
-    for (int x = lin_width.size() -1; lin_width[x]  == max_x; x--) {del_x++;}
-    for (int y = lin_height.size()-1; lin_height[y] == max_y; y--) {del_y++;}
-
-    for (int i = 0; i < del_x; i++) {lin_width.pop_back();}
-    for (int i = 0; i < del_y; i++) {lin_height.pop_back();}
 }
 
 void ImageCreation::calculate_truncated_linspace(int image_width, int image_height, const std::vector<int> &lin_width,
@@ -32,6 +20,32 @@ void ImageCreation::calculate_truncated_linspace(int image_width, int image_heig
     min_val = INT32_MIN;
     for (int y = 0; y < image_height; y++) {if (lin_height[y] > min_val) {min_val = lin_height[y]; truncated_lin_height.push_back(min_val);}}
     truncated_lin_height.pop_back();
+}
+
+void ImageCreation::create_image(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
+                                 uint32_t simulation_width, uint32_t simulation_height, const ColorContainer &cc,
+                                 const TexturesContainer &textures, int image_width, int image_height,
+                                 std::vector<unsigned char> &image_vector,
+                                 const std::vector<BaseGridBlock> &second_grid, bool use_cuda, bool cuda_is_available,
+                                 void *cuda_creator_ptr, const std::vector<int> &truncated_lin_width,
+                                 const std::vector<int> &truncated_lin_height) {
+    if (!use_cuda || !cuda_is_available) {
+        ImageCreation::ImageCreationTools::complex_image_creation(lin_width, lin_height, simulation_width,
+                                                                  simulation_height, cc, textures, image_width,
+                                                                  image_vector, second_grid);
+    } else {
+#if __CUDA_USED__
+        std::vector<Differences> differences{};
+        reinterpret_cast<CUDAImageCreator *>(cuda_creator_ptr)->compile_differences(truncated_lin_width, truncated_lin_height,
+                                                                                    differences, simulation_width,
+                                                                                    simulation_height, second_grid);
+
+        reinterpret_cast<CUDAImageCreator *>(cuda_creator_ptr)->cuda_create_image(image_width, image_height,
+                                                                                  lin_width, lin_height, image_vector,
+                                                                                  cc, 32, simulation_width, simulation_height,
+                                                                                  differences);
+#endif
+    }
 }
 
 const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation,

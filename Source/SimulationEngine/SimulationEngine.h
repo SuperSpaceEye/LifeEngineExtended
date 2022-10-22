@@ -26,7 +26,6 @@
 #include "../Containers/CPU/EngineControlParametersContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Containers/CPU/RecordingContainer.h"
 #include "../Stuff/Linspace.h"
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"

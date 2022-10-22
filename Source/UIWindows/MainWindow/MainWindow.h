@@ -52,7 +52,6 @@
 #include "../../Stuff/MiscFuncs.h"
 #include "../../Stuff/CursorMode.h"
 #include "../../Stuff/Vector2.h"
-#include "../../Containers/CPU/RecordingContainer.h"
 #include "../../Stuff/ImageCreation.h"
 #include "../../Stuff/DataSavingFunctions.h"
 #include "../../Containers/CPU/OrganismInfoContainer.h"
@@ -119,7 +118,8 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine engine{edc, ecp, bp, sp, occp};
-    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp};
+    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp,
+                      &cuda_is_available_var, &use_cuda};
     StatisticsCore st{&ui};
     InfoWindow iw{&ui};
     #ifndef __NO_RECORDER__
@@ -146,7 +146,6 @@ private:
     bool change_editing_grid = false;
     bool use_cuda = false;
     bool synchronise_info_update_with_window_update = false;
-    bool wait_for_engine_to_stop_to_render = false;
     bool resize_simulation_grid_flag = false;
     bool menu_hidden = false;
     //is needed to prevent multiple switches when pressing button
@@ -162,6 +161,7 @@ private:
     bool save_simulation_settings = true;
     bool uses_point_size = false;
     bool update_last_cursor_pos = true;
+    bool cuda_is_available_var = false;
 
     std::atomic<bool> do_not_parse_image_data_ct = false;
     std::atomic<bool> do_not_parse_image_data_mt = false;
@@ -203,7 +203,7 @@ private:
     void create_image_creation_thread();
 
     void read_json_data(const std::string &path);
-    void json_resize_and_make_walls(rapidjson::Document & d);
+    void json_resize_and_make_walls();
     static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
     static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
 
@@ -236,8 +236,6 @@ private:
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void create_image();
-
-    bool wait_for_engine_to_pause();
 
     // parses actual simulation grid to grid from which image is created
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
@@ -404,14 +402,12 @@ private slots:
     void cb_do_not_mutate_brain_of_plants_slot(bool state);
     void cb_use_weighted_brain_slot(bool state);
     //Other
-    void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
-    void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_really_stop_render_slot(bool state);

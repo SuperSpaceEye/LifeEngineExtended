@@ -11,7 +11,7 @@
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
                                Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
-                               OCCParameters *occp)
+                               OCCParameters *occp, bool *cuda_is_available, bool *use_cuda)
         : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
                                 chosen_organism(chosen_organism), textures(textures) {
@@ -32,6 +32,9 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     auto occ = OrganismConstructionCode();
     occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
 
+    this->cuda_is_available = cuda_is_available;
+    this->use_cuda = use_cuda;
+
     editor_organism = new Organism(editor_width / 2,
                                    editor_height / 2,
                                    Rotation::UP,
@@ -43,7 +46,6 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     resize_editing_grid(width, height);
     resize_image();
-    create_image();
 
     initialize_gui();
     reset_scale_view();
@@ -230,7 +232,7 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
     editor_width = width;
     editor_height = height;
     edit_grid.clear();
-    edit_grid.resize(width, std::vector<EditBlock>(height, EditBlock{}));
+    edit_grid.resize(width * height, BaseGridBlock{});
 
     editor_organism->x = editor_width / 2;
     editor_organism->y = editor_height / 2;
@@ -263,6 +265,7 @@ void OrganismEditor::create_image() {
     update_cell_count_label();
 
     resize_image();
+
     auto image_width = ui.editor_graphicsView->viewport()->width();
     auto image_height = ui.editor_graphicsView->viewport()->height();
 
@@ -278,75 +281,29 @@ void OrganismEditor::create_image() {
 
     std::vector<int> lin_width;
     std::vector<int> lin_height;
+    std::vector<int> truncated_lin_width;
+    std::vector<int> truncated_lin_height;
 
     ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
 
-    complex_for_loop(lin_width, lin_height);
+    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+
+#ifdef __CUDA_USED__
+    void * cuda_i_creator = &cuda_image_creator;
+#else
+    void * cuda_i_creator = nullptr;
+#endif
+
+    ImageCreation::create_image(lin_width, lin_height, editor_width, editor_height, *color_container, textures,
+                                image_width, image_height, edit_image, edit_grid, *use_cuda, *cuda_is_available,
+                                cuda_i_creator, truncated_lin_width, truncated_lin_height);
 
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(edit_image.data(), image_width, image_height, QImage::Format_RGB32)));
 }
 
-void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {
-    //x - start, y - stop
-    std::vector<Vector2<int>> width_img_boundaries;
-    std::vector<Vector2<int>> height_img_boundaries;
-
-    auto last = INT32_MIN;
-    auto count = 0;
-    for (int x = 0; x < lin_width.size(); x++) {
-        if (last < lin_width[x]) {
-            width_img_boundaries.emplace_back(count, x);
-            last = lin_width[x];
-            count = x;
-        }
-    }
-    width_img_boundaries.emplace_back(count, lin_width.size());
-
-    last = INT32_MIN;
-    count = 0;
-    for (int x = 0; x < lin_height.size(); x++) {
-        if (last < lin_height[x]) {
-            height_img_boundaries.emplace_back(count, x);
-            last = lin_height[x];
-            count = x;
-        }
-    }
-    height_img_boundaries.emplace_back(count, lin_height.size());
-
-    color pixel_color;
-    //width of boundaries of an organisms
-
-    //width bound, height bound
-    for (auto &w_b: width_img_boundaries) {
-        for (auto &h_b: height_img_boundaries) {
-            for (int x = w_b.x; x < w_b.y; x++) {
-                for (int y = h_b.x; y < h_b.y; y++) {
-                    if (lin_width[x] < 0 ||
-                        lin_width[x] >= editor_width ||
-                        lin_height[y] < 0 ||
-                        lin_height[y] >= editor_height) {
-                        pixel_color = color_container->simulation_background_color;
-                    } else {
-                        auto &block = edit_grid[lin_width[x]][lin_height[y]];
-
-                        pixel_color = ImageCreation::ImageCreationTools::get_texture_color(block.type,
-                                                                                           block.rotation,
-                                                                                           float(x - w_b.x) / (w_b.y - w_b.x),
-                                                                                           float(y - h_b.x) / (h_b.y - h_b.x),
-                                                                                           textures);
-                    }
-                    ImageCreation::ImageCreationTools::set_image_pixel(x, y, ui.editor_graphicsView->viewport()->width(), pixel_color, edit_image);
-                }
-            }
-        }
-    }
-}
-
 void OrganismEditor::clear_grid() {
-    for (auto & row: edit_grid) {
-        for (auto & block: row) {
-            block.type = BlockTypes::EmptyBlock;
-        }
+    for (auto & block: edit_grid) {
+        block.type = BlockTypes::EmptyBlock;
     }
 }
 
@@ -357,8 +314,8 @@ void OrganismEditor::place_organism_on_a_grid() {
     for (auto & block: editor_organism->anatomy._organism_blocks) {
         auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
         auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
-        edit_grid[x][y].type = block.type;
-        edit_grid[x][y].rotation = block.rotation;
+        edit_grid[x + y * editor_width].type = block.type;
+        edit_grid[x + y * editor_width].rotation = block.rotation;
     }
     finalize_chosen_organism();
 }

@@ -26,7 +26,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 __constant__ ColorContainer const_color_container;
 
-void CUDAImageCreator::load_symbols(ColorContainer * colorContainer) {
+void CUDAImageCreator::load_symbols(const ColorContainer *colorContainer) {
     gpuErrchk(cudaMemcpyToSymbol(const_color_container, colorContainer, sizeof(ColorContainer)));
 }
 
@@ -140,29 +140,41 @@ update_differences(int simulation_width, int diff_len, Differences *diffs, BaseG
     d_second_simulation_grid[diff.x + diff.y * simulation_width].rotation = diff.rotation;
 }
 
+//TODO
 void
-CUDAImageCreator::compile_differences(std::vector<int> &truncated_lin_width, std::vector<int> &truncated_lin_height,
-                                      std::vector<Differences> &host_differences, EngineDataContainer *dc) {
+CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_width, const std::vector<int> &truncated_lin_height,
+                                      std::vector<Differences> &host_differences, int simulation_width,
+                                      int simulation_height, const std::vector<BaseGridBlock> &simple_state_grid) {
     host_differences.reserve(truncated_lin_width.size() * truncated_lin_height.size());
+    if (device_state_grid.size() != truncated_lin_width.size() * truncated_lin_height.size()) {
+        device_state_grid.resize(truncated_lin_width.size() * truncated_lin_height.size());
+    }
 
     for (auto x: truncated_lin_width) {
-        if (x < 0 || x >= dc->simulation_width) { continue;}
+        if (x < 0 || x >= simulation_width) { continue;}
         for (auto y: truncated_lin_height) {
-            if (y < 0 || y >= dc->simulation_height) { continue;}
-            host_differences.emplace_back(Differences{static_cast<uint32_t>(x),
-                                                      static_cast<uint32_t>(y),
-                                                      dc->simple_state_grid[x + y * dc->simulation_width].type,
-                                                      dc->simple_state_grid[x + y * dc->simulation_width].rotation,
-            });
+            if (y < 0 || y >= simulation_height) { continue;}
+            auto & hb = simple_state_grid[x + y * simulation_width];
+            auto & db = device_state_grid[x + y * simulation_width];
+
+            if (hb.type != db.type || hb.rotation != db.rotation) {
+                db.type = hb.type;
+                db.rotation = hb.rotation;
+
+                host_differences.emplace_back(Differences{static_cast<uint32_t>(x),
+                                                          static_cast<uint32_t>(y),
+                                                          simple_state_grid[x + y * simulation_width].type,
+                                                          simple_state_grid[x + y * simulation_width].rotation,
+                });
+            }
         }
     }
 }
 
-void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std::vector<int> &lin_width,
-                                         std::vector<int> &lin_height,
-                                         std::vector<unsigned char> &image_vector, ColorContainer &color_container,
-                                         EngineDataContainer &dc, int block_size, std::vector<int> &truncated_lin_width,
-                                         std::vector<int> &truncated_lin_height) {
+void CUDAImageCreator::cuda_create_image(int image_width, int image_height, const std::vector<int> &lin_width,
+                                         const std::vector<int> &lin_height, std::vector<unsigned char> &image_vector,
+                                         const ColorContainer &color_container, int block_size, int simulation_width,
+                                         int simulation_height, std::vector<Differences> &differences) {
     std::vector<Vector2<int>> width_img_boundaries;
     std::vector<Vector2<int>> height_img_boundaries;
 
@@ -188,19 +200,15 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
     }
     height_img_boundaries.emplace_back(count, lin_height.size());
 
-    std::vector<Differences> differences{};
-
-    compile_differences(truncated_lin_width, truncated_lin_height, differences, &dc);
-
     check_if_changed(image_width, image_height,
-                     dc.simulation_width, dc.simulation_height,
+                     simulation_width, simulation_height,
                      width_img_boundaries.size(), height_img_boundaries.size(),
                      lin_width.size(), lin_height.size(), differences.size());
 
-    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, truncated_lin_width, truncated_lin_height, differences);
+    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, differences);
 
     update_differences<<<(differences.size() + block_size - 1) / block_size, block_size>>>(
-            dc.simulation_width, differences.size(),
+            simulation_width, differences.size(),
             d_differences,
             d_second_simulation_grid);
 
@@ -214,13 +222,14 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, std:
 //    dim3 block(block_size, block_size);
 
     create_image_kernel<<<grid, block_size>>>(image_width,
-                                              dc.simulation_width, dc.simulation_height,
+                                              simulation_width, simulation_height,
                                               width_img_boundaries.size(), height_img_boundaries.size(),
                                               d_lin_width, d_lin_height,
                                               d_width_img_boundaries, d_height_img_boundaries,
                                               d_image_vector, d_second_simulation_grid, d_textures);
 
-    gpuErrchk( cudaDeviceSynchronize() );
+    gpuErrchk( cudaDeviceSynchronize() )
+//    cudaDeviceSynchronize();
 
     copy_result_image(image_vector, image_width, image_height);
 }
@@ -234,6 +243,8 @@ void CUDAImageCreator::free() {
     cudaFree(d_lin_height);
     cudaFree(d_differences);
     free_textures();
+
+    device_state_grid = std::vector<BaseGridBlock>();
 
     d_lin_width = nullptr;
     d_lin_height = nullptr;
@@ -303,11 +314,10 @@ void CUDAImageCreator::free_textures() {
     d_textures = nullptr;
 }
 
-void CUDAImageCreator::copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
-                                      std::vector<Vector2<int>> &width_img_boundaries, std::vector<Vector2<int>> &height_img_boundaries,
-                                      std::vector<int> & truncated_lin_width,
-                                      std::vector<int> & truncated_lin_height,
-                                      std::vector<Differences> &host_differences) {
+void CUDAImageCreator::copy_to_device(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
+                                      const std::vector<Vector2<int>> &width_img_boundaries,
+                                      const std::vector<Vector2<int>> &height_img_boundaries,
+                                      const std::vector<Differences> &host_differences) {
     gpuErrchk(cudaMemcpy(d_lin_width,
                          lin_width.data(),
                          sizeof (int)*lin_width.size(),

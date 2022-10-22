@@ -8,7 +8,7 @@
 
 #include "MainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent):
         QWidget(parent){
     ui.setupUi(this);
 
@@ -44,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     cc = ColorContainer{};
     sp = SimulationParameters{};
+
+    cuda_is_available_var = cuda_is_available();
 
     auto anatomy = Anatomy();
 
@@ -135,6 +137,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     load_textures_from_disk();
+
+    //TODO
+    ui.tb_open_benchmarks->setEnabled(false);
 }
 
 void MainWindow::mainloop_tick() {
@@ -170,11 +175,6 @@ void MainWindow::update_fps_labels(int fps, int tps, int ups) {
 }
 
 void MainWindow::ui_tick() {
-    if (ecp.synchronise_simulation_and_window) {
-        ecp.engine_pass_tick = true;
-        ecp.synchronise_simulation_tick = true;
-    }
-
     if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
@@ -270,39 +270,24 @@ void MainWindow::create_image() {
 
     int new_buffer = !bool(ready_buffer);
 
-    if (!use_cuda) {
-        ImageCreation::ImageCreationTools::complex_image_creation(lin_width,
-                                                                  lin_height,
-                                                                  edc.simulation_width,
-                                                                  edc.simulation_height,
-                                                                  cc,
-                                                                  textures,
-                                                                  ui.simulation_graphicsView->width(),
-                                                                  image_vectors[new_buffer],
-                                                                  edc.simple_state_grid);
-    } else {
-#if __CUDA_USED__
-        cuda_creator.cuda_create_image(image_width,
-                                       image_height,
-                                       lin_width,
-                                       lin_height,
-                                       image_vectors[new_buffer],
-                                       cc,
-                                       edc, 32, truncated_lin_width, truncated_lin_height);
+#ifdef __CUDA_USED__
+    void * cuda_creator_ptr = &cuda_creator;
+#else
+    void * cuda_creator_ptr = nullptr;
 #endif
-    }
+
+    ImageCreation::create_image(lin_width, lin_height, edc.simulation_width, edc.simulation_height, cc, textures,
+                                image_width, image_height, image_vectors[new_buffer], edc.simple_state_grid,
+                                use_cuda, cuda_is_available_var, cuda_creator_ptr, truncated_lin_width, truncated_lin_height);
+
     ready_buffer = new_buffer;
     do_not_parse_image_data_ct.store(false);
 }
 
 void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
                                              const std::vector<int> &truncated_lin_height) {
-    if ((!pause_grid_parsing && !ecp.engine_global_pause) || ecp.synchronise_simulation_and_window) {
-        ecp.engine_pause = true;
-        // pausing engine to parse data from engine.
-        auto paused = wait_for_engine_to_pause();
-        // if for some reason engine is not paused in time, it will use old parsed data and not switch engine on.
-        if (paused) { parse_simulation_grid(truncated_lin_width, truncated_lin_height); engine.unpause();}
+    if (!pause_grid_parsing && !ecp.engine_global_pause) {
+        parse_simulation_grid(truncated_lin_width, truncated_lin_height);
     }
 }
 
@@ -353,12 +338,6 @@ void MainWindow::set_simulation_interval(int max_simulation_fps) {
     edc.unlimited_simulation_fps = false;
 }
 
-
-//Can wait, or it can not.
-bool MainWindow::wait_for_engine_to_pause() {
-    if (!wait_for_engine_to_stop_to_render || ecp.engine_global_pause) {return true;}
-    return engine.wait_for_engine_to_pause_force();
-}
 
 void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
     for (int x: lin_width) {
@@ -621,7 +600,6 @@ void MainWindow::initialize_gui() {
 
     ui.table_organism_block_parameters->horizontalHeader()->setVisible(true);
     ui.table_organism_block_parameters->verticalHeader()->setVisible(true);
-    ui.cb_wait_for_engine_to_stop->setChecked(wait_for_engine_to_stop_to_render);
 
     ui.le_update_info_every_n_milliseconds ->setText(QString::fromStdString(std::to_string(update_info_every_n_milliseconds)));
     ui.cb_synchronise_info_with_window->setChecked(synchronise_info_update_with_window_update);
@@ -873,7 +851,7 @@ void MainWindow::load_textures_from_disk() {
     }
 
 #if __CUDA_USED__
-    if (cuda_is_available() && use_cuda) {
+    if (cuda_is_available_var && use_cuda) {
         cuda_creator.copy_textures(textures);
     }
 #endif
@@ -933,7 +911,7 @@ void MainWindow::save_state() {
                                                   SHIFT_keyboard_movement_multiplier,
                                                   font_size, float_precision, brush_size,
                                                   update_info_every_n_milliseconds,
-                                                  use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                                  use_cuda, disable_warnings,
                                                   really_stop_render, save_simulation_settings, uses_point_size
                                           }, sp, occp);
 }
@@ -946,7 +924,7 @@ void MainWindow::load_state() {
                                                  SHIFT_keyboard_movement_multiplier,
                                                  font_size, float_precision, brush_size,
                                                  update_info_every_n_milliseconds,
-                                                 use_cuda, wait_for_engine_to_stop_to_render, disable_warnings,
+                                                 use_cuda, disable_warnings,
                                                  really_stop_render, save_simulation_settings, uses_point_size
                                          }, sp, occp);
     initialize_gui();

@@ -20,7 +20,6 @@ enum class SimulationModes {
 };
 
 struct EngineControlParameters {
-    // if false then engine will y
     volatile bool engine_working = true;
 
     volatile bool stop_engine = false;
@@ -31,7 +30,6 @@ struct EngineControlParameters {
     // will do one tick and then return to being stopped.
     volatile bool engine_pass_tick = false;
 
-    volatile bool synchronise_simulation_tick = false;
     // a signal for window process that engine is stopped, and window process can parse data from engine
     volatile bool engine_paused = false;
     // for image creating purposes
@@ -47,8 +45,6 @@ struct EngineControlParameters {
 
     volatile bool tb_paused = false;
     volatile bool reset_with_editor_organism = false;
-
-    volatile bool synchronise_simulation_and_window = false;
 
     SimulationModes simulation_mode = SimulationModes::CPU_Single_Threaded;
     SimulationModes change_to_mode = SimulationModes::CPU_Single_Threaded;

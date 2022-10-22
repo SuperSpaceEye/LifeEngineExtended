@@ -125,8 +125,6 @@ void MainWindow::b_clear_all_walls_slot() {
 }
 
 void MainWindow::b_save_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    ecp.synchronise_simulation_and_window = false;
     engine.pause();
     ecp.engine_global_pause = true;
     engine.wait_for_engine_to_pause_force();
@@ -147,7 +145,6 @@ void MainWindow::b_save_world_slot() {
     } else if (selected_filter.toStdString() == "JSON (*.json)") {
         filetype = ".json";
     } else {
-        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
@@ -173,15 +170,12 @@ void MainWindow::b_save_world_slot() {
         }
     }
 
-    ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     engine.unpause();
 }
 
 void MainWindow::b_load_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    bool flag2 = sp.reset_on_total_extinction;
-    ecp.synchronise_simulation_and_window = false;
+    bool flag = sp.reset_on_total_extinction;
     sp.reset_on_total_extinction = false;
     engine.pause();
     ecp.engine_global_pause = true;
@@ -198,7 +192,6 @@ void MainWindow::b_load_world_slot() {
     } else if (selected_filter.toStdString() == "JSON (*.json)"){
         filetype = ".json";
     } else {
-        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
@@ -216,7 +209,6 @@ void MainWindow::b_load_world_slot() {
         read_json_data(full_path);
     }
 
-    ecp.synchronise_simulation_and_window = flag;
     sp.reset_on_total_extinction = flag;
     ecp.engine_global_pause = false;
     engine.unpause();
@@ -581,11 +573,6 @@ void MainWindow::rb_cuda_slot() {
 
 //==================== Check buttons ====================
 
-void MainWindow::cb_synchronise_simulation_and_window_slot(bool state) {
-    ecp.synchronise_simulation_and_window = state;
-    ecp.engine_pause = state;
-}
-
 void MainWindow::cb_use_evolved_anatomy_mutation_rate_slot(bool state) {
     sp.use_anatomy_evolved_mutation_rate = state;
     ui.le_global_anatomy_mutation_rate->setDisabled(state);
@@ -609,11 +596,11 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
         use_cuda = false;
 #if __CUDA_USED__
         cuda_creator.free();
+        ee.cuda_image_creator.free();
 #endif
         return;}
 
-    auto result = cuda_is_available();
-    if (!result) {
+    if (!cuda_is_available_var) {
         ui.cb_use_nvidia_for_image_generation->setChecked(false);
         use_cuda = false;
         if (!disable_warnings) {
@@ -624,6 +611,7 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
     use_cuda = true;
 #if __CUDA_USED__
     cuda_creator.copy_textures(textures);
+    ee.cuda_image_creator.copy_textures(textures);
 #endif
 }
 
@@ -827,8 +815,6 @@ void MainWindow::cb_set_fixed_move_range_slot            (bool state) { sp.set_f
 void MainWindow::cb_self_organism_blocks_block_sight_slot(bool state){ sp.organism_self_blocks_block_sight = state;}
 
 void MainWindow::cb_failed_reproduction_eats_food_slot   (bool state) { sp.failed_reproduction_eats_food = state;}
-
-void MainWindow::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop_to_render = state;}
 
 void MainWindow::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 

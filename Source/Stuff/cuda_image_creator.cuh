@@ -48,6 +48,7 @@ class CUDAImageCreator {
     CudaTextureHolder * d_textures = nullptr;
 
     std::vector<color*> d_textures_pointers;
+    std::vector<BaseGridBlock> device_state_grid;
 
     int last_image_width = 0;
     int last_image_height = 0;
@@ -76,14 +77,10 @@ class CUDAImageCreator {
                           int width_img_boundaries_size, int height_img_boundaries_size,
                           int lin_width_size, int lin_height_size, int differences);
 
-    void copy_to_device(std::vector<int> &lin_width, std::vector<int> &lin_height,
-                        std::vector<Vector2<int>> &width_img_boundaries, std::vector<Vector2<int>> &height_img_boundaries,
-                        std::vector<int> & truncated_lin_width,
-                        std::vector<int> & truncated_lin_height,
-                        std::vector<Differences> &host_differences);
-
-    void compile_differences(std::vector<int> &truncated_lin_width, std::vector<int> &truncated_lin_height,
-                             std::vector<Differences> &host_differences, EngineDataContainer *dc);
+    void copy_to_device(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
+                        const std::vector<Vector2<int>> &width_img_boundaries,
+                        const std::vector<Vector2<int>> &height_img_boundaries,
+                        const std::vector<Differences> &host_differences);
 
     void copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height);
 
@@ -92,12 +89,16 @@ public:
 
     void free();
 
-    void cuda_create_image(int image_width, int image_height, std::vector<int> &lin_width, std::vector<int> &lin_height,
-                           std::vector<unsigned char> &image_vector, ColorContainer &color_container,
-                           EngineDataContainer &dc, int block_size, std::vector<int> &truncated_lin_width,
-                           std::vector<int> &truncated_lin_height);
+    void compile_differences(const std::vector<int> &truncated_lin_width, const std::vector<int> &truncated_lin_height,
+                             std::vector<Differences> &host_differences, int simulation_width,
+                             int simulation_height, const std::vector<BaseGridBlock> &simple_state_grid);
 
-    void load_symbols(ColorContainer *colorContainer);
+    void cuda_create_image(int image_width, int image_height, const std::vector<int> &lin_width,
+                           const std::vector<int> &lin_height, std::vector<unsigned char> &image_vector,
+                           const ColorContainer &color_container, int block_size, int simulation_width,
+                           int simulation_height, std::vector<Differences> &differences);
+
+    void load_symbols(const ColorContainer *colorContainer);
 
     void copy_textures(TexturesContainer & container);
 };
