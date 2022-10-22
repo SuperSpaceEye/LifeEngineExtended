@@ -23,11 +23,6 @@ MainWindow::MainWindow(QWidget *parent):
     edc.simulation_width = 200;
     edc.simulation_height = 200;
 
-#if __VALGRIND_MODE__
-    edc.simulation_width = 50;
-    edc.simulation_height = 50;
-#endif
-
     edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
     edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
@@ -118,10 +113,6 @@ MainWindow::MainWindow(QWidget *parent):
     set_simulation_interval(60);
 
     cb_show_extended_statistics_slot(false);
-#if __VALGRIND_MODE__ == 1
-    cb_synchronise_simulation_and_window_slot(false);
-    ui.cb_synchronise_sim_and_win->setChecked(false);
-#endif
 
     auto executable_path = QCoreApplication::applicationDirPath().toStdString();
     if (!std::filesystem::exists(executable_path + "/temp")) {
@@ -168,12 +159,6 @@ void MainWindow::mainloop_tick() {
     }
 }
 
-void MainWindow::update_fps_labels(int fps, int tps, int ups) {
-    ui.lb_fps->setText(QString::fromStdString("fps: " + std::to_string(fps)));
-    ui.lb_sps->setText(QString::fromStdString("tps: " + std::to_string(tps)));
-    ui.lb_ups->setText(QString::fromStdString("ups: " + std::to_string(ups)));
-}
-
 void MainWindow::ui_tick() {
     if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
@@ -198,9 +183,6 @@ void MainWindow::ui_tick() {
 
     window_frames++;
 
-#if __VALGRIND_MODE__ == 1
-    return;
-#endif
     if (pause_grid_parsing && really_stop_render) { return;}
 
     if (do_not_parse_image_data_ct) { return;}
@@ -208,6 +190,12 @@ void MainWindow::ui_tick() {
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vectors[ready_buffer].data(), image_width, image_height, QImage::Format_RGB32)));
     have_read_buffer = true;
     do_not_parse_image_data_mt.store(false);
+}
+
+void MainWindow::update_fps_labels(int fps, int tps, int ups) {
+    ui.lb_fps->setText(QString::fromStdString("fps: " + std::to_string(fps)));
+    ui.lb_sps->setText(QString::fromStdString("tps: " + std::to_string(tps)));
+    ui.lb_ups->setText(QString::fromStdString("ups: " + std::to_string(ups)));
 }
 
 void MainWindow::resize_image() {
@@ -853,6 +841,7 @@ void MainWindow::load_textures_from_disk() {
 #if __CUDA_USED__
     if (cuda_is_available_var && use_cuda) {
         cuda_creator.copy_textures(textures);
+        ee.cuda_image_creator.copy_textures(textures);
     }
 #endif
 }

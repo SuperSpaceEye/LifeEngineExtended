@@ -96,8 +96,6 @@ if (NOT NO_RECORDER)
     set(ADDITIONAL_PROJECT_FILES Source/Stuff/moviemaker/include/movie.h Source/Stuff/moviemaker/src/reader.cpp Source/Stuff/moviemaker/src/writer.cpp Source/UIWindows/Recorder/RecorderWindowUI.h Source/UIWindows/Recorder/Recorder.cpp Source/UIWindows/Recorder/Recorder.h Source/UIWindows/Recorder/RecorderSlots.cpp)
 endif()
 
-add_compile_definitions(__VALGRIND_MODE__=0)
-
 if(CUDAToolkit_FOUND)
     enable_language(CUDA)
     set(CUDA_FILES ${CUDA_SOURCES} ${CUDA_HEADERS})

@@ -31,7 +31,7 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     engine.unpause();
 }
 
-void MainWindow::read_data(std::ifstream &is) {
+void MainWindow::read_world_data(std::ifstream &is) {
     //If save version is incompatible
     if (!DataSavingFunctions::read_version(is)) {
         display_message("Save version is incompatible with current program version.");
@@ -160,7 +160,7 @@ void MainWindow::update_table_values() {
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
-void MainWindow::read_json_data(const std::string &path) {
+void MainWindow::read_json_world_data(const std::string &path) {
     std::string json;
     auto ss = std::ostringstream();
     std::ifstream file;

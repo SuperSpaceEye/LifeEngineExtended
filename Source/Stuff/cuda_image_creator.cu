@@ -259,7 +259,7 @@ void CUDAImageCreator::free() {
     free_textures();
 
     device_state_grid.clear();
-    //for some reason this causes segfault in organism editors cuda_image_creator
+    //TODO for some reason this causes segfault in organism editors cuda_image_creator
 //    device_state_grid = std::vector<BaseGridBlock>{};
 
     d_lin_width = nullptr;

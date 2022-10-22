@@ -69,7 +69,7 @@ class SimulationEngine {
     //lehmer is like 2 times faster than mt19937
     lehmer64 gen;
 
-    void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
+    void try_kill_organism(int x, int y);
     void try_remove_food(int x, int y);
 public:
     OrganismInfoContainer info{};
@@ -80,7 +80,7 @@ public:
 
     void make_random_walls();
 
-    void set_wall(std::vector<Organism *> &temp, const Action &action);
+    void set_wall(const Action &action);
     void clear_walls();
 
     //TODO make getters and setters for it.
@@ -114,6 +114,10 @@ public:
                             std::vector<BaseEventNode *> node_storage);
 
     void set_seed(uint64_t new_seed);
+
+    bool action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag);
+
+    void action_place_organism(const Action &action);
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

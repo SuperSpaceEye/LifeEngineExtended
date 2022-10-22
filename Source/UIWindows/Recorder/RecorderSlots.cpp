@@ -128,7 +128,6 @@ void Recorder::b_pause_recording_slot() {
         return;
     }
 
-    ecp->pause_button_pause = true;
     ecp->tb_paused = true;
     engine->pause();
     engine->wait_for_engine_to_pause_force();

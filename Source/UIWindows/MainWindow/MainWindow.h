@@ -95,8 +95,11 @@ private:
 
     TexturesContainer textures{};
 
+    //double buffering to eliminate tearing
     std::array<std::vector<unsigned char>, 2> image_vectors{std::vector<unsigned char>{}, std::vector<unsigned char>{}};
+    //which buffer should be used to draw an image on screen
     volatile int ready_buffer = 0;
+    //if the main thread did not draw the image on screen, do not compute next image.
     volatile bool have_read_buffer = false;
 
     QGraphicsScene scene;
@@ -133,6 +136,7 @@ private:
     float scaling_coefficient = 1.2;
     // actual zoom
     float scaling_zoom = 1;
+    //center position of a camera
     float center_x = 0;
     float center_y = 0;
     float image_creation_interval = 0.;
@@ -144,6 +148,7 @@ private:
     bool left_mouse_button_pressed = false;
     bool change_main_simulation_grid = false;
     bool change_editing_grid = false;
+    //use cuda to draw images for simulation/organism editor
     bool use_cuda = false;
     bool synchronise_info_update_with_window_update = false;
     bool resize_simulation_grid_flag = false;
@@ -163,6 +168,7 @@ private:
     bool update_last_cursor_pos = true;
     bool cuda_is_available_var = false;
 
+    //maybe excessive, but it (i think) sometimes caused segfaults on resize
     std::atomic<bool> do_not_parse_image_data_ct = false;
     std::atomic<bool> do_not_parse_image_data_mt = false;
 
@@ -174,8 +180,11 @@ private:
 
     int last_mouse_x_pos = 0;
     int last_mouse_y_pos = 0;
+    //hom many frames were computed in a second
     int image_frames = 0;
+    //how many times ui has updated
     int window_frames = 0;
+    //max ui updates ps
     int max_ups = 100;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
@@ -186,9 +195,10 @@ private:
     int brush_size = 2;
     int update_info_every_n_milliseconds = 100;
     //Will give a warning if num is higher than this.
+    //TODO delete
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
-    int font_size = 0;
+    int font_size;
     int image_width;
     int image_height;
     int last_last_cursor_x_pos = 0;
@@ -202,7 +212,7 @@ private:
 
     void create_image_creation_thread();
 
-    void read_json_data(const std::string &path);
+    void read_json_world_data(const std::string &path);
     void json_resize_and_make_walls();
     static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
     static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
@@ -215,7 +225,7 @@ private:
                        uint32_t recovery_simulation_width,
                        uint32_t recovery_simulation_height);
 
-    void read_data(std::ifstream& is);
+    void read_world_data(std::ifstream& is);
     bool read_data_container_data(std::ifstream &is);
     void read_simulation_grid(std::ifstream& is);
     bool read_organisms(std::ifstream& is);
@@ -224,6 +234,7 @@ private:
 
     static std::vector<Vector2<int>> iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2);
 
+    //is invoked by qt timer
     void mainloop_tick();
     void ui_tick();
     void set_simulation_interval(int max_simulation_fps);
@@ -237,7 +248,7 @@ private:
 
     void create_image();
 
-    // parses actual simulation grid to grid from which image is created
+    // only parses what is seen by user form viewpoint
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
     void parse_full_simulation_grid(bool parse);
 
@@ -247,6 +258,7 @@ private:
     void change_editing_grid_left_click();
     void change_editing_grid_right_click();
 
+    //TODO
     void set_simulation_num_threads(uint8_t num_threads);
 
     void set_cursor_mode(CursorMode mode);

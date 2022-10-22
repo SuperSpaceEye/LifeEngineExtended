@@ -33,7 +33,6 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
-    //TODO i think i messed this up somehow
     inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
@@ -68,7 +67,6 @@ struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
 
 struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
-    //TODO
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
     std::vector<SerializedAdjacentSpaceContainer> killing_space;

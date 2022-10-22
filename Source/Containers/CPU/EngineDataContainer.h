@@ -48,6 +48,8 @@ struct EngineDataContainer {
         //factor determining how many dead_organisms_before_last_alive_position can be before compress_organisms is called
         float max_dead_organisms_in_alive_section_factor = 2;
         float memory_allocation_strategy_modifier = 2;
+        //TODO make le
+        int max_dead_organisms = 500;
         std::vector<Organism> organisms{};
         std::vector<uint32_t> dead_organisms_positions{};
         std::vector<uint32_t> temp_dead_organisms_positions{};

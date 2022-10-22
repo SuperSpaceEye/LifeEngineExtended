@@ -201,12 +201,12 @@ void MainWindow::b_load_world_slot() {
 
     if (filetype == ".lfew") {
         std::ifstream in(full_path, std::ios::in | std::ios::binary);
-        read_data(in);
+        read_world_data(in);
         in.close();
 
     } else if (filetype == ".json") {
         sp.use_occ = false;
-        read_json_data(full_path);
+        read_json_world_data(full_path);
     }
 
     sp.reset_on_total_extinction = flag;
