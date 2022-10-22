@@ -145,6 +145,9 @@ void
 CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_width, const std::vector<int> &truncated_lin_height,
                                       std::vector<Differences> &host_differences, int simulation_width,
                                       int simulation_height, const std::vector<BaseGridBlock> &simple_state_grid) {
+    if (do_not_create_image) { return;}
+    creating_image = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     host_differences.reserve(truncated_lin_width.size() * truncated_lin_height.size());
     if (device_state_grid.size() != truncated_lin_width.size() * truncated_lin_height.size()) {
         device_state_grid.resize(truncated_lin_width.size() * truncated_lin_height.size());
@@ -169,12 +172,17 @@ CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_widt
             }
         }
     }
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    creating_image = false;
 }
 
 void CUDAImageCreator::cuda_create_image(int image_width, int image_height, const std::vector<int> &lin_width,
                                          const std::vector<int> &lin_height, std::vector<unsigned char> &image_vector,
                                          const ColorContainer &color_container, int block_size, int simulation_width,
                                          int simulation_height, std::vector<Differences> &differences) {
+    if (do_not_create_image) { return;}
+    creating_image = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     std::vector<Vector2<int>> width_img_boundaries;
     std::vector<Vector2<int>> height_img_boundaries;
 
@@ -229,12 +237,18 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, cons
                                               d_image_vector, d_second_simulation_grid, d_textures);
 
     gpuErrchk( cudaDeviceSynchronize() )
-//    cudaDeviceSynchronize();
 
     copy_result_image(image_vector, image_width, image_height);
+
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    creating_image = false;
 }
 
 void CUDAImageCreator::free() {
+    do_not_create_image = true;
+    while (creating_image) {}
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+
     cudaFree(d_image_vector);
     cudaFree(d_second_simulation_grid);
     cudaFree(d_width_img_boundaries);
@@ -244,7 +258,9 @@ void CUDAImageCreator::free() {
     cudaFree(d_differences);
     free_textures();
 
-    device_state_grid = std::vector<BaseGridBlock>();
+    device_state_grid.clear();
+    //for some reason this causes segfault in organism editors cuda_image_creator
+//    device_state_grid = std::vector<BaseGridBlock>{};
 
     d_lin_width = nullptr;
     d_lin_height = nullptr;
@@ -302,6 +318,8 @@ void CUDAImageCreator::copy_textures(TexturesContainer &container) {
                          temp_container.data(),
                          sizeof(CudaTextureHolder)*temp_container.size(),
                          cudaMemcpyHostToDevice));
+
+    do_not_create_image = false;
 }
 
 void CUDAImageCreator::free_textures() {

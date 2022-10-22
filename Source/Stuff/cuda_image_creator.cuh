@@ -48,7 +48,8 @@ class CUDAImageCreator {
     CudaTextureHolder * d_textures = nullptr;
 
     std::vector<color*> d_textures_pointers;
-    std::vector<BaseGridBlock> device_state_grid;
+
+    std::vector<BaseGridBlock> device_state_grid{};
 
     int last_image_width = 0;
     int last_image_height = 0;
@@ -60,6 +61,9 @@ class CUDAImageCreator {
     int last_simulation_width = 0;
     int last_simulation_height = 0;
     int last_differences = 0;
+
+    volatile bool creating_image = false;
+    volatile bool do_not_create_image = false;
 
     void image_dimensions_changed(int image_width, int image_height);
 
