@@ -111,7 +111,7 @@ int32_t OrganismsController::get_last_alive_organism_position(EngineDataContaine
 
 //Will compress alive organisms so that there will be no dead organisms between alive ones.
 //Dead organisms positions should be sorted first.
-void OrganismsController::compress_organisms(EngineDataContainer &edc) {
+void OrganismsController::try_compress_organisms(EngineDataContainer &edc) {
     if (edc.stc.max_dead_organisms < edc.stc.dead_organisms_before_last_alive_position || edc.stc.dead_organisms_before_last_alive_position * edc.stc.max_dead_organisms_in_alive_section_factor < edc.stc.num_alive_organisms) { return;}
     if (edc.stc.num_alive_organisms == 1) { return;}
 

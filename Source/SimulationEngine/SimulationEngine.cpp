@@ -16,7 +16,6 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
         edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters),
         occp(occp) {
     boost::random_device rd;
-//    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
     //TODO only do if enabled?
     init_auto_food_drop(edc.simulation_width, edc.simulation_height);
@@ -431,7 +430,7 @@ void SimulationEngine::init_auto_food_drop(int width, int height) {
 }
 
 //Will always wait for engine to pause
-bool SimulationEngine::wait_for_engine_to_pause_force() {
+bool SimulationEngine::wait_for_engine_to_pause() {
     while (!ecp.engine_paused) {}
     std::atomic_thread_fence(std::memory_order_release);
     do_not_unpause = false;
@@ -443,7 +442,7 @@ void SimulationEngine::pause() {
     std::atomic_thread_fence(std::memory_order_release);
     ecp.engine_pause = true;
     std::atomic_thread_fence(std::memory_order_seq_cst);
-    wait_for_engine_to_pause_force();
+    wait_for_engine_to_pause();
 }
 
 void SimulationEngine::unpause() {

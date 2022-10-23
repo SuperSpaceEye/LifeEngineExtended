@@ -502,6 +502,10 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
     st.ui.lb_last_alive_position     ->setText(QString::fromStdString("Last alive position: " + std::to_string(edc.stc.last_alive_position)));
     st.ui.lb_dead_inside             ->setText(QString::fromStdString("Dead inside: " + std::to_string(edc.stc.dead_organisms_before_last_alive_position)));
     st.ui.lb_dead_outside            ->setText(QString::fromStdString("Dead outside: " + std::to_string(edc.stc.num_dead_organisms - edc.stc.dead_organisms_before_last_alive_position)));
+
+    st.ui.lb_zoom       ->setText(QString::fromStdString("Zoom: " + std::to_string(scaling_zoom)));
+    st.ui.lb_viewpoint_x->setText(QString::fromStdString("Viewpoint x: " + std::to_string(center_x)));
+    st.ui.lb_viewpoint_y->setText(QString::fromStdString("Viewpoint y: " + std::to_string(center_y)));
 }
 
 // So that changes in code values would be set by default in gui.

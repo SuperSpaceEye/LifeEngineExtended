@@ -11,10 +11,11 @@
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
                                Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
-                               OCCParameters *occp, bool *cuda_is_available, bool *use_cuda)
+                               OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda)
         : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
-                                chosen_organism(chosen_organism), textures(textures) {
+                                chosen_organism(chosen_organism), textures(textures), cuda_is_available(cuda_is_available),
+                                use_cuda(use_cuda){
     ui.setupUi(this);
 
     ui.editor_graphicsView->show();
@@ -31,9 +32,6 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     auto occ = OrganismConstructionCode();
     occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
-
-    this->cuda_is_available = cuda_is_available;
-    this->use_cuda = use_cuda;
 
     editor_organism = new Organism(editor_width / 2,
                                    editor_height / 2,
@@ -295,7 +293,7 @@ void OrganismEditor::create_image() {
 #endif
 
     ImageCreation::create_image(lin_width, lin_height, editor_width, editor_height, *color_container, textures,
-                                image_width, image_height, edit_image, edit_grid, *use_cuda, *cuda_is_available,
+                                image_width, image_height, edit_image, edit_grid, use_cuda, cuda_is_available,
                                 cuda_i_creator, truncated_lin_width, truncated_lin_height);
 
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(edit_image.data(), image_width, image_height, QImage::Format_RGB32)));

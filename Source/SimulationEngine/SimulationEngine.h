@@ -43,7 +43,7 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
     OCCParameters &occp;
-//    OrganismInfoContainer info{};
+
     WorldEventsController world_events_controller{};
     SimulationParameters sp_copy;
 
@@ -83,7 +83,6 @@ public:
     void set_wall(const Action &action);
     void clear_walls();
 
-    //TODO make getters and setters for it.
     void reinit_organisms();
 
     void reset_world();
@@ -96,8 +95,7 @@ public:
     void pause();
     void unpause();
 
-    //Will always wait for engine to pause
-    bool wait_for_engine_to_pause_force();
+    bool wait_for_engine_to_pause();
     void parse_full_simulation_grid();
 
     void update_info();

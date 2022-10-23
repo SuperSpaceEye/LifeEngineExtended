@@ -126,8 +126,8 @@ public:
 
     Rotation choosen_rotation = Rotation::UP;
 
-    bool * cuda_is_available;
-    bool * use_cuda;
+    const bool & cuda_is_available;
+    const bool & use_cuda;
 
 #ifdef __CUDA_USED__
     CUDAImageCreator cuda_image_creator{};
@@ -136,7 +136,7 @@ public:
     OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                    SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
                    Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
-                   OCCParameters *occp, bool *cuda_is_available, bool *use_cuda);
+                   OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 

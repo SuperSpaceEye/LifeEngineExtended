@@ -7,12 +7,12 @@
 //==================== Line edits ====================
 
 void Recorder::le_number_of_pixels_per_block_slot() {
-    le_slot_lower_bound<int>(num_pixels_per_block, num_pixels_per_block, "int", _ui.le_number_or_pixels_per_block, 1, "1");
+    le_slot_lower_bound<int>(num_pixels_per_block, num_pixels_per_block, "int", ui.le_number_or_pixels_per_block, 1, "1");
 }
 
 void Recorder::le_first_grid_buffer_size_slot() {
     int temp;
-    le_slot_lower_bound<int>(temp, temp, "int", _ui.le_first_grid_buffer_size, 1, "1");
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_first_grid_buffer_size, 1, "1");
 
     if (temp == tbuffer->buffer_pos) { return;}
 
@@ -26,12 +26,32 @@ void Recorder::le_first_grid_buffer_size_slot() {
 
 void Recorder::le_log_every_n_tick_slot() {
     int temp = ecp->parse_full_grid_every_n;
-    le_slot_lower_bound<int>(temp, temp, "int", _ui.le_log_every_n_tick, 1, "1");
+    le_slot_lower_bound<int>(temp, temp, "int", ui.le_log_every_n_tick, 1, "1");
     ecp->parse_full_grid_every_n = temp;
 }
 
 void Recorder::le_video_fps_slot() {
-    le_slot_lower_bound<int>(video_fps, video_fps, "int", _ui.le_video_fps, 1, "1");
+    le_slot_lower_bound<int>(video_fps, video_fps, "int", ui.le_video_fps, 1, "1");
+}
+
+void Recorder::le_zoom_slot() {
+    le_slot_lower_bound<float>(zoom, zoom, "float", ui.le_zoom, 0, "0");
+}
+
+void Recorder::le_viewpoint_y_slot() {
+    le_slot_no_bound(viewpoint_y, viewpoint_y, "float", ui.le_viewpoint_y);
+}
+
+void Recorder::le_viewpoint_x_slot() {
+    le_slot_no_bound(viewpoint_x, viewpoint_x, "float", ui.le_viewpoint_x);
+}
+
+void Recorder::le_image_width_slot() {
+    le_slot_lower_bound<int>(image_width, image_width, "int", ui.le_image_width, 1, "1");
+}
+
+void Recorder::le_image_height_slot() {
+    le_slot_lower_bound<int>(image_height, image_height, "int", ui.le_image_height, 1, "1");
 }
 
 //==================== Buttons edits ====================
@@ -63,15 +83,28 @@ void Recorder::b_create_image_slot() {
     }
 #endif
 
-    std::vector<unsigned char> raw_image_data(edc->simulation_width*edc->simulation_height*num_pixels_per_block*num_pixels_per_block*4);
+    std::vector<unsigned char> raw_image_data;
+    int image_width_dim;
+    int image_height_dim;
+
+    if (use_viewpoint) {
+        raw_image_data.resize(image_width * image_height * 4);
+        image_width_dim  = image_width;
+        image_height_dim = image_height;
+    } else {
+        raw_image_data.resize(edc->simulation_width * edc->simulation_height *num_pixels_per_block * num_pixels_per_block * 4);
+        image_width_dim  = edc->simulation_width*num_pixels_per_block;
+        image_height_dim = edc->simulation_height*num_pixels_per_block;
+    }
 
     engine->parse_full_simulation_grid();
 
-    create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height, num_pixels_per_block);
+    create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height,
+                 num_pixels_per_block, use_cuda, use_viewpoint);
 
     QImage image(raw_image_data.data(),
-                 edc->simulation_width*num_pixels_per_block,
-                 edc->simulation_height*num_pixels_per_block,
+                 image_width_dim,
+                 image_height_dim,
                  QImage::Format_RGB32);
 
     image.save(QString::fromStdString(full_path), "PNG");
@@ -130,7 +163,7 @@ void Recorder::b_pause_recording_slot() {
 
     ecp->tb_paused = true;
     engine->pause();
-    engine->wait_for_engine_to_pause_force();
+    engine->wait_for_engine_to_pause();
     engine->unpause();
     parent_ui->tb_pause->setChecked(true);
 
@@ -182,7 +215,7 @@ void Recorder::b_load_intermediate_data_location_slot() {
     tbuffer->recorded_transactions = total_recorded;
     tbuffer->saved_buffers = number_of_files;
 
-    _ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(tbuffer->buffer_size)));
+    ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(tbuffer->buffer_size)));
 
     recording_paused = true;
 }
@@ -199,9 +232,15 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         display_message("No recording is loaded.");
         return;
     }
-    edc->record_data = false;
 
-//    lock_recording = true;
+    //TODO
+    if (compiling_recording) {
+        display_message("Recording is being compiled.");
+        return;
+    }
+
+    compiling_recording = true;
+    edc->record_data = false;
 
     //Will be loaded from disk
     tbuffer->flush_transactions();
@@ -212,7 +251,12 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                             int num_pixels_per_block,
                             int recorded_states,
                             int buffer_size,
-                            int video_fps) {
+                            int video_fps,
+                            int image_width,
+                            int image_height,
+                            bool use_cuda,
+                            bool cuda_is_available,
+                            bool use_viewpoint) {
         std::vector<unsigned char> image_vec(
              simulation_width * simulation_height * num_pixels_per_block * num_pixels_per_block * 4);
 
@@ -269,8 +313,17 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 //
 //            std::filesystem::remove(movie_name+"_temp.mp4");
 //        } else {
-            writer.start_writing(movie_name, simulation_width * num_pixels_per_block,
-                                 simulation_height * num_pixels_per_block, video_fps);
+            int dim_width;
+            int dim_height;
+            if (use_viewpoint) {
+                dim_width = image_width;
+                dim_height = image_height;
+            } else {
+                dim_width = simulation_width * num_pixels_per_block;
+                dim_height = simulation_height * num_pixels_per_block;
+            }
+
+            writer.start_writing(movie_name, dim_width, dim_height, video_fps);
 //        }
 
         int processed_transactions = 0;
@@ -296,7 +349,8 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 
                 frame_num++;
 
-                Recorder::create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height, num_pixels_per_block);
+                create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
+                             num_pixels_per_block, use_cuda, use_viewpoint);
 
                 writer.addFrame(&image_vec[0]);
 
@@ -320,8 +374,10 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
             }
         }
         reconstructor.finish_reconstruction();
+        compiling_recording = false;
     }, tbuffer->path_to_save, edc->simulation_width, edc->simulation_height,
-       num_pixels_per_block, tbuffer->recorded_transactions, tbuffer->buffer_size, video_fps);
+       num_pixels_per_block, tbuffer->recorded_transactions, tbuffer->buffer_size, video_fps,
+       image_width, image_height, use_cuda, cuda_is_available, use_viewpoint);
 
     thr2.detach();
 
@@ -377,4 +433,41 @@ void Recorder::b_new_recording_slot() {
     clear_data();
     auto path = QCoreApplication::applicationDirPath().toStdString();
     tbuffer->path_to_save = new_recording(path);
+}
+
+void Recorder::b_set_from_camera_slot() {
+    viewpoint_x = *main_viewpoint_x;
+    viewpoint_y = *main_viewpoint_y;
+    zoom = *main_zoom;
+    image_width  = parent_ui->simulation_graphicsView->viewport()->width();
+    image_height = parent_ui->simulation_graphicsView->viewport()->height();
+
+    ui.le_viewpoint_x->setText(QString::fromStdString(to_str(viewpoint_x, 5)));
+    ui.le_viewpoint_y->setText(QString::fromStdString(to_str(viewpoint_y, 5)));
+    ui.le_zoom->setText(QString::fromStdString(to_str(zoom, 5)));
+
+    ui.le_image_width ->setText(QString::fromStdString(std::to_string(image_width)));
+    ui.le_image_height->setText(QString::fromStdString(std::to_string(image_height)));
+}
+
+void Recorder::cb_use_relative_viewpoint_slot(bool state) {use_viewpoint = state;}
+
+void Recorder::cb_use_cuda_slot(bool state) {
+    if (!state) {
+        use_cuda = false;
+#if __CUDA_USED__
+        cuda_image_creator.free();
+#endif
+        return;}
+
+    if (!cuda_is_available) {
+        ui.cb_use_cuda->setChecked(false);
+        use_cuda = false;
+        display_message("Warning, CUDA is not available on this device.");
+        return;
+    }
+    use_cuda = true;
+#if __CUDA_USED__
+    cuda_image_creator.copy_textures(*textures);
+#endif
 }

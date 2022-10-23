@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>712</height>
+    <width>994</width>
+    <height>732</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,8 +45,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>895</width>
-        <height>710</height>
+        <width>992</width>
+        <height>730</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -169,6 +169,31 @@
              <string>Organisms capacity:</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="lb_zoom">
+              <property name="text">
+               <string>Zoom:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lb_viewpoint_x">
+              <property name="text">
+               <string>Viewpoint x:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lb_viewpoint_y">
+              <property name="text">
+               <string>Viewpoint y:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <spacer name="verticalSpacer">

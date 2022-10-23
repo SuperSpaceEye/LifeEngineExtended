@@ -30,7 +30,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(dc->stc.organisms_observations[i], gen);}}
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {make_decision(dc, sp, &organism, gen);}}
 
-    OrganismsController::compress_organisms(*dc);
+    OrganismsController::try_compress_organisms(*dc);
     //TODO the result of sorting doesn't need to be perfect, just good enough.
     //https://en.wikipedia.org/wiki/K-sorted_sequence#Algorithms
     //https://en.wikipedia.org/wiki/Partial_sorting
@@ -91,6 +91,7 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, Simula
     }
 }
 
+//just iterate over all producing spaces and try to make food.
 void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *dc, SimulationParameters *sp,
                                                            Organism *organism, lehmer64 &gen, float multiplier) {
     for (auto & pr: organism->anatomy._producing_space) {

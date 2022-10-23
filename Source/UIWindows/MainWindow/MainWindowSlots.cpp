@@ -127,7 +127,7 @@ void MainWindow::b_clear_all_walls_slot() {
 void MainWindow::b_save_world_slot() {
     engine.pause();
     ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause();
 
     QString selected_filter;
     QFileDialog file_dialog{};
@@ -179,7 +179,7 @@ void MainWindow::b_load_world_slot() {
     sp.reset_on_total_extinction = false;
     engine.pause();
     ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause();
 
     std::atomic_thread_fence(std::memory_order_release);
     QString selected_filter;
@@ -626,6 +626,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         st.ui.lb_last_alive_position->show();
         st.ui.lb_dead_inside->show();
         st.ui.lb_dead_outside->show();
+        st.ui.lb_zoom->show();
+        st.ui.lb_viewpoint_x->show();
+        st.ui.lb_viewpoint_y->show();
     } else {
         st.ui.lb_child_organisms->hide();
         st.ui.lb_child_organisms_capacity->hide();
@@ -636,6 +639,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         st.ui.lb_last_alive_position->hide();
         st.ui.lb_dead_inside->hide();
         st.ui.lb_dead_outside->hide();
+        st.ui.lb_zoom->hide();
+        st.ui.lb_viewpoint_x->hide();
+        st.ui.lb_viewpoint_y->hide();
     }
 }
 

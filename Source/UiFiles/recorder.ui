@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>674</height>
+    <width>948</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -202,12 +202,108 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cb_use_relative_viewpoint">
+         <property name="text">
+          <string>Use relative viewpoint</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cb_use_cuda">
+         <property name="text">
+          <string>Use cuda</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Viewpoint x </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_viewpoint_x"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Viewpoint y </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_viewpoint_y"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Zoom </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_zoom"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Image width</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_image_width"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Image height </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_image_height"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="b_set_from_camera">
+         <property name="text">
+          <string>Set from camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -433,6 +529,134 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_use_relative_viewpoint</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Recorder</receiver>
+   <slot>cb_use_relative_viewpoint_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>519</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_viewpoint_x</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_viewpoint_x_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>274</x>
+     <y>550</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_viewpoint_y</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_viewpoint_y_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>715</x>
+     <y>550</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_zoom</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_zoom_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>474</x>
+     <y>583</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>b_set_from_camera</sender>
+   <signal>clicked()</signal>
+   <receiver>Recorder</receiver>
+   <slot>b_set_from_camera_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>615</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_image_width</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_image_width_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>272</x>
+     <y>599</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_image_height</sender>
+   <signal>returnPressed()</signal>
+   <receiver>Recorder</receiver>
+   <slot>le_image_height_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>717</x>
+     <y>599</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_cuda</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Recorder</receiver>
+   <slot>cb_use_cuda_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>449</x>
+     <y>515</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>le_number_of_pixels_per_block_slot()</slot>
@@ -448,5 +672,13 @@
   <slot>b_pause_recording_slot()</slot>
   <slot>le_log_every_n_tick_slot()</slot>
   <slot>le_video_fps_slot()</slot>
+  <slot>b_set_from_camera_slot()</slot>
+  <slot>le_zoom_slot()</slot>
+  <slot>le_viewpoint_x_slot()</slot>
+  <slot>le_viewpoint_y_slot()</slot>
+  <slot>cb_use_relative_viewpoint_slot(bool)</slot>
+  <slot>le_image_width_slot()</slot>
+  <slot>le_image_height_slot()</slot>
+  <slot>cb_use_cuda_slot(bool)</slot>
  </slots>
 </ui>

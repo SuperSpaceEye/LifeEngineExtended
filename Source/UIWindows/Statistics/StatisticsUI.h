@@ -41,6 +41,10 @@ public:
     QLabel *lb_dead_inside;
     QLabel *lb_dead_outside;
     QLabel *lb_organisms_capacity;
+    QHBoxLayout *horizontalLayout;
+    QLabel *lb_zoom;
+    QLabel *lb_viewpoint_x;
+    QLabel *lb_viewpoint_y;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_47;
     QVBoxLayout *verticalLayout_38;
@@ -98,7 +102,7 @@ public:
     {
         if (Statistics->objectName().isEmpty())
             Statistics->setObjectName("Statistics");
-        Statistics->resize(897, 712);
+        Statistics->resize(994, 732);
         verticalLayout = new QVBoxLayout(Statistics);
         verticalLayout->setSpacing(0);
         verticalLayout->setObjectName("verticalLayout");
@@ -109,7 +113,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName("scrollAreaWidgetContents_4");
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 895, 710));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 992, 730));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -188,6 +192,26 @@ public:
         lb_organisms_capacity->setObjectName("lb_organisms_capacity");
 
         verticalLayout_37->addWidget(lb_organisms_capacity);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        lb_zoom = new QLabel(widget_5);
+        lb_zoom->setObjectName("lb_zoom");
+
+        horizontalLayout->addWidget(lb_zoom);
+
+        lb_viewpoint_x = new QLabel(widget_5);
+        lb_viewpoint_x->setObjectName("lb_viewpoint_x");
+
+        horizontalLayout->addWidget(lb_viewpoint_x);
+
+        lb_viewpoint_y = new QLabel(widget_5);
+        lb_viewpoint_y->setObjectName("lb_viewpoint_y");
+
+        horizontalLayout->addWidget(lb_viewpoint_y);
+
+
+        verticalLayout_37->addLayout(horizontalLayout);
 
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -475,6 +499,9 @@ public:
         lb_dead_inside->setText(QCoreApplication::translate("Statistics", "Dead inside:", nullptr));
         lb_dead_outside->setText(QCoreApplication::translate("Statistics", "Dead outside:", nullptr));
         lb_organisms_capacity->setText(QCoreApplication::translate("Statistics", "Organisms capacity:", nullptr));
+        lb_zoom->setText(QCoreApplication::translate("Statistics", "Zoom:", nullptr));
+        lb_viewpoint_x->setText(QCoreApplication::translate("Statistics", "Viewpoint x:", nullptr));
+        lb_viewpoint_y->setText(QCoreApplication::translate("Statistics", "Viewpoint y:", nullptr));
         lb_moving_organisms->setText(QCoreApplication::translate("Statistics", "Moving organisms:", nullptr));
         lb_organisms_with_eyes->setText(QCoreApplication::translate("Statistics", "Organisms with eyes:", nullptr));
         lb_avg_org_lifetime_2->setText(QCoreApplication::translate("Statistics", "Avg organism lifetime:", nullptr));
