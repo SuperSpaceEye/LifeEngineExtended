@@ -25,7 +25,7 @@ void Recorder::closeEvent(QCloseEvent *event) {
 
 void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                             int simulation_width, int simulation_height, int num_pixels_per_block, bool use_cuda,
-                            bool use_viewpoint) {
+                            bool use_viewpoint, bool yuv_format) {
     int image_width;
     int image_height;
     int start_x;
@@ -54,8 +54,9 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const st
 #endif
 
     ImageCreation::create_image(lin_width, lin_height, edc->simulation_width, edc->simulation_height,
-                                *cc, *textures, image_width, image_height, raw_image_data, grid, use_cuda, cuda_is_available,
-                                cuda_i_creator, truncated_lin_width, truncated_lin_height);
+                                *cc, *textures, image_width, image_height, raw_image_data, grid, use_cuda,
+                                cuda_is_available,
+                                cuda_i_creator, truncated_lin_width, truncated_lin_height, yuv_format);
 }
 
 void
@@ -153,7 +154,7 @@ void Recorder::update_label() {
         }
         size_of_recording = convert_num_bytes(size);
     }
-    std::string time_length_of_recording = convert_seconds(tbuffer->recorded_transactions / ecp->parse_full_grid_every_n / video_fps);
+    std::string time_length_of_recording = convert_seconds((tbuffer->recorded_transactions / ecp->parse_full_grid_every_n) / video_fps);
     std::string str = "Status: " + status + " ||| Recorded " + rec_states + " ticks ||| Video ticks " + rec_video_states  + " ||| Buffer filling: " + buffer_filling  + " ||| Recording size on disk: " + size_of_recording + " ||| Time length of recording with " + std::to_string(video_fps) + " fps: " + time_length_of_recording;
     ui.lb_recording_information->setText(QString::fromStdString(str));
 }

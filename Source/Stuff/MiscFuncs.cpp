@@ -49,10 +49,10 @@ std::string convert_seconds(uint64_t num_seconds) {
     std::string minutes;
     std::string hours;
 
-    if (num_seconds/60/24 > 0) {
-        auto result = num_seconds/60/24;
+    if (num_seconds/60/60 > 0) {
+        auto result = num_seconds/60/60;
         hours += std::to_string(result) + "h ";
-        num_seconds -= result * 60 * 24;
+        num_seconds -= result * 60 * 60;
     }
 
     if (num_seconds/60 > 0) {

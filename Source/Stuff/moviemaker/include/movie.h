@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 extern "C"
 {
@@ -43,10 +44,13 @@ public :
     MovieWriter()=default;
     void start_writing(const std::string& filename, const unsigned int width, const unsigned int height, const int frameRate = 25);
 
-    void addFrame(const uint8_t* pixels, bool write_to_console = false);
+    void addFrame(const uint8_t *pixels);
+    void addYUVFrame(const uint8_t* pixels);
 
     void stop_writing();
     ~MovieWriter();
+
+    void convert_image(const uint8_t *pixels);
 };
 
 class MovieReader

@@ -37,6 +37,7 @@ struct CudaTextureHolder {
 };
 
 class CUDAImageCreator {
+public:
     int * d_lin_width = nullptr;
     int * d_lin_height = nullptr;
 
@@ -65,7 +66,7 @@ class CUDAImageCreator {
     volatile bool creating_image = false;
     volatile bool do_not_create_image = false;
 
-    void image_dimensions_changed(int image_width, int image_height);
+    void image_dimensions_changed(int image_width, int image_height, bool yuv_format);
 
     void simulation_dimensions_changed(int simulation_width, int simulation_height);
 
@@ -79,14 +80,15 @@ class CUDAImageCreator {
 
     void check_if_changed(int image_width, int image_height, int simulation_width, int simulation_height,
                           int width_img_boundaries_size, int height_img_boundaries_size,
-                          int lin_width_size, int lin_height_size, int differences);
+                          int lin_width_size, int lin_height_size, int differences, bool yuv_format);
 
     void copy_to_device(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
                         const std::vector<Vector2<int>> &width_img_boundaries,
                         const std::vector<Vector2<int>> &height_img_boundaries,
                         const std::vector<Differences> &host_differences);
 
-    void copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height);
+    static void copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height,
+                                  unsigned char *d_image_vector, bool yuv_format);
 
 public:
     CUDAImageCreator()=default;
@@ -100,11 +102,20 @@ public:
     void cuda_create_image(int image_width, int image_height, const std::vector<int> &lin_width,
                            const std::vector<int> &lin_height, std::vector<unsigned char> &image_vector,
                            const ColorContainer &color_container, int block_size, int simulation_width,
-                           int simulation_height, std::vector<Differences> &differences);
+                           int simulation_height, std::vector<Differences> &differences, bool yuv_format);
 
     void load_symbols(const ColorContainer *colorContainer);
 
     void copy_textures(TexturesContainer & container);
+
+    static void
+    cuda_call_create_image(int image_width, int image_height, std::vector<unsigned char> &image_vector,
+                           int block_size, int simulation_width, int simulation_height, int *d_lin_width,
+                           int *d_lin_height, Vector2<int> *d_width_img_boundaries,
+                           Vector2<int> *d_height_img_boundaries, unsigned char *d_image_vector,
+                           BaseGridBlock *d_second_simulation_grid, CudaTextureHolder *d_textures,
+                           int height_img_boundaries_size, int width_img_boundaries_size,
+                           bool yuv_format);
 };
 
 #endif //THELIFEENGINECPP_CUDA_IMAGE_CREATOR_CUH

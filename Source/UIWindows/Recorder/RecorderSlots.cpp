@@ -100,7 +100,7 @@ void Recorder::b_create_image_slot() {
     engine->parse_full_simulation_grid();
 
     create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height,
-                 num_pixels_per_block, use_cuda, use_viewpoint);
+                 num_pixels_per_block, use_cuda, use_viewpoint, false);
 
     QImage image(raw_image_data.data(),
                  image_width_dim,
@@ -245,6 +245,17 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
     //Will be loaded from disk
     tbuffer->flush_transactions();
 
+    start_normal_thread();
+
+    b_stop_recording_slot();
+    tbuffer->finish_recording();
+
+#if defined(__WIN32)
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+}
+
+void Recorder::start_normal_thread() {
     std::thread thr2([this](std::string path_to_save,
                             int simulation_width,
                             int simulation_height,
@@ -257,8 +268,18 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                             bool use_cuda,
                             bool cuda_is_available,
                             bool use_viewpoint) {
-        std::vector<unsigned char> image_vec(
-             simulation_width * simulation_height * num_pixels_per_block * num_pixels_per_block * 4);
+        int modifier = 4;
+        if (use_cuda) {modifier = 3;}
+
+         std::vector<unsigned char> image_vec;
+
+        if (use_viewpoint) {
+            image_vec = std::vector<unsigned char>(
+                    image_width * image_height * modifier);
+        } else {
+            image_vec = std::vector<unsigned char>(
+                    simulation_width * simulation_height * num_pixels_per_block * num_pixels_per_block * modifier);
+        }
 
         TransactionBuffer local_tbuffer;
         int parse_every = ecp->parse_full_grid_every_n;
@@ -330,7 +351,64 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
         int frame_num = 0;
         int last_frame_num = 0;
 
-        reconstructor.start_reconstruction(simulation_width, simulation_height);
+#ifdef __CUDA_USED__
+        RecordingReconstructorCUDA cuda_reconstructor{};
+        if (use_cuda_reconstructor && use_cuda && cuda_is_available) {
+            int start_x;
+            int end_x;
+            int start_y;
+            int end_y;
+            std::vector<int> lin_width;
+            std::vector<int> lin_height;
+            std::vector<int> truncated_lin_width;
+            std::vector<int> truncated_lin_height;
+
+            std::vector<Vector2<int>> width_img_boundaries;
+            std::vector<Vector2<int>> height_img_boundaries;
+
+            if (!use_viewpoint) {
+                prepare_full_view(simulation_width, simulation_height, num_pixels_per_block, image_height, start_x, end_x,
+                                  start_y,
+                                  end_y, truncated_lin_width, truncated_lin_height, image_width, lin_width, lin_height);
+            } else {
+                prepare_relative_view(lin_height, truncated_lin_width,
+                                      truncated_lin_height, image_width, image_height, start_x, end_x, start_y, end_y,
+                                      lin_width);
+            }
+
+            auto last = INT32_MIN;
+            auto count = 0;
+            for (int x = 0; x < lin_width.size(); x++) {
+                if (last < lin_width[x]) {
+                    width_img_boundaries.emplace_back(count, x);
+                    last = lin_width[x];
+                    count = x;
+                }
+            }
+            width_img_boundaries.emplace_back(count, lin_width.size());
+
+            last = INT32_MIN;
+            count = 0;
+            for (int x = 0; x < lin_height.size(); x++) {
+                if (last < lin_height[x]) {
+                    height_img_boundaries.emplace_back(count, x);
+                    last = lin_height[x];
+                    count = x;
+                }
+            }
+            height_img_boundaries.emplace_back(count, lin_height.size());
+
+            cuda_reconstructor.start_reconstruction(simulation_width, simulation_height);
+            cuda_reconstructor.prepare_image_creation(image_width, image_height,
+                                                      lin_width, lin_height,
+                                                      width_img_boundaries, height_img_boundaries,
+                                                      *textures, cc);
+        } else {
+#endif
+            reconstructor.start_reconstruction(simulation_width, simulation_height);
+#ifdef __CUDA_USED__
+        }
+#endif
         for (auto &[_, file]: directories) {
             int width;
             int height;
@@ -341,18 +419,36 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
 
             for (int i = 0; i < len; i++) {
                 processed_transactions++;
-
-                reconstructor.apply_transaction(local_tbuffer.transactions[i]);
+#ifdef __CUDA_USED__
+                if (use_cuda_reconstructor && use_cuda && cuda_is_available) {
+                    cuda_reconstructor.apply_transaction(local_tbuffer.transactions[i]);
+                } else {
+#endif
+                    reconstructor.apply_transaction(local_tbuffer.transactions[i]);
+#ifdef __CUDA_USED__
+                }
+#endif
 
                 if (processed_transactions <= loaded_frames) { continue;}
                 if (processed_transactions % parse_every != 0) { continue;}
 
                 frame_num++;
+#ifdef __CUDA_USED__
+                if (use_cuda_reconstructor && use_cuda && cuda_is_available) {
+                    cuda_reconstructor.make_image(image_vec);
+                } else {
+#endif
+                    create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
+                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda);
+#ifdef __CUDA_USED__
+                }
+#endif
 
-                create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
-                             num_pixels_per_block, use_cuda, use_viewpoint);
-
-                writer.addFrame(&image_vec[0]);
+                if (use_cuda) {
+                    writer.addYUVFrame(&image_vec[0]);
+                } else {
+                    writer.addFrame(&image_vec[0]);
+                }
 
                 auto point2 = std::chrono::high_resolution_clock::now();
                 if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
@@ -368,25 +464,28 @@ void Recorder::b_compile_intermediate_data_into_video_slot() {
                     point = std::chrono::high_resolution_clock::now();
                     clear_console();
                     std::cout << "Processed transactions " << processed_transactions << "/" << recorded_states <<
-                    ". Compiled frames " << frame_num << "/" << recorded_states/parse_every << ". Expected time until completion: " << time
+                    ". Compiled frames " << frame_num << "/" << recorded_states/parse_every << ". Frames in second "
+                    << frames_in_second << ". Expected time until completion: " << time
                               << ". Do not turn off program.\n";
                 }
             }
         }
-        reconstructor.finish_reconstruction();
-        compiling_recording = false;
+#ifdef __CUDA_USED__
+        if (use_cuda_reconstructor && use_cuda && cuda_is_available) {
+            cuda_reconstructor.finish_reconstruction();
+            cuda_reconstructor.finish_image_creation();
+        } else {
+#endif
+            reconstructor.finish_reconstruction();
+            compiling_recording = false;
+#ifdef __CUDA_USED__
+        }
+#endif
     }, tbuffer->path_to_save, edc->simulation_width, edc->simulation_height,
-       num_pixels_per_block, tbuffer->recorded_transactions, tbuffer->buffer_size, video_fps,
-       image_width, image_height, use_cuda, cuda_is_available, use_viewpoint);
+                     num_pixels_per_block, tbuffer->recorded_transactions, tbuffer->buffer_size, video_fps,
+                     image_width, image_height, use_cuda, cuda_is_available, use_viewpoint);
 
     thr2.detach();
-
-    b_stop_recording_slot();
-    tbuffer->finish_recording();
-
-#if defined(__WIN32)
-    ShowWindow(GetConsoleWindow(), SW_HIDE);
-#endif
 }
 
 void Recorder::b_clear_intermediate_data_slot() {
@@ -470,4 +569,8 @@ void Recorder::cb_use_cuda_slot(bool state) {
 #if __CUDA_USED__
     cuda_image_creator.copy_textures(*textures);
 #endif
+}
+
+void Recorder::cb_use_cuda_reconstructor_slot(bool state) {
+    use_cuda_reconstructor = state;
 }

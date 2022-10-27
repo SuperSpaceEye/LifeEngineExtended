@@ -28,7 +28,7 @@ void ImageCreation::create_image(const std::vector<int> &lin_width, const std::v
                                  std::vector<unsigned char> &image_vector,
                                  const std::vector<BaseGridBlock> &second_grid, bool use_cuda, bool cuda_is_available,
                                  void *cuda_creator_ptr, const std::vector<int> &truncated_lin_width,
-                                 const std::vector<int> &truncated_lin_height) {
+                                 const std::vector<int> &truncated_lin_height, bool cuda_yuv_format) {
     if (!use_cuda || !cuda_is_available) {
         ImageCreation::ImageCreationTools::complex_image_creation(lin_width, lin_height, simulation_width,
                                                                   simulation_height, cc, textures, image_width,
@@ -42,8 +42,9 @@ void ImageCreation::create_image(const std::vector<int> &lin_width, const std::v
 
         reinterpret_cast<CUDAImageCreator *>(cuda_creator_ptr)->cuda_create_image(image_width, image_height,
                                                                                   lin_width, lin_height, image_vector,
-                                                                                  cc, 32, simulation_width, simulation_height,
-                                                                                  differences);
+                                                                                  cc, 32, simulation_width,
+                                                                                  simulation_height,
+                                                                                  differences, cuda_yuv_format);
 #endif
     }
 }

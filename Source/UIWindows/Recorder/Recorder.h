@@ -26,6 +26,10 @@
 #include "../../Containers/CPU/OrganismInfoContainer.h"
 #include "../../WorldRecorder/RecordingReconstructor.h"
 
+#ifdef __CUDA_USED__
+#include "../../WorldRecorder/RecordingReconstructorCUDA.cuh"
+#endif
+
 #include "../../Stuff/moviemaker/include/movie.h"
 
 #if defined(__WIN32)
@@ -46,6 +50,10 @@ private:
     TransactionBuffer * tbuffer = nullptr;
 
     RecordingReconstructor reconstructor;
+
+#ifdef __CUDA_USED__
+//    RecordingReconstructorCUDA cuda_reconstructor{};
+#endif
 
     int num_pixels_per_block = 5;
     bool recording_paused = false;
@@ -68,11 +76,13 @@ private:
     const bool & cuda_is_available;
     bool compiling_recording = false;
 
+    bool use_cuda_reconstructor = false;
+
     void closeEvent(QCloseEvent * event) override;
 
     void create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                       int simulation_width, int simulation_height, int num_pixels_per_block, bool use_cuda,
-                      bool use_viewpoint);
+                      bool use_viewpoint, bool yuv_format);
 
     void init_gui();
 
@@ -81,6 +91,21 @@ private:
     static std::string get_string_date();
 
     void clear_data();
+
+    void prepare_relative_view(std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+                               std::vector<int> &truncated_lin_height, int &image_width, int &image_height,
+                               int &start_x,
+                               int &end_x, int &start_y, int &end_y, std::vector<int> &lin_width) const;
+
+    void
+    prepare_full_view(int simulation_width, int simulation_height, int num_pixels_per_block, int &image_height,
+                      int start_x,
+                      int end_x, int start_y, int end_y, std::vector<int> &truncated_lin_width,
+                      std::vector<int> &truncated_lin_height, int &image_width, std::vector<int> &lin_width,
+                      std::vector<int> &lin_height) const;
+
+
+    void start_normal_thread();
 
 public:
     Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer *edc, EngineControlParameters *ecp, ColorContainer *cc,
@@ -118,18 +143,7 @@ private slots:
 
     void cb_use_relative_viewpoint_slot(bool state);
     void cb_use_cuda_slot(bool state);
-
-    void prepare_relative_view(std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
-                               std::vector<int> &truncated_lin_height, int &image_width, int &image_height,
-                               int &start_x,
-                               int &end_x, int &start_y, int &end_y, std::vector<int> &lin_width) const;
-
-    void
-    prepare_full_view(int simulation_width, int simulation_height, int num_pixels_per_block, int &image_height,
-                      int start_x,
-                      int end_x, int start_y, int end_y, std::vector<int> &truncated_lin_width,
-                      std::vector<int> &truncated_lin_height, int &image_width, std::vector<int> &lin_width,
-                      std::vector<int> &lin_height) const;
+    void cb_use_cuda_reconstructor_slot(bool state);
 };
 
 #endif //LIFEENGINEEXTENDED_RECORDER_H

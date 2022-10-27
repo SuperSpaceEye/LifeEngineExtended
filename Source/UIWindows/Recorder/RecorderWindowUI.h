@@ -58,6 +58,7 @@ public:
     QSpacerItem *verticalSpacer_4;
     QCheckBox *cb_use_relative_viewpoint;
     QCheckBox *cb_use_cuda;
+    QCheckBox *cb_use_cuda_reconstructor;
     QHBoxLayout *horizontalLayout_6;
     QLabel *label_5;
     QLineEdit *le_viewpoint_x;
@@ -226,6 +227,11 @@ public:
 
         verticalLayout_2->addWidget(cb_use_cuda);
 
+        cb_use_cuda_reconstructor = new QCheckBox(full_video_image_creator);
+        cb_use_cuda_reconstructor->setObjectName("cb_use_cuda_reconstructor");
+
+        verticalLayout_2->addWidget(cb_use_cuda_reconstructor);
+
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName("horizontalLayout_6");
         label_5 = new QLabel(full_video_image_creator);
@@ -327,6 +333,7 @@ public:
         QObject::connect(le_image_width, SIGNAL(returnPressed()), Recorder, SLOT(le_image_width_slot()));
         QObject::connect(le_image_height, SIGNAL(returnPressed()), Recorder, SLOT(le_image_height_slot()));
         QObject::connect(cb_use_cuda, SIGNAL(toggled(bool)), Recorder, SLOT(cb_use_cuda_slot(bool)));
+        QObject::connect(cb_use_cuda_reconstructor, SIGNAL(toggled(bool)), Recorder, SLOT(cb_use_cuda_reconstructor_slot(bool)));
 
         tabWidget->setCurrentIndex(0);
 
@@ -353,6 +360,7 @@ public:
         b_delete_all_intermediate_data_from_disk->setText(QCoreApplication::translate("Recorder", "Delete all intermediate data from disk", nullptr));
         cb_use_relative_viewpoint->setText(QCoreApplication::translate("Recorder", "Use relative viewpoint", nullptr));
         cb_use_cuda->setText(QCoreApplication::translate("Recorder", "Use cuda", nullptr));
+        cb_use_cuda_reconstructor->setText(QCoreApplication::translate("Recorder", "Use cuda reconstructor", nullptr));
         label_5->setText(QCoreApplication::translate("Recorder", "Viewpoint x ", nullptr));
         label_6->setText(QCoreApplication::translate("Recorder", "Viewpoint y ", nullptr));
         label_7->setText(QCoreApplication::translate("Recorder", "Zoom ", nullptr));

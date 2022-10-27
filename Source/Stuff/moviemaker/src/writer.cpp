@@ -98,20 +98,11 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
     writing = true;
 }
 
-void MovieWriter::addFrame(const uint8_t* pixels, bool write_to_console)
+void MovieWriter::addFrame(const uint8_t *pixels)
 {
     // The AVFrame data will be stored as RGBRGBRGB... row-wise,
     // from left to right and from top to bottom.
-    for (unsigned int y = 0; y < height; y++)
-    {
-        for (unsigned int x = 0; x < width; x++)
-        {
-            // rgbpic->linesize[0] is equal to width.
-            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 0] = pixels[y * 4 * width + 4 * x + 2];
-            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 1] = pixels[y * 4 * width + 4 * x + 1];
-            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 2] = pixels[y * 4 * width + 4 * x + 0];
-        }
-    }
+    convert_image(pixels);
 
     // Not actually scaling anything, but just converting
     // the RGB data to YUV and store it in yuvpic.
@@ -131,8 +122,6 @@ void MovieWriter::addFrame(const uint8_t* pixels, bool write_to_console)
     int ret = avcodec_encode_video2(c, &pkt, yuvpic, &got_output);
     if (got_output)
     {
-        fflush(stdout);
-
         // We set the packet PTS and DTS taking in the account our FPS (second argument),
         // and the time base that our selected format uses (third argument).
         av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
@@ -140,13 +129,53 @@ void MovieWriter::addFrame(const uint8_t* pixels, bool write_to_console)
         iframe++;
 
         pkt.stream_index = stream->index;
-        if (write_to_console) {
-            printf("Writing frame %d (size = %d)\n", iframe, pkt.size);
-        }
 
         // Write the encoded frame to the mp4 file.
         av_interleaved_write_frame(fc, &pkt);
         av_packet_unref(&pkt);
+    }
+}
+
+void MovieWriter::addYUVFrame(const uint8_t *pixels) {
+    avpicture_fill((AVPicture*)yuvpic, pixels, AV_PIX_FMT_YUV420P, width, height);
+
+    av_init_packet(&pkt);
+    pkt.data = nullptr;
+    pkt.size = 0;
+
+    // The PTS of the frame are just in a reference unit,
+    // unrelated to the format we are using. We set them,
+    // for instance, as the corresponding frame number.
+    yuvpic->pts = iframe;
+
+    int got_output;
+    int ret = avcodec_encode_video2(c, &pkt, yuvpic, &got_output);
+    if (got_output)
+    {
+        // We set the packet PTS and DTS taking in the account our FPS (second argument),
+        // and the time base that our selected format uses (third argument).
+        av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
+
+        iframe++;
+
+        pkt.stream_index = stream->index;
+
+        // Write the encoded frame to the mp4 file.
+        av_interleaved_write_frame(fc, &pkt);
+        av_packet_unref(&pkt);
+    }
+}
+
+void MovieWriter::convert_image(const uint8_t *pixels) {
+    for (unsigned int y = 0; y < height; y++)
+    {
+        for (unsigned int x = 0; x < width; x++)
+        {
+            // rgbpic->linesize[0] is equal to width.
+            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 0] = pixels[y * 4 * width + 4 * x + 2];
+            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 1] = pixels[y * 4 * width + 4 * x + 1];
+            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 2] = pixels[y * 4 * width + 4 * x + 0];
+        }
     }
 }
 

@@ -43,7 +43,7 @@ namespace ImageCreation {
                       std::vector<unsigned char> &image_vector,
                       const std::vector<BaseGridBlock> &second_grid, bool use_cuda, bool cuda_is_available,
                       void *cuda_creator_ptr, const std::vector<int> &truncated_lin_width,
-                      const std::vector<int> &truncated_lin_height);
+                      const std::vector<int> &truncated_lin_height, bool cuda_yuv_format);
 
     namespace ImageCreationTools {
         const color &get_texture_color(BlockTypes type,

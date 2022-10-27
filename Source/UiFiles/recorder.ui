@@ -232,6 +232,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cb_use_cuda_reconstructor">
+         <property name="text">
+          <string>Use cuda reconstructor</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
           <widget class="QLabel" name="label_5">
@@ -657,6 +664,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_use_cuda_reconstructor</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Recorder</receiver>
+   <slot>cb_use_cuda_reconstructor_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>473</x>
+     <y>542</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>473</x>
+     <y>350</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>le_number_of_pixels_per_block_slot()</slot>
@@ -680,5 +703,6 @@
   <slot>le_image_width_slot()</slot>
   <slot>le_image_height_slot()</slot>
   <slot>cb_use_cuda_slot(bool)</slot>
+  <slot>cb_use_cuda_reconstructor_slot(bool)</slot>
  </slots>
 </ui>

@@ -110,7 +110,6 @@ struct SerializedOrganismStructureContainer {
 
 class Anatomy {
 private:
-
     SerializedOrganismStructureContainer *
     add_block(BlockTypes type, int block_choice, Rotation rotation, int x_, int y_,
               boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
