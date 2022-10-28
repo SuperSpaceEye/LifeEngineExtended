@@ -268,7 +268,8 @@ void Recorder::start_normal_thread() {
                             bool use_cuda,
                             bool cuda_is_available,
                             bool use_viewpoint) {
-        int modifier = 3;
+        int modifier = 4;
+        if (use_cuda) {modifier = 3;}
 
          std::vector<unsigned char> image_vec;
 
@@ -438,12 +439,16 @@ void Recorder::start_normal_thread() {
                 } else {
 #endif
                     create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
-                                 num_pixels_per_block, use_cuda, use_viewpoint, true);
+                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda);
 #ifdef __CUDA_USED__
                 }
 #endif
 
-                writer.addYUVFrame(image_vec.data());
+                if (use_cuda) {
+                    writer.addYUVFrame(image_vec.data());
+                } else {
+                    writer.addFrame(image_vec.data());
+                }
 
                 auto point2 = std::chrono::high_resolution_clock::now();
                 if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
