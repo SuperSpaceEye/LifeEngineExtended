@@ -193,7 +193,7 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
 //https://stackoverflow.com/questions/9465815/rgb-to-yuv420-algorithm-efficiency
 
 //TODO it is fucking useless because of it's speed compared to just making an rgb image and converting it.
-// probably because of shitty memory access that cuda was able to overcome with shear amount of cores/threads.
+// probably because of shitty memory access that cuda was able to overcome with sheer amount of cores/threads.
 //https://stackoverflow.com/questions/1737726/how-to-perform-rgb-yuv-conversion-in-c-c
 #define CLIP(X) ( (X) > 255 ? 255 : (X) < 0 ? 0 : (X))
 
