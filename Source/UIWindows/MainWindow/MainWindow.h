@@ -72,7 +72,7 @@
 #include "../OCCParameters/OCCParameters.h"
 
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
 #include "../../Stuff/cuda_image_creator.cuh"
 #include "../../Stuff/get_device_count.cuh"
 #endif
@@ -86,7 +86,7 @@ class MainWindow: public QWidget {
 private:
     CursorMode cursor_mode = CursorMode::ModifyFood;
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     CUDAImageCreator cuda_creator{};
 #endif
 

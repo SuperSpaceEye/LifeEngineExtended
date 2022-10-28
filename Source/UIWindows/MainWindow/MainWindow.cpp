@@ -604,7 +604,7 @@ void MainWindow::initialize_gui() {
     ui.cb_really_stop_render->setChecked(really_stop_render);
     ui.cb_show_extended_statistics->setChecked(false);
     ui.cb_load_evolution_controls_from_state->setChecked(save_simulation_settings);
-#if __CUDA_USED__ == 0
+#ifndef __CUDA_USED__
     ui.cb_use_nvidia_for_image_generation->hide();
 #endif
 
@@ -845,7 +845,7 @@ void MainWindow::load_textures_from_disk() {
         }
     }
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     if (cuda_is_available_var && use_cuda) {
         cuda_creator.copy_textures(textures);
         ee.cuda_image_creator.copy_textures(textures);

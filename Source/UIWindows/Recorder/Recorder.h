@@ -116,7 +116,7 @@ public:
 
     void update_label();
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     CUDAImageCreator cuda_image_creator{};
 #endif
 private slots:

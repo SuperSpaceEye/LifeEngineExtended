@@ -594,7 +594,7 @@ void MainWindow::cb_fill_window_slot(bool state) {
 void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
     if (!state) {
         use_cuda = false;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
         cuda_creator.free();
         ee.cuda_image_creator.free();
 #endif
@@ -609,7 +609,7 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
         return;
     }
     use_cuda = true;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     cuda_creator.copy_textures(textures);
     ee.cuda_image_creator.copy_textures(textures);
 #endif

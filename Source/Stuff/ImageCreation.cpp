@@ -28,13 +28,22 @@ void ImageCreation::create_image(const std::vector<int> &lin_width, const std::v
                                  std::vector<unsigned char> &image_vector,
                                  const std::vector<BaseGridBlock> &second_grid, bool use_cuda, bool cuda_is_available,
                                  void *cuda_creator_ptr, const std::vector<int> &truncated_lin_width,
-                                 const std::vector<int> &truncated_lin_height, bool cuda_yuv_format) {
+                                 const std::vector<int> &truncated_lin_height, bool yuv_format) {
+#ifdef __CUDA_USED__
     if (!use_cuda || !cuda_is_available) {
-        ImageCreation::ImageCreationTools::complex_image_creation(lin_width, lin_height, simulation_width,
-                                                                  simulation_height, cc, textures, image_width,
-                                                                  image_vector, second_grid);
+#endif
+        if (yuv_format) {
+            ImageCreation::ImageCreationTools::complex_yuv_image_creation(image_width, lin_width, lin_height,
+                                                                          simulation_width,
+                                                                          simulation_height, cc, textures,
+                                                                          image_vector, second_grid, image_height);
+        } else {
+            ImageCreation::ImageCreationTools::complex_image_creation(lin_width, lin_height, simulation_width,
+                                                                      simulation_height, cc, textures, image_width,
+                                                                      image_vector, second_grid);
+        }
+#ifdef __CUDA_USED__
     } else {
-#if __CUDA_USED__
         std::vector<Differences> differences{};
         reinterpret_cast<CUDAImageCreator *>(cuda_creator_ptr)->compile_differences(truncated_lin_width, truncated_lin_height,
                                                                                     differences, simulation_width,
@@ -45,8 +54,8 @@ void ImageCreation::create_image(const std::vector<int> &lin_width, const std::v
                                                                                   cc, 32, simulation_width,
                                                                                   simulation_height,
                                                                                   differences, cuda_yuv_format);
-#endif
     }
+#endif
 }
 
 const color &ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation,
@@ -175,6 +184,92 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
                                                         textures);
                     }
                     set_image_pixel(x, y, image_width, pixel_color, image_vector);
+                }
+            }
+        }
+    }
+}
+
+//https://stackoverflow.com/questions/1737726/how-to-perform-rgb-yuv-conversion-in-c-c
+#define CLIP(X) ( (X) > 255 ? 255 : (X) < 0 ? 0 : (X))
+
+// RGB -> YUV
+#define RGB2Y(R, G, B) CLIP(( (  66 * (R) + 129 * (G) +  25 * (B) + 128) >> 8) +  16)
+#define RGB2U(R, G, B) CLIP(( ( -38 * (R) -  74 * (G) + 112 * (B) + 128) >> 8) + 128)
+#define RGB2V(R, G, B) CLIP(( ( 112 * (R) -  94 * (G) -  18 * (B) + 128) >> 8) + 128)
+//https://stackoverflow.com/questions/27822017/planar-yuv420-data-layout
+void set_yuv_image_pixel(int x, int y, int width, int height, color color, std::vector<unsigned char> image_vector) {
+    //y
+    image_vector[y * width + x] = RGB2Y(color.r, color.g, color.b);
+    //u
+    image_vector[(y / 2) * (width / 2) + (x / 2) + width*height] = RGB2U(color.r, color.g, color.b);
+    //v
+    image_vector[(y / 2) * (width / 2) + (x / 2) + width*height + width*height / 4] = RGB2V(color.r, color.g, color.b);
+}
+
+
+void ImageCreation::ImageCreationTools::complex_yuv_image_creation(int image_width, const std::vector<int> &lin_width,
+                                                                   const std::vector<int> &lin_height,
+                                                                   uint32_t simulation_width,
+                                                                   uint32_t simulation_height, const ColorContainer &cc,
+                                                                   const TexturesContainer &textures,
+                                                                   std::vector<unsigned char> &image_vector,
+                                                                   const std::vector<BaseGridBlock> &second_grid,
+                                                                   int image_height) {
+    //x - start, y - stop
+    std::vector<Vector2<int>> width_img_boundaries;
+    std::vector<Vector2<int>> height_img_boundaries;
+
+    auto last = INT32_MIN;
+    auto count = 0;
+    for (int x = 0; x < lin_width.size(); x++) {
+        if (last < lin_width[x]) {
+            width_img_boundaries.emplace_back(count, x);
+            last = lin_width[x];
+            count = x;
+        }
+    }
+    width_img_boundaries.emplace_back(count, lin_width.size());
+
+    last = INT32_MIN;
+    count = 0;
+    for (int x = 0; x < lin_height.size(); x++) {
+        if (last < lin_height[x]) {
+            height_img_boundaries.emplace_back(count, x);
+            last = lin_height[x];
+            count = x;
+        }
+    }
+    height_img_boundaries.emplace_back(count, lin_height.size());
+
+    color pixel_color;
+    //width of boundaries of an organisms
+
+    //width bound, height bound
+    //goes through seen blocks
+    for (auto &w_b: width_img_boundaries) {
+        for (auto &h_b: height_img_boundaries) {
+            //calculates texture in seen block.
+            for (int x = w_b.x; x < w_b.y; x++) {
+                for (int y = h_b.x; y < h_b.y; y++) {
+                    if (lin_width[x] < 0 ||
+                        lin_width[x] >= simulation_width ||
+                        lin_height[y] < 0 ||
+                        lin_height[y] >= simulation_height) {
+                        pixel_color = cc.simulation_background_color;
+                    } else {
+                        auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
+                        //double({pos} - {dim}_b.x) / ({dim}_b.y - {dim}_b.x)
+                        // first,  calculate relative position of a pixel inside a texture block.
+                        // second, calculate a dimension of a pixel that is going to be displayed.
+                        // third,  normalize relative position between 0 and 1 by dividing result of first stage by second one.
+                        pixel_color = get_texture_color(block.type,
+                                                        block.rotation,
+                                                        double(x - w_b.x) / (w_b.y - w_b.x),
+                                                        double(y - h_b.x) / (h_b.y - h_b.x),
+                                                        textures);
+                    }
+                    set_yuv_image_pixel(x, y, image_width, image_height, pixel_color, image_vector);
                 }
             }
         }

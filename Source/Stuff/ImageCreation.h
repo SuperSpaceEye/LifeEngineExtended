@@ -15,7 +15,7 @@
 #include "Vector2.h"
 #include "textures.h"
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
 #include "cuda_image_creator.cuh"
 #endif
 
@@ -43,7 +43,7 @@ namespace ImageCreation {
                       std::vector<unsigned char> &image_vector,
                       const std::vector<BaseGridBlock> &second_grid, bool use_cuda, bool cuda_is_available,
                       void *cuda_creator_ptr, const std::vector<int> &truncated_lin_width,
-                      const std::vector<int> &truncated_lin_height, bool cuda_yuv_format);
+                      const std::vector<int> &truncated_lin_height, bool yuv_format);
 
     namespace ImageCreationTools {
         const color &get_texture_color(BlockTypes type,
@@ -67,6 +67,15 @@ namespace ImageCreation {
                                     int image_width,
                                     std::vector<unsigned char> &image_vector,
                                     const std::vector<BaseGridBlock> &second_grid);
+
+        void complex_yuv_image_creation(int image_width, const std::vector<int> &lin_width,
+                                        const std::vector<int> &lin_height,
+                                        uint32_t simulation_width,
+                                        uint32_t simulation_height, const ColorContainer &cc,
+                                        const TexturesContainer &textures,
+                                        std::vector<unsigned char> &image_vector,
+                                        const std::vector<BaseGridBlock> &second_grid,
+                                        int image_height);
     }
 }
 

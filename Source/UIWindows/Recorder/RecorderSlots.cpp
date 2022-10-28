@@ -268,8 +268,7 @@ void Recorder::start_normal_thread() {
                             bool use_cuda,
                             bool cuda_is_available,
                             bool use_viewpoint) {
-        int modifier = 4;
-        if (use_cuda) {modifier = 3;}
+        int modifier = 3;
 
          std::vector<unsigned char> image_vec;
 
@@ -439,16 +438,12 @@ void Recorder::start_normal_thread() {
                 } else {
 #endif
                     create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
-                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda);
+                                 num_pixels_per_block, use_cuda, use_viewpoint, true);
 #ifdef __CUDA_USED__
                 }
 #endif
 
-                if (use_cuda) {
-                    writer.addYUVFrame(&image_vec[0]);
-                } else {
-                    writer.addFrame(&image_vec[0]);
-                }
+                writer.addYUVFrame(image_vec.data());
 
                 auto point2 = std::chrono::high_resolution_clock::now();
                 if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - point).count() / 1000. > 1. / 5) {
@@ -554,7 +549,7 @@ void Recorder::cb_use_relative_viewpoint_slot(bool state) {use_viewpoint = state
 void Recorder::cb_use_cuda_slot(bool state) {
     if (!state) {
         use_cuda = false;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
         cuda_image_creator.free();
 #endif
         return;}
@@ -566,7 +561,7 @@ void Recorder::cb_use_cuda_slot(bool state) {
         return;
     }
     use_cuda = true;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     cuda_image_creator.copy_textures(*textures);
 #endif
 }

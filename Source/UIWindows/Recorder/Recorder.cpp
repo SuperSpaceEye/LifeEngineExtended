@@ -47,7 +47,7 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const st
                               lin_width);
     }
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     void * cuda_i_creator = &cuda_image_creator;
 #else
     void * cuda_i_creator = nullptr;
@@ -55,8 +55,7 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const st
 
     ImageCreation::create_image(lin_width, lin_height, edc->simulation_width, edc->simulation_height,
                                 *cc, *textures, image_width, image_height, raw_image_data, grid, use_cuda,
-                                cuda_is_available,
-                                cuda_i_creator, truncated_lin_width, truncated_lin_height, yuv_format);
+                                cuda_is_available, cuda_i_creator, truncated_lin_width, truncated_lin_height, yuv_format);
 }
 
 void

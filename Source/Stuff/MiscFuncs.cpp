@@ -104,12 +104,12 @@ bool choose_node_window(NodeType &new_node_type) {
     return main_dialog.exec();
 }
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
 #include "get_device_count.cuh"
 #endif
 
 bool cuda_is_available() {
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     return get_device_count();
 #else
     return false;
