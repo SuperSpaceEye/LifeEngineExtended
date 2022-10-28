@@ -108,11 +108,10 @@ add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJE
 if(CUDAToolkit_FOUND)
     message(STATUS "Found CUDAToolkit version ${CUDAToolkit_VERSION}")
 
-    add_compile_definitions(__CUDA_USED__=1)
+    add_compile_definitions(__CUDA_USED__)
     set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 else()
     message(STATUS "No CUDAToolkit found.")
-    add_compile_definitions(__CUDA_USED__=0)
 endif()
 
 if(CUDAToolkit_FOUND)

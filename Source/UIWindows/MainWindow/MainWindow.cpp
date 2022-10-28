@@ -676,6 +676,7 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
 void MainWindow::change_main_grid_left_click() {
     while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
 
     if (update_last_cursor_pos) {
         last_last_cursor_x_pos = last_mouse_x_pos;
@@ -723,6 +724,7 @@ void MainWindow::change_main_grid_left_click() {
         }
     }
     endfor:
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     ecp.do_not_use_user_actions_ui = false;
 
     last_last_cursor_x_pos = last_mouse_x_pos;

@@ -88,11 +88,7 @@ void SimulationEngine::simulation_tick() {
     edc.engine_ticks_between_updates++;
     edc.total_engine_ticks++;
 
-    if (edc.stc.num_alive_organisms == 0) {
-        ecp.organisms_extinct = true;
-    } else {
-        ecp.organisms_extinct = false;
-    }
+    ecp.organisms_extinct = edc.stc.num_alive_organisms == 0;
 
     if (ecp.organisms_extinct && (sp.pause_on_total_extinction || sp.reset_on_total_extinction)) {
         ecp.engine_paused = true;
@@ -123,12 +119,17 @@ void SimulationEngine::simulation_tick() {
 //    }
 }
 
+//TODO after a really big amount of simulation ticks the program can for some reason segfault if you try to interact
+// with the sim through user actions. I have no idea why and can't exactly troubleshoot it (I am not patient enough).
+// The memory gets corrupted somewhere, though it also can be because of the previous logic that I've changed now.
+// The simulation itself may corrupt memory, but the -fsanitize=address doesn't tell anything wrong for a small simulation
+// time. If I don't detect any segfaults for some time, I will delete this to do.
 void SimulationEngine::process_user_action_pool() {
-    if (!edc.ui_user_actions_pool.empty() && !ecp.do_not_use_user_actions_ui) {
+    if (!ecp.do_not_use_user_actions_ui && !edc.ui_user_actions_pool.empty()) {
         ecp.do_not_use_user_actions_engine = true;
-        edc.engine_user_actions_pool.resize(edc.ui_user_actions_pool.size());
-        std::copy(edc.ui_user_actions_pool.begin(), edc.ui_user_actions_pool.end(), edc.engine_user_actions_pool.begin());
-        edc.ui_user_actions_pool.clear();
+        std::atomic_thread_fence(std::memory_order_seq_cst);
+        std::swap(edc.ui_user_actions_pool, edc.engine_user_actions_pool);
+        std::atomic_thread_fence(std::memory_order_seq_cst);
         ecp.do_not_use_user_actions_engine = false;
     } else { return; }
 
