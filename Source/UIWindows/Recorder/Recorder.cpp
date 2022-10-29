@@ -105,6 +105,11 @@ void Recorder::init_gui() {
     ui.le_log_every_n_tick->setText(QString::fromStdString(std::to_string(ecp->parse_full_grid_every_n)));
     ui.le_first_grid_buffer_size->setText(QString::fromStdString(std::to_string(tbuffer->buffer_size)));
     ui.le_video_fps->setText(QString::fromStdString(std::to_string(video_fps)));
+
+    if (!cuda_is_available) {
+        ui.cb_use_cuda->hide();
+        ui.cb_use_cuda_reconstructor->hide();
+    }
 }
 
 std::string Recorder::new_recording(std::string path) {

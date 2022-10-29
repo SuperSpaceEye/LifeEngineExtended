@@ -228,7 +228,6 @@ void MovieWriter::stop_writing() {
 
     // Freeing all the allocated memory:
     temp_data = std::vector<unsigned char>{};
-    av_frame_free(&rgbpic);
     av_frame_free(&yuvpic);
     avformat_free_context(fc);
 

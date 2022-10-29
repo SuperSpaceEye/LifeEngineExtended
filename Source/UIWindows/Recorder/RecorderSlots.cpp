@@ -549,7 +549,7 @@ void Recorder::b_set_from_camera_slot() {
     ui.le_image_height->setText(QString::fromStdString(std::to_string(image_height)));
 }
 
-void Recorder::cb_use_relative_viewpoint_slot(bool state) {use_viewpoint = state;}
+void Recorder::cb_use_relative_viewpoint_slot(bool state) {use_viewpoint = state; b_set_from_camera_slot();}
 
 void Recorder::cb_use_cuda_slot(bool state) {
     if (!state) {
