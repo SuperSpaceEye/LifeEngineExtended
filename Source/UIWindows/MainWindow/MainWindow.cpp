@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent):
     edc.simulation_width = 200;
     edc.simulation_height = 200;
 
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
+    edc.CPU_simulation_grid.resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
     edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();

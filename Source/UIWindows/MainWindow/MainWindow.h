@@ -97,8 +97,6 @@ private:
 
     //double buffering to eliminate tearing
     std::array<std::vector<unsigned char>, 2> image_vectors{std::vector<unsigned char>{}, std::vector<unsigned char>{}};
-    //will reflect the state of images.
-    std::array<std::vector<BaseGridBlock>, 2> image_grid{std::vector<BaseGridBlock>{}, std::vector<BaseGridBlock>{}};
     //which buffer should be used to draw an image on screen
     volatile int ready_buffer = 0;
     //if the main thread did not draw the image on screen, do not compute next image.

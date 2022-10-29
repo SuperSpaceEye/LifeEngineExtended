@@ -68,14 +68,6 @@ namespace ImageCreation {
                                     std::vector<unsigned char> &image_vector,
                                     const std::vector<BaseGridBlock> &second_grid);
 
-        void complex_yuv_image_creation(int image_width, const std::vector<int> &lin_width,
-                                        const std::vector<int> &lin_height,
-                                        uint32_t simulation_width,
-                                        uint32_t simulation_height, const ColorContainer &cc,
-                                        const TexturesContainer &textures,
-                                        std::vector<unsigned char> &image_vector,
-                                        const std::vector<BaseGridBlock> &second_grid,
-                                        int image_height);
     }
 }
 

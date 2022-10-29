@@ -27,7 +27,6 @@ class MovieWriter
 
     bool writing = false;
 
-    SwsContext* swsCtx;
     AVOutputFormat* fmt;
     AVStream* stream;
     AVFormatContext* fc;
@@ -40,12 +39,14 @@ class MovieWriter
 
     cairo_surface_t* cairo_surface;
 
+    std::vector<unsigned char> temp_data;
+
 public :
     MovieWriter()=default;
     void start_writing(const std::string& filename, const unsigned int width, const unsigned int height, const int frameRate = 25);
 
-    void addFrame(const uint8_t *pixels);
     void addYUVFrame(const uint8_t* pixels);
+    void addFrame(const uint8_t * pixels);
 
     void stop_writing();
     ~MovieWriter();
