@@ -10,7 +10,8 @@ void ImageCreation::calculate_linspace(std::vector<int> &lin_width, std::vector<
     lin_height = linspace<int>(start_y, end_y, image_height);
 }
 
-void ImageCreation::calculate_truncated_linspace(int image_width, int image_height, const std::vector<int> &lin_width,
+void ImageCreation::calculate_truncated_linspace(int image_width, int image_height,
+                                                 const std::vector<int> &lin_width,
                                                  const std::vector<int> &lin_height,
                                                  std::vector<int> &truncated_lin_width,
                                                  std::vector<int> &truncated_lin_height) {
@@ -147,11 +148,11 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
 
     last = INT32_MIN;
     count = 0;
-    for (int x = 0; x < lin_height.size(); x++) {
-        if (last < lin_height[x]) {
-            height_img_boundaries.emplace_back(count, x);
-            last = lin_height[x];
-            count = x;
+    for (int y = 0; y < lin_height.size(); y++) {
+        if (last < lin_height[y]) {
+            height_img_boundaries.emplace_back(count, y);
+            last = lin_height[y];
+            count = y;
         }
     }
     height_img_boundaries.emplace_back(count, lin_height.size());

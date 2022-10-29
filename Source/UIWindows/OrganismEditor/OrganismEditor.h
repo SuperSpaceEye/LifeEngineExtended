@@ -118,8 +118,8 @@ public:
     bool change_disabled = false;
     bool short_instructions = false;
 
-    Organism * editor_organism;
-    Organism ** chosen_organism;
+    Organism editor_organism;
+    Organism * chosen_organism;
 
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
     Rotation chosen_block_rotation = Rotation::UP;
@@ -135,7 +135,7 @@ public:
 
     OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                    SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                   Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                   Organism *chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
                    OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);

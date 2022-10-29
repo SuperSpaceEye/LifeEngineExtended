@@ -96,6 +96,7 @@ public:
     void kill_organism(EngineDataContainer & edc);
 
     void move_organism(Organism & organism);
+    void copy_organism(const Organism & organism);
 
     Organism & operator=(const Organism & organism)=default;
     Organism()=default;

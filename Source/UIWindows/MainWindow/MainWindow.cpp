@@ -68,12 +68,12 @@ MainWindow::MainWindow(QWidget *parent):
                                        Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp, &occp,
                                        &edc.stc.occl, 1);
 
-    edc.base_organism->last_decision_observation = DecisionObservation{};
-    edc.chosen_organism->last_decision_observation = DecisionObservation{};
+    edc.base_organism.last_decision_observation = DecisionObservation{};
+    edc.chosen_organism.last_decision_observation = DecisionObservation{};
 
     auto * organism = OrganismsController::get_new_main_organism(edc);
     auto array_place = organism->vector_index;
-    *organism = Organism(edc.base_organism);
+    organism->copy_organism(edc.base_organism);
     organism->vector_index = array_place;
 
     SimulationEngineSingleThread::place_organism(&edc, organism);
@@ -199,10 +199,9 @@ void MainWindow::update_fps_labels(int fps, int tps, int ups) {
 }
 
 void MainWindow::resize_image() {
-    image_vectors[0].clear();
-    image_vectors[1].clear();
-    image_vectors[0].reserve(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
-    image_vectors[1].reserve(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
+    if (image_vectors[0].size() == 4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height()) {return;}
+    image_vectors[0].resize(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
+    image_vectors[1].resize(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
 }
 
 void MainWindow::move_center(int delta_x, int delta_y) {
@@ -783,8 +782,8 @@ void MainWindow::change_editing_grid_left_click() {
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
 
     //relative position
-    auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy.set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
+    auto r_pos = Vector2<int>{cpg.x - ee.editor_organism.x, cpg.y - ee.editor_organism.y};
+    ee.editor_organism.anatomy.set_block(ee.chosen_block_type, ee.chosen_block_rotation, r_pos.x, r_pos.y);
     ee.create_image();
 }
 
@@ -793,11 +792,11 @@ void MainWindow::change_editing_grid_right_click() {
 
     auto cpg = ee.calculate_cursor_pos_on_grid(last_mouse_x_pos, last_mouse_y_pos);
     if (cpg.x < 0 || cpg.y < 0 || cpg.x >= ee.editor_width || cpg.y >= ee.editor_height) { return;}
-    if (ee.editor_organism->anatomy._organism_blocks.size() == 1) { return;}
+    if (ee.editor_organism.anatomy._organism_blocks.size() == 1) { return;}
 
     //relative position
-    auto r_pos = Vector2<int>{cpg.x - ee.editor_organism->x, cpg.y - ee.editor_organism->y};
-    ee.editor_organism->anatomy.set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
+    auto r_pos = Vector2<int>{cpg.x - ee.editor_organism.x, cpg.y - ee.editor_organism.y};
+    ee.editor_organism.anatomy.set_block(BlockTypes::EmptyBlock, Rotation::UP, r_pos.x, r_pos.y);
     ee.create_image();
 }
 

@@ -155,7 +155,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryAddOrganism: {
                 bool continue_flag = false;
-                edc.chosen_organism->init_values();
+                edc.chosen_organism.init_values();
 
                 continue_flag = action_check_if_space_for_organism_is_free(action, continue_flag);
                 if (continue_flag) { continue; }
@@ -179,8 +179,7 @@ void SimulationEngine::process_user_action_pool() {
 
     for (auto & action: edc.engine_user_actions_pool) {
         if (action.type == ActionType::TrySelectOrganism && edc.selected_organism != nullptr) {
-            delete edc.chosen_organism;
-            edc.chosen_organism = new Organism(edc.selected_organism);
+            edc.chosen_organism.copy_organism(edc.selected_organism);
             edc.selected_organism = nullptr;
             ecp.update_editor_organism = true;
             break;
@@ -194,7 +193,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
     auto * new_organism = OrganismsController::get_new_main_organism(edc);
 
     auto array_place = new_organism->vector_index;
-    *new_organism = Organism(edc.chosen_organism);
+    new_organism->copy_organism(edc.chosen_organism);
     new_organism->vector_index = array_place;
 
     if (array_place > edc.stc.last_alive_position) { edc.stc.last_alive_position = array_place; }
@@ -205,24 +204,24 @@ void SimulationEngine::action_place_organism(const Action &action) {
     if (edc.record_data) { edc.stc.tbuffer.record_new_organism(*new_organism);}
 
     for (auto &block: new_organism->anatomy._organism_blocks) {
-        int x = block.get_pos(edc.chosen_organism->rotation).x + new_organism->x;
-        int y = block.get_pos(edc.chosen_organism->rotation).y + new_organism->y;
+        int x = block.get_pos(edc.chosen_organism.rotation).x + new_organism->x;
+        int y = block.get_pos(edc.chosen_organism.rotation).y + new_organism->y;
 
         edc.CPU_simulation_grid[x][y].type     = block.type;
         edc.CPU_simulation_grid[x][y].organism_index = new_organism->vector_index;
-        edc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, edc.chosen_organism->rotation);
+        edc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
-    for (auto &block: edc.chosen_organism->anatomy._organism_blocks) {
+    for (auto &block: edc.chosen_organism.anatomy._organism_blocks) {
         continue_flag = check_if_out_of_bounds(&edc,
-                                               block.get_pos(edc.chosen_organism->rotation).x + action.x,
-                                               block.get_pos(edc.chosen_organism->rotation).y + action.y);
+                                               block.get_pos(edc.chosen_organism.rotation).x + action.x,
+                                               block.get_pos(edc.chosen_organism.rotation).y + action.y);
         if (continue_flag) { break; }
 
-        int x = block.get_pos(edc.chosen_organism->rotation).x + action.x;
-        int y = block.get_pos(edc.chosen_organism->rotation).y + action.y;
+        int x = block.get_pos(edc.chosen_organism.rotation).x + action.x;
+        int y = block.get_pos(edc.chosen_organism.rotation).y + action.y;
 
         auto & _block = edc.CPU_simulation_grid[x][y];
 
@@ -306,19 +305,19 @@ void SimulationEngine::reset_world() {
     partial_clear_world();
     make_walls();
 
-    edc.base_organism->x = edc.simulation_width / 2;
-    edc.base_organism->y = edc.simulation_height / 2;
+    edc.base_organism.x = edc.simulation_width / 2;
+    edc.base_organism.y = edc.simulation_height / 2;
 
-    edc.chosen_organism->x = edc.simulation_width / 2;
-    edc.chosen_organism->y = edc.simulation_height / 2;
+    edc.chosen_organism.x = edc.simulation_width / 2;
+    edc.chosen_organism.y = edc.simulation_height / 2;
 
     Organism * organism = OrganismsController::get_new_main_organism(edc);
     auto array_place = organism->vector_index;
 
     if (ecp.reset_with_editor_organism) {
-        *organism = Organism(edc.chosen_organism);
+        organism->copy_organism(edc.chosen_organism);
     } else {
-        *organism = Organism(edc.base_organism);
+        organism->copy_organism(edc.base_organism);
     }
     organism->vector_index = array_place;
     edc.stc.last_alive_position = organism->vector_index;

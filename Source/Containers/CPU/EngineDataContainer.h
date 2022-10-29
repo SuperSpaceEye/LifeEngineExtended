@@ -66,8 +66,8 @@ struct EngineDataContainer {
 
     std::vector<BaseGridBlock> simple_state_grid;
 
-    Organism * base_organism = nullptr;
-    Organism * chosen_organism = nullptr;
+    Organism base_organism{};
+    Organism chosen_organism{};
 
     int auto_reset_counter = 0;
 
