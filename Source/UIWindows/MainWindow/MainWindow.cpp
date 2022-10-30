@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     cuda_is_available_var = cuda_is_available();
 
+    rc.init_gui();
+
     auto anatomy = Anatomy();
 
     auto brain = Brain(BrainTypes::RandomActions);

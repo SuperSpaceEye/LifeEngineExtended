@@ -7,7 +7,7 @@
 Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer *edc, EngineControlParameters *ecp,
                    ColorContainer *cc,
                    TexturesContainer *textures, TransactionBuffer *tbuffer, float *viewpoint_x, float *viewpoint_y,
-                   float *zoom, const bool &cuda_is_available) :
+                   float *zoom, bool &cuda_is_available) :
     parent_ui(_parent_ui), edc(edc), ecp(ecp), cc(cc), textures(textures), tbuffer(tbuffer), main_viewpoint_x(viewpoint_x),
     main_viewpoint_y(viewpoint_y), main_zoom(zoom), cuda_is_available(cuda_is_available){
     ui.setupUi(this);
@@ -109,6 +109,9 @@ void Recorder::init_gui() {
     if (!cuda_is_available) {
         ui.cb_use_cuda->hide();
         ui.cb_use_cuda_reconstructor->hide();
+    } else {
+        ui.cb_use_cuda->show();
+        ui.cb_use_cuda_reconstructor->show();
     }
 }
 

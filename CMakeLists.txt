@@ -6,9 +6,12 @@ project(${PROJECT_NAME})
 option(WIN_COMPILATION "If compiling for windows" OFF)
 option(NO_RECORDER "If you don't want recorder" OFF)
 option(CMAKE_PREFIX_PATH "Set path to qt6 binary" "/home/spaceeye/Qt/6.4.0/Src/qtbase")
+option(USE_MARCH_NATIVE "Use -march=native option" OFF)
 
 option(BOOST_ROOT "If on windows, set path to boost root directory" "C:\\libs\\boost\\boost_1_79_0")
 option(BOOST_LIBRARYDIR "If on windows, set path to compiled libraries, like 'boost\\stage\\libs'" "C:\\libs\\boost\\boost_1_79_0\\stage\\libs")
+
+# -ffast-math -funroll-loops -ftree-parallelize-loops=4
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CUDA_STANDARD 20)
@@ -16,6 +19,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+if(USE_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif()
 
 #https://developer.nvidia.com/cuda-gpus
 #set(CMAKE_CUDA_ARCHITECTURES 35 37 50 52 53 60 61 62 70 72 75 80 86)

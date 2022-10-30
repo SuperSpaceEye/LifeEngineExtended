@@ -73,7 +73,7 @@ private:
 
     bool use_viewpoint = false;
     bool use_cuda = false;
-    const bool & cuda_is_available;
+    bool & cuda_is_available;
     bool compiling_recording = false;
 
     bool use_cuda_reconstructor = false;
@@ -83,8 +83,6 @@ private:
     void create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                       int simulation_width, int simulation_height, int num_pixels_per_block, bool use_cuda,
                       bool use_viewpoint, bool yuv_format);
-
-    void init_gui();
 
     std::string new_recording(std::string path);
 
@@ -110,11 +108,13 @@ private:
 public:
     Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer *edc, EngineControlParameters *ecp, ColorContainer *cc,
              TexturesContainer *textures, TransactionBuffer *tbuffer, float *viewpoint_x, float *viewpoint_y,
-             float *zoom, const bool &cuda_is_available);
+             float *zoom, bool &cuda_is_available);
 
     void set_engine(SimulationEngine * engine);
 
     void update_label();
+
+    void init_gui();
 
 #ifdef __CUDA_USED__
     CUDAImageCreator cuda_image_creator{};
