@@ -128,62 +128,69 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
                                                                const ColorContainer &cc, const TexturesContainer &textures,
                                                                int image_width, std::vector<unsigned char> &image_vector,
                                                                const std::vector<BaseGridBlock> &second_grid) {
-    //x - start, y - stop
-    std::vector<Vector2<int>> width_img_boundaries;
-    std::vector<Vector2<int>> height_img_boundaries;
+    std::vector<int> width_img_boundaries;
+    std::vector<int> height_img_boundaries;
 
     auto last = INT32_MIN;
     auto count = 0;
     for (int x = 0; x < lin_width.size(); x++) {
         if (last < lin_width[x]) {
-            width_img_boundaries.emplace_back(count, x);
+            width_img_boundaries.emplace_back(x - count);
             last = lin_width[x];
             count = x;
         }
     }
-    width_img_boundaries.emplace_back(count, lin_width.size());
+    width_img_boundaries.emplace_back(lin_width.size() - count);
 
     last = INT32_MIN;
     count = 0;
     for (int y = 0; y < lin_height.size(); y++) {
         if (last < lin_height[y]) {
-            height_img_boundaries.emplace_back(count, y);
+            height_img_boundaries.emplace_back(y - count);
             last = lin_height[y];
             count = y;
         }
     }
-    height_img_boundaries.emplace_back(count, lin_height.size());
+    height_img_boundaries.emplace_back(lin_height.size() - count);
 
     color pixel_color;
     //width of boundaries of an organisms
 
-    //width bound, height bound
-    //goes through seen blocks
-    for (auto &h_b: height_img_boundaries) {
-        for (auto &w_b: width_img_boundaries) {
-            //calculates texture in seen block.
-            for (int y = h_b.x; y < h_b.y; y++) {
-                for (int x = w_b.x; x < w_b.y; x++) {
-                    if (lin_width[x] < 0 ||
-                        lin_width[x] >= simulation_width ||
-                        lin_height[y] < 0 ||
-                        lin_height[y] >= simulation_height) {
-                        pixel_color = cc.simulation_background_color;
-                    } else {
-                        auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
-                        //double({pos} - {dim}_b.x) / ({dim}_b.y - {dim}_b.x)
-                        // first,  calculate relative position of a pixel inside a texture block.
-                        // second, calculate a dimension of a pixel that is going to be displayed.
-                        // third,  normalize relative position between 0 and 1 by dividing result of first stage by second one.
-                        pixel_color = get_texture_color(block.type,
-                                                        block.rotation,
-                                                        double(x - w_b.x) / (w_b.y - w_b.x),
-                                                        double(y - h_b.x) / (h_b.y - h_b.x),
-                                                        textures);
-                    }
-                    set_image_pixel(x, y, image_width, pixel_color, image_vector);
-                }
+    int texture_x_i = 1;
+    int texture_y_i = 1;
+
+    int texture_x = 0;
+    int texture_y = 0;
+
+    int texture_width = width_img_boundaries[1];
+    int texture_height = height_img_boundaries[1];
+
+    for (int y = 0; y < lin_height.size(); y++) {
+        for (int x = 0; x < image_width; x++) {
+            if (lin_width[x] < 0 ||
+                lin_width[x] >= simulation_width ||
+                lin_height[y] < 0 ||
+                lin_height[y] >= simulation_height) {
+                pixel_color = cc.simulation_background_color;
+            } else {
+                auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
+                //double({pos} - {dim}_b.x) / ({dim}_b.y - {dim}_b.x)
+                // first,  calculate relative position of a pixel inside a texture block.
+                // second, calculate a dimension of a pixel that is going to be displayed.
+                // third,  normalize relative position between 0 and 1 by dividing result of first stage by second one.
+                pixel_color = get_texture_color(block.type,
+                                                block.rotation,
+                                                double(texture_x) / (texture_width),
+                                                double(texture_y) / (texture_height),
+                                                textures);
             }
+            set_image_pixel(x, y, image_width, pixel_color, image_vector);
+            texture_x++;
+
+            if (texture_x > texture_width) {texture_x=0; texture_width = width_img_boundaries[++texture_x_i];}
         }
+        texture_x=0; texture_x_i = 0; texture_width = width_img_boundaries[++texture_x_i];
+        texture_y++;
+        if (texture_y > texture_height) {texture_y=0; texture_height = height_img_boundaries[++texture_y_i];}
     }
 }
