@@ -116,6 +116,10 @@ void ImageCreation::ImageCreationTools::set_image_pixel(int x,
     image_vector[index  ] = color.b;
 }
 
+//TODO optimization. Right now the function divides width/height in blocks of coordinates of start and end, then iterates over items in a rectangle manner.
+// Possible optimization may be to instead just save width/height of each block, and iterate over full width/height in a line manner,
+// internally updating (something like) texture_x++/texture_y++ at the end, and when texture_x/texture_y >= texture_width/texture_height, zero them and update
+// to new texture_{dim}
 //First calculates what world blocks are seen, then calculates how much of each world block is seen in the frame.
 void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector<int> &lin_width,
                                                                const std::vector<int> &lin_height,
@@ -155,11 +159,11 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
 
     //width bound, height bound
     //goes through seen blocks
-    for (auto &w_b: width_img_boundaries) {
-        for (auto &h_b: height_img_boundaries) {
+    for (auto &h_b: height_img_boundaries) {
+        for (auto &w_b: width_img_boundaries) {
             //calculates texture in seen block.
-            for (int x = w_b.x; x < w_b.y; x++) {
-                for (int y = h_b.x; y < h_b.y; y++) {
+            for (int y = h_b.x; y < h_b.y; y++) {
+                for (int x = w_b.x; x < w_b.y; x++) {
                     if (lin_width[x] < 0 ||
                         lin_width[x] >= simulation_width ||
                         lin_height[y] < 0 ||

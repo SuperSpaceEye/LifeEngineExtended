@@ -126,8 +126,8 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
     auto w_b = d_width_img_boundaries[x_pos];
     auto h_b = d_height_img_boundaries[y_pos];
 
-    for (int x = w_b.x; x < w_b.y; x++) {
-        for (int y = h_b.x; y < h_b.y; y++) {
+    for (int y = h_b.x; y < h_b.y; y++) {
+        for (int x = w_b.x; x < w_b.y; x++) {
             auto &block = d_second_simulation_grid[d_lin_width[x] + d_lin_height[y] * simulation_width];
 
             if (d_lin_width[x] < 0 ||
@@ -166,8 +166,8 @@ create_yuv_image_kernel(int image_width, int image_height, int simulation_width,
     auto w_b = d_width_img_boundaries[x_pos];
     auto h_b = d_height_img_boundaries[y_pos];
 
-    for (int x = w_b.x; x < w_b.y; x++) {
-        for (int y = h_b.x; y < h_b.y; y++) {
+    for (int y = h_b.x; y < h_b.y; y++) {
+        for (int x = w_b.x; x < w_b.y; x++) {
             auto &block = d_second_simulation_grid[d_lin_width[x] + d_lin_height[y] * simulation_width];
 
             if (d_lin_width[x] < 0 ||
@@ -209,10 +209,10 @@ CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_widt
         device_state_grid.resize(truncated_lin_width.size() * truncated_lin_height.size());
     }
 
-    for (auto x: truncated_lin_width) {
-        if (x < 0 || x >= simulation_width) { continue;}
-        for (auto y: truncated_lin_height) {
-            if (y < 0 || y >= simulation_height) { continue;}
+    for (auto y: truncated_lin_height) {
+        if (y < 0 || y >= simulation_height) { continue;}
+        for (auto x: truncated_lin_width) {
+            if (x < 0 || x >= simulation_width) { continue;}
             auto & hb = simple_state_grid[x + y * simulation_width];
             auto & db = device_state_grid[x + y * simulation_width];
 
