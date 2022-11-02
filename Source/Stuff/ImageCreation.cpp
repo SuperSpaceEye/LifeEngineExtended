@@ -131,7 +131,7 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
     std::vector<int> width_img_boundaries;
     std::vector<int> height_img_boundaries;
 
-    auto last = INT32_MIN;
+    auto last = lin_width[0];
     auto count = 0;
     for (int x = 0; x < lin_width.size(); x++) {
         if (last < lin_width[x]) {
@@ -142,7 +142,7 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
     }
     width_img_boundaries.emplace_back(lin_width.size() - count);
 
-    last = INT32_MIN;
+    last = lin_height[0];
     count = 0;
     for (int y = 0; y < lin_height.size(); y++) {
         if (last < lin_height[y]) {
