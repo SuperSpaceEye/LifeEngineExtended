@@ -30,8 +30,6 @@ MainWindow::MainWindow(QWidget *parent):
 
     engine.make_walls();
 
-    sp.use_occ = false;
-
     #ifndef __NO_RECORDER__
     rc.set_engine(&engine);
     #endif
@@ -679,11 +677,10 @@ Vector2<int> MainWindow::calculate_cursor_pos_on_grid(int x, int y) {
     return c_pos;
 }
 
-//TODO clear command in simulation probably causes segfaults.
 void MainWindow::change_main_grid_left_click() {
-    while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
     std::atomic_thread_fence(std::memory_order_seq_cst);
+    while (ecp.do_not_use_user_actions_engine) {}
 
     if (update_last_cursor_pos) {
         last_last_cursor_x_pos = last_mouse_x_pos;
@@ -739,8 +736,9 @@ void MainWindow::change_main_grid_left_click() {
 }
 
 void MainWindow::change_main_grid_right_click() {
-    while (ecp.do_not_use_user_actions_engine) {}
     ecp.do_not_use_user_actions_ui = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    while (ecp.do_not_use_user_actions_engine) {}
 
     if (update_last_cursor_pos) {
         last_last_cursor_x_pos = last_mouse_x_pos;

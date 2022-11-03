@@ -66,7 +66,6 @@ struct EngineControlParameters {
     volatile bool pause_world_events = false;
     volatile bool update_world_events_ui_once = false;
 
-    //to prevent segfaults.
     volatile bool do_not_use_user_actions_ui = false;
     volatile bool do_not_use_user_actions_engine = false;
 };

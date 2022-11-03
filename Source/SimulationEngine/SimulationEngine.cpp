@@ -119,19 +119,15 @@ void SimulationEngine::simulation_tick() {
 //    }
 }
 
-//TODO after a really big amount of simulation ticks the program can for some reason segfault if you try to interact
-// with the sim through user actions. I have no idea why and can't exactly troubleshoot it (I am not patient enough).
-// The memory gets corrupted somewhere, though it also can be because of the previous logic that I've changed now.
-// The simulation itself may corrupt memory, but the -fsanitize=address doesn't tell anything wrong for a small simulation
-// time. If I don't detect any segfaults for some time, I will delete this to do.
 void SimulationEngine::process_user_action_pool() {
+    ecp.do_not_use_user_actions_engine = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     if (!ecp.do_not_use_user_actions_ui && !edc.ui_user_actions_pool.empty()) {
-        ecp.do_not_use_user_actions_engine = true;
         std::atomic_thread_fence(std::memory_order_seq_cst);
         std::swap(edc.ui_user_actions_pool, edc.engine_user_actions_pool);
         std::atomic_thread_fence(std::memory_order_seq_cst);
         ecp.do_not_use_user_actions_engine = false;
-    } else { return; }
+    } else { ecp.do_not_use_user_actions_engine = false; return; }
 
     for (auto & action : edc.engine_user_actions_pool) {
         if (check_if_out_of_bounds(&edc, action.x, action.y)) {continue;}
