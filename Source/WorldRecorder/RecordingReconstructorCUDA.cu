@@ -485,20 +485,20 @@ void RecordingReconstructorCUDA::prepare_image_creation(int image_width, int ima
 
     std::vector<Differences> d{};
 
-//    creator.check_if_changed(image_width, image_height, grid_width, grid_height, width_img_boundaries.size(),
-//                             height_img_boundaries.size(), lin_width.size(), lin_height.size(), 0, 0, 0, true);
-//    creator.copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, d, rel_x, rel_y);
-//    creator.copy_textures(container);
+    creator.check_if_changed(image_width, image_height, grid_width, grid_height, width_img_boundaries.size(),
+                             height_img_boundaries.size(), lin_width.size(), lin_height.size(), 0, true);
+    creator.copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, d);
+    creator.copy_textures(container);
 }
 
 void RecordingReconstructorCUDA::make_image(std::vector<unsigned char> &image_vector) {
     //TODO i think that I need to load symbols every time. idk though.
     creator.load_symbols(color_container);
-//    CUDAImageCreator::cuda_call_create_image(image_width, image_height, image_vector, 32, grid_width, grid_height,
-//                                             creator.d_lin_width, creator.d_lin_height, creator.d_width_img_boundaries,
-//                                             creator.d_height_img_boundaries, creator.d_image_vector, d_rec_grid,
-//                                             creator.d_textures, height_img_boundaries_size, width_img_boundaries_size,
-//                                             true, nullptr, nullptr, 0);
+    CUDAImageCreator::cuda_call_create_image(image_width, image_height, image_vector, 32, grid_width, grid_height,
+                                             creator.d_lin_width, creator.d_lin_height, creator.d_width_img_boundaries,
+                                             creator.d_height_img_boundaries, creator.d_image_vector, d_rec_grid,
+                                             creator.d_textures, height_img_boundaries_size, width_img_boundaries_size,
+                                             true);
 }
 
 void RecordingReconstructorCUDA::finish_image_creation() {

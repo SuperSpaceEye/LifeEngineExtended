@@ -116,10 +116,6 @@ void ImageCreation::ImageCreationTools::set_image_pixel(int x,
     image_vector[index  ] = color.b;
 }
 
-//TODO optimization. Right now the function divides width/height in blocks of coordinates of start and end, then iterates over items in a rectangle manner.
-// Possible optimization may be to instead just save width/height of each block, and iterate over full width/height in a line manner,
-// internally updating (something like) texture_x++/texture_y++ at the end, and when texture_x/texture_y >= texture_width/texture_height, zero them and update
-// to new texture_{dim}
 //First calculates what world blocks are seen, then calculates how much of each world block is seen in the frame.
 void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector<int> &lin_width,
                                                                const std::vector<int> &lin_height,

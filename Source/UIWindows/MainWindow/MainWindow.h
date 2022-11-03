@@ -56,6 +56,7 @@
 #include "../../Stuff/DataSavingFunctions.h"
 #include "../../Containers/CPU/OrganismInfoContainer.h"
 #include "../../SimulationEngine/OrganismsController.h"
+#include "../../Stuff/IPSSmoother.h"
 
 #include "../../Stuff/rapidjson/document.h"
 #include "../../Stuff/rapidjson/writer.h"
@@ -114,6 +115,7 @@ private:
 
     Ui::MainWindow ui{};
     QTimer * timer;
+    IPSSmoother fps_smoother{};
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;

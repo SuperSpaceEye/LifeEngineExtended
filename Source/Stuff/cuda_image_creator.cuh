@@ -41,10 +41,8 @@ public:
     int * d_lin_width = nullptr;
     int * d_lin_height = nullptr;
 
-    int *d_width_img_boundaries = nullptr;
-    int *d_height_img_boundaries = nullptr;
-    int *d_rel_x = nullptr;
-    int *d_rel_y = nullptr;
+    Vector2<int> *d_width_img_boundaries = nullptr;
+    Vector2<int> *d_height_img_boundaries = nullptr;
     unsigned char * d_image_vector = nullptr;
     BaseGridBlock * d_second_simulation_grid = nullptr;
     Differences * d_differences = nullptr;
@@ -61,8 +59,6 @@ public:
 
     int last_width_img_boundaries = 0;
     int last_height_img_boundaries = 0;
-    int last_rel_x = 0;
-    int last_rel_y = 0;
     int last_simulation_width = 0;
     int last_simulation_height = 0;
     int last_differences = 0;
@@ -78,22 +74,18 @@ public:
 
     void lin_size_changed(int lin_width_size, int lin_height_size);
 
-    void rel_size_changed(int rel_x, int rel_y);
-
     void differences_changed(int differences);
 
     void free_textures();
 
     void check_if_changed(int image_width, int image_height, int simulation_width, int simulation_height,
                           int width_img_boundaries_size, int height_img_boundaries_size,
-                          int lin_width_size, int lin_height_size, int differences, int d_rel_x,
-                          int d_rel_y, bool yuv_format);
+                          int lin_width_size, int lin_height_size, int differences, bool yuv_format);
 
     void copy_to_device(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
-                        const std::vector<int> &width_img_boundaries,
-                        const std::vector<int> &height_img_boundaries,
-                        const std::vector<Differences> &host_differences, const std::vector<int> &rel_x,
-                        const std::vector<int> &rel_y);
+                        const std::vector<Vector2<int>> &width_img_boundaries,
+                        const std::vector<Vector2<int>> &height_img_boundaries,
+                        const std::vector<Differences> &host_differences);
 
     static void copy_result_image(std::vector<unsigned char> &image_vector, int image_width, int image_height,
                                   unsigned char *d_image_vector, bool yuv_format);
@@ -119,10 +111,11 @@ public:
     static void
     cuda_call_create_image(int image_width, int image_height, std::vector<unsigned char> &image_vector,
                            int block_size, int simulation_width, int simulation_height, int *d_lin_width,
-                           int *d_lin_height, int *d_width_img_boundaries, int *d_height_img_boundaries,
-                           unsigned char *d_image_vector, BaseGridBlock *d_second_simulation_grid,
-                           CudaTextureHolder *d_textures, int height_img_boundaries_size,
-                           int width_img_boundaries_size, bool yuv_format, int *d_rel_x, int *d_rel_y);
+                           int *d_lin_height, Vector2<int> *d_width_img_boundaries,
+                           Vector2<int> *d_height_img_boundaries, unsigned char *d_image_vector,
+                           BaseGridBlock *d_second_simulation_grid, CudaTextureHolder *d_textures,
+                           int height_img_boundaries_size, int width_img_boundaries_size,
+                           bool yuv_format);
 };
 
 #endif //THELIFEENGINECPP_CUDA_IMAGE_CREATOR_CUH

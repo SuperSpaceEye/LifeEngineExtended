@@ -440,6 +440,10 @@ void MainWindow::le_brush_size_slot() {
 void MainWindow::le_update_info_every_n_milliseconds_slot() {
     le_slot_lower_bound<int>(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
                              ui.le_update_info_every_n_milliseconds, 1, "1");
+
+    int buffer_size =  1. / (update_info_every_n_milliseconds / 1000.) > 0 ? 1. / (update_info_every_n_milliseconds / 1000.): 1;
+
+    fps_smoother.set_max_items(buffer_size);
 }
 
 void MainWindow::le_menu_height_slot() {

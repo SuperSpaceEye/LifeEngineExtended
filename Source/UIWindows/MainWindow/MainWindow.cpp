@@ -105,6 +105,8 @@ MainWindow::MainWindow(QWidget *parent):
         #endif
 
         load_state();
+
+        le_update_info_every_n_milliseconds_slot();
     });
 
     timer = new QTimer(parent);
@@ -149,15 +151,17 @@ void MainWindow::mainloop_tick() {
 
         auto scale = (info_update/1000000.);
 
+        fps_smoother.log_data(image_frames / scale);
+        image_frames = 0;
+
+        update_fps_labels(fps_smoother.get_rate_per_second(), simulation_frames / scale, window_frames / scale);
+        window_frames = 0;
+        fps_timer = clock_now();
+
         engine.update_info();
         auto info = engine.get_info();
 
-        update_fps_labels(image_frames / scale, simulation_frames / scale, window_frames / scale);
         update_statistics_info(info);
-
-        image_frames = 0;
-        window_frames = 0;
-        fps_timer = clock_now();
     }
 }
 

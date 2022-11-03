@@ -111,41 +111,41 @@ __device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs
 
 __global__ void create_image_kernel(int image_width, int simulation_width, int simulation_height, int width_img_size,
                                     int height_img_size, int *d_lin_width, int *d_lin_height,
-                                    int *d_width_img_boundaries,
-                                    int *d_height_img_boundaries, int *d_rel_x, int *d_rel_y,
-                                    unsigned char *d_image_vector,
+                                    Vector2<int> *d_width_img_boundaries,
+                                    Vector2<int> *d_height_img_boundaries, unsigned char *d_image_vector,
                                     BaseGridBlock *d_second_simulation_grid, CudaTextureHolder *textures) {
-    auto x = blockIdx.x * blockDim.x + threadIdx.x;
-    auto y = blockIdx.y * blockDim.y + threadIdx.y;
+    auto x_pos = blockIdx.x * blockDim.x + threadIdx.x;
+    auto y_pos = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (x >= width_img_size || y >= height_img_size) {return;}
+    if (x_pos >= width_img_size || y_pos >= height_img_size) {return;}
 
     color pixel_color;
 
     //x - start, y - stop
 
-    int texture_x = d_rel_x[x];
-    int texture_y = d_rel_y[y];
+    auto w_b = d_width_img_boundaries[x_pos];
+    auto h_b = d_height_img_boundaries[y_pos];
 
-    int texture_width = d_width_img_boundaries[x];
-    int texture_height = d_height_img_boundaries[y];
+    for (int y = h_b.x; y < h_b.y; y++) {
+        for (int x = w_b.x; x < w_b.y; x++) {
+            auto &block = d_second_simulation_grid[d_lin_width[x] + d_lin_height[y] * simulation_width];
 
-    auto &block = d_second_simulation_grid[d_lin_width[x] + d_lin_height[y] * simulation_width];
-
-    if (d_lin_width[x] < 0 ||
-        d_lin_width[x] >= simulation_width ||
-        d_lin_height[y] < 0 ||
-        d_lin_height[y] >= simulation_height) {
-        pixel_color = const_color_container.simulation_background_color;
-    } else {
-        pixel_color = get_texture_color(block.type,
-                                        block.rotation,
-                                        float(texture_x) / (texture_width),
-                                        float(texture_y) / (texture_height),
-                                        textures
-        );
+            if (d_lin_width[x] < 0 ||
+                d_lin_width[x] >= simulation_width ||
+                d_lin_height[y] < 0 ||
+                d_lin_height[y] >= simulation_height) {
+                pixel_color = const_color_container.simulation_background_color;
+            } else {
+                pixel_color = get_texture_color(block.type,
+                                                block.rotation,
+                                                float(x - w_b.x) / (w_b.y - w_b.x),
+                                                float(y - h_b.x) / (h_b.y - h_b.x),
+                                                textures
+                );
+            }
+            set_image_pixel(x, y, image_width, pixel_color, d_image_vector);
+        }
     }
-    set_image_pixel(x, y, image_width, pixel_color, d_image_vector);
 }
 
 __global__ void
@@ -241,49 +241,38 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, cons
     if (do_not_create_image) { return;}
     creating_image = true;
     std::atomic_thread_fence(std::memory_order_seq_cst);
-    std::vector<int> width_img_boundaries;
-    std::vector<int> height_img_boundaries;
-
-    std::vector<int> rel_x;
-    std::vector<int> rel_y;
+    std::vector<Vector2<int>> width_img_boundaries;
+    std::vector<Vector2<int>> height_img_boundaries;
 
     //TODO It shouldn't be too heavy on performance, but maybe only do if the viewpoint changes. Same for lin_{dimension}
     auto last = lin_width[0];
     auto count = 0;
-    int b_size = 0;
     for (int x = 0; x < lin_width.size(); x++) {
         if (last < lin_width[x]) {
+            width_img_boundaries.emplace_back(count, x);
             last = lin_width[x];
             count = x;
-            b_size = x - count;
         }
-        width_img_boundaries.emplace_back(b_size);
-        rel_x.emplace_back(x - count);
     }
-    width_img_boundaries.emplace_back(lin_width.size() - count);
-    rel_x.emplace_back(lin_width.size() - count);
+    width_img_boundaries.emplace_back(count, lin_width.size());
 
     last = lin_height[0];
     count = 0;
-    b_size = 0;
     for (int x = 0; x < lin_height.size(); x++) {
         if (last < lin_height[x]) {
+            height_img_boundaries.emplace_back(count, x);
             last = lin_height[x];
             count = x;
-            b_size = x - count;
         }
-        height_img_boundaries.emplace_back(b_size);
-        rel_y.emplace_back(x - count);
     }
-    height_img_boundaries.emplace_back(lin_height.size() - count);
-    rel_y.emplace_back(lin_height.size() - count);
+    height_img_boundaries.emplace_back(count, lin_height.size());
 
     check_if_changed(image_width, image_height,
                      simulation_width, simulation_height,
                      width_img_boundaries.size(), height_img_boundaries.size(),
-                     lin_width.size(), lin_height.size(), differences.size(), rel_x.size(), rel_y.size(), yuv_format);
+                     lin_width.size(), lin_height.size(), differences.size(), yuv_format);
 
-    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, differences, rel_x, rel_y);
+    copy_to_device(lin_width, lin_height, width_img_boundaries, height_img_boundaries, differences);
 
     update_differences<<<(differences.size() + block_size - 1) / block_size, block_size>>>(
             simulation_width, differences.size(),
@@ -297,7 +286,7 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, cons
     cuda_call_create_image(image_width, image_height, image_vector, block_size, simulation_width, simulation_height,
                            d_lin_width, d_lin_height, d_width_img_boundaries,
                            d_height_img_boundaries, d_image_vector, d_second_simulation_grid, d_textures,
-                           height_img_boundaries.size(), width_img_boundaries.size(), yuv_format, d_rel_x, d_rel_y);
+                           height_img_boundaries.size(), width_img_boundaries.size(), yuv_format);
 
     std::atomic_thread_fence(std::memory_order_seq_cst);
     creating_image = false;
@@ -306,28 +295,29 @@ void CUDAImageCreator::cuda_create_image(int image_width, int image_height, cons
 void
 CUDAImageCreator::cuda_call_create_image(int image_width, int image_height, std::vector<unsigned char> &image_vector,
                                          int block_size, int simulation_width, int simulation_height, int *d_lin_width,
-                                         int *d_lin_height, int *d_width_img_boundaries, int *d_height_img_boundaries,
-                                         unsigned char *d_image_vector, BaseGridBlock *d_second_simulation_grid,
-                                         CudaTextureHolder *d_textures, int height_img_boundaries_size,
-                                         int width_img_boundaries_size, bool yuv_format, int *d_rel_x, int *d_rel_y) {
+                                         int *d_lin_height, Vector2<int> *d_width_img_boundaries,
+                                         Vector2<int> *d_height_img_boundaries, unsigned char *d_image_vector,
+                                         BaseGridBlock *d_second_simulation_grid, CudaTextureHolder *d_textures,
+                                         int height_img_boundaries_size, int width_img_boundaries_size,
+                                         bool yuv_format) {
     dim3 grid((width_img_boundaries_size + block_size - 1) / block_size,
               height_img_boundaries_size);
 
     if (yuv_format) {
-//        create_yuv_image_kernel<<<grid, block_size>>>(image_width,
-//                                                      image_height,
-//                                                      simulation_width, simulation_height,
-//                                                      width_img_boundaries_size, height_img_boundaries_size,
-//                                                      d_lin_width, d_lin_height,
-//                                                      d_width_img_boundaries, d_height_img_boundaries,
-//                                                      d_image_vector, d_second_simulation_grid, d_textures);
+        create_yuv_image_kernel<<<grid, block_size>>>(image_width,
+                                                      image_height,
+                                                      simulation_width, simulation_height,
+                                                      width_img_boundaries_size, height_img_boundaries_size,
+                                                      d_lin_width, d_lin_height,
+                                                      d_width_img_boundaries, d_height_img_boundaries,
+                                                      d_image_vector, d_second_simulation_grid, d_textures);
 
     } else {
         create_image_kernel<<<grid, block_size>>>(image_width,
                                                   simulation_width, simulation_height,
                                                   width_img_boundaries_size, height_img_boundaries_size,
                                                   d_lin_width, d_lin_height,
-                                                  d_width_img_boundaries, d_height_img_boundaries, d_rel_x, d_rel_y,
+                                                  d_width_img_boundaries, d_height_img_boundaries,
                                                   d_image_vector, d_second_simulation_grid, d_textures);
     }
 
@@ -345,8 +335,6 @@ void CUDAImageCreator::free() {
     cudaFree(d_second_simulation_grid);
     cudaFree(d_width_img_boundaries);
     cudaFree(d_height_img_boundaries);
-    cudaFree(d_rel_x);
-    cudaFree(d_rel_y);
     cudaFree(d_lin_width);
     cudaFree(d_lin_height);
     cudaFree(d_differences);
@@ -360,8 +348,6 @@ void CUDAImageCreator::free() {
     d_lin_height = nullptr;
     d_width_img_boundaries = nullptr;
     d_height_img_boundaries = nullptr;
-    d_rel_x = nullptr;
-    d_rel_y = nullptr;
     d_image_vector = nullptr;
     d_second_simulation_grid = nullptr;
     d_differences = nullptr;
@@ -373,8 +359,6 @@ void CUDAImageCreator::free() {
 
     last_width_img_boundaries = 0;
     last_height_img_boundaries = 0;
-    last_rel_x = 0;
-    last_rel_y = 0;
     last_simulation_width = 0;
     last_simulation_height = 0;
     last_differences = 0;
@@ -435,10 +419,9 @@ void CUDAImageCreator::free_textures() {
 }
 
 void CUDAImageCreator::copy_to_device(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
-                                      const std::vector<int> &width_img_boundaries,
-                                      const std::vector<int> &height_img_boundaries,
-                                      const std::vector<Differences> &host_differences, const std::vector<int> &rel_x,
-                                      const std::vector<int> &rel_y) {
+                                      const std::vector<Vector2<int>> &width_img_boundaries,
+                                      const std::vector<Vector2<int>> &height_img_boundaries,
+                                      const std::vector<Differences> &host_differences) {
     gpuErrchk(cudaMemcpy(d_lin_width,
                          lin_width.data(),
                          sizeof (int)*lin_width.size(),
@@ -467,8 +450,7 @@ void CUDAImageCreator::copy_to_device(const std::vector<int> &lin_width, const s
 
 void CUDAImageCreator::check_if_changed(int image_width, int image_height, int simulation_width, int simulation_height,
                                         int width_img_boundaries_size, int height_img_boundaries_size,
-                                        int lin_width_size, int lin_height_size, int differences, int d_rel_x,
-                                        int d_rel_y, bool yuv_format) {
+                                        int lin_width_size, int lin_height_size, int differences, bool yuv_format) {
     if (image_width != last_image_width || image_height != last_image_height) {
         last_image_width = image_width;
         last_image_height = image_height;
@@ -488,12 +470,6 @@ void CUDAImageCreator::check_if_changed(int image_width, int image_height, int s
         last_lin_width = lin_width_size;
         last_lin_height = lin_height_size;
         lin_size_changed(lin_width_size, lin_height_size);
-    }
-
-    if (d_rel_x != last_rel_x || d_rel_y != last_rel_y) {
-        last_rel_x = d_rel_x;
-        last_rel_y = d_rel_y;
-        rel_size_changed(lin_width_size, lin_height_size);
     }
 
     if (differences != last_differences) {
@@ -526,13 +502,6 @@ void CUDAImageCreator::lin_size_changed(int lin_width_size, int lin_height_size)
     gpuErrchk(cudaFree(d_lin_height));
     gpuErrchk(cudaMalloc((int**)&d_lin_width, sizeof(int) * lin_width_size));
     gpuErrchk(cudaMalloc((int**)&d_lin_height, sizeof(int) * lin_height_size));
-}
-
-void CUDAImageCreator::rel_size_changed(int rel_x, int rel_y) {
-    gpuErrchk(cudaFree(d_rel_x));
-    gpuErrchk(cudaFree(d_rel_y));
-    gpuErrchk(cudaMalloc((int**)&d_rel_x, sizeof(int) * rel_x));
-    gpuErrchk(cudaMalloc((int**)&d_rel_y, sizeof(int) * rel_y));
 }
 
 void CUDAImageCreator::differences_changed(int differences) {
