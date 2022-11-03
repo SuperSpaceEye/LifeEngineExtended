@@ -385,7 +385,14 @@ void MainWindow::just_resize_simulation_grid() {
     edc.CPU_simulation_grid.clear();
     edc.simple_state_grid.clear();
 
-    edc.CPU_simulation_grid   .resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
+#ifdef __CUDA_USED__
+    if (cuda_is_available_var && use_cuda) {
+        cuda_creator.free();
+        cuda_creator.copy_textures(textures);
+    }
+#endif
+
+    edc.CPU_simulation_grid.resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
     edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);

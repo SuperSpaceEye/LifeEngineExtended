@@ -201,8 +201,8 @@ void
 CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_width, const std::vector<int> &truncated_lin_height,
                                       std::vector<Differences> &host_differences, int simulation_width,
                                       int simulation_height, const std::vector<BaseGridBlock> &simple_state_grid) {
-    if (do_not_create_image) { return;}
     creating_image = true;
+    if (do_not_create_image) { creating_image = false; return;}
     std::atomic_thread_fence(std::memory_order_seq_cst);
     host_differences.reserve(truncated_lin_width.size() * truncated_lin_height.size());
     if (device_state_grid.size() != truncated_lin_width.size() * truncated_lin_height.size()) {
@@ -341,8 +341,7 @@ void CUDAImageCreator::free() {
     free_textures();
 
     device_state_grid.clear();
-    //TODO for some reason this causes segfault in organism editors cuda_image_creator
-//    device_state_grid = std::vector<BaseGridBlock>{};
+    device_state_grid = std::vector<BaseGridBlock>{};
 
     d_lin_width = nullptr;
     d_lin_height = nullptr;
