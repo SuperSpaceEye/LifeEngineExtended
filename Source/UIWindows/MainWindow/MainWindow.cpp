@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     engine.make_walls();
 
+    sp.use_occ = false;
+
     #ifndef __NO_RECORDER__
     rc.set_engine(&engine);
     #endif

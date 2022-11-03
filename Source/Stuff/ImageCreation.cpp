@@ -136,7 +136,8 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
             count = x;
         }
     }
-    width_img_boundaries.emplace_back(lin_width.size() - count);
+    //TODO here is a blunt method to fix error
+    width_img_boundaries.emplace_back(INT32_MAX);
 
     last = lin_height[0];
     count = 0;
@@ -147,22 +148,22 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
             count = y;
         }
     }
-    height_img_boundaries.emplace_back(lin_height.size() - count);
+    height_img_boundaries.emplace_back(INT32_MAX);
 
     color pixel_color;
     //width of boundaries of an organisms
 
-    int texture_x_i = 1;
-    int texture_y_i = 1;
+    int texture_x_i = 0;
+    int texture_y_i = 0;
 
     int texture_x = 0;
     int texture_y = 0;
 
-    int texture_width = width_img_boundaries[1];
-    int texture_height = height_img_boundaries[1];
+    int texture_width  = width_img_boundaries[0];
+    int texture_height = height_img_boundaries[0];
 
     for (int y = 0; y < lin_height.size(); y++) {
-        for (int x = 0; x < image_width; x++) {
+        for (int x = 0; x < lin_width.size(); x++) {
             if (lin_width[x] < 0 ||
                 lin_width[x] >= simulation_width ||
                 lin_height[y] < 0 ||
@@ -181,12 +182,12 @@ void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector
                                                 textures);
             }
             set_image_pixel(x, y, image_width, pixel_color, image_vector);
-            texture_x++;
 
-            if (texture_x > texture_width) {texture_x=0; texture_width = width_img_boundaries[++texture_x_i];}
+            texture_x++;
+            if (texture_x+1  > texture_width) {texture_x=0; texture_width = width_img_boundaries[++texture_x_i];}
         }
-        texture_x=0; texture_x_i = 0; texture_width = width_img_boundaries[++texture_x_i];
+        texture_x=0; texture_x_i = 0; texture_width = width_img_boundaries[0];
         texture_y++;
-        if (texture_y > texture_height) {texture_y=0; texture_height = height_img_boundaries[++texture_y_i];}
+        if (texture_y+1> texture_height) {texture_y=0; texture_height = height_img_boundaries[++texture_y_i];}
     }
 }
