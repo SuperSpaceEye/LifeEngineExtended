@@ -489,6 +489,7 @@ void SimulationEngine::pause_world_events() {
 }
 
 void SimulationEngine::stop_world_events(bool no_resume) {
+    if (!ecp.execute_world_events) { return;}
     pause();
     sp = SimulationParameters{sp_copy};
     ecp.execute_world_events = false;

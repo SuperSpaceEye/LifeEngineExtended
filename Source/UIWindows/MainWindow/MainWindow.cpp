@@ -929,6 +929,11 @@ void MainWindow::load_state() {
                                                  really_stop_render, save_simulation_settings, uses_point_size
                                          }, sp, occp);
     initialize_gui();
+    auto temp = disable_warnings;
+    disable_warnings = true;
+    cb_use_occ_slot(sp.use_occ);
+    disable_warnings = temp;
+
     occpw.reinit_gui(true);
 
     apply_font_size();

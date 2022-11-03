@@ -162,7 +162,7 @@ private:
     bool fill_window = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
-    bool really_stop_render = false;
+    bool really_stop_render = true;
     bool update_textures = false;
     bool is_fullscreen = false;
     bool save_simulation_settings = true;

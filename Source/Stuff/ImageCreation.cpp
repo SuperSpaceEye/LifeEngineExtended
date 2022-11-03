@@ -116,7 +116,6 @@ void ImageCreation::ImageCreationTools::set_image_pixel(int x,
     image_vector[index  ] = color.b;
 }
 
-//First calculates what world blocks are seen, then calculates how much of each world block is seen in the frame.
 void ImageCreation::ImageCreationTools::complex_image_creation(const std::vector<int> &lin_width,
                                                                const std::vector<int> &lin_height,
                                                                uint32_t simulation_width,

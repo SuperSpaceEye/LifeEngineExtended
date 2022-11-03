@@ -11,7 +11,7 @@
 
 struct SimulationParameters {
     //evolution controls
-    float food_production_probability = 0.01; //0.005;
+    float food_production_probability = 0.022;
     int   produce_food_every_n_life_ticks = 1;
     float lifespan_multiplier = 100;
     int   look_range = 50;
@@ -60,7 +60,7 @@ struct SimulationParameters {
     bool use_anatomy_evolved_mutation_rate = true;
     bool use_brain_evolved_mutation_rate = true;
     bool movers_can_produce_food = false;
-    bool food_blocks_reproduction = false;
+    bool food_blocks_reproduction = true;
     //world controls
     bool reset_on_total_extinction = true;
     bool pause_on_total_extinction = false;
@@ -80,7 +80,7 @@ struct SimulationParameters {
     bool use_new_child_pos_calculator = true;
     bool no_random_decisions = false;
     bool use_occ = true;
-    bool recenter_to_imaginary_pos = false;
+    bool recenter_to_imaginary_pos = true;
     bool do_not_mutate_brains_of_plants = true;
     bool use_weighted_brain = true;
 };
