@@ -218,13 +218,13 @@ CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_widt
 
             //TODO different vectors for rotation and type to save time on copying?
             if (hb.type != db.type || hb.rotation != db.rotation) {
-                db.type = hb.type;
+                db.type     = hb.type;
                 db.rotation = hb.rotation;
 
                 host_differences.emplace_back(Differences{static_cast<uint32_t>(x),
                                                           static_cast<uint32_t>(y),
-                                                          simple_state_grid[x + y * simulation_width].type,
-                                                          simple_state_grid[x + y * simulation_width].rotation,
+                                                          hb.type,
+                                                          hb.rotation,
                 });
             }
         }

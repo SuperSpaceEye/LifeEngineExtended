@@ -387,8 +387,8 @@ void MainWindow::just_resize_simulation_grid() {
 
 #ifdef __CUDA_USED__
     if (cuda_is_available_var && use_cuda) {
-        cuda_creator.free();
-        cuda_creator.copy_textures(textures);
+        cuda_creator.device_state_grid.clear();
+        cuda_creator.device_state_grid.resize(edc.simulation_width*edc.simulation_height);
     }
 #endif
 
