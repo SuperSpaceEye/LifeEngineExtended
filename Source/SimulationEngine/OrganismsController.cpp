@@ -144,8 +144,9 @@ void OrganismsController::try_compress_organisms(EngineDataContainer &edc) {
         //update indexes of swapped organisms the cells on a grid
         for (auto * organism: std::array<Organism*, 2>{left_organism, right_organism}) {
             for (auto & block: organism->anatomy._organism_blocks) {
-                auto * w_block = &edc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-                w_block->organism_index = organism->vector_index;
+                auto & organism_index = edc.st_grid.get_organism_index(organism->x + block.get_pos(organism->rotation).x,
+                                                                       organism->y + block.get_pos(organism->rotation).y);
+                organism_index = organism->vector_index;
             }
         }
 

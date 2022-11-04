@@ -19,7 +19,7 @@
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 
-#include "../GridBlocks/BaseGridBlock.h"
+#include "../GridStuff/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
 #include "../Stuff/BlockTypes.hpp"
 #include "../Stuff/Vector2.h"

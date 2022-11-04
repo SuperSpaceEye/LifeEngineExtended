@@ -30,12 +30,12 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
 
     for (uint32_t x = 0; x < edc.simulation_width; x++) {
         for (uint32_t y = 0; y < edc.simulation_height; y++) {
-            auto & block = edc.CPU_simulation_grid[x][y];
+            auto type = edc.st_grid.get_type(x, y);
 
-            switch (block.type) {
+            switch (type) {
                 case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
-                    blocks.emplace_back(x, y, block.type);
+                    blocks.emplace_back(x, y, type);
                 default: break;
             }
         }
@@ -137,7 +137,7 @@ void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataCont
     is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
 
     for (auto & block: blocks) {
-        edc.CPU_simulation_grid[block.x][block.y].type = block.type;
+        edc.st_grid.get_type(block.x, block.y) = block.type;
     }
 }
 
@@ -266,14 +266,14 @@ void DataSavingFunctions::json_write_grid(Document & d, EngineDataContainer &edc
 
     for (int x = 1; x < edc.simulation_width - 1; x++) {
         for (int y = 1; y < edc.simulation_height - 1; y++) {
-            if (edc.CPU_simulation_grid[x][y].type != BlockTypes::WallBlock &&
-                edc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) {continue;}
+            auto type = edc.st_grid.get_type(x, y);
+            if (type != BlockTypes::WallBlock && type != BlockTypes::FoodBlock) {continue;}
             Value cell(kObjectType);
 
             cell.AddMember("c", Value(x-1), d.GetAllocator());
             cell.AddMember("r", Value(y-1), d.GetAllocator());
 
-            if (edc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) {
+            if (type == BlockTypes::FoodBlock) {
                 food.PushBack(cell, d.GetAllocator());
             } else {
                 walls.PushBack(cell, d.GetAllocator());

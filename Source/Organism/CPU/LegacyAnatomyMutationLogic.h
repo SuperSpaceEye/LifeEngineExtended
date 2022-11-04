@@ -8,7 +8,7 @@
 
 #include "../../Stuff/Vector2.h"
 #include "../../PRNGS/lehmer64.h"
-#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridStuff/BaseGridBlock.h"
 #include "../../Stuff/BlockTypes.hpp"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"

@@ -251,13 +251,13 @@ void MainWindow::json_read_ticks_food_walls(Document *d_, EngineDataContainer *e
         int x = pos["c"].GetInt() + 1;
         int y = pos["r"].GetInt() + 1;
 
-        edc.CPU_simulation_grid[x][y].type = BlockTypes::FoodBlock;
+        edc.st_grid.get_type(x, y) = BlockTypes::FoodBlock;
     }
 
     for (auto & pos: d["grid"]["walls"].GetArray()) {
         int x = pos["c"].GetInt() + 1;
         int y = pos["r"].GetInt() + 1;
 
-        edc.CPU_simulation_grid[x][y].type = BlockTypes::WallBlock;
+        edc.st_grid.get_type(x, y) = BlockTypes::WallBlock;
     }
 }

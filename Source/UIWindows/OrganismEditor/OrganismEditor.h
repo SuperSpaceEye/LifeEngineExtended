@@ -30,7 +30,7 @@
 #include "../../Organism/CPU/Anatomy.h"
 #include "../../Organism/CPU/Brain.h"
 #include "../../Organism/CPU/Rotation.h"
-#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridStuff/BaseGridBlock.h"
 #include "EditorUI.h"
 #include "../MainWindow/WindowUI.h"
 #include "../../Stuff/Vector2.h"

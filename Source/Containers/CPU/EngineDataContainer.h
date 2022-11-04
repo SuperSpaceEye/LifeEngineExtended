@@ -13,8 +13,8 @@
 #include <deque>
 
 #include "../../Stuff/Actions.h"
-#include "../../GridBlocks/BaseGridBlock.h"
-#include "../../GridBlocks/SingleThreadGridBlock.h"
+#include "../../GridStuff//BaseGridBlock.h"
+#include "../../GridStuff/STGridWorld.h"
 #include "../../Organism/CPU/ObservationStuff.h"
 #include "../../Organism/CPU/Organism.h"
 #include "OCCLogicContainer.h"
@@ -36,7 +36,7 @@ struct EngineDataContainer {
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
 
-    std::vector<std::vector<SingleThreadGridBlock>> CPU_simulation_grid;
+    STGridWorld st_grid;
 
     struct SingleThreadContainer {
         int32_t num_dead_organisms  = 0;

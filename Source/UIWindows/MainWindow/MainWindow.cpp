@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent):
     edc.simulation_width = 200;
     edc.simulation_height = 200;
 
-    edc.CPU_simulation_grid.resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
+    edc.st_grid.resize(edc.simulation_width, edc.simulation_height);
     edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     update_simulation_size_label();
@@ -338,8 +338,8 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
         if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= edc.simulation_height) { continue; }
-            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.st_grid.get_type(x, y);
+            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
         }
     }
 }
@@ -382,7 +382,7 @@ void MainWindow::just_resize_simulation_grid() {
     edc.simulation_width = new_simulation_width;
     edc.simulation_height = new_simulation_height;
 
-    edc.CPU_simulation_grid.clear();
+    edc.st_grid.clear();
     edc.simple_state_grid.clear();
 
 #ifdef __CUDA_USED__
@@ -392,7 +392,7 @@ void MainWindow::just_resize_simulation_grid() {
     }
 #endif
 
-    edc.CPU_simulation_grid.resize(edc.simulation_width, std::vector<SingleThreadGridBlock>(edc.simulation_height, SingleThreadGridBlock{}));
+    edc.st_grid.resize(edc.simulation_width, edc.simulation_height);
     edc.simple_state_grid.resize(edc.simulation_width * edc.simulation_height, BaseGridBlock{});
 
     engine.init_auto_food_drop(edc.simulation_width, edc.simulation_height);
@@ -409,7 +409,7 @@ void MainWindow::resize_simulation_grid() {
         if (!use_cuda) {
             auto msg = DescisionMessageBox("Warning",
                                        QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(SingleThreadGridBlock)) * new_simulation_height * new_simulation_width)),
+                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t) * 2) * new_simulation_height * new_simulation_width)),
                                        "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
@@ -418,7 +418,7 @@ void MainWindow::resize_simulation_grid() {
         } else {
             auto msg = DescisionMessageBox("Warning",
                                            QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) + sizeof(SingleThreadGridBlock)) * new_simulation_height * new_simulation_width)
+                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t)*2) * new_simulation_height * new_simulation_width)
                                                                   + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width))
                                                                   + " GPU's VRAM",
                                            "OK", "Cancel", this);

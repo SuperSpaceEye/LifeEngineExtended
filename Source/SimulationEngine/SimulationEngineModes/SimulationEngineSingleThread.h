@@ -13,7 +13,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridStuff/BaseGridBlock.h"
 #include "../../Organism/CPU/Organism.h"
 #include "../../Stuff/BlockTypes.hpp"
 #include "../../Containers/CPU/EngineControlParametersContainer.h"

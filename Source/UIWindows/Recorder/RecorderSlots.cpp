@@ -133,10 +133,10 @@ void Recorder::b_start_recording_slot() {
 
     for (int x = 0; x < edc->simulation_width; x++) {
         for (int y = 0; y < edc->simulation_height; y++) {
-            auto & block = edc->CPU_simulation_grid[x][y];
-            if (block.type == BlockTypes::FoodBlock) {
+            auto type = edc->st_grid.get_type(x, y);
+            if (type == BlockTypes::FoodBlock) {
                 tbuffer->record_food_change(x, y, true);
-            } else if (block.type == BlockTypes::WallBlock) {
+            } else if (type == BlockTypes::WallBlock) {
                 tbuffer->record_wall_changes(x, y, true);
             }
         }
