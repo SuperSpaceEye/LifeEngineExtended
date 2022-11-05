@@ -205,8 +205,8 @@ CUDAImageCreator::compile_differences(const std::vector<int> &truncated_lin_widt
     if (do_not_create_image) { creating_image = false; return;}
     std::atomic_thread_fence(std::memory_order_seq_cst);
     host_differences.reserve(truncated_lin_width.size() * truncated_lin_height.size());
-    if (device_state_grid.size() != truncated_lin_width.size() * truncated_lin_height.size()) {
-        device_state_grid.resize(truncated_lin_width.size() * truncated_lin_height.size());
+    if (device_state_grid.size() != simple_state_grid.size()) {
+        device_state_grid.resize(simple_state_grid.size());
     }
 
     for (auto y: truncated_lin_height) {
