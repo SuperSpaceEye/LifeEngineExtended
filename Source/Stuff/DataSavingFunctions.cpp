@@ -30,12 +30,12 @@ void DataSavingFunctions::write_simulation_grid(QDataStream & os, EngineDataCont
 
     for (uint32_t x = 0; x < edc.simulation_width; x++) {
         for (uint32_t y = 0; y < edc.simulation_height; y++) {
-            auto & block = edc.CPU_simulation_grid[x][y];
+            auto type = edc.st_grid.get_type(x, y);
 
-            switch (block.type) {
+            switch (type) {
                 case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
-                    blocks.emplace_back(x, y, block.type);
+                    blocks.emplace_back(x, y, type);
                 default: break;
             }
         }
@@ -78,11 +78,13 @@ void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * ana
     uint32_t producing_space_size = anatomy->_producing_space.size();
     uint32_t eating_space_size    = anatomy->_eating_space.size();
     uint32_t killing_space_size   = anatomy->_killing_space.size();
+    uint32_t eye_vec_size         = anatomy->_eye_block_vec.size();
 
     os.device()->write((char*)&organism_blocks_size, sizeof(uint32_t));
     os.device()->write((char*)&producing_space_size, sizeof(uint32_t));
     os.device()->write((char*)&eating_space_size,    sizeof(uint32_t));
     os.device()->write((char*)&killing_space_size,   sizeof(uint32_t));
+    os.device()->write((char*)&eye_vec_size,         sizeof(uint32_t));
 
     os.device()->write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     os.device()->write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -94,6 +96,7 @@ void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * ana
     os.device()->write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     os.device()->write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     os.device()->write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.device()->write((char*)&anatomy->_eye_block_vec[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
@@ -136,7 +139,7 @@ void DataSavingFunctions::read_simulation_grid(QDataStream &is, EngineDataContai
     is.readRawData((char*)&blocks[0], sizeof(WorldBlocks)*size);
 
     for (auto & block: blocks) {
-        edc.CPU_simulation_grid[block.x][block.y].type = block.type;
+        edc.st_grid.get_type(block.x, block.y) = block.type;
     }
 }
 
@@ -192,16 +195,19 @@ void DataSavingFunctions::read_organism_anatomy(QDataStream &is, Anatomy * anato
     uint32_t producing_space_size = 0;
     uint32_t eating_space_size    = 0;
     uint32_t killing_space_size   = 0;
+    uint32_t eye_vec_size         = 0;
 
     is.readRawData((char*)&organism_blocks_size, sizeof(uint32_t));
     is.readRawData((char*)&producing_space_size, sizeof(uint32_t));
     is.readRawData((char*)&eating_space_size,    sizeof(uint32_t));
     is.readRawData((char*)&killing_space_size,   sizeof(uint32_t));
+    is.readRawData((char*)&eye_vec_size,         sizeof(uint32_t));
 
     anatomy->_organism_blocks.resize(organism_blocks_size);
     anatomy->_producing_space.resize(producing_space_size);
     anatomy->_eating_space   .resize(eating_space_size);
     anatomy->_killing_space  .resize(killing_space_size);
+    anatomy->_eye_block_vec  .resize(eye_vec_size);
 
     is.readRawData((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
     is.readRawData((char*)&anatomy->_producer_blocks, sizeof(int32_t));
@@ -213,6 +219,7 @@ void DataSavingFunctions::read_organism_anatomy(QDataStream &is, Anatomy * anato
     is.readRawData((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     is.readRawData((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
     is.readRawData((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.readRawData((char*)&anatomy->_eye_block_vec[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;
@@ -260,14 +267,14 @@ void DataSavingFunctions::json_write_grid(Document & d, EngineDataContainer &edc
 
     for (int x = 1; x < edc.simulation_width - 1; x++) {
         for (int y = 1; y < edc.simulation_height - 1; y++) {
-            if (edc.CPU_simulation_grid[x][y].type != BlockTypes::WallBlock &&
-                edc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) {continue;}
+            auto type = edc.st_grid.get_type(x, y);
+            if (type != BlockTypes::WallBlock && type != BlockTypes::FoodBlock) {continue;}
             Value cell(kObjectType);
 
             cell.AddMember("c", Value(x-1), d.GetAllocator());
             cell.AddMember("r", Value(y-1), d.GetAllocator());
 
-            if (edc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) {
+            if (type == BlockTypes::FoodBlock) {
                 food.PushBack(cell, d.GetAllocator());
             } else {
                 walls.PushBack(cell, d.GetAllocator());
@@ -751,7 +758,6 @@ void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, Da
     d.AddMember("update_info_every_n_milliseconds", Value(state.update_info_every_n_milliseconds), d.GetAllocator());
 
     d.AddMember("use_cuda",                          Value(state.use_cuda), d.GetAllocator());
-    d.AddMember("wait_for_engine_to_stop_to_render", Value(state.wait_for_engine_to_stop_to_render), d.GetAllocator());
     d.AddMember("disable_warnings",                  Value(state.disable_warnings), d.GetAllocator());
     d.AddMember("really_stop_render",                Value(state.really_stop_render), d.GetAllocator());
     d.AddMember("save_simulation_settings",          Value(state.save_simulation_settings), d.GetAllocator());
@@ -768,7 +774,6 @@ void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, Dat
     state.brush_size                       = d["brush_size"].GetInt();
     state.update_info_every_n_milliseconds = d["update_info_every_n_milliseconds"].GetInt();
 
-    state.wait_for_engine_to_stop_to_render = d["wait_for_engine_to_stop_to_render"].GetBool();
     state.disable_warnings                  = d["disable_warnings"].GetBool();
     state.really_stop_render                = d["really_stop_render"].GetBool();
     state.save_simulation_settings          = d["save_simulation_settings"].GetBool();
@@ -802,11 +807,26 @@ void DataSavingFunctions::write_json_state(const std::string &path, ProgramState
     file.close();
 }
 
-bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+void DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
                                           OCCParameters &occp) {
+
+    std::function<void(const std::string *, ProgramState, SimulationParameters *, OCCParameters *)> func = &read_json_state_private;
+
+    //if during loading function crashes (incompatible settings), then overwrite them with current version of setting.
+    if (try_and_catch_abort(func, &path, state, &sp, &occp)) {
+        write_json_state(path, state, sp, occp);
+    }
+}
+
+void DataSavingFunctions::read_json_state_private(const std::string *path_, ProgramState state,
+                                                  SimulationParameters *sp_, OCCParameters *occp_) {
+    auto & path = *path_;
+    auto & sp = *sp_;
+    auto & occp = *occp_;
+
     if (!std::filesystem::exists(path)) {
         write_json_state(path, state, sp, occp);
-        return false;
+        return;
     }
 
     std::string json;
@@ -814,7 +834,7 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     std::ifstream file;
     file.open(path);
     if (!file.is_open()) {
-        return false;
+        return;
     }
 
     ss << file.rdbuf();
@@ -826,7 +846,7 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     d.Parse(json.c_str());
 
     if (!read_json_version(d)) {
-        return false;
+        return;
     }
 
     read_json_program_settings(d, state);
@@ -834,8 +854,6 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
         read_json_extended_simulation_parameters(d, sp);
         read_json_occp(d, occp);
     }
-
-    return true;
 }
 
 void DataSavingFunctions::write_occp(QDataStream &os, OCCParameters &occp) {

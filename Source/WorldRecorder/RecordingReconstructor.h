@@ -12,7 +12,6 @@ private:
     int width;
     int height;
 
-    bool initialized = false;
     bool recenter_to_imaginary_pos;
 
     std::vector<BaseGridBlock> rec_grid;
@@ -25,16 +24,17 @@ private:
     void apply_move_change(Transaction &transaction);
     void apply_wall_change(Transaction &transaction);
     void apply_compressed_change(Transaction &transaction);
+
+    void apply_starting_point(Transaction & transaction);
+    void apply_reset(Transaction & transaction);
+    void apply_normal(Transaction & transaction);
+    //TODO void_apply_user_food_change
 public:
     RecordingReconstructor()=default;
 
     void start_reconstruction(int width, int height);
 
     void apply_transaction(Transaction & transaction);
-
-    void apply_starting_point(Transaction & transaction);
-    void apply_reset(Transaction & transaction);
-    void apply_normal(Transaction & transaction);
 
     const std::vector<BaseGridBlock> & get_state();
 

@@ -361,16 +361,6 @@
            </item>
           </layout>
          </item>
-         <item>
-          <widget class="QCheckBox" name="cb_synchronise_sim_and_win">
-           <property name="text">
-            <string>Synchronise simulation and window</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -463,8 +453,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>631</width>
-                  <height>219</height>
+                  <width>606</width>
+                  <height>233</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -771,8 +761,8 @@
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>617</width>
-                  <height>254</height>
+                  <width>606</width>
+                  <height>270</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1081,9 +1071,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-1255</y>
-                  <width>617</width>
-                  <height>1582</height>
+                  <y>0</y>
+                  <width>606</width>
+                  <height>1678</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2108,9 +2098,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
-                  <width>617</width>
-                  <height>774</height>
+                  <y>-110</y>
+                  <width>606</width>
+                  <height>807</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2273,13 +2263,6 @@
                      <widget class="QCheckBox" name="cb_disable_warnings">
                       <property name="text">
                        <string>Disable warnings</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="cb_wait_for_engine_to_stop">
-                      <property name="text">
-                       <string>Wait for engine to stop to render</string>
                       </property>
                      </widget>
                     </item>
@@ -2580,22 +2563,6 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>399</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_synchronise_sim_and_win</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_synchronise_simulation_and_window_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>745</x>
-     <y>699</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>559</x>
-     <y>406</y>
     </hint>
    </hints>
   </connection>
@@ -3972,22 +3939,6 @@
     <hint type="destinationlabel">
      <x>446</x>
      <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_wait_for_engine_to_stop</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_wait_for_engine_to_stop_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>647</x>
-     <y>871</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>448</y>
     </hint>
    </hints>
   </connection>

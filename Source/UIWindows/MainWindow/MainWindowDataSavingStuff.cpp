@@ -31,7 +31,7 @@ void MainWindow::recover_state(const SimulationParameters &recovery_sp, const Or
     engine.unpause();
 }
 
-void MainWindow::read_data(QDataStream &is) {
+void MainWindow::read_world_data(QDataStream &is) {
     //If save version is incompatible
     if (!DataSavingFunctions::read_version(is)) {
         display_message("Save version is incompatible with current program version.");
@@ -160,32 +160,20 @@ void MainWindow::update_table_values() {
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
-#include <csetjmp>
-#include <csignal>
-
-jmp_buf env;
-
-void on_sigabrt (int signum)
-{
-    signal (signum, SIG_DFL);
-    longjmp (env, 1);
-}
-
-template <typename ...A>
-bool try_and_catch_abort(std::function<void(A...)> f, A... args)
-{
-    if (setjmp (env) == 0) {
-        signal(SIGABRT, &on_sigabrt);
-        f(args...);
-        signal (SIGABRT, SIG_DFL);
-        return false;
+void MainWindow::read_json_world_data(const std::string &path) {
+    std::string json;
+    auto ss = std::ostringstream();
+    std::ifstream file;
+    file.open(path);
+    if (!file.is_open()) {
+        return;
     }
-    else {
-        return true;
-    }
-}
 
-void MainWindow::read_json_data(const std::string &json) {
+    ss << file.rdbuf();
+    json = ss.str();
+
+    file.close();
+
     Document document;
     document.Parse(json.c_str());
 
@@ -206,7 +194,7 @@ void MainWindow::read_json_data(const std::string &json) {
         recover_state(recovery_sp, recovery_bp, recovery_simulation_width, recovery_simulation_height);
         return;
     }
-    json_resize_and_make_walls(document);
+    json_resize_and_make_walls();
     std::function<void(rapidjson::GenericDocument<rapidjson::UTF8<>>*, EngineDataContainer*)> func2 = &json_read_ticks_food_walls;
     if (try_and_catch_abort(func2, reinterpret_cast<rapidjson::GenericDocument<rapidjson::UTF8<>>*>(&document), &edc)) {
         display_message("Failed to read positions of walls or food.");
@@ -237,7 +225,7 @@ void MainWindow::json_read_sim_width_height(Document * d_, int32_t * new_width, 
     *new_width  = d["grid"]["cols"].GetInt() + 2;
 }
 
-void MainWindow::json_resize_and_make_walls(Document &d) {
+void MainWindow::json_resize_and_make_walls() {
     new_simulation_width = edc.simulation_width;
     new_simulation_height = edc.simulation_height;
 
@@ -263,13 +251,13 @@ void MainWindow::json_read_ticks_food_walls(Document *d_, EngineDataContainer *e
         int x = pos["c"].GetInt() + 1;
         int y = pos["r"].GetInt() + 1;
 
-        edc.CPU_simulation_grid[x][y].type = BlockTypes::FoodBlock;
+        edc.st_grid.get_type(x, y) = BlockTypes::FoodBlock;
     }
 
     for (auto & pos: d["grid"]["walls"].GetArray()) {
         int x = pos["c"].GetInt() + 1;
         int y = pos["r"].GetInt() + 1;
 
-        edc.CPU_simulation_grid[x][y].type = BlockTypes::WallBlock;
+        edc.st_grid.get_type(x, y) = BlockTypes::WallBlock;
     }
 }

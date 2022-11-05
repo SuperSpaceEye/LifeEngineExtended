@@ -241,7 +241,7 @@ Brain Brain::mutate(lehmer64 &mt, SimulationParameters sp) {
     return new_brain;
 }
 
-//TODO
+//TODO remember
 void Brain::convert_simple_to_weighted() {
     auto * simple_decision = (SimpleDecision*)&simple_action_table;
     auto * weight = (float*)&weighted_action_table;

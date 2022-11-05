@@ -31,10 +31,6 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
             (unsigned char*)&pixels[0], CAIRO_FORMAT_RGB24, width, height,
             cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, width));
 
-    // Preparing to convert my generated RGB images to YUV frames.
-    swsCtx = sws_getContext(width, height,
-                            AV_PIX_FMT_RGB24, width, height, AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR, NULL, NULL, NULL);
-
     // Preparing the data concerning the format and codec,
     // in order to write properly the header, frame data and end of file.
     const char* fmtext = "mp4";
@@ -44,11 +40,9 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
 
     // Setting up the codec.
     AVCodec* codec = avcodec_find_encoder_by_name("libx264");
-//    AVCodec* codec = avcodec_find_encoder_by_name("libvpx-vp9");
     AVDictionary* opt = NULL;
     av_dict_set(&opt, "preset", "ultrafast", 0);
     av_dict_set(&opt, "crf", "23", 0);
-//    av_dict_set(&opt, "tune", "zerolatency", 0);
     stream = avformat_new_stream(fc, codec);
     c = stream->codec;
     c->width = width;
@@ -76,13 +70,8 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
     int ret = avformat_write_header(fc, &opt);
     av_dict_free(&opt);
 
-    // Preparing the containers of the frame data:
-    // Allocating memory for each RGB frame, which will be lately converted to YUV.
-    rgbpic = av_frame_alloc();
-    rgbpic->format = AV_PIX_FMT_RGB24;
-    rgbpic->width = width;
-    rgbpic->height = height;
-    ret = av_frame_get_buffer(rgbpic, 1);
+    //the temporary holder for converted yuv data before calling avpicture_fill on yuvpic
+    temp_data.resize(3*width*height);
 
     // Allocating memory for each conversion output YUV frame.
     yuvpic = av_frame_alloc();
@@ -91,32 +80,87 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
     yuvpic->height = height;
     ret = av_frame_get_buffer(yuvpic, 1);
 
-    // After the format, code and general frame data is set,
-    // we can write the video in the frame generation loop:
-    // std::vector<uint8_t> B(width*height*3);
-
     writing = true;
 }
 
-void MovieWriter::addFrame(const uint8_t* pixels, bool write_to_console)
-{
-    // The AVFrame data will be stored as RGBRGBRGB... row-wise,
-    // from left to right and from top to bottom.
-    for (unsigned int y = 0; y < height; y++)
+void MovieWriter::addYUVFrame(const uint8_t *pixels) {
+    avpicture_fill((AVPicture*)yuvpic, pixels, AV_PIX_FMT_YUV420P, width, height);
+
+    av_init_packet(&pkt);
+    pkt.data = nullptr;
+    pkt.size = 0;
+
+    // The PTS of the frame are just in a reference unit,
+    // unrelated to the format we are using. We set them,
+    // for instance, as the corresponding frame number.
+    yuvpic->pts = iframe;
+
+    int got_output;
+    int ret = avcodec_encode_video2(c, &pkt, yuvpic, &got_output);
+    if (got_output)
     {
-        for (unsigned int x = 0; x < width; x++)
+        // We set the packet PTS and DTS taking in the account our FPS (second argument),
+        // and the time base that our selected format uses (third argument).
+        av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
+
+        iframe++;
+
+        pkt.stream_index = stream->index;
+
+        // Write the encoded frame to the mp4 file.
+        av_interleaved_write_frame(fc, &pkt);
+        av_packet_unref(&pkt);
+    }
+}
+
+// https://stackoverflow.com/questions/9465815/rgb-to-yuv420-algorithm-efficiency
+void Bitmap2Yuv420p_calc2(uint8_t *destination, const uint8_t *rgb, size_t width, size_t height)
+{
+    size_t image_size = width * height;
+    size_t upos = image_size;
+    size_t vpos = upos + upos / 4;
+    size_t i = 0;
+
+    for( size_t line = 0; line < height; ++line )
+    {
+        if( !(line % 2) )
         {
-            // rgbpic->linesize[0] is equal to width.
-            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 0] = pixels[y * 4 * width + 4 * x + 2];
-            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 1] = pixels[y * 4 * width + 4 * x + 1];
-            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 2] = pixels[y * 4 * width + 4 * x + 0];
+            for( size_t x = 0; x < width; x += 2 )
+            {
+                uint8_t r = rgb[4 * i + 2];
+                uint8_t g = rgb[4 * i + 1];
+                uint8_t b = rgb[4 * i + 0];
+
+                destination[i++] = ((66*r + 129*g + 25*b) >> 8) + 16;
+
+                destination[upos++] = ((-38*r + -74*g + 112*b) >> 8) + 128;
+                destination[vpos++] = ((112*r + -94*g + -18*b) >> 8) + 128;
+
+                r = rgb[4 * i + 2];
+                g = rgb[4 * i + 1];
+                b = rgb[4 * i + 0];
+
+                destination[i++] = ((66*r + 129*g + 25*b) >> 8) + 16;
+            }
+        }
+        else
+        {
+            for( size_t x = 0; x < width; x += 1 )
+            {
+                uint8_t r = rgb[4 * i + 2];
+                uint8_t g = rgb[4 * i + 1];
+                uint8_t b = rgb[4 * i + 0];
+
+                destination[i++] = ((66*r + 129*g + 25*b) >> 8) + 16;
+            }
         }
     }
+}
 
-    // Not actually scaling anything, but just converting
-    // the RGB data to YUV and store it in yuvpic.
-    sws_scale(swsCtx, rgbpic->data, rgbpic->linesize, 0,
-              height, yuvpic->data, yuvpic->linesize);
+void MovieWriter::addFrame(const uint8_t *pixels)
+{
+    Bitmap2Yuv420p_calc2(temp_data.data(), pixels, width, height);
+    avpicture_fill((AVPicture*)yuvpic, temp_data.data(), AV_PIX_FMT_YUV420P, width, height);
 
     av_init_packet(&pkt);
     pkt.data = NULL;
@@ -131,8 +175,6 @@ void MovieWriter::addFrame(const uint8_t* pixels, bool write_to_console)
     int ret = avcodec_encode_video2(c, &pkt, yuvpic, &got_output);
     if (got_output)
     {
-        fflush(stdout);
-
         // We set the packet PTS and DTS taking in the account our FPS (second argument),
         // and the time base that our selected format uses (third argument).
         av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
@@ -140,13 +182,23 @@ void MovieWriter::addFrame(const uint8_t* pixels, bool write_to_console)
         iframe++;
 
         pkt.stream_index = stream->index;
-        if (write_to_console) {
-            printf("Writing frame %d (size = %d)\n", iframe, pkt.size);
-        }
 
         // Write the encoded frame to the mp4 file.
         av_interleaved_write_frame(fc, &pkt);
         av_packet_unref(&pkt);
+    }
+}
+
+void MovieWriter::convert_image(const uint8_t *pixels) {
+    for (unsigned int y = 0; y < height; y++)
+    {
+        for (unsigned int x = 0; x < width; x++)
+        {
+            // rgbpic->linesize[0] is equal to width.
+            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 0] = pixels[y * 4 * width + 4 * x + 2];
+            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 1] = pixels[y * 4 * width + 4 * x + 1];
+            rgbpic->data[0][y * rgbpic->linesize[0] + 3 * x + 2] = pixels[y * 4 * width + 4 * x + 0];
+        }
     }
 }
 
@@ -175,8 +227,7 @@ void MovieWriter::stop_writing() {
     avcodec_close(stream->codec);
 
     // Freeing all the allocated memory:
-    sws_freeContext(swsCtx);
-    av_frame_free(&rgbpic);
+    temp_data = std::vector<unsigned char>{};
     av_frame_free(&yuvpic);
     avformat_free_context(fc);
 

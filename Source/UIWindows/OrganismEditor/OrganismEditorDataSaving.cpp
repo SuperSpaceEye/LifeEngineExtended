@@ -8,9 +8,8 @@ void OrganismEditor::read_organism(QDataStream &is) {
     OCCParameters p{};
     OCCLogicContainer l{};
 
-    DataSavingFunctions::read_organism(is, *sp, *editor_organism->bp, *chosen_organism, p, l);
+    DataSavingFunctions::read_organism(is, *sp, *editor_organism.bp, chosen_organism, p, l);
 
-    delete editor_organism;
     load_chosen_organism();
 }
 
@@ -25,9 +24,8 @@ void OrganismEditor::read_json_organism(std::string &json) {
         return;
     }
 
-    DataSavingFunctions::json_read_organism(organism, *sp, *editor_organism->bp, *chosen_organism);
+    DataSavingFunctions::json_read_organism(organism, *sp, *editor_organism.bp, chosen_organism);
 
-    delete editor_organism;
     load_chosen_organism();
 }
 
@@ -35,7 +33,7 @@ void OrganismEditor::write_json_organism(std::string &json) {
     Document j_organism;
     j_organism.SetObject();
 
-    DataSavingFunctions::write_json_organism(j_organism, editor_organism, j_organism, *sp);
+    DataSavingFunctions::write_json_organism(j_organism, &editor_organism, j_organism, *sp);
 
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);

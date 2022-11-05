@@ -5,7 +5,6 @@
 #include "RecordingReconstructor.h"
 
 void RecordingReconstructor::start_reconstruction(int width, int height) {
-    initialized = true;
     this->width = width;
     this->height = height;
 
@@ -107,6 +106,7 @@ void RecordingReconstructor::apply_food_change(Transaction &transaction) {
 }
 
 void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
+    //TODO did it wrong
     rec_orgs.resize(rec_orgs.size() + transaction.organism_change.size());
     for (auto & o: transaction.organism_change) {
         for (auto & b: o.anatomy._organism_blocks) {
@@ -144,5 +144,4 @@ void RecordingReconstructor::finish_reconstruction() {
     rec_orgs = std::vector<Organism>();
     width = 0;
     height = 0;
-    initialized = false;
 }

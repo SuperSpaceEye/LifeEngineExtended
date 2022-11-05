@@ -47,11 +47,11 @@
 #include "../../Stuff/MiscFuncs.h"
 #include "../../Stuff/CursorMode.h"
 #include "../../Stuff/Vector2.h"
-#include "../../Containers/CPU/RecordingContainer.h"
 #include "../../Stuff/ImageCreation.h"
 #include "../../Stuff/DataSavingFunctions.h"
 #include "../../Containers/CPU/OrganismInfoContainer.h"
 #include "../../SimulationEngine/OrganismsController.h"
+#include "../../Stuff/IPSSmoother.h"
 
 #include "../../Stuff/rapidjson/document.h"
 #include "../../Stuff/rapidjson/writer.h"
@@ -68,7 +68,7 @@
 #include "../OCCParameters/OCCParameters.h"
 
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
 #include "../../Stuff/cuda_image_creator.cuh"
 #include "../../Stuff/get_device_count.cuh"
 #endif
@@ -82,7 +82,7 @@ class MainWindow: public QWidget {
 private:
     CursorMode cursor_mode = CursorMode::ModifyFood;
 
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     CUDAImageCreator cuda_creator{};
 #endif
 
@@ -91,8 +91,11 @@ private:
 
     TexturesContainer textures{};
 
+    //double buffering to eliminate tearing
     std::array<std::vector<unsigned char>, 2> image_vectors{std::vector<unsigned char>{}, std::vector<unsigned char>{}};
+    //which buffer should be used to draw an image on screen
     volatile int ready_buffer = 0;
+    //if the main thread did not draw the image on screen, do not compute next image.
     volatile bool have_read_buffer = false;
 
     QGraphicsScene scene;
@@ -107,6 +110,7 @@ private:
 
     Ui::MainWindow ui{};
     QTimer * timer;
+    IPSSmoother fps_smoother{};
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
@@ -114,11 +118,12 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_event_execution;
 
     SimulationEngine engine{edc, ecp, bp, sp, occp};
-    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp};
+    OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp,
+                      cuda_is_available_var, use_cuda};
     StatisticsCore st{&ui};
     InfoWindow iw{&ui};
     #ifndef __NO_RECORDER__
-    Recorder rc{&ui, &edc, &ecp, &cc, &textures, &edc.stc.tbuffer};
+    Recorder rc{&ui, &edc, &ecp, &cc, &textures, &edc.stc.tbuffer, &center_x, &center_y, &scaling_zoom, cuda_is_available_var};
     #endif
     WorldEvents we{&ui, &sp, &bp, &engine.info, &ecp, &engine};
     Benchmarks bs{ui};
@@ -128,6 +133,7 @@ private:
     float scaling_coefficient = 1.2;
     // actual zoom
     float scaling_zoom = 1;
+    //center position of a camera
     float center_x = 0;
     float center_y = 0;
     float image_creation_interval = 0.;
@@ -139,9 +145,9 @@ private:
     bool left_mouse_button_pressed = false;
     bool change_main_simulation_grid = false;
     bool change_editing_grid = false;
+    //use cuda to draw images for simulation/organism editor
     bool use_cuda = false;
     bool synchronise_info_update_with_window_update = false;
-    bool wait_for_engine_to_stop_to_render = false;
     bool resize_simulation_grid_flag = false;
     bool menu_hidden = false;
     //is needed to prevent multiple switches when pressing button
@@ -151,13 +157,15 @@ private:
     bool fill_window = false;
     //stops copying from main simulation grid to secondary grid from which image is constructed
     bool pause_grid_parsing = false;
-    bool really_stop_render = false;
+    bool really_stop_render = true;
     bool update_textures = false;
     bool is_fullscreen = false;
     bool save_simulation_settings = true;
     bool uses_point_size = false;
     bool update_last_cursor_pos = true;
+    bool cuda_is_available_var = false;
 
+    //maybe excessive, but it (i think) sometimes caused segfaults on resize
     std::atomic<bool> do_not_parse_image_data_ct = false;
     std::atomic<bool> do_not_parse_image_data_mt = false;
 
@@ -169,8 +177,11 @@ private:
 
     int last_mouse_x_pos = 0;
     int last_mouse_y_pos = 0;
+    //hom many frames were computed in a second
     int image_frames = 0;
+    //how many times ui has updated
     int window_frames = 0;
+    //max ui updates ps
     int max_ups = 100;
     // if fill_window, then size of a cell on a screen should be around this value
     int starting_cell_size_on_resize = 1;
@@ -181,9 +192,10 @@ private:
     int brush_size = 2;
     int update_info_every_n_milliseconds = 100;
     //Will give a warning if num is higher than this.
+    //TODO delete
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
-    int font_size = 0;
+    int font_size;
     int image_width;
     int image_height;
     int last_last_cursor_x_pos = 0;
@@ -199,6 +211,8 @@ private:
     void create_image_creation_thread();
 
     void json_resize_and_make_walls(rapidjson::Document & d);
+    void read_json_world_data(const std::string &path);
+    void json_resize_and_make_walls();
     static void json_read_sim_width_height(rapidjson::Document * d_, int32_t * new_width, int32_t * new_height);
     static void json_read_ticks_food_walls(rapidjson::Document *d_, EngineDataContainer *edc_);
 
@@ -210,7 +224,7 @@ private:
                        uint32_t recovery_simulation_width,
                        uint32_t recovery_simulation_height);
 
-    void read_data(QDataStream &is);
+    void read_world_data(QDataStream &is);
     bool read_data_container_data(QDataStream &is);
     void read_simulation_grid(QDataStream &is);
     bool read_organisms(QDataStream &is);
@@ -219,6 +233,7 @@ private:
 
     static std::vector<Vector2<int>> iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2);
 
+    //is invoked by qt timer
     void mainloop_tick();
     void ui_tick();
     void set_simulation_interval(int max_simulation_fps);
@@ -232,9 +247,7 @@ private:
 
     void create_image();
 
-    bool wait_for_engine_to_pause();
-
-    // parses actual simulation grid to grid from which image is created
+    // only parses what is seen by user form viewpoint
     void parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height);
     void parse_full_simulation_grid(bool parse);
 
@@ -244,6 +257,7 @@ private:
     void change_editing_grid_left_click();
     void change_editing_grid_right_click();
 
+    //TODO
     void set_simulation_num_threads(uint8_t num_threads);
 
     void set_cursor_mode(CursorMode mode);
@@ -399,14 +413,12 @@ private slots:
     void cb_do_not_mutate_brain_of_plants_slot(bool state);
     void cb_use_weighted_brain_slot(bool state);
     //Other
-    void cb_synchronise_simulation_and_window_slot(bool state);
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
     void cb_generate_random_walls_on_reset_slot(bool state);
     void cb_reset_with_editor_organism_slot(bool state);
     //Settings
     void cb_disable_warnings_slot(bool state);
-    void cb_wait_for_engine_to_stop_slot(bool state);
     void cb_synchronise_info_with_window_slot(bool state);
     void cb_use_nvidia_for_image_generation_slot(bool state);
     void cb_really_stop_render_slot(bool state);

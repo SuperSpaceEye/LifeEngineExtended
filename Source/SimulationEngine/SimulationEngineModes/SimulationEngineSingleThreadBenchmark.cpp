@@ -12,7 +12,7 @@ bool SimulationEngineSingleThreadBenchmark::resize_benchmark_grid(int width, int
     if (benchmark_running) {return false;}
     dc.simulation_width  = width;
     dc.simulation_height = height;
-    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<SingleThreadGridBlock>(dc.simulation_height, SingleThreadGridBlock{}));
+//    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<SingleThreadGridBlock>(dc.simulation_height, SingleThreadGridBlock{}));
     return true;
 }
 
@@ -262,7 +262,7 @@ void SimulationEngineSingleThreadBenchmark::finish_benchmarking() {
     remove_benchmark_organisms();
     dc = EngineDataContainer{};
     benchmark_results = std::vector<BenchmarkResult>();
-    dc.CPU_simulation_grid = std::vector<std::vector<SingleThreadGridBlock>>();
+//    dc.CPU_simulation_grid = std::vector<std::vector<SingleThreadGridBlock>>();
 }
 
 const std::vector<BenchmarkResult> & SimulationEngineSingleThreadBenchmark::get_results() {
@@ -362,10 +362,10 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
         for (auto & block: organism->anatomy._organism_blocks) {
             if (SimulationEngineSingleThread::check_if_block_out_of_bounds(&dc, organism, block, organism->rotation)) { continue_flag = true;break;}
 
-            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-            [organism->y + block.get_pos(organism->rotation).y];
-
-            if (w_block->type != BlockTypes::EmptyBlock)
+//            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
+//            [organism->y + block.get_pos(organism->rotation).y];
+//
+//            if (w_block->type != BlockTypes::EmptyBlock)
             { continue_flag = true;break;}
         }
         if (continue_flag) {continue_flag = false; i--; continue;}
@@ -383,18 +383,18 @@ void SimulationEngineSingleThreadBenchmark::reset_state() {
         OrganismsController::free_main_organism(&organism, dc);
     }
 
-    for (auto & row: dc.CPU_simulation_grid) {
-        row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
-    }
-    for (int x = 0; x < dc.simulation_width; x++) {
-        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
-    }
-
-    for (int y = 0; y < dc.simulation_height; y++) {
-        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
-    }
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
+//    }
+//    for (int x = 0; x < dc.simulation_width; x++) {
+//        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+//        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
+//    }
+//
+//    for (int y = 0; y < dc.simulation_height; y++) {
+//        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+//        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+//    }
 
     gen.set_seed(seed);
 }
@@ -404,11 +404,11 @@ using std::chrono::duration_cast;
 using std::chrono::nanoseconds;
 
 void SimulationEngineSingleThreadBenchmark::prepare_produce_food_benchmark() {
-    for (auto & row: dc.CPU_simulation_grid) {
-        for (auto & block: row) {
-            if (block.type == BlockTypes::FoodBlock) {block.type = BlockTypes::EmptyBlock;}
-        }
-    }
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        for (auto & block: row) {
+//            if (block.type == BlockTypes::FoodBlock) {block.type = BlockTypes::EmptyBlock;}
+//        }
+//    }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResult &res, bool flag) {
     auto start = NOW();
@@ -435,11 +435,11 @@ void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResu
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_eat_food_benchmark() {
-    for (auto & row: dc.CPU_simulation_grid) {
-        for (auto & block: row) {
-            if (block.type == BlockTypes::EmptyBlock) {block.type = BlockTypes::FoodBlock;}
-        }
-    }
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        for (auto & block: row) {
+//            if (block.type == BlockTypes::EmptyBlock) {block.type = BlockTypes::FoodBlock;}
+//        }
+//    }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(BenchmarkResult &res, bool flag) {
     auto start = NOW();
@@ -645,9 +645,9 @@ void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark(int
     for (int i = dc.stc.organisms.size()-1; i >= num_organisms; i--) {
         auto organism = &dc.stc.organisms[i];
         for (auto & block: organism->anatomy._organism_blocks) {
-            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-            w_block->type = BlockTypes::FoodBlock;
-            w_block->organism_index = -1;
+//            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
+//            w_block->type = BlockTypes::FoodBlock;
+//            w_block->organism_index = -1;
         }
         organism->kill_organism(dc);
     }

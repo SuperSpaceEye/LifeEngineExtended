@@ -125,11 +125,9 @@ void MainWindow::b_clear_all_walls_slot() {
 }
 
 void MainWindow::b_save_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    ecp.synchronise_simulation_and_window = false;
     engine.pause();
     ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause();
 
     std::string filter;
     QByteArray data{};
@@ -158,14 +156,12 @@ void MainWindow::b_save_world_slot() {
             data.erase(data.end()-1, data.end());
         } else {
             display_message("Worlds cannot be saved in json format with OCC enabled.");
-            ecp.synchronise_simulation_and_window = flag;
             ecp.engine_global_pause = false;
             engine.unpause();
             return;
         }
     //cancel
     } else if (result == 2) {
-        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
@@ -173,19 +169,16 @@ void MainWindow::b_save_world_slot() {
 
     QFileDialog::saveFileContent(data, QString::fromStdString(filter));
 
-    ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     engine.unpause();
 }
 
 void MainWindow::b_load_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    bool flag2 = sp.reset_on_total_extinction;
-    ecp.synchronise_simulation_and_window = false;
+    bool flag = sp.reset_on_total_extinction;
     sp.reset_on_total_extinction = false;
     engine.pause();
     ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause();
     auto fileContentReady = [&](const QString &fileName, const QByteArray &fileContent) {
         if (!fileName.isEmpty()) {
             std::filesystem::path filePath = fileName.toStdString();
@@ -193,15 +186,14 @@ void MainWindow::b_load_world_slot() {
             if (extension == ".lfew") {
                 QDataStream stream(fileContent);
                 stream.setByteOrder(QDataStream::LittleEndian);
-                read_data(stream);
+                read_world_data(stream);
             } else if (extension == ".json") {
                 sp.use_occ = false;
                 std::string str(fileContent.constData(), fileContent.length());
-                read_json_data(str);
+                read_json_world_data(str);
             }
         }
-        ecp.synchronise_simulation_and_window = flag;
-        sp.reset_on_total_extinction = flag2;
+        sp.reset_on_total_extinction = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         initialize_gui();
@@ -436,6 +428,10 @@ void MainWindow::le_brush_size_slot() {
 void MainWindow::le_update_info_every_n_milliseconds_slot() {
     le_slot_lower_bound<int>(update_info_every_n_milliseconds, update_info_every_n_milliseconds, "int",
                              ui.le_update_info_every_n_milliseconds, 1, "1");
+
+    int buffer_size =  1. / (update_info_every_n_milliseconds / 1000.) > 0 ? 1. / (update_info_every_n_milliseconds / 1000.): 1;
+
+    fps_smoother.set_max_items(buffer_size);
 }
 
 void MainWindow::le_menu_height_slot() {
@@ -569,11 +565,6 @@ void MainWindow::rb_cuda_slot() {
 
 //==================== Check buttons ====================
 
-void MainWindow::cb_synchronise_simulation_and_window_slot(bool state) {
-    ecp.synchronise_simulation_and_window = state;
-    ecp.engine_pause = state;
-}
-
 void MainWindow::cb_use_evolved_anatomy_mutation_rate_slot(bool state) {
     sp.use_anatomy_evolved_mutation_rate = state;
     ui.le_global_anatomy_mutation_rate->setDisabled(state);
@@ -595,13 +586,13 @@ void MainWindow::cb_fill_window_slot(bool state) {
 void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
     if (!state) {
         use_cuda = false;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
         cuda_creator.free();
+        ee.cuda_image_creator.free();
 #endif
         return;}
 
-    auto result = cuda_is_available();
-    if (!result) {
+    if (!cuda_is_available_var) {
         ui.cb_use_nvidia_for_image_generation->setChecked(false);
         use_cuda = false;
         if (!disable_warnings) {
@@ -610,8 +601,9 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
         return;
     }
     use_cuda = true;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     cuda_creator.copy_textures(textures);
+    ee.cuda_image_creator.copy_textures(textures);
 #endif
 }
 
@@ -626,6 +618,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         st.ui.lb_last_alive_position->show();
         st.ui.lb_dead_inside->show();
         st.ui.lb_dead_outside->show();
+        st.ui.lb_zoom->show();
+        st.ui.lb_viewpoint_x->show();
+        st.ui.lb_viewpoint_y->show();
     } else {
         st.ui.lb_child_organisms->hide();
         st.ui.lb_child_organisms_capacity->hide();
@@ -636,6 +631,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         st.ui.lb_last_alive_position->hide();
         st.ui.lb_dead_inside->hide();
         st.ui.lb_dead_outside->hide();
+        st.ui.lb_zoom->hide();
+        st.ui.lb_viewpoint_x->hide();
+        st.ui.lb_viewpoint_y->hide();
     }
 }
 
@@ -815,8 +813,6 @@ void MainWindow::cb_set_fixed_move_range_slot            (bool state) { sp.set_f
 void MainWindow::cb_self_organism_blocks_block_sight_slot(bool state){ sp.organism_self_blocks_block_sight = state;}
 
 void MainWindow::cb_failed_reproduction_eats_food_slot   (bool state) { sp.failed_reproduction_eats_food = state;}
-
-void MainWindow::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop_to_render = state;}
 
 void MainWindow::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 

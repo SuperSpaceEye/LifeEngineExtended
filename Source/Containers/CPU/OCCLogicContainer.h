@@ -5,7 +5,7 @@
 #ifndef LIFEENGINEEXTENDED_OCCLOGICCONTAINER_H
 #define LIFEENGINEEXTENDED_OCCLOGICCONTAINER_H
 
-#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridStuff/BaseGridBlock.h"
 
 struct OCCBlock: public BaseGridBlock {
     int parent_block_pos = -1;

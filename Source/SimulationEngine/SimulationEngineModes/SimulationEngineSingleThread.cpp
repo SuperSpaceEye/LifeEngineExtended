@@ -30,7 +30,7 @@ void SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer * dc
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(dc->stc.organisms_observations[i], gen);}}
     for (int i = 0; i <= dc->stc.last_alive_position; i++) {auto & organism = dc->stc.organisms[i]; if (!organism.is_dead) {make_decision(dc, sp, &organism, gen);}}
 
-    OrganismsController::compress_organisms(*dc);
+    OrganismsController::try_compress_organisms(*dc);
     //TODO the result of sorting doesn't need to be perfect, just good enough.
     //https://en.wikipedia.org/wiki/K-sorted_sequence#Algorithms
     //https://en.wikipedia.org/wiki/Partial_sorting
@@ -72,10 +72,9 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer *dc, Organ
     if (dc->record_data) {dc->stc.tbuffer.record_new_organism(*organism);}
     for (auto &block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
-        w_block->type = block.type;
-        w_block->rotation = get_global_rotation(block.rotation, organism->rotation);
-        w_block->organism_index = organism->vector_index;
+        dc->st_grid.get_type(organism->x + pos.x, organism->y + pos.y) = block.type;
+        dc->st_grid.get_rotation(organism->x + pos.x, organism->y + pos.y) = get_global_rotation(block.rotation, organism->rotation);
+        dc->st_grid.get_organism_index(organism->x + pos.x, organism->y + pos.y) = organism->vector_index;
     }
 }
 
@@ -91,6 +90,7 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer * dc, Simula
     }
 }
 
+//just iterate over all producing spaces and try to make food.
 void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *dc, SimulationParameters *sp,
                                                            Organism *organism, lehmer64 &gen, float multiplier) {
     for (auto & pr: organism->anatomy._producing_space) {
@@ -98,10 +98,11 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *
             auto x = organism->x + pc.get_pos(organism->rotation).x;
             auto y = organism->y + pc.get_pos(organism->rotation).y;
 
-            auto * w_block = &dc->CPU_simulation_grid[x][y];
-            if (w_block->type != BlockTypes::EmptyBlock) {continue;}
+            auto & type = dc->st_grid.get_type(x, y);
+
+            if (type != BlockTypes::EmptyBlock) {continue;}
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
-                w_block->type = BlockTypes::FoodBlock;
+                type = BlockTypes::FoodBlock;
                 if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, true);}
                 if (sp->stop_when_one_food_generated) { return;}
                 continue;
@@ -122,11 +123,11 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc,
         auto x = organism->x + pc.get_pos(organism->rotation).x;
         auto y = organism->y + pc.get_pos(organism->rotation).y;
 
-        auto * w_block = &dc->CPU_simulation_grid[x][y];
+        auto & type = dc->st_grid.get_type(x, y);
 
         //if space is occupied, then do nothing
-        if (w_block->type != BlockTypes::EmptyBlock) { continue;}
-        w_block->type = BlockTypes::FoodBlock;
+        if (type != BlockTypes::EmptyBlock) { continue;}
+        type = BlockTypes::FoodBlock;
         if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, true);}
         if (sp->stop_when_one_food_generated) { return;}
     }
@@ -137,10 +138,10 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, Simulation
         auto x = organism->x + pc.get_pos(organism->rotation).x;
         auto y = organism->y + pc.get_pos(organism->rotation).y;
 
-        auto * w_block = &dc->CPU_simulation_grid[x][y];
-        if (w_block->type == BlockTypes::FoodBlock) {
+        auto & type = dc->st_grid.get_type(x, y);
+        if (type == BlockTypes::FoodBlock) {
             if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, false);}
-            w_block->type = BlockTypes::EmptyBlock;
+            type = BlockTypes::EmptyBlock;
             organism->food_collected++;
         }
     }
@@ -152,28 +153,15 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, Organi
         organism->kill_organism(*dc);
         if (dc->record_data) {dc->stc.tbuffer.record_organism_dying(organism->vector_index);}
         for (auto & block: organism->anatomy._organism_blocks) {
-            auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-            w_block->type = BlockTypes::FoodBlock;
-            w_block->organism_index = -1;
+            dc->st_grid.get_type(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y) = BlockTypes::FoodBlock;
+            dc->st_grid.get_organism_index(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y) = -1;
         }
-
-
-        //TODO New version.
-//        auto * second_organism = &dc->stc.organisms[dc->stc.last_alive_position];
-//
-//        std::swap(*organism, *second_organism);
-//        std::swap(organism->vector_index, second_organism->vector_index);
-//        dc->stc.last_alive_position--;
-//        dc->stc.dead_organisms_positions.emplace_back(second_organism->vector_index);
-//        i--;
     }
 }
 
 void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism) {
     for (auto &block: organism->anatomy._killing_space) {
-        auto world_block = dc->CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][
-                organism->y + block.get_pos(organism->rotation).y];
-        switch (world_block.type) {
+        switch (dc->st_grid.get_type(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y)) {
             case BlockTypes::EmptyBlock:
             case BlockTypes::FoodBlock:
             case BlockTypes::WallBlock:
@@ -182,7 +170,7 @@ void SimulationEngineSingleThread::apply_damage(EngineDataContainer * dc, Simula
             default:
                 break;
         }
-        auto * world_organism = OrganismsController::get_organism_by_index(world_block.organism_index, *dc);
+        auto * world_organism = OrganismsController::get_organism_by_index(dc->st_grid.get_organism_index(organism->x + block.get_pos(organism->rotation).x,organism->y + block.get_pos(organism->rotation).y), *dc);
         if (world_organism == nullptr) { continue;}
         if (sp->on_touch_kill) { world_organism->damage = world_organism->life_points + 1; break; }
         world_organism->damage += sp->killer_damage_amount;
@@ -245,7 +233,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
             pos_x += offset_x;
             pos_y += offset_y;
 
-            last_observation.type = dc->CPU_simulation_grid[pos_x][pos_y].type;
+            last_observation.type = dc->st_grid.get_type(pos_x, pos_y);
             last_observation.distance = i;
 
             switch (last_observation.type) {
@@ -253,7 +241,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
                 case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock: goto endfor;
                 default:
-                    if (!sp->organism_self_blocks_block_sight && dc->CPU_simulation_grid[pos_x][pos_y].organism_index == organism->vector_index) {
+                    if (!sp->organism_self_blocks_block_sight && dc->st_grid.get_organism_index(pos_x, pos_y) == organism->vector_index) {
                         continue;
                     }
                     goto endfor;
@@ -286,14 +274,15 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
     for (auto & block: organism->anatomy._organism_blocks) {
         if (check_if_block_out_of_bounds(dc, organism, block, new_rotation)) { return;}
 
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + block.get_pos(new_rotation).x][organism->y + block.get_pos(new_rotation).y];
+        auto type = dc->st_grid.get_type(organism->x + block.get_pos(new_rotation).x, organism->y + block.get_pos(new_rotation).y);
+        auto organism_index = dc->st_grid.get_organism_index(organism->x + block.get_pos(new_rotation).x, organism->y + block.get_pos(new_rotation).y);
 
         if (sp->food_blocks_movement) {
-            if (w_block->type != BlockTypes::EmptyBlock && w_block->organism_index != organism->vector_index) {
+            if (type != BlockTypes::EmptyBlock && organism_index != organism->vector_index) {
                 return;
             }
         } else {
-            if ((w_block->type != BlockTypes::EmptyBlock && w_block->type != BlockTypes::FoodBlock) && w_block->organism_index != organism->vector_index) {
+            if ((type != BlockTypes::EmptyBlock && type != BlockTypes::FoodBlock) && organism_index != organism->vector_index) {
                 return;
             }
         }
@@ -301,19 +290,17 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer *dc, Orga
 
     for (auto & block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
-        w_block->type = BlockTypes::EmptyBlock;
-        w_block->organism_index = -1;
+        dc->st_grid.get_type(organism->x + pos.x, organism->y + pos.y) = BlockTypes::EmptyBlock;
+        dc->st_grid.get_organism_index(organism->x + pos.x, organism->y + pos.y) = -1;
     }
 
     //If there is a place for rotated organism, then rotation can happen
     organism->rotation = new_rotation;
     for (auto & block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
-        w_block->type = block.type;
-        w_block->rotation = get_global_rotation(block.rotation, organism->rotation);
-        w_block->organism_index = organism->vector_index;
+        dc->st_grid.get_type(organism->x + pos.x, organism->y + pos.y) = block.type;
+        dc->st_grid.get_rotation(organism->x + pos.x, organism->y + pos.y) = get_global_rotation(block.rotation, organism->rotation);
+        dc->st_grid.get_organism_index(organism->x + pos.x, organism->y + pos.y) = organism->vector_index;
     }
 }
 
@@ -335,14 +322,15 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
     //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
     for (auto & block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[new_x + pos.x][new_y + pos.y];
+        auto type = dc->st_grid.get_type(new_x + pos.x, new_y + pos.y);
+        auto & organism_index = dc->st_grid.get_organism_index(new_x + pos.x, new_y + pos.y);
+
         if (sp->food_blocks_movement) {
-            if (w_block->type != BlockTypes::EmptyBlock &&
-                w_block->organism_index != organism->vector_index) {
+            if (type != BlockTypes::EmptyBlock && organism_index != organism->vector_index) {
                 return;
             }
         } else {
-            if ((w_block->type != BlockTypes::EmptyBlock && w_block->type != BlockTypes::FoodBlock) && w_block->organism_index != organism->vector_index) {
+            if ((type != BlockTypes::EmptyBlock && type != BlockTypes::FoodBlock) && organism_index != organism->vector_index) {
                 return;
             }
         }
@@ -350,17 +338,15 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer *dc, Organi
 
     for (auto & block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[organism->x + pos.x][organism->y + pos.y];
-        w_block->type = BlockTypes::EmptyBlock;
-        w_block->organism_index = -1;
+        dc->st_grid.get_type(organism->x + pos.x, organism->y + pos.y) = BlockTypes::EmptyBlock;
+        dc->st_grid.get_organism_index(organism->x + pos.x, organism->y + pos.y) = -1;
     }
 
     for (auto & block: organism->anatomy._organism_blocks) {
         auto pos = block.get_pos(organism->rotation);
-        auto * w_block = &dc->CPU_simulation_grid[new_x + pos.x][new_y + pos.y];
-        w_block->type = block.type;
-        w_block->rotation = get_global_rotation(block.rotation,organism->rotation);
-        w_block->organism_index = organism->vector_index;
+        dc->st_grid.get_type(new_x + pos.x, new_y + pos.y) = block.type;
+        dc->st_grid.get_rotation(new_x + pos.x, new_y + pos.y) = get_global_rotation(block.rotation, organism->rotation);
+        dc->st_grid.get_organism_index(new_x + pos.x, new_y + pos.y) = organism->vector_index;
     }
 
     organism->x = new_x;
@@ -452,13 +438,13 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer *dc, Simulati
     for (auto & block: child_pattern->anatomy._organism_blocks) {
         if (check_if_block_out_of_bounds(dc, child_pattern, block, child_pattern->rotation)) {return;}
 
-        auto * w_block = &dc->CPU_simulation_grid[child_pattern->x + block.get_pos(child_pattern->rotation).x]
-                                    [child_pattern->y + block.get_pos(child_pattern->rotation).y];
+        auto type = dc->st_grid.get_type(child_pattern->x + block.get_pos(child_pattern->rotation).x,
+                                           child_pattern->y + block.get_pos(child_pattern->rotation).y);
 
-        if (sp->food_blocks_reproduction && w_block->type != BlockTypes::EmptyBlock
+        if (sp->food_blocks_reproduction && type != BlockTypes::EmptyBlock
             ||
-            !sp->food_blocks_reproduction && !(w_block->type == BlockTypes::EmptyBlock ||
-            w_block->type == BlockTypes::FoodBlock)
+            !sp->food_blocks_reproduction && !(type == BlockTypes::EmptyBlock ||
+            type == BlockTypes::FoodBlock)
             )
         {return;}
     }
@@ -640,8 +626,7 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
             return false;
         };
 
-        auto * block = &dc->CPU_simulation_grid[x][y];
-        switch (block->type) {
+        switch (dc->st_grid.get_type(x, y)) {
             case BlockTypes::EmptyBlock:
                 continue;
             case BlockTypes::WallBlock:
@@ -649,7 +634,7 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
             case BlockTypes::FoodBlock:
                 continue;
             default:
-                if (block->organism_index == allow_organism) { continue;}
+                if (dc->st_grid.get_organism_index(x, y) == allow_organism) { continue;}
                 return false;
         }
     }

@@ -312,6 +312,34 @@ void Organism::move_organism(Organism &organism) {
     occl = organism.occl;
 }
 
+void Organism::copy_organism(const Organism &organism) {
+    x = organism.x;
+    y = organism.y;
+    life_points = organism.life_points;
+    damage = organism.damage;
+    max_lifetime = organism.max_lifetime;
+    lifetime = organism.lifetime;
+    anatomy_mutation_rate = organism.anatomy_mutation_rate;
+    brain_mutation_rate = organism.brain_mutation_rate;
+    food_collected = organism.food_collected;
+    food_needed = organism.food_needed;
+    multiplier = organism.multiplier;
+    move_range = organism.move_range;
+    rotation = organism.rotation;
+    move_counter = organism.move_counter;
+    max_decision_lifetime = organism.max_decision_lifetime;
+    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
+
+    brain = organism.brain;
+    anatomy = organism.anatomy;
+    occ = organism.occ;
+
+    sp = organism.sp;
+    bp = organism.bp;
+    occp = organism.occp;
+    occl = organism.occl;
+}
+
 void Organism::kill_organism(EngineDataContainer &edc) {
     if (is_dead) { return;}
     OrganismsController::free_main_organism(this, edc);

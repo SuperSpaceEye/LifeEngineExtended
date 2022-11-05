@@ -23,7 +23,7 @@
 #include "Rotation.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "../../Stuff/BlockTypes.hpp"
-#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridStuff/BaseGridBlock.h"
 #include "../../PRNGS/lehmer64.h"
 #include "../../Stuff/Vector2.h"
 
@@ -40,7 +40,6 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
-    //TODO i think i messed this up somehow
     inline Vector2<int> get_pos(Rotation rotation) {
         switch (rotation) {
             case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
@@ -75,7 +74,6 @@ struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
 
 struct SerializedOrganismStructureContainer {
     std::vector<SerializedOrganismBlockContainer> organism_blocks;
-    //TODO
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
@@ -119,7 +117,6 @@ struct SerializedOrganismStructureContainer {
 
 class Anatomy {
 private:
-
     SerializedOrganismStructureContainer *
     add_block(BlockTypes type, int block_choice, Rotation rotation, int x_, int y_,
               boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,

@@ -66,7 +66,6 @@ public:
     QHBoxLayout *horizontalLayout_41;
     QLabel *label_43;
     QLineEdit *le_brush_size;
-    QCheckBox *cb_synchronise_sim_and_win;
     QFrame *frame_3;
     QVBoxLayout *verticalLayout_4;
     QTabWidget *Tabs;
@@ -267,7 +266,6 @@ public:
     QLabel *label_19;
     QLineEdit *le_float_number_precision;
     QCheckBox *cb_disable_warnings;
-    QCheckBox *cb_wait_for_engine_to_stop;
     QHBoxLayout *horizontalLayout_30;
     QLabel *label_25;
     QLineEdit *le_font_size;
@@ -528,12 +526,6 @@ public:
 
         verticalLayout_6->addLayout(horizontalLayout_41);
 
-        cb_synchronise_sim_and_win = new QCheckBox(frame_2);
-        cb_synchronise_sim_and_win->setObjectName("cb_synchronise_sim_and_win");
-        cb_synchronise_sim_and_win->setChecked(false);
-
-        verticalLayout_6->addWidget(cb_synchronise_sim_and_win);
-
 
         horizontalLayout->addWidget(frame_2);
 
@@ -567,7 +559,7 @@ public:
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
         scrollAreaWidgetContents_3->setObjectName("scrollAreaWidgetContents_3");
-        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 631, 219));
+        scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 606, 233));
         QSizePolicy sizePolicy3(QSizePolicy::Ignored, QSizePolicy::Minimum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -754,7 +746,7 @@ public:
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
         scrollAreaWidgetContents_4->setObjectName("scrollAreaWidgetContents_4");
-        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 617, 254));
+        scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 606, 270));
         QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -938,7 +930,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1255, 617, 1582));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1678));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1624,7 +1616,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 617, 774));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -110, 606, 807));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -1715,11 +1707,6 @@ public:
         cb_disable_warnings->setObjectName("cb_disable_warnings");
 
         verticalLayout_19->addWidget(cb_disable_warnings);
-
-        cb_wait_for_engine_to_stop = new QCheckBox(widget_2);
-        cb_wait_for_engine_to_stop->setObjectName("cb_wait_for_engine_to_stop");
-
-        verticalLayout_19->addWidget(cb_wait_for_engine_to_stop);
 
         horizontalLayout_30 = new QHBoxLayout();
         horizontalLayout_30->setObjectName("horizontalLayout_30");
@@ -1999,7 +1986,6 @@ public:
 
         retranslateUi(MainWindow);
         QObject::connect(b_reset, SIGNAL(clicked()), MainWindow, SLOT(b_reset_slot()));
-        QObject::connect(cb_synchronise_sim_and_win, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_synchronise_simulation_and_window_slot(bool)));
         QObject::connect(tb_stoprender, SIGNAL(toggled(bool)), MainWindow, SLOT(tb_stoprender_slot(bool)));
         QObject::connect(rb_wall, SIGNAL(clicked()), MainWindow, SLOT(rb_wall_slot()));
         QObject::connect(b_reset_view, SIGNAL(clicked()), MainWindow, SLOT(b_reset_view_slot()));
@@ -2086,7 +2072,6 @@ public:
         QObject::connect(le_lifespan_multiplier, SIGNAL(returnPressed()), MainWindow, SLOT(le_lifespan_multiplier_slot()));
         QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
         QObject::connect(cb_failed_reproduction_eats_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_failed_reproduction_eats_food_slot(bool)));
-        QObject::connect(cb_wait_for_engine_to_stop, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_wait_for_engine_to_stop_slot(bool)));
         QObject::connect(cb_use_new_child_pos_calculator, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_new_child_pos_calculator_slot(bool)));
         QObject::connect(cb_checks_if_path_is_clear, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_check_if_path_is_clear_slot(bool)));
         QObject::connect(le_extra_mover_reproduction_cost, SIGNAL(returnPressed()), MainWindow, SLOT(le_extra_mover_reproduction_cost_slot()));
@@ -2148,7 +2133,6 @@ public:
         rb_wall->setText(QCoreApplication::translate("MainWindow", "Wall mode", nullptr));
         rb_null_button->setText(QString());
         label_43->setText(QCoreApplication::translate("MainWindow", "Brush size:", nullptr));
-        cb_synchronise_sim_and_win->setText(QCoreApplication::translate("MainWindow", "Synchronise simulation and window", nullptr));
         label_8->setText(QCoreApplication::translate("MainWindow", "Starting cell size:", nullptr));
         le_cell_size->setText(QCoreApplication::translate("MainWindow", "1", nullptr));
         cb_fill_window->setText(QCoreApplication::translate("MainWindow", "Fill window", nullptr));
@@ -2334,7 +2318,6 @@ public:
         label_19->setText(QCoreApplication::translate("MainWindow", "Float number precision: ", nullptr));
         le_float_number_precision->setText(QCoreApplication::translate("MainWindow", "2", nullptr));
         cb_disable_warnings->setText(QCoreApplication::translate("MainWindow", "Disable warnings", nullptr));
-        cb_wait_for_engine_to_stop->setText(QCoreApplication::translate("MainWindow", "Wait for engine to stop to render", nullptr));
         label_25->setText(QCoreApplication::translate("MainWindow", "Font size:", nullptr));
         label_46->setText(QCoreApplication::translate("MainWindow", "Update info every n milliseconds:", nullptr));
         cb_synchronise_info_with_window->setText(QCoreApplication::translate("MainWindow", "Synhronise info updates with window updates", nullptr));
