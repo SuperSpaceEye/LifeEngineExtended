@@ -30,6 +30,7 @@ void OrganismsController::free_child_organism(Organism *child_organism, EngineDa
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
     // If there are organisms not in use, take them.
     edc.stc.num_alive_organisms++;
+
     if (!edc.stc.dead_organisms_positions.empty()) {
         edc.stc.num_dead_organisms--;
         auto * ptr = &edc.stc.organisms[edc.stc.dead_organisms_positions.back()];
@@ -60,12 +61,10 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
 
     organism->is_dead = true;
 
-    { //TODO New version. Comment it.
-        edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
+    edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
 
-        if (organism->vector_index < edc.stc.last_alive_position) {
-            edc.stc.dead_organisms_before_last_alive_position++;
-        }
+    if (organism->vector_index < edc.stc.last_alive_position) {
+        edc.stc.dead_organisms_before_last_alive_position++;
     }
 
     edc.stc.num_dead_organisms++;
@@ -112,7 +111,7 @@ int32_t OrganismsController::get_last_alive_organism_position(EngineDataContaine
 //Will compress alive organisms so that there will be no dead organisms between alive ones.
 //Dead organisms positions should be sorted first.
 void OrganismsController::try_compress_organisms(EngineDataContainer &edc) {
-    if (edc.stc.max_dead_organisms < edc.stc.dead_organisms_before_last_alive_position || edc.stc.dead_organisms_before_last_alive_position * edc.stc.max_dead_organisms_in_alive_section_factor < edc.stc.num_alive_organisms) { return;}
+    if (edc.stc.max_dead_organisms > edc.stc.dead_organisms_before_last_alive_position || edc.stc.dead_organisms_before_last_alive_position * edc.stc.max_dead_organisms_in_alive_section_factor < edc.stc.num_alive_organisms) { return;}
     if (edc.stc.num_alive_organisms == 1) { return;}
 
     //TODO on call of compress_organisms go through all dead organisms positions and only append to temp list positions that are < last_alive_position
