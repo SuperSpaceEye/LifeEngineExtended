@@ -42,7 +42,9 @@ MainWindow::MainWindow(QWidget *parent):
 
     cuda_is_available_var = cuda_is_available();
 
+#ifndef __NO_RECORDER__
     rc.init_gui();
+#endif
 
     auto anatomy = Anatomy();
 
@@ -272,7 +274,7 @@ void MainWindow::create_image() {
     ImageCreation::create_image(lin_width, lin_height, edc.simulation_width, edc.simulation_height, cc, textures,
                                 image_width, image_height, image_vectors[new_buffer], edc.simple_state_grid,
                                 use_cuda, cuda_is_available_var, cuda_creator_ptr, truncated_lin_width,
-                                truncated_lin_height, false);
+                                truncated_lin_height, false, 1);
 
     ready_buffer = new_buffer;
     do_not_parse_image_data_ct.store(false);

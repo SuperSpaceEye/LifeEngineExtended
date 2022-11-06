@@ -82,7 +82,7 @@ private:
 
     void create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                       int simulation_width, int simulation_height, int num_pixels_per_block, bool use_cuda,
-                      bool use_viewpoint, bool yuv_format);
+                      bool use_viewpoint, bool yuv_format, int kernel_size);
 
     std::string new_recording(std::string path);
 

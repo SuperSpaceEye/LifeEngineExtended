@@ -71,7 +71,7 @@ struct SimulationParameters {
     bool organism_self_blocks_block_sight = false;
     bool failed_reproduction_eats_food = true;
     bool rotate_every_move_tick = false;
-    bool multiply_food_production_prob = true;
+    bool multiply_food_production_prob = false;
     bool simplified_food_production = false;
     bool stop_when_one_food_generated = false;
     bool eat_then_produce = true;

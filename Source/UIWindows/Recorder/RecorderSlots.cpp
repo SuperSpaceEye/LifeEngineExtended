@@ -100,7 +100,7 @@ void Recorder::b_create_image_slot() {
     engine->parse_full_simulation_grid();
 
     create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height,
-                 num_pixels_per_block, use_cuda, use_viewpoint, false);
+                 num_pixels_per_block, false, use_viewpoint, false, 3);
 
     QImage image(raw_image_data.data(),
                  image_width_dim,
@@ -439,7 +439,7 @@ void Recorder::start_normal_thread() {
                 } else {
 #endif
                     create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
-                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda);
+                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda, 1);
 #ifdef __CUDA_USED__
                 }
 #endif
