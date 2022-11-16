@@ -106,7 +106,7 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *
                 auto & food_num = dc->st_grid.get_food_num(x, y);
                 if (food_num + 1 > sp->max_food)
                 //if "adds" new food
-                if (dc->record_data && food_num < sp->food_threshold) {dc->stc.tbuffer.record_food_change(x, y, true);}
+                if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, 1);}
                 food_num += 1;
                 if (sp->stop_when_one_food_generated) { return;}
                 continue;
@@ -135,7 +135,7 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc,
         auto & food_num = dc->st_grid.get_food_num(x, y);
         if (food_num + 1 > sp->max_food) { continue;}
         // if adds "new food"
-        if (dc->record_data && food_num < sp->food_threshold) {dc->stc.tbuffer.record_food_change(x, y, true);}
+        if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, 1);}
         food_num += 1;
         if (sp->stop_when_one_food_generated) { return;}
     }
@@ -150,7 +150,7 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, Simulation
         if (food_num > sp->food_threshold) {
             //TODO
             food_num -= 1;
-            if (dc->record_data && food_num < sp->food_threshold) {dc->stc.tbuffer.record_food_change(x, y, false);}
+            if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, -1);}
             organism->food_collected++;
         }
     }

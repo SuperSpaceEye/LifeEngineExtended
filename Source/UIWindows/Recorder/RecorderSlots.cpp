@@ -138,9 +138,7 @@ void Recorder::b_start_recording_slot() {
     for (int x = 0; x < edc->simulation_width; x++) {
         for (int y = 0; y < edc->simulation_height; y++) {
             auto type = edc->st_grid.get_type(x, y);
-            if (type == BlockTypes::FoodBlock) {
-                tbuffer->record_food_change(x, y, true);
-            } else if (type == BlockTypes::WallBlock) {
+            if (type == BlockTypes::WallBlock) {
                 tbuffer->record_wall_changes(x, y, true);
             }
         }
@@ -153,6 +151,7 @@ void Recorder::b_start_recording_slot() {
 void Recorder::b_stop_recording_slot() {
     edc->record_data = false;
     ecp->lock_resizing = false;
+    recording_paused = false;
 
     tbuffer->finish_recording();
 

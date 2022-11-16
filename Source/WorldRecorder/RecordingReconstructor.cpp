@@ -23,6 +23,7 @@ void RecordingReconstructor::apply_transaction(Transaction &transaction) {
 
 void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
     rec_grid = std::vector<BaseGridBlock>(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
+    food_grid = std::vector<float>(width*height, 0);
     rec_orgs = std::vector<Organism>();
     recenter_to_imaginary_pos = transaction.recenter_to_imaginary_pos;
 
@@ -31,6 +32,7 @@ void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
 
 void RecordingReconstructor::apply_reset(Transaction & transaction) {
     rec_grid = std::vector<BaseGridBlock>(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
+    food_grid = std::vector<float>(width*height, 0);
     rec_orgs = std::vector<Organism>();
     recenter_to_imaginary_pos = transaction.recenter_to_imaginary_pos;
     transaction.dead_organisms.clear();

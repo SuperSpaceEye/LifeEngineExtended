@@ -115,13 +115,16 @@ void apply_organism_change(CudaTransaction * d_transaction, RecCudaOrganism * d_
 }
 
 __global__
-void apply_food_change(CudaTransaction * d_transaction, BaseGridBlock * d_rec_grid, int sim_width) {
+void apply_food_change(CudaTransaction *d_transaction, BaseGridBlock *d_rec_grid, int sim_width, float *d_food_grid) {
     auto i_pos = blockIdx.x * blockDim.x + threadIdx.x;
     if (i_pos >= d_transaction->food_change_size) { return;}
 
     auto & chg = d_transaction->food_change[i_pos];
+    auto & num = d_food_grid[chg.x + chg.y * sim_width];
+    num += chg.num;
+
     //TODO
-//    d_rec_grid[chg.x + chg.y * sim_width].type = chg.added ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
+    d_rec_grid[chg.x + chg.y * sim_width].type = chg.num > 0.99 ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
 }
 
 __device__
@@ -202,7 +205,8 @@ void apply_recenter(CudaTransaction * d_transaction, RecCudaOrganism * d_orgs, i
 }
 
 __global__
-void apply_dead_organisms(CudaTransaction * d_transaction, RecCudaOrganism * d_orgs, BaseGridBlock * d_rec_grid, int width) {
+void apply_dead_organisms(CudaTransaction *d_transaction, RecCudaOrganism *d_orgs, BaseGridBlock *d_rec_grid, int width,
+                          float *d_food_grid) {
     auto i_pos = blockIdx.x * blockDim.x + threadIdx.x;
     if (i_pos >= d_transaction->dead_organisms_size) { return;}
 
@@ -213,11 +217,16 @@ void apply_dead_organisms(CudaTransaction * d_transaction, RecCudaOrganism * d_o
 
         auto & wb = d_rec_grid[o.x + get_pos(o.rotation, b.relative_x, b.relative_y).x + (o.y + get_pos(o.rotation, b.relative_x, b.relative_y).y) * width];
         wb.type = BlockTypes::FoodBlock;
+
+        //TODO
+        auto & fb = d_food_grid[o.x + get_pos(o.rotation, b.relative_x, b.relative_y).x + (o.y + get_pos(o.rotation, b.relative_x, b.relative_y).y) * width];
+        fb += 1;
     }
 }
 
 __global__
-void apply_move_change(CudaTransaction * d_transaction, BaseGridBlock * d_rec_grid, RecCudaOrganism * d_orgs, int width) {
+void apply_move_change(CudaTransaction *d_transaction, BaseGridBlock *d_rec_grid, RecCudaOrganism *d_orgs, int width,
+                       float *d_food_grid) {
     auto i_pos = blockIdx.x * blockDim.x + threadIdx.x;
     if (i_pos >= d_transaction->move_change_size) { return;}
 
@@ -227,7 +236,13 @@ void apply_move_change(CudaTransaction * d_transaction, BaseGridBlock * d_rec_gr
     for (int i = 0; i < o.num_blocks; i++) {
         auto & b = o._organism_blocks[i];
         auto & wb = d_rec_grid[o.x + get_pos(o.rotation, b.relative_x, b.relative_y).x + (o.y + get_pos(o.rotation, b.relative_x, b.relative_y).y) * width];
-        wb.type = BlockTypes::EmptyBlock;
+        auto & fb = d_food_grid[o.x + get_pos(o.rotation, b.relative_x, b.relative_y).x + (o.y + get_pos(o.rotation, b.relative_x, b.relative_y).y) * width];
+        //TODO
+        if (fb > 0.99) {
+            wb.type = BlockTypes::FoodBlock;
+        } else {
+            wb.type = BlockTypes::EmptyBlock;
+        }
     }
 
     o.rotation = chg.rotation;
@@ -267,12 +282,18 @@ void RecordingReconstructorCUDA::start_reconstruction(int width, int height) {
     grid_height = height;
 
     std::vector<BaseGridBlock> temp(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
+    std::vector<float> temp2(grid_width*grid_height, 0);
 
     gpuErrchk(cudaMalloc((BaseGridBlock**)&d_rec_grid, sizeof(BaseGridBlock)*width*height))
+    gpuErrchk(cudaMalloc((BaseGridBlock**)&d_food_grid, sizeof(BaseGridBlock)*width*height))
 
     gpuErrchk(cudaMemcpy(d_rec_grid,
                          temp.data(),
                          sizeof(BaseGridBlock)*temp.size(),
+                         cudaMemcpyHostToDevice))
+    gpuErrchk(cudaMemcpy(d_food_grid,
+                         temp2.data(),
+                         sizeof(BaseGridBlock)*temp2.size(),
                          cudaMemcpyHostToDevice))
 }
 
@@ -293,6 +314,11 @@ void RecordingReconstructorCUDA::apply_starting_point(Transaction &transaction) 
                          temp.data(),
                          sizeof(BaseGridBlock)*temp.size(),
                          cudaMemcpyHostToDevice))
+    std::vector<float> temp2(grid_width*grid_height, 0);
+    gpuErrchk(cudaMemcpy(d_food_grid,
+                         temp2.data(),
+                         sizeof(BaseGridBlock)*temp2.size(),
+                         cudaMemcpyHostToDevice))
 
     for (int i = 0; i < num_orgs; i++) {
         cudaFree(d_rec_orgs[i]._organism_blocks);
@@ -309,6 +335,11 @@ void RecordingReconstructorCUDA::apply_reset(Transaction & transaction) {
     gpuErrchk(cudaMemcpy(d_rec_grid,
                          temp.data(),
                          sizeof(BaseGridBlock)*temp.size(),
+                         cudaMemcpyHostToDevice))
+    std::vector<float> temp2(grid_width*grid_height, 0);
+    gpuErrchk(cudaMemcpy(d_food_grid,
+                         temp2.data(),
+                         sizeof(BaseGridBlock)*temp2.size(),
                          cudaMemcpyHostToDevice))
 
     for (int i = 0; i < num_orgs; i++) {
@@ -334,7 +365,7 @@ void RecordingReconstructorCUDA::apply_normal(Transaction &transaction) {
 
     if (d_transaction->wall_change_size != 0) {
     num = d_transaction->food_change_size / block_size + block_size;
-    apply_food_change<<<num, block_size>>>(d_transaction, d_rec_grid, grid_width);
+        apply_food_change<<<num, block_size>>>(d_transaction, d_rec_grid, grid_width, d_food_grid);
     gpuErrchk(cudaDeviceSynchronize())
     }
 
@@ -347,7 +378,7 @@ void RecordingReconstructorCUDA::apply_normal(Transaction &transaction) {
 
     if (d_transaction->wall_change_size != 0) {
     num = d_transaction->dead_organisms_size / block_size + block_size;
-    apply_dead_organisms<<<num, block_size>>>(d_transaction, d_rec_orgs, d_rec_grid, grid_width);
+        apply_dead_organisms<<<num, block_size>>>(d_transaction, d_rec_orgs, d_rec_grid, grid_width, d_food_grid);
     gpuErrchk(cudaDeviceSynchronize())
     }
 
@@ -359,7 +390,7 @@ void RecordingReconstructorCUDA::apply_normal(Transaction &transaction) {
 
     if (d_transaction->wall_change_size != 0) {
     num = d_transaction->move_change_size / block_size + block_size;
-    apply_move_change<<<num, block_size>>>(d_transaction, d_rec_grid, d_rec_orgs, grid_width);
+        apply_move_change<<<num, block_size>>>(d_transaction, d_rec_grid, d_rec_orgs, grid_width, d_food_grid);
     gpuErrchk(cudaDeviceSynchronize())
     }
 
@@ -515,6 +546,7 @@ void RecordingReconstructorCUDA::finish_reconstruction() {
         cudaFree(org->_organism_blocks);
     }
     cudaFree(d_rec_orgs);
+    cudaFree(d_food_grid);
     cudaFree(d_transaction);
 
     num_orgs = 0;
