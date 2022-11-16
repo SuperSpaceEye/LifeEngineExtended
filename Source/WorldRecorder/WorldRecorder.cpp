@@ -23,8 +23,8 @@ void TransactionBuffer::start_recording(std::string path_to_save_, int width_, i
     transactions[0].starting_point = true;
 }
 
-void TransactionBuffer::record_food_change(int x, int y, bool added) {
-    transactions[buffer_pos].food_change.emplace_back(x, y, added);
+void TransactionBuffer::record_food_change(int x, int y, float num) {
+    transactions[buffer_pos].food_change.emplace_back(x, y, num);
 }
 
 void TransactionBuffer::record_new_organism(Organism &organism) {

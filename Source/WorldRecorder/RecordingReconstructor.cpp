@@ -61,7 +61,12 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
 
         for (auto & b: o.anatomy._organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
-            wb.type = BlockTypes::EmptyBlock;
+            //TODO
+            if (food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] >= 1) {
+                wb.type = BlockTypes::FoodBlock;
+            } else {
+                wb.type = BlockTypes::EmptyBlock;
+            }
         }
 
         o.rotation = mc.rotation;
@@ -82,6 +87,8 @@ void RecordingReconstructor::apply_dead_organisms(Transaction &transaction) {
         for (auto & b: o.anatomy._organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             wb.type = BlockTypes::FoodBlock;
+            //TODO
+            food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] += 1;
         }
     }
 }
@@ -101,7 +108,7 @@ void RecordingReconstructor::apply_recenter(const Transaction &transaction) {
 
 void RecordingReconstructor::apply_food_change(Transaction &transaction) {
     for (auto & fc: transaction.food_change) {
-        rec_grid[fc.x + fc.y * width].type = fc.added ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
+        food_grid[fc.x + fc.y * width] += fc.num;
     }
 }
 
@@ -142,6 +149,7 @@ const std::vector<BaseGridBlock> &RecordingReconstructor::get_state() {
 void RecordingReconstructor::finish_reconstruction() {
     rec_grid = std::vector<BaseGridBlock>();
     rec_orgs = std::vector<Organism>();
+    food_grid = std::vector<float>();
     width = 0;
     height = 0;
 }

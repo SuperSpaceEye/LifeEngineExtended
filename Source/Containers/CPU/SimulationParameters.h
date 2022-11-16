@@ -37,6 +37,9 @@ struct SimulationParameters {
     float weighted_brain_mutation_step = 0.1;
     float threshold_move = 0.1;
 
+    float food_threshold = 1;
+    float max_food = 2.1;
+
     int   min_move_range = 1;
     int   max_move_range = 5;
     float move_range_delimiter = 0.5;

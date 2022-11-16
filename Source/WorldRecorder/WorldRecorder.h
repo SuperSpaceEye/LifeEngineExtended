@@ -14,10 +14,10 @@
 struct FoodChange {
     int x;
     int y;
-    bool added;
+    float num;
 
     FoodChange()=default;
-    FoodChange(int x, int y, bool added): x(x), y(y), added(added){}
+    FoodChange(int x, int y, float num): x(x), y(y), num(num){}
 };
 
 struct WallChange {
@@ -64,7 +64,7 @@ struct TransactionBuffer {
 
     void start_recording(std::string path_to_save, int width, int height, int buffer_size = 2000);
 
-    void record_food_change(int x, int y, bool added);
+    void record_food_change(int x, int y, float num);
     void record_new_organism(Organism & organism);
     void record_organism_dying(int organism_index);
     void record_organism_move_change(int vector_index, int x, int y, Rotation rotation);

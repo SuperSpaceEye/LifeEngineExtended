@@ -15,6 +15,7 @@ private:
     bool recenter_to_imaginary_pos;
 
     std::vector<BaseGridBlock> rec_grid;
+    std::vector<float> food_grid;
     std::vector<Organism> rec_orgs;
 
     void apply_organism_change(Transaction &transaction);

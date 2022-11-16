@@ -340,8 +340,12 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
         if (x < 0 || x >= edc.simulation_width) { continue; }
         for (int y: lin_height) {
             if (y < 0 || y >= edc.simulation_height) { continue; }
-            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.st_grid.get_type(x, y);
+            auto type = edc.st_grid.get_type(x, y);
+            edc.simple_state_grid[x + y * edc.simulation_width].type = type;
             edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
+
+            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) > sp.food_threshold) {
+                edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
         }
     }
 }

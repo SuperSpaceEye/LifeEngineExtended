@@ -102,8 +102,12 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer *
 
             if (type != BlockTypes::EmptyBlock) {continue;}
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp->food_production_probability * multiplier) {
-                type = BlockTypes::FoodBlock;
-                if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, true);}
+                //TODO
+                auto & food_num = dc->st_grid.get_food_num(x, y);
+                if (food_num + 1 > sp->max_food)
+                //if "adds" new food
+                if (dc->record_data && food_num < sp->food_threshold) {dc->stc.tbuffer.record_food_change(x, y, true);}
+                food_num += 1;
                 if (sp->stop_when_one_food_generated) { return;}
                 continue;
             }
@@ -127,8 +131,12 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer *dc,
 
         //if space is occupied, then do nothing
         if (type != BlockTypes::EmptyBlock) { continue;}
-        type = BlockTypes::FoodBlock;
-        if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, true);}
+        //TODO
+        auto & food_num = dc->st_grid.get_food_num(x, y);
+        if (food_num + 1 > sp->max_food) { continue;}
+        // if adds "new food"
+        if (dc->record_data && food_num < sp->food_threshold) {dc->stc.tbuffer.record_food_change(x, y, true);}
+        food_num += 1;
         if (sp->stop_when_one_food_generated) { return;}
     }
 }
@@ -138,10 +146,11 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, Simulation
         auto x = organism->x + pc.get_pos(organism->rotation).x;
         auto y = organism->y + pc.get_pos(organism->rotation).y;
 
-        auto & type = dc->st_grid.get_type(x, y);
-        if (type == BlockTypes::FoodBlock) {
-            if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, false);}
-            type = BlockTypes::EmptyBlock;
+        auto & food_num = dc->st_grid.get_food_num(x, y);
+        if (food_num > sp->food_threshold) {
+            //TODO
+            food_num -= 1;
+            if (dc->record_data && food_num < sp->food_threshold) {dc->stc.tbuffer.record_food_change(x, y, false);}
             organism->food_collected++;
         }
     }

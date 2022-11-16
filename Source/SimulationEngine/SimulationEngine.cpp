@@ -135,8 +135,11 @@ void SimulationEngine::process_user_action_pool() {
             case ActionType::TryAddFood: {
                 auto &type = edc.st_grid.get_type(action.x, action.y);
                 if (type != BlockTypes::EmptyBlock) { continue; }
-                type = BlockTypes::FoodBlock;
-                if (edc.record_data) { edc.stc.tbuffer.record_food_change(action.x, action.y, true); }
+                //TODO
+                auto & num = edc.st_grid.get_food_num(action.x, action.y);
+                if (num + 1 > sp.max_food) { continue; }
+                if (edc.record_data) { edc.stc.tbuffer.record_food_change(action.x, action.y, 1); }
+                num+=1;
             }
                 break;
             case ActionType::TryRemoveFood:
@@ -225,14 +228,15 @@ bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &
         int y = block.get_pos(edc.chosen_organism.rotation).y + action.y;
 
         auto type = edc.st_grid.get_type(x, y);
+        auto num = edc.st_grid.get_food_num(x, y);
 
         if (sp.food_blocks_reproduction) {
-            if (type != BlockTypes::EmptyBlock) {
+            if (type != BlockTypes::EmptyBlock && num > sp.food_threshold) {
                 continue_flag = true;
                 break;
             }
         } else {
-            if (type != BlockTypes::EmptyBlock && type != BlockTypes::FoodBlock) {
+            if (type != BlockTypes::EmptyBlock) {
                 continue_flag = true;
                 break;
             }
@@ -272,10 +276,9 @@ void SimulationEngine::random_food_drop() {
 }
 
 void SimulationEngine::try_remove_food(int x, int y) {
-    auto & type = edc.st_grid.get_type(x, y);
-    if (type != BlockTypes::FoodBlock) { return;}
-    type = BlockTypes::EmptyBlock;
-    if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, false);}
+    auto & num = edc.st_grid.get_food_num(x, y);
+    if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, -num);}
+    num = 0;
 }
 
 void SimulationEngine::try_kill_organism(int x, int y) {
@@ -348,6 +351,8 @@ void SimulationEngine::partial_clear_world() {
             }
 
             type = BlockTypes::EmptyBlock;
+
+            edc.st_grid.get_food_num(x, y) = 0;
         }
     }
 
@@ -457,8 +462,12 @@ void SimulationEngine::unpause() {
 void SimulationEngine::parse_full_simulation_grid() {
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
-            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.st_grid.get_type(x, y);
+            auto type = edc.st_grid.get_type(x, y);
+            edc.simple_state_grid[x + y * edc.simulation_width].type = type;
             edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
+
+            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) > sp.food_threshold) {
+                edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
         }
     }
 }
