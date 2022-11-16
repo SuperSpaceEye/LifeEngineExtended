@@ -70,6 +70,7 @@ private:
 
     int image_width = 1000;
     int image_height = 1000;
+    int kernel_size = 1;
 
     bool use_viewpoint = false;
     bool use_cuda = false;
@@ -129,6 +130,7 @@ private slots:
     void le_viewpoint_x_slot();
     void le_image_width_slot();
     void le_image_height_slot();
+    void le_kernel_size();
 
     void b_create_image_slot();
     void b_start_recording_slot();

@@ -54,6 +54,10 @@ void Recorder::le_image_height_slot() {
     le_slot_lower_bound<int>(image_height, image_height, "int", ui.le_image_height, 1, "1");
 }
 
+void Recorder::le_kernel_size() {
+    le_slot_lower_bound<int>(kernel_size, kernel_size, "int", ui.le_kernel_size, 1, "1");
+}
+
 //==================== Buttons edits ====================
 
 void Recorder::b_create_image_slot() {
@@ -100,7 +104,7 @@ void Recorder::b_create_image_slot() {
     engine->parse_full_simulation_grid();
 
     create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height,
-                 num_pixels_per_block, false, use_viewpoint, false, 3);
+                 num_pixels_per_block, false, use_viewpoint, false, kernel_size);
 
     QImage image(raw_image_data.data(),
                  image_width_dim,
