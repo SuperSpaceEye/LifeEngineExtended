@@ -120,7 +120,8 @@ void apply_food_change(CudaTransaction * d_transaction, BaseGridBlock * d_rec_gr
     if (i_pos >= d_transaction->food_change_size) { return;}
 
     auto & chg = d_transaction->food_change[i_pos];
-    d_rec_grid[chg.x + chg.y * sim_width].type = chg.added ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
+    //TODO
+//    d_rec_grid[chg.x + chg.y * sim_width].type = chg.added ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
 }
 
 __device__

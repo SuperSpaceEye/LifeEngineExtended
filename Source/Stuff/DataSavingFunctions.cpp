@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 9;
+const uint32_t SAVE_VERSION = 10;
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -31,26 +31,24 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
     for (uint32_t x = 0; x < edc.simulation_width; x++) {
         for (uint32_t y = 0; y < edc.simulation_height; y++) {
             auto type = edc.st_grid.get_type(x, y);
-            auto num = edc.st_grid.get_food_num(x, y);
-
-            auto block = WorldBlocks{x, y, BlockTypes::EmptyBlock, num};
 
             switch (type) {
                 case BlockTypes::WallBlock:
-                    block.type = type;
+                    blocks.emplace_back(x, y, BlockTypes::WallBlock);
                     break;
-                default:
-                    break;
+                default:break;
             }
-
-            blocks.push_back(block);
         }
     }
 
-    auto size = blocks.size();
+    uint64_t size = blocks.size();
 
-    os.write((char*)&size, sizeof(std::size_t));
-    os.write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
+    os.write((char*)&size, sizeof(uint64_t));
+    os.write((char*)blocks.data(), sizeof(WorldBlocks)*blocks.size());
+
+    size = edc.st_grid.food_vec.size();
+    os.write((char*)&size, sizeof(uint64_t));
+    os.write((char*)edc.st_grid.food_vec.data(), sizeof(float)*edc.st_grid.food_vec.size());
 }
 
 void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) {
@@ -99,23 +97,23 @@ void DataSavingFunctions::write_organism_anatomy(std::ofstream & os, Anatomy * a
     os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    os.write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    os.write((char*)&anatomy->_eye_block_vec[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
+    os.write((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    os.write((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    os.write((char*)anatomy->_killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.write((char*)anatomy->_eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
         os.write((char*)&space_size, sizeof(uint32_t));
-        os.write((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        os.write((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
 
 
 bool DataSavingFunctions::read_version(std::ifstream &is) {
-    int save_version;
-    is.read((char*)&save_version, sizeof(int));
+    uint32_t save_version;
+    is.read((char*)&save_version, sizeof(uint32_t));
     return save_version == SAVE_VERSION;
 }
 
@@ -129,24 +127,23 @@ void DataSavingFunctions::read_organisms_block_parameters(std::ifstream& is, Org
 
 void DataSavingFunctions::read_data_container_data(std::ifstream& is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height) {
     is.read((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&sim_width,    sizeof(uint32_t));
-    is.read((char*)&sim_height,   sizeof(uint32_t));
+    is.read((char*)&sim_width,               sizeof(uint32_t));
+    is.read((char*)&sim_height,              sizeof(uint32_t));
 }
 
 void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataContainer &edc) {
     std::vector<WorldBlocks> blocks{};
-    std::size_t size;
+    uint64_t size;
 
-    is.read((char*)&size, sizeof(std::size_t));
+    is.read((char*)&size, sizeof(uint64_t));
     blocks.resize(size);
+    is.read((char*)blocks.data(), sizeof(WorldBlocks)*size);
 
-    is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
+    is.read((char*)&size, sizeof(uint64_t));
+    is.read((char*)edc.st_grid.food_vec.data(), sizeof(float)*edc.st_grid.food_vec.size());
 
     for (auto & block: blocks) {
-        if (block.type != BlockTypes::EmptyBlock) {
-            edc.st_grid.get_type(block.x, block.y) = block.type;
-        }
-        edc.st_grid.get_food_num(block.x, block.y) = block.food_num;
+        edc.st_grid.get_type(block.x, block.y) = block.type;
     }
 }
 
@@ -223,16 +220,16 @@ void DataSavingFunctions::read_organism_anatomy(std::ifstream& is, Anatomy * ana
     is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    is.read((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.read((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.read((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    is.read((char*)&anatomy->_eye_block_vec[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
+    is.read((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    is.read((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    is.read((char*)anatomy->_killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.read((char*)anatomy->_eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;
         is.read((char*)&space_size, sizeof(uint32_t));
         space.resize(space_size);
-        is.read((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        is.read((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
