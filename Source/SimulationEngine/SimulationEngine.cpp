@@ -283,12 +283,15 @@ void SimulationEngine::try_remove_food(int x, int y) {
 
 void SimulationEngine::try_kill_organism(int x, int y) {
     auto & type = edc.st_grid.get_type(x, y);
-    if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock || type == BlockTypes::FoodBlock) { return; }
+    if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
     if (edc.record_data) {edc.stc.tbuffer.record_organism_dying(organism_ptr->vector_index);}
     for (auto & block: organism_ptr->anatomy._organism_blocks) {
         edc.st_grid.get_type(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                             organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::FoodBlock;
+                             organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
+        //TODO
+        edc.st_grid.get_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
+                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y) += 1;
     }
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         if (&edc.stc.organisms[i] == organism_ptr) {

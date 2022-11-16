@@ -162,8 +162,10 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer *dc, Organi
         organism->kill_organism(*dc);
         if (dc->record_data) {dc->stc.tbuffer.record_organism_dying(organism->vector_index);}
         for (auto & block: organism->anatomy._organism_blocks) {
-            dc->st_grid.get_type(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y) = BlockTypes::FoodBlock;
+            dc->st_grid.get_type(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y) = BlockTypes::EmptyBlock;
             dc->st_grid.get_organism_index(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y) = -1;
+            //TODO
+            dc->st_grid.get_food_num(organism->x + block.get_pos(organism->rotation).x, organism->y + block.get_pos(organism->rotation).y) += 1;
         }
     }
 }
