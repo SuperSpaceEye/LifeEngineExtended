@@ -31,13 +31,19 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
     for (uint32_t x = 0; x < edc.simulation_width; x++) {
         for (uint32_t y = 0; y < edc.simulation_height; y++) {
             auto type = edc.st_grid.get_type(x, y);
+            auto num = edc.st_grid.get_food_num(x, y);
+
+            auto block = WorldBlocks{x, y, BlockTypes::EmptyBlock, num};
 
             switch (type) {
-                case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
-                    blocks.emplace_back(x, y, type);
-                default: break;
+                    block.type = type;
+                    break;
+                default:
+                    break;
             }
+
+            blocks.push_back(block);
         }
     }
 
@@ -137,7 +143,10 @@ void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataCont
     is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
 
     for (auto & block: blocks) {
-        edc.st_grid.get_type(block.x, block.y) = block.type;
+        if (block.type != BlockTypes::EmptyBlock) {
+            edc.st_grid.get_type(block.x, block.y) = block.type;
+        }
+        edc.st_grid.get_food_num(block.x, block.y) = block.food_num;
     }
 }
 

@@ -22,7 +22,7 @@ private:
 public:
     std::vector<BlockTypes> type_vec;
     std::vector<Rotation> rotation_vec;
-    std::vector<int32_t> food_vec;
+    std::vector<float> food_vec;
     std::vector<int32_t> organism_index;
 
     void resize(int width, int height) {
@@ -36,13 +36,13 @@ public:
 
     inline BlockTypes & get_type(int x, int y)        {return type_vec[x + y * width];}
     inline Rotation & get_rotation(int x, int y)      {return rotation_vec[x + y * width];}
-    inline int32_t & get_food_num(int x, int y)       {return food_vec[x + y * width];}
+    inline float & get_food_num(int x, int y)         {return food_vec[x + y * width];}
     inline int32_t & get_organism_index(int x, int y) {return organism_index[x + y * width];}
 
     void clear() {
         type_vec = std::vector<BlockTypes>();
         rotation_vec = std::vector<Rotation>();
-        food_vec = std::vector<int32_t>();
+        food_vec = std::vector<float>();
         organism_index = std::vector<int32_t>();
     }
 };

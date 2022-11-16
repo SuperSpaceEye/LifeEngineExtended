@@ -134,7 +134,7 @@ void MainWindow::b_save_world_slot() {
 
     std::atomic_thread_fence(std::memory_order_release);
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
-                                                 "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
+                                                 "Custom save type (*.lfew)", &selected_filter);
     std::atomic_thread_fence(std::memory_order_release);
 #ifndef __WIN32
     bool file_exists = std::filesystem::exists(file_name.toStdString());
@@ -142,8 +142,6 @@ void MainWindow::b_save_world_slot() {
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
         filetype = ".lfew";
-    } else if (selected_filter.toStdString() == "JSON (*.json)") {
-        filetype = ".json";
     } else {
         ecp.engine_global_pause = false;
         engine.unpause();
@@ -161,13 +159,6 @@ void MainWindow::b_save_world_slot() {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
         write_data(out);
         out.close();
-    } else {
-        if (!sp.use_occ) {
-            auto info = engine.get_info();
-            DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
-        } else {
-            display_message("Worlds cannot be saved in json format with OCC enabled.");
-        }
     }
 
     ecp.engine_global_pause = false;
@@ -184,13 +175,11 @@ void MainWindow::b_load_world_slot() {
     std::atomic_thread_fence(std::memory_order_release);
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
-                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
+                                                  tr("Custom save type (*.lfew)"), &selected_filter);
     std::atomic_thread_fence(std::memory_order_release);
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
         filetype = ".lfew";
-    } else if (selected_filter.toStdString() == "JSON (*.json)"){
-        filetype = ".json";
     } else {
         ecp.engine_global_pause = false;
         engine.unpause();
@@ -203,10 +192,6 @@ void MainWindow::b_load_world_slot() {
         std::ifstream in(full_path, std::ios::in | std::ios::binary);
         read_world_data(in);
         in.close();
-
-    } else if (filetype == ".json") {
-        sp.use_occ = false;
-        read_json_world_data(full_path);
     }
 
     sp.reset_on_total_extinction = flag;

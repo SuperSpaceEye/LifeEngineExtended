@@ -111,7 +111,7 @@ void RecordingReconstructor::apply_food_change(Transaction &transaction) {
         auto & num = food_grid[fc.x + fc.y * width];
         num += fc.num;
         if (num > 0.99) {
-            rec_grid[fc.x + fc.y * width] = BlockTypes::FoodBlock;
+            rec_grid[fc.x + fc.y * width].type = BlockTypes::FoodBlock;
         }
     }
 }
