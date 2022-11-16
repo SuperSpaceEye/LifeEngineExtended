@@ -62,7 +62,7 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
         for (auto & b: o.anatomy._organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             //TODO
-            if (food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] >= 1) {
+            if (food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] >= 0.99) {
                 wb.type = BlockTypes::FoodBlock;
             } else {
                 wb.type = BlockTypes::EmptyBlock;
@@ -108,7 +108,11 @@ void RecordingReconstructor::apply_recenter(const Transaction &transaction) {
 
 void RecordingReconstructor::apply_food_change(Transaction &transaction) {
     for (auto & fc: transaction.food_change) {
-        food_grid[fc.x + fc.y * width] += fc.num;
+        auto & num = food_grid[fc.x + fc.y * width];
+        num += fc.num;
+        if (num > 0.99) {
+            rec_grid[fc.x + fc.y * width] = BlockTypes::FoodBlock;
+        }
     }
 }
 
