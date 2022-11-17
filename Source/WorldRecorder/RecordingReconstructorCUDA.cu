@@ -482,15 +482,15 @@ void RecordingReconstructorCUDA::prepare_transaction(Transaction &transaction) {
                          sizeof(MoveChange)*transaction.move_change.size(),
                          cudaMemcpyHostToDevice))
 
-    if (transaction.wall_change.size() > d_transaction->wall_change_size_length) {
+    if (transaction.user_wall_change.size() > d_transaction->wall_change_size_length) {
         cudaFree(d_transaction->wall_change);
-        gpuErrchk(cudaMalloc((WallChange**)&d_transaction->wall_change, sizeof(WallChange)*transaction.wall_change.size()))
-        d_transaction->wall_change_size_length = transaction.wall_change.size();
+        gpuErrchk(cudaMalloc((WallChange**)&d_transaction->wall_change, sizeof(WallChange)*transaction.user_wall_change.size()))
+        d_transaction->wall_change_size_length = transaction.user_wall_change.size();
     }
-    d_transaction->wall_change_size = transaction.wall_change.size();
+    d_transaction->wall_change_size = transaction.user_wall_change.size();
     gpuErrchk(cudaMemcpy(d_transaction->wall_change,
-                         transaction.wall_change.data(),
-                         sizeof(WallChange)*transaction.wall_change.size(),
+                         transaction.user_wall_change.data(),
+                         sizeof(WallChange)*transaction.user_wall_change.size(),
                          cudaMemcpyHostToDevice))
 
     if (transaction.compressed_change.size() > d_transaction->compressed_change_size_length) {

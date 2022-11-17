@@ -150,7 +150,9 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer * dc, Simulation
         if (food_num > sp->food_threshold) {
             //TODO
             food_num -= 1;
-            if (dc->record_data) {dc->stc.tbuffer.record_food_change(x, y, -1);}
+            if (dc->record_data) {
+                dc->stc.tbuffer.record_food_change(x, y, -1);
+            }
             organism->food_collected++;
         }
     }
@@ -246,6 +248,10 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer *dc, Sim
 
             last_observation.type = dc->st_grid.get_type(pos_x, pos_y);
             last_observation.distance = i;
+            //TODO
+            if (last_observation.type == BlockTypes::EmptyBlock && dc->st_grid.get_food_num(pos_x, pos_y) > sp->food_threshold) {
+                last_observation.type = BlockTypes::FoodBlock;
+            }
 
             switch (last_observation.type) {
                 case BlockTypes::EmptyBlock: continue;

@@ -23,8 +23,14 @@ private:
     void apply_recenter(const Transaction &transaction);
     void apply_dead_organisms(Transaction &transaction);
     void apply_move_change(Transaction &transaction);
-    void apply_wall_change(Transaction &transaction);
     void apply_compressed_change(Transaction &transaction);
+
+    void apply_user_wall_change(Transaction &transaction, int pos);
+    void apply_user_food_change(Transaction &transaction, int pos);
+    void apply_user_add_organism(Transaction &transaction, int pos);
+    void apply_user_kill_organism(Transaction &transaction, int pos);
+
+    void apply_user_actions(Transaction &transaction);
 
     void apply_starting_point(Transaction & transaction);
     void apply_reset(Transaction & transaction);

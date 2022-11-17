@@ -27,6 +27,9 @@ void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
     rec_orgs = std::vector<Organism>();
     recenter_to_imaginary_pos = transaction.recenter_to_imaginary_pos;
 
+    apply_organism_change(transaction);
+    transaction.organism_change.clear();
+
     apply_normal(transaction);
 }
 
@@ -42,19 +45,71 @@ void RecordingReconstructor::apply_reset(Transaction & transaction) {
 
 
 void RecordingReconstructor::apply_normal(Transaction &transaction) {
-    apply_food_change(transaction);
     apply_recenter(transaction);
+    apply_food_change(transaction);
     apply_dead_organisms(transaction);
-    apply_compressed_change(transaction);
     apply_move_change(transaction);
-    apply_wall_change(transaction);
+    apply_compressed_change(transaction);
     apply_organism_change(transaction);
+
+    apply_user_actions(transaction);
 }
 
-void RecordingReconstructor::apply_wall_change(Transaction &transaction) {
-    for (auto & wc: transaction.wall_change) {
-        rec_grid[wc.x + wc.y * width].type = wc.added ? BlockTypes::WallBlock : BlockTypes::EmptyBlock;
+void RecordingReconstructor::apply_user_actions(Transaction &transaction) {
+    int wall_change_pos = 0;
+    int food_change_pos = 0;
+    int organism_change_pos = 0;
+    int organism_kill_pos = 0;
+
+    for (auto type: transaction.user_action_execution_order) {
+        switch (type) {
+            case RecActionType::WallChange:     apply_user_wall_change(transaction, wall_change_pos++); break;
+            case RecActionType::FoodChange:     apply_user_food_change(transaction, food_change_pos++);break;
+            case RecActionType::OrganismChange: apply_user_add_organism(transaction, organism_change_pos++); break;
+            case RecActionType::OrganismKill:   apply_user_kill_organism(transaction, organism_kill_pos++); break;
+        }
     }
+}
+
+void RecordingReconstructor::apply_user_wall_change(Transaction &transaction, int pos) {
+    auto & wc = transaction.user_wall_change[pos];
+    rec_grid[wc.x + wc.y * width].type = wc.added ? BlockTypes::WallBlock : BlockTypes::EmptyBlock;
+}
+
+void RecordingReconstructor::apply_user_kill_organism(Transaction &transaction, int pos) {
+    auto dc = transaction.user_dead_change[pos];
+    auto & o = rec_orgs[dc];
+    for (auto & b: o.anatomy._organism_blocks) {
+        auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
+        wb.type = BlockTypes::FoodBlock;
+        //TODO
+        food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] += 1;
+    }
+}
+
+void RecordingReconstructor::apply_user_food_change(Transaction &transaction, int pos) {
+    auto & fc = transaction.user_food_change[pos];
+    auto & num = food_grid[fc.x + fc.y * width];
+    auto & type = rec_grid[fc.x + fc.y * width].type;
+    num += fc.num;
+
+    //TODO
+    if (type == BlockTypes::EmptyBlock || type == BlockTypes::FoodBlock) {
+        type = num > 0.99 ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
+    }
+}
+
+void RecordingReconstructor::apply_user_add_organism(Transaction &transaction, int pos) {
+    auto & o = transaction.user_organism_change[pos];
+    for (auto & b: o.anatomy._organism_blocks) {
+        auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
+        wb.type = b.type;
+        wb.rotation = b.rotation;
+    }
+    auto temp = o.vector_index;
+    if (temp > rec_orgs.size()) {rec_orgs.resize(temp+1);}
+    rec_orgs[temp] = o;
+    rec_orgs[temp].vector_index = temp;
 }
 
 void RecordingReconstructor::apply_move_change(Transaction &transaction) {
@@ -111,9 +166,12 @@ void RecordingReconstructor::apply_recenter(const Transaction &transaction) {
 void RecordingReconstructor::apply_food_change(Transaction &transaction) {
     for (auto & fc: transaction.food_change) {
         auto & num = food_grid[fc.x + fc.y * width];
+        auto & type = rec_grid[fc.x + fc.y * width].type;
         num += fc.num;
-        if (num > 0.99) {
-            rec_grid[fc.x + fc.y * width].type = BlockTypes::FoodBlock;
+
+        //TODO
+        if (type == BlockTypes::EmptyBlock || type == BlockTypes::FoodBlock) {
+            type = num > 0.99 ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
         }
     }
 }
@@ -128,6 +186,7 @@ void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
             wb.rotation = b.rotation;
         }
         auto temp = o.vector_index;
+        if (temp > rec_orgs.size()) {rec_orgs.resize(temp+1);}
         rec_orgs[temp] = o;
         rec_orgs[temp].vector_index = temp;
     }

@@ -139,7 +139,7 @@ void Recorder::b_start_recording_slot() {
         for (int y = 0; y < edc->simulation_height; y++) {
             auto type = edc->st_grid.get_type(x, y);
             if (type == BlockTypes::WallBlock) {
-                tbuffer->record_wall_changes(x, y, true);
+                tbuffer->record_user_wall_change(x, y, true);
             }
         }
     }

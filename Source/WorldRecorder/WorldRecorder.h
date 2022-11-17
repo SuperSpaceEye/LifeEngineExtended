@@ -39,13 +39,26 @@ struct MoveChange {
     MoveChange(int vector_index, Rotation rotation, int x, int y): vector_index(vector_index), rotation(rotation), x(x), y(y){}
 };
 
+//TODO recenter
+enum class RecActionType {
+    WallChange,
+    FoodChange,
+    OrganismChange,
+    OrganismKill
+};
+
 struct Transaction {
     std::vector<Organism> organism_change;
     std::vector<FoodChange> food_change;
     std::vector<int> dead_organisms;
     std::vector<MoveChange> move_change;
-    std::vector<WallChange> wall_change;
     std::vector<std::pair<int, int>> compressed_change;
+
+    std::vector<RecActionType> user_action_execution_order;
+    std::vector<WallChange> user_wall_change;
+    std::vector<FoodChange> user_food_change;
+    std::vector<Organism> user_organism_change;
+    std::vector<int> user_dead_change;
     bool starting_point;
     bool recenter_to_imaginary_pos;
     bool reset = false;
@@ -69,9 +82,13 @@ struct TransactionBuffer {
     void record_organism_dying(int organism_index);
     void record_organism_move_change(int vector_index, int x, int y, Rotation rotation);
     void record_recenter_to_imaginary_pos(bool state);
-    void record_wall_changes(int x, int y, bool added);
     void record_reset();
     void record_compressed(int pos1, int pos2);
+
+    void record_user_wall_change(int x, int y, bool added);
+    void record_user_food_change(int x, int y, float num);
+    void record_user_new_organism(Organism & organism);
+    void record_user_kill_organism(int organism_index);
 
     void resize_buffer(int new_buffer_size);
     void flush_transactions();
