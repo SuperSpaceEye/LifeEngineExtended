@@ -78,7 +78,7 @@ struct TransactionBuffer {
     void start_recording(std::string path_to_save, int width, int height, int buffer_size = 2000);
 
     void record_food_change(int x, int y, float num);
-    void record_new_organism(Organism & organism);
+    void record_new_organism(const Organism &organism);
     void record_organism_dying(int organism_index);
     void record_organism_move_change(int vector_index, int x, int y, Rotation rotation);
     void record_recenter_to_imaginary_pos(bool state);
@@ -87,7 +87,7 @@ struct TransactionBuffer {
 
     void record_user_wall_change(int x, int y, bool added);
     void record_user_food_change(int x, int y, float num);
-    void record_user_new_organism(Organism & organism);
+    void record_user_new_organism(const Organism &organism);
     void record_user_kill_organism(int organism_index);
 
     void resize_buffer(int new_buffer_size);

@@ -65,10 +65,10 @@ MainWindow::MainWindow(QWidget *parent):
 
     ee.occ_mode(sp.use_occ);
 
-    edc.base_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
+    edc.base_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                      Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
                                      &edc.stc.occl, 1);
-    edc.chosen_organism = new Organism(edc.simulation_width / 2, edc.simulation_height / 2,
+    edc.chosen_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                        Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp, &occp,
                                        &edc.stc.occl, 1);
 

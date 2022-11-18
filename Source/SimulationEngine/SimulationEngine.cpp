@@ -129,6 +129,8 @@ void SimulationEngine::process_user_action_pool() {
         ecp.do_not_use_user_actions_engine = false;
     } else { ecp.do_not_use_user_actions_engine = false; return; }
 
+    bool have_sorted = false;
+
     for (auto & action : edc.engine_user_actions_pool) {
         if (check_if_out_of_bounds(&edc, action.x, action.y)) {continue;}
         switch (action.type) {
@@ -162,11 +164,13 @@ void SimulationEngine::process_user_action_pool() {
 
                 continue_flag = action_check_if_space_for_organism_is_free(action, continue_flag);
                 if (continue_flag) { continue; }
+                if (!have_sorted) {OrganismsController::precise_sort_high_to_low_dead_organisms_positions(edc); have_sorted = true;}
                 action_place_organism(action);
             }
                 break;
             case ActionType::TryKillOrganism: {
                 try_kill_organism(action.x, action.y);
+                have_sorted = false;
             }
                 break;
             case ActionType::TrySelectOrganism: {
@@ -181,7 +185,7 @@ void SimulationEngine::process_user_action_pool() {
 
     for (auto & action: edc.engine_user_actions_pool) {
         if (action.type == ActionType::TrySelectOrganism && edc.selected_organism != nullptr) {
-            edc.chosen_organism.copy_organism(edc.selected_organism);
+            edc.chosen_organism.copy_organism(*edc.selected_organism);
             edc.selected_organism = nullptr;
             ecp.update_editor_organism = true;
             break;
@@ -229,7 +233,7 @@ bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &
         auto num = edc.st_grid.get_food_num(x, y);
 
         if (sp.food_blocks_reproduction) {
-            if (type != BlockTypes::EmptyBlock && num > sp.food_threshold) {
+            if (type != BlockTypes::EmptyBlock || num > sp.food_threshold) {
                 continue_flag = true;
                 break;
             }

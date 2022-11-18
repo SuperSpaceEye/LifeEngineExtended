@@ -105,7 +105,7 @@ public:
              SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
              OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate = 0.05,
              float brain_mutation_rate = 0.1);
-    Organism(Organism *organism);
+    explicit Organism(Organism *organism);
     int32_t create_child(lehmer64 *gen, EngineDataContainer &edc);
 };
 

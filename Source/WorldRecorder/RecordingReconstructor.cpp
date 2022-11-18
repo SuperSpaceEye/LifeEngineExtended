@@ -107,7 +107,7 @@ void RecordingReconstructor::apply_user_add_organism(Transaction &transaction, i
         wb.rotation = b.rotation;
     }
     auto temp = o.vector_index;
-    if (temp > rec_orgs.size()) {rec_orgs.resize(temp+1);}
+    if (temp+1 > rec_orgs.size()) {rec_orgs.resize(temp+1);}
     rec_orgs[temp] = o;
     rec_orgs[temp].vector_index = temp;
 }
@@ -186,7 +186,7 @@ void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
             wb.rotation = b.rotation;
         }
         auto temp = o.vector_index;
-        if (temp > rec_orgs.size()) {rec_orgs.resize(temp+1);}
+        if (temp+1 > rec_orgs.size()) {rec_orgs.resize(temp+1);}
         rec_orgs[temp] = o;
         rec_orgs[temp].vector_index = temp;
     }

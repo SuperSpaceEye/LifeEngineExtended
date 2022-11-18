@@ -27,8 +27,8 @@ void TransactionBuffer::record_food_change(int x, int y, float num) {
     transactions[buffer_pos].food_change.emplace_back(x, y, num);
 }
 
-void TransactionBuffer::record_new_organism(Organism &organism) {
-    auto new_organism = Organism(&organism);
+void TransactionBuffer::record_new_organism(const Organism &organism) {
+    auto new_organism = Organism(); new_organism.copy_organism(organism);
     new_organism.vector_index = organism.vector_index;
     transactions[buffer_pos].organism_change.emplace_back(std::move(new_organism));
 }
@@ -63,8 +63,8 @@ void TransactionBuffer::record_user_food_change(int x, int y, float num) {
     transactions[buffer_pos].user_action_execution_order.emplace_back(RecActionType::FoodChange);
 }
 
-void TransactionBuffer::record_user_new_organism(Organism &organism) {
-    auto new_organism = Organism(&organism);
+void TransactionBuffer::record_user_new_organism(const Organism &organism) {
+    auto new_organism = Organism(); new_organism.copy_organism(organism);
     new_organism.vector_index = organism.vector_index;
     transactions[buffer_pos].user_organism_change.emplace_back(std::move(new_organism));
     transactions[buffer_pos].user_action_execution_order.emplace_back(RecActionType::OrganismChange);
@@ -141,7 +141,10 @@ void TransactionBuffer::flush_transactions() {
 
         size = transaction.user_organism_change.size();
         out.write((char*)&size, sizeof(int));
-        out.write((char*)transaction.user_organism_change.data(), sizeof(Organism)*size);
+        for (auto & o: transaction.user_organism_change) {
+            DataSavingFunctions::write_organism(out, &o);
+            out.write((char*)&o.vector_index, sizeof(int));
+        }
 
         size = transaction.user_dead_change.size();
         out.write((char*)&size, sizeof(int));
@@ -260,8 +263,10 @@ bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
 
         in.read((char*)&size, sizeof(int));
         transaction.user_organism_change.resize(size);
-        in.read((char*)transaction.user_organism_change.data(), sizeof(Organism) * size);
-
+        for (auto & o: transaction.user_organism_change) {
+            DataSavingFunctions::read_organism(in, sp, bp, &o, occp, occl);
+            in.read((char*)&o.vector_index, sizeof(int));
+        }
         in.read((char*)&size, sizeof(int));
         transaction.user_dead_change.resize(size);
         in.read((char*)transaction.user_dead_change.data(), sizeof(int) * size);

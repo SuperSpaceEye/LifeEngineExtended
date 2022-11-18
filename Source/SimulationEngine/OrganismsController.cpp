@@ -39,7 +39,7 @@ Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
         if (ptr->vector_index < edc.stc.last_alive_position) {
             edc.stc.dead_organisms_before_last_alive_position--;
         }
-
+        ptr->is_dead = false;
         return ptr;
     }
 
