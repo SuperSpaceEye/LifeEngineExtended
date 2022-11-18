@@ -293,7 +293,7 @@ void SimulationEngine::try_kill_organism(int x, int y) {
                              organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
         //TODO
         edc.st_grid.get_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y) += 1;
+                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y) += block.get_food_cost(*organism_ptr->bp);
     }
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         if (&edc.stc.organisms[i] == organism_ptr) {
