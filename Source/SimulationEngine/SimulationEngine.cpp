@@ -108,7 +108,7 @@ void SimulationEngine::simulation_tick() {
 
 //    switch (ecp.simulation_mode){
 //        case SimulationModes::CPU_Single_Threaded:
-            SimulationEngineSingleThread::single_threaded_tick(&edc, &sp, &gen);
+    SimulationEngineSingleThread::single_threaded_tick(edc, sp, gen);
 //            break;
 //        case SimulationModes::CPU_Partial_Multi_threaded:
 //            break;
@@ -336,7 +336,7 @@ void SimulationEngine::reset_world() {
         edc.stc.tbuffer.record_reset();
         edc.stc.tbuffer.record_transaction();}
 
-    SimulationEngineSingleThread::place_organism(&edc, organism);
+    SimulationEngineSingleThread::place_organism(edc, *organism, sp);
 
     if (ecp.execute_world_events) { stop_world_events(true); start_world_events();}
 
@@ -473,7 +473,7 @@ void SimulationEngine::parse_full_simulation_grid() {
             edc.simple_state_grid[x + y * edc.simulation_width].type = type;
             edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
 
-            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) > sp.food_threshold) {
+            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
                 edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
         }
     }

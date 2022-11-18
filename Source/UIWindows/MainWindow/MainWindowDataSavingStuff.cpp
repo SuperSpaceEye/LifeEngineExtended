@@ -140,7 +140,7 @@ void MainWindow::update_table_values() {
             float *value;
             switch (static_cast<ParametersNames>(col)) {
                 case ParametersNames::FoodCostModifier:
-                    value = &type->food_cost_modifier;
+                    value = &type->food_cost;
                     break;
                 case ParametersNames::LifePointAmount:
                     value = &type->life_point_amount;

@@ -80,12 +80,12 @@ struct SimulationParameters {
     bool eat_then_produce = true;
     bool check_if_path_is_clear = true;
     bool food_blocks_movement = false;
-    bool use_new_child_pos_calculator = true;
     bool no_random_decisions = false;
     bool use_occ = true;
     bool recenter_to_imaginary_pos = true;
     bool do_not_mutate_brains_of_plants = true;
     bool use_weighted_brain = true;
+    bool organisms_destroy_food = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

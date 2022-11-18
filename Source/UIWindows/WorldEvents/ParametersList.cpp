@@ -79,32 +79,32 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
     changeable_pm["change cell"]                     = ChangeableReturn{ValueType::INT, nullptr, &sp->change_cell,                     ClampModes::ClampMinValue, 0, 0, 0};
     changeable_pm["remove cell"]                     = ChangeableReturn{ValueType::INT, nullptr, &sp->remove_cell,                     ClampModes::ClampMinValue, 0, 0, 0};
 
-    changeable_pm["Mouth Block food cost modifier"]= ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
+    changeable_pm["Mouth Block food cost modifier"]= ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost, nullptr};
     changeable_pm["Mouth Block life point amount"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
     changeable_pm["Mouth Block lifetime weight"]   = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
     changeable_pm["Mouth Block chance weight"]     = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
 
-    changeable_pm["Producer Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
+    changeable_pm["Producer Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost, nullptr};
     changeable_pm["Producer Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
     changeable_pm["Producer Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
     changeable_pm["Producer Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
 
-    changeable_pm["Mover Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
+    changeable_pm["Mover Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost, nullptr};
     changeable_pm["Mover Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
     changeable_pm["Mover Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
     changeable_pm["Mover Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
 
-    changeable_pm["Killer Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
+    changeable_pm["Killer Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost, nullptr};
     changeable_pm["Killer Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
     changeable_pm["Killer Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
     changeable_pm["Killer Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
 
-    changeable_pm["Armor Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
+    changeable_pm["Armor Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost, nullptr};
     changeable_pm["Armor Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
     changeable_pm["Armor Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
     changeable_pm["Armor Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
 
-    changeable_pm["Eye Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
+    changeable_pm["Eye Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost, nullptr};
     changeable_pm["Eye Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
     changeable_pm["Eye Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
     changeable_pm["Eye Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};

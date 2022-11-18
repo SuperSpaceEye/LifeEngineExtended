@@ -1071,7 +1071,7 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-1300</y>
                   <width>606</width>
                   <height>1678</height>
                  </rect>
@@ -1722,13 +1722,6 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_use_new_child_pos_calculator">
-                      <property name="text">
-                       <string>Use new child position calculator</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <widget class="QCheckBox" name="cb_checks_if_path_is_clear">
                       <property name="text">
                        <string>Check if path is clear</string>
@@ -1767,6 +1760,13 @@
                      <widget class="QCheckBox" name="cb_use_weighted_brain">
                       <property name="text">
                        <string>Use weighted brain</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_organisms_destroy_food">
+                      <property name="text">
+                       <string>Organisms destroy food</string>
                       </property>
                      </widget>
                     </item>
@@ -2098,7 +2098,7 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-110</y>
+                  <y>0</y>
                   <width>606</width>
                   <height>807</height>
                  </rect>
@@ -3943,22 +3943,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>cb_use_new_child_pos_calculator</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_use_new_child_pos_calculator_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>629</x>
-     <y>867</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>448</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cb_checks_if_path_is_clear</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -4454,6 +4438,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_organisms_destroy_food</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_organisms_destroy_food_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>839</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4579,13 +4579,14 @@
   <slot>le_set_ups_slot()</slot>
   <slot>cb_do_not_mutate_brain_of_plants_slot(bool)</slot>
   <slot>cb_use_weighted_brain_slot(bool)</slot>
+  <slot>cb_organisms_destroy_food_slot(bool)</slot>
  </slots>
  <buttongroups>
+  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
-  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

@@ -195,6 +195,7 @@ BrainWeightedDecision Brain::calculate_weighted_action(Observation &observation,
                 case Rotation::DOWN:  return BrainWeightedDecision{BrainDecision::MoveDown, weight};
                 case Rotation::RIGHT: return BrainWeightedDecision{BrainDecision::MoveRight, weight};
             }
+        default: return BrainWeightedDecision{};
     }
 }
 

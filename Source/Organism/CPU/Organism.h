@@ -84,12 +84,12 @@ public:
     int calculate_organism_lifetime();
     float calculate_food_needed();
 
-    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen,
+    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 &gen,
                         OrganismConstructionCode &new_occ);
-    void mutate_brain(Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 *gen);
-    static int mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range);
+    void mutate_brain(Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 &gen);
+    static int mutate_move_range(SimulationParameters *sp, lehmer64 &gen, int parent_move_range);
 
-    void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
+    void think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 
     void init_values();
 
@@ -106,7 +106,7 @@ public:
              OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate = 0.05,
              float brain_mutation_rate = 0.1);
     explicit Organism(Organism *organism);
-    int32_t create_child(lehmer64 *gen, EngineDataContainer &edc);
+    int32_t create_child(lehmer64 &gen, EngineDataContainer &edc);
 };
 
 

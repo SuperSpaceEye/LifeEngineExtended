@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent):
     organism->copy_organism(edc.base_organism);
     organism->vector_index = array_place;
 
-    SimulationEngineSingleThread::place_organism(&edc, organism);
+    SimulationEngineSingleThread::place_organism(edc, *organism, sp);
 
     resize_image();
     reset_scale_view();
@@ -153,10 +153,13 @@ void MainWindow::mainloop_tick() {
 
         auto scale = (info_update/1000000.);
 
-        fps_smoother.log_data(image_frames / scale);
+        last_fps = last_fps * 0.5 + (image_frames / scale) * 0.5;
+        last_sps = last_sps * 0.5 + (simulation_frames / scale) * 0.5;
+        last_ups = last_ups * 0.5 + (window_frames / scale) * 0.5;
+
         image_frames = 0;
 
-        update_fps_labels(fps_smoother.get_rate_per_second(), simulation_frames / scale, window_frames / scale);
+        update_fps_labels(last_fps, last_sps, last_ups);
         window_frames = 0;
         fps_timer = clock_now();
 
@@ -344,7 +347,7 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
             edc.simple_state_grid[x + y * edc.simulation_width].type = type;
             edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
 
-            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) > sp.food_threshold) {
+            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
                 edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
         }
     }
@@ -582,13 +585,13 @@ void MainWindow::initialize_gui() {
     ui.cb_simplified_food_production        ->setChecked(sp.simplified_food_production);
     ui.cb_stop_when_one_food_generated      ->setChecked(sp.stop_when_one_food_generated);
     ui.cb_eat_then_produce                  ->setChecked(sp.eat_then_produce);
-    ui.cb_use_new_child_pos_calculator      ->setChecked(sp.use_new_child_pos_calculator);
     ui.cb_checks_if_path_is_clear           ->setChecked(sp.check_if_path_is_clear);
     ui.cb_no_random_decisions               ->setChecked(sp.no_random_decisions);
     ui.cb_use_organism_construction_code    ->setChecked(sp.use_occ);
     ui.cb_recenter_to_imaginary             ->setChecked(sp.recenter_to_imaginary_pos);
     ui.cb_do_not_mutate_brain_of_plants     ->setChecked(sp.do_not_mutate_brains_of_plants);
     ui.cb_use_weighted_brain                ->setChecked(sp.use_weighted_brain);
+    ui.cb_organisms_destroy_food            ->setChecked(sp.organisms_destroy_food);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));

@@ -180,7 +180,7 @@ bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer 
         auto array_place = organism->vector_index;
         read_organism(is, sp, bp, organism, occp, occl);
         organism->vector_index = array_place;
-        SimulationEngineSingleThread::place_organism(&edc, organism);
+        SimulationEngineSingleThread::place_organism(edc, *organism, sp);
     }
 
     return false;
@@ -575,18 +575,17 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
 
         if (new_organism->anatomy._mover_blocks > 0 && new_organism->anatomy._eye_blocks > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
 
-        SimulationEngineSingleThread::place_organism(&edc, new_organism);
+        SimulationEngineSingleThread::place_organism(edc, *new_organism, sp);
     }
 
     auto gen = lehmer64(42);
 
     for (auto & organism: edc.stc.organisms) {
         edc.stc.organisms_observations.clear();
-        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, &edc);
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(&edc, &sp, &organism, edc.stc.organisms_observations);}}
+        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, edc);
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(edc, sp, organism, edc.stc.organisms_observations);}}
 
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i],
-                                                                                                                                                          &gen);}}
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i], gen);}}
     }
 }
 
@@ -669,12 +668,12 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("eat_then_produce",                 Value(sp.eat_then_produce), d.GetAllocator());
     d.AddMember("check_if_path_is_clear",           Value(sp.check_if_path_is_clear), d.GetAllocator());
     d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
-    d.AddMember("use_new_child_pos_calculator",     Value(sp.use_new_child_pos_calculator), d.GetAllocator());
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
     d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
     d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
     d.AddMember("do_not_mutate_brains_of_plants",   Value(sp.do_not_mutate_brains_of_plants), d.GetAllocator());
     d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
+    d.AddMember("organisms_destroy_food",           Value(sp.organisms_destroy_food), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -743,12 +742,12 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.eat_then_produce                 = d["eat_then_produce"].GetBool();
     sp.check_if_path_is_clear           = d["check_if_path_is_clear"].GetBool();
     sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
-    sp.use_new_child_pos_calculator     = d["use_new_child_pos_calculator"].GetBool();
     sp.no_random_decisions              = d["no_random_decisions"].GetBool();
     sp.use_occ                          = d["use_occ"].GetBool();
     sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
     sp.do_not_mutate_brains_of_plants   = d["do_not_mutate_brains_of_plants"].GetBool();
     sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
+    sp.organisms_destroy_food           = d["organisms_destroy_food"].GetBool();
 }
 
 

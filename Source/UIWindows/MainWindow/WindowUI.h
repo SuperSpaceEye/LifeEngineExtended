@@ -237,13 +237,13 @@ public:
     QCheckBox *cb_simplified_food_production;
     QCheckBox *cb_stop_when_one_food_generated;
     QCheckBox *cb_eat_then_produce;
-    QCheckBox *cb_use_new_child_pos_calculator;
     QCheckBox *cb_checks_if_path_is_clear;
     QCheckBox *cb_no_random_decisions;
     QCheckBox *cb_use_organism_construction_code;
     QCheckBox *cb_recenter_to_imaginary;
     QCheckBox *cb_do_not_mutate_brain_of_plants;
     QCheckBox *cb_use_weighted_brain;
+    QCheckBox *cb_organisms_destroy_food;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -316,8 +316,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *cursor_modes;
     QButtonGroup *simulation_modes;
+    QButtonGroup *cursor_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -930,7 +930,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1678));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1300, 606, 1678));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1446,11 +1446,6 @@ public:
 
         verticalLayout_20->addWidget(cb_eat_then_produce);
 
-        cb_use_new_child_pos_calculator = new QCheckBox(widget);
-        cb_use_new_child_pos_calculator->setObjectName("cb_use_new_child_pos_calculator");
-
-        verticalLayout_20->addWidget(cb_use_new_child_pos_calculator);
-
         cb_checks_if_path_is_clear = new QCheckBox(widget);
         cb_checks_if_path_is_clear->setObjectName("cb_checks_if_path_is_clear");
 
@@ -1480,6 +1475,11 @@ public:
         cb_use_weighted_brain->setObjectName("cb_use_weighted_brain");
 
         verticalLayout_20->addWidget(cb_use_weighted_brain);
+
+        cb_organisms_destroy_food = new QCheckBox(widget);
+        cb_organisms_destroy_food->setObjectName("cb_organisms_destroy_food");
+
+        verticalLayout_20->addWidget(cb_organisms_destroy_food);
 
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
@@ -1616,7 +1616,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, -110, 606, 807));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 807));
         QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -2072,7 +2072,6 @@ public:
         QObject::connect(le_lifespan_multiplier, SIGNAL(returnPressed()), MainWindow, SLOT(le_lifespan_multiplier_slot()));
         QObject::connect(le_anatomy_mutation_rate_delimiter, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_mutation_rate_delimiter_slot()));
         QObject::connect(cb_failed_reproduction_eats_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_failed_reproduction_eats_food_slot(bool)));
-        QObject::connect(cb_use_new_child_pos_calculator, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_new_child_pos_calculator_slot(bool)));
         QObject::connect(cb_checks_if_path_is_clear, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_check_if_path_is_clear_slot(bool)));
         QObject::connect(le_extra_mover_reproduction_cost, SIGNAL(returnPressed()), MainWindow, SLOT(le_extra_mover_reproduction_cost_slot()));
         QObject::connect(le_anatomy_min_possible_mutation_rate, SIGNAL(returnPressed()), MainWindow, SLOT(le_anatomy_min_possible_mutation_rate_slot()));
@@ -2104,6 +2103,7 @@ public:
         QObject::connect(le_set_ups, SIGNAL(returnPressed()), MainWindow, SLOT(le_set_ups_slot()));
         QObject::connect(cb_do_not_mutate_brain_of_plants, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_do_not_mutate_brain_of_plants_slot(bool)));
         QObject::connect(cb_use_weighted_brain, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_weighted_brain_slot(bool)));
+        QObject::connect(cb_organisms_destroy_food, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_organisms_destroy_food_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2227,13 +2227,13 @@ public:
         cb_simplified_food_production->setText(QCoreApplication::translate("MainWindow", "Simplified food production", nullptr));
         cb_stop_when_one_food_generated->setText(QCoreApplication::translate("MainWindow", "Stop food production when one food is generated", nullptr));
         cb_eat_then_produce->setText(QCoreApplication::translate("MainWindow", "Eat first, then produce food.", nullptr));
-        cb_use_new_child_pos_calculator->setText(QCoreApplication::translate("MainWindow", "Use new child position calculator", nullptr));
         cb_checks_if_path_is_clear->setText(QCoreApplication::translate("MainWindow", "Check if path is clear", nullptr));
         cb_no_random_decisions->setText(QCoreApplication::translate("MainWindow", "No random decisions", nullptr));
         cb_use_organism_construction_code->setText(QCoreApplication::translate("MainWindow", "Use Organism Construction Code", nullptr));
         cb_recenter_to_imaginary->setText(QCoreApplication::translate("MainWindow", "Recenter organisms to imaginary position", nullptr));
         cb_do_not_mutate_brain_of_plants->setText(QCoreApplication::translate("MainWindow", "Do not mutate brain of plants/simple movers", nullptr));
         cb_use_weighted_brain->setText(QCoreApplication::translate("MainWindow", "Use weighted brain", nullptr));
+        cb_organisms_destroy_food->setText(QCoreApplication::translate("MainWindow", "Organisms destroy food", nullptr));
         label_45->setText(QCoreApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "Food Cost", nullptr));

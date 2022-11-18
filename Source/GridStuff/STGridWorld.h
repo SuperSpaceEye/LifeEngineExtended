@@ -38,6 +38,15 @@ public:
     inline Rotation & get_rotation(int x, int y)      {return rotation_vec[x + y * width];}
     inline float & get_food_num(int x, int y)         {return food_vec[x + y * width];}
     inline int32_t & get_organism_index(int x, int y) {return organism_index[x + y * width];}
+    inline bool add_food_num(int x, int y, float num, float max_food_num) {
+        auto & fnum = food_vec[x + y * width];
+        if (fnum + num > max_food_num) {
+            return false;
+        } else {
+            fnum += num;
+            return true;
+        }
+    }
 
     void clear() {
         type_vec = std::vector<BlockTypes>();

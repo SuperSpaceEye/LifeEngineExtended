@@ -57,6 +57,18 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
         uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(organism_rotation) + static_cast<uint_fast8_t>(rotation);
         return static_cast<Rotation>(new_int_rotation%4);
     }
+
+    float get_food_cost(OrganismBlockParameters &bp) const {
+        switch (type) {
+            case BlockTypes::MouthBlock:    return bp.MouthBlock.food_cost;
+            case BlockTypes::ProducerBlock: return bp.ProducerBlock.food_cost;
+            case BlockTypes::MoverBlock:    return bp.MoverBlock.food_cost;
+            case BlockTypes::KillerBlock:   return bp.KillerBlock.food_cost;
+            case BlockTypes::ArmorBlock:    return bp.ArmorBlock.food_cost;
+            case BlockTypes::EyeBlock:      return bp.EyeBlock.food_cost;
+            default: throw std::logic_error("Shouldn't happen");
+        }
+    }
 };
 
 struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
