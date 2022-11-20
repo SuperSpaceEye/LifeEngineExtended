@@ -629,6 +629,9 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("weighted_brain_mutation_step", Value(sp.weighted_brain_mutation_step), d.GetAllocator());
     d.AddMember("threshold_move",               Value(sp.threshold_move), d.GetAllocator());
 
+    d.AddMember("food_threshold", Value(sp.food_threshold), d.GetAllocator());
+    d.AddMember("max_food",       Value(sp.max_food), d.GetAllocator());
+
     d.AddMember("min_move_range",       Value(sp.min_move_range), d.GetAllocator());
     d.AddMember("max_move_range",       Value(sp.max_move_range), d.GetAllocator());
     d.AddMember("move_range_delimiter", Value(sp.move_range_delimiter), d.GetAllocator());
@@ -702,6 +705,9 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
 
     sp.weighted_brain_mutation_step = d["weighted_brain_mutation_step"].GetFloat();
     sp.threshold_move               = d["threshold_move"].GetFloat();
+
+    sp.food_threshold = d["food_threshold"].GetFloat();
+    sp.max_food       = d["max_food"].GetFloat();
 
     sp.min_move_range       = d["min_move_range"].GetInt();
     sp.max_move_range       = d["max_move_range"].GetInt();

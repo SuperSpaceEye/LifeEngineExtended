@@ -40,6 +40,8 @@ struct SimulationParameters {
     float food_threshold = 0.99;
     float max_food = 2.1;
 
+    float continuous_movement_drag = 0.2;
+
     int   min_move_range = 1;
     int   max_move_range = 5;
     float move_range_delimiter = 0.5;
@@ -86,6 +88,7 @@ struct SimulationParameters {
     bool do_not_mutate_brains_of_plants = true;
     bool use_weighted_brain = true;
     bool organisms_destroy_food = true;
+    bool use_continuous_movement = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

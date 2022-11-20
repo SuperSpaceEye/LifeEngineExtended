@@ -66,8 +66,21 @@ public:
                                              brain_mutation_rate(brain_mutation_rate), move_range(move_range) {};
 };
 
+struct ContinuousData {
+    // physics
+    float p_x = 0;
+    float p_y = 0;
+    //velocity
+    float p_vx = 0;
+    float p_vy = 0;
+    //force
+    float p_fx = 0;
+    float p_fy = 0;
+};
+
 class Organism: public OrganismData {
 public:
+    ContinuousData cdata;
     Anatomy anatomy;
     Brain brain;
     OrganismConstructionCode occ;
@@ -107,6 +120,10 @@ public:
              float brain_mutation_rate = 0.1);
     explicit Organism(Organism *organism);
     int32_t create_child(lehmer64 &gen, EngineDataContainer &edc);
+
+    void calculate_discrete_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
+
+    void calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 };
 
 

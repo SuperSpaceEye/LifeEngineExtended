@@ -54,11 +54,15 @@ void Organism::init_values() {
         multiplier *= anatomy._producer_blocks;
     }
 
-    if (sp->use_weighted_brain && brain.brain_type != BrainTypes::WeightedBrain) {
+    if (anatomy._eye_blocks == 0) {brain.brain_type = BrainTypes::RandomActions;}
+
+    if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
         brain.convert_simple_to_weighted();
-    } else if (!sp->use_weighted_brain && brain.brain_type != BrainTypes::SimpleBrain) {
+    } else if (!sp->use_weighted_brain && brain.brain_type == BrainTypes::WeightedBrain) {
         brain.convert_weighted_to_simple(sp->threshold_move);
     }
+
+    if (sp->use_continuous_movement) {cdata = ContinuousData{float(x), float(y), 0, 0, 0, 0};}
 }
 
 //TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
@@ -255,32 +259,36 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
     if (anatomy._mover_blocks == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
-        auto new_decision = brain.get_decision(organism_observations, rotation, gen, sp->look_range, sp->threshold_move);
-        if (new_decision.decision != BrainDecision::DoNothing) {
-            last_decision_observation = new_decision;
+        if (sp->use_continuous_movement) {
+            calculate_continuous_decision(organism_observations, gen);
         } else {
-            if (!sp->no_random_decisions) {
-                last_decision_observation = Brain::get_random_action(gen);
-            }
+            calculate_discrete_decision(organism_observations, gen);
         }
-//        if (new_decision.decision != BrainDecision::DoNothing
-//            && new_decision.observation.distance > last_decision_observation.observation.distance) {
-//            last_decision_observation = new_decision;
-//            return;
-//        }
-//
-//        if (new_decision.decision != BrainDecision::DoNothing
-//            && last_decision_observation.time > max_decision_lifetime) {
-//            last_decision_observation = new_decision;
-//            return;
-//        }
-//
-//        if (last_decision_observation.time > max_do_nothing_lifetime) {
-//            last_decision_observation = brain.get_random_action(*mt);
-//            return;
-//        }
-//
-//        last_decision_observation.time++;
+    }
+}
+
+void Organism::calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
+    auto wdir = brain.get_weighted_direction(organism_observations, sp->look_range);
+
+    if (brain.brain_type == BrainTypes::RandomActions) {
+        wdir[0] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+        wdir[1] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+        wdir[2] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+        wdir[3] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+    }
+
+    cdata.p_fx += (wdir[3] - wdir[1]) * 0.5f;
+    cdata.p_fy += (wdir[2] - wdir[0]) * 0.5f;
+}
+
+void Organism::calculate_discrete_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
+    auto new_decision = brain.get_decision(organism_observations, rotation, gen, sp->look_range, sp->threshold_move);
+    if (new_decision.decision != BrainDecision::DoNothing) {
+        last_decision_observation = new_decision;
+    } else {
+        if (!sp->no_random_decisions) {
+            last_decision_observation = Brain::get_random_action(gen);
+        }
     }
 }
 

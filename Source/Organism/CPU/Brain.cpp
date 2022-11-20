@@ -134,7 +134,8 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
     throw "bad";
 }
 
-DecisionObservation Brain::get_weighted_action(std::vector<Observation> &observations_vector, int look_range, float threshold_move) {
+std::array<float, 4> Brain::get_weighted_direction(std::vector<Observation> &observations_vector,
+                                                   int look_range) const {
     //up, left, down, right
     std::array<float, 4> weighted_directions{0, 0, 0, 0};
 
@@ -144,6 +145,11 @@ DecisionObservation Brain::get_weighted_action(std::vector<Observation> &observa
         auto wd = calculate_weighted_action(observation, look_range);
         weighted_directions[static_cast<int>(wd.decision)] += wd.weight;
     }
+    return weighted_directions;
+}
+
+DecisionObservation Brain::get_weighted_action_discrete(std::vector<Observation> &observations_vector, int look_range, float threshold_move) {
+    std::array<float, 4> weighted_directions = get_weighted_direction(observations_vector, look_range);
 
     float max_weight = 0;
     int direction = 0;
@@ -212,7 +218,7 @@ Brain::get_decision(std::vector<Observation> &observation_vector, Rotation organ
             action = get_simple_action(observation_vector);
             break;
         case BrainTypes::WeightedBrain:
-            action = get_weighted_action(observation_vector, look_range, threshold_move);
+            action = get_weighted_action_discrete(observation_vector, look_range, threshold_move);
             break;
         case BrainTypes::BehaviourTreeBrain:
             break;

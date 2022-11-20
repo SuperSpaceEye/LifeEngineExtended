@@ -40,7 +40,8 @@ public:
 
     static void eat_food        (EngineDataContainer &edc, SimulationParameters &sp, Organism &organism);
 
-    static void tick_lifetime(EngineDataContainer &edc, Organism &organism, int &i);
+    static void tick_lifetime(EngineDataContainer &edc, Organism &organism, int &i,
+                              SimulationParameters &sp);
 
     static void apply_damage    (EngineDataContainer & edc, SimulationParameters & sp, Organism &organism);
 
@@ -80,6 +81,13 @@ public:
 
     //min x, min y, max x, max y
     static std::array<int, 4> get_organism_dimensions(Organism &organism);
+
+    static bool calculate_discrete_movement(EngineDataContainer &edc, Organism &organism, const BrainDecision &decision,
+                                            const SimulationParameters &sp, int &new_x, int &new_y);
+
+    static bool
+    calculate_continuous_move(EngineDataContainer &edc, Organism &organism, const SimulationParameters &sp, int &new_x,
+                              int &new_y);
 };
 
 

@@ -217,6 +217,10 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_organism_index(x, y) = new_organism->vector_index;
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
+
+    if(sp.use_continuous_movement) {
+        new_organism->init_values();
+    }
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
@@ -291,9 +295,9 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     for (auto & block: organism_ptr->anatomy._organism_blocks) {
         edc.st_grid.get_type(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
                              organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
-        //TODO
-        edc.st_grid.get_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y) += block.get_food_cost(*organism_ptr->bp);
+        edc.st_grid.add_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
+                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y,
+                                 block.get_food_cost(*organism_ptr->bp), sp.max_food);
     }
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         if (&edc.stc.organisms[i] == organism_ptr) {
@@ -444,7 +448,6 @@ void SimulationEngine::init_auto_food_drop(int width, int height) {
     std::shuffle(auto_food_drop_coordinates_shuffled.begin(), auto_food_drop_coordinates_shuffled.end(), gen);
 }
 
-//Will always wait for engine to pause
 bool SimulationEngine::wait_for_engine_to_pause() {
     while (!ecp.engine_paused) {}
     std::atomic_thread_fence(std::memory_order_release);

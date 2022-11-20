@@ -21,7 +21,9 @@ SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer &edc, Sim
 
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {apply_damage(edc, sp, organism);}}
 
-    for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {tick_lifetime(edc, organism, i);}}
+    for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {
+            tick_lifetime(
+                    edc, organism, i, sp);}}
 
     edc.stc.organisms_observations.clear();
 
@@ -47,6 +49,9 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Orga
         edc.st_grid.get_rotation(organism.x + pos.x, organism.y + pos.y) = get_global_rotation(block.rotation, organism.rotation);
         edc.st_grid.get_organism_index(organism.x + pos.x, organism.y + pos.y) = organism.vector_index;
         if (sp.organisms_destroy_food) {edc.st_grid.get_food_num(organism.x + pos.x, organism.y + pos.y) = 0;}
+    }
+    if (sp.use_continuous_movement) {
+        organism.init_values();
     }
 }
 
@@ -126,7 +131,8 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer &edc, Simulation
     }
 }
 
-void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer &edc, Organism &organism, int &i) {
+void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer &edc, Organism &organism, int &i,
+                                                 SimulationParameters &sp) {
     organism.lifetime++;
     if (organism.lifetime > organism.max_lifetime || organism.damage > organism.life_points) {
         organism.kill_organism(edc);
@@ -134,7 +140,8 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer &edc, Organ
         for (auto & block: organism.anatomy._organism_blocks) {
             edc.st_grid.get_type(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y) = BlockTypes::EmptyBlock;
             edc.st_grid.get_organism_index(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y) = -1;
-            edc.st_grid.get_food_num(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y) += block.get_food_cost(*organism.bp);
+            edc.st_grid.add_food_num(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y,
+                                     block.get_food_cost(*organism.bp), sp.max_food);
         }
     }
 }
@@ -193,18 +200,10 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, Si
         auto offset_y = 0;
 
         switch (block_rotation) {
-            case Rotation::UP:
-                offset_y = -1;
-                break;
-            case Rotation::LEFT:
-                offset_x = -1;
-                break;
-            case Rotation::DOWN:
-                offset_y = 1;
-                break;
-            case Rotation::RIGHT:
-                offset_x = 1;
-                break;
+            case Rotation::UP:    offset_y = -1; break;
+            case Rotation::LEFT:  offset_x = -1; break;
+            case Rotation::DOWN:  offset_y =  1; break;
+            case Rotation::RIGHT: offset_x =  1; break;
         }
 
         auto last_observation = Observation{BlockTypes::EmptyBlock, 0, block.rotation};
@@ -215,7 +214,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, Si
 
             last_observation.type = edc.st_grid.get_type(pos_x, pos_y);
             last_observation.distance = i;
-            //TODO
+
             if (last_observation.type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(pos_x, pos_y) > sp.food_threshold) {
                 last_observation.type = BlockTypes::FoodBlock;
             }
@@ -288,32 +287,13 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer &edc, Org
 
 void SimulationEngineSingleThread::move_organism(EngineDataContainer &edc, Organism &organism, BrainDecision decision,
                                                  SimulationParameters &sp, bool &moved) {
-    // rotates movement relative to simulation grid
+    int new_x = -1;
+    int new_y = -1;
 
-    int new_x = organism.x;
-    int new_y = organism.y;
-
-    switch (decision) {
-        case BrainDecision::MoveUp:    new_y -= 1; break;
-        case BrainDecision::MoveLeft:  new_x -= 1; break;
-        case BrainDecision::MoveDown:  new_y += 1; break;
-        case BrainDecision::MoveRight: new_x += 1; break;
-        default: break;
-    }
-
-    //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
-    for (auto & block: organism.anatomy._organism_blocks) {
-        auto pos = block.get_pos(organism.rotation);
-
-        auto type = edc.st_grid.get_type(new_x + pos.x, new_y + pos.y);
-        auto organism_index = edc.st_grid.get_organism_index(new_x + pos.x, new_y + pos.y);
-
-        if (sp.food_blocks_movement) {
-            auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
-            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num > sp.food_threshold)) {return;}
-        } else {
-            if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {return;}
-        }
+    if (sp.use_continuous_movement) {
+        if (!calculate_continuous_move(edc, organism, sp, new_x, new_y)) { return;}
+    } else {
+        if (!calculate_discrete_movement(edc, organism, decision, sp, new_x, new_y)) { return; }
     }
 
     for (auto & block: organism.anatomy._organism_blocks) {
@@ -335,26 +315,111 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer &edc, Organ
     moved = true;
 }
 
+bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer &edc, Organism &organism,
+                                                             const SimulationParameters &sp, int &new_x,
+                                                             int &new_y) {
+    float mass = organism.food_needed; // + organism.food_collected
+    auto & cd = organism.cdata;
+    cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.anatomy._mover_blocks;
+    cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.anatomy._mover_blocks;
+
+    cd.p_x += cd.p_vx;
+    cd.p_y += cd.p_vy;
+
+    cd.p_fx = 0;
+    cd.p_fy = 0;
+
+    new_x = std::round(cd.p_x);
+    new_y = std::round(cd.p_y);
+
+    if (new_x != organism.x || new_y != organism.y) {
+        bool is_clear = true;
+
+        for (auto & block: organism.anatomy._organism_blocks) {
+            auto pos = block.get_pos(organism.rotation);
+
+            auto type = edc.st_grid.get_type(new_x + pos.x, new_y + pos.y);
+            auto organism_index = edc.st_grid.get_organism_index(new_x + pos.x, new_y + pos.y);
+
+            if (sp.food_blocks_movement) {
+                auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
+                if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num > sp.food_threshold)) {is_clear = false; break;}
+            } else {
+                if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {is_clear = false; break;}
+            }
+        }
+
+        if (!is_clear) {
+            cd.p_x = organism.x;
+            cd.p_y = organism.y;
+            cd.p_vx = 0;
+            cd.p_vy = 0;
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool SimulationEngineSingleThread::calculate_discrete_movement(EngineDataContainer &edc, Organism &organism,
+                                                               const BrainDecision &decision,
+                                                               const SimulationParameters &sp, int &new_x,
+                                                               int &new_y) {
+    new_x = organism.x;
+    new_y = organism.y;
+    switch (decision) {
+        case BrainDecision::MoveUp:    new_y -= 1; break;
+        case BrainDecision::MoveLeft:  new_x -= 1; break;
+        case BrainDecision::MoveDown:  new_y += 1; break;
+        case BrainDecision::MoveRight: new_x += 1; break;
+        default: break;
+    }
+
+    //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
+    for (auto & block: organism.anatomy._organism_blocks) {
+        auto pos = block.get_pos(organism.rotation);
+
+        auto type = edc.st_grid.get_type(new_x + pos.x, new_y + pos.y);
+        auto organism_index = edc.st_grid.get_organism_index(new_x + pos.x, new_y + pos.y);
+
+        if (sp.food_blocks_movement) {
+            auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
+            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num > sp.food_threshold)) {return false;}
+        } else {
+            if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {return false;}
+        }
+    }
+    return true;
+}
+
 void SimulationEngineSingleThread::make_decision(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen) {
     bool moved = false;
 
-    switch (organism.last_decision_observation.decision) {
-        case BrainDecision::MoveUp:
-        case BrainDecision::MoveDown:
-        case BrainDecision::MoveLeft:
-        case BrainDecision::MoveRight:
-            if (organism.anatomy._mover_blocks > 0) {
-                move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
-                organism.move_counter++;
-            }
-            break;
-        default: break;
+    if (sp.use_continuous_movement) {
+        if (organism.anatomy._mover_blocks > 0) {
+            move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
+            organism.move_counter++;
+        }
+    } else {
+        switch (organism.last_decision_observation.decision) {
+            case BrainDecision::MoveUp:
+            case BrainDecision::MoveDown:
+            case BrainDecision::MoveLeft:
+            case BrainDecision::MoveRight:
+                if (organism.anatomy._mover_blocks > 0) {
+                    move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
+                    organism.move_counter++;
+                }
+                break;
+            default:
+                break;
+        }
     }
     if ((organism.move_counter >= organism.move_range) || (sp.set_fixed_move_range && sp.min_move_range >= organism.move_counter)) {
         organism.move_counter = 0;
     }
     if ((organism.move_counter == 0 || sp.rotate_every_move_tick) && organism.anatomy._mover_blocks > 0 && sp.runtime_rotation_enabled) {
-        if (organism.last_decision_observation.decision != organism.last_decision || sp.no_random_decisions) {
+        if (organism.last_decision_observation.decision != organism.last_decision || sp.no_random_decisions || sp.use_continuous_movement) {
             organism.last_decision = organism.last_decision_observation.decision;
             rotate_organism(edc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(gen)),
                             sp, moved);

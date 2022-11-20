@@ -502,7 +502,7 @@ SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(BenchmarkResult &
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::tick_lifetime(dc, dc.stc.organisms[i], i);
+            SimulationEngineSingleThread::tick_lifetime(dc, dc.stc.organisms[i], i, sp);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -511,7 +511,7 @@ SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(BenchmarkResult &
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::tick_lifetime(dc, dc.stc.organisms[i], i);
+            SimulationEngineSingleThread::tick_lifetime(dc, dc.stc.organisms[i], i, sp);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
