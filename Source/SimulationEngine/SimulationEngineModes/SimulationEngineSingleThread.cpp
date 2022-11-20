@@ -332,6 +332,8 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
     new_x = std::round(cd.p_x);
     new_y = std::round(cd.p_y);
 
+    if (check_if_out_of_bounds(edc, new_x, new_y)) {return false;}
+
     if (new_x != organism.x || new_y != organism.y) {
         bool is_clear = true;
 
