@@ -172,10 +172,6 @@ void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
         return;
     }
 
-    if (new_anatomy._eye_blocks == 0 && new_anatomy._mover_blocks == 0) {
-        new_brain.set_simple_action_table(brain);
-    }
-
     bool mutate_brain;
     _brain_mutation_rate = brain_mutation_rate;
 
@@ -268,9 +264,9 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
 }
 
 void Organism::calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
-    auto wdir = brain.get_weighted_direction(organism_observations, sp->look_range);
+    auto [wdir, ho] = brain.get_global_weighted_direction(organism_observations, sp->look_range, rotation);
 
-    if (brain.brain_type == BrainTypes::RandomActions) {
+    if (brain.brain_type == BrainTypes::RandomActions || (!ho && !sp->no_random_decisions)) {
         wdir[0] = std::uniform_real_distribution<float>(-1., 1.)(gen);
         wdir[1] = std::uniform_real_distribution<float>(-1., 1.)(gen);
         wdir[2] = std::uniform_real_distribution<float>(-1., 1.)(gen);

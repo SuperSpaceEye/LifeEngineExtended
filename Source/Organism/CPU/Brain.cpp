@@ -17,9 +17,10 @@ simple_action_table(SimpleActionTable{brain.simple_action_table}), weighted_acti
 
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
-void Brain::set_simple_action_table(Brain brain) {
+void Brain::set_brain(Brain brain) {
     brain_type = brain.brain_type;
     simple_action_table = brain.simple_action_table;
+    weighted_action_table = brain.weighted_action_table;
 }
 
 DecisionObservation Brain::get_random_action(lehmer64 &mt) {
@@ -148,6 +149,29 @@ std::array<float, 4> Brain::get_weighted_direction(std::vector<Observation> &obs
     return weighted_directions;
 }
 
+inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
+    uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(rotation1) + static_cast<uint_fast8_t>(rotation2);
+    return static_cast<Rotation>(new_int_rotation%4);
+}
+
+std::pair<std::array<float, 4>, bool>
+Brain::get_global_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
+                                     Rotation organism_rotation) const {
+    //up, left, down, right
+    std::array<float, 4> weighted_directions{0, 0, 0, 0};
+    bool had_observation = false;
+
+    for (auto & observation: observations_vector) {
+        if (observation.distance == 0) {continue;}
+
+        auto wd = calculate_weighted_action(observation, look_range);
+
+        weighted_directions[static_cast<int>(get_global_rotation((Rotation)wd.decision, organism_rotation))] += wd.weight;
+        if (wd.weight > 0) had_observation = true;
+    }
+    return {weighted_directions, had_observation};
+}
+
 DecisionObservation Brain::get_weighted_action_discrete(std::vector<Observation> &observations_vector, int look_range, float threshold_move) {
     std::array<float, 4> weighted_directions = get_weighted_direction(observations_vector, look_range);
 
@@ -240,9 +264,11 @@ Brain Brain::mutate(lehmer64 &mt, SimulationParameters sp) {
     switch (brain_type) {
         case BrainTypes::SimpleBrain:
             new_brain.simple_action_table = mutate_simple_action_table(simple_action_table, mt);
+            new_brain.brain_type = BrainTypes::SimpleBrain;
             break;
         case BrainTypes::WeightedBrain:
             new_brain.weighted_action_table = mutate_weighted_action_table(weighted_action_table, mt, sp);
+            new_brain.brain_type = BrainTypes::WeightedBrain;
             break;
     }
     return new_brain;
@@ -260,6 +286,7 @@ void Brain::convert_simple_to_weighted() {
             case SimpleDecision::GoTowards: *(weight+i) = 1; break;
         }
     }
+    brain_type = BrainTypes::WeightedBrain;
 }
 
 void Brain::convert_weighted_to_simple(float threshold_move) {
@@ -273,4 +300,5 @@ void Brain::convert_weighted_to_simple(float threshold_move) {
         else if (tw > 0) {*(simple_decision+i) = SimpleDecision::GoTowards;}
         else {*(simple_decision+i) = SimpleDecision::GoAway;}
     }
+    brain_type = BrainTypes::SimpleBrain;
 }

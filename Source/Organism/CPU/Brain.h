@@ -126,9 +126,13 @@ public:
 
     Brain mutate(lehmer64 &mt, SimulationParameters sp);
 
-    void set_simple_action_table(Brain brain);
+    void set_brain(Brain brain);
 
     std::array<float, 4> get_weighted_direction(std::vector<Observation> &observations_vector, int look_range) const;
+
+    std::pair<std::array<float, 4>, bool>
+    get_global_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
+                                  Rotation organism_rotation) const;
 };
 
 

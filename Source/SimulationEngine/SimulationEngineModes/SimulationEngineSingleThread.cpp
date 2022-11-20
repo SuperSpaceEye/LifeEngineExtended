@@ -417,7 +417,8 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer &edc, Simul
                 break;
         }
     }
-    if ((organism.move_counter >= organism.move_range) || (sp.set_fixed_move_range && sp.min_move_range >= organism.move_counter)) {
+
+    if ((!sp.set_fixed_move_range && organism.move_counter >= organism.move_range) || (sp.set_fixed_move_range && sp.min_move_range <= organism.move_counter)) {
         organism.move_counter = 0;
     }
     if ((organism.move_counter == 0 || sp.rotate_every_move_tick) && organism.anatomy._mover_blocks > 0 && sp.runtime_rotation_enabled) {
