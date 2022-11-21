@@ -555,6 +555,9 @@ void MainWindow::initialize_gui() {
     ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost, 0)));
     ui.le_anatomy_mutation_rate_step        ->setText(QString::fromStdString(to_str(sp.anatomy_mutations_rate_mutation_step, 2)));
     ui.le_brain_mutation_rate_step          ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_mutation_step, 2)));
+    ui.le_continuous_movement_drag          ->setText(QString::fromStdString(to_str(sp.continuous_movement_drag, 2)));
+    ui.le_food_threshold                    ->setText(QString::fromStdString(to_str(sp.food_threshold, 2)));
+    ui.le_max_food                          ->setText(QString::fromStdString(to_str(sp.max_food)));
     ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
     ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
@@ -592,6 +595,7 @@ void MainWindow::initialize_gui() {
     ui.cb_do_not_mutate_brain_of_plants     ->setChecked(sp.do_not_mutate_brains_of_plants);
     ui.cb_use_weighted_brain                ->setChecked(sp.use_weighted_brain);
     ui.cb_organisms_destroy_food            ->setChecked(sp.organisms_destroy_food);
+    ui.cb_use_continuous_movement           ->setChecked(sp.use_continuous_movement);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));

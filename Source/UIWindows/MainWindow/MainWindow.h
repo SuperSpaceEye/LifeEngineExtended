@@ -363,7 +363,9 @@ private slots:
     void le_extra_mover_reproduction_cost_slot();
     void le_anatomy_mutation_rate_step_slot();
     void le_brain_mutation_rate_step_slot();
-    void le_keyboard_movement_amount_slot();
+    void le_continuous_movement_drag_slot();
+    void le_food_threshold_slot();
+    void le_max_food_slot();
     //Settings
     void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
@@ -380,6 +382,7 @@ private slots:
     void le_memory_allocation_strategy_modifier_slot();
     void le_random_seed_slot();
     void le_set_ups_slot();
+    void le_keyboard_movement_amount_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();
@@ -417,6 +420,7 @@ private slots:
     void cb_recenter_to_imaginary_slot(bool state);
     void cb_do_not_mutate_brain_of_plants_slot(bool state);
     void cb_use_weighted_brain_slot(bool state);
+    void cb_use_continuous_movement_slot(bool state);
     //Other
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);

@@ -215,7 +215,7 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, Si
             last_observation.type = edc.st_grid.get_type(pos_x, pos_y);
             last_observation.distance = i;
 
-            if (last_observation.type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(pos_x, pos_y) > sp.food_threshold) {
+            if (last_observation.type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(pos_x, pos_y) >= sp.food_threshold) {
                 last_observation.type = BlockTypes::FoodBlock;
             }
 
@@ -262,7 +262,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer &edc, Org
 
         if (sp.food_blocks_movement) {
             auto food_num = edc.st_grid.get_food_num(organism.x + block.get_pos(new_rotation).x, organism.y + block.get_pos(new_rotation).y);
-            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num > sp.food_threshold)) {return;}
+            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {return;}
         } else {
             if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {return;}
         }
@@ -345,7 +345,7 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
 
             if (sp.food_blocks_movement) {
                 auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
-                if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num > sp.food_threshold)) {is_clear = false; break;}
+                if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {is_clear = false; break;}
             } else {
                 if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {is_clear = false; break;}
             }
@@ -386,7 +386,7 @@ bool SimulationEngineSingleThread::calculate_discrete_movement(EngineDataContain
 
         if (sp.food_blocks_movement) {
             auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
-            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num > sp.food_threshold)) {return false;}
+            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {return false;}
         } else {
             if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {return false;}
         }
@@ -487,7 +487,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer &edc, Simulat
         if (sp.food_blocks_reproduction) {
             auto food_num = edc.st_grid.get_food_num(child_pattern->x + block.get_pos(child_pattern->rotation).x,
                                                      child_pattern->y + block.get_pos(child_pattern->rotation).y);
-            if (type != BlockTypes::EmptyBlock || food_num > sp.food_threshold) {return;}
+            if (type != BlockTypes::EmptyBlock || food_num >= sp.food_threshold) {return;}
         } else {
             if (type != BlockTypes::EmptyBlock) {return;}
         }

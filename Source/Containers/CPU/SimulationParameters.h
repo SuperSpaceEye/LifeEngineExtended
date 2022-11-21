@@ -11,7 +11,7 @@
 
 struct SimulationParameters {
     //evolution controls
-    float food_production_probability = 0.022;
+    float food_production_probability = 0.025;
     int   produce_food_every_n_life_ticks = 1;
     float lifespan_multiplier = 100;
     int   look_range = 50;
@@ -37,8 +37,8 @@ struct SimulationParameters {
     float weighted_brain_mutation_step = 0.1;
     float threshold_move = 0.1;
 
-    float food_threshold = 0.99;
-    float max_food = 2.1;
+    float food_threshold = 1;
+    float max_food = 1;
 
     float continuous_movement_drag = 0.2;
 

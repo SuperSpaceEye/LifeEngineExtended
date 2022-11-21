@@ -518,6 +518,19 @@ void MainWindow::le_random_seed_slot() {
     engine.set_seed(temp);
 }
 
+void MainWindow::le_continuous_movement_drag_slot() {
+    le_slot_lower_upper_bound<float>(sp.continuous_movement_drag, sp.continuous_movement_drag, "float", ui.le_continuous_movement_drag,
+                                     0, "0", 1, "1");
+}
+
+void MainWindow::le_food_threshold_slot() {
+    le_slot_lower_bound<float>(sp.food_threshold, sp.food_threshold, "float", ui.le_food_threshold, 0, "0");
+}
+
+void MainWindow::le_max_food_slot() {
+    le_slot_lower_bound<float>(sp.max_food, sp.max_food, "float", ui.le_max_food, 0, "0");
+}
+
 void MainWindow::le_set_ups_slot() {
     le_slot_lower_bound(max_ups, max_ups, "int", ui.le_set_ups, 10, "10");
     set_image_creator_interval(1./image_creation_interval+1);
@@ -777,6 +790,12 @@ void MainWindow::cb_use_weighted_brain_slot(bool state) {
     sp.use_weighted_brain = state;
     engine.reinit_organisms();
     ee.update_brain_edit_visibility(state);
+}
+
+void MainWindow::cb_use_continuous_movement_slot(bool state) {
+    if (state && !sp.use_weighted_brain) { cb_use_weighted_brain_slot(true); ui.cb_use_weighted_brain->setChecked(true);}
+    if (state) {ui.cb_use_weighted_brain->setEnabled(false);} else {ui.cb_use_weighted_brain->setEnabled(true);}
+    sp.use_continuous_movement = state;
 }
 
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}

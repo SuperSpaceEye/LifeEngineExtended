@@ -677,6 +677,7 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("do_not_mutate_brains_of_plants",   Value(sp.do_not_mutate_brains_of_plants), d.GetAllocator());
     d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
     d.AddMember("organisms_destroy_food",           Value(sp.organisms_destroy_food), d.GetAllocator());
+    d.AddMember("use_continuous_movement",          Value(sp.use_continuous_movement), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -754,6 +755,7 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.do_not_mutate_brains_of_plants   = d["do_not_mutate_brains_of_plants"].GetBool();
     sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
     sp.organisms_destroy_food           = d["organisms_destroy_food"].GetBool();
+    sp.use_continuous_movement          = d["use_continuous_movement"].GetBool();
 }
 
 
