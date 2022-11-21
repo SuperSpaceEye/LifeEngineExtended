@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <array>
 #include <random>
 #include <memory>
 #include "../../PRNGS/lehmer64.h"

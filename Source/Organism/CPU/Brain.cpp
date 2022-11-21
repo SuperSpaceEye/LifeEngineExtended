@@ -138,7 +138,7 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
 std::array<float, 4> Brain::get_weighted_direction(std::vector<Observation> &observations_vector,
                                                    int look_range) const {
     //up, left, down, right
-    std::vector<float> weighted_directions{0, 0, 0, 0};
+    std::array<float, 4> weighted_directions{0, 0, 0, 0};
 
     for (auto & observation: observations_vector) {
         if (observation.distance == 0) {continue;}
