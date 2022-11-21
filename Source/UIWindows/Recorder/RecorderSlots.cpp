@@ -54,6 +54,10 @@ void Recorder::le_image_height_slot() {
     le_slot_lower_bound<int>(image_height, image_height, "int", ui.le_image_height, 1, "1");
 }
 
+void Recorder::le_kernel_size() {
+    le_slot_lower_bound<int>(kernel_size, kernel_size, "int", ui.le_kernel_size, 1, "1");
+}
+
 //==================== Buttons edits ====================
 
 void Recorder::b_create_image_slot() {
@@ -100,7 +104,7 @@ void Recorder::b_create_image_slot() {
     engine->parse_full_simulation_grid();
 
     create_image(raw_image_data, edc->simple_state_grid, edc->simulation_width, edc->simulation_height,
-                 num_pixels_per_block, use_cuda, use_viewpoint, false);
+                 num_pixels_per_block, false, use_viewpoint, false, kernel_size);
 
     QImage image(raw_image_data.data(),
                  image_width_dim,
@@ -134,10 +138,8 @@ void Recorder::b_start_recording_slot() {
     for (int x = 0; x < edc->simulation_width; x++) {
         for (int y = 0; y < edc->simulation_height; y++) {
             auto type = edc->st_grid.get_type(x, y);
-            if (type == BlockTypes::FoodBlock) {
-                tbuffer->record_food_change(x, y, true);
-            } else if (type == BlockTypes::WallBlock) {
-                tbuffer->record_wall_changes(x, y, true);
+            if (type == BlockTypes::WallBlock) {
+                tbuffer->record_user_wall_change(x, y, true);
             }
         }
     }
@@ -149,6 +151,7 @@ void Recorder::b_start_recording_slot() {
 void Recorder::b_stop_recording_slot() {
     edc->record_data = false;
     ecp->lock_resizing = false;
+    recording_paused = false;
 
     tbuffer->finish_recording();
 
@@ -439,7 +442,7 @@ void Recorder::start_normal_thread() {
                 } else {
 #endif
                     create_image(image_vec, reconstructor.get_state(), simulation_width, simulation_height,
-                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda);
+                                 num_pixels_per_block, use_cuda, use_viewpoint, use_cuda, 1);
 #ifdef __CUDA_USED__
                 }
 #endif

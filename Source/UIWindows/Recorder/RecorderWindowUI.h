@@ -27,13 +27,16 @@ class Ui_Recorder
 {
 public:
     QVBoxLayout *verticalLayout;
-    QTabWidget *tabWidget;
+    QTabWidget *teab;
     QWidget *full_video_image_creator;
     QVBoxLayout *verticalLayout_2;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout;
     QLabel *label;
     QLineEdit *le_number_or_pixels_per_block;
+    QHBoxLayout *horizontalLayout_9;
+    QLabel *label_10;
+    QLineEdit *le_kernel_size;
     QPushButton *b_create_image;
     QSpacerItem *verticalSpacer_3;
     QHBoxLayout *horizontalLayout_2;
@@ -83,8 +86,8 @@ public:
         verticalLayout = new QVBoxLayout(Recorder);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        tabWidget = new QTabWidget(Recorder);
-        tabWidget->setObjectName("tabWidget");
+        teab = new QTabWidget(Recorder);
+        teab->setObjectName("teab");
         full_video_image_creator = new QWidget();
         full_video_image_creator->setObjectName("full_video_image_creator");
         verticalLayout_2 = new QVBoxLayout(full_video_image_creator);
@@ -108,12 +111,27 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout);
 
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setObjectName("horizontalLayout_9");
+        label_10 = new QLabel(full_video_image_creator);
+        label_10->setObjectName("label_10");
+
+        horizontalLayout_9->addWidget(label_10);
+
+        le_kernel_size = new QLineEdit(full_video_image_creator);
+        le_kernel_size->setObjectName("le_kernel_size");
+
+        horizontalLayout_9->addWidget(le_kernel_size);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_9);
+
         b_create_image = new QPushButton(full_video_image_creator);
         b_create_image->setObjectName("b_create_image");
 
         verticalLayout_2->addWidget(b_create_image);
 
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer_3);
 
@@ -213,7 +231,7 @@ public:
 
         verticalLayout_2->addWidget(b_delete_all_intermediate_data_from_disk);
 
-        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer_4);
 
@@ -306,9 +324,9 @@ public:
 
         verticalLayout_2->addItem(verticalSpacer_2);
 
-        tabWidget->addTab(full_video_image_creator, QString());
+        teab->addTab(full_video_image_creator, QString());
 
-        verticalLayout->addWidget(tabWidget);
+        verticalLayout->addWidget(teab);
 
 
         retranslateUi(Recorder);
@@ -334,8 +352,9 @@ public:
         QObject::connect(le_image_height, SIGNAL(returnPressed()), Recorder, SLOT(le_image_height_slot()));
         QObject::connect(cb_use_cuda, SIGNAL(toggled(bool)), Recorder, SLOT(cb_use_cuda_slot(bool)));
         QObject::connect(cb_use_cuda_reconstructor, SIGNAL(toggled(bool)), Recorder, SLOT(cb_use_cuda_reconstructor_slot(bool)));
+        QObject::connect(le_kernel_size, SIGNAL(returnPressed()), Recorder, SLOT(le_kernel_size()));
 
-        tabWidget->setCurrentIndex(0);
+        teab->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(Recorder);
@@ -345,6 +364,7 @@ public:
     {
         Recorder->setWindowTitle(QCoreApplication::translate("Recorder", "Recorder", nullptr));
         label->setText(QCoreApplication::translate("Recorder", "Number of pixels per world block", nullptr));
+        label_10->setText(QCoreApplication::translate("Recorder", "Kernel size: ", nullptr));
         b_create_image->setText(QCoreApplication::translate("Recorder", "Create image", nullptr));
         label_2->setText(QCoreApplication::translate("Recorder", "Grid tbuffer size", nullptr));
         label_3->setText(QCoreApplication::translate("Recorder", "Log every n tick", nullptr));
@@ -367,7 +387,7 @@ public:
         label_8->setText(QCoreApplication::translate("Recorder", "Image width", nullptr));
         label_9->setText(QCoreApplication::translate("Recorder", "Image height ", nullptr));
         b_set_from_camera->setText(QCoreApplication::translate("Recorder", "Set from camera", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(full_video_image_creator), QCoreApplication::translate("Recorder", "Full grid video/Image creator", nullptr));
+        teab->setTabText(teab->indexOf(full_video_image_creator), QCoreApplication::translate("Recorder", "Full grid video/Image creator", nullptr));
     } // retranslateUi
 
 };

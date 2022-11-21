@@ -11,7 +11,7 @@
 
 struct SimulationParameters {
     //evolution controls
-    float food_production_probability = 0.022;
+    float food_production_probability = 0.025;
     int   produce_food_every_n_life_ticks = 1;
     float lifespan_multiplier = 100;
     int   look_range = 50;
@@ -36,6 +36,11 @@ struct SimulationParameters {
 
     float weighted_brain_mutation_step = 0.1;
     float threshold_move = 0.1;
+
+    float food_threshold = 1;
+    float max_food = 1;
+
+    float continuous_movement_drag = 0.2;
 
     int   min_move_range = 1;
     int   max_move_range = 5;
@@ -71,18 +76,19 @@ struct SimulationParameters {
     bool organism_self_blocks_block_sight = false;
     bool failed_reproduction_eats_food = true;
     bool rotate_every_move_tick = false;
-    bool multiply_food_production_prob = true;
+    bool multiply_food_production_prob = false;
     bool simplified_food_production = false;
     bool stop_when_one_food_generated = false;
     bool eat_then_produce = true;
     bool check_if_path_is_clear = true;
     bool food_blocks_movement = false;
-    bool use_new_child_pos_calculator = true;
     bool no_random_decisions = false;
     bool use_occ = true;
     bool recenter_to_imaginary_pos = true;
     bool do_not_mutate_brains_of_plants = true;
     bool use_weighted_brain = true;
+    bool organisms_destroy_food = true;
+    bool use_continuous_movement = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

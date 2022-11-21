@@ -29,60 +29,65 @@ inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
 
 class SimulationEngineSingleThread {
 public:
-    static void place_organism  (EngineDataContainer * dc, Organism * organism);
+    static void place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp);
 
-    static void produce_food    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen);
+    static void produce_food    (EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen);
 
-    static void produce_food_simplified(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen, float multiplier);
+    static void produce_food_simplified(EngineDataContainer &edc, SimulationParameters &sp,
+                                        Organism &organism, lehmer64 &gen, float multiplier);
 
-    static void produce_food_complex(EngineDataContainer * dc, SimulationParameters * sp, Organism *organism, lehmer64 &gen, float multiplier);
+    static void produce_food_complex(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen, float multiplier);
 
-    static void eat_food        (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
+    static void eat_food        (EngineDataContainer &edc, SimulationParameters &sp, Organism &organism);
 
-    static void tick_lifetime(EngineDataContainer *dc, Organism *organism, int &i);
+    static void tick_lifetime(EngineDataContainer &edc, Organism &organism, int &i,
+                              SimulationParameters &sp);
 
-    static void apply_damage    (EngineDataContainer * dc, SimulationParameters * sp, Organism *organism);
+    static void apply_damage    (EngineDataContainer & edc, SimulationParameters & sp, Organism &organism);
 
     static void reserve_observations(std::vector<std::vector<Observation>> &observations,
                                      std::vector<Organism> &organisms,
-                                     EngineDataContainer *dc);
+                                     EngineDataContainer &edc);
 
-    static void get_observations(EngineDataContainer *dc, SimulationParameters *sp,
-                                 Organism *organism,
+    static void get_observations(EngineDataContainer &edc, SimulationParameters &sp,
+                                 Organism &organism,
                                  std::vector<std::vector<Observation>> &organism_observations);
 
-    static void rotate_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
-                                SimulationParameters *sp, bool &moved);
+    static void rotate_organism(EngineDataContainer &edc, Organism &organism, BrainDecision decision,
+                                SimulationParameters &sp, bool &moved);
 
-    static void move_organism(EngineDataContainer *dc, Organism *organism, BrainDecision decision,
-                              SimulationParameters *sp, bool &moved);
+    static void move_organism(EngineDataContainer &edc, Organism &organism, BrainDecision decision,
+                              SimulationParameters &sp, bool &moved);
 
-    static void make_decision   (EngineDataContainer *dc, SimulationParameters *sp, Organism *organism, lehmer64 *gen);
+    static void make_decision   (EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen);
 
-    static void try_make_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                               lehmer64 *gen);
+    static void try_make_child(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism,
+                               lehmer64 &gen);
 
-    static void place_child(EngineDataContainer *dc, SimulationParameters *sp, Organism *organism,
-                            lehmer64 *gen);
+    static void place_child(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism,
+                            lehmer64 &gen);
 
-    static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
+    static bool check_if_out_of_bounds(EngineDataContainer &edc, int x, int y);
 
-    static bool check_if_block_out_of_bounds(EngineDataContainer *dc, Organism *organism,
+    static bool check_if_block_out_of_bounds(EngineDataContainer &edc, Organism &organism,
                                              BaseSerializedContainer &block, Rotation rotation);
 
-    static void single_threaded_tick(EngineDataContainer * dc,
-                                     SimulationParameters * sp,
-                                     lehmer64 *gen);
+    static void single_threaded_tick(EngineDataContainer &edc, SimulationParameters &sp, lehmer64 &gen);
 
-    static bool path_is_clear(int x, int y, Rotation direction, int steps, int32_t allow_organism, EngineDataContainer *dc,
-                              SimulationParameters *sp);
+    static bool path_is_clear(int x, int y, Rotation direction, int steps, int32_t allow_organism, EngineDataContainer &edc,
+                              SimulationParameters &sp);
 
-    static void new_child_pos_calculator(Organism *organism, Rotation to_place, int distance, EngineDataContainer &edc);
-
-    static void old_child_pos_calculator(Organism *organism, Rotation to_place, int distance, EngineDataContainer &edc);
+    static void child_pos_calculator(Organism &organism, const Rotation to_place, int distance, EngineDataContainer &edc);
 
     //min x, min y, max x, max y
-    static std::array<int, 4> get_organism_dimensions(Organism * organism);
+    static std::array<int, 4> get_organism_dimensions(Organism &organism);
+
+    static bool calculate_discrete_movement(EngineDataContainer &edc, Organism &organism, const BrainDecision &decision,
+                                            const SimulationParameters &sp, int &new_x, int &new_y);
+
+    static bool
+    calculate_continuous_move(EngineDataContainer &edc, Organism &organism, const SimulationParameters &sp, int &new_x,
+                              int &new_y);
 };
 
 

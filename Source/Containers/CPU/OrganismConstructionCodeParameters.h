@@ -8,6 +8,7 @@
 #include <random>
 #include <vector>
 
+//TODO
 //https://github.com/DavidPal/discrete-distribution
 
 struct OCCParameters {
@@ -20,7 +21,7 @@ struct OCCParameters {
     std::vector<int> group_size_weights{1, 1, 1, 1, 1};
     std::discrete_distribution<int> group_size_discrete_distribution{group_size_weights.begin(), group_size_weights.end()};
 
-    bool uniform_occ_instructions_mutation = true;
+    bool uniform_occ_instructions_mutation = false;
     std::vector<int> occ_instructions_mutation_weights{1};
     std::discrete_distribution<int> occ_instructions_mutation_discrete_distribution{occ_instructions_mutation_weights.begin(), occ_instructions_mutation_weights.end()};
 

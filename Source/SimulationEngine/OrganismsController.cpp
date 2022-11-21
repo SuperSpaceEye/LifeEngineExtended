@@ -39,7 +39,7 @@ Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
         if (ptr->vector_index < edc.stc.last_alive_position) {
             edc.stc.dead_organisms_before_last_alive_position--;
         }
-
+        ptr->is_dead = false;
         return ptr;
     }
 
@@ -87,25 +87,10 @@ int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *ch
     return main_o_ptr->vector_index;
 }
 
-void OrganismsController::precise_sort_low_to_high_dead_organisms_positions(EngineDataContainer &edc) {
-    std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
-        return a < b;
-    });
-}
-
 void OrganismsController::precise_sort_high_to_low_dead_organisms_positions(EngineDataContainer &edc) {
     std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
         return a > b;
     });
-}
-
-int32_t OrganismsController::get_last_alive_organism_position(EngineDataContainer &edc) {
-    int32_t last_alive_organism_place = edc.stc.organisms.size() - 1;
-    while (edc.stc.organisms[last_alive_organism_place].is_dead && last_alive_organism_place > 0) {
-        last_alive_organism_place--;
-    }
-
-    return last_alive_organism_place;
 }
 
 //Will compress alive organisms so that there will be no dead organisms between alive ones.

@@ -5,7 +5,7 @@
 #include "DataSavingFunctions.h"
 
 //TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 9;
+const uint32_t SAVE_VERSION = 10;
 
 void DataSavingFunctions::write_version(QDataStream &os) {
     os.device()->write((char*)&SAVE_VERSION, sizeof(uint32_t));
@@ -33,10 +33,10 @@ void DataSavingFunctions::write_simulation_grid(QDataStream & os, EngineDataCont
             auto type = edc.st_grid.get_type(x, y);
 
             switch (type) {
-                case BlockTypes::FoodBlock:
                 case BlockTypes::WallBlock:
-                    blocks.emplace_back(x, y, type);
-                default: break;
+                    blocks.emplace_back(x, y, BlockTypes::WallBlock);
+                    break;
+                default:break;
             }
         }
     }
@@ -45,6 +45,9 @@ void DataSavingFunctions::write_simulation_grid(QDataStream & os, EngineDataCont
 
     os.device()->write((char*)&size, sizeof(std::uint64_t));
     os.device()->write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
+    size = edc.st_grid.food_vec.size();
+    os.device()->write((char*)&size, sizeof(uint64_t));
+    os.device()->write((char*)edc.st_grid.food_vec.data(), sizeof(float)*edc.st_grid.food_vec.size());
 }
 
 void DataSavingFunctions::write_organism(QDataStream &os, Organism *organism) {
@@ -93,15 +96,15 @@ void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * ana
     os.device()->write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     os.device()->write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    os.device()->write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.device()->write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.device()->write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    os.device()->write((char*)&anatomy->_eye_block_vec[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
+    os.device()->write((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    os.device()->write((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    os.device()->write((char*)anatomy->_killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.device()->write((char*)anatomy->_eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
 
     for (auto & space: anatomy->_producing_space) {
         auto space_size = space.size();
         os.device()->write((char*)&space_size, sizeof(uint32_t));
-        os.device()->write((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        os.device()->write((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
@@ -109,9 +112,7 @@ void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * ana
 
 bool DataSavingFunctions::read_version(QDataStream &is) {
     uint32_t save_version;
-    std::cout << "start of save version" << "\n";
     is.readRawData((char*)&save_version, sizeof(uint32_t));
-    std::cout << save_version << "\n";
     return save_version == SAVE_VERSION;
 }
 
@@ -133,10 +134,12 @@ void DataSavingFunctions::read_simulation_grid(QDataStream &is, EngineDataContai
     std::vector<WorldBlocks> blocks{};
     std::uint64_t size;
 
-    is.readRawData((char*)&size, sizeof(std::uint64_t));
+    is.readRawData((char*)&size, sizeof(uint64_t));
     blocks.resize(size);
+    is.readRawData((char*)blocks.data(), sizeof(WorldBlocks)*size);
 
-    is.readRawData((char*)&blocks[0], sizeof(WorldBlocks)*size);
+    is.readRawData((char*)&size, sizeof(uint64_t));
+    is.readRawData((char*)edc.st_grid.food_vec.data(), sizeof(float)*edc.st_grid.food_vec.size());
 
     for (auto & block: blocks) {
         edc.st_grid.get_type(block.x, block.y) = block.type;
@@ -176,7 +179,7 @@ bool DataSavingFunctions::read_organisms(QDataStream &is, EngineDataContainer &e
         auto array_place = organism->vector_index;
         read_organism(is, sp, bp, organism, occp, occl);
         organism->vector_index = array_place;
-        SimulationEngineSingleThread::place_organism(&edc, organism);
+        SimulationEngineSingleThread::place_organism(edc, *organism, sp);
     }
 
     return false;
@@ -216,16 +219,16 @@ void DataSavingFunctions::read_organism_anatomy(QDataStream &is, Anatomy * anato
     is.readRawData((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
     is.readRawData((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
 
-    is.readRawData((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.readRawData((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.readRawData((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    is.readRawData((char*)&anatomy->_eye_block_vec[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
+    is.readRawData((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
+    is.readRawData((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
+    is.readRawData((char*)anatomy->_killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.readRawData((char*)anatomy->_eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
 
     for (auto & space: anatomy->_producing_space) {
         uint32_t space_size;
         is.readRawData((char*)&space_size, sizeof(uint32_t));
         space.resize(space_size);
-        is.readRawData((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        is.readRawData((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
@@ -570,18 +573,17 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
 
         if (new_organism->anatomy._mover_blocks > 0 && new_organism->anatomy._eye_blocks > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
 
-        SimulationEngineSingleThread::place_organism(&edc, new_organism);
+        SimulationEngineSingleThread::place_organism(edc, *new_organism, sp);
     }
 
     auto gen = lehmer64(42);
 
     for (auto & organism: edc.stc.organisms) {
         edc.stc.organisms_observations.clear();
-        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, &edc);
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(&edc, &sp, &organism, edc.stc.organisms_observations);}}
+        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, edc);
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(edc, sp, organism, edc.stc.organisms_observations);}}
 
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i],
-                                                                                                                                                          &gen);}}
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i], gen);}}
     }
 }
 
@@ -625,6 +627,9 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("weighted_brain_mutation_step", Value(sp.weighted_brain_mutation_step), d.GetAllocator());
     d.AddMember("threshold_move",               Value(sp.threshold_move), d.GetAllocator());
 
+    d.AddMember("food_threshold", Value(sp.food_threshold), d.GetAllocator());
+    d.AddMember("max_food",       Value(sp.max_food), d.GetAllocator());
+
     d.AddMember("min_move_range",       Value(sp.min_move_range), d.GetAllocator());
     d.AddMember("max_move_range",       Value(sp.max_move_range), d.GetAllocator());
     d.AddMember("move_range_delimiter", Value(sp.move_range_delimiter), d.GetAllocator());
@@ -664,12 +669,13 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("eat_then_produce",                 Value(sp.eat_then_produce), d.GetAllocator());
     d.AddMember("check_if_path_is_clear",           Value(sp.check_if_path_is_clear), d.GetAllocator());
     d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
-    d.AddMember("use_new_child_pos_calculator",     Value(sp.use_new_child_pos_calculator), d.GetAllocator());
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
     d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
     d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
     d.AddMember("do_not_mutate_brains_of_plants",   Value(sp.do_not_mutate_brains_of_plants), d.GetAllocator());
     d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
+    d.AddMember("organisms_destroy_food",           Value(sp.organisms_destroy_food), d.GetAllocator());
+    d.AddMember("use_continuous_movement",          Value(sp.use_continuous_movement), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -698,6 +704,9 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
 
     sp.weighted_brain_mutation_step = d["weighted_brain_mutation_step"].GetFloat();
     sp.threshold_move               = d["threshold_move"].GetFloat();
+
+    sp.food_threshold = d["food_threshold"].GetFloat();
+    sp.max_food       = d["max_food"].GetFloat();
 
     sp.min_move_range       = d["min_move_range"].GetInt();
     sp.max_move_range       = d["max_move_range"].GetInt();
@@ -738,12 +747,13 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.eat_then_produce                 = d["eat_then_produce"].GetBool();
     sp.check_if_path_is_clear           = d["check_if_path_is_clear"].GetBool();
     sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
-    sp.use_new_child_pos_calculator     = d["use_new_child_pos_calculator"].GetBool();
     sp.no_random_decisions              = d["no_random_decisions"].GetBool();
     sp.use_occ                          = d["use_occ"].GetBool();
     sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
     sp.do_not_mutate_brains_of_plants   = d["do_not_mutate_brains_of_plants"].GetBool();
     sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
+    sp.organisms_destroy_food           = d["organisms_destroy_food"].GetBool();
+    sp.use_continuous_movement          = d["use_continuous_movement"].GetBool();
 }
 
 

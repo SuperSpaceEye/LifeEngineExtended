@@ -71,6 +71,7 @@ class RecordingReconstructorCUDA {
     BaseGridBlock *d_rec_grid = nullptr;
     CudaTextureHolder *d_textures = nullptr;
     ColorContainer * color_container = nullptr;
+    float *d_food_grid = nullptr;
 
     int num_orgs;
     // Using cudaMallocManaged is probably efficient enough as reconstruction itself takes minuscule amount of execution

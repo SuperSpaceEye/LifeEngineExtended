@@ -31,7 +31,7 @@ namespace DataSavingFunctions {
         uint32_t y;
         BlockTypes type;
         WorldBlocks()=default;
-        WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type) {}
+        WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type){}
     };
 
     struct ProgramState {

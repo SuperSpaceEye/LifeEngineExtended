@@ -54,11 +54,15 @@ void Organism::init_values() {
         multiplier *= anatomy._producer_blocks;
     }
 
-    if (sp->use_weighted_brain && brain.brain_type != BrainTypes::WeightedBrain) {
+    if (anatomy._eye_blocks == 0) {brain.brain_type = BrainTypes::RandomActions;}
+
+    if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
         brain.convert_simple_to_weighted();
-    } else if (!sp->use_weighted_brain && brain.brain_type != BrainTypes::SimpleBrain) {
+    } else if (!sp->use_weighted_brain && brain.brain_type == BrainTypes::WeightedBrain) {
         brain.convert_weighted_to_simple(sp->threshold_move);
     }
+
+    if (sp->use_continuous_movement) {cdata = ContinuousData{float(x), float(y), 0, 0, 0, 0};}
 }
 
 //TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
@@ -99,25 +103,25 @@ float Organism::calculate_food_needed() {
     food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._mover_blocks > 0);
     for (auto & block: anatomy._organism_blocks) {
         switch (block.type) {
-            case BlockTypes::MouthBlock:    food_needed += bp->MouthBlock.   food_cost_modifier; break;
-            case BlockTypes::ProducerBlock: food_needed += bp->ProducerBlock.food_cost_modifier; break;
-            case BlockTypes::MoverBlock:    food_needed += bp->MoverBlock.   food_cost_modifier; break;
-            case BlockTypes::KillerBlock:   food_needed += bp->KillerBlock.  food_cost_modifier; break;
-            case BlockTypes::ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost_modifier; break;
-            case BlockTypes::EyeBlock:      food_needed += bp->EyeBlock.     food_cost_modifier; break;
+            case BlockTypes::MouthBlock:    food_needed += bp->MouthBlock.   food_cost; break;
+            case BlockTypes::ProducerBlock: food_needed += bp->ProducerBlock.food_cost; break;
+            case BlockTypes::MoverBlock:    food_needed += bp->MoverBlock.   food_cost; break;
+            case BlockTypes::KillerBlock:   food_needed += bp->KillerBlock.  food_cost; break;
+            case BlockTypes::ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost; break;
+            case BlockTypes::EyeBlock:      food_needed += bp->EyeBlock.     food_cost; break;
             default: throw std::runtime_error("Unknown block");
         }
     }
     return food_needed;
 }
 
-void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen,
+void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 &gen,
                               OrganismConstructionCode &new_occ) {
     bool mutate_anatomy;
     _anatomy_mutation_rate = anatomy_mutation_rate;
 
     if (sp->use_anatomy_evolved_mutation_rate) {
-        if (std::uniform_real_distribution<float>(0,1)(*gen) <= sp->anatomy_mutation_rate_delimiter) {
+        if (std::uniform_real_distribution<float>(0,1)(gen) <= sp->anatomy_mutation_rate_delimiter) {
             _anatomy_mutation_rate += sp->anatomy_mutations_rate_mutation_step;
             if (_anatomy_mutation_rate > 1) {_anatomy_mutation_rate = 1;}
         } else {
@@ -126,9 +130,9 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
                 _anatomy_mutation_rate = sp->anatomy_min_possible_mutation_rate;
             }
         }
-        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*gen) <= _anatomy_mutation_rate;
+        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(gen) <= _anatomy_mutation_rate;
     } else {
-        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(*gen) <= sp->global_anatomy_mutation_rate;
+        mutate_anatomy = std::uniform_real_distribution<float>(0, 1)(gen) <= sp->global_anatomy_mutation_rate;
     }
 
     if (mutate_anatomy) {
@@ -138,15 +142,15 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
             total_chance += sp->change_cell;
             total_chance += sp->remove_cell;
 
-            int choice = std::uniform_int_distribution<int>(0, total_chance)(*gen);
+            int choice = std::uniform_int_distribution<int>(0, total_chance)(gen);
 
-            if (choice < sp->add_cell) {new_anatomy = Anatomy(anatomy.add_random_block(*bp, *gen));return;}
+            if (choice < sp->add_cell) {new_anatomy = Anatomy(anatomy.add_random_block(*bp, gen));return;}
             choice -= sp->add_cell;
-            if (choice < sp->change_cell) {new_anatomy = Anatomy(anatomy.change_random_block(*bp, *gen));return;}
+            if (choice < sp->change_cell) {new_anatomy = Anatomy(anatomy.change_random_block(*bp, gen));return;}
             choice -= sp->change_cell;
-            if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(*gen));return;}
+            if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(gen));return;}
         } else {
-            new_occ = occ.mutate(*occp, *gen);
+            new_occ = occ.mutate(*occp, gen);
             new_anatomy = Anatomy(new_occ.compile_code(*occl));
 
             if (new_anatomy._organism_blocks.empty()) {
@@ -162,21 +166,17 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
 }
 
 void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
-                            float &_brain_mutation_rate, lehmer64 *gen) {
+                            float &_brain_mutation_rate, lehmer64 &gen) {
     // movers without eyes as well.
     if (sp->do_not_mutate_brains_of_plants && (new_anatomy._mover_blocks == 0 || new_anatomy._eye_blocks == 0)) {
         return;
-    }
-
-    if (new_anatomy._eye_blocks == 0 && new_anatomy._mover_blocks == 0) {
-        new_brain.set_simple_action_table(brain);
     }
 
     bool mutate_brain;
     _brain_mutation_rate = brain_mutation_rate;
 
     if (sp->use_brain_evolved_mutation_rate) {
-        if (std::uniform_real_distribution<float>(0,1)(*gen) <= sp->brain_mutation_rate_delimiter) {
+        if (std::uniform_real_distribution<float>(0,1)(gen) <= sp->brain_mutation_rate_delimiter) {
             _brain_mutation_rate += sp->brain_mutation_rate_mutation_step;
             if (_brain_mutation_rate > 1) {_brain_mutation_rate = 1;}
         } else {
@@ -185,25 +185,25 @@ void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
                 _brain_mutation_rate = sp->brain_min_possible_mutation_rate;
             }
         }
-        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*gen) <= _brain_mutation_rate;
+        mutate_brain = std::uniform_real_distribution<float>(0, 1)(gen) <= _brain_mutation_rate;
     } else {
-        mutate_brain = std::uniform_real_distribution<float>(0, 1)(*gen) <= sp->global_brain_mutation_rate;
+        mutate_brain = std::uniform_real_distribution<float>(0, 1)(gen) <= sp->global_brain_mutation_rate;
     }
 
     // if mutate brain
     if (mutate_brain) {
-        new_brain = brain.mutate(*gen, *sp);
+        new_brain = brain.mutate(gen, *sp);
     } else {
         // just copy brain from parent
         new_brain = Brain{brain};
     }
 }
 
-int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range) {
+int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 &gen, int parent_move_range) {
     if (sp->set_fixed_move_range) {return parent_move_range;}
 
     auto child_move_range = parent_move_range;
-    if (std::uniform_real_distribution<float>(0, 1)(*gen) <= sp->move_range_delimiter) {
+    if (std::uniform_real_distribution<float>(0, 1)(gen) <= sp->move_range_delimiter) {
         child_move_range += 1;
         if (child_move_range > sp->max_move_range) {return sp->max_move_range;}
         return child_move_range;
@@ -214,7 +214,7 @@ int Organism::mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int par
     }
 }
 
-int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
+int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
     Anatomy new_anatomy;
     Brain new_brain{};
     OrganismConstructionCode new_occ;
@@ -252,35 +252,39 @@ int32_t Organism::create_child(lehmer64 *gen, EngineDataContainer &edc) {
     return child_ptr->vector_index;
 }
 
-void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt) {
+void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
     if (anatomy._mover_blocks == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
-        auto new_decision = brain.get_decision(organism_observations, rotation, *mt, sp->look_range, sp->threshold_move);
-        if (new_decision.decision != BrainDecision::DoNothing) {
-            last_decision_observation = new_decision;
+        if (sp->use_continuous_movement) {
+            calculate_continuous_decision(organism_observations, gen);
         } else {
-            if (!sp->no_random_decisions) {
-                last_decision_observation = Brain::get_random_action(*mt);
-            }
+            calculate_discrete_decision(organism_observations, gen);
         }
-//        if (new_decision.decision != BrainDecision::DoNothing
-//            && new_decision.observation.distance > last_decision_observation.observation.distance) {
-//            last_decision_observation = new_decision;
-//            return;
-//        }
-//
-//        if (new_decision.decision != BrainDecision::DoNothing
-//            && last_decision_observation.time > max_decision_lifetime) {
-//            last_decision_observation = new_decision;
-//            return;
-//        }
-//
-//        if (last_decision_observation.time > max_do_nothing_lifetime) {
-//            last_decision_observation = brain.get_random_action(*mt);
-//            return;
-//        }
-//
-//        last_decision_observation.time++;
+    }
+}
+
+void Organism::calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
+    auto [wdir, ho] = brain.get_global_weighted_direction(organism_observations, sp->look_range, rotation);
+
+    if (brain.brain_type == BrainTypes::RandomActions || (!ho && !sp->no_random_decisions)) {
+        wdir[0] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+        wdir[1] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+        wdir[2] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+        wdir[3] = std::uniform_real_distribution<float>(-1., 1.)(gen);
+    }
+
+    cdata.p_fx += (wdir[3] - wdir[1]) * 0.5f;
+    cdata.p_fy += (wdir[2] - wdir[0]) * 0.5f;
+}
+
+void Organism::calculate_discrete_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
+    auto new_decision = brain.get_decision(organism_observations, rotation, gen, sp->look_range, sp->threshold_move);
+    if (new_decision.decision != BrainDecision::DoNothing) {
+        last_decision_observation = new_decision;
+    } else {
+        if (!sp->no_random_decisions) {
+            last_decision_observation = Brain::get_random_action(gen);
+        }
     }
 }
 

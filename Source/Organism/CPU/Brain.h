@@ -32,8 +32,6 @@ enum class BrainDecision {
     Flip,
 
     DoNothing,
-
-    TryProduceChild,
 };
 
 //Maybe for later
@@ -100,8 +98,8 @@ private:
     mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);
 
     DecisionObservation get_simple_action(std::vector<Observation> &observations_vector);
-    DecisionObservation get_weighted_action(std::vector<Observation> &observations_vector, int look_range,
-                                      float threshold_move);
+    DecisionObservation get_weighted_action_discrete(std::vector<Observation> &observations_vector, int look_range,
+                                                     float threshold_move);
 
     BrainDecision calculate_simple_action(Observation &observation) const;
     BrainWeightedDecision calculate_weighted_action(Observation &observation, int look_range) const;
@@ -128,7 +126,13 @@ public:
 
     Brain mutate(lehmer64 &mt, SimulationParameters sp);
 
-    void set_simple_action_table(Brain brain);
+    void set_brain(Brain brain);
+
+    std::array<float, 4> get_weighted_direction(std::vector<Observation> &observations_vector, int look_range) const;
+
+    std::pair<std::array<float, 4>, bool>
+    get_global_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
+                                  Rotation organism_rotation) const;
 };
 
 

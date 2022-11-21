@@ -294,7 +294,7 @@ void OrganismEditor::create_image() {
 
     ImageCreation::create_image(lin_width, lin_height, editor_width, editor_height, *color_container, textures,
                                 image_width, image_height, edit_image, edit_grid, use_cuda, cuda_is_available,
-                                cuda_i_creator, truncated_lin_width, truncated_lin_height, false);
+                                cuda_i_creator, truncated_lin_width, truncated_lin_height, false, 1);
 
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(edit_image.data(), image_width, image_height, QImage::Format_RGB32)));
 }

@@ -25,7 +25,7 @@ void Recorder::closeEvent(QCloseEvent *event) {
 
 void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const std::vector<BaseGridBlock> &grid,
                             int simulation_width, int simulation_height, int num_pixels_per_block, bool use_cuda,
-                            bool use_viewpoint, bool yuv_format) {
+                            bool use_viewpoint, bool yuv_format, int kernel_size) {
     int image_width;
     int image_height;
     int start_x;
@@ -55,7 +55,8 @@ void Recorder::create_image(std::vector<unsigned char> &raw_image_data, const st
 
     ImageCreation::create_image(lin_width, lin_height, edc->simulation_width, edc->simulation_height,
                                 *cc, *textures, image_width, image_height, raw_image_data, grid, use_cuda,
-                                cuda_is_available, cuda_i_creator, truncated_lin_width, truncated_lin_height, yuv_format);
+                                cuda_is_available, cuda_i_creator, truncated_lin_width, truncated_lin_height,
+                                yuv_format, kernel_size);
 }
 
 void

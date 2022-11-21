@@ -51,7 +51,6 @@
 #include "../../Stuff/DataSavingFunctions.h"
 #include "../../Containers/CPU/OrganismInfoContainer.h"
 #include "../../SimulationEngine/OrganismsController.h"
-#include "../../Stuff/IPSSmoother.h"
 
 #include "../../Stuff/rapidjson/document.h"
 #include "../../Stuff/rapidjson/writer.h"
@@ -110,7 +109,9 @@ private:
 
     Ui::MainWindow ui{};
     QTimer * timer;
-    IPSSmoother fps_smoother{};
+    float last_fps = 0;
+    float last_sps = 0;
+    float last_ups = 0;
 
     std::chrono::time_point<std::chrono::high_resolution_clock> last_window_update;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_simulation_update;
@@ -359,7 +360,9 @@ private slots:
     void le_extra_mover_reproduction_cost_slot();
     void le_anatomy_mutation_rate_step_slot();
     void le_brain_mutation_rate_step_slot();
-    void le_keyboard_movement_amount_slot();
+    void le_continuous_movement_drag_slot();
+    void le_food_threshold_slot();
+    void le_max_food_slot();
     //Settings
     void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
@@ -376,6 +379,7 @@ private slots:
     void le_memory_allocation_strategy_modifier_slot();
     void le_random_seed_slot();
     void le_set_ups_slot();
+    void le_keyboard_movement_amount_slot();
     //Other
     void le_max_sps_slot();
     void le_max_fps_slot();
@@ -405,13 +409,15 @@ private slots:
     void cb_stop_when_one_food_generated(bool state);
     void cb_eat_then_produce_slot(bool state);
     void cb_food_blocks_movement_slot(bool state);
-    void cb_use_new_child_pos_calculator_slot(bool state);
+    void cb_organisms_destroy_food_slot(bool state);
+
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);
     void cb_use_occ_slot(bool state);
     void cb_recenter_to_imaginary_slot(bool state);
     void cb_do_not_mutate_brain_of_plants_slot(bool state);
     void cb_use_weighted_brain_slot(bool state);
+    void cb_use_continuous_movement_slot(bool state);
     //Other
     void cb_fill_window_slot(bool state);
     void cb_clear_walls_on_reset_slot(bool state);
