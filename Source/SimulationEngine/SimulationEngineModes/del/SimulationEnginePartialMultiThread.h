@@ -16,15 +16,15 @@
 #include <atomic>
 
 #include "../../GridBlocks/BaseGridBlock.h"
-#include "../../Organism/CPU/Organism.h"
-#include "../../Stuff/BlockTypes.hpp"
-#include "../../Containers/CPU/EngineControlParametersContainer.h"
-#include "../../Containers/CPU/EngineDataContainer.h"
-#include "../../Containers/CPU/OrganismBlockParameters.h"
-#include "../../Stuff/Linspace.h"
-#include "SimulationEngineSingleThread.h"
-#include "../../PRNGS/lehmer64.h"
-#include "../../Organism/CPU/ObservationStuff.h"
+#include "../../../Organism/CPU/Organism.h"
+#include "../../../Stuff/BlockTypes.hpp"
+#include "../../../Containers/CPU/EngineControlParametersContainer.h"
+#include "../../../Containers/CPU/EngineDataContainer.h"
+#include "../../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../../Stuff/Linspace.h"
+#include "../SimulationEngineSingleThread.h"
+#include "../../../PRNGS/lehmer64.h"
+#include "../../../Organism/CPU/ObservationStuff.h"
 
 struct EngineDataContainer;
 struct eager_worker_partial;

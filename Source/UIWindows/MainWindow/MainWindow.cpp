@@ -137,6 +137,11 @@ MainWindow::MainWindow(QWidget *parent):
 
     //TODO
     ui.tb_open_benchmarks->setEnabled(false);
+    ui.tb_open_benchmarks->hide();
+    ui.cb_benchmarks_always_on_top->hide();
+    //biome buttons
+    ui.pushButton->hide();
+    ui.checkBox->hide();
 }
 
 void MainWindow::mainloop_tick() {

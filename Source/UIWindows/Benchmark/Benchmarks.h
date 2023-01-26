@@ -9,7 +9,7 @@
 
 #include "BenchmarkUI.h"
 #include "../MainWindow/WindowUI.h"
-#include "../../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThreadBenchmark.h"
+#include "../../SimulationEngine/SimulationEngineModes/del/SimulationEngineSingleThreadBenchmark.h"
 #include "../../Stuff/MiscFuncs.h"
 
 class Benchmarks: public QWidget {
