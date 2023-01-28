@@ -58,7 +58,7 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Orga
 void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen) {
     if (organism.anatomy._producer_blocks == 0) {return;}
     if (organism.anatomy._mover_blocks > 0 && !sp.movers_can_produce_food) {return;}
-    if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
+//    if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp.simplified_food_production) {
         produce_food_simplified(edc, sp, organism, gen, organism.multiplier);
@@ -77,9 +77,7 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer &
 
             auto & type = edc.st_grid.get_type(x, y);
 
-            if (type != BlockTypes::EmptyBlock) {continue;}
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp.food_production_probability * multiplier) {
-                //TODO
                 //if couldn't add the food because there is already almost max amount.
                 if (edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
                 if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, 1);}
@@ -104,10 +102,6 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
 
         auto & type = edc.st_grid.get_type(x, y);
 
-        //if space is occupied, then do nothing
-        if (type != BlockTypes::EmptyBlock) { continue;}
-
-        //TODO
         if (edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
         if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, 1);}
         if (sp.stop_when_one_food_generated) { return;}
@@ -121,7 +115,6 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer &edc, Simulation
 
         auto & food_num = edc.st_grid.get_food_num(x, y);
         if (food_num >= sp.food_threshold) {
-            //TODO
             food_num -= 1;
             if (edc.record_data) {
                 edc.stc.tbuffer.record_food_change(x, y, -1);
@@ -345,9 +338,10 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
 
             if (sp.food_blocks_movement) {
                 auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
-                if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {is_clear = false; break;}
+                if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index)
+                || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {is_clear = false; break;}
             } else {
-                if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {is_clear = false; break;}
+                if ( type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {is_clear = false; break;}
             }
         }
 

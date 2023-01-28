@@ -175,7 +175,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TrySelectOrganism: {
                 auto & type = edc.st_grid.get_type(action.x, action.y);
-                if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock || type == BlockTypes::FoodBlock) { continue; }
+                if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { continue; }
                 edc.selected_organism = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(action.x, action.y), edc);
                 goto endfor;
                 }

@@ -42,8 +42,6 @@ struct OrganismInfoContainer {
     int64_t moving_organisms = 0;
     int64_t organisms_with_eyes = 0;
 
-    double total_total_mutation_rate = 0;
-
     [[nodiscard]] const OrganismInfoContainer & get_info() const {
         return *this;
     }
@@ -56,22 +54,21 @@ struct OrganismInfoContainer {
 private:
     static void parse_organisms_info(OrganismInfoContainer & info, EngineDataContainer * edc, EngineControlParameters * ecp) {
         bool has_pool = true;
-        int i = 0;
         while (has_pool) {
             std::vector<Organism> * pool;
 
-            if (ecp->simulation_mode == SimulationModes::CPU_Single_Threaded) {
+//            if (ecp->simulation_mode == SimulationModes::CPU_Single_Threaded) {
                 pool = &edc->stc.organisms;
                 has_pool = false;
-            } else if (ecp->simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+//            } else if (ecp->simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
 //                pool = &edc->organisms_pools[i];
 //                i++;
 //                if (i >= ecp->num_threads) {
 //                    has_pool = false;
 //                }
-            } else {
-                throw "no pool";
-            }
+//            } else {
+//                throw "no pool";
+//            }
 
             for (auto & organism: *pool) {
                 if (organism.is_dead) { continue;}
@@ -160,8 +157,6 @@ private:
                           (sizeof(Brain) * info.total_avg.total) +
                           (sizeof(Anatomy) * info.total_avg.total) +
                           (sizeof(Organism) * info.total_avg.total);
-
-        info.total_total_mutation_rate = info.total_avg.anatomy_mutation_rate;
 
         info.total_avg.size /= info.total_avg.total;
 

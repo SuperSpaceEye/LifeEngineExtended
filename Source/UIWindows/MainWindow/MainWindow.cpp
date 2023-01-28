@@ -150,7 +150,6 @@ void MainWindow::mainloop_tick() {
     auto info_update = std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - fps_timer).count();
 
     if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
-        auto start_timer = clock_now();
         uint32_t simulation_frames = edc.engine_ticks_between_updates;
         edc.engine_ticks_between_updates = 0;
 
@@ -742,7 +741,6 @@ void MainWindow::change_main_grid_left_click() {
                     case CursorMode::ChooseOrganism:
                         edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, pt.x + x, pt.y + y);
                         goto endfor;
-                        break;
                     case CursorMode::PlaceOrganism:
                         edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, pt.x, pt.y);
                         goto endfor;
@@ -835,12 +833,17 @@ void MainWindow::load_textures_from_disk() {
     QImage image;
     auto executable_path = QCoreApplication::applicationDirPath().toStdString();
 
-    std::array<std::string, 9> filenames{"empty", "mouth", "producer", "mover", "killer", "armor", "eye", "food", "wall"};
     std::array<std::string, 5> file_extensions{".png", ".jpg", ".jpeg", ".bmp", ".gif"};
 
-    for (int i = 0; i < filenames.size(); i++) {
+    for (int i = 0; i < blocks.size(); i++) {
         std::string filename;
-        filename.append(executable_path).append("/textures/").append(filenames[i]);
+        filename.append(executable_path).append("/textures/").append(
+                [](std::string data){
+                    std::transform(data.begin(), data.end(), data.begin(),
+                                   [](unsigned char c){ return std::tolower(c); });
+                    return data;
+                }(blocks[i])
+                );
 
         bool exists = false;
         for (auto & extension: file_extensions) {

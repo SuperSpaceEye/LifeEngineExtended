@@ -211,6 +211,7 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
             next_instruction = OCCInstruction::ResetToOrigin;
         }
 
+        //TODO remake
         switch (instruction) {
             case OCCInstruction::ShiftUp:
             case OCCInstruction::ShiftUpLeft:
@@ -290,7 +291,8 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
             shift = shift_values[static_cast<int>(instruction)];
             set_block(cursor_x + shift[0], cursor_y + shift[1],
                       //set block instruction are in the same order as block types.
-                      static_cast<BlockTypes>(static_cast<int>(next_instruction) - 18 + 1),
+                      static_cast<BlockTypes>(
+                              static_cast<int>(next_instruction)- NON_SET_BLOCK_OCC_INSTRUCTIONS + 1),
                       base_rotation, occ_c, blocks, container, center_x, center_y);
             i++;
             pass = true;
@@ -432,6 +434,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
     int group_size;
 
     if (occp.uniform_mutation_distribution) {
+        //5 mutations
         mutation_type = static_cast<OCCMutations>(std::uniform_int_distribution<int>(0, 4)(gen));
     } else {
         mutation_type = static_cast<OCCMutations>(occp.mutation_discrete_distribution(gen));
