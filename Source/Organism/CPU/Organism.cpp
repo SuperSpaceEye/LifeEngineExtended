@@ -68,26 +68,20 @@ void Organism::init_values() {
 //TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
 float Organism::calculate_max_life() {
     life_points = 0;
-    for (auto& item: anatomy._organism_blocks) {
-        life_points += bp->pa[int(item.type)-1].life_point_amount;
-    }
+    for (auto& item: anatomy._organism_blocks) {life_points += bp->pa[int(item.type)-1].life_point_amount;}
     return life_points;
 }
 
 int Organism::calculate_organism_lifetime() {
     float lifetime_weights = 0;
-    for (auto & block: anatomy._organism_blocks) {
-        lifetime_weights += bp->pa[(int)block.type-1].lifetime_weight;
-    }
+    for (auto & block: anatomy._organism_blocks) {lifetime_weights += bp->pa[(int)block.type-1].lifetime_weight;}
     max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
 }
 
 float Organism::calculate_food_needed() {
     food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._mover_blocks > 0);
-    for (auto & block: anatomy._organism_blocks) {
-        food_needed += bp->pa[(int)block.type-1].food_cost;
-    }
+    for (auto & block: anatomy._organism_blocks) {food_needed += bp->pa[(int)block.type-1].food_cost;}
     return food_needed;
 }
 

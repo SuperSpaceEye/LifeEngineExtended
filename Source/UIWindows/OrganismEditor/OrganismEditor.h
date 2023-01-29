@@ -51,7 +51,6 @@ class OrganismEditor: public QWidget {
     Q_OBJECT
 public:
     std::vector<std::string> decisions{"Do Nothing", "Go Away", "Go Towards"};
-    std::vector<std::string> observations{"Mouth Cell", "Producer Cell", "Mover Cell", "Killer Cell", "Armor Cell", "Eye Cell", "Food", "Wall"};
     std::map<std::string, std::map<std::string, QCheckBox*>> brain_checkboxes;
     std::map<std::string, QLineEdit*> brain_line_edits;
     std::map<std::string, BlockTypes>     mapped_block_types_s_to_type;

@@ -28,6 +28,7 @@ enum class BlockTypes {
 const std::array<std::string, 9> BLOCK_NAMES {"Empty", "Mouth", "Producer", "Mover", "Killer", "Armor", "Eye", "Food", "Wall"};
 const std::array<std::string, 6> ORGANISM_BLOCK_NAMES {"Mouth", "Producer", "Mover", "Killer", "Armor", "Eye"};
 const int NUM_ORGANISM_BLOCKS = ORGANISM_BLOCK_NAMES.size();
+const int NUM_WORLD_BLOCKS = BLOCK_NAMES.size();
 
 /*
  * Adding new block type.
@@ -48,12 +49,7 @@ const int NUM_ORGANISM_BLOCKS = ORGANISM_BLOCK_NAMES.size();
  * 13) go to Source/Containers/CPU/OrganismInfoContainer.h
  * 14) go to Source/UIWindows/OrganismEditor/OrganismEditor.h
  * 15) Source/UIWindows/OrganismEditor/OrganismEditor.cpp
- * 16) Source/Containers/CPU/OrganismBlockParameters.h
- * 17) Source/UIWindows/WorldEvents/ParametersList.cpp
- * 18) Source/UIWindows/MainWindow/MainWindowDataSavingStuff.cpp update_table_values
  * 19) World recorder
- * 20) Organism
- *
  *
  */
 

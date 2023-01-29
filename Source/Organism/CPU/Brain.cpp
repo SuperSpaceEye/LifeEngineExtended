@@ -29,44 +29,23 @@ DecisionObservation Brain::get_random_action(lehmer64 &mt) {
 
 
 SimpleActionTable Brain::mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt) {
-    auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
+    auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, NUM_WORLD_BLOCKS-1)(mt));
     auto new_simple_action_table = SimpleActionTable{parents_simple_action_table};
 
     auto new_decision = static_cast<SimpleDecision>(std::uniform_int_distribution<int>(0, 2)(mt));
 
-    switch (mutate_type){
-        case BlockTypes::MouthBlock:    new_simple_action_table.MouthBlock    = new_decision;break;
-        case BlockTypes::ProducerBlock: new_simple_action_table.ProducerBlock = new_decision;break;
-        case BlockTypes::MoverBlock:    new_simple_action_table.MoverBlock    = new_decision;break;
-        case BlockTypes::KillerBlock:   new_simple_action_table.KillerBlock   = new_decision;break;
-        case BlockTypes::ArmorBlock:    new_simple_action_table.ArmorBlock    = new_decision;break;
-        case BlockTypes::EyeBlock:      new_simple_action_table.EyeBlock      = new_decision;break;
-        case BlockTypes::FoodBlock:     new_simple_action_table.FoodBlock     = new_decision;break;
-        case BlockTypes::WallBlock:     new_simple_action_table.WallBlock     = new_decision;break;
-        default: break;
-    }
+    new_simple_action_table.da[int(mutate_type)] = new_decision;
+
     return new_simple_action_table;
 }
 
 WeightedActionTable Brain::mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp) {
-    auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, 8)(mt));
+    auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, NUM_WORLD_BLOCKS-1)(mt));
     auto new_weighted_action_table = WeightedActionTable{parent_action_table};
 
     float modif = sp.weighted_brain_mutation_step * (std::uniform_int_distribution<int>(0, 1)(mt) ? 1. : -1.);
 
-    float * value;
-
-    switch (mutate_type){
-        case BlockTypes::MouthBlock:    value = &new_weighted_action_table.MouthBlock    ;break;
-        case BlockTypes::ProducerBlock: value = &new_weighted_action_table.ProducerBlock ;break;
-        case BlockTypes::MoverBlock:    value = &new_weighted_action_table.MoverBlock    ;break;
-        case BlockTypes::KillerBlock:   value = &new_weighted_action_table.KillerBlock   ;break;
-        case BlockTypes::ArmorBlock:    value = &new_weighted_action_table.ArmorBlock    ;break;
-        case BlockTypes::EyeBlock:      value = &new_weighted_action_table.EyeBlock      ;break;
-        case BlockTypes::FoodBlock:     value = &new_weighted_action_table.FoodBlock     ;break;
-        case BlockTypes::WallBlock:     value = &new_weighted_action_table.WallBlock     ;break;
-        default: break;
-    }
+    float * value = &new_weighted_action_table.da[int(mutate_type)];
 
     if (modif > 0) {
         *value = std::min<float>(1.,  *value+modif);
@@ -99,19 +78,19 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
 }
 
 BrainDecision Brain::calculate_simple_action(Observation &observation) const {
-    SimpleDecision action;
-    switch (observation.type) {
-        case BlockTypes::MouthBlock:    action = simple_action_table.MouthBlock;    break;
-        case BlockTypes::ProducerBlock: action = simple_action_table.ProducerBlock; break;
-        case BlockTypes::MoverBlock:    action = simple_action_table.MoverBlock;    break;
-        case BlockTypes::KillerBlock:   action = simple_action_table.KillerBlock;   break;
-        case BlockTypes::ArmorBlock:    action = simple_action_table.ArmorBlock;    break;
-        case BlockTypes::EyeBlock:      action = simple_action_table.EyeBlock;      break;
-        case BlockTypes::FoodBlock:     action = simple_action_table.FoodBlock;     break;
-        case BlockTypes::WallBlock:     action = simple_action_table.WallBlock;     break;
-        case BlockTypes::EmptyBlock:    action = SimpleDecision::DoNothing;         break;
-        default: throw "unknown block";
-    }
+    SimpleDecision action = simple_action_table.da[int(observation.type)];
+//    switch (observation.type) {
+//        case BlockTypes::MouthBlock:    action = simple_action_table.MouthBlock;    break;
+//        case BlockTypes::ProducerBlock: action = simple_action_table.ProducerBlock; break;
+//        case BlockTypes::MoverBlock:    action = simple_action_table.MoverBlock;    break;
+//        case BlockTypes::KillerBlock:   action = simple_action_table.KillerBlock;   break;
+//        case BlockTypes::ArmorBlock:    action = simple_action_table.ArmorBlock;    break;
+//        case BlockTypes::EyeBlock:      action = simple_action_table.EyeBlock;      break;
+//        case BlockTypes::FoodBlock:     action = simple_action_table.FoodBlock;     break;
+//        case BlockTypes::WallBlock:     action = simple_action_table.WallBlock;     break;
+//        case BlockTypes::EmptyBlock:    action = SimpleDecision::DoNothing;         break;
+//        default: throw "unknown block";
+//    }
 
     switch (action) {
         case SimpleDecision::DoNothing:
@@ -192,19 +171,19 @@ DecisionObservation Brain::get_weighted_action_discrete(std::vector<Observation>
 
 BrainWeightedDecision Brain::calculate_weighted_action(Observation &observation, int look_range) const{
     float distance_modifier = (float)std::abs(observation.distance - look_range - 1) / look_range;
-    float weight;
+    float weight = weighted_action_table.da[int(observation.type)];
 
-    switch (observation.type) {
-        case BlockTypes::EmptyBlock:    weight = 0; break;
-        case BlockTypes::MouthBlock:    weight = weighted_action_table.MouthBlock; break;
-        case BlockTypes::ProducerBlock: weight = weighted_action_table.ProducerBlock; break;
-        case BlockTypes::MoverBlock:    weight = weighted_action_table.MoverBlock; break;
-        case BlockTypes::KillerBlock:   weight = weighted_action_table.KillerBlock; break;
-        case BlockTypes::ArmorBlock:    weight = weighted_action_table.ArmorBlock; break;
-        case BlockTypes::EyeBlock:      weight = weighted_action_table.EyeBlock; break;
-        case BlockTypes::FoodBlock:     weight = weighted_action_table.FoodBlock; break;
-        case BlockTypes::WallBlock:     weight = weighted_action_table.WallBlock; break;
-    }
+//    switch (observation.type) {
+//        case BlockTypes::EmptyBlock:    weight = 0; break;
+//        case BlockTypes::MouthBlock:    weight = weighted_action_table.MouthBlock; break;
+//        case BlockTypes::ProducerBlock: weight = weighted_action_table.ProducerBlock; break;
+//        case BlockTypes::MoverBlock:    weight = weighted_action_table.MoverBlock; break;
+//        case BlockTypes::KillerBlock:   weight = weighted_action_table.KillerBlock; break;
+//        case BlockTypes::ArmorBlock:    weight = weighted_action_table.ArmorBlock; break;
+//        case BlockTypes::EyeBlock:      weight = weighted_action_table.EyeBlock; break;
+//        case BlockTypes::FoodBlock:     weight = weighted_action_table.FoodBlock; break;
+//        case BlockTypes::WallBlock:     weight = weighted_action_table.WallBlock; break;
+//    }
 
     weight *= distance_modifier;
 
@@ -274,31 +253,31 @@ Brain Brain::mutate(lehmer64 &mt, SimulationParameters sp) {
     return new_brain;
 }
 
-//TODO remember
 void Brain::convert_simple_to_weighted() {
-    auto * simple_decision = (SimpleDecision*)&simple_action_table;
-    auto * weight = (float*)&weighted_action_table;
+    auto & sda = simple_action_table.da;
+    auto & wda = weighted_action_table.da;
 
-    for (int i = 0; i < 8; i++) {
-        switch (*(simple_decision+i)) {
-            case SimpleDecision::DoNothing: *(weight+i) = 0; break;
-            case SimpleDecision::GoAway:    *(weight+i) = -1; break;
-            case SimpleDecision::GoTowards: *(weight+i) = 1; break;
+    for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
+        switch (sda[i]) {
+            case SimpleDecision::DoNothing: wda[i] = 0; break;
+            case SimpleDecision::GoAway:    wda[i] = -1; break;
+            case SimpleDecision::GoTowards: wda[i] = 1; break;
         }
     }
+
     brain_type = BrainTypes::WeightedBrain;
 }
 
 void Brain::convert_weighted_to_simple(float threshold_move) {
-    auto * simple_decision = (SimpleDecision*)&simple_action_table;
-    auto * weight = (float*)&weighted_action_table;
+    auto & sda = simple_action_table.da;
+    auto & wda = weighted_action_table.da;
 
-    for (int i = 0; i < 8; i++) {
-        float tw = *(weight+i);
+    for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
+        auto tw = wda[i];
 
-        if (std::abs(tw) < threshold_move) {*(simple_decision+i) = SimpleDecision::DoNothing;}
-        else if (tw > 0) {*(simple_decision+i) = SimpleDecision::GoTowards;}
-        else {*(simple_decision+i) = SimpleDecision::GoAway;}
+        if (std::abs(tw) < threshold_move) {sda[i] = SimpleDecision::DoNothing;}
+        else if (tw > 0) {sda[i] = SimpleDecision::GoTowards;}
+        else {sda[i] = SimpleDecision::GoAway;}
     }
     brain_type = BrainTypes::SimpleBrain;
 }

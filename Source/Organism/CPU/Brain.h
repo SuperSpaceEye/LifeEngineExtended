@@ -64,26 +64,44 @@ struct DecisionObservation {
 
 //TODO remember convert
 struct SimpleActionTable {
-    SimpleDecision MouthBlock    = SimpleDecision::DoNothing;
-    SimpleDecision ProducerBlock = SimpleDecision::DoNothing;
-    SimpleDecision MoverBlock    = SimpleDecision::DoNothing;
-    SimpleDecision KillerBlock   = SimpleDecision::GoAway;
-    SimpleDecision ArmorBlock    = SimpleDecision::DoNothing;
-    SimpleDecision EyeBlock      = SimpleDecision::DoNothing;
-    SimpleDecision FoodBlock     = SimpleDecision::GoTowards;
-    SimpleDecision WallBlock     = SimpleDecision::DoNothing;
+    //decision array
+    //contains empty observation type which cannot be mutated
+    std::array<SimpleDecision, NUM_WORLD_BLOCKS> da{
+        // is computed at compile time
+            []() consteval {
+                std::array<SimpleDecision, NUM_WORLD_BLOCKS> data{};
+                for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
+                    if (i+1 == int(BlockTypes::KillerBlock)) {
+                        data[i] = SimpleDecision::GoAway;
+                    } else if (i+1 == int(BlockTypes::FoodBlock)) {
+                        data[i] = SimpleDecision::GoTowards;
+                    } else {
+                        data[i] = SimpleDecision::DoNothing;
+                    }
+                }
+                return data;
+            }()
+    };
 };
 
 // "-1" - go away, "1" - go towards, "0" - neutral
 struct WeightedActionTable {
-    float MouthBlock    = 0;
-    float ProducerBlock = 0;
-    float MoverBlock    = 0;
-    float KillerBlock   = -1;
-    float ArmorBlock    = 0;
-    float EyeBlock      = 0;
-    float FoodBlock     = 1;
-    float WallBlock     = 0;
+    std::array<float, NUM_WORLD_BLOCKS> da{
+            // is computed at compile time
+            []() consteval {
+                std::array<float, NUM_WORLD_BLOCKS> data{};
+                for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
+                    if (i+1 == int(BlockTypes::KillerBlock)) {
+                        data[i] = -1;
+                    } else if (i+1 == int(BlockTypes::FoodBlock)) {
+                        data[i] = 1;
+                    } else {
+                        data[i] = 0;
+                    }
+                }
+                return data;
+            }()
+    };
 };
 
 struct BrainWeightedDecision {

@@ -57,7 +57,7 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 }
 
 void OrganismEditor::update_cell_count_label() {
-    ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism.anatomy._organism_blocks.size())));
+    ui.label_cell_count->setText(QString::fromStdString("Block count: " + std::to_string(editor_organism.anatomy._organism_blocks.size())));
 }
 
 void OrganismEditor::update_gui() {
@@ -72,7 +72,8 @@ void OrganismEditor::update_gui() {
 void OrganismEditor::initialize_gui() {
     update_gui();
 
-    for (auto & observation: observations) {
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {
+        auto & observation = BLOCK_NAMES[i];
         auto * horizontal_layout = new QHBoxLayout{};
         auto * b_group = new QButtonGroup(this);
         auto * weight_le = new QLineEdit(ui.widget_2);
@@ -98,14 +99,7 @@ void OrganismEditor::initialize_gui() {
     mapped_decisions_s_to_type["Go Away"]    = SimpleDecision::GoAway;
     mapped_decisions_s_to_type["Go Towards"] = SimpleDecision::GoTowards;
 
-    mapped_block_types_s_to_type["Mouth Cell"]    = BlockTypes::MouthBlock;
-    mapped_block_types_s_to_type["Producer Cell"] = BlockTypes::ProducerBlock;
-    mapped_block_types_s_to_type["Mover Cell"]    = BlockTypes::MoverBlock;
-    mapped_block_types_s_to_type["Killer Cell"]   = BlockTypes::KillerBlock;
-    mapped_block_types_s_to_type["Armor Cell"]    = BlockTypes::ArmorBlock;
-    mapped_block_types_s_to_type["Eye Cell"]      = BlockTypes::EyeBlock;
-    mapped_block_types_s_to_type["Food"]          = BlockTypes::FoodBlock;
-    mapped_block_types_s_to_type["Wall"]          = BlockTypes::WallBlock;
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {mapped_block_types_s_to_type[BLOCK_NAMES[i]] = BlockTypes(i);}
 
     for (auto & pair: mapped_decisions_s_to_type)   {mapped_decisions_type_to_s  [pair.second] = pair.first;}
     for (auto & pair: mapped_block_types_s_to_type) {mapped_block_types_type_to_s[pair.second] = pair.first;}
@@ -117,18 +111,7 @@ void OrganismEditor::brain_cb_chooser(std::string observation, std::string actio
     auto observation_type = mapped_block_types_s_to_type[observation];
     auto decision = mapped_decisions_s_to_type[action];
 
-    SimpleDecision * brain_decision;
-
-    switch (observation_type) {
-        case BlockTypes::MouthBlock:    brain_decision = &editor_organism.brain.simple_action_table.MouthBlock;    break;
-        case BlockTypes::ProducerBlock: brain_decision = &editor_organism.brain.simple_action_table.ProducerBlock; break;
-        case BlockTypes::MoverBlock:    brain_decision = &editor_organism.brain.simple_action_table.MoverBlock;    break;
-        case BlockTypes::KillerBlock:   brain_decision = &editor_organism.brain.simple_action_table.KillerBlock;   break;
-        case BlockTypes::ArmorBlock:    brain_decision = &editor_organism.brain.simple_action_table.ArmorBlock;    break;
-        case BlockTypes::EyeBlock:      brain_decision = &editor_organism.brain.simple_action_table.EyeBlock;      break;
-        case BlockTypes::FoodBlock:     brain_decision = &editor_organism.brain.simple_action_table.FoodBlock;     break;
-        case BlockTypes::WallBlock:     brain_decision = &editor_organism.brain.simple_action_table.WallBlock;     break;
-    }
+    SimpleDecision * brain_decision = &editor_organism.brain.simple_action_table.da[int(observation_type)];
 
     switch (decision) {
         case SimpleDecision::DoNothing: *brain_decision = SimpleDecision::DoNothing;break;
@@ -140,18 +123,7 @@ void OrganismEditor::brain_cb_chooser(std::string observation, std::string actio
 void OrganismEditor::brain_weight_chooser(std::string observation, QLineEdit *le) {
     auto observation_type = mapped_block_types_s_to_type[observation];
 
-    float * weight;
-
-    switch (observation_type) {
-        case BlockTypes::MouthBlock:    weight = &editor_organism.brain.weighted_action_table.MouthBlock;    break;
-        case BlockTypes::ProducerBlock: weight = &editor_organism.brain.weighted_action_table.ProducerBlock; break;
-        case BlockTypes::MoverBlock:    weight = &editor_organism.brain.weighted_action_table.MoverBlock;    break;
-        case BlockTypes::KillerBlock:   weight = &editor_organism.brain.weighted_action_table.KillerBlock;   break;
-        case BlockTypes::ArmorBlock:    weight = &editor_organism.brain.weighted_action_table.ArmorBlock;    break;
-        case BlockTypes::EyeBlock:      weight = &editor_organism.brain.weighted_action_table.EyeBlock;      break;
-        case BlockTypes::FoodBlock:     weight = &editor_organism.brain.weighted_action_table.FoodBlock;     break;
-        case BlockTypes::WallBlock:     weight = &editor_organism.brain.weighted_action_table.WallBlock;     break;
-    }
+    float * weight = &editor_organism.brain.weighted_action_table.da[int(observation_type)];
 
     le_slot_lower_upper_bound<float>(*weight, *weight, "float", le, -1., "-1", 1., "1");
 }
@@ -162,25 +134,19 @@ void OrganismEditor::update_brain_state() {
 }
 
 void OrganismEditor::update_brain_line_edits() {
-    brain_line_edits["Mouth Cell"]   ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.MouthBlock)));
-    brain_line_edits["Producer Cell"]->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.ProducerBlock)));
-    brain_line_edits["Mover Cell"]   ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.MoverBlock)));
-    brain_line_edits["Killer Cell"]  ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.KillerBlock)));
-    brain_line_edits["Armor Cell"]   ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.ArmorBlock)));
-    brain_line_edits["Eye Cell"]     ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.EyeBlock)));
-    brain_line_edits["Food"]         ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.FoodBlock)));
-    brain_line_edits["Wall"]         ->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.WallBlock)));
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {
+        const auto & name = BLOCK_NAMES[i];
+
+        brain_line_edits[name]->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.da[i])));
+    }
 }
 
 void OrganismEditor::update_brain_checkboxes() {
-    brain_checkboxes["Mouth Cell"]   [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.MouthBlock]]   ->setChecked(true);
-    brain_checkboxes["Producer Cell"][mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.ProducerBlock]]->setChecked(true);
-    brain_checkboxes["Mover Cell"]   [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.MoverBlock]]   ->setChecked(true);
-    brain_checkboxes["Killer Cell"]  [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.KillerBlock]]  ->setChecked(true);
-    brain_checkboxes["Armor Cell"]   [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.ArmorBlock]]   ->setChecked(true);
-    brain_checkboxes["Eye Cell"]     [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.EyeBlock]]     ->setChecked(true);
-    brain_checkboxes["Food"]         [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.FoodBlock]]    ->setChecked(true);
-    brain_checkboxes["Wall"]         [mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.WallBlock]]    ->setChecked(true);
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {
+        const auto & name = BLOCK_NAMES[i];
+
+        brain_checkboxes[name][mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.da[i]]]->setChecked(true);
+    }
 }
 
 void OrganismEditor::closeEvent(QCloseEvent * event) {
@@ -207,7 +173,6 @@ void OrganismEditor::move_center(int delta_x, int delta_y) {
     center_x -= delta_x * scaling_zoom;
     center_y -= delta_y * scaling_zoom;
     create_image();
-//    std::this_thread::sleep_for(std::chrono::milliseconds(int(1./60*1000)));
 }
 
 void OrganismEditor::reset_scale_view() {
