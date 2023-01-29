@@ -4,11 +4,14 @@
 
 #include "DataSavingFunctions.h"
 
-//TODO increment every time saving logic changes
 const uint32_t SAVE_VERSION = 10;
+const std::string VERSION_NAME = "main";
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
+    auto size = VERSION_NAME.size();
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write(VERSION_NAME.c_str(), VERSION_NAME.size());
 }
 
 void DataSavingFunctions::write_simulation_parameters(std::ofstream & os, SimulationParameters &sp) {
@@ -113,8 +116,14 @@ void DataSavingFunctions::write_organism_anatomy(std::ofstream & os, Anatomy * a
 
 bool DataSavingFunctions::read_version(std::ifstream &is) {
     uint32_t save_version;
+    uint32_t version_len;
+    std::string version_name;
+
     is.read((char*)&save_version, sizeof(uint32_t));
-    return save_version == SAVE_VERSION;
+    is.read((char*)&version_len, sizeof(uint32_t));
+    version_name.resize(version_len, *"0");
+    is.read((char*)version_name.c_str(), version_len);
+    return (save_version == SAVE_VERSION) && (version_name == VERSION_NAME);
 }
 
 void DataSavingFunctions::read_simulation_parameters(std::ifstream& is, SimulationParameters &sp) {
@@ -874,21 +883,21 @@ void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
     os.write((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
     os.write((char*)&occp.uniform_swap_distance, sizeof(bool));
 
-    int size = occp.mutation_type_weights.size();
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    uint32_t size = occp.mutation_type_weights.size();
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.mutation_type_weights.data(), sizeof(uint32_t)*size);
 
     size = occp.max_group_size;
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.group_size_weights.data(), sizeof(uint32_t)*size);
 
     size = occp.occ_instructions_mutation_weights.size();
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(uint32_t)*size);
 
     size = occp.max_distance;
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(uint32_t) * size);
 }
 
 void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
@@ -897,25 +906,25 @@ void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
     is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
     is.read((char*)&occp.uniform_swap_distance, sizeof(bool));
 
-    int size;
-    is.read((char*)&size, sizeof(int));
-    is.read((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    uint32_t size;
+    is.read((char*)&size, sizeof(uint32_t));
+    is.read((char*)occp.mutation_type_weights.data(), sizeof(uint32_t)*size);
 
-    is.read((char*)&size, sizeof(int));
+    is.read((char*)&size, sizeof(uint32_t));
     occp.max_group_size = size;
     occp.group_size_weights.resize(occp.max_group_size);
-    is.read((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    is.read((char*)occp.group_size_weights.data(), sizeof(uint32_t)*size);
 
-    is.read((char*)&size, sizeof(int));
+    is.read((char*)&size, sizeof(uint32_t));
     if (size != occp.occ_instructions_mutation_weights.size()) {
         //TODO throw error
         throw "";
     }
-    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
+    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(uint32_t)*(size));
 
-    is.read((char*)&size, sizeof(int));
+    is.read((char*)&size, sizeof(uint32_t));
     occp.max_distance = size;
-    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(uint32_t) * size);
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};

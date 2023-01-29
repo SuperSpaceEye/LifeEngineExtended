@@ -79,18 +79,6 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
 
 BrainDecision Brain::calculate_simple_action(Observation &observation) const {
     SimpleDecision action = simple_action_table.da[int(observation.type)];
-//    switch (observation.type) {
-//        case BlockTypes::MouthBlock:    action = simple_action_table.MouthBlock;    break;
-//        case BlockTypes::ProducerBlock: action = simple_action_table.ProducerBlock; break;
-//        case BlockTypes::MoverBlock:    action = simple_action_table.MoverBlock;    break;
-//        case BlockTypes::KillerBlock:   action = simple_action_table.KillerBlock;   break;
-//        case BlockTypes::ArmorBlock:    action = simple_action_table.ArmorBlock;    break;
-//        case BlockTypes::EyeBlock:      action = simple_action_table.EyeBlock;      break;
-//        case BlockTypes::FoodBlock:     action = simple_action_table.FoodBlock;     break;
-//        case BlockTypes::WallBlock:     action = simple_action_table.WallBlock;     break;
-//        case BlockTypes::EmptyBlock:    action = SimpleDecision::DoNothing;         break;
-//        default: throw "unknown block";
-//    }
 
     switch (action) {
         case SimpleDecision::DoNothing:
@@ -111,7 +99,7 @@ BrainDecision Brain::calculate_simple_action(Observation &observation) const {
                 case Rotation::RIGHT: return BrainDecision::MoveRight;
             }
     }
-    throw "bad";
+    throw std::logic_error("Unknown action");
 }
 
 std::array<float, 4> Brain::get_weighted_direction(std::vector<Observation> &observations_vector,
@@ -172,18 +160,6 @@ DecisionObservation Brain::get_weighted_action_discrete(std::vector<Observation>
 BrainWeightedDecision Brain::calculate_weighted_action(Observation &observation, int look_range) const{
     float distance_modifier = (float)std::abs(observation.distance - look_range - 1) / look_range;
     float weight = weighted_action_table.da[int(observation.type)];
-
-//    switch (observation.type) {
-//        case BlockTypes::EmptyBlock:    weight = 0; break;
-//        case BlockTypes::MouthBlock:    weight = weighted_action_table.MouthBlock; break;
-//        case BlockTypes::ProducerBlock: weight = weighted_action_table.ProducerBlock; break;
-//        case BlockTypes::MoverBlock:    weight = weighted_action_table.MoverBlock; break;
-//        case BlockTypes::KillerBlock:   weight = weighted_action_table.KillerBlock; break;
-//        case BlockTypes::ArmorBlock:    weight = weighted_action_table.ArmorBlock; break;
-//        case BlockTypes::EyeBlock:      weight = weighted_action_table.EyeBlock; break;
-//        case BlockTypes::FoodBlock:     weight = weighted_action_table.FoodBlock; break;
-//        case BlockTypes::WallBlock:     weight = weighted_action_table.WallBlock; break;
-//    }
 
     weight *= distance_modifier;
 
