@@ -9,7 +9,7 @@
 #ifndef THELIFEENGINECPP_BLOCKTYPES_HPP
 #define THELIFEENGINECPP_BLOCKTYPES_HPP
 
-#include <vector>
+#include <array>
 #include <string>
 
 enum class BlockTypes {
@@ -25,8 +25,9 @@ enum class BlockTypes {
     WallBlock,
 };
 
-const std::vector<std::string> blocks {"Empty", "Mouth", "Producer", "Mover", "Killer", "Armor", "Eye", "Food", "Wall"};
-const std::vector<std::string> organism_blocks {"Mouth", "Producer", "Mover", "Killer", "Armor", "Eye"};
+const std::array<std::string, 9> BLOCK_NAMES {"Empty", "Mouth", "Producer", "Mover", "Killer", "Armor", "Eye", "Food", "Wall"};
+const std::array<std::string, 6> ORGANISM_BLOCK_NAMES {"Mouth", "Producer", "Mover", "Killer", "Armor", "Eye"};
+const int NUM_ORGANISM_BLOCKS = ORGANISM_BLOCK_NAMES.size();
 
 /*
  * Adding new block type.

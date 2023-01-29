@@ -835,14 +835,14 @@ void MainWindow::load_textures_from_disk() {
 
     std::array<std::string, 5> file_extensions{".png", ".jpg", ".jpeg", ".bmp", ".gif"};
 
-    for (int i = 0; i < blocks.size(); i++) {
+    for (int i = 0; i < BLOCK_NAMES.size(); i++) {
         std::string filename;
         filename.append(executable_path).append("/textures/").append(
                 [](std::string data){
                     std::transform(data.begin(), data.end(), data.begin(),
                                    [](unsigned char c){ return std::tolower(c); });
                     return data;
-                }(blocks[i])
+                }(BLOCK_NAMES[i])
                 );
 
         bool exists = false;

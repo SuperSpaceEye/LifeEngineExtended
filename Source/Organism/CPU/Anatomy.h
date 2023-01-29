@@ -12,6 +12,7 @@
 #include <utility>
 #include <boost/unordered_map.hpp>
 #include <random>
+#include <numeric>
 
 #include "Rotation.h"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
@@ -46,7 +47,7 @@ public:
 
 struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     BlockTypes type;
-    //for now only for eye blocks
+    //for now only for eye BLOCK_NAMES
     //local rotation of a block
     Rotation rotation = Rotation::UP;
 
@@ -59,15 +60,7 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     }
 
     float get_food_cost(OrganismBlockParameters &bp) const {
-        switch (type) {
-            case BlockTypes::MouthBlock:    return bp.MouthBlock.food_cost;
-            case BlockTypes::ProducerBlock: return bp.ProducerBlock.food_cost;
-            case BlockTypes::MoverBlock:    return bp.MoverBlock.food_cost;
-            case BlockTypes::KillerBlock:   return bp.KillerBlock.food_cost;
-            case BlockTypes::ArmorBlock:    return bp.ArmorBlock.food_cost;
-            case BlockTypes::EyeBlock:      return bp.EyeBlock.food_cost;
-            default: throw std::logic_error("Shouldn't happen");
-        }
+        return bp.pa[(int)type-1].food_cost;
     }
 };
 
@@ -157,8 +150,8 @@ public:
     Anatomy & operator=(Anatomy && other_anatomy)=default ;
 
 
-    SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt);
-    SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen);
+    SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& bp, lehmer64 &mt);
+    SerializedOrganismStructureContainer * change_random_block(OrganismBlockParameters& bp, lehmer64 &gen);
     SerializedOrganismStructureContainer * remove_random_block(lehmer64 &gen);
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);

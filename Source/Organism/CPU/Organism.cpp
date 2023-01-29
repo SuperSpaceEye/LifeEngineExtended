@@ -69,15 +69,7 @@ void Organism::init_values() {
 float Organism::calculate_max_life() {
     life_points = 0;
     for (auto& item: anatomy._organism_blocks) {
-        switch (item.type) {
-            case BlockTypes::MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
-            case BlockTypes::ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
-            case BlockTypes::MoverBlock:    life_points += bp->MoverBlock.   life_point_amount; break;
-            case BlockTypes::KillerBlock:   life_points += bp->KillerBlock.  life_point_amount; break;
-            case BlockTypes::ArmorBlock:    life_points += bp->ArmorBlock.   life_point_amount; break;
-            case BlockTypes::EyeBlock:      life_points += bp->EyeBlock.     life_point_amount; break;
-            default: throw std::runtime_error("Unknown block");
-        }
+        life_points += bp->pa[int(item.type)-1].life_point_amount;
     }
     return life_points;
 }
@@ -85,15 +77,7 @@ float Organism::calculate_max_life() {
 int Organism::calculate_organism_lifetime() {
     float lifetime_weights = 0;
     for (auto & block: anatomy._organism_blocks) {
-        switch (block.type) {
-            case BlockTypes::MouthBlock:    lifetime_weights += bp->MouthBlock.   lifetime_weight; break;
-            case BlockTypes::ProducerBlock: lifetime_weights += bp->ProducerBlock.lifetime_weight; break;
-            case BlockTypes::MoverBlock:    lifetime_weights += bp->MoverBlock.   lifetime_weight; break;
-            case BlockTypes::KillerBlock:   lifetime_weights += bp->KillerBlock.  lifetime_weight; break;
-            case BlockTypes::ArmorBlock:    lifetime_weights += bp->ArmorBlock.   lifetime_weight; break;
-            case BlockTypes::EyeBlock:      lifetime_weights += bp->EyeBlock.     lifetime_weight; break;
-            default: throw std::runtime_error("Unknown block");
-        }
+        lifetime_weights += bp->pa[(int)block.type-1].lifetime_weight;
     }
     max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
@@ -102,15 +86,7 @@ int Organism::calculate_organism_lifetime() {
 float Organism::calculate_food_needed() {
     food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._mover_blocks > 0);
     for (auto & block: anatomy._organism_blocks) {
-        switch (block.type) {
-            case BlockTypes::MouthBlock:    food_needed += bp->MouthBlock.   food_cost; break;
-            case BlockTypes::ProducerBlock: food_needed += bp->ProducerBlock.food_cost; break;
-            case BlockTypes::MoverBlock:    food_needed += bp->MoverBlock.   food_cost; break;
-            case BlockTypes::KillerBlock:   food_needed += bp->KillerBlock.  food_cost; break;
-            case BlockTypes::ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost; break;
-            case BlockTypes::EyeBlock:      food_needed += bp->EyeBlock.     food_cost; break;
-            default: throw std::runtime_error("Unknown block");
-        }
+        food_needed += bp->pa[(int)block.type-1].food_cost;
     }
     return food_needed;
 }

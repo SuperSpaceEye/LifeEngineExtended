@@ -864,15 +864,7 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     } else {
         if (!disable_warnings) {display_message("Value should be float.");}
     }
-    BParameters * type;
-    switch (static_cast<BlocksNames>(row)) {
-        case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
-        case BlocksNames::ProducerBlock: type = &bp.ProducerBlock; break;
-        case BlocksNames::MoverBlock:    type = &bp.MoverBlock;    break;
-        case BlocksNames::KillerBlock:   type = &bp.KillerBlock;   break;
-        case BlocksNames::ArmorBlock:    type = &bp.ArmorBlock;    break;
-        case BlocksNames::EyeBlock:      type = &bp.EyeBlock;      break;
-    }
+    BParameters * type = &bp.pa[row];
 
     float * value;
     switch (static_cast<ParametersNames>(col)) {

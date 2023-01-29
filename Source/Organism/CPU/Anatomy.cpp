@@ -112,7 +112,7 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
                                                  eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt) {
+SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& bp, lehmer64 &mt) {
     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
 
     for (auto& block: _organism_blocks) {
@@ -141,44 +141,25 @@ SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockPa
         }
     }
 
-    float total_chance = 0;
-    total_chance += block_parameters.MouthBlock   .chance_weight;
-    total_chance += block_parameters.ProducerBlock.chance_weight;
-    total_chance += block_parameters.MoverBlock   .chance_weight;
-    total_chance += block_parameters.KillerBlock  .chance_weight;
-    total_chance += block_parameters.ArmorBlock   .chance_weight;
-    total_chance += block_parameters.EyeBlock     .chance_weight;
+    float total_chance = [&](){float summ=0;for(auto&item:bp.pa){summ+=item.chance_weight;}return summ;}();
 
     float type_choice  = std::uniform_real_distribution<float>{0, total_chance}(mt);
     int   block_choice = std::uniform_int_distribution<int>{0, int(_single_adjacent_space.size()+_single_diagonal_adjacent_space.size())-1}(mt);
 
-    if (type_choice < block_parameters.MouthBlock.chance_weight)   {return add_block(BlockTypes::MouthBlock,
-                                                                                     block_choice, Rotation::UP, 0, 0,
-                                                                                     organism_blocks, _single_adjacent_space,
-                                                                                     _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.MouthBlock.chance_weight;
-    if (type_choice < block_parameters.ProducerBlock.chance_weight) {return add_block(BlockTypes::ProducerBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.ProducerBlock.chance_weight;
-    if (type_choice < block_parameters.MoverBlock.chance_weight)    {return add_block(BlockTypes::MoverBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.MoverBlock.chance_weight;
-    if (type_choice < block_parameters.KillerBlock.chance_weight)   {return add_block(BlockTypes::KillerBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.KillerBlock.chance_weight;
-    if (type_choice < block_parameters.ArmorBlock.chance_weight)    {return add_block(BlockTypes::ArmorBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    Rotation rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(mt));
-    return add_block(BlockTypes::EyeBlock, block_choice, rotation, 0, 0,
-                     organism_blocks, _single_adjacent_space,
+    for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+        auto & item = bp.pa[i];
+        if (type_choice < item.chance_weight) {
+            return add_block((BlockTypes)(i+1),
+                             block_choice, static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(mt)),
+                             0, 0, organism_blocks, _single_adjacent_space,
+                             _single_diagonal_adjacent_space, single_adjacent_space);
+        }
+        type_choice -= item.chance_weight;
+    }
+
+    // if for some reason the choice fails.
+    return add_block((BlockTypes)NUM_ORGANISM_BLOCKS, block_choice, static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(mt)),
+                     0, 0, organism_blocks, _single_adjacent_space,
                      _single_diagonal_adjacent_space, single_adjacent_space);
 }
 
@@ -258,34 +239,21 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
                                                  eye_blocks);
 }
 
-SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen) {
-    float total_chance = 0;
-    total_chance += block_parameters.MouthBlock   .chance_weight;
-    total_chance += block_parameters.ProducerBlock.chance_weight;
-    total_chance += block_parameters.MoverBlock   .chance_weight;
-    total_chance += block_parameters.KillerBlock  .chance_weight;
-    total_chance += block_parameters.ArmorBlock   .chance_weight;
-    total_chance += block_parameters.EyeBlock     .chance_weight;
+SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& bp, lehmer64 &gen) {
+    float total_chance = [&](){float summ=0;for(auto&item:bp.pa){summ+=item.chance_weight;}return summ;}();
 
     float type_choice  = std::uniform_real_distribution<float>{0, total_chance}(gen);
     int   block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(gen);
 
-    if (type_choice < block_parameters.MouthBlock.chance_weight)    {return change_block(BlockTypes::MouthBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.MouthBlock.chance_weight;
-    if (type_choice < block_parameters.ProducerBlock.chance_weight) {return change_block(BlockTypes::ProducerBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.ProducerBlock.chance_weight;
-    if (type_choice < block_parameters.MoverBlock.chance_weight)    {return change_block(BlockTypes::MoverBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.MoverBlock.chance_weight;
-    if (type_choice < block_parameters.KillerBlock.chance_weight)   {return change_block(BlockTypes::KillerBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.KillerBlock.chance_weight;
-    if (type_choice < block_parameters.ArmorBlock.chance_weight)    {return change_block(BlockTypes::ArmorBlock,
-                                                                                         block_choice, &gen);}
+    for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+        auto &item = bp.pa[i];
+        if (type_choice < item.chance_weight) {
+            return change_block((BlockTypes)(i+1), block_choice, &gen);
+        }
+        type_choice -= item.chance_weight;
+    }
 
-    return change_block(BlockTypes::EyeBlock, block_choice, &gen);
+    return change_block((BlockTypes)NUM_ORGANISM_BLOCKS, block_choice, &gen);
 }
 
 SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
