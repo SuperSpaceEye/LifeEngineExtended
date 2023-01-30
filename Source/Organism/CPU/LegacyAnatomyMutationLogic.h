@@ -7,12 +7,12 @@
 
 
 #include "../../Stuff/Vector2.h"
-#include "../../PRNGS/lehmer64.h"
 #include "../../GridStuff/BaseGridBlock.h"
 #include "../../Stuff/BlockTypes.hpp"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
-#include "Anatomy.h"
+#include "AnatomyContainers.h"
+
 #include <random>
 #include <boost/unordered_map.hpp>
 #include <utility>
@@ -71,13 +71,13 @@ public:
             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
 
-    static SerializedOrganismStructureContainer *serialize(
+    static SerializedOrganismStructureContainer * serialize(
             const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
             const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>> &producing_space,
             const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
             const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
             const std::vector<int> &num_producing_space,
-            frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> &c);
+            ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> &c);
 
     static inline void serialize_eye_blocks(const std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                                             std::vector<SerializedOrganismBlockContainer> &eye_blocks_vector,

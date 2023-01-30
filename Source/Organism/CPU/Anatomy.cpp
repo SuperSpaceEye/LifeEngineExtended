@@ -64,7 +64,7 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
     block.rotation = rotation;
     organism_blocks[x][y] = block;
 
-    frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> c = get_map();
+    auto c = get_map();
     set_m(c, _c);
     get_mp(c, type)++;
 
@@ -344,7 +344,7 @@ void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blo
     delete new_structure;
 }
 
-Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) {
+Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
     _organism_blocks = std::move(other_anatomy._organism_blocks);
     _producing_space = std::move(other_anatomy._producing_space);
     _eating_space    = std::move(other_anatomy._eating_space);

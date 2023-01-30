@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "../../SimulationEngine/OrganismsController.h"
+#include "AnatomyContainers.h"
 
 Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
                    SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,

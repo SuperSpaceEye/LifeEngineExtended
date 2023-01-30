@@ -2,7 +2,6 @@
 // Created by spaceeye on 15.09.22.
 //
 
-#include "Anatomy.h"
 #include "LegacyAnatomyMutationLogic.h"
 
 void LegacyAnatomyMutationLogic::set_single_adjacent(int x, int y, int x_offset, int y_offset,
@@ -125,7 +124,7 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
         const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
         const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
         const std::vector<int> &num_producing_space,
-        frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> &c) {
+        ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> &c) {
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
 
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;

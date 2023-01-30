@@ -3,6 +3,7 @@
 //
 
 #include "OrganismConstructionCode.h"
+#include "AnatomyContainers.h"
 
 
 //Will simulate changes in cursor position and find max/min positions that occ will need to actually construct anatomy
