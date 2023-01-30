@@ -132,35 +132,13 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
         block.parent_block_pos = temp_blocks.size()-1;
         block.type = type;
     } else {
-        switch (block.type) {
-            case BlockTypes::MouthBlock:    structure_container->mouth_blocks--    ; break;
-            case BlockTypes::ProducerBlock: structure_container->producer_blocks-- ; break;
-            case BlockTypes::MoverBlock:    structure_container->mover_blocks--    ; break;
-            case BlockTypes::KillerBlock:   structure_container->killer_blocks--   ; break;
-            case BlockTypes::ArmorBlock:    structure_container->armor_blocks--    ; break;
-            case BlockTypes::EyeBlock:      structure_container->eye_blocks--      ; break;
-            case BlockTypes::EmptyBlock:
-            case BlockTypes::FoodBlock:
-            case BlockTypes::WallBlock:
-                break;
-        }
+        get_mp(structure_container->c, block.type)--;
         temp_blocks[block.parent_block_pos].type = type;
         temp_blocks[block.parent_block_pos].rotation = rotation;
         block.type = type;
     }
 
-    switch (type) {
-        case BlockTypes::MouthBlock:    structure_container->mouth_blocks++    ; break;
-        case BlockTypes::ProducerBlock: structure_container->producer_blocks++ ; break;
-        case BlockTypes::MoverBlock:    structure_container->mover_blocks++    ; break;
-        case BlockTypes::KillerBlock:   structure_container->killer_blocks++   ; break;
-        case BlockTypes::ArmorBlock:    structure_container->armor_blocks++    ; break;
-        case BlockTypes::EyeBlock:      structure_container->eye_blocks++      ; break;
-        case BlockTypes::EmptyBlock:
-        case BlockTypes::FoodBlock:
-        case BlockTypes::WallBlock:
-            break;
-    }
+    get_mp(structure_container->c, type)++;
 }
 
 void set_rotation(int x, int y, Rotation rotation, OCCLogicContainer &occ_c,
@@ -326,14 +304,14 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
     auto &killer_space    = std::get<2>(spaces);
     auto &eye_blocks_vec  = std::get<3>(spaces);
 
-    eye_blocks_vec.reserve(container->eye_blocks);
+    eye_blocks_vec.reserve(container->c["eye"]);
 
     auto temp_producing_space = std::vector<OCCSerializedProducingSpace>();
 
-    producing_space.resize(container->producer_blocks);
+    producing_space.resize(container->c["producer"]);
     //TODO probably not very space efficient
-    eating_space.reserve(container->mouth_blocks*4);
-    killer_space.reserve(container->killer_blocks*4);
+    eating_space.reserve(container->c["mouth"]*4);
+    killer_space.reserve(container->c["killer"]*4);
 
     int producer = -1;
 

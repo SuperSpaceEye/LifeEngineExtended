@@ -12,6 +12,9 @@
 #include <array>
 #include <string>
 
+#include "frozen/unordered_map.h"
+#include "frozen/string.h"
+
 enum class BlockTypes {
     EmptyBlock,
     MouthBlock,
@@ -27,8 +30,31 @@ enum class BlockTypes {
 
 const std::array<std::string, 9> BLOCK_NAMES {"Empty", "Mouth", "Producer", "Mover", "Killer", "Armor", "Eye", "Food", "Wall"};
 const std::array<std::string, 6> ORGANISM_BLOCK_NAMES {"Mouth", "Producer", "Mover", "Killer", "Armor", "Eye"};
+const std::array<frozen::string, 6> F_ORGANISM_BLOCK_NAMES {"mouth", "producer", "mover", "killer", "armor", "eye"};
 const int NUM_ORGANISM_BLOCKS = ORGANISM_BLOCK_NAMES.size();
 const int NUM_WORLD_BLOCKS = BLOCK_NAMES.size();
+
+constexpr auto get_map(){
+    return frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS>{
+            {"mouth", 0},
+            {"producer", 0},
+            {"mover", 0},
+            {"killer", 0},
+            {"armor", 0},
+            {"eye", 0},
+    };
+};
+
+//set map
+inline constexpr void set_m(frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS>&m1,
+                            const frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS>&m2) {
+    for (const auto & fi: F_ORGANISM_BLOCK_NAMES) {m1[fi] = m2[fi];}
+}
+
+//get map parameter
+inline constexpr int& get_mp(frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS>&m, BlockTypes type) {
+    return m[F_ORGANISM_BLOCK_NAMES[int(type)-1]];
+}
 
 /*
  * Adding new block type.

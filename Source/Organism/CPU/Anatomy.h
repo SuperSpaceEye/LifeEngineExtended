@@ -77,12 +77,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
     std::vector<SerializedOrganismBlockContainer> eye_blocks_vec;
 
-    int32_t mouth_blocks{};
-    int32_t producer_blocks{};
-    int32_t mover_blocks{};
-    int32_t killer_blocks{};
-    int32_t armor_blocks{};
-    int32_t eye_blocks{};
+    frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> c = get_map();
 
     SerializedOrganismStructureContainer()=default;
     SerializedOrganismStructureContainer(
@@ -92,24 +87,15 @@ struct SerializedOrganismStructureContainer {
             std::vector<SerializedAdjacentSpaceContainer> killing_space,
             std::vector<SerializedOrganismBlockContainer> eye_block_vector,
 
-            int32_t mouth_blocks,
-            int32_t producer_blocks,
-            int32_t mover_blocks,
-            int32_t killer_blocks,
-            int32_t armor_blocks,
-            int32_t eye_blocks):
+            frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> c
+            ):
             organism_blocks                (std::move(organism_blocks)),
             producing_space                (std::move(producing_space)),
             eating_space                   (std::move(eating_space)),
             killing_space                  (std::move(killing_space)),
             eye_blocks_vec                 (std::move(eye_block_vector)),
 
-            mouth_blocks(mouth_blocks),
-            producer_blocks(producer_blocks),
-            mover_blocks(mover_blocks),
-            killer_blocks(killer_blocks),
-            armor_blocks(armor_blocks),
-            eye_blocks(eye_blocks)
+            c(c)
             {}
 };
 
@@ -135,19 +121,13 @@ public:
     std::vector<SerializedAdjacentSpaceContainer> _killing_space;
     std::vector<SerializedOrganismBlockContainer> _eye_block_vec;
 
-    int32_t _mouth_blocks    = 0;
-    int32_t _producer_blocks = 0;
-    int32_t _mover_blocks    = 0;
-    int32_t _killer_blocks   = 0;
-    int32_t _armor_blocks    = 0;
-    int32_t _eye_blocks      = 0;
+    frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> _c = get_map();
 
     explicit Anatomy(SerializedOrganismStructureContainer *structure);
     Anatomy(const Anatomy& anatomy);
     Anatomy()=default;
-    Anatomy & operator=(Anatomy const & other_anatomy)=default;
-//    Anatomy & operator=(Anatomy && other_anatomy) noexcept ;
-    Anatomy & operator=(Anatomy && other_anatomy)=default ;
+    Anatomy & operator=(Anatomy const & other_anatomy);
+    Anatomy & operator=(Anatomy && other_anatomy);
 
 
     SerializedOrganismStructureContainer * add_random_block(OrganismBlockParameters& bp, lehmer64 &mt);

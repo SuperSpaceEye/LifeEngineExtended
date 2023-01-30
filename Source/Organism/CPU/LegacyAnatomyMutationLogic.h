@@ -71,20 +71,13 @@ public:
             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space);
 
-    static SerializedOrganismStructureContainer * serialize(
+    static SerializedOrganismStructureContainer *serialize(
             const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>>& producing_space,
-            const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-            const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
-
-            const std::vector<int> & num_producing_space,
-
-            int32_t mouth_blocks,
-            int32_t producer_blocks,
-            int32_t mover_blocks,
-            int32_t killer_blocks,
-            int32_t armor_blocks,
-            int32_t eye_blocks);
+            const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>> &producing_space,
+            const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
+            const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
+            const std::vector<int> &num_producing_space,
+            frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> &c);
 
     static inline void serialize_eye_blocks(const std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                                             std::vector<SerializedOrganismBlockContainer> &eye_blocks_vector,

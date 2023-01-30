@@ -93,12 +93,12 @@ void DataSavingFunctions::write_organism_anatomy(std::ofstream & os, Anatomy * a
     os.write((char*)&killing_space_size,   sizeof(uint32_t));
     os.write((char*)&eye_vec_size,         sizeof(uint32_t));
 
-    os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    os.write((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    os.write((char*)&anatomy->_c["mouth"],    sizeof(int32_t));
+    os.write((char*)&anatomy->_c["producer"], sizeof(int32_t));
+    os.write((char*)&anatomy->_c["mover"],    sizeof(int32_t));
+    os.write((char*)&anatomy->_c["killer"],   sizeof(int32_t));
+    os.write((char*)&anatomy->_c["armor"],    sizeof(int32_t));
+    os.write((char*)&anatomy->_c["eye"],      sizeof(int32_t));
 
     os.write((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     os.write((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
@@ -222,12 +222,13 @@ void DataSavingFunctions::read_organism_anatomy(std::ifstream& is, Anatomy * ana
     anatomy->_killing_space  .resize(killing_space_size);
     anatomy->_eye_block_vec  .resize(eye_vec_size);
 
-    is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    is.read((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    //TODO
+    is.read((char*)&anatomy->_c["mouth"],    sizeof(int32_t));
+    is.read((char*)&anatomy->_c["producer"], sizeof(int32_t));
+    is.read((char*)&anatomy->_c["mover"],    sizeof(int32_t));
+    is.read((char*)&anatomy->_c["killer"],   sizeof(int32_t));
+    is.read((char*)&anatomy->_c["armor"],    sizeof(int32_t));
+    is.read((char*)&anatomy->_c["eye"],      sizeof(int32_t));
 
     is.read((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
     is.read((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
@@ -340,9 +341,9 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     j_organism.AddMember("damage",           Value(organism->damage), d.GetAllocator());
 
     j_anatomy.AddMember("birth_distance", Value(6), d.GetAllocator());
-    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
 
     for (auto & block: organism->anatomy._organism_blocks) {
         Value cell(kObjectType);
@@ -582,7 +583,7 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
         json_read_organism(organism, sp, bp, new_organism);
         new_organism->vector_index = array_place;
 
-        if (new_organism->anatomy._mover_blocks > 0 && new_organism->anatomy._eye_blocks > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
+        if (new_organism->anatomy._c["mover"] > 0 && new_organism->anatomy._c["eye"] > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
 
         SimulationEngineSingleThread::place_organism(edc, *new_organism, sp);
     }

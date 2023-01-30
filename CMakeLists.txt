@@ -37,9 +37,9 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
 #https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
-set(CMAKE_LINK_DEF_FILE_FLAG "${CMAKE_LINK_DEF_FILE_FLAG} -fsanitize=address")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+#set(CMAKE_LINK_DEF_FILE_FLAG "${CMAKE_LINK_DEF_FILE_FLAG} -fsanitize=address")
 
 set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/del/SimulationEngineCuda.cuh Source/Stuff/cuda_image_creator.cuh Source/Stuff/get_device_count.cuh)
 set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/del/SimulationEngineCuda.cu Source/Stuff/cuda_image_creator.cu Source/Stuff/get_device_count.cu)
@@ -108,9 +108,29 @@ if(CUDAToolkit_FOUND)
     set(CUDA_FILES ${CUDA_SOURCES} ${CUDA_HEADERS} Source/WorldRecorder/RecordingReconstructorCUDA.cu Source/WorldRecorder/RecordingReconstructorCUDA.cuh)
 endif()
 
+set(prefix "Source/Stuff/")
+set(FROZEN_HEADERS
+        "${prefix}frozen/algorithm.h"
+        "${prefix}frozen/map.h"
+        "${prefix}frozen/random.h"
+        "${prefix}frozen/set.h"
+        "${prefix}frozen/string.h"
+        "${prefix}frozen/unordered_map.h"
+        "${prefix}frozen/unordered_set.h"
+        "${prefix}frozen/bits/algorithms.h"
+        "${prefix}frozen/bits/basic_types.h"
+        "${prefix}frozen/bits/defines.h"
+        "${prefix}frozen/bits/elsa.h"
+        "${prefix}frozen/bits/elsa_std.h"
+        "${prefix}frozen/bits/exceptions.h"
+        "${prefix}frozen/bits/hash_string.h"
+        "${prefix}frozen/bits/pmh.h"
+        "${prefix}frozen/bits/version.h"
+        )
+
 set(PROJECT_FILES main.cpp Source/SimulationEngine/SimulationEngine.cpp Source/SimulationEngine/SimulationEngine.h Source/UIWindows/MainWindow/MainWindow.cpp Source/UIWindows/MainWindow/MainWindow.h Source/Organism/CPU/Organism.cpp Source/Organism/CPU/Organism.h Source/GridStuff/BaseGridBlock.h Source/Containers/CPU/ColorContainer.h Source/Organism/CPU/Anatomy.cpp Source/Organism/CPU/Anatomy.h Source/Stuff/BlockTypes.hpp Source/Containers/CPU/SimulationParameters.h Source/Containers/CPU/EngineControlParametersContainer.h Source/Containers/CPU/OrganismBlockParameters.h Source/Stuff/Linspace.h Source/UIWindows/MainWindow/WindowUI.h Source/UIWindows/MainWindow/MainWindowSlots.cpp Source/UIWindows/MainWindow/MainWindowEvents.cpp Source/Organism/CPU/Brain.cpp Source/Organism/CPU/Brain.h Source/SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.cpp Source/Stuff/Actions.h Source/PRNGS/xorshf96.h Source/Stuff/textures.h Source/Organism/CPU/ObservationStuff.h Source/GridStuff/STGridWorld.h Source/UIWindows/MainWindow/MainWindowDataSavingStuff.cpp Source/UIWindows/Statistics/StatisticsCore.h Source/UIWindows/OrganismEditor/OrganismEditor.h Source/UIWindows/OrganismEditor/OrganismEditor.cpp Source/UIWindows/OrganismEditor/OrganismEditorSlots.cpp Source/Stuff/MiscFuncs.h Source/Stuff/MiscFuncs.cpp Source/Stuff/PerlinNoise.hpp Source/UIWindows/OrganismEditor/OrganismEditorDataSaving.cpp Source/UIWindows/InfoWindow/InfoWindowUI.h Source/UIWindows/InfoWindow/InfoWindow.cpp Source/UIWindows/InfoWindow/InfoWindow.h Source/Stuff/ImageCreation.h Source/Stuff/ImageCreation.cpp Source/Stuff/DataSavingFunctions.h Source/Stuff/DataSavingFunctions.cpp Source/UIWindows/WorldEvents/WorldEvents.cpp Source/UIWindows/WorldEvents/WorldEvents.h Source/UIWindows/WorldEvents/EventNodes.h Source/UIWindows/WorldEvents/ChangeValueEventNodeWidget.cpp Source/UIWindows/WorldEvents/ChangeValueEventNodeWidget.h Source/UIWindows/WorldEvents/ConditionalEventNodeWidget.cpp Source/UIWindows/WorldEvents/ConditionalEventNodeWidget.h Source/UIWindows/WorldEvents/ConditionalEventNodeWidgetSlots.cpp Source/UIWindows/WorldEvents/ParametersList.h Source/UIWindows/WorldEvents/ParametersList.cpp Source/UIWindows/WorldEvents/ChangeValueEventNodeWidgetSlots.cpp Source/Containers/CPU/OrganismInfoContainer.h Source/UIWindows/WorldEvents/WorldEventsController.h Source/UIWindows/WorldEvents/WorldEventsController.cpp Source/UIWindows/WorldEvents/WorldEventsController.h Source/UIWindows/WorldEvents/WorldEventsSlots.cpp Source/SimulationEngine/SimulationEngineModes/del/SimulationEngineSingleThreadBenchmark.cpp Source/SimulationEngine/SimulationEngineModes/del/SimulationEngineSingleThreadBenchmark.h Source/UIWindows/Benchmark/Benchmarks.cpp Source/UIWindows/Benchmark/Benchmarks.h Source/UIWindows/Benchmark/BenchmarkSlots.cpp Source/SimulationEngine/OrganismsController.cpp Source/SimulationEngine/OrganismsController.h Source/Organism/CPU/OrganismConstructionCode.cpp Source/Organism/CPU/OrganismConstructionCode.h Source/Organism/CPU/LegacyAnatomyMutationLogic.h Source/Organism/CPU/LegacyAnatomyMutationLogic.cpp Source/Containers/CPU/OrganismConstructionCodeParameters.h Source/Containers/CPU/OCCLogicContainer.h Source/UIWindows/OCCParameters/OCCParameters.cpp Source/UIWindows/OCCParameters/OCCParameters.h Source/UIWindows/OCCParameters/OCCParametersSlots.cpp Source/UIWindows/OrganismEditor/OCCTranspiler/OCCTranspiler.cpp Source/UIWindows/OrganismEditor/OCCTranspiler/OCCTranspiler.h Source/WorldRecorder/WorldRecorder.cpp Source/WorldRecorder/WorldRecorder.h Source/WorldRecorder/RecordingReconstructor.cpp Source/WorldRecorder/RecordingReconstructor.h)
 
-add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES})
+add_executable(${PROJECT_NAME} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES} ${FROZEN_HEADERS})
 
 if(CUDAToolkit_FOUND)
     message(STATUS "Found CUDAToolkit version ${CUDAToolkit_VERSION}")

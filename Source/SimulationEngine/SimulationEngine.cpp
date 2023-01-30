@@ -218,7 +218,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
 
-    if (new_organism->anatomy._eye_blocks > 0 && new_organism->anatomy._mover_blocks > 0) {
+    if (new_organism->anatomy._c["eye"] > 0 && new_organism->anatomy._c["mover"] > 0) {
         if (sp.use_weighted_brain || sp.use_continuous_movement) {
             new_organism->brain.brain_type = BrainTypes::WeightedBrain;
         } else {

@@ -51,10 +51,10 @@ void Organism::init_values() {
     multiplier = 1;
 
     if (sp->multiply_food_production_prob) {
-        multiplier *= anatomy._producer_blocks;
+        multiplier *= anatomy._c["producer"];
     }
 
-    if (anatomy._eye_blocks == 0) {brain.brain_type = BrainTypes::RandomActions;}
+    if (anatomy._c["eye"] == 0) {brain.brain_type = BrainTypes::RandomActions;}
 
     if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
         brain.convert_simple_to_weighted();
@@ -80,7 +80,7 @@ int Organism::calculate_organism_lifetime() {
 }
 
 float Organism::calculate_food_needed() {
-    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._mover_blocks > 0);
+    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._c["mover"] > 0);
     for (auto & block: anatomy._organism_blocks) {food_needed += bp->pa[(int)block.type-1].food_cost;}
     return food_needed;
 }
@@ -138,7 +138,7 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
 void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 &gen) {
     // movers without eyes as well.
-    if (sp->do_not_mutate_brains_of_plants && (new_anatomy._mover_blocks == 0 || new_anatomy._eye_blocks == 0)) {
+    if (sp->do_not_mutate_brains_of_plants && (new_anatomy._c["mover"] == 0 || new_anatomy._c["eye"] == 0)) {
         return;
     }
 
@@ -196,7 +196,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
     auto child_move_range = mutate_move_range(sp, gen, move_range);
 
-    if (new_anatomy._eye_blocks > 0 && new_anatomy._mover_blocks > 0) {
+    if (new_anatomy._c["eye"] > 0 && new_anatomy._c["mover"] > 0) {
         if (!sp->use_weighted_brain) {
             new_brain.brain_type = BrainTypes::SimpleBrain;
         } else {
@@ -223,7 +223,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
-    if (anatomy._mover_blocks == 0) { return;}
+    if (anatomy._c["mover"] == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
         if (sp->use_continuous_movement) {
             calculate_continuous_decision(organism_observations, gen);

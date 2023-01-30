@@ -121,17 +121,11 @@ void LegacyAnatomyMutationLogic::create_killing_space(boost::unordered::unordere
 
 SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
         const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-        const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>>& producing_space,
-        const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& eating_space,
-        const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& killing_space,
-
-        const std::vector<int> & num_producing_space,
-        int32_t mouth_blocks,
-        int32_t producer_blocks,
-        int32_t mover_blocks,
-        int32_t killer_blocks,
-        int32_t armor_blocks,
-        int32_t eye_blocks) {
+        const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, ProducerAdjacent>> &producing_space,
+        const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &eating_space,
+        const boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &killing_space,
+        const std::vector<int> &num_producing_space,
+        frozen::unordered_map<frozen::string, int, NUM_ORGANISM_BLOCKS> &c) {
     std::vector<SerializedOrganismBlockContainer> _organism_blocks;
 
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
@@ -141,7 +135,7 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
 
     _organism_blocks.reserve(get_map_size(organism_blocks));
 
-    _producing_space.reserve(producer_blocks);
+    _producing_space.reserve(c["producer"]);
     _eating_space.reserve(   get_map_size(eating_space));
     _killing_space.reserve(get_map_size(killing_space));
 
@@ -153,7 +147,7 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
 
     serialize_killing_space(killing_space, _killing_space);
 
-    serialize_eye_blocks(_organism_blocks, _eye_blocks_vector, eye_blocks);
+    serialize_eye_blocks(_organism_blocks, _eye_blocks_vector, c["eye"]);
 
     return new SerializedOrganismStructureContainer{_organism_blocks,
 
@@ -162,12 +156,7 @@ SerializedOrganismStructureContainer * LegacyAnatomyMutationLogic::serialize(
                                                     _killing_space,
                                                     _eye_blocks_vector,
 
-                                                    mouth_blocks,
-                                                    producer_blocks,
-                                                    mover_blocks,
-                                                    killer_blocks,
-                                                    armor_blocks,
-                                                    eye_blocks};
+                                                    c};
 }
 
 void
