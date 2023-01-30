@@ -325,15 +325,16 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
     new_x = std::round(cd.p_x);
     new_y = std::round(cd.p_y);
 
-    if (check_if_out_of_bounds(edc, new_x, new_y)) {return false;}
-
     if (new_x != organism.x || new_y != organism.y) {
         bool is_clear = true;
 
         for (auto & block: organism.anatomy._organism_blocks) {
             auto pos = block.get_pos(organism.rotation);
 
-            auto type = edc.st_grid.get_type(new_x + pos.x, new_y + pos.y);
+            auto new_pos = Vector2{new_x + pos.x, new_y + pos.y};
+            if (check_if_out_of_bounds(edc, new_pos.x, new_pos.y)) {return false;}
+
+            auto type = edc.st_grid.get_type(new_pos.y, new_pos.x);
             auto organism_index = edc.st_grid.get_organism_index(new_x + pos.x, new_y + pos.y);
 
             if (sp.food_blocks_movement) {

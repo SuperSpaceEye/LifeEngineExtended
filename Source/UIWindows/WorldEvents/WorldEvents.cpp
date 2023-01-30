@@ -20,10 +20,14 @@ WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
     ui.world_events_layout->setAlignment(Qt::AlignLeft);
 
     button_add_new_branch();
+
+    //load/save world events
+    ui.pushButton->hide();
+    ui.pushButton_2->hide();
 }
 
 void WorldEvents::closeEvent(QCloseEvent *event) {
-    parent_ui->tb_open_info_window->setChecked(false);
+    parent_ui->tb_open_world_events->setChecked(false);
     QWidget::closeEvent(event);
 }
 
