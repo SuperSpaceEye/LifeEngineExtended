@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 31.01.23.
 //
@@ -6,12 +10,13 @@
 #define LIFEENGINEEXTENDED_ANATOMYCONTAINERS_H
 
 #include <vector>
-#include <boost/unordered_map.hpp>
+#include <string_view>
 
 #include "../../Stuff/Vector2.h"
 #include "../../Stuff/BlockTypes.hpp"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
+#include "../../Stuff/ConstMap.h"
 
 struct ProducerAdjacent {
     int producer = -1;

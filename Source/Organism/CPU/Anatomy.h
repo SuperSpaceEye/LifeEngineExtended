@@ -20,7 +20,7 @@
 #include "../../GridStuff/BaseGridBlock.h"
 #include "../../PRNGS/lehmer64.h"
 #include "../../Stuff/Vector2.h"
-#include "AnatomyContainers.h"
+//#include "AnatomyContainers.h"
 #include "LegacyAnatomyMutationLogic.h"
 
 class Anatomy {

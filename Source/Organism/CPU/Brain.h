@@ -62,13 +62,12 @@ struct DecisionObservation {
     int time = 0;
 };
 
-//TODO remember convert
 struct SimpleActionTable {
     //decision array
     //contains empty observation type which cannot be mutated
     std::array<SimpleDecision, NUM_WORLD_BLOCKS> da{
         // is computed at compile time
-            []() consteval {
+            []() constexpr {
                 std::array<SimpleDecision, NUM_WORLD_BLOCKS> data{};
                 for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
                     if (i+1 == int(BlockTypes::KillerBlock)) {
@@ -88,7 +87,7 @@ struct SimpleActionTable {
 struct WeightedActionTable {
     std::array<float, NUM_WORLD_BLOCKS> da{
             // is computed at compile time
-            []() consteval {
+            []() constexpr {
                 std::array<float, NUM_WORLD_BLOCKS> data{};
                 for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
                     if (i+1 == int(BlockTypes::KillerBlock)) {

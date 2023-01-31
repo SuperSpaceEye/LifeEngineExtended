@@ -417,8 +417,6 @@ void SimulationEngine::make_walls() {
 void SimulationEngine::make_random_walls() {
     perlin.reseed(gen());
 
-    auto temp = std::vector<Organism*>{};
-
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
             auto noise = perlin.octave2D_01((x * sp.perlin_x_modifier), (y * sp.perlin_y_modifier), sp.perlin_octaves, sp.perlin_persistence);

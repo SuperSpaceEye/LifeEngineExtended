@@ -9,7 +9,6 @@
 #ifndef THELIFEENGINECPP_BASEGRIDBLOCK_H
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
-#include <iostream>
 #include "../Stuff/BlockTypes.hpp"
 #include "../Organism/CPU/Rotation.h"
 
