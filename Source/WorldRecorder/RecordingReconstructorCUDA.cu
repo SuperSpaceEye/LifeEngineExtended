@@ -82,14 +82,14 @@ void RecCudaOrganism::load_host_organism(Organism &organism) {
     x = organism.x;
     y = organism.y;
     vector_index = organism.vector_index;
-    num_blocks = organism.anatomy._organism_blocks.size();
+    num_blocks = organism.anatomy.organism_blocks.size();
 
     gpuErrchk(cudaMalloc((SerializedOrganismBlockContainer**)&_organism_blocks,
-                        sizeof(SerializedOrganismBlockContainer)*organism.anatomy._organism_blocks.size()))
+                        sizeof(SerializedOrganismBlockContainer)*organism.anatomy.organism_blocks.size()))
 
     gpuErrchk(cudaMemcpy(_organism_blocks,
-                         organism.anatomy._organism_blocks.data(),
-                         sizeof(SerializedOrganismBlockContainer)*organism.anatomy._organism_blocks.size(),
+                         organism.anatomy.organism_blocks.data(),
+                         sizeof(SerializedOrganismBlockContainer)*organism.anatomy.organism_blocks.size(),
                          cudaMemcpyHostToDevice))
 }
 

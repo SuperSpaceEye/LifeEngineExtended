@@ -57,7 +57,7 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 }
 
 void OrganismEditor::update_cell_count_label() {
-    ui.label_cell_count->setText(QString::fromStdString("Block count: " + std::to_string(editor_organism.anatomy._organism_blocks.size())));
+    ui.label_cell_count->setText(QString::fromStdString("Block count: " + std::to_string(editor_organism.anatomy.organism_blocks.size())));
 }
 
 void OrganismEditor::update_gui() {
@@ -203,17 +203,17 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
     int x = editor_organism.x;
     int y = editor_organism.y;
 
-    for (int i = 0; i < editor_organism.anatomy._organism_blocks.size(); i++) {
-        auto & block = editor_organism.anatomy._organism_blocks[i];
+    for (int i = 0; i < editor_organism.anatomy.organism_blocks.size(); i++) {
+        auto & block = editor_organism.anatomy.organism_blocks[i];
 
         if (block.get_pos(Rotation::UP).x + x >= editor_width  || block.get_pos(Rotation::UP).x + x < 0 ||
             block.get_pos(Rotation::UP).y + y >= editor_height || block.get_pos(Rotation::UP).y + y < 0) {
-            editor_organism.anatomy._organism_blocks.erase(editor_organism.anatomy._organism_blocks.begin()+i);
+            editor_organism.anatomy.organism_blocks.erase(editor_organism.anatomy.organism_blocks.begin() + i);
             i--;
         }
     }
 
-    editor_organism.anatomy.set_many_blocks(editor_organism.anatomy._organism_blocks);
+    editor_organism.anatomy.set_many_blocks(editor_organism.anatomy.organism_blocks);
 
     place_organism_on_a_grid();
 }
@@ -274,7 +274,7 @@ void OrganismEditor::place_organism_on_a_grid() {
     clear_grid();
     if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
 
-    for (auto & block: editor_organism.anatomy._organism_blocks) {
+    for (auto & block: editor_organism.anatomy.organism_blocks) {
         auto x = editor_organism.x + block.get_pos(Rotation::UP).x;
         auto y = editor_organism.y + block.get_pos(Rotation::UP).y;
         edit_grid[x + y * editor_width].type = block.type;
@@ -323,7 +323,7 @@ bool OrganismEditor::check_edit_area() {
 
     bool ret = false;
 
-    for (auto & block: editor_organism.anatomy._organism_blocks) {
+    for (auto & block: editor_organism.anatomy.organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
         if (block.relative_y < min.y) {min.y = block.relative_y;}
         if (block.relative_x > max.x) {max.x = block.relative_x;}

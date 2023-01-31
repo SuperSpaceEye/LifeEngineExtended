@@ -72,7 +72,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<std::vector<SerializedAdjacentSpaceContainer>> producing_space;
     std::vector<SerializedAdjacentSpaceContainer> eating_space;
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
-    std::vector<SerializedOrganismBlockContainer> eye_blocks_vec;
+    std::vector<SerializedOrganismBlockContainer> eye_block_vec;
 
     ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = get_map();
 
@@ -90,10 +90,30 @@ struct SerializedOrganismStructureContainer {
             producing_space                (std::move(producing_space)),
             eating_space                   (std::move(eating_space)),
             killing_space                  (std::move(killing_space)),
-            eye_blocks_vec                 (std::move(eye_block_vector)),
+            eye_block_vec                  (std::move(eye_block_vector)),
 
             c(c)
             {}
+    void move_s(SerializedOrganismStructureContainer *structure) {
+        organism_blocks = std::move(structure->organism_blocks);
+
+        producing_space = std::move(structure->producing_space);
+        eating_space    = std::move(structure->eating_space);
+        killing_space   = std::move(structure->killing_space);
+        eye_block_vec   = std::move(structure->eye_block_vec);
+
+        set_m(c, structure->c);
+    }
+    void copy_s(const SerializedOrganismStructureContainer * structure) {
+        organism_blocks = std::vector(structure->organism_blocks);
+
+        producing_space = std::vector(structure->producing_space);
+        eating_space    = std::vector(structure->eating_space);
+        killing_space   = std::vector(structure->killing_space);
+        eye_block_vec   = std::vector(structure->eye_block_vec);
+
+        set_m(c, structure->c);
+    }
 };
 
 #endif //LIFEENGINEEXTENDED_ANATOMYCONTAINERS_H

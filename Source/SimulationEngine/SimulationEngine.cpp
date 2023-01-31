@@ -209,7 +209,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
 
     if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
 
-    for (auto &block: new_organism->anatomy._organism_blocks) {
+    for (auto &block: new_organism->anatomy.organism_blocks) {
         int x = block.get_pos(edc.chosen_organism.rotation).x + new_organism->x;
         int y = block.get_pos(edc.chosen_organism.rotation).y + new_organism->y;
 
@@ -218,7 +218,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
 
-    if (new_organism->anatomy._c["eye"] > 0 && new_organism->anatomy._c["mover"] > 0) {
+    if (new_organism->anatomy.c["eye"] > 0 && new_organism->anatomy.c["mover"] > 0) {
         if (sp.use_weighted_brain || sp.use_continuous_movement) {
             new_organism->brain.brain_type = BrainTypes::WeightedBrain;
         } else {
@@ -232,7 +232,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
-    for (auto &block: edc.chosen_organism.anatomy._organism_blocks) {
+    for (auto &block: edc.chosen_organism.anatomy.organism_blocks) {
         continue_flag = check_if_out_of_bounds(&edc,
                                                block.get_pos(edc.chosen_organism.rotation).x + action.x,
                                                block.get_pos(edc.chosen_organism.rotation).y + action.y);
@@ -300,7 +300,7 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
     if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
-    for (auto & block: organism_ptr->anatomy._organism_blocks) {
+    for (auto & block: organism_ptr->anatomy.organism_blocks) {
         edc.st_grid.get_type(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
                              organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
         edc.st_grid.add_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,

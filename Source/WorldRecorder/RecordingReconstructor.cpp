@@ -79,7 +79,7 @@ void RecordingReconstructor::apply_user_wall_change(Transaction &transaction, in
 void RecordingReconstructor::apply_user_kill_organism(Transaction &transaction, int pos) {
     auto dc = transaction.user_dead_change[pos];
     auto & o = rec_orgs[dc];
-    for (auto & b: o.anatomy._organism_blocks) {
+    for (auto & b: o.anatomy.organism_blocks) {
         auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
         wb.type = BlockTypes::FoodBlock;
         //TODO
@@ -101,7 +101,7 @@ void RecordingReconstructor::apply_user_food_change(Transaction &transaction, in
 
 void RecordingReconstructor::apply_user_add_organism(Transaction &transaction, int pos) {
     auto & o = transaction.user_organism_change[pos];
-    for (auto & b: o.anatomy._organism_blocks) {
+    for (auto & b: o.anatomy.organism_blocks) {
         auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
         wb.type = b.type;
         wb.rotation = b.rotation;
@@ -116,7 +116,7 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
     for (auto & mc: transaction.move_change) {
         auto & o = rec_orgs[mc.vector_index];
 
-        for (auto & b: o.anatomy._organism_blocks) {
+        for (auto & b: o.anatomy.organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             //TODO
             if (food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] >= 0.99) {
@@ -130,7 +130,7 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
         o.x = mc.x;
         o.y = mc.y;
 
-        for (auto & b: o.anatomy._organism_blocks) {
+        for (auto & b: o.anatomy.organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             wb.type = b.type;
             wb.rotation = b.rotation;
@@ -141,7 +141,7 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
 void RecordingReconstructor::apply_dead_organisms(Transaction &transaction) {
     for (auto & dc: transaction.dead_organisms) {
         auto & o = rec_orgs[dc];
-        for (auto & b: o.anatomy._organism_blocks) {
+        for (auto & b: o.anatomy.organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             wb.type = BlockTypes::FoodBlock;
             //TODO
@@ -180,7 +180,7 @@ void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
     //TODO did it wrong
     rec_orgs.resize(rec_orgs.size() + transaction.organism_change.size());
     for (auto & o: transaction.organism_change) {
-        for (auto & b: o.anatomy._organism_blocks) {
+        for (auto & b: o.anatomy.organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             wb.type = b.type;
             wb.rotation = b.rotation;

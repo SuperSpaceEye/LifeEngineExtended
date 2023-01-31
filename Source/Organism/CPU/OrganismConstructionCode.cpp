@@ -110,7 +110,7 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
     container->producing_space = std::move(std::get<0>(spaces));
     container->eating_space    = std::move(std::get<1>(spaces));
     container->killing_space   = std::move(std::get<2>(spaces));
-    container->eye_blocks_vec  = std::move(std::get<3>(spaces));
+    container->eye_block_vec  = std::move(std::get<3>(spaces));
 
     return container;
 }

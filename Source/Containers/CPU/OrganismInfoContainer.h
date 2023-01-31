@@ -73,66 +73,66 @@ private:
             for (auto & organism: *pool) {
                 if (organism.is_dead) { continue;}
 
-                info.total_size_organism_blocks += organism.anatomy._organism_blocks.size();
-                info.total_size_producing_space += organism.anatomy._producing_space.size();
-                info.total_size_eating_space    += organism.anatomy._eating_space.size();
+                info.total_size_organism_blocks += organism.anatomy.organism_blocks.size();
+                info.total_size_producing_space += organism.anatomy.producing_space.size();
+                info.total_size_eating_space    += organism.anatomy.eating_space.size();
 
-                if (organism.anatomy._c["mover"] > 0) {
+                if (organism.anatomy.c["mover"] > 0) {
                     info.move_range += organism.move_range;
                     info.moving_organisms++;
 
-                    if(organism.anatomy._c["eye"] > 0) {
+                    if(organism.anatomy.c["eye"] > 0) {
                         info.organisms_with_eyes++;
                     }
                 }
 
-                info.total_avg.size += organism.anatomy._organism_blocks.size();
+                info.total_avg.size += organism.anatomy.organism_blocks.size();
 
                 //TODO
                 info.total_avg._organism_lifetime += organism.max_lifetime;
                 info.total_avg._organism_age      += organism.lifetime;
                 info.total_avg._gathered_food     += organism.food_collected;
-                info.total_avg._mouth_blocks      += organism.anatomy._c["mouth"];
-                info.total_avg._producer_blocks   += organism.anatomy._c["producer"];
-                info.total_avg._mover_blocks      += organism.anatomy._c["mover"];
-                info.total_avg._killer_blocks     += organism.anatomy._c["killer"];
-                info.total_avg._armor_blocks      += organism.anatomy._c["armor"];
-                info.total_avg._eye_blocks        += organism.anatomy._c["eye"];
+                info.total_avg._mouth_blocks      += organism.anatomy.c["mouth"];
+                info.total_avg._producer_blocks   += organism.anatomy.c["producer"];
+                info.total_avg._mover_blocks      += organism.anatomy.c["mover"];
+                info.total_avg._killer_blocks     += organism.anatomy.c["killer"];
+                info.total_avg._armor_blocks      += organism.anatomy.c["armor"];
+                info.total_avg._eye_blocks        += organism.anatomy.c["eye"];
                 info.total_avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
                 info.total_avg.brain_mutation_rate   += organism.brain_mutation_rate;
                 info.total_avg.anatomy_mutation_rate += organism.anatomy_mutation_rate;
                 info.total_avg.total++;
 
-                if (organism.anatomy._c["mover"] > 0) {
-                    info.moving_avg.size += organism.anatomy._organism_blocks.size();
+                if (organism.anatomy.c["mover"] > 0) {
+                    info.moving_avg.size += organism.anatomy.organism_blocks.size();
 
                     info.moving_avg._organism_lifetime += organism.max_lifetime;
                     info.moving_avg._organism_age      += organism.lifetime;
                     info.moving_avg._gathered_food     += organism.food_collected;
-                    info.moving_avg._mouth_blocks      += organism.anatomy._c["mouth"];
-                    info.moving_avg._producer_blocks   += organism.anatomy._c["producer"];
-                    info.moving_avg._mover_blocks      += organism.anatomy._c["mover"];
-                    info.moving_avg._killer_blocks     += organism.anatomy._c["killer"];
-                    info.moving_avg._armor_blocks      += organism.anatomy._c["armor"];
-                    info.moving_avg._eye_blocks        += organism.anatomy._c["eye"];
+                    info.moving_avg._mouth_blocks      += organism.anatomy.c["mouth"];
+                    info.moving_avg._producer_blocks   += organism.anatomy.c["producer"];
+                    info.moving_avg._mover_blocks      += organism.anatomy.c["mover"];
+                    info.moving_avg._killer_blocks     += organism.anatomy.c["killer"];
+                    info.moving_avg._armor_blocks      += organism.anatomy.c["armor"];
+                    info.moving_avg._eye_blocks        += organism.anatomy.c["eye"];
                     info.moving_avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
                     info.moving_avg.brain_mutation_rate   += organism.brain_mutation_rate;
                     info.moving_avg.anatomy_mutation_rate += organism.anatomy_mutation_rate;
                     info.moving_avg.total++;
                 } else {
-                    info.station_avg.size += organism.anatomy._organism_blocks.size();
+                    info.station_avg.size += organism.anatomy.organism_blocks.size();
 
                     info.station_avg._organism_lifetime += organism.max_lifetime;
                     info.station_avg._organism_age      += organism.lifetime;
                     info.station_avg._gathered_food     += organism.food_collected;
-                    info.station_avg._mouth_blocks      += organism.anatomy._c["mouth"];
-                    info.station_avg._producer_blocks   += organism.anatomy._c["producer"];
-                    info.station_avg._mover_blocks      += organism.anatomy._c["mover"];
-                    info.station_avg._killer_blocks     += organism.anatomy._c["killer"];
-                    info.station_avg._armor_blocks      += organism.anatomy._c["armor"];
-                    info.station_avg._eye_blocks        += organism.anatomy._c["eye"];
+                    info.station_avg._mouth_blocks      += organism.anatomy.c["mouth"];
+                    info.station_avg._producer_blocks   += organism.anatomy.c["producer"];
+                    info.station_avg._mover_blocks      += organism.anatomy.c["mover"];
+                    info.station_avg._killer_blocks     += organism.anatomy.c["killer"];
+                    info.station_avg._armor_blocks      += organism.anatomy.c["armor"];
+                    info.station_avg._eye_blocks        += organism.anatomy.c["eye"];
                     info.station_avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
                     info.station_avg.brain_mutation_rate   += organism.brain_mutation_rate;

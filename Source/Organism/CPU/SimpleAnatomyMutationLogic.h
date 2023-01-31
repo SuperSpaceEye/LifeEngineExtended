@@ -6,8 +6,8 @@
 // Created by spaceeye on 15.09.22.
 //
 
-#ifndef LIFEENGINEEXTENDED_LEGACYANATOMYMUTATIONLOGIC_H
-#define LIFEENGINEEXTENDED_LEGACYANATOMYMUTATIONLOGIC_H
+#ifndef LIFEENGINEEXTENDED_SIMPLEANATOMYMUTATIONLOGIC_H
+#define LIFEENGINEEXTENDED_SIMPLEANATOMYMUTATIONLOGIC_H
 
 
 #include "../../Stuff/Vector2.h"
@@ -21,7 +21,7 @@
 #include <boost/unordered_map.hpp>
 #include <string_view>
 
-class LegacyAnatomyMutationLogic {
+class SimpleAnatomyMutationLogic {
 
     static void set_single_adjacent(int x, int y, int x_offset, int y_offset,
                                     boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
@@ -234,13 +234,9 @@ public:
         _killing_space.reserve(get_map_size(killing_space));
 
         serialize_organism_blocks(organism_blocks, _organism_blocks);
-
         serialize_producing_space(producing_space, num_producing_space, _producing_space);
-
         serialize_eating_space(eating_space, _eating_space);
-
         serialize_killing_space(killing_space, _killing_space);
-
         serialize_eye_blocks(_organism_blocks, _eye_blocks_vector, c["eye"]);
 
         return new SerializedOrganismStructureContainer{_organism_blocks,
@@ -255,4 +251,4 @@ public:
 };
 
 
-#endif //LIFEENGINEEXTENDED_LEGACYANATOMYMUTATIONLOGIC_H
+#endif //LIFEENGINEEXTENDED_SIMPLEANATOMYMUTATIONLOGIC_H

@@ -123,7 +123,7 @@ void OrganismEditor::b_compile_occ_slot() {
     Anatomy temp_anatomy;
     temp_occ.get_code_ref() = std::move(occt.get_transpiled_instructions());
     temp_anatomy = Anatomy(temp_occ.compile_code(occl));
-    if (temp_anatomy._organism_blocks.empty()) {
+    if (temp_anatomy.organism_blocks.empty()) {
         display_message("Instruction sequence produced empty anatomy");
         occt.get_transpiled_instructions();
         return;

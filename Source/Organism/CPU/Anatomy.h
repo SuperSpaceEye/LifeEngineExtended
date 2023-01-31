@@ -21,32 +21,31 @@
 #include "../../PRNGS/lehmer64.h"
 #include "../../Stuff/Vector2.h"
 //#include "AnatomyContainers.h"
-#include "LegacyAnatomyMutationLogic.h"
+#include "SimpleAnatomyMutationLogic.h"
 
-class Anatomy {
+class Anatomy: public SerializedOrganismStructureContainer {
 private:
     SerializedOrganismStructureContainer *
     add_block(BlockTypes type, int block_choice, Rotation rotation, int x_, int y_,
-              boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+              boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
               std::vector<SerializedAdjacentSpaceContainer> &_single_adjacent_space,
               std::vector<SerializedAdjacentSpaceContainer> &_single_diagonal_adjacent_space,
               boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space);
     SerializedOrganismStructureContainer *change_block(BlockTypes type, int block_choice, lehmer64 *gen);
     SerializedOrganismStructureContainer *remove_block(int block_choice);
 
+    SerializedOrganismStructureContainer *
+    make_container(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
+                   boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
+                   std::vector<int> &num_producing_space,
+                   ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const;
+
+
     void subtract_difference(int x, int y);
     Vector2<int> recenter_to_imaginary();
     Vector2<int> recenter_to_existing();
 
 public:
-    std::vector<SerializedOrganismBlockContainer> _organism_blocks;
-    std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;
-    std::vector<SerializedAdjacentSpaceContainer> _eating_space;
-    std::vector<SerializedAdjacentSpaceContainer> _killing_space;
-    std::vector<SerializedOrganismBlockContainer> _eye_block_vec;
-
-    ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> _c = get_map();
-
     explicit Anatomy(SerializedOrganismStructureContainer *structure);
     Anatomy(const Anatomy& anatomy);
     Anatomy()=default;
