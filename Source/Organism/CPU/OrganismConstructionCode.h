@@ -9,6 +9,7 @@
 #include "OrganismConstructionCodeInstruction.h"
 #include "../../Containers/CPU/OrganismConstructionCodeParameters.h"
 #include "../../Containers/CPU/OCCLogicContainer.h"
+#include "AnatomyContainers.h"
 
 //https://github.com/DavidPal/discrete-distribution
 //https://stackoverflow.com/questions/53632441/c-sampling-from-discrete-distribution-without-replacement

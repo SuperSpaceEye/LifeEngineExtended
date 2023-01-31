@@ -11,6 +11,9 @@
 
 #include <array>
 #include <string>
+#include <string_view>
+
+#include "ConstMap.h"
 
 enum class BlockTypes {
     EmptyBlock,
@@ -27,8 +30,26 @@ enum class BlockTypes {
 
 const std::array<std::string, 9> BLOCK_NAMES {"Empty", "Mouth", "Producer", "Mover", "Killer", "Armor", "Eye", "Food", "Wall"};
 const std::array<std::string, 6> ORGANISM_BLOCK_NAMES {"Mouth", "Producer", "Mover", "Killer", "Armor", "Eye"};
-const int NUM_ORGANISM_BLOCKS = ORGANISM_BLOCK_NAMES.size();
-const int NUM_WORLD_BLOCKS = BLOCK_NAMES.size();
+constexpr std::string_view SW_ORGANISM_BLOCK_NAMES[6] {"mouth", "producer", "mover", "killer", "armor", "eye"};
+constexpr int NUM_ORGANISM_BLOCKS = ORGANISM_BLOCK_NAMES.size();
+constexpr int NUM_WORLD_BLOCKS = BLOCK_NAMES.size();
+
+constexpr auto get_map(){
+    return ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>{};
+};
+
+//set map
+constexpr void set_m(ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>&m1,
+                     const ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>&m2) {
+    for (auto & fi: SW_ORGANISM_BLOCK_NAMES) {
+        m1[fi] = m2[fi];
+    }
+}
+
+//get map parameter
+constexpr int& get_mp(ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>&m, BlockTypes type) {
+    return m[SW_ORGANISM_BLOCK_NAMES[int(type) - 1]];
+}
 
 /*
  * Adding new block type.

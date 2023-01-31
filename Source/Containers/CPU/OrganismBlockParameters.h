@@ -22,15 +22,6 @@ struct OrganismBlockParameters {
     std::array<BParameters, NUM_ORGANISM_BLOCKS> pa;
 };
 
-enum class BlocksNames {
-    MouthBlock,
-    ProducerBlock,
-    MoverBlock,
-    KillerBlock,
-    ArmorBlock,
-    EyeBlock
-};
-
 enum class ParametersNames {
     FoodCostModifier,
     LifePointAmount,
