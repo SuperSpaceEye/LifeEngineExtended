@@ -62,8 +62,8 @@ constexpr int& get_mp(ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_O
  *      5) go to Source/Organism/CPU/AnatomyContainers.h and modify SerializedOrganismStructureContainer
  *      7) go to Source/Organism/CPU/SimpleAnatomyMutationLogic.h
  *      8) go to Source/Organism/CPU/Anatomy.cpp make_container
+ *      10) go to Source/Stuff/DataSavingFunctions.cpp {read/write}_organism_anatomy
  * 9) go to Source/Stuff/textures.h and add new default texture. The order is important
- * 10) go to Source/Stuff/DataSavingFunctions.cpp {read/write}_organism_anatomy
  *
  * 11) go to Source/UiFiles/statistics.ui and add new labels for type, transpile ui to h
  * 12) go to Source/UIWindows/MainWindow/MainWindow.cpp update_statistic_window

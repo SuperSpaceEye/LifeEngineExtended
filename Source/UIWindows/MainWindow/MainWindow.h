@@ -61,7 +61,7 @@
 #include "../../Stuff/rapidjson/writer.h"
 #include "../../Stuff/rapidjson/stringbuffer.h"
 
-#include "../Statistics/StatisticsCore.h"
+#include "../Statistics/Statistics.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
 #ifndef __NO_RECORDER__
@@ -126,7 +126,7 @@ private:
     SimulationEngine engine{edc, ecp, bp, sp, occp};
     OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp,
                       cuda_is_available_var, use_cuda};
-    StatisticsCore st{&ui};
+    Statistics st{&ui};
     InfoWindow iw{&ui};
     #ifndef __NO_RECORDER__
     Recorder rc{&ui, &edc, &ecp, &cc, &textures, &edc.stc.tbuffer, &center_x, &center_y, &scaling_zoom, cuda_is_available_var};

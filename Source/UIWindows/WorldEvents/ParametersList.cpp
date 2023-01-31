@@ -124,45 +124,20 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
 
     changing_pm["moving organisms with eyes"] = ChangingReturn{ValueType::INT64, nullptr, &ic->organisms_with_eyes};
 
-    //TODO
-    changing_pm["avg total organisms size"]                  = ChangingReturn{ValueType::DOUBLE, &ic->total_avg.size,                  nullptr};
-    changing_pm["avg total organisms lifetime"]              = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._organism_lifetime,    nullptr};
-    changing_pm["avg total organisms age"]                   = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._organism_age,         nullptr};
-    changing_pm["avg total organisms mouth cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._mouth_blocks,         nullptr};
-    changing_pm["avg total organisms producer cells"]        = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._producer_blocks,      nullptr};
-    changing_pm["avg total organisms mover cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._mover_blocks,         nullptr};
-    changing_pm["avg total organisms killer cells"]          = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._killer_blocks,        nullptr};
-    changing_pm["avg total organisms armor cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._armor_blocks,         nullptr};
-    changing_pm["avg total organisms eye cells"]             = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._eye_blocks,           nullptr};
-    changing_pm["avg total organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->total_avg.brain_mutation_rate,   nullptr};
-    changing_pm["avg total organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->total_avg.anatomy_mutation_rate, nullptr};
-    changing_pm["total organisms amount"]                    = ChangingReturn{ValueType::INT64, nullptr, &ic->total_avg.total};
+    std::array<std::string, 3> names {"total, stationary", "moving"};
+    for (int n = 0; n < 3; n++) {
+        auto & name = names[n];
 
-    changing_pm["avg stationary organisms size"]                  = ChangingReturn{ValueType::DOUBLE, &ic->station_avg.size,                  nullptr};
-    changing_pm["avg stationary organisms lifetime"]              = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._organism_lifetime,    nullptr};
-    changing_pm["avg stationary organisms age"]                   = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._organism_age,         nullptr};
-    changing_pm["avg stationary organisms mouth cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._mouth_blocks,         nullptr};
-    changing_pm["avg stationary organisms producer cells"]        = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._producer_blocks,      nullptr};
-    changing_pm["avg stationary organisms mover cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._mover_blocks,         nullptr};
-    changing_pm["avg stationary organisms killer cells"]          = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._killer_blocks,        nullptr};
-    changing_pm["avg stationary organisms armor cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._armor_blocks,         nullptr};
-    changing_pm["avg stationary organisms eye cells"]             = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._eye_blocks,           nullptr};
-    changing_pm["avg stationary organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->station_avg.brain_mutation_rate,   nullptr};
-    changing_pm["avg stationary organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->station_avg.anatomy_mutation_rate, nullptr};
-    changing_pm["stationary organisms amount"]                    = ChangingReturn{ValueType::INT64, nullptr, &ic->station_avg.total};
-
-    changing_pm["avg moving organisms size"]                  = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg.size,                  nullptr};
-    changing_pm["avg moving organisms lifetime"]              = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._organism_lifetime,    nullptr};
-    changing_pm["avg moving organisms age"]                   = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._organism_age,         nullptr};
-    changing_pm["avg moving organisms mouth cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._mouth_blocks,         nullptr};
-    changing_pm["avg moving organisms producer cells"]        = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._producer_blocks,      nullptr};
-    changing_pm["avg moving organisms mover cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._mover_blocks,         nullptr};
-    changing_pm["avg moving organisms killer cells"]          = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._killer_blocks,        nullptr};
-    changing_pm["avg moving organisms armor cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._armor_blocks,         nullptr};
-    changing_pm["avg moving organisms eye cells"]             = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._eye_blocks,           nullptr};
-    changing_pm["avg moving organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg.brain_mutation_rate,   nullptr};
-    changing_pm["avg moving organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg.anatomy_mutation_rate, nullptr};
-    changing_pm["moving organisms amount"]                    = ChangingReturn{ValueType::INT64, nullptr, &ic->moving_avg.total};
+        changing_pm["avg "+name+" organisms size"]     = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].size,                nullptr};
+        changing_pm["avg "+name+" organisms lifetime"] = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n]._organism_lifetime , nullptr};
+        changing_pm["avg "+name+" organisms age"]      = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n]._organism_age,       nullptr};
+        for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+            changing_pm["avg "+name+" organisms "+ORGANISM_BLOCK_NAMES[i]+" blocks"] = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].block_avgs[i], nullptr};
+        }
+        changing_pm["avg "+name+" organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].brain_mutation_rate,   nullptr};
+        changing_pm["avg "+name+" organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].anatomy_mutation_rate, nullptr};
+        changing_pm[name+" organisms amount"] = ChangingReturn{ValueType::INT64, nullptr, &ic->avgs[n].total};
+    }
 }
 
 const std::vector<std::string> & ParametersList::get_changeable_parameters_list() {

@@ -47,7 +47,7 @@ public:
     QLabel *lb_viewpoint_y;
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_47;
-    QVBoxLayout *verticalLayout_38;
+    QVBoxLayout *moving_vl;
     QLabel *lb_moving_organisms;
     QLabel *lb_organisms_with_eyes;
     QLabel *lb_avg_org_lifetime_2;
@@ -59,13 +59,7 @@ public:
     QLabel *lb_total_occ_len_2;
     QLabel *lb_anatomy_mutation_rate_2;
     QLabel *lb_brain_mutation_rate_2;
-    QLabel *lb_mouth_num_2;
-    QLabel *lb_producer_num_2;
-    QLabel *lb_mover_num_2;
-    QLabel *lb_killer_num_2;
-    QLabel *lb_armor_num_2;
-    QLabel *lb_eye_num_2;
-    QVBoxLayout *verticalLayout_40;
+    QVBoxLayout *stationary_vl;
     QLabel *lb_stationary_organisms;
     QLabel *lb_organism_size_3;
     QLabel *lb_avg_occ_len_3;
@@ -75,12 +69,7 @@ public:
     QLabel *lb_avg_age_3;
     QLabel *lb_anatomy_mutation_rate_3;
     QLabel *lb_brain_mutation_rate_3;
-    QLabel *lb_producer_num_3;
-    QLabel *lb_mouth_num_3;
-    QLabel *lb_killer_num_3;
-    QLabel *lb_armor_num_3;
-    QLabel *lb_eye_num_3;
-    QVBoxLayout *verticalLayout_10;
+    QVBoxLayout *both_vl;
     QLabel *lb_organisms_alive_2;
     QLabel *lb_organism_size_4;
     QLabel *lb_avg_occ_length_4;
@@ -90,12 +79,6 @@ public:
     QLabel *lb_avg_age_4;
     QLabel *lb_anatomy_mutation_rate_4;
     QLabel *lb_brain_mutation_rate_4;
-    QLabel *lb_producer_num_4;
-    QLabel *lb_mover_num_4;
-    QLabel *lb_mouth_num_4;
-    QLabel *lb_killer_num_4;
-    QLabel *lb_armor_num_4;
-    QLabel *lb_eye_num_4;
     QSpacerItem *verticalSpacer_2;
 
     void setupUi(QWidget *Statistics)
@@ -219,250 +202,165 @@ public:
 
         horizontalLayout_47 = new QHBoxLayout();
         horizontalLayout_47->setObjectName("horizontalLayout_47");
-        verticalLayout_38 = new QVBoxLayout();
-        verticalLayout_38->setObjectName("verticalLayout_38");
+        moving_vl = new QVBoxLayout();
+        moving_vl->setObjectName("moving_vl");
         lb_moving_organisms = new QLabel(widget_5);
         lb_moving_organisms->setObjectName("lb_moving_organisms");
 
-        verticalLayout_38->addWidget(lb_moving_organisms);
+        moving_vl->addWidget(lb_moving_organisms);
 
         lb_organisms_with_eyes = new QLabel(widget_5);
         lb_organisms_with_eyes->setObjectName("lb_organisms_with_eyes");
 
-        verticalLayout_38->addWidget(lb_organisms_with_eyes);
+        moving_vl->addWidget(lb_organisms_with_eyes);
 
         lb_avg_org_lifetime_2 = new QLabel(widget_5);
         lb_avg_org_lifetime_2->setObjectName("lb_avg_org_lifetime_2");
 
-        verticalLayout_38->addWidget(lb_avg_org_lifetime_2);
+        moving_vl->addWidget(lb_avg_org_lifetime_2);
 
         lb_avg_gathered_food_2 = new QLabel(widget_5);
         lb_avg_gathered_food_2->setObjectName("lb_avg_gathered_food_2");
 
-        verticalLayout_38->addWidget(lb_avg_gathered_food_2);
+        moving_vl->addWidget(lb_avg_gathered_food_2);
 
         lb_avg_age_2 = new QLabel(widget_5);
         lb_avg_age_2->setObjectName("lb_avg_age_2");
 
-        verticalLayout_38->addWidget(lb_avg_age_2);
+        moving_vl->addWidget(lb_avg_age_2);
 
         lb_average_moving_range = new QLabel(widget_5);
         lb_average_moving_range->setObjectName("lb_average_moving_range");
 
-        verticalLayout_38->addWidget(lb_average_moving_range);
+        moving_vl->addWidget(lb_average_moving_range);
 
         lb_organism_size_2 = new QLabel(widget_5);
         lb_organism_size_2->setObjectName("lb_organism_size_2");
 
-        verticalLayout_38->addWidget(lb_organism_size_2);
+        moving_vl->addWidget(lb_organism_size_2);
 
         lb_avg_occ_len_2 = new QLabel(widget_5);
         lb_avg_occ_len_2->setObjectName("lb_avg_occ_len_2");
 
-        verticalLayout_38->addWidget(lb_avg_occ_len_2);
+        moving_vl->addWidget(lb_avg_occ_len_2);
 
         lb_total_occ_len_2 = new QLabel(widget_5);
         lb_total_occ_len_2->setObjectName("lb_total_occ_len_2");
 
-        verticalLayout_38->addWidget(lb_total_occ_len_2);
+        moving_vl->addWidget(lb_total_occ_len_2);
 
         lb_anatomy_mutation_rate_2 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_2->setObjectName("lb_anatomy_mutation_rate_2");
 
-        verticalLayout_38->addWidget(lb_anatomy_mutation_rate_2);
+        moving_vl->addWidget(lb_anatomy_mutation_rate_2);
 
         lb_brain_mutation_rate_2 = new QLabel(widget_5);
         lb_brain_mutation_rate_2->setObjectName("lb_brain_mutation_rate_2");
 
-        verticalLayout_38->addWidget(lb_brain_mutation_rate_2);
-
-        lb_mouth_num_2 = new QLabel(widget_5);
-        lb_mouth_num_2->setObjectName("lb_mouth_num_2");
-
-        verticalLayout_38->addWidget(lb_mouth_num_2);
-
-        lb_producer_num_2 = new QLabel(widget_5);
-        lb_producer_num_2->setObjectName("lb_producer_num_2");
-
-        verticalLayout_38->addWidget(lb_producer_num_2);
-
-        lb_mover_num_2 = new QLabel(widget_5);
-        lb_mover_num_2->setObjectName("lb_mover_num_2");
-
-        verticalLayout_38->addWidget(lb_mover_num_2);
-
-        lb_killer_num_2 = new QLabel(widget_5);
-        lb_killer_num_2->setObjectName("lb_killer_num_2");
-
-        verticalLayout_38->addWidget(lb_killer_num_2);
-
-        lb_armor_num_2 = new QLabel(widget_5);
-        lb_armor_num_2->setObjectName("lb_armor_num_2");
-
-        verticalLayout_38->addWidget(lb_armor_num_2);
-
-        lb_eye_num_2 = new QLabel(widget_5);
-        lb_eye_num_2->setObjectName("lb_eye_num_2");
-
-        verticalLayout_38->addWidget(lb_eye_num_2);
+        moving_vl->addWidget(lb_brain_mutation_rate_2);
 
 
-        horizontalLayout_47->addLayout(verticalLayout_38);
+        horizontalLayout_47->addLayout(moving_vl);
 
-        verticalLayout_40 = new QVBoxLayout();
-        verticalLayout_40->setObjectName("verticalLayout_40");
+        stationary_vl = new QVBoxLayout();
+        stationary_vl->setObjectName("stationary_vl");
         lb_stationary_organisms = new QLabel(widget_5);
         lb_stationary_organisms->setObjectName("lb_stationary_organisms");
 
-        verticalLayout_40->addWidget(lb_stationary_organisms);
+        stationary_vl->addWidget(lb_stationary_organisms);
 
         lb_organism_size_3 = new QLabel(widget_5);
         lb_organism_size_3->setObjectName("lb_organism_size_3");
 
-        verticalLayout_40->addWidget(lb_organism_size_3);
+        stationary_vl->addWidget(lb_organism_size_3);
 
         lb_avg_occ_len_3 = new QLabel(widget_5);
         lb_avg_occ_len_3->setObjectName("lb_avg_occ_len_3");
 
-        verticalLayout_40->addWidget(lb_avg_occ_len_3);
+        stationary_vl->addWidget(lb_avg_occ_len_3);
 
         lb_total_occ_length_3 = new QLabel(widget_5);
         lb_total_occ_length_3->setObjectName("lb_total_occ_length_3");
 
-        verticalLayout_40->addWidget(lb_total_occ_length_3);
+        stationary_vl->addWidget(lb_total_occ_length_3);
 
         lb_avg_org_lifetime_3 = new QLabel(widget_5);
         lb_avg_org_lifetime_3->setObjectName("lb_avg_org_lifetime_3");
 
-        verticalLayout_40->addWidget(lb_avg_org_lifetime_3);
+        stationary_vl->addWidget(lb_avg_org_lifetime_3);
 
         lb_avg_gathered_food_3 = new QLabel(widget_5);
         lb_avg_gathered_food_3->setObjectName("lb_avg_gathered_food_3");
 
-        verticalLayout_40->addWidget(lb_avg_gathered_food_3);
+        stationary_vl->addWidget(lb_avg_gathered_food_3);
 
         lb_avg_age_3 = new QLabel(widget_5);
         lb_avg_age_3->setObjectName("lb_avg_age_3");
 
-        verticalLayout_40->addWidget(lb_avg_age_3);
+        stationary_vl->addWidget(lb_avg_age_3);
 
         lb_anatomy_mutation_rate_3 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_3->setObjectName("lb_anatomy_mutation_rate_3");
 
-        verticalLayout_40->addWidget(lb_anatomy_mutation_rate_3);
+        stationary_vl->addWidget(lb_anatomy_mutation_rate_3);
 
         lb_brain_mutation_rate_3 = new QLabel(widget_5);
         lb_brain_mutation_rate_3->setObjectName("lb_brain_mutation_rate_3");
 
-        verticalLayout_40->addWidget(lb_brain_mutation_rate_3);
-
-        lb_producer_num_3 = new QLabel(widget_5);
-        lb_producer_num_3->setObjectName("lb_producer_num_3");
-
-        verticalLayout_40->addWidget(lb_producer_num_3);
-
-        lb_mouth_num_3 = new QLabel(widget_5);
-        lb_mouth_num_3->setObjectName("lb_mouth_num_3");
-
-        verticalLayout_40->addWidget(lb_mouth_num_3);
-
-        lb_killer_num_3 = new QLabel(widget_5);
-        lb_killer_num_3->setObjectName("lb_killer_num_3");
-
-        verticalLayout_40->addWidget(lb_killer_num_3);
-
-        lb_armor_num_3 = new QLabel(widget_5);
-        lb_armor_num_3->setObjectName("lb_armor_num_3");
-
-        verticalLayout_40->addWidget(lb_armor_num_3);
-
-        lb_eye_num_3 = new QLabel(widget_5);
-        lb_eye_num_3->setObjectName("lb_eye_num_3");
-
-        verticalLayout_40->addWidget(lb_eye_num_3);
+        stationary_vl->addWidget(lb_brain_mutation_rate_3);
 
 
-        horizontalLayout_47->addLayout(verticalLayout_40);
+        horizontalLayout_47->addLayout(stationary_vl);
 
-        verticalLayout_10 = new QVBoxLayout();
-        verticalLayout_10->setObjectName("verticalLayout_10");
+        both_vl = new QVBoxLayout();
+        both_vl->setObjectName("both_vl");
         lb_organisms_alive_2 = new QLabel(widget_5);
         lb_organisms_alive_2->setObjectName("lb_organisms_alive_2");
 
-        verticalLayout_10->addWidget(lb_organisms_alive_2);
+        both_vl->addWidget(lb_organisms_alive_2);
 
         lb_organism_size_4 = new QLabel(widget_5);
         lb_organism_size_4->setObjectName("lb_organism_size_4");
 
-        verticalLayout_10->addWidget(lb_organism_size_4);
+        both_vl->addWidget(lb_organism_size_4);
 
         lb_avg_occ_length_4 = new QLabel(widget_5);
         lb_avg_occ_length_4->setObjectName("lb_avg_occ_length_4");
 
-        verticalLayout_10->addWidget(lb_avg_occ_length_4);
+        both_vl->addWidget(lb_avg_occ_length_4);
 
         lb_total_occ_length_4 = new QLabel(widget_5);
         lb_total_occ_length_4->setObjectName("lb_total_occ_length_4");
 
-        verticalLayout_10->addWidget(lb_total_occ_length_4);
+        both_vl->addWidget(lb_total_occ_length_4);
 
         lb_avg_org_lifetime_4 = new QLabel(widget_5);
         lb_avg_org_lifetime_4->setObjectName("lb_avg_org_lifetime_4");
 
-        verticalLayout_10->addWidget(lb_avg_org_lifetime_4);
+        both_vl->addWidget(lb_avg_org_lifetime_4);
 
         lb_avg_gathered_food_4 = new QLabel(widget_5);
         lb_avg_gathered_food_4->setObjectName("lb_avg_gathered_food_4");
 
-        verticalLayout_10->addWidget(lb_avg_gathered_food_4);
+        both_vl->addWidget(lb_avg_gathered_food_4);
 
         lb_avg_age_4 = new QLabel(widget_5);
         lb_avg_age_4->setObjectName("lb_avg_age_4");
 
-        verticalLayout_10->addWidget(lb_avg_age_4);
+        both_vl->addWidget(lb_avg_age_4);
 
         lb_anatomy_mutation_rate_4 = new QLabel(widget_5);
         lb_anatomy_mutation_rate_4->setObjectName("lb_anatomy_mutation_rate_4");
 
-        verticalLayout_10->addWidget(lb_anatomy_mutation_rate_4);
+        both_vl->addWidget(lb_anatomy_mutation_rate_4);
 
         lb_brain_mutation_rate_4 = new QLabel(widget_5);
         lb_brain_mutation_rate_4->setObjectName("lb_brain_mutation_rate_4");
 
-        verticalLayout_10->addWidget(lb_brain_mutation_rate_4);
-
-        lb_producer_num_4 = new QLabel(widget_5);
-        lb_producer_num_4->setObjectName("lb_producer_num_4");
-
-        verticalLayout_10->addWidget(lb_producer_num_4);
-
-        lb_mover_num_4 = new QLabel(widget_5);
-        lb_mover_num_4->setObjectName("lb_mover_num_4");
-
-        verticalLayout_10->addWidget(lb_mover_num_4);
-
-        lb_mouth_num_4 = new QLabel(widget_5);
-        lb_mouth_num_4->setObjectName("lb_mouth_num_4");
-
-        verticalLayout_10->addWidget(lb_mouth_num_4);
-
-        lb_killer_num_4 = new QLabel(widget_5);
-        lb_killer_num_4->setObjectName("lb_killer_num_4");
-
-        verticalLayout_10->addWidget(lb_killer_num_4);
-
-        lb_armor_num_4 = new QLabel(widget_5);
-        lb_armor_num_4->setObjectName("lb_armor_num_4");
-
-        verticalLayout_10->addWidget(lb_armor_num_4);
-
-        lb_eye_num_4 = new QLabel(widget_5);
-        lb_eye_num_4->setObjectName("lb_eye_num_4");
-
-        verticalLayout_10->addWidget(lb_eye_num_4);
+        both_vl->addWidget(lb_brain_mutation_rate_4);
 
 
-        horizontalLayout_47->addLayout(verticalLayout_10);
+        horizontalLayout_47->addLayout(both_vl);
 
 
         verticalLayout_37->addLayout(horizontalLayout_47);
@@ -513,12 +411,6 @@ public:
         lb_total_occ_len_2->setText(QCoreApplication::translate("Statistics", "Total occ length:", nullptr));
         lb_anatomy_mutation_rate_2->setText(QCoreApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
         lb_brain_mutation_rate_2->setText(QCoreApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
-        lb_mouth_num_2->setText(QCoreApplication::translate("Statistics", "Avg mouth num: ", nullptr));
-        lb_producer_num_2->setText(QCoreApplication::translate("Statistics", "Avg producer num: ", nullptr));
-        lb_mover_num_2->setText(QCoreApplication::translate("Statistics", "Avg mover num:", nullptr));
-        lb_killer_num_2->setText(QCoreApplication::translate("Statistics", "Avg killer num:", nullptr));
-        lb_armor_num_2->setText(QCoreApplication::translate("Statistics", "Avg armor num: ", nullptr));
-        lb_eye_num_2->setText(QCoreApplication::translate("Statistics", "Avg eye num: ", nullptr));
         lb_stationary_organisms->setText(QCoreApplication::translate("Statistics", "Stationary organisms:", nullptr));
         lb_organism_size_3->setText(QCoreApplication::translate("Statistics", "Avg organism size:", nullptr));
         lb_avg_occ_len_3->setText(QCoreApplication::translate("Statistics", "Avg occ length:", nullptr));
@@ -528,11 +420,6 @@ public:
         lb_avg_age_3->setText(QCoreApplication::translate("Statistics", "Avg organism age:", nullptr));
         lb_anatomy_mutation_rate_3->setText(QCoreApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
         lb_brain_mutation_rate_3->setText(QCoreApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
-        lb_producer_num_3->setText(QCoreApplication::translate("Statistics", "Avg producer num: ", nullptr));
-        lb_mouth_num_3->setText(QCoreApplication::translate("Statistics", "Avg mouth num: ", nullptr));
-        lb_killer_num_3->setText(QCoreApplication::translate("Statistics", "Avg killer num:", nullptr));
-        lb_armor_num_3->setText(QCoreApplication::translate("Statistics", "Avg armor num: ", nullptr));
-        lb_eye_num_3->setText(QCoreApplication::translate("Statistics", "Avg eye num: ", nullptr));
         lb_organisms_alive_2->setText(QCoreApplication::translate("Statistics", "Organisms alive:", nullptr));
         lb_organism_size_4->setText(QCoreApplication::translate("Statistics", "Avg organism size:", nullptr));
         lb_avg_occ_length_4->setText(QCoreApplication::translate("Statistics", "Avg occ length:", nullptr));
@@ -542,12 +429,6 @@ public:
         lb_avg_age_4->setText(QCoreApplication::translate("Statistics", "Avg organism age:", nullptr));
         lb_anatomy_mutation_rate_4->setText(QCoreApplication::translate("Statistics", "Avg anatomy mutation rate:", nullptr));
         lb_brain_mutation_rate_4->setText(QCoreApplication::translate("Statistics", "Avg brain mutation rate:", nullptr));
-        lb_producer_num_4->setText(QCoreApplication::translate("Statistics", "Avg producer num: ", nullptr));
-        lb_mover_num_4->setText(QCoreApplication::translate("Statistics", "Avg mover num:", nullptr));
-        lb_mouth_num_4->setText(QCoreApplication::translate("Statistics", "Avg mouth num: ", nullptr));
-        lb_killer_num_4->setText(QCoreApplication::translate("Statistics", "Avg killer num:", nullptr));
-        lb_armor_num_4->setText(QCoreApplication::translate("Statistics", "Avg armor num: ", nullptr));
-        lb_eye_num_4->setText(QCoreApplication::translate("Statistics", "Avg eye num: ", nullptr));
     } // retranslateUi
 
 };

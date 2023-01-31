@@ -93,17 +93,14 @@ void DataSavingFunctions::write_organism_anatomy(std::ofstream & os, Anatomy * a
     os.write((char*)&killing_space_size,   sizeof(uint32_t));
     os.write((char*)&eye_vec_size,         sizeof(uint32_t));
 
-    os.write((char*)&anatomy->c["mouth"], sizeof(int32_t));
-    os.write((char*)&anatomy->c["producer"], sizeof(int32_t));
-    os.write((char*)&anatomy->c["mover"], sizeof(int32_t));
-    os.write((char*)&anatomy->c["killer"], sizeof(int32_t));
-    os.write((char*)&anatomy->c["armor"], sizeof(int32_t));
-    os.write((char*)&anatomy->c["eye"], sizeof(int32_t));
+    for (auto & item: anatomy->c.data) {
+        os.write((char*)&item, sizeof(int32_t));
+    }
 
     os.write((char*)anatomy->organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->organism_blocks.size());
-    os.write((char*)anatomy->eating_space.data(), sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
-    os.write((char*)anatomy->killing_space.data(), sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
-    os.write((char*)anatomy->eye_block_vec.data(), sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
+    os.write((char*)anatomy->eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
+    os.write((char*)anatomy->killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
+    os.write((char*)anatomy->eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
 
     for (auto & space: anatomy->producing_space) {
         auto space_size = space.size();
@@ -222,18 +219,14 @@ void DataSavingFunctions::read_organism_anatomy(std::ifstream& is, Anatomy * ana
     anatomy->killing_space  .resize(killing_space_size);
     anatomy->eye_block_vec  .resize(eye_vec_size);
 
-    //TODO
-    is.read((char*)&anatomy->c["mouth"], sizeof(int32_t));
-    is.read((char*)&anatomy->c["producer"], sizeof(int32_t));
-    is.read((char*)&anatomy->c["mover"], sizeof(int32_t));
-    is.read((char*)&anatomy->c["killer"], sizeof(int32_t));
-    is.read((char*)&anatomy->c["armor"], sizeof(int32_t));
-    is.read((char*)&anatomy->c["eye"], sizeof(int32_t));
+    for (auto & item: anatomy->c.data) {
+        is.read((char*)&item, sizeof(int32_t));
+    }
 
     is.read((char*)anatomy->organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->organism_blocks.size());
-    is.read((char*)anatomy->eating_space.data(), sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
-    is.read((char*)anatomy->killing_space.data(), sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
-    is.read((char*)anatomy->eye_block_vec.data(), sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
+    is.read((char*)anatomy->eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
+    is.read((char*)anatomy->killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
+    is.read((char*)anatomy->eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
 
     for (auto & space: anatomy->producing_space) {
         uint32_t space_size;
@@ -242,6 +235,17 @@ void DataSavingFunctions::read_organism_anatomy(std::ifstream& is, Anatomy * ana
         is.read((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
