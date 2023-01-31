@@ -796,6 +796,7 @@ void MainWindow::cb_use_continuous_movement_slot(bool state) {
     if (state && !sp.use_weighted_brain) { cb_use_weighted_brain_slot(true); ui.cb_use_weighted_brain->setChecked(true);}
     if (state) {ui.cb_use_weighted_brain->setEnabled(false);} else {ui.cb_use_weighted_brain->setEnabled(true);}
     sp.use_continuous_movement = state;
+    engine.reinit_organisms();
 }
 
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
