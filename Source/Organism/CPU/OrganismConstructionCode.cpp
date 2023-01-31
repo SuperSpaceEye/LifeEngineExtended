@@ -33,54 +33,41 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
         auto instruction = occ_vector[i];
         bool last_instruction = i == occ_vector.size()-1;
 
-        switch (instruction) {
-            case OCCInstruction::ShiftUp:
-            case OCCInstruction::ShiftUpLeft:
-            case OCCInstruction::ShiftLeft:
-            case OCCInstruction::ShiftLeftDown:
-            case OCCInstruction::ShiftDown:
-            case OCCInstruction::ShiftDownRight:
-            case OCCInstruction::ShiftRight:
-            case OCCInstruction::ShiftRightUp: {
-                auto shift = shift_values[static_cast<int>(instruction)];
+        if (int(instruction) >= int(OCCInstruction::ShiftUp)
+         && int(instruction) <= int(OCCInstruction::ShiftRightUp)) {
+            auto shift = shift_values[static_cast<int>(instruction)];
 
-                if (!last_instruction) {
-                    auto next_instruction = occ_vector[i + 1];
+            if (!last_instruction) {
+                auto next_instruction = occ_vector[i + 1];
 
-                    switch (next_instruction) {
-                        case OCCInstruction::SetBlockMouth:
-                        case OCCInstruction::SetBlockProducer:
-                        case OCCInstruction::SetBlockMover:
-                        case OCCInstruction::SetBlockKiller:
-                        case OCCInstruction::SetBlockArmor:
-                        case OCCInstruction::SetBlockEye:
-                            if (x + shift[0] < edges[0]) { edges[0] = x + shift[0];}
-                            if (x + shift[0] > edges[1]) { edges[1] = x + shift[0];}
-                            if (y + shift[1] < edges[2]) { edges[2] = y + shift[1];}
-                            if (y + shift[1] > edges[3]) { edges[3] = y + shift[1];}
-                            continue;
-                        default:
-                            break;
-                    }
+                if (int(next_instruction) >= int(OCCInstruction::SetBlockMouth)
+                 && int(next_instruction) < int(OCCInstruction::SetBlockMouth)+NUM_ORGANISM_BLOCKS) {
+                    if (x + shift[0] < edges[0]) { edges[0] = x + shift[0];}
+                    if (x + shift[0] > edges[1]) { edges[1] = x + shift[0];}
+                    if (y + shift[1] < edges[2]) { edges[2] = y + shift[1];}
+                    if (y + shift[1] > edges[3]) { edges[3] = y + shift[1];}
+                    continue;
                 }
-                x += shift[0];
-                y += shift[1];
-
-                if (x < edges[0]) { edges[0] = x;}
-                if (x > edges[1]) { edges[1] = x;}
-                if (y < edges[2]) { edges[2] = y;}
-                if (y > edges[3]) { edges[3] = y;}
             }
-                break;
-            case OCCInstruction::ResetToOrigin:
-                x = origin_x;
-                y = origin_y;
-                break;
-            case OCCInstruction::SetOrigin:
-                origin_x = x;
-                origin_y = y;
-                break;
-            default: break;
+            x += shift[0];
+            y += shift[1];
+
+            if (x < edges[0]) { edges[0] = x;}
+            if (x > edges[1]) { edges[1] = x;}
+            if (y < edges[2]) { edges[2] = y;}
+            if (y > edges[3]) { edges[3] = y;}
+        }
+
+        if (instruction == OCCInstruction::ResetToOrigin) {
+            x = origin_x;
+            y = origin_y;
+            continue;
+        }
+
+        if (instruction == OCCInstruction::SetOrigin) {
+            origin_x = x;
+            origin_y = y;
+            continue;
         }
     }
 
@@ -106,13 +93,7 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
     container->organism_blocks = compile_base_structure(container, occ_c, edges);
     edges[0]--;edges[1]++;edges[2]--;edges[3]++;
 
-    auto spaces = compile_spaces(occ_c, edges, container->organism_blocks, container);
-    container->producing_space = std::move(std::get<0>(spaces));
-    container->eating_space    = std::move(std::get<1>(spaces));
-    container->killing_space   = std::move(std::get<2>(spaces));
-    container->eye_block_vec  = std::move(std::get<3>(spaces));
-
-    return container;
+    return compile_spaces(occ_c, edges, container->organism_blocks, container);
 }
 
 void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContainer &occ_c,
@@ -190,61 +171,52 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
             next_instruction = OCCInstruction::ResetToOrigin;
         }
 
-        //TODO remake
-        switch (instruction) {
-            case OCCInstruction::ShiftUp:
-            case OCCInstruction::ShiftUpLeft:
-            case OCCInstruction::ShiftLeft:
-            case OCCInstruction::ShiftLeftDown:
-            case OCCInstruction::ShiftDown:
-            case OCCInstruction::ShiftDownRight:
-            case OCCInstruction::ShiftRight:
-            case OCCInstruction::ShiftRightUp: {
-                //if next instruction is set block, then do not shift the cursor,
-                // but place block on shifted position from cursor and increment i so that it will not get set block instruction
-                bool pass = false;
-                shift_instruction_part(container, occ_c, shift_values, shift, base_rotation, cursor_x, cursor_y,
-                                       center_x, center_y,
-                                       instruction, next_instruction, blocks, i, pass);
-                if (pass) { continue; }
-                shift = shift_values[static_cast<int>(instruction)];
-                cursor_x += shift[0];
-                cursor_y += shift[1];
-            }
-                break;
+        if (int(instruction) >= int(OCCInstruction::ShiftUp)
+            && int(instruction) <= int(OCCInstruction::ShiftRightUp)) {
+            bool pass = false;
+            shift_instruction_part(container, occ_c, shift_values, shift, base_rotation, cursor_x, cursor_y,
+                                   center_x, center_y,
+                                   instruction, next_instruction, blocks, i, pass);
+            if (pass) { continue; }
+            shift = shift_values[static_cast<int>(instruction)];
+            cursor_x += shift[0];
+            cursor_y += shift[1];
+            continue;
+        }
 
-            case OCCInstruction::ApplyRotationUp:    base_rotation = Rotation::UP;    break;
-            case OCCInstruction::ApplyRotationLeft:  base_rotation = Rotation::LEFT;  break;
-            case OCCInstruction::ApplyRotationDown:  base_rotation = Rotation::DOWN;  break;
-            case OCCInstruction::ApplyRotationRight: base_rotation = Rotation::RIGHT; break;
+        if (int(instruction) >= int(OCCInstruction::ApplyRotationUp)
+         && int(instruction) <= int(OCCInstruction::ApplyRotationRight)) {
+            base_rotation = (Rotation)(int(instruction)-int(OCCInstruction::ApplyRotationUp));
+            continue;
+        }
 
-            case OCCInstruction::SetRotationUp:    set_rotation(cursor_x, cursor_y, Rotation::UP,    occ_c, blocks);break;
-            case OCCInstruction::SetRotationLeft:  set_rotation(cursor_x, cursor_y, Rotation::LEFT,  occ_c, blocks);break;
-            case OCCInstruction::SetRotationDown:  set_rotation(cursor_x, cursor_y, Rotation::DOWN,  occ_c, blocks);break;
-            case OCCInstruction::SetRotationRight: set_rotation(cursor_x, cursor_y, Rotation::RIGHT, occ_c, blocks);break;
+        if (int(instruction) >= int(OCCInstruction::SetRotationUp)
+         && int(instruction) <= int(OCCInstruction::SetRotationRight)) {
+            set_rotation(cursor_x, cursor_y, (Rotation)(int(instruction)-int(OCCInstruction::ApplyRotationUp)), occ_c, blocks);
+            continue;
+        }
 
-            case OCCInstruction::ResetToOrigin:
-                cursor_x = origin_x;
-                cursor_y = origin_y;
-                break;
-            case OCCInstruction::SetOrigin:
-                origin_x = cursor_x;
-                origin_y = cursor_y;
-                break;
+        if (instruction == OCCInstruction::ResetToOrigin) {
+            cursor_x = origin_x;
+            cursor_y = origin_y;
+            continue;
+        }
 
-            case OCCInstruction::SetBlockMouth:    set_block(cursor_x, cursor_y, BlockTypes::MouthBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetBlockProducer: set_block(cursor_x, cursor_y, BlockTypes::ProducerBlock, base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetBlockMover:    set_block(cursor_x, cursor_y, BlockTypes::MoverBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetBlockKiller:   set_block(cursor_x, cursor_y, BlockTypes::KillerBlock,   base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetBlockArmor:    set_block(cursor_x, cursor_y, BlockTypes::ArmorBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetBlockEye:      set_block(cursor_x, cursor_y, BlockTypes::EyeBlock,      base_rotation, occ_c, blocks, container, center_x, center_y);break;
+        if (instruction == OCCInstruction::SetOrigin) {
+            origin_x = cursor_x;
+            origin_y = cursor_y;
+        }
 
-            case OCCInstruction::SetUnderBlockMouth:    set_block(cursor_x, cursor_y, BlockTypes::MouthBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetUnderBlockProducer: set_block(cursor_x, cursor_y, BlockTypes::ProducerBlock, base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetUnderBlockMover:    set_block(cursor_x, cursor_y, BlockTypes::MoverBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetUnderBlockKiller:   set_block(cursor_x, cursor_y, BlockTypes::KillerBlock,   base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetUnderBlockArmor:    set_block(cursor_x, cursor_y, BlockTypes::ArmorBlock,    base_rotation, occ_c, blocks, container, center_x, center_y);break;
-            case OCCInstruction::SetUnderBlockEye:      set_block(cursor_x, cursor_y, BlockTypes::EyeBlock,      base_rotation, occ_c, blocks, container, center_x, center_y);break;
+        if (int(instruction) >= int(OCCInstruction::SetBlockMouth)
+         && int(instruction) < int(OCCInstruction::SetBlockMouth) + NUM_ORGANISM_BLOCKS) {
+            set_block(cursor_x, cursor_y, (BlockTypes)(int(instruction)-int(OCCInstruction::SetBlockMouth)+1), base_rotation, occ_c, blocks, container, center_x, center_y);
+            continue;
+        }
+
+        if (int(instruction) >= int(OCCInstruction::SetUnderBlockMouth)
+            && int(instruction) < int(OCCInstruction::SetUnderBlockMouth) + NUM_ORGANISM_BLOCKS) {
+            set_block(cursor_x, cursor_y, (BlockTypes)(int(instruction)-int(OCCInstruction::SetUnderBlockMouth)+1), base_rotation, occ_c, blocks, container, center_x, center_y);
+            continue;
         }
     }
 
@@ -260,37 +232,24 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
                                                       const OCCInstruction &next_instruction,
                                                       std::vector<SerializedOrganismBlockContainer> &blocks, int &i,
                                                       bool &pass) {
-    switch (next_instruction) {
-        case OCCInstruction::SetBlockMouth:
-        case OCCInstruction::SetBlockProducer:
-        case OCCInstruction::SetBlockMover:
-        case OCCInstruction::SetBlockKiller:
-        case OCCInstruction::SetBlockArmor:
-        case OCCInstruction::SetBlockEye:
-            shift = shift_values[static_cast<int>(instruction)];
-            set_block(cursor_x + shift[0], cursor_y + shift[1],
-                      //set block instruction are in the same order as block types.
-                      static_cast<BlockTypes>(
-                              static_cast<int>(next_instruction)- NON_SET_BLOCK_OCC_INSTRUCTIONS + 1),
-                      base_rotation, occ_c, blocks, container, center_x, center_y);
-            i++;
-            pass = true;
-            break;
-        default:
-            break;
+    if (int(next_instruction) >= int(OCCInstruction::SetBlockMouth)
+        && int(next_instruction) < int(OCCInstruction::SetBlockMouth) + NUM_ORGANISM_BLOCKS) {
+        shift = shift_values[static_cast<int>(instruction)];
+        set_block(cursor_x + shift[0], cursor_y + shift[1],
+                //set block instruction are in the same order as block types.
+                  static_cast<BlockTypes>(
+                          static_cast<int>(next_instruction)- NON_SET_BLOCK_OCC_INSTRUCTIONS + 1),
+                  base_rotation, occ_c, blocks, container, center_x, center_y);
+        i++;
+        pass = true;
     }
 }
 
 //Will compile spaces all at the same time in one go.
-std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedOrganismBlockContainer>>
+SerializedOrganismStructureContainer *
 OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<int, 4> edges,
                                          std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                                          SerializedOrganismStructureContainer *container) {
-    std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>,
-               std::vector<SerializedAdjacentSpaceContainer>,
-               std::vector<SerializedAdjacentSpaceContainer>,
-               std::vector<SerializedOrganismBlockContainer>> spaces;
-
     auto shifting_positions = std::array<std::array<int, 2>, 4> {
         std::array<int, 2>{ 0,-1},
         std::array<int, 2>{-1, 0},
@@ -300,10 +259,10 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
 
     occ_c.spaces_counter++;
 
-    auto &producing_space = std::get<0>(spaces);
-    auto &eating_space    = std::get<1>(spaces);
-    auto &killer_space    = std::get<2>(spaces);
-    auto &eye_blocks_vec  = std::get<3>(spaces);
+    auto &producing_space = container->producing_space;
+    auto &eating_space    = container->eating_space;
+    auto &killer_space    = container->killing_space;
+    auto &eye_blocks_vec  = container->eye_block_vec;
 
     eye_blocks_vec.reserve(container->c["eye"]);
 
@@ -388,7 +347,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
         }
     }
 
-    return spaces;
+    return container;
 }
 
 std::vector<OCCInstruction> create_random_group(int group_size, OCCParameters &occp, lehmer64 &gen) {

@@ -44,7 +44,7 @@ private:
     std::vector<SerializedOrganismBlockContainer>
     compile_base_structure(SerializedOrganismStructureContainer *container, OCCLogicContainer &occ_c, std::array<int, 4> edges);
     //producing space, eating space, killing space
-    static std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedOrganismBlockContainer>>
+    static SerializedOrganismStructureContainer *
     compile_spaces(OCCLogicContainer &occ_c, std::array<int, 4> edges,
                    std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                    SerializedOrganismStructureContainer *container);

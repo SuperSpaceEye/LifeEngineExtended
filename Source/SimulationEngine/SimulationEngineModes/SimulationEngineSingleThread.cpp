@@ -333,15 +333,16 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
             auto pos = block.get_pos(organism.rotation);
 
             auto new_pos = Vector2{new_x + pos.x, new_y + pos.y};
-            if (check_if_out_of_bounds(edc, new_pos.x, new_pos.y)) {return false;}
+            //organism can get enough velocity to have new coordinate reach over wall boundary
+            if (check_if_out_of_bounds(edc, new_pos.x, new_pos.y)) {is_clear = false; break;}
 
-            auto type = edc.st_grid.get_type(new_pos.y, new_pos.x);
+            auto type = edc.st_grid.get_type(new_pos.x, new_pos.y);
             auto organism_index = edc.st_grid.get_organism_index(new_x + pos.x, new_y + pos.y);
 
             if (sp.food_blocks_movement) {
                 auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
                 if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index)
-                || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {is_clear = false; break;}
+                 || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {is_clear = false; break;}
             } else {
                 if ( type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {is_clear = false; break;}
             }
@@ -382,9 +383,10 @@ bool SimulationEngineSingleThread::calculate_discrete_movement(EngineDataContain
 
         if (sp.food_blocks_movement) {
             auto food_num = edc.st_grid.get_food_num(new_x + pos.x, new_y + pos.y);
-            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {return false;}
+            if ((type != BlockTypes::EmptyBlock && organism_index != organism.vector_index)
+             || (type == BlockTypes::EmptyBlock && food_num >= sp.food_threshold)) {return false;}
         } else {
-            if (type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {return false;}
+            if ( type != BlockTypes::EmptyBlock && organism_index != organism.vector_index) {return false;}
         }
     }
     return true;

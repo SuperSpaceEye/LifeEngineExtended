@@ -6,6 +6,21 @@
 // Created by spaceeye on 23.03.2022.
 //
 
+/*
+ * Adding new block type. The order of types is important !!!
+ * 1) Add new type below last organism block type and add appropriate string names
+ * 2) go to Source/Organism/CPU/OrganismConstructionCodeInstruction.h
+ * 3) add new set instructions for new type and update SET_BLOCK_OCC_INSTRUCTIONS
+ * short instructions shouldn't have the same name
+ * if block has space
+ *      4) go to Source/Organism/CPU/AnatomyContainers.h and modify SerializedOrganismStructureContainer
+ *      5) go to Source/Organism/CPU/SimpleAnatomyMutationLogic.h
+ *      6) go to Source/Organism/CPU/Anatomy.cpp make_container
+ *      7) go to Source/Stuff/DataSavingFunctions.cpp {read/write}_organism_anatomy
+ *      8) go to Source/Organism/CPU/OrganismConstructionCode.cpp
+ * 9) go to Source/Stuff/textures.h and add new default texture.
+ */
+
 #ifndef THELIFEENGINECPP_BLOCKTYPES_HPP
 #define THELIFEENGINECPP_BLOCKTYPES_HPP
 
@@ -50,26 +65,5 @@ constexpr void set_m(ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_OR
 constexpr int& get_mp(ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>&m, BlockTypes type) {
     return m[SW_ORGANISM_BLOCK_NAMES[int(type) - 1]];
 }
-
-/*
- * Adding new block type.
- * 1) Add new type below EyeBlock
- * 2) go to Source/Organism/CPU/OrganismConstructionCodeInstruction.h
- * 3) add new set instructions for new type and update SET_BLOCK_OCC_INSTRUCTIONS
- * short instructions shouldn't have the same name
- * 4) go to Source/Organism/CPU/OrganismConstructionCode.cpp and modify
- * if block has space
- *      5) go to Source/Organism/CPU/AnatomyContainers.h and modify SerializedOrganismStructureContainer
- *      7) go to Source/Organism/CPU/SimpleAnatomyMutationLogic.h
- *      8) go to Source/Organism/CPU/Anatomy.cpp make_container
- *      10) go to Source/Stuff/DataSavingFunctions.cpp {read/write}_organism_anatomy
- * 9) go to Source/Stuff/textures.h and add new default texture. The order is important
- *
- * 11) go to Source/UiFiles/statistics.ui and add new labels for type, transpile ui to h
- * 12) go to Source/UIWindows/MainWindow/MainWindow.cpp update_statistic_window
- * 13) go to Source/Containers/CPU/OrganismInfoContainer.h
- * 19) World recorder
- *
- */
 
 #endif //THELIFEENGINECPP_BLOCKTYPES_HPP

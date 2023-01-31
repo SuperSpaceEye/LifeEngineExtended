@@ -123,7 +123,7 @@ private:
             if (std::isnan(info.avgs[n]._organism_age))      {info.avgs[n]._organism_age      = 0;}
             if (std::isnan(info.avgs[n]._gathered_food))     {info.avgs[n]._gathered_food     = 0;}
             for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
-                if (std::isnan(info.avgs[n].block_avgs[n])) { info.avgs[n].block_avgs[i] = 0; }
+                if (std::isnan(info.avgs[n].block_avgs[i])) { info.avgs[n].block_avgs[i] = 0; }
             }
             if (std::isnan(info.avgs[n].occ_instructions_num)) {info.avgs[n].occ_instructions_num = 0;}
 
