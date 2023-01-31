@@ -33,8 +33,8 @@ set(CMAKE_CUDA_ARCHITECTURES 61)
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 
 #for perf
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
 
 #https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
