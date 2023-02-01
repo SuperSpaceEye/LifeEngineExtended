@@ -524,7 +524,9 @@ void MainWindow::le_continuous_movement_drag_slot() {
 }
 
 void MainWindow::le_food_threshold_slot() {
+    engine.pause();
     le_slot_lower_bound<float>(sp.food_threshold, sp.food_threshold, "float", ui.le_food_threshold, 0, "0");
+    engine.unpause();
 }
 
 void MainWindow::le_max_food_slot() {

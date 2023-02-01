@@ -43,6 +43,7 @@ public:
         if (fnum + num > max_food_num) {
             return false;
         } else {
+            if (fnum + num < 0) {return false;}
             fnum += num;
             return true;
         }

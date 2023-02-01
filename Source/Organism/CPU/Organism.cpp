@@ -276,6 +276,7 @@ void Organism::move_organism(Organism &organism) {
     max_decision_lifetime = organism.max_decision_lifetime;
     max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
+    cdata = organism.cdata;
     brain = organism.brain;
     anatomy = std::move(organism.anatomy);
     occ = std::move(organism.occ);
@@ -304,6 +305,7 @@ void Organism::copy_organism(const Organism &organism) {
     max_decision_lifetime = organism.max_decision_lifetime;
     max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
+    cdata = organism.cdata;
     brain = organism.brain;
     anatomy = organism.anatomy;
     occ = organism.occ;
@@ -312,6 +314,8 @@ void Organism::copy_organism(const Organism &organism) {
     bp = organism.bp;
     occp = organism.occp;
     occl = organism.occl;
+
+    init_values();
 }
 
 void Organism::kill_organism(EngineDataContainer &edc) {

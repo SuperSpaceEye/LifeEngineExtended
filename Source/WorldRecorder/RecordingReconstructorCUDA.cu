@@ -363,40 +363,41 @@ void RecordingReconstructorCUDA::apply_normal(Transaction &transaction) {
 
     //TODO
 
-    if (d_transaction->wall_change_size != 0) {
-    num = d_transaction->food_change_size / block_size + block_size;
-        apply_food_change<<<num, block_size>>>(d_transaction, d_rec_grid, grid_width, d_food_grid);
-    gpuErrchk(cudaDeviceSynchronize())
-    }
+    //    if (d_transaction->wall_change_size != 0) {
+//    num = d_transaction->wall_change_size / block_size + block_size;
+//    apply_wall_change<<<num, block_size>>>(d_transaction, d_rec_grid, grid_width);
+//    gpuErrchk(cudaDeviceSynchronize())
+//    }
 
-    if (d_transaction->wall_change_size != 0) {
-    if (recenter_to_imaginary_position != transaction.recenter_to_imaginary_pos) { recenter_to_imaginary_position = transaction.recenter_to_imaginary_pos;
+
+    if (recenter_to_imaginary_position != transaction.recenter_to_imaginary_pos) {
+    recenter_to_imaginary_position = transaction.recenter_to_imaginary_pos;
     num = num_orgs / block_size + block_size;
-    apply_recenter<<<num, block_size>>>(d_transaction, d_rec_orgs, num_orgs, recenter_to_imaginary_position);}
+    apply_recenter<<<num, block_size>>>(d_transaction, d_rec_orgs, num_orgs, recenter_to_imaginary_position);
+    gpuErrchk(cudaDeviceSynchronize())}
+
+
+    if (d_transaction->food_change_size!= 0) {
+    num = d_transaction->food_change_size / block_size + block_size;
+    apply_food_change<<<num, block_size>>>(d_transaction, d_rec_grid, grid_width, d_food_grid);
     gpuErrchk(cudaDeviceSynchronize())
     }
 
-    if (d_transaction->wall_change_size != 0) {
+    if (d_transaction->dead_organisms_size != 0) {
     num = d_transaction->dead_organisms_size / block_size + block_size;
         apply_dead_organisms<<<num, block_size>>>(d_transaction, d_rec_orgs, d_rec_grid, grid_width, d_food_grid);
     gpuErrchk(cudaDeviceSynchronize())
     }
 
-    if (d_transaction->wall_change_size != 0) {
+    if (d_transaction->move_change_size != 0) {
+    num = d_transaction->move_change_size / block_size + block_size;
+    apply_move_change<<<num, block_size>>>(d_transaction, d_rec_grid, d_rec_orgs, grid_width, d_food_grid);
+    gpuErrchk(cudaDeviceSynchronize())
+    }
+
+    if (d_transaction->compressed_change_size != 0) {
     num = d_transaction->compressed_change_size / block_size + block_size;
     apply_compressed_change<<<num, block_size>>>(d_transaction, d_rec_orgs);
-    gpuErrchk(cudaDeviceSynchronize())
-    }
-
-    if (d_transaction->wall_change_size != 0) {
-    num = d_transaction->move_change_size / block_size + block_size;
-        apply_move_change<<<num, block_size>>>(d_transaction, d_rec_grid, d_rec_orgs, grid_width, d_food_grid);
-    gpuErrchk(cudaDeviceSynchronize())
-    }
-
-    if (d_transaction->wall_change_size != 0) {
-    num = d_transaction->wall_change_size / block_size + block_size;
-    apply_wall_change<<<num, block_size>>>(d_transaction, d_rec_grid, grid_width);
     gpuErrchk(cudaDeviceSynchronize())
     }
 

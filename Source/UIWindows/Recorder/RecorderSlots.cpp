@@ -141,8 +141,12 @@ void Recorder::b_start_recording_slot() {
             if (type == BlockTypes::WallBlock) {
                 tbuffer->record_user_wall_change(x, y, true);
             }
+            auto food = edc->st_grid.get_food_num(x, y);
+            tbuffer->record_food_change(x, y, food);
         }
     }
+
+    tbuffer->record_transaction();
 
     recording_paused = false;
     edc->record_data = true;

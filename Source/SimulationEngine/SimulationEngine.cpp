@@ -299,14 +299,19 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     auto & type = edc.st_grid.get_type(x, y);
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
-    if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
     for (auto & block: organism_ptr->anatomy.organism_blocks) {
         edc.st_grid.get_type(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
                              organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
         edc.st_grid.add_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
                                  organism_ptr->y + block.get_pos(organism_ptr->rotation).y,
                                  block.get_food_cost(*organism_ptr->bp), sp.max_food);
+        if (edc.record_data) {
+            edc.stc.tbuffer.record_food_change(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
+                                               organism_ptr->y + block.get_pos(organism_ptr->rotation).y,
+                                               block.get_food_cost(*organism_ptr->bp));
+        }
     }
+    if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         if (&edc.stc.organisms[i] == organism_ptr) {
             edc.stc.organisms[i].kill_organism(edc);

@@ -48,7 +48,11 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Orga
         edc.st_grid.get_type(organism.x + pos.x, organism.y + pos.y) = block.type;
         edc.st_grid.get_rotation(organism.x + pos.x, organism.y + pos.y) = get_global_rotation(block.rotation, organism.rotation);
         edc.st_grid.get_organism_index(organism.x + pos.x, organism.y + pos.y) = organism.vector_index;
-        if (sp.organisms_destroy_food) {edc.st_grid.get_food_num(organism.x + pos.x, organism.y + pos.y) = 0;}
+        if (sp.organisms_destroy_food) {
+            auto & num = edc.st_grid.get_food_num(organism.x + pos.x, organism.y + pos.y);
+            if (edc.record_data) {edc.stc.tbuffer.record_food_change(organism.x + pos.x, organism.y + pos.y, -num);}
+            num = 0;
+        }
     }
     if (sp.use_continuous_movement) {
         organism.init_values();
@@ -79,7 +83,7 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer &
 
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp.food_production_probability * multiplier) {
                 //if couldn't add the food because there is already almost max amount.
-                if (edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
+                if (!edc.st_grid.add_food_num(x, y, 1, sp.max_food)) {continue;}
                 if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, 1);}
                 if (sp.stop_when_one_food_generated) { return;}
                 continue;
@@ -102,7 +106,7 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
 
         auto & type = edc.st_grid.get_type(x, y);
 
-        if (edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
+        if (!edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
         if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, 1);}
         if (sp.stop_when_one_food_generated) { return;}
     }
@@ -115,11 +119,14 @@ void SimulationEngineSingleThread::eat_food(EngineDataContainer &edc, Simulation
 
         auto & food_num = edc.st_grid.get_food_num(x, y);
         if (food_num >= sp.food_threshold) {
-            food_num -= 1;
+            //TODO
+            auto food_eaten = std::min(food_num, 1.f);
+            organism.food_collected += food_eaten;
+            food_num -= food_eaten;
+
             if (edc.record_data) {
-                edc.stc.tbuffer.record_food_change(x, y, -1);
+                edc.stc.tbuffer.record_food_change(x, y, -food_eaten);
             }
-            organism.food_collected++;
         }
     }
 }
@@ -133,8 +140,11 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer &edc, Organ
         for (auto & block: organism.anatomy.organism_blocks) {
             edc.st_grid.get_type(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y) = BlockTypes::EmptyBlock;
             edc.st_grid.get_organism_index(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y) = -1;
-            edc.st_grid.add_food_num(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y,
+            bool added = edc.st_grid.add_food_num(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y,
                                      block.get_food_cost(*organism.bp), sp.max_food);
+            if (edc.record_data && added) {
+                edc.stc.tbuffer.record_food_change(organism.x + block.get_pos(organism.rotation).x, organism.y + block.get_pos(organism.rotation).y, block.get_food_cost(*organism.bp));
+            }
         }
     }
 }
@@ -167,7 +177,6 @@ void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<
 
         //if organism has no eyes, movers or is moving, then do not observe.
         if (organism.anatomy.c["eye"] > 0 && organism.anatomy.c["mover"] > 0 && organism.move_counter == 0) {
-//            std::cout << organism.anatomy._c["eye"] << "\n";
             observations.emplace_back(std::vector<Observation>(organism.anatomy.c["eye"]));
         } else {
             observations.emplace_back();
