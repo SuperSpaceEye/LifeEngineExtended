@@ -223,7 +223,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
-    if (anatomy.c["mover"] == 0) { return;}
+    if (anatomy.c.data[int(BlockTypes::MoverBlock)-1] == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
         if (sp->use_continuous_movement) {
             calculate_continuous_decision(organism_observations, gen);

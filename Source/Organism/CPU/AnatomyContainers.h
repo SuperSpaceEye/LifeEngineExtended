@@ -32,13 +32,12 @@ public:
     relative_x(relative_x), relative_y(relative_y) {}
 
     inline Vector2<int> get_pos(Rotation rotation) {
-        switch (rotation) {
-            case Rotation::UP:    return Vector2<int>{relative_x, relative_y};
-            case Rotation::LEFT:  return Vector2<int>{relative_y, -relative_x};
-            case Rotation::DOWN:  return Vector2<int>{-relative_x, -relative_y};
-            case Rotation::RIGHT: return Vector2<int>{-relative_y, relative_x};
-            default: return Vector2<int>{relative_x, relative_y};
-        }
+        return std::array<Vector2<int>, 4> {
+                Vector2<int>{relative_x, relative_y},
+                Vector2<int>{relative_y, -relative_x},
+                Vector2<int>{-relative_x, -relative_y},
+                Vector2<int>{-relative_y, relative_x}
+        }[int(rotation)];
     }
 };
 

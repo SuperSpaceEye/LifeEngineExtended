@@ -60,9 +60,9 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Orga
 }
 
 void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen) {
-    if (organism.anatomy.c["producer"] == 0) {return;}
-    if (organism.anatomy.c["mover"] > 0 && !sp.movers_can_produce_food) {return;}
-//    if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
+    if (organism.anatomy.c.data[int(BlockTypes::ProducerBlock)-1] == 0) {return;}
+    if (organism.anatomy.c.data[int(BlockTypes::MoverBlock)-1] > 0 && !sp.movers_can_produce_food) {return;}
+    if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp.simplified_food_production) {
         produce_food_simplified(edc, sp, organism, gen, organism.multiplier);
