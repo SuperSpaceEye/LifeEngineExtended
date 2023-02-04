@@ -205,9 +205,10 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
 
     for (int i = 0; i < editor_organism.anatomy.organism_blocks.size(); i++) {
         auto & block = editor_organism.anatomy.organism_blocks[i];
+        const auto pos = block.get_pos(Rotation::UP);
 
-        if (block.get_pos(Rotation::UP).x + x >= editor_width  || block.get_pos(Rotation::UP).x + x < 0 ||
-            block.get_pos(Rotation::UP).y + y >= editor_height || block.get_pos(Rotation::UP).y + y < 0) {
+        if (pos.x + x >= editor_width  || pos.x + x < 0 ||
+            pos.y + y >= editor_height || pos.y + y < 0) {
             editor_organism.anatomy.organism_blocks.erase(editor_organism.anatomy.organism_blocks.begin() + i);
             i--;
         }

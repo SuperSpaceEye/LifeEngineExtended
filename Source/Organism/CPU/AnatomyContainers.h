@@ -18,10 +18,6 @@
 #include "Rotation.h"
 #include "../../Stuff/ConstMap.h"
 
-struct ProducerAdjacent {
-    int producer = -1;
-};
-
 struct BaseSerializedContainer {
 public:
     int relative_x;
@@ -31,7 +27,7 @@ public:
     BaseSerializedContainer(int relative_x, int relative_y):
     relative_x(relative_x), relative_y(relative_y) {}
 
-    inline Vector2<int> get_pos(Rotation rotation) {
+    inline Vector2<int> get_pos(Rotation rotation) const {
         return std::array<Vector2<int>, 4> {
                 Vector2<int>{relative_x, relative_y},
                 Vector2<int>{relative_y, -relative_x},
@@ -50,20 +46,23 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     SerializedOrganismBlockContainer()=default;
     SerializedOrganismBlockContainer(BlockTypes type, Rotation rotation, int relative_x, int relative_y):
             BaseSerializedContainer(relative_x, relative_y), type(type), rotation(rotation) {}
-    Rotation get_block_rotation_on_grid(Rotation organism_rotation) {
+    Rotation get_block_rotation_on_grid(Rotation organism_rotation) const {
         uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(organism_rotation) + static_cast<uint_fast8_t>(rotation);
         return static_cast<Rotation>(new_int_rotation%4);
     }
 
-    float get_food_cost(OrganismBlockParameters &bp) const {
+    inline float get_food_cost(const OrganismBlockParameters &bp) const {
         return bp.pa[(int)type-1].food_cost;
     }
 };
 
 struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
+    uint8_t num = 1;
     SerializedAdjacentSpaceContainer()=default;
     SerializedAdjacentSpaceContainer(int relative_x, int relative_y):
-    BaseSerializedContainer(relative_x, relative_y) {}
+            BaseSerializedContainer(relative_x, relative_y) {}
+    SerializedAdjacentSpaceContainer(int relative_x, int relative_y, uint8_t count):
+            BaseSerializedContainer(relative_x, relative_y), num(count) {}
 };
 
 struct SerializedOrganismStructureContainer {

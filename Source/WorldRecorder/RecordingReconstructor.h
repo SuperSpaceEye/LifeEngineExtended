@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 02.10.22.
 //
@@ -13,6 +17,7 @@ private:
     int height;
 
     bool recenter_to_imaginary_pos;
+    float food_threshold;
 
     std::vector<BaseGridBlock> rec_grid;
     std::vector<float> food_grid;
@@ -21,6 +26,7 @@ private:
     void apply_organism_change(Transaction &transaction);
     void apply_food_change(Transaction &transaction);
     void apply_recenter(const Transaction &transaction);
+    void apply_food_threshold(Transaction & transaction);
     void apply_dead_organisms(Transaction &transaction);
     void apply_move_change(Transaction &transaction);
     void apply_compressed_change(Transaction &transaction);

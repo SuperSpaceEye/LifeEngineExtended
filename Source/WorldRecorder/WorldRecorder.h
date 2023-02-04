@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 02.10.22.
 //
@@ -59,6 +63,7 @@ struct Transaction {
     std::vector<FoodChange> user_food_change;
     std::vector<Organism> user_organism_change;
     std::vector<int> user_dead_change;
+    float food_threshold;
     bool starting_point;
     bool recenter_to_imaginary_pos;
     bool reset = false;
@@ -82,6 +87,7 @@ struct TransactionBuffer {
     void record_organism_dying(int organism_index);
     void record_organism_move_change(int vector_index, int x, int y, Rotation rotation);
     void record_recenter_to_imaginary_pos(bool state);
+    void record_food_threshold(float food_threshold);
     void record_reset();
     void record_compressed(int pos1, int pos2);
 

@@ -70,19 +70,21 @@ private:
                 || (n == 1 && organism.anatomy.c["mover"] == 0)
                 || (n == 2 && organism.anatomy.c["mover"] > 0))) {continue;}
 
-                info.avgs[n].size += organism.anatomy.organism_blocks.size();
+                auto & avg = info.avgs[n];
 
-                info.avgs[n]._organism_lifetime += organism.max_lifetime;
-                info.avgs[n]._organism_age      += organism.lifetime;
-                info.avgs[n]._gathered_food     += organism.food_collected;
+                avg.size += organism.anatomy.organism_blocks.size();
+
+                avg._organism_lifetime += organism.max_lifetime;
+                avg._organism_age      += organism.lifetime;
+                avg._gathered_food     += organism.food_collected;
                 for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
-                    info.avgs[n].block_avgs[i] += organism.anatomy.c.data[i];
+                    avg.block_avgs[i] += organism.anatomy.c.data[i];
                 }
-                info.avgs[n].total_occ_instructions_num += organism.occ.get_code_const_ref().size();
+                avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 
-                info.avgs[n].brain_mutation_rate   += organism.brain_mutation_rate;
-                info.avgs[n].anatomy_mutation_rate += organism.anatomy_mutation_rate;
-                info.avgs[n].total++;
+                avg.brain_mutation_rate   += organism.brain_mutation_rate;
+                avg.anatomy_mutation_rate += organism.anatomy_mutation_rate;
+                avg.total++;
             }
         }
 
@@ -104,31 +106,33 @@ private:
                           (sizeof(Organism) * info.avgs[0].total);
 
         for (int n = 0; n < 3; n++) {
-            info.avgs[n].size /= info.avgs[n].total;
+            auto & avg = info.avgs[n];
 
-            info.avgs[n]._organism_lifetime /= info.avgs[n].total;
-            info.avgs[n]._organism_age      /= info.avgs[n].total;
-            info.avgs[n]._gathered_food     /= info.avgs[n].total;
+            avg.size /= avg.total;
+
+            avg._organism_lifetime /= avg.total;
+            avg._organism_age      /= avg.total;
+            avg._gathered_food     /= avg.total;
             for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
-                info.avgs[n].block_avgs[i] /= info.avgs[n].total;
+                avg.block_avgs[i] /= avg.total;
             }
-            info.avgs[n].occ_instructions_num = info.avgs[n].total_occ_instructions_num ? (double)info.avgs[n].total_occ_instructions_num / info.avgs[n].total : 0;
+            avg.occ_instructions_num = avg.total_occ_instructions_num ? (double)avg.total_occ_instructions_num / avg.total : 0;
 
-            info.avgs[n].brain_mutation_rate   /= info.avgs[n].total;
-            info.avgs[n].anatomy_mutation_rate /= info.avgs[n].total;
+            avg.brain_mutation_rate   /= avg.total;
+            avg.anatomy_mutation_rate /= avg.total;
 
-            if (std::isnan(info.avgs[n].size))               {info.avgs[n].size               = 0;}
+            if (std::isnan(avg.size))               {avg.size               = 0;}
 
-            if (std::isnan(info.avgs[n]._organism_lifetime)) {info.avgs[n]._organism_lifetime = 0;}
-            if (std::isnan(info.avgs[n]._organism_age))      {info.avgs[n]._organism_age      = 0;}
-            if (std::isnan(info.avgs[n]._gathered_food))     {info.avgs[n]._gathered_food     = 0;}
+            if (std::isnan(avg._organism_lifetime)) {avg._organism_lifetime = 0;}
+            if (std::isnan(avg._organism_age))      {avg._organism_age      = 0;}
+            if (std::isnan(avg._gathered_food))     {avg._gathered_food     = 0;}
             for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
-                if (std::isnan(info.avgs[n].block_avgs[i])) { info.avgs[n].block_avgs[i] = 0; }
+                if (std::isnan(avg.block_avgs[i])) { avg.block_avgs[i] = 0; }
             }
-            if (std::isnan(info.avgs[n].occ_instructions_num)) {info.avgs[n].occ_instructions_num = 0;}
+            if (std::isnan(avg.occ_instructions_num)) {avg.occ_instructions_num = 0;}
 
-            if (std::isnan(info.avgs[n].brain_mutation_rate))   {info.avgs[n].brain_mutation_rate   = 0;}
-            if (std::isnan(info.avgs[n].anatomy_mutation_rate)) {info.avgs[n].anatomy_mutation_rate = 0;}
+            if (std::isnan(avg.brain_mutation_rate))   {avg.brain_mutation_rate   = 0;}
+            if (std::isnan(avg.anatomy_mutation_rate)) {avg.anatomy_mutation_rate = 0;}
         }
     }
 };

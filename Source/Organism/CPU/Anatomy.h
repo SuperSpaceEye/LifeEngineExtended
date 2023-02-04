@@ -37,7 +37,6 @@ private:
     SerializedOrganismStructureContainer *
     make_container(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
                    boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
-                   std::vector<int> &num_producing_space,
                    ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const;
 
 
@@ -57,7 +56,7 @@ public:
     SerializedOrganismStructureContainer * remove_random_block(lehmer64 &gen);
 
     void set_block(BlockTypes type, Rotation rotation, int x, int y);
-    void set_many_blocks(std::vector<SerializedOrganismBlockContainer> & blocks);
+    void set_many_blocks(const std::vector<SerializedOrganismBlockContainer> &blocks);
     Vector2<int> recenter_blocks(bool imaginary_center);
 };
 

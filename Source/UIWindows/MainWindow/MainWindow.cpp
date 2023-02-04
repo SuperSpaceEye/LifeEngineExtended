@@ -348,11 +348,12 @@ void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const 
         for (int y: lin_height) {
             if (y < 0 || y >= edc.simulation_height) { continue; }
             auto type = edc.st_grid.get_type(x, y);
-            edc.simple_state_grid[x + y * edc.simulation_width].type = type;
-            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
+            auto & simple_block = edc.simple_state_grid[x + y * edc.simulation_width];
+            simple_block.type = type;
+            simple_block.rotation = edc.st_grid.get_rotation(x, y);
 
             if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
-                edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
+                simple_block.type = BlockTypes::FoodBlock;}
         }
     }
 }
@@ -916,7 +917,7 @@ void MainWindow::apply_font_size() {
 void MainWindow::create_image_creation_thread() {
     image_creation_thread = std::thread{[&](){
         auto point1 = std::chrono::high_resolution_clock::now();
-        auto point2 = std::chrono::high_resolution_clock::now();
+        auto point2 = point1;
         while (true) {
             point1 = std::chrono::high_resolution_clock::now();
             if (!pause_grid_parsing || !really_stop_render) {
@@ -928,7 +929,7 @@ void MainWindow::create_image_creation_thread() {
             }
             point2 = std::chrono::high_resolution_clock::now();
             std::this_thread::sleep_for(std::chrono::microseconds(
-                    std::max<long>(
+                    std::max<int64_t>(
                             int(image_creation_interval * 1000000) -
                             std::chrono::duration_cast<std::chrono::microseconds>(point2 - point1).count()
             , 0)));

@@ -17,7 +17,7 @@ simple_action_table(SimpleActionTable{brain.simple_action_table}), weighted_acti
 
 Brain::Brain(BrainTypes brain_type): brain_type(brain_type) {}
 
-void Brain::set_brain(Brain brain) {
+void Brain::set_brain(const Brain& brain) {
     brain_type = brain.brain_type;
     simple_action_table = brain.simple_action_table;
     weighted_action_table = brain.weighted_action_table;
@@ -28,7 +28,7 @@ DecisionObservation Brain::get_random_action(lehmer64 &mt) {
 }
 
 
-SimpleActionTable Brain::mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt) {
+SimpleActionTable Brain::mutate_simple_action_table(const SimpleActionTable &parents_simple_action_table, lehmer64 &mt) {
     auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, NUM_WORLD_BLOCKS-1)(mt));
     auto new_simple_action_table = SimpleActionTable{parents_simple_action_table};
 
@@ -39,7 +39,7 @@ SimpleActionTable Brain::mutate_simple_action_table(SimpleActionTable &parents_s
     return new_simple_action_table;
 }
 
-WeightedActionTable Brain::mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp) {
+WeightedActionTable Brain::mutate_weighted_action_table(const WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp) {
     auto mutate_type = static_cast<BlockTypes>(std::uniform_int_distribution<int>(1, NUM_WORLD_BLOCKS-1)(mt));
     auto new_weighted_action_table = WeightedActionTable{parent_action_table};
 
@@ -77,29 +77,31 @@ DecisionObservation Brain::get_simple_action(std::vector<Observation> &observati
     return DecisionObservation{calculate_simple_action(observations_vector[observation_i]), observations_vector[observation_i]};
 }
 
-BrainDecision Brain::calculate_simple_action(Observation &observation) const {
+BrainDecision Brain::calculate_simple_action(const Observation &observation) const {
     SimpleDecision action = simple_action_table.da[int(observation.type)];
 
-    switch (action) {
-        case SimpleDecision::DoNothing:
-            return BrainDecision::DoNothing;
-        case SimpleDecision::GoAway:
-            switch (observation.eye_rotation)
-            {   //local movement
-                case Rotation::UP:    return BrainDecision::MoveDown;
-                case Rotation::LEFT:  return BrainDecision::MoveRight;
-                case Rotation::DOWN:  return BrainDecision::MoveUp;
-                case Rotation::RIGHT: return BrainDecision::MoveLeft;
-            }
-        case SimpleDecision::GoTowards:
-            switch (observation.eye_rotation) {
-                case Rotation::UP:    return BrainDecision::MoveUp;
-                case Rotation::LEFT:  return BrainDecision::MoveLeft;
-                case Rotation::DOWN:  return BrainDecision::MoveDown;
-                case Rotation::RIGHT: return BrainDecision::MoveRight;
-            }
+
+    if (action == SimpleDecision::DoNothing) {return BrainDecision::DoNothing;}
+
+#ifdef __DEBUG__
+    if ((int)observation.eye_rotation < 0 || (int)observation.eye_rotation >= 4) {
+        throw std::runtime_error("");
     }
-    throw std::logic_error("Unknown action");
+#endif
+
+    return std::array<std::array<BrainDecision, 4>, 2> {
+            std::array<BrainDecision, 4>{
+            BrainDecision::MoveDown,
+            BrainDecision::MoveRight,
+            BrainDecision::MoveUp,
+            BrainDecision::MoveLeft
+        }, std::array<BrainDecision, 4>{
+            BrainDecision::MoveUp,
+            BrainDecision::MoveLeft,
+            BrainDecision::MoveDown,
+            BrainDecision::MoveRight
+        }
+    }[int(action)-1][int(observation.eye_rotation)];
 }
 
 std::array<float, 4> Brain::get_weighted_direction(std::vector<Observation> &observations_vector,
@@ -157,31 +159,34 @@ DecisionObservation Brain::get_weighted_action_discrete(std::vector<Observation>
     return DecisionObservation{static_cast<BrainDecision>(direction), observations_vector[0], 0};
 }
 
-BrainWeightedDecision Brain::calculate_weighted_action(Observation &observation, int look_range) const{
+BrainWeightedDecision Brain::calculate_weighted_action(const Observation &observation, int look_range) const{
     float distance_modifier = (float)std::abs(observation.distance - look_range - 1) / look_range;
     float weight = weighted_action_table.da[int(observation.type)];
 
     weight *= distance_modifier;
 
     SimpleDecision action = weight > 0 ? SimpleDecision::GoTowards : SimpleDecision::GoAway;
-    switch (action) {
-        case SimpleDecision::GoAway:
-            switch (observation.eye_rotation)
-            {   //local movement
-                case Rotation::UP:    return BrainWeightedDecision{BrainDecision::MoveDown, weight};
-                case Rotation::LEFT:  return BrainWeightedDecision{BrainDecision::MoveRight, weight};
-                case Rotation::DOWN:  return BrainWeightedDecision{BrainDecision::MoveUp, weight};
-                case Rotation::RIGHT: return BrainWeightedDecision{BrainDecision::MoveLeft, weight};
-            }
-        case SimpleDecision::GoTowards:
-            switch (observation.eye_rotation) {
-                case Rotation::UP:    return BrainWeightedDecision{BrainDecision::MoveUp, weight};
-                case Rotation::LEFT:  return BrainWeightedDecision{BrainDecision::MoveLeft, weight};
-                case Rotation::DOWN:  return BrainWeightedDecision{BrainDecision::MoveDown, weight};
-                case Rotation::RIGHT: return BrainWeightedDecision{BrainDecision::MoveRight, weight};
-            }
-        default: return BrainWeightedDecision{};
+
+#ifdef __DEBUG__
+    if ((int)observation.eye_rotation < 0 || (int)observation.eye_rotation >= 4) {
+        throw std::runtime_error("");
     }
+#endif
+
+    auto decision = std::array<std::array<BrainDecision, 4>, 2> {
+            std::array<BrainDecision, 4>{
+                    BrainDecision::MoveDown,
+                    BrainDecision::MoveRight,
+                    BrainDecision::MoveUp,
+                    BrainDecision::MoveLeft
+            }, std::array<BrainDecision, 4>{
+                    BrainDecision::MoveUp,
+                    BrainDecision::MoveLeft,
+                    BrainDecision::MoveDown,
+                    BrainDecision::MoveRight
+            }}[(int)action-1][(int)observation.eye_rotation];
+
+    return BrainWeightedDecision{decision, weight};
 }
 
 

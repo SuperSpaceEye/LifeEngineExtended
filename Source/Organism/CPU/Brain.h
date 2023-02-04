@@ -110,16 +110,16 @@ struct BrainWeightedDecision {
 
 class Brain {
 private:
-    static SimpleActionTable mutate_simple_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
+    static SimpleActionTable mutate_simple_action_table(const SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
     static WeightedActionTable
-    mutate_weighted_action_table(WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);
+    mutate_weighted_action_table(const WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);
 
     DecisionObservation get_simple_action(std::vector<Observation> &observations_vector);
     DecisionObservation get_weighted_action_discrete(std::vector<Observation> &observations_vector, int look_range,
                                                      float threshold_move);
 
-    BrainDecision calculate_simple_action(Observation &observation) const;
-    BrainWeightedDecision calculate_weighted_action(Observation &observation, int look_range) const;
+    BrainDecision calculate_simple_action(const Observation &observation) const;
+    BrainWeightedDecision calculate_weighted_action(const Observation &observation, int look_range) const;
 public:
     Brain()=default;
     Brain(Brain & brain);
@@ -143,7 +143,7 @@ public:
 
     Brain mutate(lehmer64 &mt, SimulationParameters sp);
 
-    void set_brain(Brain brain);
+    void set_brain(const Brain& brain);
 
     std::array<float, 4> get_weighted_direction(std::vector<Observation> &observations_vector, int look_range) const;
 

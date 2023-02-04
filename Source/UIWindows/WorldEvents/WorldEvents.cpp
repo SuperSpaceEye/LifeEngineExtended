@@ -42,7 +42,7 @@ void WorldEvents::button_add_new_branch() {
             delete layout;
             return;
         }
-        auto * spacer_item = ui.world_events_layout->itemAt(ui.world_events_layout->count()-1);
+        auto * spacer_item = ui.world_events_layout->itemAt(ui.world_events_layout->count() - 1);
         ui.world_events_layout->removeItem(spacer_item);
         delete spacer_item;
 

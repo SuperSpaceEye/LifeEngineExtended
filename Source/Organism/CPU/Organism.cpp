@@ -135,7 +135,7 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
     new_occ = OrganismConstructionCode(occ);
 }
 
-void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
+void Organism::mutate_brain(const Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 &gen) {
     // movers without eyes as well.
     if (sp->do_not_mutate_brains_of_plants && (new_anatomy.c["mover"] == 0 || new_anatomy.c["eye"] == 0)) {

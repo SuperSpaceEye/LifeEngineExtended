@@ -99,7 +99,7 @@ public:
 
     void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 &gen,
                         OrganismConstructionCode &new_occ);
-    void mutate_brain(Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 &gen);
+    void mutate_brain(const Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 &gen);
     static int mutate_move_range(SimulationParameters *sp, lehmer64 &gen, int parent_move_range);
 
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);

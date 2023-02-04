@@ -26,8 +26,13 @@ struct CudaTransaction {
     FoodChange * food_change = nullptr;
     int * dead_organisms = nullptr;
     MoveChange * move_change = nullptr;
-    WallChange * wall_change = nullptr;
     std::pair<int, int> * compressed_change = nullptr;
+
+    RecActionType * user_action_execution_order = nullptr;
+    WallChange * user_wall_change = nullptr;
+    FoodChange * user_food_change = nullptr;
+    RecCudaOrganism * user_organism_change = nullptr;
+    int * user_dead_change = nullptr;
 
     //length of a current transaction
     int organism_change_size = 0;
@@ -42,7 +47,6 @@ struct CudaTransaction {
     int food_change_size_length = 0;
     int dead_organisms_size_length = 0;
     int move_change_size_length = 0;
-    int wall_change_size_length = 0;
     int compressed_change_size_length = 0;
 
     bool starting_point;

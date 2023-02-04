@@ -257,14 +257,14 @@ void apply_move_change(CudaTransaction *d_transaction, BaseGridBlock *d_rec_grid
     }
 }
 
-__global__
-void apply_wall_change(CudaTransaction * d_transaction, BaseGridBlock * d_rec_grid, int sim_width) {
-    auto i_pos = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i_pos >= d_transaction->wall_change_size) { return;}
-
-    auto & chg = d_transaction->wall_change[i_pos];
-    d_rec_grid[chg.x + chg.y * sim_width].type = chg.added ? BlockTypes::WallBlock : BlockTypes::EmptyBlock;
-}
+//__global__
+//void apply_wall_change(CudaTransaction * d_transaction, BaseGridBlock * d_rec_grid, int sim_width) {
+//    auto i_pos = blockIdx.x * blockDim.x + threadIdx.x;
+//    if (i_pos >= d_transaction->wall_change_size) { return;}
+//
+//    auto & chg = d_transaction->wall_change[i_pos];
+//    d_rec_grid[chg.x + chg.y * sim_width].type = chg.added ? BlockTypes::WallBlock : BlockTypes::EmptyBlock;
+//}
 
 __global__
 void apply_compressed_change(CudaTransaction * d_transaction, RecCudaOrganism * d_orgs) {
@@ -385,7 +385,7 @@ void RecordingReconstructorCUDA::apply_normal(Transaction &transaction) {
 
     if (d_transaction->dead_organisms_size != 0) {
     num = d_transaction->dead_organisms_size / block_size + block_size;
-        apply_dead_organisms<<<num, block_size>>>(d_transaction, d_rec_orgs, d_rec_grid, grid_width, d_food_grid);
+    apply_dead_organisms<<<num, block_size>>>(d_transaction, d_rec_orgs, d_rec_grid, grid_width, d_food_grid);
     gpuErrchk(cudaDeviceSynchronize())
     }
 
@@ -483,16 +483,16 @@ void RecordingReconstructorCUDA::prepare_transaction(Transaction &transaction) {
                          sizeof(MoveChange)*transaction.move_change.size(),
                          cudaMemcpyHostToDevice))
 
-    if (transaction.user_wall_change.size() > d_transaction->wall_change_size_length) {
-        cudaFree(d_transaction->wall_change);
-        gpuErrchk(cudaMalloc((WallChange**)&d_transaction->wall_change, sizeof(WallChange)*transaction.user_wall_change.size()))
-        d_transaction->wall_change_size_length = transaction.user_wall_change.size();
-    }
-    d_transaction->wall_change_size = transaction.user_wall_change.size();
-    gpuErrchk(cudaMemcpy(d_transaction->wall_change,
-                         transaction.user_wall_change.data(),
-                         sizeof(WallChange)*transaction.user_wall_change.size(),
-                         cudaMemcpyHostToDevice))
+//    if (transaction.user_wall_change.size() > d_transaction->wall_change_size_length) {
+//        cudaFree(d_transaction->wall_change);
+//        gpuErrchk(cudaMalloc((WallChange**)&d_transaction->wall_change, sizeof(WallChange)*transaction.user_wall_change.size()))
+//        d_transaction->wall_change_size_length = transaction.user_wall_change.size();
+//    }
+//    d_transaction->wall_change_size = transaction.user_wall_change.size();
+//    gpuErrchk(cudaMemcpy(d_transaction->wall_change,
+//                         transaction.user_wall_change.data(),
+//                         sizeof(WallChange)*transaction.user_wall_change.size(),
+//                         cudaMemcpyHostToDevice))
 
     if (transaction.compressed_change.size() > d_transaction->compressed_change_size_length) {
         cudaFree(d_transaction->compressed_change);

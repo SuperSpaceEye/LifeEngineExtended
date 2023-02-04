@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 15.09.22.
 //
@@ -33,6 +37,19 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
         auto instruction = occ_vector[i];
         bool last_instruction = i == occ_vector.size()-1;
 
+        if ((
+                int(instruction) >= int(OCCInstruction::SetUnderBlockMouth)
+             && int(instruction)  < int(OCCInstruction::SetUnderBlockMouth)+NUM_ORGANISM_BLOCKS)
+             || (
+                int(instruction) >= int(OCCInstruction::SetBlockMouth)
+             && int(instruction)  < int(OCCInstruction::SetBlockMouth)+NUM_ORGANISM_BLOCKS
+                  )) {
+            if (x < edges[0]) { edges[0] = x;}
+            if (x > edges[1]) { edges[1] = x;}
+            if (y < edges[2]) { edges[2] = y;}
+            if (y > edges[3]) { edges[3] = y;}
+        }
+
         if (int(instruction) >= int(OCCInstruction::ShiftUp)
          && int(instruction) <= int(OCCInstruction::ShiftRightUp)) {
             auto shift = shift_values[static_cast<int>(instruction)];
@@ -46,16 +63,12 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
                     if (x + shift[0] > edges[1]) { edges[1] = x + shift[0];}
                     if (y + shift[1] < edges[2]) { edges[2] = y + shift[1];}
                     if (y + shift[1] > edges[3]) { edges[3] = y + shift[1];}
+                    i+=1;
                     continue;
                 }
             }
             x += shift[0];
             y += shift[1];
-
-            if (x < edges[0]) { edges[0] = x;}
-            if (x > edges[1]) { edges[1] = x;}
-            if (y < edges[2]) { edges[2] = y;}
-            if (y > edges[3]) { edges[3] = y;}
         }
 
         if (instruction == OCCInstruction::ResetToOrigin) {
@@ -85,7 +98,6 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
         occ_c.occ_height = edge_height;
         occ_c.occ_main_block_construction_space.resize(edge_width*edge_height);
         //TODO i don't want to bother with calculating additional values right now.
-        occ_c.occ_producing_space.resize((edge_width + 2) * (edge_height + 2));
         occ_c.occ_eating_space   .resize((edge_width + 2) * (edge_height + 2));
         occ_c.occ_killing_space  .resize((edge_width + 2) * (edge_height + 2));
     }
@@ -99,6 +111,12 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
 void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContainer &occ_c,
                std::vector<SerializedOrganismBlockContainer> &temp_blocks,
                SerializedOrganismStructureContainer *structure_container, int center_x, int center_y) {
+#ifdef __DEBUG__
+    if (x < 0 || y < 0 || x >= occ_c.occ_width || y >= occ_c.occ_height) {
+        throw std::runtime_error("");
+    }
+    if ((int)rotation >= 4) {throw std::runtime_error("");}
+#endif
     auto & block = occ_c.occ_main_block_construction_space[x + y * occ_c.occ_width];
     bool set_block = false;
 
@@ -125,6 +143,10 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
 
 void set_rotation(int x, int y, Rotation rotation, OCCLogicContainer &occ_c,
                   std::vector<SerializedOrganismBlockContainer> &temp_blocks) {
+#ifdef __DEBUG__
+    if ((int)rotation >= 4) {throw std::runtime_error("");}
+#endif
+    if (x < 0 || y < 0 || x >= occ_c.occ_width || y >= occ_c.occ_height) {return;}
     auto & block = occ_c.occ_main_block_construction_space[x + y * occ_c.occ_width];
     if (block.counter == occ_c.main_counter) {
         temp_blocks[block.parent_block_pos].rotation = rotation;
@@ -133,7 +155,7 @@ void set_rotation(int x, int y, Rotation rotation, OCCLogicContainer &occ_c,
 
 std::vector<SerializedOrganismBlockContainer>
 OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureContainer *container,
-                                                 OCCLogicContainer &occ_c, std::array<int, 4> edges) {
+                                                 OCCLogicContainer &occ_c, const std::array<int, 4> &edges) {
     std::vector<SerializedOrganismBlockContainer> blocks;
     auto shift_values = std::array<std::array<int, 2>, 8> {
             std::array<int, 2>{ 0,-1},
@@ -192,7 +214,7 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
 
         if (int(instruction) >= int(OCCInstruction::SetRotationUp)
          && int(instruction) <= int(OCCInstruction::SetRotationRight)) {
-            set_rotation(cursor_x, cursor_y, (Rotation)(int(instruction)-int(OCCInstruction::ApplyRotationUp)), occ_c, blocks);
+            set_rotation(cursor_x, cursor_y, (Rotation)(int(instruction)-int(OCCInstruction::SetRotationUp)), occ_c, blocks);
             continue;
         }
 
@@ -205,6 +227,7 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
         if (instruction == OCCInstruction::SetOrigin) {
             origin_x = cursor_x;
             origin_y = cursor_y;
+            continue;
         }
 
         if (int(instruction) >= int(OCCInstruction::SetBlockMouth)
@@ -226,10 +249,10 @@ OrganismConstructionCode::compile_base_structure(SerializedOrganismStructureCont
 void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructureContainer *container,
                                                       OCCLogicContainer &occ_c,
                                                       const std::array<std::array<int, 2>, 8> &shift_values,
-                                                      std::array<int, 2> &shift, Rotation &base_rotation, int cursor_x,
+                                                      std::array<int, 2> &shift, const Rotation base_rotation, int cursor_x,
                                                       int cursor_y, int center_x, int center_y,
-                                                      const OCCInstruction &instruction,
-                                                      const OCCInstruction &next_instruction,
+                                                      const OCCInstruction instruction,
+                                                      const OCCInstruction next_instruction,
                                                       std::vector<SerializedOrganismBlockContainer> &blocks, int &i,
                                                       bool &pass) {
     if (int(next_instruction) >= int(OCCInstruction::SetBlockMouth)
@@ -247,10 +270,10 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
 
 //Will compile spaces all at the same time in one go.
 SerializedOrganismStructureContainer *
-OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<int, 4> edges,
+OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::array<int, 4> &edges,
                                          std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                                          SerializedOrganismStructureContainer *container) {
-    auto shifting_positions = std::array<std::array<int, 2>, 4> {
+    constexpr auto shifting_positions = std::array<std::array<int, 2>, 4> {
         std::array<int, 2>{ 0,-1},
         std::array<int, 2>{-1, 0},
         std::array<int, 2>{ 0, 1},
@@ -288,27 +311,44 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                 for (auto & shift: shifting_positions) {
                     int x_ = x + shift[0];
                     int y_ = y + shift[1];
-                    // if eating space is not already occupied and there is no block existing on this pos in main_space.
-                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
-                        occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_width + 2)].counter != occ_c.spaces_counter
-                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter != occ_c.main_counter) {
+
+                    //organism blocks can only affect area directly connected to them, so if the space is beyond computed
+                    // edges, then no other block can affect the same area
+                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
                         temp_producing_space.emplace_back(producer, x_-center_x, y_-center_y);
-                        occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = eating_space.size() - 1;
-                    } else if (occ_c.occ_producing_space[x_ + y_ * (occ_c.occ_width + 2)].counter == occ_c.spaces_counter) {
-                        temp_producing_space[occ_c.occ_producing_space.at(x_ + y_ * (occ_c.occ_width + 2)).parent_block_pos].producer = producer;
+                        continue;
                     }
+                    //if space position is inside an organism block
+                    if (occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter == occ_c.main_counter) {
+                        continue;
+                    }
+                    //we do not care if there are other producing spaces overlapping this one
+                    temp_producing_space.emplace_back(producer, x_-center_x, y_-center_y);
                 }
                 break;
             case BlockTypes::MouthBlock:
                 for (auto & shift: shifting_positions) {
                     int x_ = x + shift[0];
                     int y_ = y + shift[1];
-                    // if eating space is not already occupied and there is no block existing on this pos in main_space.
-                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
-                        occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width + 2)].counter != occ_c.spaces_counter
-                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter != occ_c.main_counter) {
+
+                    //organism blocks can only affect area directly connected to them, so if the space is beyond computed
+                    // edges, then no other block can affect the same area
+                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
                         eating_space.emplace_back(x_-center_x, y_-center_y);
-                        occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = eating_space.size() - 1;
+                        continue;
+                    }
+                    //if space position is inside an organism block
+                    if (occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter == occ_c.main_counter) {
+                        continue;
+                    }
+                    // if the space was not initialized before
+                    if (occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)].counter != occ_c.spaces_counter) {
+                        eating_space.emplace_back(x_-center_x, y_-center_y, 1);
+                        auto & block = occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)];
+                        block.parent_block_pos = eating_space.size() - 1;
+                        block.counter = occ_c.spaces_counter;
+                    } else {
+                        eating_space[occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)].parent_block_pos].num++;
                     }
                 }
                 break;
@@ -316,16 +356,32 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, std::array<in
                 for (auto & shift: shifting_positions) {
                     int x_ = x + shift[0];
                     int y_ = y + shift[1];
-                    // if eating space is not already occupied and there is no block existing on this pos in main_space.
-                    if (x_-1 <= 0 || y_-1 <= 0 || x_-1 >= occ_c.occ_width || y_-1 >= occ_c.occ_height ||
-                        occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width + 2)].counter != occ_c.spaces_counter
-                        && occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter != occ_c.main_counter) {
+
+                    //organism blocks can only affect area directly connected to them, so if the space is beyond computed
+                    // edges, then no other block can affect the same area
+                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
                         killer_space.emplace_back(x_-center_x, y_-center_y);
-                        occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width + 2)].parent_block_pos = killer_space.size() - 1;
+                        continue;
+                    }
+                    //if space position is inside an organism block
+                    if (occ_c.occ_main_block_construction_space[(x_-1) + (y_-1) * occ_c.occ_width].counter == occ_c.main_counter) {
+                        continue;
+                    }
+                    // if the space was not initialized before
+                    if (occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)].counter != occ_c.spaces_counter) {
+                        killer_space.emplace_back(x_-center_x, y_-center_y, 1);
+                        auto & block = occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)];
+                        block.parent_block_pos = killer_space.size() - 1;
+                        block.counter = occ_c.spaces_counter;
+                    } else {
+                        killer_space[occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)].parent_block_pos].num++;
                     }
                 }
                 break;
             case BlockTypes::EyeBlock:
+#ifdef __DEBUG__
+        if ((int)block.rotation < 0 || (int)block.rotation >= 4 ) {throw std::runtime_error("");}
+#endif
                 eye_blocks_vec.emplace_back(block);
                 break;
             default: break;
@@ -390,6 +446,7 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             auto group = create_random_group(group_size, occp, gen);
             child_code.occ_vector.insert(child_code.occ_vector.end(), group.begin(), group.end());
         }
+        break;
         //insert group into sequence
         case OCCMutations::InsertRandom: {
             auto group = create_random_group(group_size, occp, gen);
@@ -410,8 +467,8 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
             while (iterator != child_code.occ_vector.end() && iterated < group.size()) {
                 (*iterator) = group[iterated];
 
-                iterated++;
-                iterator++;
+                ++iterated;
+                ++iterator;
             }
         }
             break;
@@ -451,8 +508,8 @@ OrganismConstructionCode OrganismConstructionCode::mutate(OCCParameters &occp, l
                 std::swap(*first_iterator, *second_iterator);
 
                 i++;
-                second_iterator++;
-                first_iterator++;
+                ++second_iterator;
+                ++first_iterator;
             }
         }
             break;

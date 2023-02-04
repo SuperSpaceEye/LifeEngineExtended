@@ -41,6 +41,7 @@ void SimulationEngine::threaded_mainloop() {
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (edc.record_data) {
                 edc.stc.tbuffer.record_recenter_to_imaginary_pos(sp.recenter_to_imaginary_pos);
+                edc.stc.tbuffer.record_food_threshold(sp.food_threshold);
                 edc.stc.tbuffer.record_transaction();
             }
             if (edc.total_engine_ticks % ecp.update_info_every_n_tick == 0) {info.parse_info(&edc, &ecp);}
@@ -233,13 +234,12 @@ void SimulationEngine::action_place_organism(const Action &action) {
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
     for (auto &block: edc.chosen_organism.anatomy.organism_blocks) {
-        continue_flag = check_if_out_of_bounds(&edc,
-                                               block.get_pos(edc.chosen_organism.rotation).x + action.x,
-                                               block.get_pos(edc.chosen_organism.rotation).y + action.y);
-        if (continue_flag) { break; }
+        const auto pos = block.get_pos(edc.chosen_organism.rotation);
+        const auto x = pos.x + action.x;
+        const auto y = pos.y + action.y;
 
-        int x = block.get_pos(edc.chosen_organism.rotation).x + action.x;
-        int y = block.get_pos(edc.chosen_organism.rotation).y + action.y;
+        continue_flag = check_if_out_of_bounds(&edc, x, y);
+        if (continue_flag) { break; }
 
         auto type = edc.st_grid.get_type(x, y);
         auto num = edc.st_grid.get_food_num(x, y);
@@ -300,15 +300,15 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
     for (auto & block: organism_ptr->anatomy.organism_blocks) {
-        edc.st_grid.get_type(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                             organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
-        edc.st_grid.add_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y,
-                                 block.get_food_cost(*organism_ptr->bp), sp.max_food);
+        const auto pos = block.get_pos(organism_ptr->rotation);
+        const auto ox = organism_ptr->x + pos.x;
+        const auto oy = organism_ptr->y + pos.y;
+        const auto fc = block.get_food_cost(*organism_ptr->bp);
+
+        edc.st_grid.get_type(ox, oy) = BlockTypes::EmptyBlock;
+        edc.st_grid.add_food_num(ox, oy, fc, sp.max_food);
         if (edc.record_data) {
-            edc.stc.tbuffer.record_food_change(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                                               organism_ptr->y + block.get_pos(organism_ptr->rotation).y,
-                                               block.get_food_cost(*organism_ptr->bp));
+            edc.stc.tbuffer.record_food_change(ox, oy, fc);
         }
     }
     if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
@@ -484,11 +484,12 @@ void SimulationEngine::parse_full_simulation_grid() {
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
             auto type = edc.st_grid.get_type(x, y);
-            edc.simple_state_grid[x + y * edc.simulation_width].type = type;
-            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
+            auto & simple_block = edc.simple_state_grid[x + y * edc.simulation_width];
+            simple_block.type = type;
+            simple_block.rotation = edc.st_grid.get_rotation(x, y);
 
             if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
-                edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
+                simple_block.type = BlockTypes::FoodBlock;}
         }
     }
 }
