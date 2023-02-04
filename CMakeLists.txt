@@ -12,6 +12,8 @@ option(BOOST_ROOT "If on windows, set path to boost root directory" "C:\\libs\\b
 option(BOOST_LIBRARYDIR "If on windows, set path to compiled libraries, like 'boost\\stage\\libs'" "C:\\libs\\boost\\boost_1_79_0\\stage\\libs")
 
 set(DEBUG 0)
+set(INLINE 0)
+set(SANITIZE 0)
 
 # -ffast-math -funroll-loops -ftree-parallelize-loops=4
 
@@ -36,11 +38,13 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -cudart=shared")
 
 if(DEBUG)
     add_compile_definitions(__DEBUG__)
-
+endif ()
+if (INLINE OR DEBUG)
     #for perf
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-inline-functions")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline-functions")
-
+endif ()
+if(SANITIZE OR DEBUG)
     #https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
