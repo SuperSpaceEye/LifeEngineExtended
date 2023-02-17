@@ -2,24 +2,9 @@
 
 #include "../include/movie.h"
 
-#include <librsvg-2.0/librsvg/rsvg.h>
 #include <vector>
 
 using namespace std;
-
-// One-time initialization.
-class FFmpegInitialize
-{
-public :
-
-    FFmpegInitialize()
-    {
-        // Loads the whole database of available codecs and formats.
-        av_register_all();
-    }
-};
-
-static FFmpegInitialize ffmpegInitialize;
 
 void MovieWriter::start_writing(const string& filename_, const unsigned int width_, const unsigned int height_, const int frameRate_) {
     width = width_;
@@ -35,16 +20,16 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
     // in order to write properly the header, frame data and end of file.
     const char* fmtext = "mp4";
     const string filename = filename_ + "." + fmtext;
-    fmt = av_guess_format(fmtext, NULL, NULL);
+    fmt = (AVOutputFormat*)av_guess_format(fmtext, NULL, NULL);
     avformat_alloc_output_context2(&fc, NULL, NULL, filename.c_str());
 
     // Setting up the codec.
-    AVCodec* codec = avcodec_find_encoder_by_name("libx264");
+    AVCodec* codec = (AVCodec*)avcodec_find_encoder_by_name("libx264");
     AVDictionary* opt = NULL;
     av_dict_set(&opt, "preset", "ultrafast", 0);
     av_dict_set(&opt, "crf", "23", 0);
     stream = avformat_new_stream(fc, codec);
-    c = stream->codec;
+    avcodec_parameters_to_context(c, stream->codecpar);
     c->width = width;
     c->height = height;
     c->pix_fmt = AV_PIX_FMT_YUV420P;
@@ -84,7 +69,7 @@ void MovieWriter::start_writing(const string& filename_, const unsigned int widt
 }
 
 void MovieWriter::addYUVFrame(const uint8_t *pixels) {
-    avpicture_fill((AVPicture*)yuvpic, pixels, AV_PIX_FMT_YUV420P, width, height);
+    av_image_fill_arrays(yuvpic->data, yuvpic->linesize, pixels, AV_PIX_FMT_YUV420P, width, height, 1);
 
     av_init_packet(&pkt);
     pkt.data = nullptr;
@@ -95,10 +80,20 @@ void MovieWriter::addYUVFrame(const uint8_t *pixels) {
     // for instance, as the corresponding frame number.
     yuvpic->pts = iframe;
 
-    int got_output;
-    int ret = avcodec_encode_video2(c, &pkt, yuvpic, &got_output);
-    if (got_output)
-    {
+    int ret = avcodec_send_frame(c, yuvpic);
+    if (ret < 0) {
+        throw std::runtime_error("Error sending a frame for encoding\n");
+    }
+
+    //https://stackoverflow.com/questions/59470927/how-to-replace-avcodec-encode-audio2-avcodec-encode-video2-with-avcodec-send7
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(c, &pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){
+            return;
+        }
+        else if (ret < 0) {
+            throw std::runtime_error("Error during encoding\n");
+        }
         // We set the packet PTS and DTS taking in the account our FPS (second argument),
         // and the time base that our selected format uses (third argument).
         av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
@@ -108,7 +103,10 @@ void MovieWriter::addYUVFrame(const uint8_t *pixels) {
         pkt.stream_index = stream->index;
 
         // Write the encoded frame to the mp4 file.
-        av_interleaved_write_frame(fc, &pkt);
+        ret = av_interleaved_write_frame(fc, &pkt);
+        if (ret < 0) {
+            throw std::runtime_error("Error while writing video frame");
+        }
         av_packet_unref(&pkt);
     }
 }
@@ -160,7 +158,7 @@ void Bitmap2Yuv420p_calc2(uint8_t *destination, const uint8_t *rgb, size_t width
 void MovieWriter::addFrame(const uint8_t *pixels)
 {
     Bitmap2Yuv420p_calc2(temp_data.data(), pixels, width, height);
-    avpicture_fill((AVPicture*)yuvpic, temp_data.data(), AV_PIX_FMT_YUV420P, width, height);
+    av_image_fill_arrays(yuvpic->data, yuvpic->linesize, pixels, AV_PIX_FMT_YUV420P, width, height, 1);
 
     av_init_packet(&pkt);
     pkt.data = NULL;
@@ -171,10 +169,20 @@ void MovieWriter::addFrame(const uint8_t *pixels)
     // for instance, as the corresponding frame number.
     yuvpic->pts = iframe;
 
-    int got_output;
-    int ret = avcodec_encode_video2(c, &pkt, yuvpic, &got_output);
-    if (got_output)
-    {
+    int ret = avcodec_send_frame(c, yuvpic);
+    if (ret < 0) {
+        throw std::runtime_error("Error sending a frame for encoding\n");
+    }
+
+    //https://stackoverflow.com/questions/59470927/how-to-replace-avcodec-encode-audio2-avcodec-encode-video2-with-avcodec-send7
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(c, &pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){
+            return;
+        }
+        else if (ret < 0) {
+            throw std::runtime_error("Error during encoding\n");
+        }
         // We set the packet PTS and DTS taking in the account our FPS (second argument),
         // and the time base that our selected format uses (third argument).
         av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
@@ -184,7 +192,10 @@ void MovieWriter::addFrame(const uint8_t *pixels)
         pkt.stream_index = stream->index;
 
         // Write the encoded frame to the mp4 file.
-        av_interleaved_write_frame(fc, &pkt);
+        ret = av_interleaved_write_frame(fc, &pkt);
+        if (ret < 0) {
+            throw std::runtime_error("Error while writing video frame");
+        }
         av_packet_unref(&pkt);
     }
 }
@@ -204,18 +215,18 @@ void MovieWriter::convert_image(const uint8_t *pixels) {
 
 void MovieWriter::stop_writing() {
     // Writing the delayed frames:
-    for (int got_output = 1; got_output; )
+    while (true)
     {
-        int ret = avcodec_encode_video2(c, &pkt, NULL, &got_output);
-        if (got_output)
-        {
-            fflush(stdout);
-            av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
-            pkt.stream_index = stream->index;
-            printf("Writing frame %d (size = %d)\n", iframe++, pkt.size);
-            av_interleaved_write_frame(fc, &pkt);
-            av_packet_unref(&pkt);
-        }
+        int ret = avcodec_receive_packet(c, &pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) { break;}
+
+        fflush(stdout);
+        av_packet_rescale_ts(&pkt, (AVRational){ 1, frameRate }, stream->time_base);
+        pkt.stream_index = stream->index;
+        printf("Writing frame %d (size = %d)\n", iframe++, pkt.size);
+        av_interleaved_write_frame(fc, &pkt);
+        av_packet_unref(&pkt);
+
     }
 
     // Writing the end of the file.
@@ -224,7 +235,7 @@ void MovieWriter::stop_writing() {
     // Closing the file.
     if (!(fmt->flags & AVFMT_NOFILE))
         avio_closep(&fc->pb);
-    avcodec_close(stream->codec);
+    avcodec_close(c);
 
     // Freeing all the allocated memory:
     temp_data = std::vector<unsigned char>{};

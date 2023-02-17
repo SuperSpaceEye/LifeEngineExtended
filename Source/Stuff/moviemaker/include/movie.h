@@ -17,6 +17,8 @@ extern "C"
 	#include <libavutil/mathematics.h>
 	#include <libavformat/avformat.h>
 	#include <libavutil/opt.h>
+    #include <libavutil/imgutils.h>
+    #include <libavutil/avutil.h>
 }
 
 class MovieWriter
