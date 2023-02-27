@@ -24,9 +24,9 @@ Anatomy::make_container(boost::unordered_map<int, boost::unordered_map<int, Base
                         ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const {
     std::vector<int> num_producing_space;
 
-    boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, std::vector<int>>> _producing_space;
-    boost::unordered::unordered_map<int, boost::unordered_map<int, int>> _eating_space;
-    boost::unordered::unordered_map<int, boost::unordered_map<int, int>> _killing_space;
+    boost::unordered_map<int, boost::unordered_map<int, std::vector<int>>> _producing_space;
+    boost::unordered_map<int, boost::unordered_map<int, int>> _eating_space;
+    boost::unordered_map<int, boost::unordered_map<int, int>> _killing_space;
 
     SimpleAnatomyMutationLogic::create_producing_space(_organism_blocks, _producing_space, single_adjacent_space, num_producing_space, _c["producer"]);
     SimpleAnatomyMutationLogic::create_eating_space(_organism_blocks, _eating_space, single_adjacent_space, _c["mouth"]);
