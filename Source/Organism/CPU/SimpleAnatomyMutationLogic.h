@@ -18,8 +18,15 @@
 #include "AnatomyContainers.h"
 #include "../../Stuff/ConstMap.h"
 
-#include <boost/unordered_map.hpp>
 #include <string_view>
+
+#ifndef __EMSCRIPTEN_COMPILATION__
+#include <boost/unordered_map.hpp>
+#else
+#include <unordered_map>
+#define boost std
+#endif
+#include <utility>
 
 constexpr std::array<Vector2<int>, 4> spos {
     Vector2{ 1,  0},
@@ -38,8 +45,8 @@ constexpr std::array<Vector2<int>, 4> dpos {
 class SimpleAnatomyMutationLogic {
 
     static void set_single_adjacent(int x, int y, int x_offset, int y_offset,
-                                    boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                    boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
+                                    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                    boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
                                     const BaseGridBlock &block) {
         if (!organism_blocks[x+x_offset].count(y+y_offset)       &&
             !single_adjacent_space[x+x_offset].count(y+y_offset)) {
@@ -48,16 +55,16 @@ class SimpleAnatomyMutationLogic {
     }
 
     static void set_single_diagonal_adjacent(int x, int y, int x_offset, int y_offset,
-                                             boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-                                             boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
+                                             boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+                                             boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
         if (!organism_blocks[x+x_offset].count(y+y_offset)       &&
             !single_adjacent_space[x+x_offset].count(y+y_offset) &&
             !single_diagonal_adjacent_space[x+x_offset].count(y+y_offset))
         {single_diagonal_adjacent_space[x+x_offset][y+y_offset] = true;}
     }
 
-    static inline void serialize_killing_space(const boost::unordered::unordered_map<int, boost::unordered_map<int, int>> &killing_space,
+    static inline void serialize_killing_space(const boost::unordered_map<int, boost::unordered_map<int, int>> &killing_space,
                                                std::vector<SerializedAdjacentSpaceContainer> &_killing_space) {
         for (auto const &xmap: killing_space) {
             for (auto const &yxmap: xmap.second) {
@@ -66,7 +73,7 @@ class SimpleAnatomyMutationLogic {
         }
     }
 
-    static inline void serialize_eating_space(const boost::unordered::unordered_map<int, boost::unordered_map<int, int>> &eating_space,
+    static inline void serialize_eating_space(const boost::unordered_map<int, boost::unordered_map<int, int>> &eating_space,
                                               std::vector<SerializedAdjacentSpaceContainer> &_eating_space) {
         for (auto const &xmap: eating_space) {
             for (auto const &yxmap: xmap.second) {
@@ -75,7 +82,7 @@ class SimpleAnatomyMutationLogic {
         }
     }
 
-    static inline void serialize_organism_blocks(const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
+    static inline void serialize_organism_blocks(const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                                  std::vector<SerializedOrganismBlockContainer> &_organism_blocks) {
         for (auto const &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
@@ -84,7 +91,7 @@ class SimpleAnatomyMutationLogic {
         }
     }
 
-    static inline void serialize_producing_space(const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, std::vector<int>>> &producing_space,
+    static inline void serialize_producing_space(const boost::unordered_map<int, boost::unordered_map<int, std::vector<int>>> &producing_space,
                                                  const std::vector<int> &num_producing_space,
                                                  std::vector<std::vector<SerializedAdjacentSpaceContainer>> &_producing_space) {
         for (int i = 0; i < num_producing_space.size(); i++) {
@@ -116,7 +123,7 @@ class SimpleAnatomyMutationLogic {
     }
 
     template<typename T>
-    static int get_map_size(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, T>> map) {
+    static int get_map_size(boost::unordered_map<int, boost::unordered_map<int, T>> map) {
         int total_size = 0;
         for (auto & xmap: map) {
             total_size += xmap.second.size();
@@ -124,7 +131,7 @@ class SimpleAnatomyMutationLogic {
         return total_size;
     }
 
-    static void mark_space(int x, int y, boost::unordered::unordered_map<int, boost::unordered_map<int, int>> & space) {
+    static void mark_space(int x, int y, boost::unordered_map<int, boost::unordered_map<int, int>> & space) {
         if (space[x].find(y) == space[x].end()) {
             space[x][y] = 1;
         } else {
@@ -132,7 +139,7 @@ class SimpleAnatomyMutationLogic {
         }
     }
 
-    static void mark_pr_space(int x, int y, int producer, boost::unordered::unordered_map<int, boost::unordered_map<int, std::vector<int>>> & space) {
+    static void mark_pr_space(int x, int y, int producer, boost::unordered_map<int, boost::unordered_map<int, std::vector<int>>> & space) {
         if (space[x].find(y) == space[x].end()) {
             space[x][y] = std::vector<int>{producer};
         } else {
@@ -141,7 +148,7 @@ class SimpleAnatomyMutationLogic {
     }
 
 public:
-    static void create_eating_space(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
+    static void create_eating_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                     boost::unordered_map<int, boost::unordered_map<int, int>> &eating_space,
                                     boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
                                     int32_t mouth_blocks) {
@@ -160,9 +167,9 @@ public:
         }
     }
 
-    static void create_killing_space(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                     boost::unordered::unordered_map<int, boost::unordered_map<int, int>>& killing_space,
-                                     boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+    static void create_killing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                     boost::unordered_map<int, boost::unordered_map<int, int>>& killing_space,
+                                     boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
                                      int32_t killer_blocks) {
         if (killer_blocks > 0) {
             for (auto &xmap: organism_blocks) {
@@ -179,9 +186,9 @@ public:
         }
     }
 
-    static void create_producing_space(boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-                                       boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, std::vector<int>>>& producing_space,
-                                       boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+    static void create_producing_space(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                       boost::unordered_map<int, boost::unordered_map<int, std::vector<int>>>& producing_space,
+                                       boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
                                        std::vector<int> & num_producing_space,
                                        int32_t producer_blocks) {
         if (producer_blocks > 0) {
@@ -207,8 +214,8 @@ public:
     }
 
     static void create_single_adjacent_space(
-            boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space) {
+            boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+            boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space) {
         for (auto const &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
                 for (auto & p: spos) {
@@ -219,9 +226,9 @@ public:
     }
 
     static void create_single_diagonal_adjacent_space(
-            boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
-            boost::unordered::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
+            boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_adjacent_space,
+            boost::unordered_map<int, boost::unordered_map<int, bool>>& single_diagonal_adjacent_space) {
         for (auto const &xmap: organism_blocks) {
             for (auto const &yxmap: xmap.second) {
                 for (auto & p: dpos) {
@@ -243,10 +250,10 @@ public:
     }
 
     static SerializedOrganismStructureContainer * serialize(
-            const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, BaseGridBlock>> &organism_blocks,
-            const boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, std::vector<int>>> &producing_space,
-            const boost::unordered::unordered_map<int, boost::unordered_map<int, int>> &eating_space,
-            const boost::unordered::unordered_map<int, boost::unordered_map<int, int>> &killing_space,
+            const boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+            const boost::unordered_map<int, boost::unordered_map<int, std::vector<int>>> &producing_space,
+            const boost::unordered_map<int, boost::unordered_map<int, int>> &eating_space,
+            const boost::unordered_map<int, boost::unordered_map<int, int>> &killing_space,
             const std::vector<int> &num_producing_space,
             const ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &c) {
         std::vector<SerializedOrganismBlockContainer> _organism_blocks;
