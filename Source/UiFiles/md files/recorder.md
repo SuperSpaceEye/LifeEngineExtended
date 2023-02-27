@@ -8,7 +8,6 @@ To make a video follow these steps:
 5. Click **"Compile intermediate data into video"**
 6. Wait until video is compiled. Finished video will be in the "path to program dir/videos". The video will be named with the timestamp of the start of the recording
 
-Warning! The recorder right now is pretty inefficient. During the recording it will quickly fill up a lot of space, while the creating of video is pretty slow, so it is preferable to keep your recording <5000 simulation ticks.
 You can compile several videos in parallel, but it is not recommended.
 
 ### Various setting.
@@ -22,6 +21,4 @@ You can compile several videos in parallel, but it is not recommended.
 * **"Clear intermediate data"** - Will stop the recording before freeing the tbuffer space.
 * **"Delete all intermediate data from disk"** - Will delete everything in the /temp/ folder.
 * **"Compile intermediate data into video"** - The output will be in /videos/ folder. Compilation is done in two stages:
-  1. Convert recording data into a series of images in /temp/ folder. This stage is the slowest, though you can stop the compilation and continue later.
-  2. Convert series of images into video. This stage is magnitudes faster than the previous, but cannot be stopped without losing the progress.
 * **"Load intermediate data location"** - Choose the folder with the recording.

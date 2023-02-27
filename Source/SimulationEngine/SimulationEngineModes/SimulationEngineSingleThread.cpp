@@ -81,6 +81,8 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer &
 
             auto & type = edc.st_grid.get_type(x, y);
 
+            if (type != BlockTypes::EmptyBlock && type != BlockTypes::FoodBlock) {return;}
+
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp.food_production_probability * multiplier) {
                 //if couldn't add the food because there is already almost max amount.
                 if (!edc.st_grid.add_food_num(x, y, 1, sp.max_food)) {continue;}
@@ -105,6 +107,8 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
         auto y = organism.y + pc.get_pos(organism.rotation).y;
 
         auto & type = edc.st_grid.get_type(x, y);
+
+        if (type != BlockTypes::EmptyBlock && type != BlockTypes::FoodBlock) {return;}
 
         if (!edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
         if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, 1);}
