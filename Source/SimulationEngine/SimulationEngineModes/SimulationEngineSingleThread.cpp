@@ -337,8 +337,8 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
                                                              int &new_y) {
     float mass = organism.food_needed; // + organism.food_collected
     auto & cd = organism.cdata;
-    cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.anatomy.c["mover"];
-    cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.anatomy.c["mover"];
+    cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.anatomy.c.data[int(BlockTypes::MoverBlock)];
+    cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.anatomy.c.data[int(BlockTypes::MoverBlock)];
 
     cd.p_x += cd.p_vx;
     cd.p_y += cd.p_vy;
