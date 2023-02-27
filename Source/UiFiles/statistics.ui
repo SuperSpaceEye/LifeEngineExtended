@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>712</height>
+    <width>994</width>
+    <height>732</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,8 +45,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>895</width>
-        <height>710</height>
+        <width>992</width>
+        <height>730</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -171,6 +171,31 @@
            </widget>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="lb_zoom">
+              <property name="text">
+               <string>Zoom:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lb_viewpoint_x">
+              <property name="text">
+               <string>Viewpoint x:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lb_viewpoint_y">
+              <property name="text">
+               <string>Viewpoint y:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -189,7 +214,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_47">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_38">
+             <layout class="QVBoxLayout" name="moving_vl">
               <item>
                <widget class="QLabel" name="lb_moving_organisms">
                 <property name="text">
@@ -267,52 +292,10 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QLabel" name="lb_mouth_num_2">
-                <property name="text">
-                 <string>Avg mouth num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_producer_num_2">
-                <property name="text">
-                 <string>Avg producer num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_mover_num_2">
-                <property name="text">
-                 <string>Avg mover num:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_killer_num_2">
-                <property name="text">
-                 <string>Avg killer num:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_armor_num_2">
-                <property name="text">
-                 <string>Avg armor num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_eye_num_2">
-                <property name="text">
-                 <string>Avg eye num: </string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_40">
+             <layout class="QVBoxLayout" name="stationary_vl">
               <item>
                <widget class="QLabel" name="lb_stationary_organisms">
                 <property name="text">
@@ -376,45 +359,10 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QLabel" name="lb_producer_num_3">
-                <property name="text">
-                 <string>Avg producer num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_mouth_num_3">
-                <property name="text">
-                 <string>Avg mouth num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_killer_num_3">
-                <property name="text">
-                 <string>Avg killer num:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_armor_num_3">
-                <property name="text">
-                 <string>Avg armor num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_eye_num_3">
-                <property name="text">
-                 <string>Avg eye num: </string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_10">
+             <layout class="QVBoxLayout" name="both_vl">
               <item>
                <widget class="QLabel" name="lb_organisms_alive_2">
                 <property name="text">
@@ -475,48 +423,6 @@
                <widget class="QLabel" name="lb_brain_mutation_rate_4">
                 <property name="text">
                  <string>Avg brain mutation rate:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_producer_num_4">
-                <property name="text">
-                 <string>Avg producer num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_mover_num_4">
-                <property name="text">
-                 <string>Avg mover num:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_mouth_num_4">
-                <property name="text">
-                 <string>Avg mouth num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_killer_num_4">
-                <property name="text">
-                 <string>Avg killer num:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_armor_num_4">
-                <property name="text">
-                 <string>Avg armor num: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="lb_eye_num_4">
-                <property name="text">
-                 <string>Avg eye num: </string>
                 </property>
                </widget>
               </item>

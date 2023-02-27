@@ -1,5 +1,6 @@
 # Evolution Controls
 These are the explanations for some evolution options
+- **"Food production probability"** - Probablilty of producing food per tick for each producing block
 - **"Lifespan multiplier"** - Multiplicator of the sum of "Lifetime Weight" of each block of an organism.
 - **"Anatomy mutation rate mutation step"** - An amount by which a mutation rate of an organism can increase or decrease
 - **"Anatomy mutation rate delimiter"** - A parameter which controls whatever organism's anatomy mutation rate will be biased to increase or decrease. If >0.5 then the rate will increase, if <0.5 then the rate will decrease, if == 0.5 then no bias.
@@ -9,12 +10,17 @@ These are the explanations for some evolution options
 - **"Organism's self cells block sight"** - If disabled, organism can see through itself. If enabled, the eye that points to the cell that belongs to itself will return "Empty block" as observation.
 - **"Set fixed move range"** - Will force organisms to use "Min move range" and will make child move ranges equal to parent during reproduction.
 - **"Move range delimiter"** - The same as Anatomy mutation rate delimiter”
+- **"Food threshold"** - Minimum amount of food needed in a world block before organisms can eat it.
+- **"Max food"** - Maximum amount of food a world block can contain
+- **"Continuous movement drag"** - If continuous mode enabled, sets drag for organism's movement
 - **"Failed reproduction eats food"** - If disabled, then the food will be deduced from parent organism only after successful reproduction.
 - **"Rotate every move tick"** - Will make organisms rotate every time they move. If disabled, then they will rotate only at the end of move range.
 - **"Simplified food production"** - Will try to produce food for each space that can produce food.
 - **"Eat first, then produce food"** - If disabled, will produce food first and only then eat.
 - **"Use new child position calculator"** - New child position calculator calculating position of a child by first calculating the coordinates of edges of parent and child + distance. For example, if the chosen reproduction direction is up, then calculator will calculate the uppermost y cell coordinate of a parent, the bottom y cell coordinate of a child + distance. That way, the child organism will never appear inside a parent organism_index. The old child position calculator however calculates only the edge coordinates of a parent organism_index + distance, allowing child organisms to appear inside parent, with the side effect of organisms being unable to reproduce if the reproducing distance is less than (height or width)/2 (depending on child organism_index rotation and chosen reproductive direction)
 - **"Check if path is clear"** - If enabled, will check for each cell of a child organism if there is an obstruction in the way (except for parents cells), like a wall or a food if "Food blocks reproduction" is enabled. If there is, then the parent organism_index will not reproduce. If disabled, the child will just check if there is a space for itself at the end coordinated, but it will introduce some behaviours such as child organisms hopping though walls if they are thin enough.
+- **"Recenter organism to imaginary position"** - If enabled, will set "center" of organism to mathematical center, even if there are no cell corresponding to center.
+- **"Use weighted brain"** - Instead of discrete decision making, will add all observations to a movement vector.
 
 "Organism cell parameters modifiers" - modifiers for each cell of all organisms.
 - **"Life point"** - The amount of life points this cell will give to organism

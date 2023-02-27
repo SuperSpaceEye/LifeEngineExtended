@@ -11,7 +11,7 @@
 
 struct SimulationParameters {
     //evolution controls
-    float food_production_probability = 0.01; //0.005;
+    float food_production_probability = 0.025;
     int   produce_food_every_n_life_ticks = 1;
     float lifespan_multiplier = 100;
     int   look_range = 50;
@@ -33,6 +33,14 @@ struct SimulationParameters {
     float brain_mutation_rate_mutation_step = 0.01;
     float brain_min_possible_mutation_rate = 0.01;
     float brain_mutation_rate_delimiter = 0.5;
+
+    float weighted_brain_mutation_step = 0.1;
+    float threshold_move = 0.1;
+
+    float food_threshold = 1;
+    float max_food = 1;
+
+    float continuous_movement_drag = 0.2;
 
     int   min_move_range = 1;
     int   max_move_range = 5;
@@ -57,7 +65,7 @@ struct SimulationParameters {
     bool use_anatomy_evolved_mutation_rate = true;
     bool use_brain_evolved_mutation_rate = true;
     bool movers_can_produce_food = false;
-    bool food_blocks_reproduction = false;
+    bool food_blocks_reproduction = true;
     //world controls
     bool reset_on_total_extinction = true;
     bool pause_on_total_extinction = false;
@@ -68,16 +76,19 @@ struct SimulationParameters {
     bool organism_self_blocks_block_sight = false;
     bool failed_reproduction_eats_food = true;
     bool rotate_every_move_tick = false;
-    bool multiply_food_production_prob = true;
+    bool multiply_food_production_prob = false;
     bool simplified_food_production = false;
     bool stop_when_one_food_generated = false;
     bool eat_then_produce = true;
     bool check_if_path_is_clear = true;
     bool food_blocks_movement = false;
-    bool use_new_child_pos_calculator = true;
     bool no_random_decisions = false;
     bool use_occ = true;
-    bool recenter_to_imaginary_pos = false;
+    bool recenter_to_imaginary_pos = true;
+    bool do_not_mutate_brains_of_plants = true;
+    bool use_weighted_brain = true;
+    bool organisms_destroy_food = true;
+    bool use_continuous_movement = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

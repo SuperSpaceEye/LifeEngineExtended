@@ -66,8 +66,21 @@ public:
                                              brain_mutation_rate(brain_mutation_rate), move_range(move_range) {};
 };
 
+struct ContinuousData {
+    // physics
+    float p_x = 0;
+    float p_y = 0;
+    //velocity
+    float p_vx = 0;
+    float p_vy = 0;
+    //force
+    float p_fx = 0;
+    float p_fy = 0;
+};
+
 class Organism: public OrganismData {
 public:
+    ContinuousData cdata;
     Anatomy anatomy;
     Brain brain;
     OrganismConstructionCode occ;
@@ -84,18 +97,19 @@ public:
     int calculate_organism_lifetime();
     float calculate_food_needed();
 
-    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 *gen,
+    void mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rate, lehmer64 &gen,
                         OrganismConstructionCode &new_occ);
-    void mutate_brain(Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 *gen);
-    static int mutate_move_range(SimulationParameters *sp, lehmer64 *gen, int parent_move_range);
+    void mutate_brain(const Anatomy &new_anatomy, Brain &new_brain, float &_brain_mutation_rate, lehmer64 &gen);
+    static int mutate_move_range(SimulationParameters *sp, lehmer64 &gen, int parent_move_range);
 
-    void think_decision(std::vector<Observation> &organism_observations, lehmer64 *mt);
+    void think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 
     void init_values();
 
     void kill_organism(EngineDataContainer & edc);
 
     void move_organism(Organism & organism);
+    void copy_organism(const Organism & organism);
 
     Organism & operator=(const Organism & organism)=default;
     Organism()=default;
@@ -104,8 +118,12 @@ public:
              SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
              OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate = 0.05,
              float brain_mutation_rate = 0.1);
-    Organism(Organism *organism);
-    int32_t create_child(lehmer64 *gen, EngineDataContainer &edc);
+    explicit Organism(Organism *organism);
+    int32_t create_child(lehmer64 &gen, EngineDataContainer &edc);
+
+    void calculate_discrete_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
+
+    void calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 };
 
 

@@ -12,35 +12,25 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
                                    EngineControlParameters &engine_control_parameters,
                                    OrganismBlockParameters &organism_block_parameters,
                                    SimulationParameters &simulation_parameters,
-                                   RecordingData *recording_data, OCCParameters &occp) :
+                                   OCCParameters &occp) :
         edc(engine_data_container), ecp(engine_control_parameters), op(organism_block_parameters), sp(simulation_parameters),
-        recd(recording_data), occp(occp) {
-
+        occp(occp) {
     boost::random_device rd;
-//    std::seed_seq sd{rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd()};
     gen = lehmer64(rd());
     //TODO only do if enabled?
     init_auto_food_drop(edc.simulation_width, edc.simulation_height);
 }
 
-//TODO it's kind of a mess right now
 void SimulationEngine::threaded_mainloop() {
     auto point = std::chrono::high_resolution_clock::now();
-
     while (ecp.engine_working) {
         if (!edc.unlimited_simulation_fps && ecp.calculate_simulation_tick_delta_time) { point = std::chrono::high_resolution_clock::now();}
         if (ecp.stop_engine) {
-//            SimulationEnginePartialMultiThread::kill_threads(edc);
             ecp.engine_working = false;
             ecp.engine_paused = true;
             ecp.stop_engine = false;
             return;
         }
-//        if (ecp.change_simulation_mode) { change_mode(); }
-//        if (ecp.build_threads) {
-////            SimulationEnginePartialMultiThread::build_threads(edc, ecp, sp);
-//            ecp.build_threads = false;
-//        }
         if (ecp.engine_pause || ecp.engine_global_pause) { ecp.engine_paused = true; } else { ecp.engine_paused = false;}
         process_user_action_pool();
         if ((!ecp.engine_paused || ecp.engine_pass_tick) && (!ecp.pause_button_pause || ecp.pass_tick)) {
@@ -48,9 +38,12 @@ void SimulationEngine::threaded_mainloop() {
             ecp.engine_paused = false;
             ecp.engine_pass_tick = false;
             ecp.pass_tick = false;
-            ecp.synchronise_simulation_tick = false;
-            if (ecp.record_full_grid && edc.total_engine_ticks % ecp.parse_full_grid_every_n == 0) {parse_full_simulation_grid_to_buffer();}
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
+            if (edc.record_data) {
+                edc.stc.tbuffer.record_recenter_to_imaginary_pos(sp.recenter_to_imaginary_pos);
+                edc.stc.tbuffer.record_food_threshold(sp.food_threshold);
+                edc.stc.tbuffer.record_transaction();
+            }
             if (edc.total_engine_ticks % ecp.update_info_every_n_tick == 0) {info.parse_info(&edc, &ecp);}
             if (ecp.execute_world_events && edc.total_engine_ticks % ecp.update_world_events_every_n_tick == 0) {
                 world_events_controller.tick_events(edc.total_engine_ticks, ecp.pause_world_events);
@@ -61,62 +54,42 @@ void SimulationEngine::threaded_mainloop() {
     }
 }
 
-void SimulationEngine::change_mode() {
-    if (ecp.change_to_mode == ecp.simulation_mode) {
-        return;
-    }
-
-    //switches from
-    switch (ecp.simulation_mode) {
-        case SimulationModes::CPU_Single_Threaded:
-            break;
-        case SimulationModes::CPU_Partial_Multi_threaded:
-//            SimulationEnginePartialMultiThread::stop(edc, ecp, sp);
-            break;
-        case SimulationModes::CPU_Multi_Threaded:
-            break;
-        case SimulationModes::GPU_CUDA_mode:
-            break;
-    }
-
-    //switches to
-    switch (ecp.change_to_mode) {
-        case SimulationModes::CPU_Single_Threaded:
-            break;
-        case SimulationModes::CPU_Partial_Multi_threaded:
-//            SimulationEnginePartialMultiThread::init(edc, ecp, sp);
-            break;
-        case SimulationModes::CPU_Multi_Threaded:
-            break;
-        case SimulationModes::GPU_CUDA_mode:
-            break;
-    }
-    ecp.simulation_mode = ecp.change_to_mode;
-}
+//void SimulationEngine::change_mode() {
+//    if (ecp.change_to_mode == ecp.simulation_mode) {
+//        return;
+//    }
+//
+//    //switches from
+//    switch (ecp.simulation_mode) {
+//        case SimulationModes::CPU_Single_Threaded:
+//            break;
+//        case SimulationModes::CPU_Partial_Multi_threaded:
+//            break;
+//        case SimulationModes::CPU_Multi_Threaded:
+//            break;
+//        case SimulationModes::GPU_CUDA_mode:
+//            break;
+//    }
+//
+//    //switches to
+//    switch (ecp.change_to_mode) {
+//        case SimulationModes::CPU_Single_Threaded:
+//            break;
+//        case SimulationModes::CPU_Partial_Multi_threaded:
+//            break;
+//        case SimulationModes::CPU_Multi_Threaded:
+//            break;
+//        case SimulationModes::GPU_CUDA_mode:
+//            break;
+//    }
+//    ecp.simulation_mode = ecp.change_to_mode;
+//}
 
 void SimulationEngine::simulation_tick() {
     edc.engine_ticks_between_updates++;
     edc.total_engine_ticks++;
 
-//    switch (ecp.simulation_mode) {
-//        case SimulationModes::CPU_Single_Threaded:
-            if (edc.stc.num_alive_organisms == 0) {
-                ecp.organisms_extinct = true;
-            } else {
-                ecp.organisms_extinct = false;
-            }
-//            break;
-//        case SimulationModes::CPU_Partial_Multi_threaded:
-//            ecp.organisms_extinct = true;
-//            for (auto & pool: edc.organisms_pools) {
-//                if (!pool.empty()) {
-//                    ecp.organisms_extinct = false;
-//                    break;
-//                }
-//            }
-//            break;
-//        default: break;
-//    }
+    ecp.organisms_extinct = edc.stc.num_alive_organisms == 0;
 
     if (ecp.organisms_extinct && (sp.pause_on_total_extinction || sp.reset_on_total_extinction)) {
         ecp.engine_paused = true;
@@ -129,114 +102,82 @@ void SimulationEngine::simulation_tick() {
             }
         }
         if (sp.pause_on_total_extinction) {
-            ecp.tb_paused = true ;
+            ecp.tb_paused = true;
         }
         return;
     }
 
-    switch (ecp.simulation_mode){
-        case SimulationModes::CPU_Single_Threaded:
-            SimulationEngineSingleThread::single_threaded_tick(&edc, &sp, &gen);
-            break;
-        case SimulationModes::CPU_Partial_Multi_threaded:
-//            SimulationEnginePartialMultiThread::partial_multi_thread_tick(&edc, &ecp, &op, &sp, &gen);
-            break;
-        case SimulationModes::CPU_Multi_Threaded:
-            break;
-        case SimulationModes::GPU_CUDA_mode:
-            break;
-    }
+//    switch (ecp.simulation_mode){
+//        case SimulationModes::CPU_Single_Threaded:
+    SimulationEngineSingleThread::single_threaded_tick(edc, sp, gen);
+//            break;
+//        case SimulationModes::CPU_Partial_Multi_threaded:
+//            break;
+//        case SimulationModes::CPU_Multi_Threaded:
+//            break;
+//        case SimulationModes::GPU_CUDA_mode:
+//            break;
+//    }
 }
 
-//TODO refactor
 void SimulationEngine::process_user_action_pool() {
-    if (!edc.ui_user_actions_pool.empty() && !ecp.do_not_use_user_actions_ui) {
-        ecp.do_not_use_user_actions_engine = true;
-        edc.engine_user_actions_pool.resize(edc.ui_user_actions_pool.size());
-        std::copy(edc.ui_user_actions_pool.begin(), edc.ui_user_actions_pool.end(), edc.engine_user_actions_pool.begin());
-        edc.ui_user_actions_pool.clear();
+    ecp.do_not_use_user_actions_engine = true;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    if (!ecp.do_not_use_user_actions_ui && !edc.ui_user_actions_pool.empty()) {
+        std::atomic_thread_fence(std::memory_order_seq_cst);
+        std::swap(edc.ui_user_actions_pool, edc.engine_user_actions_pool);
+        std::atomic_thread_fence(std::memory_order_seq_cst);
         ecp.do_not_use_user_actions_engine = false;
-    } else { return; }
+    } else { ecp.do_not_use_user_actions_engine = false; return; }
 
-    auto temp = std::vector<Organism*>{};
+    bool have_sorted = false;
+
     for (auto & action : edc.engine_user_actions_pool) {
         if (check_if_out_of_bounds(&edc, action.x, action.y)) {continue;}
         switch (action.type) {
-            case ActionType::TryAddFood:
-                if (edc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::EmptyBlock) {continue;}
-                edc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::FoodBlock;
+            case ActionType::TryAddFood: {
+                auto &type = edc.st_grid.get_type(action.x, action.y);
+                if (type != BlockTypes::EmptyBlock) { continue; }
+                //TODO
+                auto & num = edc.st_grid.get_food_num(action.x, action.y);
+                if (num + 1 > sp.max_food) { continue; }
+                if (edc.record_data) { edc.stc.tbuffer.record_user_food_change(action.x, action.y, 1); }
+                num+=1;
+            }
                 break;
             case ActionType::TryRemoveFood:
                 try_remove_food(action.x, action.y);
                 break;
             case ActionType::TryAddWall:
-                set_wall(temp, action);
+                set_wall(action);
                 break;
-            case ActionType::TryRemoveWall:
+            case ActionType::TryRemoveWall: {
                 if (action.x == 0 || action.y == 0 || action.x == edc.simulation_width - 1 || action.y == edc.simulation_height - 1) {continue;}
-                if (edc.CPU_simulation_grid[action.x][action.y].type != BlockTypes::WallBlock) {continue;}
-                edc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::EmptyBlock;
+                auto & type = edc.st_grid.get_type(action.x, action.y);
+                if (type != BlockTypes::WallBlock) {continue;}
+                type = BlockTypes::EmptyBlock;
+                if (edc.record_data) { edc.stc.tbuffer.record_user_wall_change(action.x, action.y, false);}
+            }
                 break;
             case ActionType::TryAddOrganism: {
                 bool continue_flag = false;
-                edc.chosen_organism->init_values();
+                edc.chosen_organism.init_values();
 
-                for (auto &block: edc.chosen_organism->anatomy._organism_blocks) {
-                    continue_flag = check_if_out_of_bounds(&edc,
-                                                           block.get_pos(edc.chosen_organism->rotation).x + action.x,
-                                                           block.get_pos(edc.chosen_organism->rotation).y + action.y);
-                    if (continue_flag) { break; }
-
-                    int x = block.get_pos(edc.chosen_organism->rotation).x + action.x;
-                    int y = block.get_pos(edc.chosen_organism->rotation).y + action.y;
-
-                    auto & _block = edc.CPU_simulation_grid[x][y];
-
-                    if (sp.food_blocks_reproduction) {
-                        if (_block.type != BlockTypes::EmptyBlock) {
-                            continue_flag = true;
-                            break;
-                        }
-                    } else {
-                        if (_block.type != BlockTypes::EmptyBlock && _block.type != BlockTypes::FoodBlock) {
-                            continue_flag = true;
-                            break;
-                        }
-                    }
-                }
-
+                continue_flag = action_check_if_space_for_organism_is_free(action, continue_flag);
                 if (continue_flag) { continue; }
-
-                auto * new_organism = OrganismsController::get_new_main_organism(edc);
-
-                auto array_place = new_organism->vector_index;
-                *new_organism = Organism(edc.chosen_organism);
-                new_organism->vector_index = array_place;
-
-                if (array_place > edc.stc.last_alive_position) { edc.stc.last_alive_position = array_place; }
-
-                new_organism->x = action.x;
-                new_organism->y = action.y;
-
-                for (auto &block: new_organism->anatomy._organism_blocks) {
-                    int x = block.get_pos(edc.chosen_organism->rotation).x + new_organism->x;
-                    int y = block.get_pos(edc.chosen_organism->rotation).y + new_organism->y;
-
-                    edc.CPU_simulation_grid[x][y].type     = block.type;
-                    edc.CPU_simulation_grid[x][y].organism_index = new_organism->vector_index;
-                    edc.CPU_simulation_grid[x][y].rotation = get_global_rotation(block.rotation, edc.chosen_organism->rotation);
-                }
+                if (!have_sorted) {OrganismsController::precise_sort_high_to_low_dead_organisms_positions(edc); have_sorted = true;}
+                action_place_organism(action);
             }
                 break;
             case ActionType::TryKillOrganism: {
-                try_kill_organism(action.x, action.y, temp);
+                try_kill_organism(action.x, action.y);
+                have_sorted = false;
             }
                 break;
             case ActionType::TrySelectOrganism: {
-                if (edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::EmptyBlock ||
-                    edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::WallBlock  ||
-                    edc.CPU_simulation_grid[action.x][action.y].type == BlockTypes::FoodBlock) { continue; }
-                edc.selected_organism = OrganismsController::get_organism_by_index(edc.CPU_simulation_grid[action.x][action.y].organism_index, edc);
+                auto & type = edc.st_grid.get_type(action.x, action.y);
+                if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { continue; }
+                edc.selected_organism = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(action.x, action.y), edc);
                 goto endfor;
                 }
         }
@@ -245,8 +186,7 @@ void SimulationEngine::process_user_action_pool() {
 
     for (auto & action: edc.engine_user_actions_pool) {
         if (action.type == ActionType::TrySelectOrganism && edc.selected_organism != nullptr) {
-            delete edc.chosen_organism;
-            edc.chosen_organism = new Organism(edc.selected_organism);
+            edc.chosen_organism.copy_organism(*edc.selected_organism);
             edc.selected_organism = nullptr;
             ecp.update_editor_organism = true;
             break;
@@ -256,20 +196,86 @@ void SimulationEngine::process_user_action_pool() {
     edc.engine_user_actions_pool.clear();
 }
 
+void SimulationEngine::action_place_organism(const Action &action) {
+    auto * new_organism = OrganismsController::get_new_main_organism(edc);
+
+    auto array_place = new_organism->vector_index;
+    new_organism->copy_organism(edc.chosen_organism);
+    new_organism->vector_index = array_place;
+
+    if (array_place > edc.stc.last_alive_position) { edc.stc.last_alive_position = array_place; }
+
+    new_organism->x = action.x;
+    new_organism->y = action.y;
+
+    if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
+
+    for (auto &block: new_organism->anatomy.organism_blocks) {
+        int x = block.get_pos(edc.chosen_organism.rotation).x + new_organism->x;
+        int y = block.get_pos(edc.chosen_organism.rotation).y + new_organism->y;
+
+        edc.st_grid.get_type(x, y)           = block.type;
+        edc.st_grid.get_organism_index(x, y) = new_organism->vector_index;
+        edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
+    }
+
+    if (new_organism->anatomy.c["eye"] > 0 && new_organism->anatomy.c["mover"] > 0) {
+        if (sp.use_weighted_brain || sp.use_continuous_movement) {
+            new_organism->brain.brain_type = BrainTypes::WeightedBrain;
+        } else {
+            new_organism->brain.brain_type = BrainTypes::SimpleBrain;
+        }
+    }
+
+    if(sp.use_continuous_movement) {
+        new_organism->init_values();
+    }
+}
+
+bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
+    for (auto &block: edc.chosen_organism.anatomy.organism_blocks) {
+        const auto pos = block.get_pos(edc.chosen_organism.rotation);
+        const auto x = pos.x + action.x;
+        const auto y = pos.y + action.y;
+
+        continue_flag = check_if_out_of_bounds(&edc, x, y);
+        if (continue_flag) { break; }
+
+        auto type = edc.st_grid.get_type(x, y);
+        auto num = edc.st_grid.get_food_num(x, y);
+
+        if (sp.food_blocks_reproduction) {
+            if (type != BlockTypes::EmptyBlock || num > sp.food_threshold) {
+                continue_flag = true;
+                break;
+            }
+        } else {
+            if (type != BlockTypes::EmptyBlock) {
+                continue_flag = true;
+                break;
+            }
+        }
+    }
+    return continue_flag;
+}
+
 void SimulationEngine::clear_walls() {
     for (int x = 1; x < edc.simulation_width - 1; x++) {
         for (int y = 1; y < edc.simulation_height - 1; y++) {
-            if (edc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock) {
-                edc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
+            auto & type = edc.st_grid.get_type(x, y);
+            if (type == BlockTypes::WallBlock) {
+                type = BlockTypes::EmptyBlock;
+                if (edc.record_data) { edc.stc.tbuffer.record_user_wall_change(x, y, false);}
             }
         }
     }
 }
 
-void SimulationEngine::set_wall(std::vector<Organism *> &temp, const Action &action) {
-    try_kill_organism(action.x, action.y, temp);
+void SimulationEngine::set_wall(const Action &action) {
+    try_kill_organism(action.x, action.y);
     try_remove_food(action.x, action.y);
-    edc.CPU_simulation_grid[action.x][action.y].type = BlockTypes::WallBlock;
+    edc.st_grid.get_type(action.x, action.y) = BlockTypes::WallBlock;
+    if (edc.record_data) { edc.stc.tbuffer.record_user_wall_change(action.x, action.y, true);}
 }
 
 void SimulationEngine::random_food_drop() {
@@ -284,41 +290,34 @@ void SimulationEngine::random_food_drop() {
 }
 
 void SimulationEngine::try_remove_food(int x, int y) {
-    if (edc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) { return;}
-    edc.CPU_simulation_grid[x][y].type = BlockTypes::EmptyBlock;
+    auto & num = edc.st_grid.get_food_num(x, y);
+    if (edc.record_data) {edc.stc.tbuffer.record_user_food_change(x, y, -num);}
+    num = 0;
 }
 
-void SimulationEngine::try_kill_organism(int x, int y, std::vector<Organism*> & temp) {
-    if (edc.CPU_simulation_grid[x][y].type == BlockTypes::EmptyBlock ||
-        edc.CPU_simulation_grid[x][y].type == BlockTypes::WallBlock ||
-        edc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) { return; }
-    Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.CPU_simulation_grid[x][y].organism_index, edc);
-    bool continue_flag = false;
-    for (auto & ptr: temp) {if (ptr == organism_ptr) {continue_flag=true; break;}}
-    if (continue_flag) { return;}
-    temp.push_back(organism_ptr);
-    for (auto & block: organism_ptr->anatomy._organism_blocks) {
-        edc.CPU_simulation_grid
-        [organism_ptr->x + block.get_pos(organism_ptr->rotation).x]
-        [organism_ptr->y + block.get_pos(organism_ptr->rotation).y].type = BlockTypes::FoodBlock;
+void SimulationEngine::try_kill_organism(int x, int y) {
+    auto & type = edc.st_grid.get_type(x, y);
+    if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
+    Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
+    for (auto & block: organism_ptr->anatomy.organism_blocks) {
+        const auto pos = block.get_pos(organism_ptr->rotation);
+        const auto ox = organism_ptr->x + pos.x;
+        const auto oy = organism_ptr->y + pos.y;
+        const auto fc = block.get_food_cost(*organism_ptr->bp);
+
+        edc.st_grid.get_type(ox, oy) = BlockTypes::EmptyBlock;
+        edc.st_grid.add_food_num(ox, oy, fc, sp.max_food);
+        if (edc.record_data) {
+            edc.stc.tbuffer.record_food_change(ox, oy, fc);
+        }
     }
-//    if (ecp.simulation_mode == SimulationModes::CPU_Single_Threaded) {
+    if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         if (&edc.stc.organisms[i] == organism_ptr) {
             edc.stc.organisms[i].kill_organism(edc);
             break;
-}
+        }
     }
-//    } else if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-//        for (auto &pool: edc.organisms_pools) {
-//            for (int i = 0; i < pool.size(); i++) {
-//                if (pool[i] == organism_ptr) {
-//                    pool.erase(pool.begin() + i);
-//                    break;
-//                }
-//            }
-//        }
-//    }
 }
 
 bool SimulationEngine::check_if_out_of_bounds(EngineDataContainer *dc, int x, int y) {
@@ -332,43 +331,53 @@ void SimulationEngine::reset_world() {
     partial_clear_world();
     make_walls();
 
-    edc.base_organism->x = edc.simulation_width / 2;
-    edc.base_organism->y = edc.simulation_height / 2;
+    edc.base_organism.x = edc.simulation_width / 2;
+    edc.base_organism.y = edc.simulation_height / 2;
 
-    edc.chosen_organism->x = edc.simulation_width / 2;
-    edc.chosen_organism->y = edc.simulation_height / 2;
+    edc.chosen_organism.x = edc.simulation_width / 2;
+    edc.chosen_organism.y = edc.simulation_height / 2;
 
     Organism * organism = OrganismsController::get_new_main_organism(edc);
     auto array_place = organism->vector_index;
 
     if (ecp.reset_with_editor_organism) {
-        *organism = Organism(edc.chosen_organism);
+        organism->copy_organism(edc.chosen_organism);
     } else {
-        *organism = Organism(edc.base_organism);
+        organism->copy_organism(edc.base_organism);
     }
     organism->vector_index = array_place;
     edc.stc.last_alive_position = organism->vector_index;
 
-    SimulationEngineSingleThread::place_organism(&edc, organism);
+    if (edc.record_data) {
+        edc.stc.tbuffer.record_new_organism(*organism);
+        edc.stc.tbuffer.record_reset();
+        edc.stc.tbuffer.record_transaction();}
+
+    SimulationEngineSingleThread::place_organism(edc, *organism, sp);
 
     if (ecp.execute_world_events) { stop_world_events(true); start_world_events();}
 
-    //Just in case
     ecp.engine_pass_tick = true;
-    ecp.synchronise_simulation_tick = true;
 }
 
 void SimulationEngine::partial_clear_world() {
     clear_organisms();
 
-    for (auto & column: edc.CPU_simulation_grid) {
-        for (auto &block: column) {
-            if (!sp.clear_walls_on_reset) {
-                if (block.type == BlockTypes::WallBlock) { continue; }
+    for (int x = 0; x < edc.simulation_width; x++) {
+        for (int y = 0; y < edc.simulation_height; y++) {
+            auto & type = edc.st_grid.get_type(x, y);
+
+            if (type == BlockTypes::WallBlock) {
+                if (!sp.clear_walls_on_reset) { continue;}
+                if (edc.record_data) { edc.stc.tbuffer.record_user_wall_change(x, y, false);}
             }
-            block.type = BlockTypes::EmptyBlock;
+
+            type = BlockTypes::EmptyBlock;
+
+            edc.st_grid.get_food_num(x, y) = 0;
         }
     }
+
     for (auto & block: edc.simple_state_grid) {
         if (!sp.clear_walls_on_reset) {
             if (block.type == BlockTypes::WallBlock) { continue; }
@@ -392,27 +401,33 @@ void SimulationEngine::clear_organisms() {
 
 void SimulationEngine::make_walls() {
     for (int x = 0; x < edc.simulation_width; x++) {
-        edc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        edc.CPU_simulation_grid[x][edc.simulation_height - 1].type = BlockTypes::WallBlock;
+        edc.st_grid.get_type(x, 0) = BlockTypes::WallBlock;
+        edc.st_grid.get_type(x, edc.simulation_height - 1) = BlockTypes::WallBlock;
+
+        if (edc.record_data) {
+            edc.stc.tbuffer.record_user_wall_change(x, 0, true);
+            edc.stc.tbuffer.record_user_wall_change(x, edc.simulation_height - 1, true);}
     }
 
     for (int y = 0; y < edc.simulation_height; y++) {
-        edc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        edc.CPU_simulation_grid[edc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+        edc.st_grid.get_type(0, y) = BlockTypes::WallBlock;
+        edc.st_grid.get_type(edc.simulation_width - 1, y) = BlockTypes::WallBlock;
+
+        if (edc.record_data) {
+            edc.stc.tbuffer.record_user_wall_change(0, y, true);
+            edc.stc.tbuffer.record_user_wall_change(edc.simulation_width - 1, y, true);}
     }
 }
 
 void SimulationEngine::make_random_walls() {
     perlin.reseed(gen());
 
-    auto temp = std::vector<Organism*>{};
-
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
             auto noise = perlin.octave2D_01((x * sp.perlin_x_modifier), (y * sp.perlin_y_modifier), sp.perlin_octaves, sp.perlin_persistence);
 
             if (noise >= sp.perlin_lower_bound && noise <= sp.perlin_upper_bound) {
-                set_wall(temp, Action{ActionType::TryAddWall, x, y});
+                set_wall(Action{ActionType::TryAddWall, x, y});
             }
         }
     }
@@ -421,28 +436,14 @@ void SimulationEngine::make_random_walls() {
 void SimulationEngine::reinit_organisms() {
     pause();
 
-//    switch (ecp.simulation_mode) {
-//        case SimulationModes::CPU_Single_Threaded:
-            for (auto & organism: edc.stc.organisms) {
-                if (!organism.is_dead) {
-                    organism.init_values();
-                }
-            }
-            for (auto & organism: edc.stc.child_organisms) {
-                organism.init_values();
-            }
-//            break;
-//        case SimulationModes::CPU_Partial_Multi_threaded:
-//        case SimulationModes::CPU_Multi_Threaded:
-//            for (auto & pool: edc.organisms_pools) {
-//                for (auto & organism: pool) {
-//                    organism->init_values();
-//                }
-//            }
-//            break;
-//        case SimulationModes::GPU_CUDA_mode:
-//            break;
-//    }
+    for (auto & organism: edc.stc.organisms) {
+        if (!organism.is_dead) {
+            organism.init_values();
+        }
+    }
+    for (auto & organism: edc.stc.child_organisms) {
+        organism.init_values();
+    }
 
     unpause();
 }
@@ -458,48 +459,39 @@ void SimulationEngine::init_auto_food_drop(int width, int height) {
     std::shuffle(auto_food_drop_coordinates_shuffled.begin(), auto_food_drop_coordinates_shuffled.end(), gen);
 }
 
-//Will always wait for engine to pause
-bool SimulationEngine::wait_for_engine_to_pause_force() {
+bool SimulationEngine::wait_for_engine_to_pause() {
     while (!ecp.engine_paused) {}
+    std::atomic_thread_fence(std::memory_order_release);
+    do_not_unpause = false;
     return ecp.engine_paused;
 }
 
 void SimulationEngine::pause() {
+    do_not_unpause = true;
+    std::atomic_thread_fence(std::memory_order_release);
     ecp.engine_pause = true;
-    wait_for_engine_to_pause_force();
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    wait_for_engine_to_pause();
 }
 
 void SimulationEngine::unpause() {
-    if (!ecp.synchronise_simulation_and_window) {
-        ecp.engine_pause = false;
-    }
+    if (do_not_unpause) { return;}
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    ecp.engine_pause = false;
 }
 
 void SimulationEngine::parse_full_simulation_grid() {
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
-            edc.simple_state_grid[x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
-        }
-    }
-}
+            auto type = edc.st_grid.get_type(x, y);
+            auto & simple_block = edc.simple_state_grid[x + y * edc.simulation_width];
+            simple_block.type = type;
+            simple_block.rotation = edc.st_grid.get_rotation(x, y);
 
-void SimulationEngine::parse_full_simulation_grid_to_buffer() {
-    while (ecp.pause_buffer_filling) {}
-    ecp.recording_full_grid = true;
-    for (int x = 0; x < edc.simulation_width; x++) {
-        for (int y = 0; y < edc.simulation_height; y++) {
-            recd->second_simulation_grid_buffer[recd->buffer_pos][x + y * edc.simulation_width].type = edc.CPU_simulation_grid[x][y].type;
-            recd->second_simulation_grid_buffer[recd->buffer_pos][x + y * edc.simulation_width].rotation = edc.CPU_simulation_grid[x][y].rotation;
+            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
+                simple_block.type = BlockTypes::FoodBlock;}
         }
     }
-    recd->buffer_pos++;
-    recd->recorded_states++;
-    if (recd->buffer_pos >= recd->buffer_size) {
-        recd->save_buffer_to_disk(recd->path_to_save, recd->buffer_pos, recd->saved_buffers, edc.simulation_width, edc.simulation_height, recd->second_simulation_grid_buffer);
-        recd->buffer_pos = 0;
-    }
-    ecp.recording_full_grid = false;
 }
 
 void SimulationEngine::update_info() {
@@ -513,7 +505,7 @@ const OrganismInfoContainer & SimulationEngine::get_info() {
 void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nodes,
                                           std::vector<char> repeating_branch,
                                           std::vector<BaseEventNode *> node_storage) {
-    stop_world_events();
+    stop_world_events_no_setting_reset();
     world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
     unpause();
 }
@@ -535,6 +527,7 @@ void SimulationEngine::pause_world_events() {
 }
 
 void SimulationEngine::stop_world_events(bool no_resume) {
+    if (!ecp.execute_world_events) { return;}
     pause();
     sp = SimulationParameters{sp_copy};
     ecp.execute_world_events = false;

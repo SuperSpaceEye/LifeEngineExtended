@@ -32,7 +32,7 @@ namespace DataSavingFunctions {
         uint32_t y;
         BlockTypes type;
         WorldBlocks()=default;
-        WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type) {}
+        WorldBlocks(uint32_t x, uint32_t y, BlockTypes type): x(x), y(y), type(type){}
     };
 
     struct ProgramState {
@@ -46,7 +46,6 @@ namespace DataSavingFunctions {
         int & update_info_every_n_milliseconds;
 
         bool & use_cuda;
-        bool & wait_for_engine_to_stop_to_render;
         bool & disable_warnings;
         bool & really_stop_render;
         bool & save_simulation_settings;
@@ -108,11 +107,14 @@ namespace DataSavingFunctions {
 
     void write_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
                           OCCParameters &occp);
-    bool read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+    void read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
                          OCCParameters &occp);
 
     void write_json_occp(rapidjson::Document & d, OCCParameters & parameters);
     void read_json_occp(rapidjson::Document & d, OCCParameters & parameters);
+
+    void read_json_state_private(const std::string *path_, ProgramState state, SimulationParameters *sp_,
+                                 OCCParameters *occp_);
 }
 
 #endif //LIFEENGINEEXTENDED_DATASAVINGFUNCTIONS_H

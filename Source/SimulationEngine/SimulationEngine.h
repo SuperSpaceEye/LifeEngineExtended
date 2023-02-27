@@ -19,14 +19,13 @@
 #include <boost/nondet_random.hpp>
 #include <boost/random.hpp>
 
-#include "../GridBlocks/BaseGridBlock.h"
+#include "../GridStuff/BaseGridBlock.h"
 #include "../Organism/CPU/Organism.h"
 #include "../Stuff/BlockTypes.hpp"
 #include "../Stuff/Vector2.h"
 #include "../Containers/CPU/EngineControlParametersContainer.h"
 #include "../Containers/CPU/EngineDataContainer.h"
 #include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Containers/CPU/RecordingContainer.h"
 #include "../Stuff/Linspace.h"
 #include "../Stuff/PerlinNoise.hpp"
 #include "../PRNGS/lehmer64.h"
@@ -44,8 +43,7 @@ class SimulationEngine {
     OrganismBlockParameters& op;
     SimulationParameters& sp;
     OCCParameters &occp;
-    RecordingData * recd;
-//    OrganismInfoContainer info{};
+
     WorldEventsController world_events_controller{};
     SimulationParameters sp_copy;
 
@@ -56,6 +54,8 @@ class SimulationEngine {
 
     std::chrono::high_resolution_clock clock;
     std::chrono::time_point<std::chrono::high_resolution_clock> fps_timer;
+
+    bool do_not_unpause = false;
 
     void process_user_action_pool();
 
@@ -69,22 +69,20 @@ class SimulationEngine {
     //lehmer is like 2 times faster than mt19937
     lehmer64 gen;
 
-    void try_kill_organism(int x, int y, std::vector<Organism*> & temp);
+    void try_kill_organism(int x, int y);
     void try_remove_food(int x, int y);
 public:
     OrganismInfoContainer info{};
 
     SimulationEngine(EngineDataContainer &engine_data_container, EngineControlParameters &engine_control_parameters,
-                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters,
-                     RecordingData *recording_data, OCCParameters &occp);
+                     OrganismBlockParameters &organism_block_parameters, SimulationParameters &simulation_parameters, OCCParameters &occp);
     void threaded_mainloop();
 
     void make_random_walls();
 
-    void set_wall(std::vector<Organism *> &temp, const Action &action);
+    void set_wall(const Action &action);
     void clear_walls();
 
-    //TODO make getters and setters for it.
     void reinit_organisms();
 
     void reset_world();
@@ -97,10 +95,8 @@ public:
     void pause();
     void unpause();
 
-    //Will always wait for engine to pause
-    bool wait_for_engine_to_pause_force();
+    bool wait_for_engine_to_pause();
     void parse_full_simulation_grid();
-    void parse_full_simulation_grid_to_buffer();
 
     void update_info();
     const OrganismInfoContainer & get_info();
@@ -116,6 +112,10 @@ public:
                             std::vector<BaseEventNode *> node_storage);
 
     void set_seed(uint64_t new_seed);
+
+    bool action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag);
+
+    void action_place_organism(const Action &action);
 };
 
 #endif //LANGUAGES_LIFEENGINE_H

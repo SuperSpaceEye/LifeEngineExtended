@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ChangeValueEventNodeWidget.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.8
+** Created by: Qt User Interface Compiler version 6.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -55,7 +55,7 @@ public:
     void setupUi(QWidget *ChangeValueEventNodeWidget)
     {
         if (ChangeValueEventNodeWidget->objectName().isEmpty())
-            ChangeValueEventNodeWidget->setObjectName(QString::fromUtf8("ChangeValueEventNodeWidget"));
+            ChangeValueEventNodeWidget->setObjectName("ChangeValueEventNodeWidget");
         ChangeValueEventNodeWidget->resize(400, 200);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -64,21 +64,21 @@ public:
         ChangeValueEventNodeWidget->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(ChangeValueEventNodeWidget);
         verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(ChangeValueEventNodeWidget);
-        frame->setObjectName(QString::fromUtf8("frame"));
+        frame->setObjectName("frame");
         frame->setFrameShape(QFrame::WinPanel);
         frame->setFrameShadow(QFrame::Raised);
         verticalLayout_2 = new QVBoxLayout(frame);
         verticalLayout_2->setSpacing(0);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
         horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
         b_new_event_left = new QPushButton(frame);
-        b_new_event_left->setObjectName(QString::fromUtf8("b_new_event_left"));
+        b_new_event_left->setObjectName("b_new_event_left");
         QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -92,7 +92,7 @@ public:
         horizontalLayout_5->addItem(horizontalSpacer);
 
         b_delete_event = new QPushButton(frame);
-        b_delete_event->setObjectName(QString::fromUtf8("b_delete_event"));
+        b_delete_event->setObjectName("b_delete_event");
         sizePolicy1.setHeightForWidth(b_delete_event->sizePolicy().hasHeightForWidth());
         b_delete_event->setSizePolicy(sizePolicy1);
 
@@ -103,7 +103,7 @@ public:
         horizontalLayout_5->addItem(horizontalSpacer_2);
 
         b_new_event_right = new QPushButton(frame);
-        b_new_event_right->setObjectName(QString::fromUtf8("b_new_event_right"));
+        b_new_event_right->setObjectName("b_new_event_right");
         sizePolicy1.setHeightForWidth(b_new_event_right->sizePolicy().hasHeightForWidth());
         b_new_event_right->setSizePolicy(sizePolicy1);
 
@@ -113,20 +113,20 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_5);
 
         label = new QLabel(frame);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName("label");
         label->setAlignment(Qt::AlignCenter);
 
         verticalLayout_2->addWidget(label);
 
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
         label_6 = new QLabel(frame);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setObjectName("label_6");
 
         horizontalLayout_4->addWidget(label_6);
 
         le_update_every_n_ticks = new QLineEdit(frame);
-        le_update_every_n_ticks->setObjectName(QString::fromUtf8("le_update_every_n_ticks"));
+        le_update_every_n_ticks->setObjectName("le_update_every_n_ticks");
         QSizePolicy sizePolicy2(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
@@ -139,14 +139,14 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_4);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         label_3 = new QLabel(frame);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName("label_3");
 
         horizontalLayout_2->addWidget(label_3);
 
         cmb_change_value = new QComboBox(frame);
-        cmb_change_value->setObjectName(QString::fromUtf8("cmb_change_value"));
+        cmb_change_value->setObjectName("cmb_change_value");
         sizePolicy2.setHeightForWidth(cmb_change_value->sizePolicy().hasHeightForWidth());
         cmb_change_value->setSizePolicy(sizePolicy2);
 
@@ -156,14 +156,14 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName("horizontalLayout");
         label_2 = new QLabel(frame);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName("label_2");
 
         horizontalLayout->addWidget(label_2);
 
         le_target_value = new QLineEdit(frame);
-        le_target_value->setObjectName(QString::fromUtf8("le_target_value"));
+        le_target_value->setObjectName("le_target_value");
         sizePolicy2.setHeightForWidth(le_target_value->sizePolicy().hasHeightForWidth());
         le_target_value->setSizePolicy(sizePolicy2);
 
@@ -173,9 +173,9 @@ public:
         verticalLayout_2->addLayout(horizontalLayout);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
         label_4 = new QLabel(frame);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setObjectName("label_4");
 
         horizontalLayout_3->addWidget(label_4);
 
@@ -186,7 +186,7 @@ public:
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
         cmb_change_mode->addItem(QString());
-        cmb_change_mode->setObjectName(QString::fromUtf8("cmb_change_mode"));
+        cmb_change_mode->setObjectName("cmb_change_mode");
         sizePolicy2.setHeightForWidth(cmb_change_mode->sizePolicy().hasHeightForWidth());
         cmb_change_mode->setSizePolicy(sizePolicy2);
 
@@ -196,14 +196,14 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_3);
 
         time_horizon_layout = new QHBoxLayout();
-        time_horizon_layout->setObjectName(QString::fromUtf8("time_horizon_layout"));
+        time_horizon_layout->setObjectName("time_horizon_layout");
         time_horizon_label = new QLabel(frame);
-        time_horizon_label->setObjectName(QString::fromUtf8("time_horizon_label"));
+        time_horizon_label->setObjectName("time_horizon_label");
 
         time_horizon_layout->addWidget(time_horizon_label);
 
         le_time_horizon = new QLineEdit(frame);
-        le_time_horizon->setObjectName(QString::fromUtf8("le_time_horizon"));
+        le_time_horizon->setObjectName("le_time_horizon");
         sizePolicy2.setHeightForWidth(le_time_horizon->sizePolicy().hasHeightForWidth());
         le_time_horizon->setSizePolicy(sizePolicy2);
 
@@ -231,23 +231,23 @@ public:
 
     void retranslateUi(QWidget *ChangeValueEventNodeWidget)
     {
-        ChangeValueEventNodeWidget->setWindowTitle(QApplication::translate("ChangeValueEventNodeWidget", "Form", nullptr));
-        b_new_event_left->setText(QApplication::translate("ChangeValueEventNodeWidget", "<= New event", nullptr));
-        b_delete_event->setText(QApplication::translate("ChangeValueEventNodeWidget", "Delete Event", nullptr));
-        b_new_event_right->setText(QApplication::translate("ChangeValueEventNodeWidget", "New event =>", nullptr));
-        label->setText(QApplication::translate("ChangeValueEventNodeWidget", "Change Value", nullptr));
-        label_6->setText(QApplication::translate("ChangeValueEventNodeWidget", "Update every n ticks", nullptr));
-        label_3->setText(QApplication::translate("ChangeValueEventNodeWidget", "Change value", nullptr));
-        label_2->setText(QApplication::translate("ChangeValueEventNodeWidget", "Target value", nullptr));
-        label_4->setText(QApplication::translate("ChangeValueEventNodeWidget", "Change mode", nullptr));
-        cmb_change_mode->setItemText(0, QApplication::translate("ChangeValueEventNodeWidget", "Linear", nullptr));
-        cmb_change_mode->setItemText(1, QApplication::translate("ChangeValueEventNodeWidget", "Step", nullptr));
-        cmb_change_mode->setItemText(2, QApplication::translate("ChangeValueEventNodeWidget", "Increase By", nullptr));
-        cmb_change_mode->setItemText(3, QApplication::translate("ChangeValueEventNodeWidget", "Decrease By", nullptr));
-        cmb_change_mode->setItemText(4, QApplication::translate("ChangeValueEventNodeWidget", "Multiply By", nullptr));
-        cmb_change_mode->setItemText(5, QApplication::translate("ChangeValueEventNodeWidget", "Divide By", nullptr));
+        ChangeValueEventNodeWidget->setWindowTitle(QCoreApplication::translate("ChangeValueEventNodeWidget", "Form", nullptr));
+        b_new_event_left->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "<= New event", nullptr));
+        b_delete_event->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Delete Event", nullptr));
+        b_new_event_right->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "New event =>", nullptr));
+        label->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Change Value", nullptr));
+        label_6->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Update every n ticks", nullptr));
+        label_3->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Change value", nullptr));
+        label_2->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Target value", nullptr));
+        label_4->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Change mode", nullptr));
+        cmb_change_mode->setItemText(0, QCoreApplication::translate("ChangeValueEventNodeWidget", "Linear", nullptr));
+        cmb_change_mode->setItemText(1, QCoreApplication::translate("ChangeValueEventNodeWidget", "Step", nullptr));
+        cmb_change_mode->setItemText(2, QCoreApplication::translate("ChangeValueEventNodeWidget", "Increase By", nullptr));
+        cmb_change_mode->setItemText(3, QCoreApplication::translate("ChangeValueEventNodeWidget", "Decrease By", nullptr));
+        cmb_change_mode->setItemText(4, QCoreApplication::translate("ChangeValueEventNodeWidget", "Multiply By", nullptr));
+        cmb_change_mode->setItemText(5, QCoreApplication::translate("ChangeValueEventNodeWidget", "Divide By", nullptr));
 
-        time_horizon_label->setText(QApplication::translate("ChangeValueEventNodeWidget", "Time horizon", nullptr));
+        time_horizon_label->setText(QCoreApplication::translate("ChangeValueEventNodeWidget", "Time horizon", nullptr));
     } // retranslateUi
 
 };

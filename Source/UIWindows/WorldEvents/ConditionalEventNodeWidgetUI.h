@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ConditionalEventNodeWidget.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.8
+** Created by: Qt User Interface Compiler version 6.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -53,7 +53,7 @@ public:
     void setupUi(QWidget *ConditionalEventNode)
     {
         if (ConditionalEventNode->objectName().isEmpty())
-            ConditionalEventNode->setObjectName(QString::fromUtf8("ConditionalEventNode"));
+            ConditionalEventNode->setObjectName("ConditionalEventNode");
         ConditionalEventNode->setWindowModality(Qt::NonModal);
         ConditionalEventNode->resize(400, 200);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -65,10 +65,10 @@ public:
         ConditionalEventNode->setContextMenuPolicy(Qt::DefaultContextMenu);
         verticalLayout = new QVBoxLayout(ConditionalEventNode);
         verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(ConditionalEventNode);
-        frame->setObjectName(QString::fromUtf8("frame"));
+        frame->setObjectName("frame");
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -80,13 +80,13 @@ public:
         frame->setMidLineWidth(0);
         verticalLayout_2 = new QVBoxLayout(frame);
         verticalLayout_2->setSpacing(0);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(4);
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
         b_new_event_left = new QPushButton(frame);
-        b_new_event_left->setObjectName(QString::fromUtf8("b_new_event_left"));
+        b_new_event_left->setObjectName("b_new_event_left");
         QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
@@ -100,7 +100,7 @@ public:
         horizontalLayout_4->addItem(horizontalSpacer);
 
         b_delete_event = new QPushButton(frame);
-        b_delete_event->setObjectName(QString::fromUtf8("b_delete_event"));
+        b_delete_event->setObjectName("b_delete_event");
 
         horizontalLayout_4->addWidget(b_delete_event);
 
@@ -109,7 +109,7 @@ public:
         horizontalLayout_4->addItem(horizontalSpacer_2);
 
         b_new_event_right = new QPushButton(frame);
-        b_new_event_right->setObjectName(QString::fromUtf8("b_new_event_right"));
+        b_new_event_right->setObjectName("b_new_event_right");
         sizePolicy2.setHeightForWidth(b_new_event_right->sizePolicy().hasHeightForWidth());
         b_new_event_right->setSizePolicy(sizePolicy2);
 
@@ -119,7 +119,7 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_4);
 
         label = new QLabel(frame);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName("label");
         QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Minimum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -130,16 +130,16 @@ public:
         verticalLayout_2->addWidget(label);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
         label_6 = new QLabel(frame);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setObjectName("label_6");
         sizePolicy3.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
         label_6->setSizePolicy(sizePolicy3);
 
         horizontalLayout_3->addWidget(label_6);
 
         le_update_every_n_ticks = new QLineEdit(frame);
-        le_update_every_n_ticks->setObjectName(QString::fromUtf8("le_update_every_n_ticks"));
+        le_update_every_n_ticks->setObjectName("le_update_every_n_ticks");
         QSizePolicy sizePolicy4(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -152,9 +152,9 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_3);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         label_3 = new QLabel(frame);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName("label_3");
         sizePolicy3.setHeightForWidth(label_3->sizePolicy().hasHeightForWidth());
         label_3->setSizePolicy(sizePolicy3);
 
@@ -163,7 +163,7 @@ public:
         cmb_condition_mode = new QComboBox(frame);
         cmb_condition_mode->addItem(QString());
         cmb_condition_mode->addItem(QString());
-        cmb_condition_mode->setObjectName(QString::fromUtf8("cmb_condition_mode"));
+        cmb_condition_mode->setObjectName("cmb_condition_mode");
         sizePolicy4.setHeightForWidth(cmb_condition_mode->sizePolicy().hasHeightForWidth());
         cmb_condition_mode->setSizePolicy(sizePolicy4);
 
@@ -173,35 +173,35 @@ public:
         verticalLayout_2->addLayout(horizontalLayout_2);
 
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName("horizontalLayout");
         label_2 = new QLabel(frame);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName("label_2");
 
         horizontalLayout->addWidget(label_2);
 
         cmb_condition_value = new QComboBox(frame);
-        cmb_condition_value->setObjectName(QString::fromUtf8("cmb_condition_value"));
+        cmb_condition_value->setObjectName("cmb_condition_value");
         sizePolicy4.setHeightForWidth(cmb_condition_value->sizePolicy().hasHeightForWidth());
         cmb_condition_value->setSizePolicy(sizePolicy4);
 
         horizontalLayout->addWidget(cmb_condition_value);
 
         label_condition = new QLabel(frame);
-        label_condition->setObjectName(QString::fromUtf8("label_condition"));
+        label_condition->setObjectName("label_condition");
         sizePolicy3.setHeightForWidth(label_condition->sizePolicy().hasHeightForWidth());
         label_condition->setSizePolicy(sizePolicy3);
 
         horizontalLayout->addWidget(label_condition);
 
         le_value_to_compare_against = new QLineEdit(frame);
-        le_value_to_compare_against->setObjectName(QString::fromUtf8("le_value_to_compare_against"));
+        le_value_to_compare_against->setObjectName("le_value_to_compare_against");
         sizePolicy4.setHeightForWidth(le_value_to_compare_against->sizePolicy().hasHeightForWidth());
         le_value_to_compare_against->setSizePolicy(sizePolicy4);
 
         horizontalLayout->addWidget(le_value_to_compare_against);
 
         label_4 = new QLabel(frame);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setObjectName("label_4");
 
         horizontalLayout->addWidget(label_4);
 
@@ -209,7 +209,7 @@ public:
         verticalLayout_2->addLayout(horizontalLayout);
 
         label_5 = new QLabel(frame);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setObjectName("label_5");
         label_5->setEnabled(false);
         sizePolicy3.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
         label_5->setSizePolicy(sizePolicy3);
@@ -235,20 +235,20 @@ public:
 
     void retranslateUi(QWidget *ConditionalEventNode)
     {
-        ConditionalEventNode->setWindowTitle(QApplication::translate("ConditionalEventNode", "Form", nullptr));
-        b_new_event_left->setText(QApplication::translate("ConditionalEventNode", "<=New event", nullptr));
-        b_delete_event->setText(QApplication::translate("ConditionalEventNode", "Delete event", nullptr));
-        b_new_event_right->setText(QApplication::translate("ConditionalEventNode", "New Event=>", nullptr));
-        label->setText(QApplication::translate("ConditionalEventNode", "Condition", nullptr));
-        label_6->setText(QApplication::translate("ConditionalEventNode", "Update every n ticks ", nullptr));
-        label_3->setText(QApplication::translate("ConditionalEventNode", "Condition mode", nullptr));
-        cmb_condition_mode->setItemText(0, QApplication::translate("ConditionalEventNode", "More or Equal", nullptr));
-        cmb_condition_mode->setItemText(1, QApplication::translate("ConditionalEventNode", "Less or Equal", nullptr));
+        ConditionalEventNode->setWindowTitle(QCoreApplication::translate("ConditionalEventNode", "Form", nullptr));
+        b_new_event_left->setText(QCoreApplication::translate("ConditionalEventNode", "<=New event", nullptr));
+        b_delete_event->setText(QCoreApplication::translate("ConditionalEventNode", "Delete event", nullptr));
+        b_new_event_right->setText(QCoreApplication::translate("ConditionalEventNode", "New Event=>", nullptr));
+        label->setText(QCoreApplication::translate("ConditionalEventNode", "Condition", nullptr));
+        label_6->setText(QCoreApplication::translate("ConditionalEventNode", "Update every n ticks ", nullptr));
+        label_3->setText(QCoreApplication::translate("ConditionalEventNode", "Condition mode", nullptr));
+        cmb_condition_mode->setItemText(0, QCoreApplication::translate("ConditionalEventNode", "More or Equal", nullptr));
+        cmb_condition_mode->setItemText(1, QCoreApplication::translate("ConditionalEventNode", "Less or Equal", nullptr));
 
-        label_2->setText(QApplication::translate("ConditionalEventNode", "If ", nullptr));
-        label_condition->setText(QApplication::translate("ConditionalEventNode", ">=", nullptr));
-        label_4->setText(QApplication::translate("ConditionalEventNode", "Then =>", nullptr));
-        label_5->setText(QApplication::translate("ConditionalEventNode", "Else\n"
+        label_2->setText(QCoreApplication::translate("ConditionalEventNode", "If ", nullptr));
+        label_condition->setText(QCoreApplication::translate("ConditionalEventNode", ">=", nullptr));
+        label_4->setText(QCoreApplication::translate("ConditionalEventNode", "Then =>", nullptr));
+        label_5->setText(QCoreApplication::translate("ConditionalEventNode", "Else\n"
 "||\n"
 "V", nullptr));
     } // retranslateUi

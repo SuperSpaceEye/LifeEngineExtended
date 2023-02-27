@@ -18,6 +18,7 @@
 #include "../../Stuff/BlockTypes.hpp"
 #include "Rotation.h"
 #include "ObservationStuff.h"
+#include "../../Containers/CPU/SimulationParameters.h"
 
 enum class BrainDecision {
     //Movement and rotation from organism viewpoint.
@@ -31,8 +32,6 @@ enum class BrainDecision {
     Flip,
 
     DoNothing,
-
-    TryProduceChild,
 };
 
 //Maybe for later
@@ -41,6 +40,7 @@ enum class BrainTypes {
     // chooses the closest observation to an editor_organism, and acts upon it. If do nothing, then returns random action.
     // If no meaningful action, then returns random action.
     SimpleBrain,
+    WeightedBrain,
     //TODO will try to implement in the future
     //https://gamedev.stackexchange.com/questions/51693/difference-between-decision-trees-behavior-trees-for-game-ai
     //https://www.behaviortree.dev/
@@ -63,23 +63,63 @@ struct DecisionObservation {
 };
 
 struct SimpleActionTable {
-    SimpleDecision MouthBlock    = SimpleDecision::DoNothing;
-    SimpleDecision ProducerBlock = SimpleDecision::DoNothing;
-    SimpleDecision MoverBlock    = SimpleDecision::DoNothing;
-    SimpleDecision KillerBlock   = SimpleDecision::GoAway;
-    SimpleDecision ArmorBlock    = SimpleDecision::DoNothing;
-    SimpleDecision EyeBlock      = SimpleDecision::DoNothing;
-    SimpleDecision FoodBlock     = SimpleDecision::GoTowards;
-    SimpleDecision WallBlock     = SimpleDecision::DoNothing;
+    //decision array
+    //contains empty observation type which cannot be mutated
+    std::array<SimpleDecision, NUM_WORLD_BLOCKS> da{
+        // is computed at compile time
+            []() constexpr {
+                std::array<SimpleDecision, NUM_WORLD_BLOCKS> data{};
+                for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
+                    if (i+1 == int(BlockTypes::KillerBlock)) {
+                        data[i] = SimpleDecision::GoAway;
+                    } else if (i+1 == int(BlockTypes::FoodBlock)) {
+                        data[i] = SimpleDecision::GoTowards;
+                    } else {
+                        data[i] = SimpleDecision::DoNothing;
+                    }
+                }
+                return data;
+            }()
+    };
+};
+
+// "-1" - go away, "1" - go towards, "0" - neutral
+struct WeightedActionTable {
+    std::array<float, NUM_WORLD_BLOCKS> da{
+            // is computed at compile time
+            []() constexpr {
+                std::array<float, NUM_WORLD_BLOCKS> data{};
+                for (int i = 0; i < NUM_WORLD_BLOCKS; i++) {
+                    if (i+1 == int(BlockTypes::KillerBlock)) {
+                        data[i] = -1;
+                    } else if (i+1 == int(BlockTypes::FoodBlock)) {
+                        data[i] = 1;
+                    } else {
+                        data[i] = 0;
+                    }
+                }
+                return data;
+            }()
+    };
+};
+
+struct BrainWeightedDecision {
+    BrainDecision decision = BrainDecision::MoveUp;
+    float weight = 0;
 };
 
 class Brain {
 private:
-    static SimpleActionTable copy_parents_table(const SimpleActionTable & parents_simple_action_table);
-    static SimpleActionTable mutate_action_table(SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
-    static SimpleActionTable get_random_action_table(lehmer64 &mt);
-    DecisionObservation get_simple_action(std::vector<Observation> & observations_vector, lehmer64 &mt);
-    BrainDecision calculate_simple_action(Observation &observation) const;
+    static SimpleActionTable mutate_simple_action_table(const SimpleActionTable &parents_simple_action_table, lehmer64 &mt);
+    static WeightedActionTable
+    mutate_weighted_action_table(const WeightedActionTable &parent_action_table, lehmer64 &mt, SimulationParameters &sp);
+
+    DecisionObservation get_simple_action(std::vector<Observation> &observations_vector);
+    DecisionObservation get_weighted_action_discrete(std::vector<Observation> &observations_vector, int look_range,
+                                                     float threshold_move);
+
+    BrainDecision calculate_simple_action(const Observation &observation) const;
+    BrainWeightedDecision calculate_weighted_action(const Observation &observation, int look_range) const;
 public:
     Brain()=default;
     Brain(Brain & brain);
@@ -89,15 +129,27 @@ public:
     Brain & operator=(const Brain & brain)=default;
 
     SimpleActionTable simple_action_table;
+    WeightedActionTable weighted_action_table;
 
     BrainTypes brain_type;
 
     static DecisionObservation get_random_action(lehmer64 &mt);
-    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt);
+    DecisionObservation get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,
+                                     int look_range, float threshold_move);
 
-    Brain mutate(lehmer64 &mt);
+    void convert_simple_to_weighted();
+    void convert_weighted_to_simple(float threshold_move);
 
-    void set_simple_action_table(Brain brain);
+
+    Brain mutate(lehmer64 &mt, SimulationParameters sp);
+
+    void set_brain(const Brain& brain);
+
+    std::array<float, 4> get_weighted_direction(std::vector<Observation> &observations_vector, int look_range) const;
+
+    std::pair<std::array<float, 4>, bool>
+    get_global_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
+                                  Rotation organism_rotation) const;
 };
 
 

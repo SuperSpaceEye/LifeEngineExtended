@@ -25,37 +25,17 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
         "add cell",
         "change cell",
         "remove cell",
-        "==========",
-        "Mouth Block food cost modifier",
-        "Mouth Block life point amount",
-        "Mouth Block lifetime weight",
-        "Mouth Block chance weight",
-        "==========",
-        "Producer Block food cost modifier",
-        "Producer Block life point amount",
-        "Producer Block lifetime weight",
-        "Producer Block chance weight",
-        "==========",
-        "Mover Block food cost modifier",
-        "Mover Block life point amount",
-        "Mover Block lifetime weight",
-        "Mover Block chance weight",
-        "==========",
-        "Killer Block food cost modifier",
-        "Killer Block life point amount",
-        "Killer Block lifetime weight",
-        "Killer Block chance weight",
-        "==========",
-        "Armor Block food cost modifier",
-        "Armor Block life point amount",
-        "Armor Block lifetime weight",
-        "Armor Block chance weight",
-        "==========",
-        "Eye Block food cost modifier",
-        "Eye Block life point amount",
-        "Eye Block lifetime weight",
-        "Eye Block chance weight"
     };
+
+    changeable_pm_list.reserve(changeable_pm_list.size() + NUM_ORGANISM_BLOCKS*5);
+
+    for (const auto & name: ORGANISM_BLOCK_NAMES) {
+        changeable_pm_list.emplace_back("==========");
+        changeable_pm_list.emplace_back(name+" Block food cost modifier");
+        changeable_pm_list.emplace_back(name+" Block life point amount");
+        changeable_pm_list.emplace_back(name+" Block food lifetime weight");
+        changeable_pm_list.emplace_back(name+" Block food chance weight");
+    }
 
 
     changeable_pm["None"] = ChangeableReturn{ValueType::NONE, nullptr, nullptr};
@@ -79,35 +59,13 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
     changeable_pm["change cell"]                     = ChangeableReturn{ValueType::INT, nullptr, &sp->change_cell,                     ClampModes::ClampMinValue, 0, 0, 0};
     changeable_pm["remove cell"]                     = ChangeableReturn{ValueType::INT, nullptr, &sp->remove_cell,                     ClampModes::ClampMinValue, 0, 0, 0};
 
-    changeable_pm["Mouth Block food cost modifier"]= ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
-    changeable_pm["Mouth Block life point amount"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
-    changeable_pm["Mouth Block lifetime weight"]   = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
-    changeable_pm["Mouth Block chance weight"]     = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
-
-    changeable_pm["Producer Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
-    changeable_pm["Producer Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
-    changeable_pm["Producer Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
-    changeable_pm["Producer Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
-
-    changeable_pm["Mover Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
-    changeable_pm["Mover Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
-    changeable_pm["Mover Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
-    changeable_pm["Mover Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
-
-    changeable_pm["Killer Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
-    changeable_pm["Killer Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
-    changeable_pm["Killer Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
-    changeable_pm["Killer Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
-
-    changeable_pm["Armor Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
-    changeable_pm["Armor Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
-    changeable_pm["Armor Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
-    changeable_pm["Armor Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
-
-    changeable_pm["Eye Block food cost modifier"] = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.food_cost_modifier, nullptr};
-    changeable_pm["Eye Block life point amount"]  = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.life_point_amount,  nullptr};
-    changeable_pm["Eye Block lifetime weight"]    = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.lifetime_weight,    nullptr};
-    changeable_pm["Eye Block chance weight"]      = ChangeableReturn{ValueType::FLOAT, &bp->MouthBlock.chance_weight,      nullptr, ClampModes::ClampMinValue, 0};
+    for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+        const auto & block = ORGANISM_BLOCK_NAMES[i];
+        changeable_pm[block+" Block food cost modifier"]= ChangeableReturn{ValueType::FLOAT, &bp->pa[i].food_cost,         nullptr};
+        changeable_pm[block+" Block life point amount"] = ChangeableReturn{ValueType::FLOAT, &bp->pa[i].life_point_amount, nullptr};
+        changeable_pm[block+" Block lifetime weight"]   = ChangeableReturn{ValueType::FLOAT, &bp->pa[i].lifetime_weight,   nullptr};
+        changeable_pm[block+" Block chance weight"]     = ChangeableReturn{ValueType::FLOAT, &bp->pa[i].chance_weight,     nullptr, ClampModes::ClampMinValue, 0};
+    }
 
     changing_pm_list = std::vector<std::string> {
             "None",
@@ -115,12 +73,15 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
             "avg total organisms size",
             "avg total organisms lifetime",
             "avg total organisms age",
-            "avg total organisms mouth cells",
-            "avg total organisms producer cells",
-            "avg total organisms mover cells",
-            "avg total organisms killer cells",
-            "avg total organisms armor cells",
-            "avg total organisms eye cells",
+    };
+
+    auto lower = [](std::string name){std::string data;for (auto & chr: name) {data += tolower(chr);}return data;};
+
+    for (auto & name: ORGANISM_BLOCK_NAMES) {
+        changing_pm_list.emplace_back("avg total organism "+lower(name)+" blocks");
+    }
+
+    auto temp = std::vector<std::string> {
             "avg total organisms brain mutation rate",
             "avg total organisms anatomy mutation rate",
             "total organisms amount",
@@ -128,12 +89,14 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
             "avg stationary organisms size",
             "avg stationary organisms lifetime",
             "avg stationary organisms age",
-            "avg stationary organisms mouth cells",
-            "avg stationary organisms producer cells",
-            "avg stationary organisms mover cells",
-            "avg stationary organisms killer cells",
-            "avg stationary organisms armor cells",
-            "avg stationary organisms eye cells",
+    };
+    changing_pm_list.insert(changing_pm_list.end(), temp.begin(), temp.end());
+
+    for (auto & name: ORGANISM_BLOCK_NAMES) {
+        changing_pm_list.emplace_back("avg stationary organism "+lower(name)+" blocks");
+    }
+
+    temp = std::vector<std::string> {
             "avg stationary organisms brain mutation rate",
             "avg stationary organisms anatomy mutation rate",
             "stationary organisms amount",
@@ -142,60 +105,39 @@ ParametersList::ParametersList(SimulationParameters *sp, OrganismBlockParameters
             "avg moving organisms size",
             "avg moving organisms lifetime",
             "avg moving organisms age",
-            "avg moving organisms mouth cells",
-            "avg moving organisms producer cells",
-            "avg moving organisms mover cells",
-            "avg moving organisms killer cells",
-            "avg moving organisms armor cells",
-            "avg moving organisms eye cells",
+    };
+    changing_pm_list.insert(changing_pm_list.end(), temp.begin(), temp.end());
+
+    for (auto & name: ORGANISM_BLOCK_NAMES) {
+        changing_pm_list.emplace_back("avg moving organism "+lower(name)+" blocks");
+    }
+
+    temp = std::vector<std::string> {
             "avg moving organisms brain mutation rate",
             "avg moving organisms anatomy mutation rate",
             "total organisms amount",
     };
+    changing_pm_list.insert(changing_pm_list.end(), temp.begin(), temp.end());
 
     changing_pm["None"] = ChangingReturn{ValueType::NONE, nullptr, nullptr};
     changeable_pm["=========="] = ChangeableReturn{ValueType::NONE, nullptr, nullptr};
 
     changing_pm["moving organisms with eyes"] = ChangingReturn{ValueType::INT64, nullptr, &ic->organisms_with_eyes};
 
-    changing_pm["avg total organisms size"]                  = ChangingReturn{ValueType::DOUBLE, &ic->total_avg.size,                  nullptr};
-    changing_pm["avg total organisms lifetime"]              = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._organism_lifetime,    nullptr};
-    changing_pm["avg total organisms age"]                   = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._organism_age,         nullptr};
-    changing_pm["avg total organisms mouth cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._mouth_blocks,         nullptr};
-    changing_pm["avg total organisms producer cells"]        = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._producer_blocks,      nullptr};
-    changing_pm["avg total organisms mover cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._mover_blocks,         nullptr};
-    changing_pm["avg total organisms killer cells"]          = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._killer_blocks,        nullptr};
-    changing_pm["avg total organisms armor cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._armor_blocks,         nullptr};
-    changing_pm["avg total organisms eye cells"]             = ChangingReturn{ValueType::DOUBLE, &ic->total_avg._eye_blocks,           nullptr};
-    changing_pm["avg total organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->total_avg.brain_mutation_rate,   nullptr};
-    changing_pm["avg total organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->total_avg.anatomy_mutation_rate, nullptr};
-    changing_pm["total organisms amount"]                    = ChangingReturn{ValueType::INT64, nullptr, &ic->total_avg.total};
+    std::array<std::string, 3> names {"total, stationary", "moving"};
+    for (int n = 0; n < 3; n++) {
+        auto & name = names[n];
 
-    changing_pm["avg stationary organisms size"]                  = ChangingReturn{ValueType::DOUBLE, &ic->station_avg.size,                  nullptr};
-    changing_pm["avg stationary organisms lifetime"]              = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._organism_lifetime,    nullptr};
-    changing_pm["avg stationary organisms age"]                   = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._organism_age,         nullptr};
-    changing_pm["avg stationary organisms mouth cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._mouth_blocks,         nullptr};
-    changing_pm["avg stationary organisms producer cells"]        = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._producer_blocks,      nullptr};
-    changing_pm["avg stationary organisms mover cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._mover_blocks,         nullptr};
-    changing_pm["avg stationary organisms killer cells"]          = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._killer_blocks,        nullptr};
-    changing_pm["avg stationary organisms armor cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._armor_blocks,         nullptr};
-    changing_pm["avg stationary organisms eye cells"]             = ChangingReturn{ValueType::DOUBLE, &ic->station_avg._eye_blocks,           nullptr};
-    changing_pm["avg stationary organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->station_avg.brain_mutation_rate,   nullptr};
-    changing_pm["avg stationary organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->station_avg.anatomy_mutation_rate, nullptr};
-    changing_pm["stationary organisms amount"]                    = ChangingReturn{ValueType::INT64, nullptr, &ic->station_avg.total};
-
-    changing_pm["avg moving organisms size"]                  = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg.size,                  nullptr};
-    changing_pm["avg moving organisms lifetime"]              = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._organism_lifetime,    nullptr};
-    changing_pm["avg moving organisms age"]                   = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._organism_age,         nullptr};
-    changing_pm["avg moving organisms mouth cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._mouth_blocks,         nullptr};
-    changing_pm["avg moving organisms producer cells"]        = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._producer_blocks,      nullptr};
-    changing_pm["avg moving organisms mover cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._mover_blocks,         nullptr};
-    changing_pm["avg moving organisms killer cells"]          = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._killer_blocks,        nullptr};
-    changing_pm["avg moving organisms armor cells"]           = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._armor_blocks,         nullptr};
-    changing_pm["avg moving organisms eye cells"]             = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg._eye_blocks,           nullptr};
-    changing_pm["avg moving organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg.brain_mutation_rate,   nullptr};
-    changing_pm["avg moving organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->moving_avg.anatomy_mutation_rate, nullptr};
-    changing_pm["moving organisms amount"]                    = ChangingReturn{ValueType::INT64, nullptr, &ic->moving_avg.total};
+        changing_pm["avg "+name+" organisms size"]     = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].size,                nullptr};
+        changing_pm["avg "+name+" organisms lifetime"] = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n]._organism_lifetime , nullptr};
+        changing_pm["avg "+name+" organisms age"]      = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n]._organism_age,       nullptr};
+        for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+            changing_pm["avg "+name+" organisms "+ORGANISM_BLOCK_NAMES[i]+" blocks"] = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].block_avgs[i], nullptr};
+        }
+        changing_pm["avg "+name+" organisms brain mutation rate"]   = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].brain_mutation_rate,   nullptr};
+        changing_pm["avg "+name+" organisms anatomy mutation rate"] = ChangingReturn{ValueType::DOUBLE, &ic->avgs[n].anatomy_mutation_rate, nullptr};
+        changing_pm[name+" organisms amount"] = ChangingReturn{ValueType::INT64, nullptr, &ic->avgs[n].total};
+    }
 }
 
 const std::vector<std::string> & ParametersList::get_changeable_parameters_list() {

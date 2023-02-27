@@ -27,11 +27,10 @@ void OrganismsController::free_child_organism(Organism *child_organism, EngineDa
     edc.stc.free_child_organisms_positions.emplace_back(child_organism->vector_index);
 }
 
-
-
 Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
     // If there are organisms not in use, take them.
     edc.stc.num_alive_organisms++;
+
     if (!edc.stc.dead_organisms_positions.empty()) {
         edc.stc.num_dead_organisms--;
         auto * ptr = &edc.stc.organisms[edc.stc.dead_organisms_positions.back()];
@@ -40,7 +39,7 @@ Organism *OrganismsController::get_new_main_organism(EngineDataContainer &edc) {
         if (ptr->vector_index < edc.stc.last_alive_position) {
             edc.stc.dead_organisms_before_last_alive_position--;
         }
-
+        ptr->is_dead = false;
         return ptr;
     }
 
@@ -61,6 +60,7 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
     organism->child_pattern_index = -1;
 
     organism->is_dead = true;
+
     edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
 
     if (organism->vector_index < edc.stc.last_alive_position) {
@@ -87,31 +87,16 @@ int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *ch
     return main_o_ptr->vector_index;
 }
 
-void OrganismsController::precise_sort_low_to_high_dead_organisms_positions(EngineDataContainer &edc) {
-    std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
-        return a < b;
-    });
-}
-
 void OrganismsController::precise_sort_high_to_low_dead_organisms_positions(EngineDataContainer &edc) {
     std::sort(edc.stc.dead_organisms_positions.begin(), edc.stc.dead_organisms_positions.end(), [](uint32_t a, uint32_t b) {
         return a > b;
     });
 }
 
-int32_t OrganismsController::get_last_alive_organism_position(EngineDataContainer &edc) {
-    int32_t last_alive_organism_place = edc.stc.organisms.size() - 1;
-    while (edc.stc.organisms[last_alive_organism_place].is_dead && last_alive_organism_place > 0) {
-        last_alive_organism_place--;
-    }
-
-    return last_alive_organism_place;
-}
-
 //Will compress alive organisms so that there will be no dead organisms between alive ones.
 //Dead organisms positions should be sorted first.
-void OrganismsController::compress_organisms(EngineDataContainer &edc) {
-    if (edc.stc.dead_organisms_before_last_alive_position * edc.stc.max_dead_organisms_in_alive_section_factor < edc.stc.num_alive_organisms) { return;}
+void OrganismsController::try_compress_organisms(EngineDataContainer &edc) {
+    if (edc.stc.max_dead_organisms > edc.stc.dead_organisms_before_last_alive_position || edc.stc.dead_organisms_before_last_alive_position * edc.stc.max_dead_organisms_in_alive_section_factor < edc.stc.num_alive_organisms) { return;}
     if (edc.stc.num_alive_organisms == 1) { return;}
 
     //TODO on call of compress_organisms go through all dead organisms positions and only append to temp list positions that are < last_alive_position
@@ -132,15 +117,20 @@ void OrganismsController::compress_organisms(EngineDataContainer &edc) {
         //while left organism is alive, go right until it is dead
         while (!(left_organism = &edc.stc.organisms[left_index])->is_dead)  {left_index++;  if (left_index >= right_index) { goto endlogic_left;}}
 
+        //record compression so that reconstruction will be correct
+        if (edc.record_data) {edc.stc.tbuffer.record_compressed(right_organism->vector_index, left_organism->vector_index);}
+
         //If left organism is dead, and right one is alive, then swap them, update positions, and repeat the process.
         std::swap(*right_organism, *left_organism);
         right_organism->vector_index = right_index;
         left_organism->vector_index  = left_index;
 
+        //update indexes of swapped organisms the cells on a grid
         for (auto * organism: std::array<Organism*, 2>{left_organism, right_organism}) {
-            for (auto & block: organism->anatomy._organism_blocks) {
-                auto * w_block = &edc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-                w_block->organism_index = organism->vector_index;
+            for (auto & block: organism->anatomy.organism_blocks) {
+                auto & organism_index = edc.st_grid.get_organism_index(organism->x + block.get_pos(organism->rotation).x,
+                                                                       organism->y + block.get_pos(organism->rotation).y);
+                organism_index = organism->vector_index;
             }
         }
 

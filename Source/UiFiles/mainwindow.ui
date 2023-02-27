@@ -157,14 +157,25 @@
           <number>9</number>
          </property>
          <item>
-          <widget class="QLabel" name="lb_fps">
-           <property name="text">
-            <string>fps:</string>
-           </property>
-           <property name="buddy">
-            <cstring>le_fps</cstring>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_58">
+           <item>
+            <widget class="QLabel" name="lb_fps">
+             <property name="text">
+              <string>fps:</string>
+             </property>
+             <property name="buddy">
+              <cstring>le_fps</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lb_ups">
+             <property name="text">
+              <string>ups:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -196,7 +207,7 @@
            <item>
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Set max sps:</string>
+              <string>Set max tps:</string>
              </property>
             </widget>
            </item>
@@ -349,16 +360,6 @@
             <widget class="QLineEdit" name="le_brush_size"/>
            </item>
           </layout>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="cb_synchronise_sim_and_win">
-           <property name="text">
-            <string>Synchronise simulation and window</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>
@@ -1070,9 +1071,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-1231</y>
+                  <y>-1317</y>
                   <width>606</width>
-                  <height>1620</height>
+                  <height>1806</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1111,7 +1112,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1679,6 +1680,48 @@
                      </layout>
                     </item>
                     <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_61">
+                      <item>
+                       <widget class="QLabel" name="label_50">
+                        <property name="text">
+                         <string>Food threshold</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_food_threshold"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_62">
+                      <item>
+                       <widget class="QLabel" name="label_51">
+                        <property name="text">
+                         <string>Max food</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_max_food"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_60">
+                      <item>
+                       <widget class="QLabel" name="label_49">
+                        <property name="text">
+                         <string>Continuous movement drag </string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_continuous_movement_drag"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
                      <widget class="QCheckBox" name="cb_failed_reproduction_eats_food">
                       <property name="text">
                        <string>Failed reproduction eats food</string>
@@ -1721,13 +1764,6 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_use_new_child_pos_calculator">
-                      <property name="text">
-                       <string>Use new child position calculator</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <widget class="QCheckBox" name="cb_checks_if_path_is_clear">
                       <property name="text">
                        <string>Check if path is clear</string>
@@ -1752,6 +1788,34 @@
                      <widget class="QCheckBox" name="cb_recenter_to_imaginary">
                       <property name="text">
                        <string>Recenter organisms to imaginary position</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_do_not_mutate_brain_of_plants">
+                      <property name="text">
+                       <string>Do not mutate brain of plants/simple movers</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_use_weighted_brain">
+                      <property name="text">
+                       <string>Use weighted brain</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_organisms_destroy_food">
+                      <property name="text">
+                       <string>Organisms destroy food</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_use_continuous_movement">
+                      <property name="text">
+                       <string>Use continuous movement</string>
                       </property>
                      </widget>
                     </item>
@@ -2085,7 +2149,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>606</width>
-                  <height>803</height>
+                  <height>807</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -2252,13 +2316,6 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QCheckBox" name="cb_wait_for_engine_to_stop">
-                      <property name="text">
-                       <string>Wait for engine to stop to render</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
                      <layout class="QHBoxLayout" name="horizontalLayout_30">
                       <item>
                        <widget class="QLabel" name="label_25">
@@ -2397,6 +2454,20 @@
                        <string>Save/Load evolution controls upon program loading.</string>
                       </property>
                      </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_59">
+                      <item>
+                       <widget class="QLabel" name="label_48">
+                        <property name="text">
+                         <string>Set max ups:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_set_ups"/>
+                      </item>
+                     </layout>
                     </item>
                     <item>
                      <spacer name="verticalSpacer_2">
@@ -2541,22 +2612,6 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>399</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_synchronise_sim_and_win</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_synchronise_simulation_and_window_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>745</x>
-     <y>699</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>559</x>
-     <y>406</y>
     </hint>
    </hints>
   </connection>
@@ -3937,38 +3992,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>cb_wait_for_engine_to_stop</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_wait_for_engine_to_stop_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>647</x>
-     <y>871</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>466</x>
-     <y>448</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cb_use_new_child_pos_calculator</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>cb_use_new_child_pos_calculator_slot(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>629</x>
-     <y>867</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>448</x>
-     <y>449</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cb_checks_if_path_is_clear</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -4416,6 +4439,134 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>le_set_ups</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_set_ups_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>726</x>
+     <y>839</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_do_not_mutate_brain_of_plants</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_do_not_mutate_brain_of_plants_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>802</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_weighted_brain</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_weighted_brain_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>675</x>
+     <y>789</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_organisms_destroy_food</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_organisms_destroy_food_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>839</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_continuous_movement_drag</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_continuous_movement_drag_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>780</x>
+     <y>794</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cb_use_continuous_movement</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_use_continuous_movement_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>756</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_food_threshold</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_food_threshold_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>743</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_max_food</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_max_food_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>716</x>
+     <y>791</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4538,6 +4689,14 @@
   <slot>cb_occp_always_on_top_slot(bool)</slot>
   <slot>cb_use_occ_slot(bool)</slot>
   <slot>cb_recenter_to_imaginary_slot(bool)</slot>
+  <slot>le_set_ups_slot()</slot>
+  <slot>cb_do_not_mutate_brain_of_plants_slot(bool)</slot>
+  <slot>cb_use_weighted_brain_slot(bool)</slot>
+  <slot>cb_organisms_destroy_food_slot(bool)</slot>
+  <slot>le_continuous_movement_drag_slot()</slot>
+  <slot>cb_use_continuous_movement_slot(bool)</slot>
+  <slot>le_food_threshold_slot()</slot>
+  <slot>le_max_food_slot()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="simulation_modes"/>

@@ -15,6 +15,10 @@
 #include "Vector2.h"
 #include "textures.h"
 
+#ifdef __CUDA_USED__
+#include "cuda_image_creator.cuh"
+#endif
+
 namespace ImageCreation {
     void calculate_linspace(std::vector<int> & lin_width,
                             std::vector<int> & lin_height,
@@ -33,18 +37,28 @@ namespace ImageCreation {
             std::vector<int> & truncated_lin_width,
             std::vector<int> & truncated_lin_height);
 
-    namespace ImageCreationTools {
-//        const color &get_texture_color_old(BlockTypes type,
-//                                           Rotation rotation,
-//                                           float relative_x_scale,
-//                                           float relative_y_scale,
-//                                           const ColorContainer &cc,
-//                                           const Textures &textures);
+    void create_image(const std::vector<int> &lin_width, const std::vector<int> &lin_height,
+                      uint32_t simulation_width, uint32_t simulation_height, const ColorContainer &cc,
+                      const TexturesContainer &textures, int image_width, int image_height,
+                      std::vector<unsigned char> &image_vector,
+                      const std::vector<BaseGridBlock> &second_grid, bool use_cuda, bool cuda_is_available,
+                      void *cuda_creator_ptr, const std::vector<int> &truncated_lin_width,
+                      const std::vector<int> &truncated_lin_height, bool yuv_format, int kernel_size);
 
-        const color &get_texture_color(BlockTypes type,
+    namespace ImageCreationTools {
+        color get_texture_color(BlockTypes type,
+                                Rotation rotation,
+                                double rxs,
+                                double rys,
+                                const TexturesContainer &textures);
+
+        color get_kernel_texture_color(BlockTypes type,
                                        Rotation rotation,
-                                       double rxs,
-                                       double rys,
+                                       int texture_x,
+                                       int texture_y,
+                                       int texture_width,
+                                       int texture_height,
+                                       int kernel_size,
                                        const TexturesContainer &textures);
 
         void set_image_pixel(int x,
@@ -53,15 +67,26 @@ namespace ImageCreation {
                              const color &color,
                              std::vector<unsigned char> &image_vector);
 
-        void complex_image_creation(const std::vector<int> &lin_width,
-                                    const std::vector<int> &lin_height,
-                                    uint32_t simulation_width,
-                                    uint32_t simulation_height,
-                                    const ColorContainer &cc,
-                                    const TexturesContainer &textures,
-                                    int image_width,
-                                    std::vector<unsigned char> &image_vector,
-                                    const std::vector<BaseGridBlock> &second_grid);
+        void cpu_image_creation(const std::vector<int> &lin_width,
+                                const std::vector<int> &lin_height,
+                                uint32_t simulation_width,
+                                uint32_t simulation_height,
+                                const ColorContainer &cc,
+                                const TexturesContainer &textures,
+                                int image_width,
+                                std::vector<unsigned char> &image_vector,
+                                const std::vector<BaseGridBlock> &second_grid);
+
+        void cpu_kernel_image_creation(const std::vector<int> &lin_width,
+                                       const std::vector<int> &lin_height,
+                                       uint32_t simulation_width,
+                                       uint32_t simulation_height,
+                                       const ColorContainer &cc,
+                                       const TexturesContainer &textures,
+                                       int image_width,
+                                       std::vector<unsigned char> &image_vector,
+                                       const std::vector<BaseGridBlock> &second_grid,
+                                       int kernel_size);
     }
 }
 

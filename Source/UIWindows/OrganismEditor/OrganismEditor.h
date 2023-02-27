@@ -30,7 +30,7 @@
 #include "../../Organism/CPU/Anatomy.h"
 #include "../../Organism/CPU/Brain.h"
 #include "../../Organism/CPU/Rotation.h"
-#include "../../GridBlocks/BaseGridBlock.h"
+#include "../../GridStuff/BaseGridBlock.h"
 #include "EditorUI.h"
 #include "../MainWindow/WindowUI.h"
 #include "../../Stuff/Vector2.h"
@@ -41,21 +41,18 @@
 #include "../../Stuff/ImageCreation.h"
 #include "../../Stuff/DataSavingFunctions.h"
 #include "OCCTranspiler/OCCTranspiler.h"
+#include "../../Stuff/ImageCreation.h"
 
-struct EditBlock : BaseGridBlock {
-    //For when cursor is hovering above block
-    bool hovering = false;
-    EditBlock()=default;
-    explicit EditBlock(BlockTypes type, Rotation rotation = Rotation::UP) :
-            BaseGridBlock(type, rotation){}
-};
+#ifdef __CUDA_USED__
+#include "../../Stuff/cuda_image_creator.cuh"
+#endif
 
 class OrganismEditor: public QWidget {
     Q_OBJECT
 public:
     std::vector<std::string> decisions{"Do Nothing", "Go Away", "Go Towards"};
-    std::vector<std::string> observations{"Mouth Cell", "Producer Cell", "Mover Cell", "Killer Cell", "Armor Cell", "Eye Cell", "Food", "Wall"};
     std::map<std::string, std::map<std::string, QCheckBox*>> brain_checkboxes;
+    std::map<std::string, QLineEdit*> brain_line_edits;
     std::map<std::string, BlockTypes>     mapped_block_types_s_to_type;
     std::map<std::string, SimpleDecision> mapped_decisions_s_to_type;
     std::map<BlockTypes,     std::string> mapped_block_types_type_to_s;
@@ -63,7 +60,7 @@ public:
 
     Ui::MainWindow * parent_ui = nullptr;
 
-    std::vector<std::vector<EditBlock>> edit_grid;
+    std::vector<BaseGridBlock> edit_grid;
     std::vector<unsigned char> edit_image;
     CursorMode * c_mode = nullptr;
 
@@ -103,7 +100,11 @@ public:
     void occ_mode(bool state);
 
     void brain_cb_chooser(std::string observation, std::string action);
+    void brain_weight_chooser(std::string observation, QLineEdit * le);
+
+    void update_brain_state();
     void update_brain_checkboxes();
+    void update_brain_line_edits();
 
     QLabel actual_cursor;
 
@@ -116,16 +117,25 @@ public:
     bool change_disabled = false;
     bool short_instructions = false;
 
-    Organism * editor_organism;
-    Organism ** chosen_organism;
+    Organism editor_organism;
+    Organism * chosen_organism;
 
     BlockTypes chosen_block_type = BlockTypes::MouthBlock;
     Rotation chosen_block_rotation = Rotation::UP;
 
+    Rotation choosen_rotation = Rotation::UP;
+
+    const bool & cuda_is_available;
+    const bool & use_cuda;
+
+#ifdef __CUDA_USED__
+    CUDAImageCreator cuda_image_creator{};
+#endif
+
     OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                    SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                   Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
-                   OCCParameters *occp);
+                   Organism *chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                   OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
@@ -136,8 +146,6 @@ public:
     void reset_scale_view();
 
     void create_image();
-
-    void complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height);
 
     void finalize_chosen_organism();
     void load_chosen_organism();
@@ -151,6 +159,8 @@ public:
     void load_occ();
 
     bool check_edit_area();
+
+    void update_brain_edit_visibility(bool weighted_edits_visible);
 
 private slots:
     void b_load_organism_slot();

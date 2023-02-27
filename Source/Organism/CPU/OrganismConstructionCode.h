@@ -9,6 +9,7 @@
 #include "OrganismConstructionCodeInstruction.h"
 #include "../../Containers/CPU/OrganismConstructionCodeParameters.h"
 #include "../../Containers/CPU/OCCLogicContainer.h"
+#include "AnatomyContainers.h"
 
 //https://github.com/DavidPal/discrete-distribution
 //https://stackoverflow.com/questions/53632441/c-sampling-from-discrete-distribution-without-replacement
@@ -41,18 +42,18 @@ private:
     std::array<int, 4> calculate_construction_edges();
 
     std::vector<SerializedOrganismBlockContainer>
-    compile_base_structure(SerializedOrganismStructureContainer *container, OCCLogicContainer &occ_c, std::array<int, 4> edges);
+    compile_base_structure(SerializedOrganismStructureContainer *container, OCCLogicContainer &occ_c, const std::array<int, 4> &edges);
     //producing space, eating space, killing space
-    static std::tuple<std::vector<std::vector<SerializedAdjacentSpaceContainer>>, std::vector<SerializedAdjacentSpaceContainer>, std::vector<SerializedAdjacentSpaceContainer>>
-    compile_spaces(OCCLogicContainer &occ_c, std::array<int, 4> edges,
+    static SerializedOrganismStructureContainer *
+    compile_spaces(OCCLogicContainer &occ_c, const std::array<int, 4> &edges,
                    std::vector<SerializedOrganismBlockContainer> &organism_blocks,
                    SerializedOrganismStructureContainer *container);
 
     static void shift_instruction_part(SerializedOrganismStructureContainer *container, OCCLogicContainer &occ_c,
-                                const std::array<std::array<int, 2>, 8> &shift_values, std::array<int, 2> &shift,
-                                Rotation &base_rotation, int cursor_x, int cursor_y, int center_x, int center_y,
-                                const OCCInstruction &instruction, const OCCInstruction &next_instruction,
-                                std::vector<SerializedOrganismBlockContainer> &blocks, int &i, bool &pass) ;
+                                       const std::array<std::array<int, 2>, 8> &shift_values, std::array<int, 2> &shift,
+                                       const Rotation base_rotation, int cursor_x, int cursor_y, int center_x, int center_y,
+                                       const OCCInstruction instruction, const OCCInstruction next_instruction,
+                                       std::vector<SerializedOrganismBlockContainer> &blocks, int &i, bool &pass) ;
 };
 
 

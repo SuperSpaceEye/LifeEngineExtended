@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'benchmark.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.8
+** Created by: Qt User Interface Compiler version 6.4.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -76,42 +76,42 @@ public:
     void setupUi(QWidget *Benchmark)
     {
         if (Benchmark->objectName().isEmpty())
-            Benchmark->setObjectName(QString::fromUtf8("Benchmark"));
+            Benchmark->setObjectName("Benchmark");
         Benchmark->resize(1031, 618);
         verticalLayout = new QVBoxLayout(Benchmark);
         verticalLayout->setSpacing(0);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         tabWidget = new QTabWidget(Benchmark);
-        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+        tabWidget->setObjectName("tabWidget");
         main_tab = new QWidget();
-        main_tab->setObjectName(QString::fromUtf8("main_tab"));
+        main_tab->setObjectName("main_tab");
         verticalLayout_2 = new QVBoxLayout(main_tab);
         verticalLayout_2->setSpacing(0);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         scrollArea = new QScrollArea(main_tab);
-        scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+        scrollArea->setObjectName("scrollArea");
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
-        scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 1025, 585));
         verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_3->setSpacing(0);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setObjectName("verticalLayout_3");
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setContentsMargins(-1, -1, 0, 0);
         verticalLayout_4 = new QVBoxLayout();
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setObjectName("verticalLayout_4");
         verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_4->addItem(verticalSpacer_2);
 
         b_run_all_benchmarks = new QPushButton(scrollAreaWidgetContents);
-        b_run_all_benchmarks->setObjectName(QString::fromUtf8("b_run_all_benchmarks"));
+        b_run_all_benchmarks->setObjectName("b_run_all_benchmarks");
 
         verticalLayout_4->addWidget(b_run_all_benchmarks);
 
@@ -120,47 +120,47 @@ public:
         verticalLayout_4->addItem(verticalSpacer_4);
 
         b_benchmark_produce_food = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_produce_food->setObjectName(QString::fromUtf8("b_benchmark_produce_food"));
+        b_benchmark_produce_food->setObjectName("b_benchmark_produce_food");
 
         verticalLayout_4->addWidget(b_benchmark_produce_food);
 
         b_benchmark_eat_food = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_eat_food->setObjectName(QString::fromUtf8("b_benchmark_eat_food"));
+        b_benchmark_eat_food->setObjectName("b_benchmark_eat_food");
 
         verticalLayout_4->addWidget(b_benchmark_eat_food);
 
         b_benchmark_apply_damage = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_apply_damage->setObjectName(QString::fromUtf8("b_benchmark_apply_damage"));
+        b_benchmark_apply_damage->setObjectName("b_benchmark_apply_damage");
 
         verticalLayout_4->addWidget(b_benchmark_apply_damage);
 
         b_benchmark_tick_lifetime = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_tick_lifetime->setObjectName(QString::fromUtf8("b_benchmark_tick_lifetime"));
+        b_benchmark_tick_lifetime->setObjectName("b_benchmark_tick_lifetime");
 
         verticalLayout_4->addWidget(b_benchmark_tick_lifetime);
 
         b_benchmark_get_observations = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_get_observations->setObjectName(QString::fromUtf8("b_benchmark_get_observations"));
+        b_benchmark_get_observations->setObjectName("b_benchmark_get_observations");
 
         verticalLayout_4->addWidget(b_benchmark_get_observations);
 
         b_benchmark_think_decision = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_think_decision->setObjectName(QString::fromUtf8("b_benchmark_think_decision"));
+        b_benchmark_think_decision->setObjectName("b_benchmark_think_decision");
 
         verticalLayout_4->addWidget(b_benchmark_think_decision);
 
         b_benchmark_rotate_organism = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_rotate_organism->setObjectName(QString::fromUtf8("b_benchmark_rotate_organism"));
+        b_benchmark_rotate_organism->setObjectName("b_benchmark_rotate_organism");
 
         verticalLayout_4->addWidget(b_benchmark_rotate_organism);
 
         b_benchmark_move_organism = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_move_organism->setObjectName(QString::fromUtf8("b_benchmark_move_organism"));
+        b_benchmark_move_organism->setObjectName("b_benchmark_move_organism");
 
         verticalLayout_4->addWidget(b_benchmark_move_organism);
 
         b_benchmark_try_make_child = new QPushButton(scrollAreaWidgetContents);
-        b_benchmark_try_make_child->setObjectName(QString::fromUtf8("b_benchmark_try_make_child"));
+        b_benchmark_try_make_child->setObjectName("b_benchmark_try_make_child");
         b_benchmark_try_make_child->setEnabled(true);
 
         verticalLayout_4->addWidget(b_benchmark_try_make_child);
@@ -170,7 +170,7 @@ public:
         verticalLayout_4->addItem(verticalSpacer_3);
 
         b_stop_benchmarks = new QPushButton(scrollAreaWidgetContents);
-        b_stop_benchmarks->setObjectName(QString::fromUtf8("b_stop_benchmarks"));
+        b_stop_benchmarks->setObjectName("b_stop_benchmarks");
 
         verticalLayout_4->addWidget(b_stop_benchmarks);
 
@@ -182,9 +182,9 @@ public:
         horizontalLayout->addLayout(verticalLayout_4);
 
         verticalLayout_5 = new QVBoxLayout();
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalLayout_5->setObjectName("verticalLayout_5");
         benchmarks_output_text_edit = new QTextEdit(scrollAreaWidgetContents);
-        benchmarks_output_text_edit->setObjectName(QString::fromUtf8("benchmarks_output_text_edit"));
+        benchmarks_output_text_edit->setObjectName("benchmarks_output_text_edit");
         benchmarks_output_text_edit->setReadOnly(true);
 
         verticalLayout_5->addWidget(benchmarks_output_text_edit);
@@ -203,32 +203,32 @@ public:
 
         tabWidget->addTab(main_tab, QString());
         settings_tab = new QWidget();
-        settings_tab->setObjectName(QString::fromUtf8("settings_tab"));
+        settings_tab->setObjectName("settings_tab");
         verticalLayout_6 = new QVBoxLayout(settings_tab);
-        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
+        verticalLayout_6->setObjectName("verticalLayout_6");
         verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_6->addItem(verticalSpacer_5);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         label_2 = new QLabel(settings_tab);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName("label_2");
 
         horizontalLayout_2->addWidget(label_2);
 
         le_grid_width = new QLineEdit(settings_tab);
-        le_grid_width->setObjectName(QString::fromUtf8("le_grid_width"));
+        le_grid_width->setObjectName("le_grid_width");
 
         horizontalLayout_2->addWidget(le_grid_width);
 
         label = new QLabel(settings_tab);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName("label");
 
         horizontalLayout_2->addWidget(label);
 
         le_grid_height = new QLineEdit(settings_tab);
-        le_grid_height->setObjectName(QString::fromUtf8("le_grid_height"));
+        le_grid_height->setObjectName("le_grid_height");
 
         horizontalLayout_2->addWidget(le_grid_height);
 
@@ -236,19 +236,19 @@ public:
         verticalLayout_6->addLayout(horizontalLayout_2);
 
         b_apply_grid_size = new QPushButton(settings_tab);
-        b_apply_grid_size->setObjectName(QString::fromUtf8("b_apply_grid_size"));
+        b_apply_grid_size->setObjectName("b_apply_grid_size");
 
         verticalLayout_6->addWidget(b_apply_grid_size);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
         label_3 = new QLabel(settings_tab);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName("label_3");
 
         horizontalLayout_3->addWidget(label_3);
 
         le_num_benchmark_organisms = new QLineEdit(settings_tab);
-        le_num_benchmark_organisms->setObjectName(QString::fromUtf8("le_num_benchmark_organisms"));
+        le_num_benchmark_organisms->setObjectName("le_num_benchmark_organisms");
 
         horizontalLayout_3->addWidget(le_num_benchmark_organisms);
 
@@ -256,14 +256,14 @@ public:
         verticalLayout_6->addLayout(horizontalLayout_3);
 
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
         label_4 = new QLabel(settings_tab);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setObjectName("label_4");
 
         horizontalLayout_4->addWidget(label_4);
 
         le_num_iterations = new QLineEdit(settings_tab);
-        le_num_iterations->setObjectName(QString::fromUtf8("le_num_iterations"));
+        le_num_iterations->setObjectName("le_num_iterations");
 
         horizontalLayout_4->addWidget(le_num_iterations);
 
@@ -271,14 +271,14 @@ public:
         verticalLayout_6->addLayout(horizontalLayout_4);
 
         horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName("horizontalLayout_5");
         label_5 = new QLabel(settings_tab);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setObjectName("label_5");
 
         horizontalLayout_5->addWidget(label_5);
 
         le_organisms_diameter = new QLineEdit(settings_tab);
-        le_organisms_diameter->setObjectName(QString::fromUtf8("le_organisms_diameter"));
+        le_organisms_diameter->setObjectName("le_organisms_diameter");
 
         horizontalLayout_5->addWidget(le_organisms_diameter);
 
@@ -321,26 +321,26 @@ public:
 
     void retranslateUi(QWidget *Benchmark)
     {
-        Benchmark->setWindowTitle(QApplication::translate("Benchmark", "Form", nullptr));
-        b_run_all_benchmarks->setText(QApplication::translate("Benchmark", "Run all benchmarks", nullptr));
-        b_benchmark_produce_food->setText(QApplication::translate("Benchmark", "Benchmark produce food", nullptr));
-        b_benchmark_eat_food->setText(QApplication::translate("Benchmark", "Benchmark eat food", nullptr));
-        b_benchmark_apply_damage->setText(QApplication::translate("Benchmark", "Benchmark apply damage", nullptr));
-        b_benchmark_tick_lifetime->setText(QApplication::translate("Benchmark", "Benchmark tick lifetime", nullptr));
-        b_benchmark_get_observations->setText(QApplication::translate("Benchmark", "Benchmark get observations", nullptr));
-        b_benchmark_think_decision->setText(QApplication::translate("Benchmark", "Benchmark think decision", nullptr));
-        b_benchmark_rotate_organism->setText(QApplication::translate("Benchmark", "Benchmark rotate organism", nullptr));
-        b_benchmark_move_organism->setText(QApplication::translate("Benchmark", "Benchmark move organism", nullptr));
-        b_benchmark_try_make_child->setText(QApplication::translate("Benchmark", "Benchmark try make child", nullptr));
-        b_stop_benchmarks->setText(QApplication::translate("Benchmark", "Stop benchmarks / Finish benchmarking", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(main_tab), QApplication::translate("Benchmark", "Benchmark", nullptr));
-        label_2->setText(QApplication::translate("Benchmark", "Grid width", nullptr));
-        label->setText(QApplication::translate("Benchmark", "Grid height", nullptr));
-        b_apply_grid_size->setText(QApplication::translate("Benchmark", "Apply grid size", nullptr));
-        label_3->setText(QApplication::translate("Benchmark", "Num benchmark organisms", nullptr));
-        label_4->setText(QApplication::translate("Benchmark", "Num iterations", nullptr));
-        label_5->setText(QApplication::translate("Benchmark", "Organisms diameter", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(settings_tab), QApplication::translate("Benchmark", "Benchmark Settings", nullptr));
+        Benchmark->setWindowTitle(QCoreApplication::translate("Benchmark", "Form", nullptr));
+        b_run_all_benchmarks->setText(QCoreApplication::translate("Benchmark", "Run all benchmarks", nullptr));
+        b_benchmark_produce_food->setText(QCoreApplication::translate("Benchmark", "Benchmark produce food", nullptr));
+        b_benchmark_eat_food->setText(QCoreApplication::translate("Benchmark", "Benchmark eat food", nullptr));
+        b_benchmark_apply_damage->setText(QCoreApplication::translate("Benchmark", "Benchmark apply damage", nullptr));
+        b_benchmark_tick_lifetime->setText(QCoreApplication::translate("Benchmark", "Benchmark tick lifetime", nullptr));
+        b_benchmark_get_observations->setText(QCoreApplication::translate("Benchmark", "Benchmark get observations", nullptr));
+        b_benchmark_think_decision->setText(QCoreApplication::translate("Benchmark", "Benchmark think decision", nullptr));
+        b_benchmark_rotate_organism->setText(QCoreApplication::translate("Benchmark", "Benchmark rotate organism", nullptr));
+        b_benchmark_move_organism->setText(QCoreApplication::translate("Benchmark", "Benchmark move organism", nullptr));
+        b_benchmark_try_make_child->setText(QCoreApplication::translate("Benchmark", "Benchmark try make child", nullptr));
+        b_stop_benchmarks->setText(QCoreApplication::translate("Benchmark", "Stop benchmarks / Finish benchmarking", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(main_tab), QCoreApplication::translate("Benchmark", "Benchmark", nullptr));
+        label_2->setText(QCoreApplication::translate("Benchmark", "Grid width", nullptr));
+        label->setText(QCoreApplication::translate("Benchmark", "Grid height", nullptr));
+        b_apply_grid_size->setText(QCoreApplication::translate("Benchmark", "Apply grid size", nullptr));
+        label_3->setText(QCoreApplication::translate("Benchmark", "Num benchmark organisms", nullptr));
+        label_4->setText(QCoreApplication::translate("Benchmark", "Num iterations", nullptr));
+        label_5->setText(QCoreApplication::translate("Benchmark", "Organisms diameter", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(settings_tab), QCoreApplication::translate("Benchmark", "Benchmark Settings", nullptr));
     } // retranslateUi
 
 };

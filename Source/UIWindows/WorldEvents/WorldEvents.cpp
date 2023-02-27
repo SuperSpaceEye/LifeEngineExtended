@@ -20,10 +20,14 @@ WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
     ui.world_events_layout->setAlignment(Qt::AlignLeft);
 
     button_add_new_branch();
+
+    //load/save world events
+    ui.pushButton->hide();
+    ui.pushButton_2->hide();
 }
 
 void WorldEvents::closeEvent(QCloseEvent *event) {
-    parent_ui->tb_open_info_window->setChecked(false);
+    parent_ui->tb_open_world_events->setChecked(false);
     QWidget::closeEvent(event);
 }
 
@@ -38,7 +42,7 @@ void WorldEvents::button_add_new_branch() {
             delete layout;
             return;
         }
-        auto * spacer_item = ui.world_events_layout->itemAt(ui.world_events_layout->count()-1);
+        auto * spacer_item = ui.world_events_layout->itemAt(ui.world_events_layout->count() - 1);
         ui.world_events_layout->removeItem(spacer_item);
         delete spacer_item;
 

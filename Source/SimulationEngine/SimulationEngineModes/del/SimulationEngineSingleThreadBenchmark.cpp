@@ -12,7 +12,7 @@ bool SimulationEngineSingleThreadBenchmark::resize_benchmark_grid(int width, int
     if (benchmark_running) {return false;}
     dc.simulation_width  = width;
     dc.simulation_height = height;
-    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<SingleThreadGridBlock>(dc.simulation_height, SingleThreadGridBlock{}));
+//    dc.CPU_simulation_grid.resize(dc.simulation_width, std::vector<SingleThreadGridBlock>(dc.simulation_height, SingleThreadGridBlock{}));
     return true;
 }
 
@@ -25,8 +25,7 @@ void SimulationEngineSingleThreadBenchmark::create_benchmark_organisms() {
 
     anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
-    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr,
-                              nullptr, 1);
+    p_organism = new Organism(0, 0, Rotation::UP, anatomy, brain, OrganismConstructionCode(), &sp, &bp, nullptr, nullptr, 1);
     benchmark_organisms[BenchmarkTypes::ProduceFood].emplace_back(
             OrganismContainer{"1 block", p_organism}
     );
@@ -262,7 +261,7 @@ void SimulationEngineSingleThreadBenchmark::finish_benchmarking() {
     remove_benchmark_organisms();
     dc = EngineDataContainer{};
     benchmark_results = std::vector<BenchmarkResult>();
-    dc.CPU_simulation_grid = std::vector<std::vector<SingleThreadGridBlock>>();
+//    dc.CPU_simulation_grid = std::vector<std::vector<SingleThreadGridBlock>>();
 }
 
 const std::vector<BenchmarkResult> & SimulationEngineSingleThreadBenchmark::get_results() {
@@ -341,7 +340,7 @@ void SimulationEngineSingleThreadBenchmark::start_benchmarking(const std::vector
 
 void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *organism, int num_organisms,
                                                                     BenchmarkResult &result, int additional_distance) {
-    auto dimensions = SimulationEngineSingleThread::get_organism_dimensions(organism);
+    auto dimensions = SimulationEngineSingleThread::get_organism_dimensions(*organism);
 
     bool continue_flag = false;
 
@@ -359,13 +358,13 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
 
         organism->x = x;
         organism->y = y;
-        for (auto & block: organism->anatomy._organism_blocks) {
-            if (SimulationEngineSingleThread::check_if_block_out_of_bounds(&dc, organism, block, organism->rotation)) { continue_flag = true;break;}
+        for (auto & block: organism->anatomy.organism_blocks) {
+            if (SimulationEngineSingleThread::check_if_block_out_of_bounds(dc, *organism, block, organism->rotation)) { continue_flag = true;break;}
 
-            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x]
-            [organism->y + block.get_pos(organism->rotation).y];
-
-            if (w_block->type != BlockTypes::EmptyBlock)
+//            auto * w_block = dc.CPU_simulation_grid[organism.x + block.get_pos(organism.rotation).x]
+//            [organism.y + block.get_pos(organism.rotation).y];
+//
+//            if (w_block->type != BlockTypes::EmptyBlock)
             { continue_flag = true;break;}
         }
         if (continue_flag) {continue_flag = false; i--; continue;}
@@ -373,7 +372,7 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
         auto new_organism = OrganismsController::get_new_main_organism(dc);
         *new_organism = Organism(organism);
         new_organism->is_dead = false;
-        SimulationEngineSingleThread::place_organism(&dc, new_organism);
+        SimulationEngineSingleThread::place_organism(dc, *new_organism, sp);
     }
     result.num_organisms = i;
 }
@@ -383,18 +382,18 @@ void SimulationEngineSingleThreadBenchmark::reset_state() {
         OrganismsController::free_main_organism(&organism, dc);
     }
 
-    for (auto & row: dc.CPU_simulation_grid) {
-        row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
-    }
-    for (int x = 0; x < dc.simulation_width; x++) {
-        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
-    }
-
-    for (int y = 0; y < dc.simulation_height; y++) {
-        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
-        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
-    }
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        row = std::vector<SingleThreadGridBlock>(dc.simulation_width);
+//    }
+//    for (int x = 0; x < dc.simulation_width; x++) {
+//        dc.CPU_simulation_grid[x][0].type = BlockTypes::WallBlock;
+//        dc.CPU_simulation_grid[x][dc.simulation_height - 1].type = BlockTypes::WallBlock;
+//    }
+//
+//    for (int y = 0; y < dc.simulation_height; y++) {
+//        dc.CPU_simulation_grid[0][y].type = BlockTypes::WallBlock;
+//        dc.CPU_simulation_grid[dc.simulation_width - 1][y].type = BlockTypes::WallBlock;
+//    }
 
     gen.set_seed(seed);
 }
@@ -404,11 +403,11 @@ using std::chrono::duration_cast;
 using std::chrono::nanoseconds;
 
 void SimulationEngineSingleThreadBenchmark::prepare_produce_food_benchmark() {
-    for (auto & row: dc.CPU_simulation_grid) {
-        for (auto & block: row) {
-            if (block.type == BlockTypes::FoodBlock) {block.type = BlockTypes::EmptyBlock;}
-        }
-    }
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        for (auto & block: row) {
+//            if (block.type == BlockTypes::FoodBlock) {block.type = BlockTypes::EmptyBlock;}
+//        }
+//    }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResult &res, bool flag) {
     auto start = NOW();
@@ -416,7 +415,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResu
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::produce_food(&dc, &sp, &dc.stc.organisms[i], gen);
+            SimulationEngineSingleThread::produce_food(dc, sp, dc.stc.organisms[i], gen);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -425,7 +424,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResu
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::produce_food(&dc, &sp, &dc.stc.organisms[i], gen);
+            SimulationEngineSingleThread::produce_food(dc, sp, dc.stc.organisms[i], gen);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -435,11 +434,11 @@ void SimulationEngineSingleThreadBenchmark::benchmark_produce_food(BenchmarkResu
 }
 
 void SimulationEngineSingleThreadBenchmark::prepare_eat_food_benchmark() {
-    for (auto & row: dc.CPU_simulation_grid) {
-        for (auto & block: row) {
-            if (block.type == BlockTypes::EmptyBlock) {block.type = BlockTypes::FoodBlock;}
-        }
-    }
+//    for (auto & row: dc.CPU_simulation_grid) {
+//        for (auto & block: row) {
+//            if (block.type == BlockTypes::EmptyBlock) {block.type = BlockTypes::FoodBlock;}
+//        }
+//    }
 }
 void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(BenchmarkResult &res, bool flag) {
     auto start = NOW();
@@ -447,7 +446,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(BenchmarkResult &
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::eat_food(&dc, &sp, &dc.stc.organisms[i]);
+            SimulationEngineSingleThread::eat_food(dc, sp, dc.stc.organisms[i]);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -456,7 +455,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_eat_food(BenchmarkResult &
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::eat_food(&dc, &sp, &dc.stc.organisms[i]);
+            SimulationEngineSingleThread::eat_food(dc, sp, dc.stc.organisms[i]);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -471,7 +470,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(BenchmarkResu
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::apply_damage(&dc, &sp, &dc.stc.organisms[i]);
+            SimulationEngineSingleThread::apply_damage(dc, sp, dc.stc.organisms[i]);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -480,7 +479,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(BenchmarkResu
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::apply_damage(&dc, &sp, &dc.stc.organisms[i]);
+            SimulationEngineSingleThread::apply_damage(dc, sp, dc.stc.organisms[i]);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -492,7 +491,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_apply_damage(BenchmarkResu
 void SimulationEngineSingleThreadBenchmark::prepare_tick_lifetime_benchmark() {
     dc.stc.dead_organisms_positions.clear();
     for (auto & organism: dc.stc.organisms) {
-        SimulationEngineSingleThread::place_organism(&dc, &organism);
+        SimulationEngineSingleThread::place_organism(dc, organism, sp);
         organism.is_dead = false;
     }
 }
@@ -503,7 +502,7 @@ SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(BenchmarkResult &
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::tick_lifetime(&dc, &dc.stc.organisms[i]);
+            SimulationEngineSingleThread::tick_lifetime(dc, dc.stc.organisms[i], i, sp);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -512,7 +511,7 @@ SimulationEngineSingleThreadBenchmark::benchmark_tick_lifetime(BenchmarkResult &
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::tick_lifetime(&dc, &dc.stc.organisms[i]);
+            SimulationEngineSingleThread::tick_lifetime(dc, dc.stc.organisms[i], i, sp);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -531,7 +530,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_get_observations(Benchmark
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::get_observations(&dc, &sp, &dc.stc.organisms[i], observations);
+            SimulationEngineSingleThread::get_observations(dc, sp, dc.stc.organisms[i], observations);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -540,7 +539,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_get_observations(Benchmark
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::get_observations(&dc, &sp, &dc.stc.organisms[i], observations);
+            SimulationEngineSingleThread::get_observations(dc, sp, dc.stc.organisms[i], observations);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -555,7 +554,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkRe
     std::vector<std::vector<Observation>> observations{dc.stc.organisms.size()};
     for (auto & observation: observations) {
         observation = std::vector<Observation>{Observation{
-                static_cast<BlockTypes>(std::uniform_int_distribution<int>(0, 8)(gen)), 5, Rotation::UP
+                static_cast<BlockTypes>(std::uniform_int_distribution<int>(0, 9)(gen)), 5, Rotation::UP
                     }};
     }
 
@@ -563,7 +562,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkRe
         for (int i = 0; i < num_organisms; i++) {
             start = NOW();
             auto &organism = dc.stc.organisms[i];
-            organism.think_decision(observations[i], &gen);
+            organism.think_decision(observations[i], gen);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -573,7 +572,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkRe
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
             auto &organism = dc.stc.organisms[i];
-            organism.think_decision(observations[i], &gen);
+            organism.think_decision(observations[i], gen);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -585,11 +584,12 @@ void SimulationEngineSingleThreadBenchmark::benchmark_think_decision(BenchmarkRe
 void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
+    bool _;
 
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             start = NOW();
-            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+            SimulationEngineSingleThread::rotate_organism(dc, dc.stc.organisms[i], BrainDecision::RotateRight, sp, _);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -598,7 +598,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkR
     } else {
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
-            SimulationEngineSingleThread::rotate_organism(&dc, &dc.stc.organisms[i], BrainDecision::RotateRight, &sp);
+            SimulationEngineSingleThread::rotate_organism(dc, dc.stc.organisms[i], BrainDecision::RotateRight, sp, _);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -610,12 +610,13 @@ void SimulationEngineSingleThreadBenchmark::benchmark_rotate_organism(BenchmarkR
 void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkResult &res, bool flag) {
     auto start = NOW();
     auto end  = NOW();
+    bool _;
 
     if (!flag) {
         for (int i = 0; i < res.num_organisms; i++) {
             auto decision = static_cast<BrainDecision>(std::uniform_int_distribution<int>(0, 3)(gen));
             start = NOW();
-            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+            SimulationEngineSingleThread::move_organism(dc, dc.stc.organisms[i], decision, sp, _);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -627,7 +628,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkRes
         start = NOW();
         for (int i = 0; i < res.num_organisms; i++) {
             decision = BrainDecision(((int)decision+1)%4);
-            SimulationEngineSingleThread::move_organism(&dc, &dc.stc.organisms[i], decision, &sp);
+            SimulationEngineSingleThread::move_organism(dc, dc.stc.organisms[i], decision, sp, _);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();
@@ -639,19 +640,19 @@ void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkRes
 //TODO does not reset like it should.
 void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark(int num_organisms) {
     for (int i = dc.stc.organisms.size()-1; i >= num_organisms; i--) {
-        auto organism = &dc.stc.organisms[i];
-        for (auto & block: organism->anatomy._organism_blocks) {
-            auto * w_block = &dc.CPU_simulation_grid[organism->x + block.get_pos(organism->rotation).x][organism->y + block.get_pos(organism->rotation).y];
-            w_block->type = BlockTypes::FoodBlock;
-            w_block->organism_index = -1;
+        auto & organism = dc.stc.organisms[i];
+        for (auto & block: organism.anatomy.organism_blocks) {
+//            auto * w_block = dc.CPU_simulation_grid[organism.x + block.get_pos(organism.rotation).x][organism.y + block.get_pos(organism.rotation).y];
+//            w_block->type = BlockTypes::FoodBlock;
+//            w_block->organism_index = -1;
         }
-        organism->kill_organism(dc);
+        organism.kill_organism(dc);
     }
 
     for (int i = 0; i < num_organisms; i++) {
-        auto organism = &dc.stc.organisms[i];
-        OrganismsController::free_child_organism(OrganismsController::get_child_organism_by_index(organism->child_pattern_index, dc), dc);
-        organism->child_pattern_index = -1;
+        auto & organism = dc.stc.organisms[i];
+        OrganismsController::free_child_organism(OrganismsController::get_child_organism_by_index(organism.child_pattern_index, dc), dc);
+        organism.child_pattern_index = -1;
     }
 }
 
@@ -664,7 +665,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(BenchmarkRe
             start = NOW();
             auto &organism = dc.stc.organisms[i];
             organism.food_collected = organism.food_needed + 1;
-            SimulationEngineSingleThread::try_make_child(&dc, &sp, &organism, &gen);
+            SimulationEngineSingleThread::try_make_child(dc, sp, organism, gen);
             end = NOW();
             auto difference = duration_cast<nanoseconds>(end - start).count();
             res.total_time_measured += difference;
@@ -675,7 +676,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_try_make_child(BenchmarkRe
         for (int i = 0; i < res.num_organisms; i++) {
             auto &organism = dc.stc.organisms[i];
             organism.food_collected = organism.food_needed + 1;
-            SimulationEngineSingleThread::try_make_child(&dc, &sp, &organism, &gen);
+            SimulationEngineSingleThread::try_make_child(dc, sp, organism, gen);
         }
         end = NOW();
         auto difference = duration_cast<nanoseconds>(end - start).count();

@@ -4,11 +4,14 @@
 
 #include "DataSavingFunctions.h"
 
-//TODO increment every time saving logic changes
-const uint32_t SAVE_VERSION = 8;
+const uint32_t SAVE_VERSION = 10;
+const std::string VERSION_NAME = "main";
 
 void DataSavingFunctions::write_version(std::ofstream &os) {
     os.write((char*)&SAVE_VERSION, sizeof(uint32_t));
+    auto size = VERSION_NAME.size();
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write(VERSION_NAME.c_str(), VERSION_NAME.size());
 }
 
 void DataSavingFunctions::write_simulation_parameters(std::ofstream & os, SimulationParameters &sp) {
@@ -30,21 +33,25 @@ void DataSavingFunctions::write_simulation_grid(std::ofstream & os, EngineDataCo
 
     for (uint32_t x = 0; x < edc.simulation_width; x++) {
         for (uint32_t y = 0; y < edc.simulation_height; y++) {
-            auto & block = edc.CPU_simulation_grid[x][y];
+            auto type = edc.st_grid.get_type(x, y);
 
-            switch (block.type) {
-                case BlockTypes::FoodBlock:
+            switch (type) {
                 case BlockTypes::WallBlock:
-                    blocks.emplace_back(x, y, block.type);
-                default: break;
+                    blocks.emplace_back(x, y, BlockTypes::WallBlock);
+                    break;
+                default:break;
             }
         }
     }
 
-    auto size = blocks.size();
+    uint64_t size = blocks.size();
 
-    os.write((char*)&size, sizeof(std::size_t));
-    os.write((char*)&blocks[0], sizeof(WorldBlocks)*blocks.size());
+    os.write((char*)&size, sizeof(uint64_t));
+    os.write((char*)blocks.data(), sizeof(WorldBlocks)*blocks.size());
+
+    size = edc.st_grid.food_vec.size();
+    os.write((char*)&size, sizeof(uint64_t));
+    os.write((char*)edc.st_grid.food_vec.data(), sizeof(float)*edc.st_grid.food_vec.size());
 }
 
 void DataSavingFunctions::write_organism(std::ofstream &os, Organism *organism) {
@@ -74,40 +81,46 @@ void DataSavingFunctions::write_organism_brain(std::ofstream & os, Brain * brain
 }
 
 void DataSavingFunctions::write_organism_anatomy(std::ofstream & os, Anatomy * anatomy) {
-    uint32_t organism_blocks_size = anatomy->_organism_blocks.size();
-    uint32_t producing_space_size = anatomy->_producing_space.size();
-    uint32_t eating_space_size    = anatomy->_eating_space.size();
-    uint32_t killing_space_size   = anatomy->_killing_space.size();
+    uint32_t organism_blocks_size = anatomy->organism_blocks.size();
+    uint32_t producing_space_size = anatomy->producing_space.size();
+    uint32_t eating_space_size    = anatomy->eating_space.size();
+    uint32_t killing_space_size   = anatomy->killing_space.size();
+    uint32_t eye_vec_size         = anatomy->eye_block_vec.size();
 
     os.write((char*)&organism_blocks_size, sizeof(uint32_t));
     os.write((char*)&producing_space_size, sizeof(uint32_t));
     os.write((char*)&eating_space_size,    sizeof(uint32_t));
     os.write((char*)&killing_space_size,   sizeof(uint32_t));
+    os.write((char*)&eye_vec_size,         sizeof(uint32_t));
 
-    os.write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    os.write((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    os.write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    os.write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    for (auto & item: anatomy->c.data) {
+        os.write((char*)&item, sizeof(int32_t));
+    }
 
-    os.write((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.write((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.write((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    os.write((char*)anatomy->organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->organism_blocks.size());
+    os.write((char*)anatomy->eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
+    os.write((char*)anatomy->killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
+    os.write((char*)anatomy->eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
 
-    for (auto & space: anatomy->_producing_space) {
+    for (auto & space: anatomy->producing_space) {
         auto space_size = space.size();
         os.write((char*)&space_size, sizeof(uint32_t));
-        os.write((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        os.write((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
 
 
 
 bool DataSavingFunctions::read_version(std::ifstream &is) {
-    int save_version;
-    is.read((char*)&save_version, sizeof(int));
-    return save_version == SAVE_VERSION;
+    uint32_t save_version;
+    uint32_t version_len;
+    std::string version_name;
+
+    is.read((char*)&save_version, sizeof(uint32_t));
+    is.read((char*)&version_len, sizeof(uint32_t));
+    version_name.resize(version_len, *"0");
+    is.read((char*)version_name.c_str(), version_len);
+    return (save_version == SAVE_VERSION) && (version_name == VERSION_NAME);
 }
 
 void DataSavingFunctions::read_simulation_parameters(std::ifstream& is, SimulationParameters &sp) {
@@ -120,21 +133,23 @@ void DataSavingFunctions::read_organisms_block_parameters(std::ifstream& is, Org
 
 void DataSavingFunctions::read_data_container_data(std::ifstream& is, EngineDataContainer &edc, uint32_t &sim_width, uint32_t &sim_height) {
     is.read((char*)&edc.loaded_engine_ticks, sizeof(uint32_t));
-    is.read((char*)&sim_width,    sizeof(uint32_t));
-    is.read((char*)&sim_height,   sizeof(uint32_t));
+    is.read((char*)&sim_width,               sizeof(uint32_t));
+    is.read((char*)&sim_height,              sizeof(uint32_t));
 }
 
 void DataSavingFunctions::read_simulation_grid(std::ifstream& is, EngineDataContainer &edc) {
     std::vector<WorldBlocks> blocks{};
-    std::size_t size;
+    uint64_t size;
 
-    is.read((char*)&size, sizeof(std::size_t));
+    is.read((char*)&size, sizeof(uint64_t));
     blocks.resize(size);
+    is.read((char*)blocks.data(), sizeof(WorldBlocks)*size);
 
-    is.read((char*)&blocks[0], sizeof(WorldBlocks)*size);
+    is.read((char*)&size, sizeof(uint64_t));
+    is.read((char*)edc.st_grid.food_vec.data(), sizeof(float)*edc.st_grid.food_vec.size());
 
     for (auto & block: blocks) {
-        edc.CPU_simulation_grid[block.x][block.y].type = block.type;
+        edc.st_grid.get_type(block.x, block.y) = block.type;
     }
 }
 
@@ -171,7 +186,7 @@ bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer 
         auto array_place = organism->vector_index;
         read_organism(is, sp, bp, organism, occp, occl);
         organism->vector_index = array_place;
-        SimulationEngineSingleThread::place_organism(&edc, organism);
+        SimulationEngineSingleThread::place_organism(edc, *organism, sp);
     }
 
     return false;
@@ -190,35 +205,47 @@ void DataSavingFunctions::read_organism_anatomy(std::ifstream& is, Anatomy * ana
     uint32_t producing_space_size = 0;
     uint32_t eating_space_size    = 0;
     uint32_t killing_space_size   = 0;
+    uint32_t eye_vec_size         = 0;
 
     is.read((char*)&organism_blocks_size, sizeof(uint32_t));
     is.read((char*)&producing_space_size, sizeof(uint32_t));
     is.read((char*)&eating_space_size,    sizeof(uint32_t));
     is.read((char*)&killing_space_size,   sizeof(uint32_t));
+    is.read((char*)&eye_vec_size,         sizeof(uint32_t));
 
-    anatomy->_organism_blocks.resize(organism_blocks_size);
-    anatomy->_producing_space.resize(producing_space_size);
-    anatomy->_eating_space   .resize(eating_space_size);
-    anatomy->_killing_space  .resize(killing_space_size);
+    anatomy->organism_blocks.resize(organism_blocks_size);
+    anatomy->producing_space.resize(producing_space_size);
+    anatomy->eating_space   .resize(eating_space_size);
+    anatomy->killing_space  .resize(killing_space_size);
+    anatomy->eye_block_vec  .resize(eye_vec_size);
 
-    is.read((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    is.read((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    is.read((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    is.read((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    for (auto & item: anatomy->c.data) {
+        is.read((char*)&item, sizeof(int32_t));
+    }
 
-    is.read((char*)&anatomy->_organism_blocks[0], sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.read((char*)&anatomy->_eating_space[0],    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.read((char*)&anatomy->_killing_space[0],   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
+    is.read((char*)anatomy->organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->organism_blocks.size());
+    is.read((char*)anatomy->eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
+    is.read((char*)anatomy->killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
+    is.read((char*)anatomy->eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
 
-    for (auto & space: anatomy->_producing_space) {
+    for (auto & space: anatomy->producing_space) {
         uint32_t space_size;
         is.read((char*)&space_size, sizeof(uint32_t));
         space.resize(space_size);
-        is.read((char*)&space[0], sizeof(SerializedAdjacentSpaceContainer) * space_size);
+        is.read((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
@@ -259,14 +286,14 @@ void DataSavingFunctions::json_write_grid(Document & d, EngineDataContainer &edc
 
     for (int x = 1; x < edc.simulation_width - 1; x++) {
         for (int y = 1; y < edc.simulation_height - 1; y++) {
-            if (edc.CPU_simulation_grid[x][y].type != BlockTypes::WallBlock &&
-                edc.CPU_simulation_grid[x][y].type != BlockTypes::FoodBlock) {continue;}
+            auto type = edc.st_grid.get_type(x, y);
+            if (type != BlockTypes::WallBlock && type != BlockTypes::FoodBlock) {continue;}
             Value cell(kObjectType);
 
             cell.AddMember("c", Value(x-1), d.GetAllocator());
             cell.AddMember("r", Value(y-1), d.GetAllocator());
 
-            if (edc.CPU_simulation_grid[x][y].type == BlockTypes::FoodBlock) {
+            if (type == BlockTypes::FoodBlock) {
                 food.PushBack(cell, d.GetAllocator());
             } else {
                 walls.PushBack(cell, d.GetAllocator());
@@ -318,11 +345,11 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     j_organism.AddMember("damage",           Value(organism->damage), d.GetAllocator());
 
     j_anatomy.AddMember("birth_distance", Value(6), d.GetAllocator());
-    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
 
-    for (auto & block: organism->anatomy._organism_blocks) {
+    for (auto & block: organism->anatomy.organism_blocks) {
         Value cell(kObjectType);
         std::string state_name;
 
@@ -362,14 +389,14 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     Value decisions(kObjectType);
 
     decisions.AddMember("empty",    Value(0), d.GetAllocator());
-    decisions.AddMember("food",     Value(static_cast<int>(table.FoodBlock)),     d.GetAllocator());
-    decisions.AddMember("wall",     Value(static_cast<int>(table.WallBlock)),     d.GetAllocator());
-    decisions.AddMember("mouth",    Value(static_cast<int>(table.MouthBlock)),    d.GetAllocator());
-    decisions.AddMember("producer", Value(static_cast<int>(table.ProducerBlock)), d.GetAllocator());
-    decisions.AddMember("mover",    Value(static_cast<int>(table.MoverBlock)),    d.GetAllocator());
-    decisions.AddMember("killer",   Value(static_cast<int>(table.KillerBlock)),   d.GetAllocator());
-    decisions.AddMember("armor",    Value(static_cast<int>(table.ArmorBlock)),    d.GetAllocator());
-    decisions.AddMember("eye",      Value(static_cast<int>(table.EyeBlock)),      d.GetAllocator());
+//    decisions.AddMember("food",     Value(static_cast<int>(table.FoodBlock)),     d.GetAllocator());
+//    decisions.AddMember("wall",     Value(static_cast<int>(table.WallBlock)),     d.GetAllocator());
+//    decisions.AddMember("mouth",    Value(static_cast<int>(table.MouthBlock)),    d.GetAllocator());
+//    decisions.AddMember("producer", Value(static_cast<int>(table.ProducerBlock)), d.GetAllocator());
+//    decisions.AddMember("mover",    Value(static_cast<int>(table.MoverBlock)),    d.GetAllocator());
+//    decisions.AddMember("killer",   Value(static_cast<int>(table.KillerBlock)),   d.GetAllocator());
+//    decisions.AddMember("armor",    Value(static_cast<int>(table.ArmorBlock)),    d.GetAllocator());
+//    decisions.AddMember("eye",      Value(static_cast<int>(table.EyeBlock)),      d.GetAllocator());
 
     j_brain.AddMember("decisions", decisions, d.GetAllocator());
 
@@ -521,14 +548,14 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
 
     if (is_mover && has_eyes) {
         auto & table = brain.simple_action_table;
-        table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
-        table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
-        table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
-        table.ProducerBlock = static_cast<SimpleDecision>(organism["brain"]["decisions"]["producer"].GetInt());
-        table.MoverBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mover"]   .GetInt());
-        table.KillerBlock   = static_cast<SimpleDecision>(organism["brain"]["decisions"]["killer"]  .GetInt());
-        table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
-        table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
+//        table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
+//        table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
+//        table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
+//        table.ProducerBlock = static_cast<SimpleDecision>(organism["brain"]["decisions"]["producer"].GetInt());
+//        table.MoverBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mover"]   .GetInt());
+//        table.KillerBlock   = static_cast<SimpleDecision>(organism["brain"]["decisions"]["killer"]  .GetInt());
+//        table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
+//        table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
     }
 
     if (rotation == 1) {rotation = 3;}
@@ -560,20 +587,19 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
         json_read_organism(organism, sp, bp, new_organism);
         new_organism->vector_index = array_place;
 
-        if (new_organism->anatomy._mover_blocks > 0 && new_organism->anatomy._eye_blocks > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
+        if (new_organism->anatomy.c["mover"] > 0 && new_organism->anatomy.c["eye"] > 0) { new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
 
-        SimulationEngineSingleThread::place_organism(&edc, new_organism);
+        SimulationEngineSingleThread::place_organism(edc, *new_organism, sp);
     }
 
     auto gen = lehmer64(42);
 
     for (auto & organism: edc.stc.organisms) {
         edc.stc.organisms_observations.clear();
-        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, &edc);
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(&edc, &sp, &organism, edc.stc.organisms_observations);}}
+        SimulationEngineSingleThread::reserve_observations(edc.stc.organisms_observations, edc.stc.organisms, edc);
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {SimulationEngineSingleThread::get_observations(edc, sp, organism, edc.stc.organisms_observations);}}
 
-        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i],
-                                                                                                                                                          &gen);}}
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {organism.think_decision(edc.stc.organisms_observations[i], gen);}}
     }
 }
 
@@ -614,6 +640,12 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("brain_min_possible_mutation_rate",  Value(sp.brain_min_possible_mutation_rate), d.GetAllocator());
     d.AddMember("brain_mutation_rate_delimiter",     Value(sp.brain_mutation_rate_delimiter), d.GetAllocator());
 
+    d.AddMember("weighted_brain_mutation_step", Value(sp.weighted_brain_mutation_step), d.GetAllocator());
+    d.AddMember("threshold_move",               Value(sp.threshold_move), d.GetAllocator());
+
+    d.AddMember("food_threshold", Value(sp.food_threshold), d.GetAllocator());
+    d.AddMember("max_food",       Value(sp.max_food), d.GetAllocator());
+
     d.AddMember("min_move_range",       Value(sp.min_move_range), d.GetAllocator());
     d.AddMember("max_move_range",       Value(sp.max_move_range), d.GetAllocator());
     d.AddMember("move_range_delimiter", Value(sp.move_range_delimiter), d.GetAllocator());
@@ -653,10 +685,13 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("eat_then_produce",                 Value(sp.eat_then_produce), d.GetAllocator());
     d.AddMember("check_if_path_is_clear",           Value(sp.check_if_path_is_clear), d.GetAllocator());
     d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
-    d.AddMember("use_new_child_pos_calculator",     Value(sp.use_new_child_pos_calculator), d.GetAllocator());
     d.AddMember("no_random_decisions",              Value(sp.no_random_decisions), d.GetAllocator());
     d.AddMember("use_occ",                          Value(sp.use_occ), d.GetAllocator());
     d.AddMember("recenter_to_imaginary_pos",        Value(sp.recenter_to_imaginary_pos), d.GetAllocator());
+    d.AddMember("do_not_mutate_brains_of_plants",   Value(sp.do_not_mutate_brains_of_plants), d.GetAllocator());
+    d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
+    d.AddMember("organisms_destroy_food",           Value(sp.organisms_destroy_food), d.GetAllocator());
+    d.AddMember("use_continuous_movement",          Value(sp.use_continuous_movement), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -682,6 +717,12 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.brain_mutation_rate_mutation_step = d["brain_mutation_rate_mutation_step"].GetFloat();
     sp.brain_min_possible_mutation_rate  = d["brain_min_possible_mutation_rate"].GetFloat();
     sp.brain_mutation_rate_delimiter     = d["brain_mutation_rate_delimiter"].GetFloat();
+
+    sp.weighted_brain_mutation_step = d["weighted_brain_mutation_step"].GetFloat();
+    sp.threshold_move               = d["threshold_move"].GetFloat();
+
+    sp.food_threshold = d["food_threshold"].GetFloat();
+    sp.max_food       = d["max_food"].GetFloat();
 
     sp.min_move_range       = d["min_move_range"].GetInt();
     sp.max_move_range       = d["max_move_range"].GetInt();
@@ -722,10 +763,13 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.eat_then_produce                 = d["eat_then_produce"].GetBool();
     sp.check_if_path_is_clear           = d["check_if_path_is_clear"].GetBool();
     sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
-    sp.use_new_child_pos_calculator     = d["use_new_child_pos_calculator"].GetBool();
     sp.no_random_decisions              = d["no_random_decisions"].GetBool();
     sp.use_occ                          = d["use_occ"].GetBool();
     sp.recenter_to_imaginary_pos        = d["recenter_to_imaginary_pos"].GetBool();
+    sp.do_not_mutate_brains_of_plants   = d["do_not_mutate_brains_of_plants"].GetBool();
+    sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
+    sp.organisms_destroy_food           = d["organisms_destroy_food"].GetBool();
+    sp.use_continuous_movement          = d["use_continuous_movement"].GetBool();
 }
 
 
@@ -740,7 +784,6 @@ void DataSavingFunctions::write_json_program_settings(rapidjson::Document &d, Da
     d.AddMember("update_info_every_n_milliseconds", Value(state.update_info_every_n_milliseconds), d.GetAllocator());
 
     d.AddMember("use_cuda",                          Value(state.use_cuda), d.GetAllocator());
-    d.AddMember("wait_for_engine_to_stop_to_render", Value(state.wait_for_engine_to_stop_to_render), d.GetAllocator());
     d.AddMember("disable_warnings",                  Value(state.disable_warnings), d.GetAllocator());
     d.AddMember("really_stop_render",                Value(state.really_stop_render), d.GetAllocator());
     d.AddMember("save_simulation_settings",          Value(state.save_simulation_settings), d.GetAllocator());
@@ -757,7 +800,6 @@ void DataSavingFunctions::read_json_program_settings(rapidjson::Document &d, Dat
     state.brush_size                       = d["brush_size"].GetInt();
     state.update_info_every_n_milliseconds = d["update_info_every_n_milliseconds"].GetInt();
 
-    state.wait_for_engine_to_stop_to_render = d["wait_for_engine_to_stop_to_render"].GetBool();
     state.disable_warnings                  = d["disable_warnings"].GetBool();
     state.really_stop_render                = d["really_stop_render"].GetBool();
     state.save_simulation_settings          = d["save_simulation_settings"].GetBool();
@@ -791,11 +833,26 @@ void DataSavingFunctions::write_json_state(const std::string &path, ProgramState
     file.close();
 }
 
-bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
+void DataSavingFunctions::read_json_state(const std::string &path, ProgramState state, SimulationParameters &sp,
                                           OCCParameters &occp) {
+
+    std::function<void(const std::string *, ProgramState, SimulationParameters *, OCCParameters *)> func = &read_json_state_private;
+
+    //if during loading function crashes (incompatible settings), then overwrite them with current version of setting.
+    if (try_and_catch_abort(func, &path, state, &sp, &occp)) {
+        write_json_state(path, state, sp, occp);
+    }
+}
+
+void DataSavingFunctions::read_json_state_private(const std::string *path_, ProgramState state,
+                                                  SimulationParameters *sp_, OCCParameters *occp_) {
+    auto & path = *path_;
+    auto & sp = *sp_;
+    auto & occp = *occp_;
+
     if (!std::filesystem::exists(path)) {
         write_json_state(path, state, sp, occp);
-        return false;
+        return;
     }
 
     std::string json;
@@ -803,7 +860,7 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     std::ifstream file;
     file.open(path);
     if (!file.is_open()) {
-        return false;
+        return;
     }
 
     ss << file.rdbuf();
@@ -815,7 +872,7 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
     d.Parse(json.c_str());
 
     if (!read_json_version(d)) {
-        return false;
+        return;
     }
 
     read_json_program_settings(d, state);
@@ -823,8 +880,6 @@ bool DataSavingFunctions::read_json_state(const std::string &path, ProgramState 
         read_json_extended_simulation_parameters(d, sp);
         read_json_occp(d, occp);
     }
-
-    return true;
 }
 
 void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
@@ -833,21 +888,21 @@ void DataSavingFunctions::write_occp(std::ofstream &os, OCCParameters &occp) {
     os.write((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
     os.write((char*)&occp.uniform_swap_distance, sizeof(bool));
 
-    int size = occp.mutation_type_weights.size();
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    uint32_t size = occp.mutation_type_weights.size();
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.mutation_type_weights.data(), sizeof(uint32_t)*size);
 
     size = occp.max_group_size;
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.group_size_weights.data(), sizeof(uint32_t)*size);
 
     size = occp.occ_instructions_mutation_weights.size();
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(uint32_t)*size);
 
     size = occp.max_distance;
-    os.write((char*)&size, sizeof(int));
-    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    os.write((char*)&size, sizeof(uint32_t));
+    os.write((char*)occp.swap_distance_mutation_weights.data(), sizeof(uint32_t) * size);
 }
 
 void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
@@ -856,25 +911,25 @@ void DataSavingFunctions::read_occp(std::ifstream &is, OCCParameters &occp) {
     is.read((char*)&occp.uniform_occ_instructions_mutation, sizeof(bool));
     is.read((char*)&occp.uniform_swap_distance, sizeof(bool));
 
-    int size;
-    is.read((char*)&size, sizeof(int));
-    is.read((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    uint32_t size;
+    is.read((char*)&size, sizeof(uint32_t));
+    is.read((char*)occp.mutation_type_weights.data(), sizeof(uint32_t)*size);
 
-    is.read((char*)&size, sizeof(int));
+    is.read((char*)&size, sizeof(uint32_t));
     occp.max_group_size = size;
     occp.group_size_weights.resize(occp.max_group_size);
-    is.read((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    is.read((char*)occp.group_size_weights.data(), sizeof(uint32_t)*size);
 
-    is.read((char*)&size, sizeof(int));
+    is.read((char*)&size, sizeof(uint32_t));
     if (size != occp.occ_instructions_mutation_weights.size()) {
         //TODO throw error
         throw "";
     }
-    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
+    is.read((char*)occp.occ_instructions_mutation_weights.data(), sizeof(uint32_t)*(size));
 
-    is.read((char*)&size, sizeof(int));
+    is.read((char*)&size, sizeof(uint32_t));
     occp.max_distance = size;
-    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    is.read((char*)occp.swap_distance_mutation_weights.data(), sizeof(uint32_t) * size);
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};

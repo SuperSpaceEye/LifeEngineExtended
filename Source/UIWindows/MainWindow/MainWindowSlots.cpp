@@ -53,11 +53,13 @@ void MainWindow::tb_open_info_window_slot(bool state) {
 }
 
 void MainWindow::tb_open_recorder_window_slot(bool state) {
+#ifndef __NO_RECORDER__
     if (state) {
         rc.show();
     } else {
         rc.close();
     }
+#endif
 }
 
 void MainWindow::tb_open_world_events_slot(bool state) {
@@ -123,18 +125,16 @@ void MainWindow::b_clear_all_walls_slot() {
 }
 
 void MainWindow::b_save_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    ecp.synchronise_simulation_and_window = false;
     engine.pause();
     ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause();
 
     QString selected_filter;
     QFileDialog file_dialog{};
 
     std::atomic_thread_fence(std::memory_order_release);
     auto file_name = file_dialog.getSaveFileName(this, tr("Save world"), "",
-                                                 "Custom save type (*.lfew);;JSON (*.json)", &selected_filter);
+                                                 "Custom save type (*.lfew)", &selected_filter);
     std::atomic_thread_fence(std::memory_order_release);
 #ifndef __WIN32
     bool file_exists = std::filesystem::exists(file_name.toStdString());
@@ -142,10 +142,7 @@ void MainWindow::b_save_world_slot() {
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
         filetype = ".lfew";
-    } else if (selected_filter.toStdString() == "JSON (*.json)") {
-        filetype = ".json";
     } else {
-        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
@@ -162,41 +159,28 @@ void MainWindow::b_save_world_slot() {
         std::ofstream out(full_path, std::ios::out | std::ios::binary);
         write_data(out);
         out.close();
-    } else {
-        if (!sp.use_occ) {
-            auto info = engine.get_info();
-            DataSavingFunctions::write_json_data(full_path, edc, sp, info.total_total_mutation_rate);
-        } else {
-            display_message("Worlds cannot be saved in json format with OCC enabled.");
-        }
     }
 
-    ecp.synchronise_simulation_and_window = flag;
     ecp.engine_global_pause = false;
     engine.unpause();
 }
 
 void MainWindow::b_load_world_slot() {
-    bool flag = ecp.synchronise_simulation_and_window;
-    bool flag2 = sp.reset_on_total_extinction;
-    ecp.synchronise_simulation_and_window = false;
+    bool flag = sp.reset_on_total_extinction;
     sp.reset_on_total_extinction = false;
     engine.pause();
     ecp.engine_global_pause = true;
-    engine.wait_for_engine_to_pause_force();
+    engine.wait_for_engine_to_pause();
 
     std::atomic_thread_fence(std::memory_order_release);
     QString selected_filter;
     auto file_name = QFileDialog::getOpenFileName(this, tr("Load world"), "",
-                                                  tr("Custom save type (*.lfew);;JSON (*.json)"), &selected_filter);
+                                                  tr("Custom save type (*.lfew)"), &selected_filter);
     std::atomic_thread_fence(std::memory_order_release);
     std::string filetype;
     if (selected_filter.toStdString() == "Custom save type (*.lfew)") {
         filetype = ".lfew";
-    } else if (selected_filter.toStdString() == "JSON (*.json)"){
-        filetype = ".json";
     } else {
-        ecp.synchronise_simulation_and_window = flag;
         ecp.engine_global_pause = false;
         engine.unpause();
         return;
@@ -206,15 +190,10 @@ void MainWindow::b_load_world_slot() {
 
     if (filetype == ".lfew") {
         std::ifstream in(full_path, std::ios::in | std::ios::binary);
-        read_data(in);
+        read_world_data(in);
         in.close();
-
-    } else if (filetype == ".json") {
-        sp.use_occ = false;
-        read_json_data(full_path);
     }
 
-    ecp.synchronise_simulation_and_window = flag;
     sp.reset_on_total_extinction = flag;
     ecp.engine_global_pause = false;
     engine.unpause();
@@ -256,11 +235,11 @@ void MainWindow::le_max_sps_slot() {
 }
 
 void MainWindow::le_max_fps_slot() {
-    int fallback = int(1/window_interval);
+    int fallback = int(1 / image_creation_interval);
     if (fallback < 0) {fallback = -1;}
     auto result = try_convert_message_box_template<int>("Inputted text is not an int", ui.le_fps, fallback);
     if (!result.is_valid) {return;}
-    set_window_interval(result.result);
+    set_image_creator_interval(result.result);
 }
 
 void MainWindow::le_num_threads_slot() {
@@ -539,6 +518,26 @@ void MainWindow::le_random_seed_slot() {
     engine.set_seed(temp);
 }
 
+void MainWindow::le_continuous_movement_drag_slot() {
+    le_slot_lower_upper_bound<float>(sp.continuous_movement_drag, sp.continuous_movement_drag, "float", ui.le_continuous_movement_drag,
+                                     0, "0", 1, "1");
+}
+
+void MainWindow::le_food_threshold_slot() {
+    engine.pause();
+    le_slot_lower_bound<float>(sp.food_threshold, sp.food_threshold, "float", ui.le_food_threshold, 0, "0");
+    engine.unpause();
+}
+
+void MainWindow::le_max_food_slot() {
+    le_slot_lower_bound<float>(sp.max_food, sp.max_food, "float", ui.le_max_food, 0, "0");
+}
+
+void MainWindow::le_set_ups_slot() {
+    le_slot_lower_bound(max_ups, max_ups, "int", ui.le_set_ups, 10, "10");
+    set_image_creator_interval(1./image_creation_interval+1);
+}
+
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
@@ -574,11 +573,6 @@ void MainWindow::rb_cuda_slot() {
 
 //==================== Check buttons ====================
 
-void MainWindow::cb_synchronise_simulation_and_window_slot(bool state) {
-    ecp.synchronise_simulation_and_window = state;
-    ecp.engine_pause = state;
-}
-
 void MainWindow::cb_use_evolved_anatomy_mutation_rate_slot(bool state) {
     sp.use_anatomy_evolved_mutation_rate = state;
     ui.le_global_anatomy_mutation_rate->setDisabled(state);
@@ -600,13 +594,13 @@ void MainWindow::cb_fill_window_slot(bool state) {
 void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
     if (!state) {
         use_cuda = false;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
         cuda_creator.free();
+        ee.cuda_image_creator.free();
 #endif
         return;}
 
-    auto result = cuda_is_available();
-    if (!result) {
+    if (!cuda_is_available_var) {
         ui.cb_use_nvidia_for_image_generation->setChecked(false);
         use_cuda = false;
         if (!disable_warnings) {
@@ -615,8 +609,9 @@ void MainWindow::cb_use_nvidia_for_image_generation_slot(bool state) {
         return;
     }
     use_cuda = true;
-#if __CUDA_USED__
+#ifdef __CUDA_USED__
     cuda_creator.copy_textures(textures);
+    ee.cuda_image_creator.copy_textures(textures);
 #endif
 }
 
@@ -631,6 +626,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         st.ui.lb_last_alive_position->show();
         st.ui.lb_dead_inside->show();
         st.ui.lb_dead_outside->show();
+        st.ui.lb_zoom->show();
+        st.ui.lb_viewpoint_x->show();
+        st.ui.lb_viewpoint_y->show();
     } else {
         st.ui.lb_child_organisms->hide();
         st.ui.lb_child_organisms_capacity->hide();
@@ -641,6 +639,9 @@ void MainWindow::cb_show_extended_statistics_slot(bool state) {
         st.ui.lb_last_alive_position->hide();
         st.ui.lb_dead_inside->hide();
         st.ui.lb_dead_outside->hide();
+        st.ui.lb_zoom->hide();
+        st.ui.lb_viewpoint_x->hide();
+        st.ui.lb_viewpoint_y->hide();
     }
 }
 
@@ -685,6 +686,7 @@ void MainWindow::cb_info_window_always_on_top_slot(bool state) {
 }
 
 void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
+#ifndef __NO_RECORDER__
     if (is_fullscreen) {return;}
     auto hidden = rc.isHidden();
 
@@ -695,6 +697,7 @@ void MainWindow::cb_recorder_window_always_on_top_slot(bool state) {
     if (!hidden) {
         rc.show();
     }
+#endif
 }
 
 void MainWindow::cb_world_events_always_on_top_slot(bool state) {
@@ -785,6 +788,19 @@ void MainWindow::cb_recenter_to_imaginary_slot(bool state) {
     engine.unpause();
 }
 
+void MainWindow::cb_use_weighted_brain_slot(bool state) {
+    sp.use_weighted_brain = state;
+    engine.reinit_organisms();
+    ee.update_brain_edit_visibility(state);
+}
+
+void MainWindow::cb_use_continuous_movement_slot(bool state) {
+    if (state && !sp.use_weighted_brain) { cb_use_weighted_brain_slot(true); ui.cb_use_weighted_brain->setChecked(true);}
+    if (state) {ui.cb_use_weighted_brain->setEnabled(false);} else {ui.cb_use_weighted_brain->setEnabled(true);}
+    sp.use_continuous_movement = state;
+    engine.reinit_organisms();
+}
+
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
 
 void MainWindow::cb_on_touch_kill_slot                   (bool state) { sp.on_touch_kill = state;}
@@ -813,8 +829,6 @@ void MainWindow::cb_self_organism_blocks_block_sight_slot(bool state){ sp.organi
 
 void MainWindow::cb_failed_reproduction_eats_food_slot   (bool state) { sp.failed_reproduction_eats_food = state;}
 
-void MainWindow::cb_wait_for_engine_to_stop_slot         (bool state) { wait_for_engine_to_stop_to_render = state;}
-
 void MainWindow::cb_rotate_every_move_tick_slot          (bool state) { sp.rotate_every_move_tick = state;}
 
 void MainWindow::cb_multiply_food_production_prob_slot   (bool state) { sp.multiply_food_production_prob = state; engine.reinit_organisms();}
@@ -829,13 +843,16 @@ void MainWindow::cb_eat_then_produce_slot                (bool state) { sp.eat_t
 
 void MainWindow::cb_food_blocks_movement_slot            (bool state) { sp.food_blocks_movement = state;}
 
-void MainWindow::cb_use_new_child_pos_calculator_slot    (bool state) { sp.use_new_child_pos_calculator = state;}
-
 void MainWindow::cb_check_if_path_is_clear_slot          (bool state) { sp.check_if_path_is_clear = state;}
 
 void MainWindow::cb_reset_with_editor_organism_slot      (bool state) { ecp.reset_with_editor_organism = state;}
 
 void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_random_decisions = state;}
+
+void MainWindow::cb_do_not_mutate_brain_of_plants_slot   (bool state) { sp.do_not_mutate_brains_of_plants = state;}
+
+//TODO destroy food under organisms on enable?
+void MainWindow::cb_organisms_destroy_food_slot          (bool state) { sp.organisms_destroy_food = state;}
 
 void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 
@@ -850,19 +867,11 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     } else {
         if (!disable_warnings) {display_message("Value should be float.");}
     }
-    BParameters * type;
-    switch (static_cast<BlocksNames>(row)) {
-        case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
-        case BlocksNames::ProducerBlock: type = &bp.ProducerBlock; break;
-        case BlocksNames::MoverBlock:    type = &bp.MoverBlock;    break;
-        case BlocksNames::KillerBlock:   type = &bp.KillerBlock;   break;
-        case BlocksNames::ArmorBlock:    type = &bp.ArmorBlock;    break;
-        case BlocksNames::EyeBlock:      type = &bp.EyeBlock;      break;
-    }
+    BParameters * type = &bp.pa[row];
 
     float * value;
     switch (static_cast<ParametersNames>(col)) {
-        case ParametersNames::FoodCostModifier: value = &type->food_cost_modifier; break;
+        case ParametersNames::FoodCostModifier: value = &type->food_cost; break;
         case ParametersNames::LifePointAmount:  value = &type->life_point_amount;  break;
         case ParametersNames::LifetimeWeight:   value = &type->lifetime_weight;    break;
         case ParametersNames::ChanceWeight:     value = &type->chance_weight;      break;

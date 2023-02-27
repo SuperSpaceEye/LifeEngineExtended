@@ -13,11 +13,12 @@
 #include <deque>
 
 #include "../../Stuff/Actions.h"
-#include "../../GridBlocks/BaseGridBlock.h"
-#include "../../GridBlocks/SingleThreadGridBlock.h"
+#include "../../GridStuff//BaseGridBlock.h"
+#include "../../GridStuff/STGridWorld.h"
 #include "../../Organism/CPU/ObservationStuff.h"
 #include "../../Organism/CPU/Organism.h"
 #include "OCCLogicContainer.h"
+#include "../../WorldRecorder/WorldRecorder.h"
 
 struct EngineDataContainer {
     uint64_t delta_time = 0;
@@ -35,7 +36,7 @@ struct EngineDataContainer {
     float simulation_interval = 0.;
     bool unlimited_simulation_fps = true;
 
-    std::vector<std::vector<SingleThreadGridBlock>> CPU_simulation_grid;
+    STGridWorld st_grid;
 
     struct SingleThreadContainer {
         int32_t num_dead_organisms  = 0;
@@ -47,6 +48,8 @@ struct EngineDataContainer {
         //factor determining how many dead_organisms_before_last_alive_position can be before compress_organisms is called
         float max_dead_organisms_in_alive_section_factor = 2;
         float memory_allocation_strategy_modifier = 2;
+        //TODO make le
+        int max_dead_organisms = 500;
         std::vector<Organism> organisms{};
         std::vector<uint32_t> dead_organisms_positions{};
         std::vector<uint32_t> temp_dead_organisms_positions{};
@@ -56,15 +59,19 @@ struct EngineDataContainer {
         std::vector<std::vector<Observation>> organisms_observations{};
 
         OCCLogicContainer occl{};
+
+        TransactionBuffer tbuffer{};
     };
     SingleThreadContainer stc{};
 
     std::vector<BaseGridBlock> simple_state_grid;
 
-    Organism * base_organism = nullptr;
-    Organism * chosen_organism = nullptr;
+    Organism base_organism{};
+    Organism chosen_organism{};
 
     int auto_reset_counter = 0;
+
+    bool record_data = false;
 
     // adding/killing organisms, adding/deleting food/walls, etc.
     std::vector<Action> ui_user_actions_pool;

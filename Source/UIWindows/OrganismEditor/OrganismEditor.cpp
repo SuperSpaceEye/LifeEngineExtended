@@ -10,11 +10,12 @@
 
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                               Organism **chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
-                               OCCParameters *occp)
+                               Organism *chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                               OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda)
         : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
-                                chosen_organism(chosen_organism), textures(textures) {
+                                chosen_organism(chosen_organism), textures(textures), cuda_is_available(cuda_is_available),
+                                use_cuda(use_cuda){
     ui.setupUi(this);
 
     ui.editor_graphicsView->show();
@@ -32,7 +33,7 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     auto occ = OrganismConstructionCode();
     occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
 
-    editor_organism = new Organism(editor_width / 2,
+    editor_organism = Organism(editor_width / 2,
                                    editor_height / 2,
                                    Rotation::UP,
                                    anatomy,
@@ -43,7 +44,6 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     resize_editing_grid(width, height);
     resize_image();
-    create_image();
 
     initialize_gui();
     reset_scale_view();
@@ -57,26 +57,28 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 }
 
 void OrganismEditor::update_cell_count_label() {
-    ui.label_cell_count->setText(QString::fromStdString("Cell count: " + std::to_string(editor_organism->anatomy._organism_blocks.size())));
+    ui.label_cell_count->setText(QString::fromStdString("Block count: " + std::to_string(editor_organism.anatomy.organism_blocks.size())));
 }
 
 void OrganismEditor::update_gui() {
-    ui.le_move_range           ->setText(QString::fromStdString(std::to_string(editor_organism->move_range)));
-    ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism->anatomy_mutation_rate)));
+    ui.le_move_range           ->setText(QString::fromStdString(std::to_string(editor_organism.move_range)));
+    ui.le_anatomy_mutation_rate->setText(QString::fromStdString(std::to_string(editor_organism.anatomy_mutation_rate)));
     ui.le_grid_width           ->setText(QString::fromStdString(std::to_string(editor_width)));
     ui.le_grid_height          ->setText(QString::fromStdString(std::to_string(editor_height)));
-    ui.le_brain_mutation_rate  ->setText(QString::fromStdString(std::to_string(editor_organism->brain_mutation_rate)));
+    ui.le_brain_mutation_rate  ->setText(QString::fromStdString(std::to_string(editor_organism.brain_mutation_rate)));
     update_cell_count_label();
 }
 
 void OrganismEditor::initialize_gui() {
     update_gui();
 
-    for (auto & observation: observations) {
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {
+        auto & observation = BLOCK_NAMES[i];
         auto * horizontal_layout = new QHBoxLayout{};
         auto * b_group = new QButtonGroup(this);
+        auto * weight_le = new QLineEdit(ui.widget_2);
 
-        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation), ui.widget_2));
+        horizontal_layout->addWidget(new QLabel(QString::fromStdString(observation + " "), ui.widget_2));
         for (auto & decision: decisions) {
             auto * cb = new QCheckBox(QString::fromStdString(decision), ui.widget_2);
             connect(cb, &QCheckBox::clicked, [&, decision, observation](){brain_cb_chooser(observation, decision);});
@@ -86,6 +88,9 @@ void OrganismEditor::initialize_gui() {
 
             brain_checkboxes[observation][decision] = cb;
         }
+        connect(weight_le, &QLineEdit::returnPressed, [&, observation, weight_le](){brain_weight_chooser(observation, weight_le);});
+        horizontal_layout->addWidget(weight_le);
+        brain_line_edits[observation] = weight_le;
 
         ui.brain_vertical_layout->addItem(horizontal_layout);
     }
@@ -94,37 +99,19 @@ void OrganismEditor::initialize_gui() {
     mapped_decisions_s_to_type["Go Away"]    = SimpleDecision::GoAway;
     mapped_decisions_s_to_type["Go Towards"] = SimpleDecision::GoTowards;
 
-    mapped_block_types_s_to_type["Mouth Cell"]    = BlockTypes::MouthBlock;
-    mapped_block_types_s_to_type["Producer Cell"] = BlockTypes::ProducerBlock;
-    mapped_block_types_s_to_type["Mover Cell"]    = BlockTypes::MoverBlock;
-    mapped_block_types_s_to_type["Killer Cell"]   = BlockTypes::KillerBlock;
-    mapped_block_types_s_to_type["Armor Cell"]    = BlockTypes::ArmorBlock;
-    mapped_block_types_s_to_type["Eye Cell"]      = BlockTypes::EyeBlock;
-    mapped_block_types_s_to_type["Food"]     = BlockTypes::FoodBlock;
-    mapped_block_types_s_to_type["Wall"]          = BlockTypes::WallBlock;
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {mapped_block_types_s_to_type[BLOCK_NAMES[i]] = BlockTypes(i);}
 
     for (auto & pair: mapped_decisions_s_to_type)   {mapped_decisions_type_to_s  [pair.second] = pair.first;}
     for (auto & pair: mapped_block_types_s_to_type) {mapped_block_types_type_to_s[pair.second] = pair.first;}
 
-    update_brain_checkboxes();
+    update_brain_state();
 }
 
 void OrganismEditor::brain_cb_chooser(std::string observation, std::string action) {
     auto observation_type = mapped_block_types_s_to_type[observation];
     auto decision = mapped_decisions_s_to_type[action];
 
-    SimpleDecision * brain_decision;
-
-    switch (observation_type) {
-        case BlockTypes::MouthBlock:    brain_decision = &editor_organism->brain.simple_action_table.MouthBlock;    break;
-        case BlockTypes::ProducerBlock: brain_decision = &editor_organism->brain.simple_action_table.ProducerBlock; break;
-        case BlockTypes::MoverBlock:    brain_decision = &editor_organism->brain.simple_action_table.MoverBlock;    break;
-        case BlockTypes::KillerBlock:   brain_decision = &editor_organism->brain.simple_action_table.KillerBlock;   break;
-        case BlockTypes::ArmorBlock:    brain_decision = &editor_organism->brain.simple_action_table.ArmorBlock;    break;
-        case BlockTypes::EyeBlock:      brain_decision = &editor_organism->brain.simple_action_table.EyeBlock;      break;
-        case BlockTypes::FoodBlock:     brain_decision = &editor_organism->brain.simple_action_table.FoodBlock;     break;
-        case BlockTypes::WallBlock:     brain_decision = &editor_organism->brain.simple_action_table.WallBlock;     break;
-    }
+    SimpleDecision * brain_decision = &editor_organism.brain.simple_action_table.da[int(observation_type)];
 
     switch (decision) {
         case SimpleDecision::DoNothing: *brain_decision = SimpleDecision::DoNothing;break;
@@ -133,15 +120,33 @@ void OrganismEditor::brain_cb_chooser(std::string observation, std::string actio
     }
 }
 
+void OrganismEditor::brain_weight_chooser(std::string observation, QLineEdit *le) {
+    auto observation_type = mapped_block_types_s_to_type[observation];
+
+    float * weight = &editor_organism.brain.weighted_action_table.da[int(observation_type)];
+
+    le_slot_lower_upper_bound<float>(*weight, *weight, "float", le, -1., "-1", 1., "1");
+}
+
+void OrganismEditor::update_brain_state() {
+    update_brain_checkboxes();
+    update_brain_line_edits();
+}
+
+void OrganismEditor::update_brain_line_edits() {
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {
+        const auto & name = BLOCK_NAMES[i];
+
+        brain_line_edits[name]->setText(QString::fromStdString(std::to_string(editor_organism.brain.weighted_action_table.da[i])));
+    }
+}
+
 void OrganismEditor::update_brain_checkboxes() {
-    brain_checkboxes["Mouth Cell"]   [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.MouthBlock]]   ->setChecked(true);
-    brain_checkboxes["Producer Cell"][mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.ProducerBlock]]->setChecked(true);
-    brain_checkboxes["Mover Cell"]   [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.MoverBlock]]   ->setChecked(true);
-    brain_checkboxes["Killer Cell"]  [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.KillerBlock]]  ->setChecked(true);
-    brain_checkboxes["Armor Cell"]   [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.ArmorBlock]]   ->setChecked(true);
-    brain_checkboxes["Eye Cell"]     [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.EyeBlock]]     ->setChecked(true);
-    brain_checkboxes["Food"]         [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.FoodBlock]]    ->setChecked(true);
-    brain_checkboxes["Wall"]         [mapped_decisions_type_to_s[editor_organism->brain.simple_action_table.WallBlock]]    ->setChecked(true);
+    for (int i = 1; i < NUM_WORLD_BLOCKS; i++) {
+        const auto & name = BLOCK_NAMES[i];
+
+        brain_checkboxes[name][mapped_decisions_type_to_s[editor_organism.brain.simple_action_table.da[i]]]->setChecked(true);
+    }
 }
 
 void OrganismEditor::closeEvent(QCloseEvent * event) {
@@ -155,7 +160,7 @@ void OrganismEditor::resizeEvent(QResizeEvent *event) {
 
 void OrganismEditor::wheelEvent(QWheelEvent *event) {
     if (ui.editor_graphicsView->underMouse()) {
-        if (event->delta() > 0) {
+        if ((event->angleDelta().x() + event->angleDelta().y()) > 0) {
             scaling_zoom /= scaling_coefficient;
         } else {
             scaling_zoom *= scaling_coefficient;
@@ -168,7 +173,6 @@ void OrganismEditor::move_center(int delta_x, int delta_y) {
     center_x -= delta_x * scaling_zoom;
     center_y -= delta_y * scaling_zoom;
     create_image();
-//    std::this_thread::sleep_for(std::chrono::milliseconds(int(1./60*1000)));
 }
 
 void OrganismEditor::reset_scale_view() {
@@ -191,25 +195,26 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
     editor_width = width;
     editor_height = height;
     edit_grid.clear();
-    edit_grid.resize(width, std::vector<EditBlock>(height, EditBlock{}));
+    edit_grid.resize(width * height, BaseGridBlock{});
 
-    editor_organism->x = editor_width / 2;
-    editor_organism->y = editor_height / 2;
+    editor_organism.x = editor_width / 2;
+    editor_organism.y = editor_height / 2;
 
-    int x = editor_organism->x;
-    int y = editor_organism->y;
+    int x = editor_organism.x;
+    int y = editor_organism.y;
 
-    for (int i = 0; i < editor_organism->anatomy._organism_blocks.size(); i++) {
-        auto & block = editor_organism->anatomy._organism_blocks[i];
+    for (int i = 0; i < editor_organism.anatomy.organism_blocks.size(); i++) {
+        auto & block = editor_organism.anatomy.organism_blocks[i];
+        const auto pos = block.get_pos(Rotation::UP);
 
-        if (block.get_pos(Rotation::UP).x + x >= editor_width  || block.get_pos(Rotation::UP).x + x < 0 ||
-            block.get_pos(Rotation::UP).y + y >= editor_height || block.get_pos(Rotation::UP).y + y < 0) {
-            editor_organism->anatomy._organism_blocks.erase(editor_organism->anatomy._organism_blocks.begin()+i);
+        if (pos.x + x >= editor_width  || pos.x + x < 0 ||
+            pos.y + y >= editor_height || pos.y + y < 0) {
+            editor_organism.anatomy.organism_blocks.erase(editor_organism.anatomy.organism_blocks.begin() + i);
             i--;
         }
     }
 
-    editor_organism->anatomy.set_many_blocks(editor_organism->anatomy._organism_blocks);
+    editor_organism.anatomy.set_many_blocks(editor_organism.anatomy.organism_blocks);
 
     place_organism_on_a_grid();
 }
@@ -224,6 +229,7 @@ void OrganismEditor::create_image() {
     update_cell_count_label();
 
     resize_image();
+
     auto image_width = ui.editor_graphicsView->viewport()->width();
     auto image_height = ui.editor_graphicsView->viewport()->height();
 
@@ -239,75 +245,29 @@ void OrganismEditor::create_image() {
 
     std::vector<int> lin_width;
     std::vector<int> lin_height;
+    std::vector<int> truncated_lin_width;
+    std::vector<int> truncated_lin_height;
 
     ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
 
-    complex_for_loop(lin_width, lin_height);
+    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+
+#ifdef __CUDA_USED__
+    void * cuda_i_creator = &cuda_image_creator;
+#else
+    void * cuda_i_creator = nullptr;
+#endif
+
+    ImageCreation::create_image(lin_width, lin_height, editor_width, editor_height, *color_container, textures,
+                                image_width, image_height, edit_image, edit_grid, use_cuda, cuda_is_available,
+                                cuda_i_creator, truncated_lin_width, truncated_lin_height, false, 1);
 
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(edit_image.data(), image_width, image_height, QImage::Format_RGB32)));
 }
 
-void OrganismEditor::complex_for_loop(std::vector<int> &lin_width, std::vector<int> &lin_height) {
-    //x - start, y - stop
-    std::vector<Vector2<int>> width_img_boundaries;
-    std::vector<Vector2<int>> height_img_boundaries;
-
-    auto last = INT32_MIN;
-    auto count = 0;
-    for (int x = 0; x < lin_width.size(); x++) {
-        if (last < lin_width[x]) {
-            width_img_boundaries.emplace_back(count, x);
-            last = lin_width[x];
-            count = x;
-        }
-    }
-    width_img_boundaries.emplace_back(count, lin_width.size());
-
-    last = INT32_MIN;
-    count = 0;
-    for (int x = 0; x < lin_height.size(); x++) {
-        if (last < lin_height[x]) {
-            height_img_boundaries.emplace_back(count, x);
-            last = lin_height[x];
-            count = x;
-        }
-    }
-    height_img_boundaries.emplace_back(count, lin_height.size());
-
-    color pixel_color;
-    //width of boundaries of an organisms
-
-    //width bound, height bound
-    for (auto &w_b: width_img_boundaries) {
-        for (auto &h_b: height_img_boundaries) {
-            for (int x = w_b.x; x < w_b.y; x++) {
-                for (int y = h_b.x; y < h_b.y; y++) {
-                    if (lin_width[x] < 0 ||
-                        lin_width[x] >= editor_width ||
-                        lin_height[y] < 0 ||
-                        lin_height[y] >= editor_height) {
-                        pixel_color = color_container->simulation_background_color;
-                    } else {
-                        auto &block = edit_grid[lin_width[x]][lin_height[y]];
-
-                        pixel_color = ImageCreation::ImageCreationTools::get_texture_color(block.type,
-                                                                                           block.rotation,
-                                                                                           float(x - w_b.x) / (w_b.y - w_b.x),
-                                                                                           float(y - h_b.x) / (h_b.y - h_b.x),
-                                                                                           textures);
-                    }
-                    ImageCreation::ImageCreationTools::set_image_pixel(x, y, ui.editor_graphicsView->viewport()->width(), pixel_color, edit_image);
-                }
-            }
-        }
-    }
-}
-
 void OrganismEditor::clear_grid() {
-    for (auto & row: edit_grid) {
-        for (auto & block: row) {
-            block.type = BlockTypes::EmptyBlock;
-        }
+    for (auto & block: edit_grid) {
+        block.type = BlockTypes::EmptyBlock;
     }
 }
 
@@ -315,11 +275,11 @@ void OrganismEditor::place_organism_on_a_grid() {
     clear_grid();
     if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
 
-    for (auto & block: editor_organism->anatomy._organism_blocks) {
-        auto x = editor_organism->x + block.get_pos(Rotation::UP).x;
-        auto y = editor_organism->y + block.get_pos(Rotation::UP).y;
-        edit_grid[x][y].type = block.type;
-        edit_grid[x][y].rotation = block.rotation;
+    for (auto & block: editor_organism.anatomy.organism_blocks) {
+        auto x = editor_organism.x + block.get_pos(Rotation::UP).x;
+        auto y = editor_organism.y + block.get_pos(Rotation::UP).y;
+        edit_grid[x + y * editor_width].type = block.type;
+        edit_grid[x + y * editor_width].rotation = block.rotation;
     }
     finalize_chosen_organism();
 }
@@ -339,15 +299,15 @@ Vector2<int> OrganismEditor::calculate_cursor_pos_on_grid(int x, int y) {
 }
 
 void OrganismEditor::finalize_chosen_organism() {
-    delete *chosen_organism;
-    *chosen_organism = new Organism(editor_organism);
+    chosen_organism->copy_organism(editor_organism);
+    chosen_organism->rotation = choosen_rotation;
 }
 
 void OrganismEditor::load_chosen_organism() {
-    editor_organism = new Organism(*chosen_organism);
+    editor_organism.copy_organism(*chosen_organism);
 
-    editor_organism->x = editor_width / 2;
-    editor_organism->y = editor_height / 2;
+    editor_organism.x = editor_width / 2;
+    editor_organism.y = editor_height / 2;
 
     if (check_edit_area()) {resize_editing_grid(new_editor_width, new_editor_height);}
 
@@ -355,7 +315,7 @@ void OrganismEditor::load_chosen_organism() {
     update_gui();
     clear_occ();
     load_occ();
-    update_brain_checkboxes();
+    update_brain_state();
 }
 
 bool OrganismEditor::check_edit_area() {
@@ -364,7 +324,7 @@ bool OrganismEditor::check_edit_area() {
 
     bool ret = false;
 
-    for (auto & block: editor_organism->anatomy._organism_blocks) {
+    for (auto & block: editor_organism.anatomy.organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
         if (block.relative_y < min.y) {min.y = block.relative_y;}
         if (block.relative_x > max.x) {max.x = block.relative_x;}
@@ -393,7 +353,7 @@ void OrganismEditor::occ_mode(bool state) {
 
         b_reset_organism_slot();
 
-        auto & occ = editor_organism->occ;
+        auto & occ = editor_organism.occ;
         occ.get_code_ref().clear();
         occ.get_code_ref().emplace_back(OCCInstruction::SetBlockMouth);
 
@@ -415,7 +375,7 @@ void OrganismEditor::occ_mode(bool state) {
 
         change_disabled = false;
 
-        auto & occ = editor_organism->occ;
+        auto & occ = editor_organism.occ;
         occ.get_code_ref().clear();
 
         ui.rb_edit_occ->hide();
@@ -431,9 +391,33 @@ void OrganismEditor::clear_occ() {
 }
 
 void OrganismEditor::load_occ() {
-    if (editor_organism->occ.get_code_const_ref().empty()) { return;}
+    if (editor_organism.occ.get_code_const_ref().empty()) { return;}
 
-    ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism->occ.get_code_const_ref(), short_instructions)));
-    ui.label_occ_count->setText(QString::fromStdString("OCC instruction count: " + std::to_string(editor_organism->occ.get_code_const_ref().size())));
+    ui.te_occ_edit_window->setPlainText(QString::fromStdString(OCCTranspiler::convert_to_text_code(editor_organism.occ.get_code_const_ref(), short_instructions)));
+    ui.label_occ_count->setText(QString::fromStdString("OCC instruction count: " + std::to_string(editor_organism.occ.get_code_const_ref().size())));
+}
+
+void OrganismEditor::update_brain_edit_visibility(bool weighted_edits_visible) {
+    if (weighted_edits_visible) {
+        for (auto & first: brain_checkboxes) {
+            for (auto & second: first.second) {
+                second.second->hide();
+            }
+        }
+
+        for (auto & first: brain_line_edits) {
+            first.second->show();
+        }
+    } else {
+        for (auto & first: brain_checkboxes) {
+            for (auto & second: first.second) {
+                second.second->show();
+            }
+        }
+
+        for (auto & first: brain_line_edits) {
+            first.second->hide();
+        }
+    }
 }
 

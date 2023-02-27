@@ -76,6 +76,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
             change_editing_grid = false;
             change_main_simulation_grid = false;
+            update_last_cursor_pos = true;
         } break;
         case QEvent::Resize: {
             auto resize_event = dynamic_cast<QResizeEvent*>(event);
@@ -86,6 +87,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             auto close_event = dynamic_cast<QCloseEvent*>(event);
             if (watched->objectName().toStdString() == "QWidgetClassWindow") {
                 engine.pause();
+                engine.stop_world_events();
                 save_state();
                 exit(0);
             }
@@ -112,7 +114,7 @@ void MainWindow::process_keyboard_events() {
 
 void MainWindow::wheelEvent(QWheelEvent *event) {
     if (ui.simulation_graphicsView->underMouse()) {
-        if (event->delta() > 0) {
+        if ((event->angleDelta().x() + event->angleDelta().y()) > 0) {
             scaling_zoom /= scaling_coefficient;
         } else {
             scaling_zoom *= scaling_coefficient;
