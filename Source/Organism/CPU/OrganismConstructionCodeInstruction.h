@@ -169,7 +169,7 @@ const std::array<std::string, 30> OCC_INSTRUCTIONS_SHORT {
         "SUBE"
 };
 
-//it will probably be much faster than using hashmap
+// TODO is this faster than using hashmap? idk
 int inline get_index_of_occ_instruction_name(std::string &name) {
     for (int i = 0; i < OCC_INSTRUCTIONS_NAME.size(); i++) {
         if (name == OCC_INSTRUCTIONS_NAME[i]) {
@@ -179,7 +179,6 @@ int inline get_index_of_occ_instruction_name(std::string &name) {
     return -1;
 }
 
-//it will probably be much faster than using hashmap
 int inline get_index_of_occ_instruction(std::string &name) {
     for (int i = 0; i < OCC_INSTRUCTIONS.size(); i++) {
         if (name == OCC_INSTRUCTIONS[i]) {
@@ -189,7 +188,6 @@ int inline get_index_of_occ_instruction(std::string &name) {
     return -1;
 }
 
-//it will probably be much faster than using hashmap
 int inline get_index_of_occ_instruction_short(std::string &name) {
     for (int i = 0; i < OCC_INSTRUCTIONS_SHORT.size(); i++) {
         if (name == OCC_INSTRUCTIONS_SHORT[i]) {

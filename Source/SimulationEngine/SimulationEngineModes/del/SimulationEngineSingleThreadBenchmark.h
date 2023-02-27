@@ -9,9 +9,9 @@
 #include <thread>
 #include <random>
 
-#include "SimulationEngineSingleThread.h"
-#include "../OrganismsController.h"
-#include "../../Containers/CPU/OrganismBlockParameters.h"
+#include "../SimulationEngineSingleThread.h"
+#include "../../OrganismsController.h"
+#include "../../../Containers/CPU/OrganismBlockParameters.h"
 
 enum class BenchmarkTypes {
     ProduceFood,

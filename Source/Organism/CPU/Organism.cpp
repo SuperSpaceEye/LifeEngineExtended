@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "../../SimulationEngine/OrganismsController.h"
+#include "AnatomyContainers.h"
 
 Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
                    SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
@@ -51,10 +52,10 @@ void Organism::init_values() {
     multiplier = 1;
 
     if (sp->multiply_food_production_prob) {
-        multiplier *= anatomy._producer_blocks;
+        multiplier *= anatomy.c["producer"];
     }
 
-    if (anatomy._eye_blocks == 0) {brain.brain_type = BrainTypes::RandomActions;}
+    if (anatomy.c["eye"] == 0) { brain.brain_type = BrainTypes::RandomActions;}
 
     if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
         brain.convert_simple_to_weighted();
@@ -65,53 +66,22 @@ void Organism::init_values() {
     if (sp->use_continuous_movement) {cdata = ContinuousData{float(x), float(y), 0, 0, 0, 0};}
 }
 
-//TODO it can be made more efficiently, but i want (in the future) mutate block parameters individually.
 float Organism::calculate_max_life() {
     life_points = 0;
-    for (auto& item: anatomy._organism_blocks) {
-        switch (item.type) {
-            case BlockTypes::MouthBlock:    life_points += bp->MouthBlock.   life_point_amount; break;
-            case BlockTypes::ProducerBlock: life_points += bp->ProducerBlock.life_point_amount; break;
-            case BlockTypes::MoverBlock:    life_points += bp->MoverBlock.   life_point_amount; break;
-            case BlockTypes::KillerBlock:   life_points += bp->KillerBlock.  life_point_amount; break;
-            case BlockTypes::ArmorBlock:    life_points += bp->ArmorBlock.   life_point_amount; break;
-            case BlockTypes::EyeBlock:      life_points += bp->EyeBlock.     life_point_amount; break;
-            default: throw std::runtime_error("Unknown block");
-        }
-    }
+    for (auto& item: anatomy.organism_blocks) { life_points += bp->pa[int(item.type) - 1].life_point_amount;}
     return life_points;
 }
 
 int Organism::calculate_organism_lifetime() {
     float lifetime_weights = 0;
-    for (auto & block: anatomy._organism_blocks) {
-        switch (block.type) {
-            case BlockTypes::MouthBlock:    lifetime_weights += bp->MouthBlock.   lifetime_weight; break;
-            case BlockTypes::ProducerBlock: lifetime_weights += bp->ProducerBlock.lifetime_weight; break;
-            case BlockTypes::MoverBlock:    lifetime_weights += bp->MoverBlock.   lifetime_weight; break;
-            case BlockTypes::KillerBlock:   lifetime_weights += bp->KillerBlock.  lifetime_weight; break;
-            case BlockTypes::ArmorBlock:    lifetime_weights += bp->ArmorBlock.   lifetime_weight; break;
-            case BlockTypes::EyeBlock:      lifetime_weights += bp->EyeBlock.     lifetime_weight; break;
-            default: throw std::runtime_error("Unknown block");
-        }
-    }
+    for (auto & block: anatomy.organism_blocks) { lifetime_weights += bp->pa[(int)block.type - 1].lifetime_weight;}
     max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
 }
 
 float Organism::calculate_food_needed() {
-    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy._mover_blocks > 0);
-    for (auto & block: anatomy._organism_blocks) {
-        switch (block.type) {
-            case BlockTypes::MouthBlock:    food_needed += bp->MouthBlock.   food_cost; break;
-            case BlockTypes::ProducerBlock: food_needed += bp->ProducerBlock.food_cost; break;
-            case BlockTypes::MoverBlock:    food_needed += bp->MoverBlock.   food_cost; break;
-            case BlockTypes::KillerBlock:   food_needed += bp->KillerBlock.  food_cost; break;
-            case BlockTypes::ArmorBlock:    food_needed += bp->ArmorBlock.   food_cost; break;
-            case BlockTypes::EyeBlock:      food_needed += bp->EyeBlock.     food_cost; break;
-            default: throw std::runtime_error("Unknown block");
-        }
-    }
+    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy.c["mover"] > 0);
+    for (auto & block: anatomy.organism_blocks) { food_needed += bp->pa[(int)block.type - 1].food_cost;}
     return food_needed;
 }
 
@@ -148,12 +118,12 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
             choice -= sp->add_cell;
             if (choice < sp->change_cell) {new_anatomy = Anatomy(anatomy.change_random_block(*bp, gen));return;}
             choice -= sp->change_cell;
-            if (choice < sp->remove_cell && anatomy._organism_blocks.size() > sp->min_organism_size) {new_anatomy = Anatomy(anatomy.remove_random_block(gen));return;}
+            if (choice < sp->remove_cell && anatomy.organism_blocks.size() > sp->min_organism_size) { new_anatomy = Anatomy(anatomy.remove_random_block(gen));return;}
         } else {
             new_occ = occ.mutate(*occp, gen);
             new_anatomy = Anatomy(new_occ.compile_code(*occl));
 
-            if (new_anatomy._organism_blocks.empty()) {
+            if (new_anatomy.organism_blocks.empty()) {
                 new_anatomy = std::move(Anatomy(anatomy));
                 new_occ = OrganismConstructionCode(occ);
             }
@@ -165,10 +135,10 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
     new_occ = OrganismConstructionCode(occ);
 }
 
-void Organism::mutate_brain(Anatomy &new_anatomy, Brain &new_brain,
+void Organism::mutate_brain(const Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 &gen) {
     // movers without eyes as well.
-    if (sp->do_not_mutate_brains_of_plants && (new_anatomy._mover_blocks == 0 || new_anatomy._eye_blocks == 0)) {
+    if (sp->do_not_mutate_brains_of_plants && (new_anatomy.c["mover"] == 0 || new_anatomy.c["eye"] == 0)) {
         return;
     }
 
@@ -226,7 +196,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
     auto child_move_range = mutate_move_range(sp, gen, move_range);
 
-    if (new_anatomy._eye_blocks > 0 && new_anatomy._mover_blocks > 0) {
+    if (new_anatomy.c["eye"] > 0 && new_anatomy.c["mover"] > 0) {
         if (!sp->use_weighted_brain) {
             new_brain.brain_type = BrainTypes::SimpleBrain;
         } else {
@@ -253,7 +223,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
-    if (anatomy._mover_blocks == 0) { return;}
+    if (anatomy.c.data[int(BlockTypes::MoverBlock)-1] == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
         if (sp->use_continuous_movement) {
             calculate_continuous_decision(organism_observations, gen);
@@ -306,6 +276,7 @@ void Organism::move_organism(Organism &organism) {
     max_decision_lifetime = organism.max_decision_lifetime;
     max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
+    cdata = organism.cdata;
     brain = organism.brain;
     anatomy = std::move(organism.anatomy);
     occ = std::move(organism.occ);
@@ -334,6 +305,7 @@ void Organism::copy_organism(const Organism &organism) {
     max_decision_lifetime = organism.max_decision_lifetime;
     max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
 
+    cdata = organism.cdata;
     brain = organism.brain;
     anatomy = organism.anatomy;
     occ = organism.occ;
@@ -342,6 +314,8 @@ void Organism::copy_organism(const Organism &organism) {
     bp = organism.bp;
     occp = organism.occp;
     occl = organism.occl;
+
+    init_values();
 }
 
 void Organism::kill_organism(EngineDataContainer &edc) {

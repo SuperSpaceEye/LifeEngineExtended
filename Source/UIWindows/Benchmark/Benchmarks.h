@@ -10,7 +10,7 @@
 
 #include "BenchmarkUI.h"
 #include "../MainWindow/WindowUI.h"
-#include "../../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThreadBenchmark.h"
+//#include "../../SimulationEngine/SimulationEngineModes/del/SimulationEngineSingleThreadBenchmark.h"
 #include "../../Stuff/MiscFuncs.h"
 
 class Benchmarks: public QWidget {
@@ -18,7 +18,7 @@ class Benchmarks: public QWidget {
 private:
     Ui::Benchmark ui{};
     Ui::MainWindow & parent_window;
-    SimulationEngineSingleThreadBenchmark benchmark{};
+//    SimulationEngineSingleThreadBenchmark benchmark{};
 
     int new_width = 2000;
     int new_height = 2000;

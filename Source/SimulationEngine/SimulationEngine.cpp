@@ -41,6 +41,7 @@ void SimulationEngine::threaded_mainloop() {
             if (sp.auto_produce_n_food > 0) {random_food_drop();}
             if (edc.record_data) {
                 edc.stc.tbuffer.record_recenter_to_imaginary_pos(sp.recenter_to_imaginary_pos);
+                edc.stc.tbuffer.record_food_threshold(sp.food_threshold);
                 edc.stc.tbuffer.record_transaction();
             }
             if (edc.total_engine_ticks % ecp.update_info_every_n_tick == 0) {info.parse_info(&edc, &ecp);}
@@ -175,7 +176,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TrySelectOrganism: {
                 auto & type = edc.st_grid.get_type(action.x, action.y);
-                if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock || type == BlockTypes::FoodBlock) { continue; }
+                if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { continue; }
                 edc.selected_organism = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(action.x, action.y), edc);
                 goto endfor;
                 }
@@ -209,7 +210,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
 
     if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
 
-    for (auto &block: new_organism->anatomy._organism_blocks) {
+    for (auto &block: new_organism->anatomy.organism_blocks) {
         int x = block.get_pos(edc.chosen_organism.rotation).x + new_organism->x;
         int y = block.get_pos(edc.chosen_organism.rotation).y + new_organism->y;
 
@@ -218,7 +219,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
 
-    if (new_organism->anatomy._eye_blocks > 0 && new_organism->anatomy._mover_blocks > 0) {
+    if (new_organism->anatomy.c["eye"] > 0 && new_organism->anatomy.c["mover"] > 0) {
         if (sp.use_weighted_brain || sp.use_continuous_movement) {
             new_organism->brain.brain_type = BrainTypes::WeightedBrain;
         } else {
@@ -232,14 +233,13 @@ void SimulationEngine::action_place_organism(const Action &action) {
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
-    for (auto &block: edc.chosen_organism.anatomy._organism_blocks) {
-        continue_flag = check_if_out_of_bounds(&edc,
-                                               block.get_pos(edc.chosen_organism.rotation).x + action.x,
-                                               block.get_pos(edc.chosen_organism.rotation).y + action.y);
-        if (continue_flag) { break; }
+    for (auto &block: edc.chosen_organism.anatomy.organism_blocks) {
+        const auto pos = block.get_pos(edc.chosen_organism.rotation);
+        const auto x = pos.x + action.x;
+        const auto y = pos.y + action.y;
 
-        int x = block.get_pos(edc.chosen_organism.rotation).x + action.x;
-        int y = block.get_pos(edc.chosen_organism.rotation).y + action.y;
+        continue_flag = check_if_out_of_bounds(&edc, x, y);
+        if (continue_flag) { break; }
 
         auto type = edc.st_grid.get_type(x, y);
         auto num = edc.st_grid.get_food_num(x, y);
@@ -299,14 +299,19 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     auto & type = edc.st_grid.get_type(x, y);
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
-    if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
-    for (auto & block: organism_ptr->anatomy._organism_blocks) {
-        edc.st_grid.get_type(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                             organism_ptr->y + block.get_pos(organism_ptr->rotation).y) = BlockTypes::EmptyBlock;
-        edc.st_grid.add_food_num(organism_ptr->x + block.get_pos(organism_ptr->rotation).x,
-                                 organism_ptr->y + block.get_pos(organism_ptr->rotation).y,
-                                 block.get_food_cost(*organism_ptr->bp), sp.max_food);
+    for (auto & block: organism_ptr->anatomy.organism_blocks) {
+        const auto pos = block.get_pos(organism_ptr->rotation);
+        const auto ox = organism_ptr->x + pos.x;
+        const auto oy = organism_ptr->y + pos.y;
+        const auto fc = block.get_food_cost(*organism_ptr->bp);
+
+        edc.st_grid.get_type(ox, oy) = BlockTypes::EmptyBlock;
+        edc.st_grid.add_food_num(ox, oy, fc, sp.max_food);
+        if (edc.record_data) {
+            edc.stc.tbuffer.record_food_change(ox, oy, fc);
+        }
     }
+    if (edc.record_data) {edc.stc.tbuffer.record_user_kill_organism(organism_ptr->vector_index);}
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {
         if (&edc.stc.organisms[i] == organism_ptr) {
             edc.stc.organisms[i].kill_organism(edc);
@@ -417,8 +422,6 @@ void SimulationEngine::make_walls() {
 void SimulationEngine::make_random_walls() {
     perlin.reseed(gen());
 
-    auto temp = std::vector<Organism*>{};
-
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
             auto noise = perlin.octave2D_01((x * sp.perlin_x_modifier), (y * sp.perlin_y_modifier), sp.perlin_octaves, sp.perlin_persistence);
@@ -481,11 +484,12 @@ void SimulationEngine::parse_full_simulation_grid() {
     for (int x = 0; x < edc.simulation_width; x++) {
         for (int y = 0; y < edc.simulation_height; y++) {
             auto type = edc.st_grid.get_type(x, y);
-            edc.simple_state_grid[x + y * edc.simulation_width].type = type;
-            edc.simple_state_grid[x + y * edc.simulation_width].rotation = edc.st_grid.get_rotation(x, y);
+            auto & simple_block = edc.simple_state_grid[x + y * edc.simulation_width];
+            simple_block.type = type;
+            simple_block.rotation = edc.st_grid.get_rotation(x, y);
 
             if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
-                edc.simple_state_grid[x + y * edc.simulation_width].type = BlockTypes::FoodBlock;}
+                simple_block.type = BlockTypes::FoodBlock;}
         }
     }
 }

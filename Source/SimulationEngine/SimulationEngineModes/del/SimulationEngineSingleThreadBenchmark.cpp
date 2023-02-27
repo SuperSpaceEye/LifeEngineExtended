@@ -358,7 +358,7 @@ void SimulationEngineSingleThreadBenchmark::place_organisms_of_type(Organism *or
 
         organism->x = x;
         organism->y = y;
-        for (auto & block: organism->anatomy._organism_blocks) {
+        for (auto & block: organism->anatomy.organism_blocks) {
             if (SimulationEngineSingleThread::check_if_block_out_of_bounds(dc, *organism, block, organism->rotation)) { continue_flag = true;break;}
 
 //            auto * w_block = dc.CPU_simulation_grid[organism.x + block.get_pos(organism.rotation).x]
@@ -641,7 +641,7 @@ void SimulationEngineSingleThreadBenchmark::benchmark_move_organism(BenchmarkRes
 void SimulationEngineSingleThreadBenchmark::prepare_try_make_child_benchmark(int num_organisms) {
     for (int i = dc.stc.organisms.size()-1; i >= num_organisms; i--) {
         auto & organism = dc.stc.organisms[i];
-        for (auto & block: organism.anatomy._organism_blocks) {
+        for (auto & block: organism.anatomy.organism_blocks) {
 //            auto * w_block = dc.CPU_simulation_grid[organism.x + block.get_pos(organism.rotation).x][organism.y + block.get_pos(organism.rotation).y];
 //            w_block->type = BlockTypes::FoodBlock;
 //            w_block->organism_index = -1;

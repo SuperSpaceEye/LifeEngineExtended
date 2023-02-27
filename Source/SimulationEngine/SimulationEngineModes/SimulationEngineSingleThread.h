@@ -67,9 +67,9 @@ public:
     static void place_child(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism,
                             lehmer64 &gen);
 
-    static bool check_if_out_of_bounds(EngineDataContainer &edc, int x, int y);
+    static inline bool check_if_out_of_bounds(EngineDataContainer &edc, int x, int y);
 
-    static bool check_if_block_out_of_bounds(EngineDataContainer &edc, Organism &organism,
+    static inline bool check_if_block_out_of_bounds(EngineDataContainer &edc, Organism &organism,
                                              BaseSerializedContainer &block, Rotation rotation);
 
     static void single_threaded_tick(EngineDataContainer &edc, SimulationParameters &sp, lehmer64 &gen);
@@ -82,7 +82,7 @@ public:
     //min x, min y, max x, max y
     static std::array<int, 4> get_organism_dimensions(Organism &organism);
 
-    static bool calculate_discrete_movement(EngineDataContainer &edc, Organism &organism, const BrainDecision &decision,
+    static bool calculate_discrete_movement(EngineDataContainer &edc, Organism &organism, BrainDecision decision,
                                             const SimulationParameters &sp, int &new_x, int &new_y);
 
     static bool

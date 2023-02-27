@@ -56,7 +56,7 @@
 #include "../../Stuff/rapidjson/writer.h"
 #include "../../Stuff/rapidjson/stringbuffer.h"
 
-#include "../Statistics/StatisticsCore.h"
+#include "../Statistics/Statistics.h"
 #include "../OrganismEditor/OrganismEditor.h"
 #include "../InfoWindow/InfoWindow.h"
 #ifndef __NO_RECORDER__
@@ -121,7 +121,7 @@ private:
     SimulationEngine engine{edc, ecp, bp, sp, occp};
     OrganismEditor ee{15, 15, &ui, &cc, &sp, &bp, &cursor_mode, &edc.chosen_organism, textures, &edc.stc.occl, &occp,
                       cuda_is_available_var, use_cuda};
-    StatisticsCore st{&ui};
+    Statistics st{&ui};
     InfoWindow iw{&ui};
     #ifndef __NO_RECORDER__
     Recorder rc{&ui, &edc, &ecp, &cc, &textures, &edc.stc.tbuffer, &center_x, &center_y, &scaling_zoom, cuda_is_available_var};
@@ -240,7 +240,7 @@ private:
     void set_simulation_interval(int max_simulation_fps);
     void set_image_creator_interval(int max_window_fps);
     void update_fps_labels(int fps, int tps, int ups);
-    void resize_image();
+    void resize_image(int image_width, int image_height);
 
     // for fill_view
     void calculate_new_simulation_size();
@@ -281,8 +281,8 @@ private:
 
     void load_textures_from_disk();
 
-    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
-                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+    void pre_parse_simulation_grid_stage(std::vector<int> &lin_width, std::vector<int> &lin_height,
+                                         std::vector<int> &truncated_lin_width,
                                          std::vector<int> &truncated_lin_height);
 
     void parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,

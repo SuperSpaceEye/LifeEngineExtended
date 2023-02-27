@@ -9,6 +9,8 @@
 #ifndef THELIFEENGINECPP_ORGANISMBLOCKPARAMETERS_H
 #define THELIFEENGINECPP_ORGANISMBLOCKPARAMETERS_H
 
+#include "../../Stuff/BlockTypes.hpp"
+
 struct BParameters {
     // food_cost_modifier - how much food does organism have to spend on one block when creating a child
     // life_point_amount - how much organism gains life points from this block
@@ -16,21 +18,8 @@ struct BParameters {
 };
 
 struct OrganismBlockParameters {
-    BParameters MouthBlock    = {1, 1, 1, 1};
-    BParameters ProducerBlock = {1, 1, 1, 1};
-    BParameters MoverBlock    = {1, 1, 1, 1};
-    BParameters KillerBlock   = {1, 1, 1, 1};
-    BParameters ArmorBlock    = {1, 1, 1, 1};
-    BParameters EyeBlock      = {1, 1, 1, 1};
-};
-
-enum class BlocksNames {
-    MouthBlock,
-    ProducerBlock,
-    MoverBlock,
-    KillerBlock,
-    ArmorBlock,
-    EyeBlock
+    //parameter array
+    std::array<BParameters, NUM_ORGANISM_BLOCKS> pa;
 };
 
 enum class ParametersNames {

@@ -1,8 +1,11 @@
 # LifeEngine Extended
-C++ implementation of https://github.com/MaxRobinsonTheGreat/LifeEngine that extends the original version with new features.
+Web Version: https://lifeengineextended.github.io/
 
-This version is work in progress.
+Warning! The web version is made using qt6 webassembly compiler which autogenerates a lot of stuff i don't know how to debug or fix. So if you have any bugs, glitches or errors (in the web version), i will probably be unable to fix them
 
+Idea for this project is based on https://github.com/MaxRobinsonTheGreat/LifeEngine.
+
+The program needs to be placed in path with only english letters.
 # Important information:
 - You should press enter after inputing text in line edits or it will not register.
 - Setting -1 into max fps/sps/organisms line edits will disable the limit.

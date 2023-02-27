@@ -4,11 +4,14 @@
 
 #include "DataSavingFunctions.h"
 
-//TODO increment every time saving logic changes
 const uint32_t SAVE_VERSION = 10;
+const std::string VERSION_NAME = "main";
 
 void DataSavingFunctions::write_version(QDataStream &os) {
     os.device()->write((char*)&SAVE_VERSION, sizeof(uint32_t));
+    auto size = VERSION_NAME.size();
+    os.device()->write((char*)&size, sizeof(uint32_t));
+    os.device()->write(VERSION_NAME.c_str(), VERSION_NAME.size());
 }
 
 void DataSavingFunctions::write_simulation_parameters(QDataStream & os, SimulationParameters &sp) {
@@ -77,11 +80,11 @@ void DataSavingFunctions::write_organism_brain(QDataStream & os, Brain * brain) 
 }
 
 void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * anatomy) {
-    uint32_t organism_blocks_size = anatomy->_organism_blocks.size();
-    uint32_t producing_space_size = anatomy->_producing_space.size();
-    uint32_t eating_space_size    = anatomy->_eating_space.size();
-    uint32_t killing_space_size   = anatomy->_killing_space.size();
-    uint32_t eye_vec_size         = anatomy->_eye_block_vec.size();
+    uint32_t organism_blocks_size = anatomy->organism_blocks.size();
+    uint32_t producing_space_size = anatomy->producing_space.size();
+    uint32_t eating_space_size    = anatomy->eating_space.size();
+    uint32_t killing_space_size   = anatomy->killing_space.size();
+    uint32_t eye_vec_size         = anatomy->eye_block_vec.size();
 
     os.device()->write((char*)&organism_blocks_size, sizeof(uint32_t));
     os.device()->write((char*)&producing_space_size, sizeof(uint32_t));
@@ -89,19 +92,16 @@ void DataSavingFunctions::write_organism_anatomy(QDataStream & os, Anatomy * ana
     os.device()->write((char*)&killing_space_size,   sizeof(uint32_t));
     os.device()->write((char*)&eye_vec_size,         sizeof(uint32_t));
 
-    os.device()->write((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    os.device()->write((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    os.device()->write((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    os.device()->write((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    os.device()->write((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    os.device()->write((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    for (auto & item: anatomy->c.data) {
+        os.device()->write((char*)&item, sizeof(int32_t));
+    }
 
-    os.device()->write((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    os.device()->write((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    os.device()->write((char*)anatomy->_killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    os.device()->write((char*)anatomy->_eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
+    os.device()->write((char*)anatomy->organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->organism_blocks.size());
+    os.device()->write((char*)anatomy->eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
+    os.device()->write((char*)anatomy->killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
+    os.device()->write((char*)anatomy->eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
 
-    for (auto & space: anatomy->_producing_space) {
+    for (auto & space: anatomy->producing_space) {
         auto space_size = space.size();
         os.device()->write((char*)&space_size, sizeof(uint32_t));
         os.device()->write((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
@@ -114,6 +114,14 @@ bool DataSavingFunctions::read_version(QDataStream &is) {
     uint32_t save_version;
     is.readRawData((char*)&save_version, sizeof(uint32_t));
     return save_version == SAVE_VERSION;
+    uint32_t version_len;
+    std::string version_name;
+
+    is.readRawData((char*)&save_version, sizeof(uint32_t));
+    is.readRawData((char*)&version_len, sizeof(uint32_t));
+    version_name.resize(version_len, *"0");
+    is.readRawData((char*)version_name.c_str(), version_len);
+    return (save_version == SAVE_VERSION) && (version_name == VERSION_NAME);
 }
 
 void DataSavingFunctions::read_simulation_parameters(QDataStream &is, SimulationParameters &sp) {
@@ -206,31 +214,39 @@ void DataSavingFunctions::read_organism_anatomy(QDataStream &is, Anatomy * anato
     is.readRawData((char*)&killing_space_size,   sizeof(uint32_t));
     is.readRawData((char*)&eye_vec_size,         sizeof(uint32_t));
 
-    anatomy->_organism_blocks.resize(organism_blocks_size);
-    anatomy->_producing_space.resize(producing_space_size);
-    anatomy->_eating_space   .resize(eating_space_size);
-    anatomy->_killing_space  .resize(killing_space_size);
-    anatomy->_eye_block_vec  .resize(eye_vec_size);
+    anatomy->organism_blocks.resize(organism_blocks_size);
+    anatomy->producing_space.resize(producing_space_size);
+    anatomy->eating_space   .resize(eating_space_size);
+    anatomy->killing_space  .resize(killing_space_size);
+    anatomy->eye_block_vec  .resize(eye_vec_size);
 
-    is.readRawData((char*)&anatomy->_mouth_blocks,    sizeof(int32_t));
-    is.readRawData((char*)&anatomy->_producer_blocks, sizeof(int32_t));
-    is.readRawData((char*)&anatomy->_mover_blocks,    sizeof(int32_t));
-    is.readRawData((char*)&anatomy->_killer_blocks,   sizeof(int32_t));
-    is.readRawData((char*)&anatomy->_armor_blocks,    sizeof(int32_t));
-    is.readRawData((char*)&anatomy->_eye_blocks,      sizeof(int32_t));
+    for (auto & item: anatomy->c.data) {
+        is.readRawData((char*)&item, sizeof(int32_t));
+    }
 
-    is.readRawData((char*)anatomy->_organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->_organism_blocks.size());
-    is.readRawData((char*)anatomy->_eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eating_space.size());
-    is.readRawData((char*)anatomy->_killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_killing_space.size());
-    is.readRawData((char*)anatomy->_eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->_eye_block_vec.size());
+    is.readRawData((char*)anatomy->organism_blocks.data(), sizeof(SerializedOrganismBlockContainer) * anatomy->organism_blocks.size());
+    is.readRawData((char*)anatomy->eating_space.data(),    sizeof(SerializedAdjacentSpaceContainer) * anatomy->eating_space.size());
+    is.readRawData((char*)anatomy->killing_space.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->killing_space.size());
+    is.readRawData((char*)anatomy->eye_block_vec.data(),   sizeof(SerializedAdjacentSpaceContainer) * anatomy->eye_block_vec.size());
 
-    for (auto & space: anatomy->_producing_space) {
+    for (auto & space: anatomy->producing_space) {
         uint32_t space_size;
         is.readRawData((char*)&space_size, sizeof(uint32_t));
         space.resize(space_size);
         is.readRawData((char*)space.data(), sizeof(SerializedAdjacentSpaceContainer) * space_size);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 using rapidjson::Value, rapidjson::Document, rapidjson::StringBuffer, rapidjson::Writer, rapidjson::kObjectType, rapidjson::kArrayType;
 
@@ -329,11 +345,11 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     j_organism.AddMember("damage",           Value(organism->damage), d.GetAllocator());
 
     j_anatomy.AddMember("birth_distance", Value(6), d.GetAllocator());
-    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
-    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_producer",    Value(static_cast<bool>(organism->anatomy._producer_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("is_mover",       Value(static_cast<bool>(organism->anatomy._mover_blocks)), d.GetAllocator());
+//    j_anatomy.AddMember("has_eyes",       Value(static_cast<bool>(organism->anatomy._eye_blocks)), d.GetAllocator());
 
-    for (auto & block: organism->anatomy._organism_blocks) {
+    for (auto & block: organism->anatomy.organism_blocks) {
         Value cell(kObjectType);
         std::string state_name;
 
@@ -373,14 +389,14 @@ void DataSavingFunctions::write_json_organism(Document &d, Organism * organism, 
     Value decisions(kObjectType);
 
     decisions.AddMember("empty",    Value(0), d.GetAllocator());
-    decisions.AddMember("food",     Value(static_cast<int>(table.FoodBlock)),     d.GetAllocator());
-    decisions.AddMember("wall",     Value(static_cast<int>(table.WallBlock)),     d.GetAllocator());
-    decisions.AddMember("mouth",    Value(static_cast<int>(table.MouthBlock)),    d.GetAllocator());
-    decisions.AddMember("producer", Value(static_cast<int>(table.ProducerBlock)), d.GetAllocator());
-    decisions.AddMember("mover",    Value(static_cast<int>(table.MoverBlock)),    d.GetAllocator());
-    decisions.AddMember("killer",   Value(static_cast<int>(table.KillerBlock)),   d.GetAllocator());
-    decisions.AddMember("armor",    Value(static_cast<int>(table.ArmorBlock)),    d.GetAllocator());
-    decisions.AddMember("eye",      Value(static_cast<int>(table.EyeBlock)),      d.GetAllocator());
+//    decisions.AddMember("food",     Value(static_cast<int>(table.FoodBlock)),     d.GetAllocator());
+//    decisions.AddMember("wall",     Value(static_cast<int>(table.WallBlock)),     d.GetAllocator());
+//    decisions.AddMember("mouth",    Value(static_cast<int>(table.MouthBlock)),    d.GetAllocator());
+//    decisions.AddMember("producer", Value(static_cast<int>(table.ProducerBlock)), d.GetAllocator());
+//    decisions.AddMember("mover",    Value(static_cast<int>(table.MoverBlock)),    d.GetAllocator());
+//    decisions.AddMember("killer",   Value(static_cast<int>(table.KillerBlock)),   d.GetAllocator());
+//    decisions.AddMember("armor",    Value(static_cast<int>(table.ArmorBlock)),    d.GetAllocator());
+//    decisions.AddMember("eye",      Value(static_cast<int>(table.EyeBlock)),      d.GetAllocator());
 
     j_brain.AddMember("decisions", decisions, d.GetAllocator());
 
@@ -532,14 +548,14 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
 
     if (is_mover && has_eyes) {
         auto & table = brain.simple_action_table;
-        table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
-        table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
-        table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
-        table.ProducerBlock = static_cast<SimpleDecision>(organism["brain"]["decisions"]["producer"].GetInt());
-        table.MoverBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mover"]   .GetInt());
-        table.KillerBlock   = static_cast<SimpleDecision>(organism["brain"]["decisions"]["killer"]  .GetInt());
-        table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
-        table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
+//        table.FoodBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["food"]    .GetInt());
+//        table.WallBlock     = static_cast<SimpleDecision>(organism["brain"]["decisions"]["wall"]    .GetInt());
+//        table.MouthBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mouth"]   .GetInt());
+//        table.ProducerBlock = static_cast<SimpleDecision>(organism["brain"]["decisions"]["producer"].GetInt());
+//        table.MoverBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["mover"]   .GetInt());
+//        table.KillerBlock   = static_cast<SimpleDecision>(organism["brain"]["decisions"]["killer"]  .GetInt());
+//        table.ArmorBlock    = static_cast<SimpleDecision>(organism["brain"]["decisions"]["armor"]   .GetInt());
+//        table.EyeBlock      = static_cast<SimpleDecision>(organism["brain"]["decisions"]["eye"]     .GetInt());
     }
 
     if (rotation == 1) {rotation = 3;}
@@ -571,7 +587,7 @@ void DataSavingFunctions::json_read_organisms_data(Document *d_, SimulationParam
         json_read_organism(organism, sp, bp, new_organism);
         new_organism->vector_index = array_place;
 
-        if (new_organism->anatomy._mover_blocks > 0 && new_organism->anatomy._eye_blocks > 0) {new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
+        if (new_organism->anatomy.c["mover"] > 0 && new_organism->anatomy.c["eye"] > 0) { new_organism->brain.brain_type = BrainTypes::SimpleBrain;}
 
         SimulationEngineSingleThread::place_organism(edc, *new_organism, sp);
     }
@@ -873,19 +889,19 @@ void DataSavingFunctions::write_occp(QDataStream &os, OCCParameters &occp) {
     os.device()->write((char*)&occp.uniform_swap_distance, sizeof(bool));
 
     int size = occp.mutation_type_weights.size();
-    os.device()->write((char*)&size, sizeof(int));
+    os.device()->write((char*)&size, sizeof(uint32_t));
     os.device()->write((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
 
     size = occp.max_group_size;
-    os.device()->write((char*)&size, sizeof(int));
+    os.device()->write((char*)&size, sizeof(uint32_t));
     os.device()->write((char*)occp.group_size_weights.data(), sizeof(int)*size);
 
     size = occp.occ_instructions_mutation_weights.size();
-    os.device()->write((char*)&size, sizeof(int));
+    os.device()->write((char*)&size, sizeof(uint32_t));
     os.device()->write((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*size);
 
     size = occp.max_distance;
-    os.device()->write((char*)&size, sizeof(int));
+    os.device()->write((char*)&size, sizeof(uint32_t));
     os.device()->write((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
 }
 
@@ -896,24 +912,24 @@ void DataSavingFunctions::read_occp(QDataStream &is, OCCParameters &occp) {
     is.readRawData((char*)&occp.uniform_swap_distance, sizeof(bool));
 
     int size;
-    is.readRawData((char*)&size, sizeof(int));
-    is.readRawData((char*)occp.mutation_type_weights.data(), sizeof(int)*size);
+    is.readRawData((char*)&size, sizeof(uint32_t));
+    is.readRawData((char*)occp.mutation_type_weights.data(), sizeof(uint32_t)*size);
 
-    is.readRawData((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(uint32_t));
     occp.max_group_size = size;
     occp.group_size_weights.resize(occp.max_group_size);
-    is.readRawData((char*)occp.group_size_weights.data(), sizeof(int)*size);
+    is.readRawData((char*)occp.group_size_weights.data(), sizeof(uint32_t)*size);
 
-    is.readRawData((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(uint32_t));
     if (size != occp.occ_instructions_mutation_weights.size()) {
         //TODO throw error
         throw "";
     }
-    is.readRawData((char*)occp.occ_instructions_mutation_weights.data(), sizeof(int)*(size));
+    is.readRawData((char*)occp.occ_instructions_mutation_weights.data(), sizeof(uint32_t)*(size));
 
-    is.readRawData((char*)&size, sizeof(int));
+    is.readRawData((char*)&size, sizeof(uint32_t));
     occp.max_distance = size;
-    is.readRawData((char*)occp.swap_distance_mutation_weights.data(), sizeof(int) * size);
+    is.readRawData((char*)occp.swap_distance_mutation_weights.data(), sizeof(uint32_t) * size);
 
     occp.mutation_discrete_distribution = std::discrete_distribution<int>{occp.mutation_type_weights.begin(), occp.mutation_type_weights.end()};
     occp.group_size_discrete_distribution = std::discrete_distribution<int>{occp.group_size_weights.begin(), occp.group_size_weights.end()};

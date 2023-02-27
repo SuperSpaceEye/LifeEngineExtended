@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 02.10.22.
 //
@@ -43,6 +47,10 @@ void TransactionBuffer::record_organism_move_change(int vector_index, int x, int
 
 void TransactionBuffer::record_recenter_to_imaginary_pos(bool state) {
     transactions[buffer_pos].recenter_to_imaginary_pos = state;
+}
+
+void TransactionBuffer::record_food_threshold(float food_threshold) {
+    transactions[buffer_pos].food_threshold = food_threshold;
 }
 
 void TransactionBuffer::record_reset() {
@@ -101,6 +109,7 @@ void TransactionBuffer::flush_transactions() {
 //        out.write((char*)&transaction.starting_point, sizeof(bool));
 //        out.write((char*)&transaction.reset, sizeof(bool));
 //        out.write((char*)&transaction.recenter_to_imaginary_pos, sizeof(bool));
+//        out.write((char*)&transaction.food_threshold, sizeof(float));
 //        out.write((char*)&transaction.uses_occ, sizeof(bool));
 //
 //        int size = transaction.organism_change.size();
@@ -167,7 +176,7 @@ void TransactionBuffer::finish_recording() {
     buffer_pos = 0;
     saved_buffers = 1;
     buffer_size = 0;
-    path_to_save = "";
+    path_to_save.clear();
     recorded_transactions = 0;
     transactions = std::vector<Transaction>();
 }
@@ -220,6 +229,7 @@ bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
 //        in.read((char*)&transaction.starting_point, sizeof(bool));
 //        in.read((char*)&transaction.reset, sizeof(bool));
 //        in.read((char*)&transaction.recenter_to_imaginary_pos, sizeof(bool));
+//        in.read((char*)&transaction.food_threshold, sizeof(float));
 //        in.read((char*)&transaction.uses_occ, sizeof(bool));
 //        sp.use_occ = transaction.uses_occ;
 //        sp.recenter_to_imaginary_pos = transaction.recenter_to_imaginary_pos;

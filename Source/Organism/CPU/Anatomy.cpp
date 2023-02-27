@@ -7,53 +7,45 @@
 //
 
 #include "Anatomy.h"
-#include "LegacyAnatomyMutationLogic.h"
+#include "SimpleAnatomyMutationLogic.h"
 
 Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
-    _organism_blocks = std::move(structure->organism_blocks);
-
-    _producing_space = std::move(structure->producing_space);
-    _eating_space    = std::move(structure->eating_space);
-    _killing_space   = std::move(structure->killing_space);
-    _eye_block_vec   = std::move(structure->eye_blocks_vec);
-
-    _mouth_blocks    = structure->mouth_blocks;
-    _producer_blocks = structure->producer_blocks;
-    _mover_blocks    = structure->mover_blocks;
-    _killer_blocks   = structure->killer_blocks;
-    _armor_blocks    = structure->armor_blocks;
-    _eye_blocks      = structure->eye_blocks;
+    move_s(structure);
     delete structure;
 }
 
 Anatomy::Anatomy(const Anatomy & anatomy) {
-    _organism_blocks = std::vector(anatomy._organism_blocks);
+    copy_s(&anatomy);
+}
 
-    _producing_space = std::vector(anatomy._producing_space);
-    _eating_space    = std::vector(anatomy._eating_space);
-    _killing_space   = std::vector(anatomy._killing_space);
-    _eye_block_vec   = std::vector(anatomy._eye_block_vec);
+SerializedOrganismStructureContainer *
+Anatomy::make_container(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
+                        boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
+                        ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const {
+    std::vector<int> num_producing_space;
 
-    _mouth_blocks    = anatomy._mouth_blocks;
-    _producer_blocks = anatomy._producer_blocks;
-    _mover_blocks    = anatomy._mover_blocks;
-    _killer_blocks   = anatomy._killer_blocks;
-    _armor_blocks    = anatomy._armor_blocks;
-    _eye_blocks      = anatomy._eye_blocks;
+    boost::unordered::unordered_map<int, boost::unordered::unordered_map<int, std::vector<int>>> _producing_space;
+    boost::unordered::unordered_map<int, boost::unordered_map<int, int>> _eating_space;
+    boost::unordered::unordered_map<int, boost::unordered_map<int, int>> _killing_space;
+
+    SimpleAnatomyMutationLogic::create_producing_space(_organism_blocks, _producing_space, single_adjacent_space, num_producing_space, _c["producer"]);
+    SimpleAnatomyMutationLogic::create_eating_space(_organism_blocks, _eating_space, single_adjacent_space, _c["mouth"]);
+    SimpleAnatomyMutationLogic::create_killing_space(_organism_blocks, _killing_space, single_adjacent_space, _c["killer"]);
+
+    return SimpleAnatomyMutationLogic::serialize(_organism_blocks,
+                                                 _producing_space,
+                                                 _eating_space,
+                                                 _killing_space,
+                                                 num_producing_space,
+                                                 _c);
 }
 
 SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int block_choice, Rotation rotation, int x_,
                                                           int y_,
-                                                          boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
+                                                          boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
                                                           std::vector<SerializedAdjacentSpaceContainer> &_single_adjacent_space,
                                                           std::vector<SerializedAdjacentSpaceContainer> &_single_diagonal_adjacent_space,
                                                           boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space) {
-    boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> producing_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
-
-    std::vector<int> num_producing_space;
-
     int x;
     int y;
     if (block_choice > -1) {
@@ -72,59 +64,28 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
     auto block = BaseGridBlock();
     block.type     = type;
     block.rotation = rotation;
-    organism_blocks[x][y] = block;
+    _organism_blocks[x][y] = block;
 
-    int32_t mouth_blocks    = _mouth_blocks;
-    int32_t producer_blocks = _producer_blocks;
-    int32_t mover_blocks    = _mover_blocks;
-    int32_t killer_blocks   = _killer_blocks;
-    int32_t armor_blocks    = _armor_blocks;
-    int32_t eye_blocks      = _eye_blocks;
+    auto _c = get_map();
+    set_m(_c, c);
+    get_mp(_c, type)++;
 
-    switch (type) {
-        case BlockTypes::MouthBlock:    mouth_blocks++    ; break;
-        case BlockTypes::ProducerBlock: producer_blocks++ ; break;
-        case BlockTypes::MoverBlock:    mover_blocks++    ; break;
-        case BlockTypes::KillerBlock:   killer_blocks++   ; break;
-        case BlockTypes::ArmorBlock:    armor_blocks++    ; break;
-        case BlockTypes::EyeBlock:      eye_blocks++      ; break;
-        case BlockTypes::EmptyBlock:
-        case BlockTypes::FoodBlock:
-        case BlockTypes::WallBlock:
-            break;
-    }
-
-    LegacyAnatomyMutationLogic::create_producing_space(organism_blocks, producing_space, single_adjacent_space, num_producing_space, producer_blocks);
-    LegacyAnatomyMutationLogic::create_eating_space(organism_blocks, eating_space, single_adjacent_space, mouth_blocks);
-    LegacyAnatomyMutationLogic::create_killing_space(organism_blocks, killing_space, single_adjacent_space, killer_blocks);
-
-    return LegacyAnatomyMutationLogic::serialize(organism_blocks,
-                                                 producing_space,
-                                                 eating_space,
-                                                 killing_space,
-                                                 num_producing_space,
-
-                                                 mouth_blocks,
-                                                 producer_blocks,
-                                                 mover_blocks,
-                                                 killer_blocks,
-                                                 armor_blocks,
-                                                 eye_blocks);
+    return make_container(_organism_blocks, single_adjacent_space, _c);
 }
 
-SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& block_parameters, lehmer64 &mt) {
-    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
+SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockParameters& bp, lehmer64 &mt) {
+    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks;
 
-    for (auto& block: _organism_blocks) {
-        organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-        organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
+    for (auto& block: organism_blocks) {
+        _organism_blocks[block.relative_x][block.relative_y].type     = block.type;
+        _organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
     }
 
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    LegacyAnatomyMutationLogic::create_single_adjacent_space(organism_blocks, single_adjacent_space);
-    LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+    SimpleAnatomyMutationLogic::create_single_adjacent_space(_organism_blocks, single_adjacent_space);
+    SimpleAnatomyMutationLogic::create_single_diagonal_adjacent_space(_organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
 
     std::vector<SerializedAdjacentSpaceContainer> _single_adjacent_space;
     std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
@@ -141,238 +102,113 @@ SerializedOrganismStructureContainer * Anatomy::add_random_block(OrganismBlockPa
         }
     }
 
-    float total_chance = 0;
-    total_chance += block_parameters.MouthBlock   .chance_weight;
-    total_chance += block_parameters.ProducerBlock.chance_weight;
-    total_chance += block_parameters.MoverBlock   .chance_weight;
-    total_chance += block_parameters.KillerBlock  .chance_weight;
-    total_chance += block_parameters.ArmorBlock   .chance_weight;
-    total_chance += block_parameters.EyeBlock     .chance_weight;
+    float total_chance = [&](){float summ=0;for(auto&item:bp.pa){summ+=item.chance_weight;}return summ;}();
 
     float type_choice  = std::uniform_real_distribution<float>{0, total_chance}(mt);
     int   block_choice = std::uniform_int_distribution<int>{0, int(_single_adjacent_space.size()+_single_diagonal_adjacent_space.size())-1}(mt);
 
-    if (type_choice < block_parameters.MouthBlock.chance_weight)   {return add_block(BlockTypes::MouthBlock,
-                                                                                     block_choice, Rotation::UP, 0, 0,
-                                                                                     organism_blocks, _single_adjacent_space,
-                                                                                     _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.MouthBlock.chance_weight;
-    if (type_choice < block_parameters.ProducerBlock.chance_weight) {return add_block(BlockTypes::ProducerBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.ProducerBlock.chance_weight;
-    if (type_choice < block_parameters.MoverBlock.chance_weight)    {return add_block(BlockTypes::MoverBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.MoverBlock.chance_weight;
-    if (type_choice < block_parameters.KillerBlock.chance_weight)   {return add_block(BlockTypes::KillerBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    type_choice -= block_parameters.KillerBlock.chance_weight;
-    if (type_choice < block_parameters.ArmorBlock.chance_weight)    {return add_block(BlockTypes::ArmorBlock,
-                                                                                      block_choice, Rotation::UP, 0, 0,
-                                                                                      organism_blocks, _single_adjacent_space,
-                                                                                      _single_diagonal_adjacent_space, single_adjacent_space);}
-    Rotation rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(mt));
-    return add_block(BlockTypes::EyeBlock, block_choice, rotation, 0, 0,
-                     organism_blocks, _single_adjacent_space,
+    for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+        auto & item = bp.pa[i];
+        if (type_choice < item.chance_weight) {
+            return add_block((BlockTypes)(i+1),
+                             block_choice, static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(mt)),
+                             0, 0, _organism_blocks, _single_adjacent_space,
+                             _single_diagonal_adjacent_space, single_adjacent_space);
+        }
+        type_choice -= item.chance_weight;
+    }
+
+    // if for some reason the choice fails.
+    return add_block((BlockTypes)NUM_ORGANISM_BLOCKS, block_choice, static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(mt)),
+                     0, 0, _organism_blocks, _single_adjacent_space,
                      _single_diagonal_adjacent_space, single_adjacent_space);
 }
 
 SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, int block_choice, lehmer64 *mt) {
-    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
-    boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> producing_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
+    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks;
 
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    std::vector<int> num_producing_space;
+    auto _c = get_map();
+    set_m(_c, c);
 
-    int32_t mouth_blocks    = _mouth_blocks;
-    int32_t producer_blocks = _producer_blocks;
-    int32_t mover_blocks    = _mover_blocks;
-    int32_t killer_blocks   = _killer_blocks;
-    int32_t armor_blocks    = _armor_blocks;
-    int32_t eye_blocks      = _eye_blocks;
+    get_mp(_c, organism_blocks[block_choice].type)--;
+    get_mp(_c, type)++;
 
-    switch (_organism_blocks[block_choice].type) {
-        case BlockTypes::MouthBlock:    mouth_blocks--    ; break;
-        case BlockTypes::ProducerBlock: producer_blocks-- ; break;
-        case BlockTypes::MoverBlock:    mover_blocks--    ; break;
-        case BlockTypes::KillerBlock:   killer_blocks--   ; break;
-        case BlockTypes::ArmorBlock:    armor_blocks--    ; break;
-        case BlockTypes::EyeBlock:      eye_blocks--      ; break;
-        case BlockTypes::EmptyBlock:
-        case BlockTypes::FoodBlock:
-        case BlockTypes::WallBlock:
-            break;
-    }
-
-    switch (type) {
-        case BlockTypes::MouthBlock:    mouth_blocks++    ; break;
-        case BlockTypes::ProducerBlock: producer_blocks++ ; break;
-        case BlockTypes::MoverBlock:    mover_blocks++    ; break;
-        case BlockTypes::KillerBlock:   killer_blocks++   ; break;
-        case BlockTypes::ArmorBlock:    armor_blocks++    ; break;
-        case BlockTypes::EyeBlock:      eye_blocks++      ; break;
-        case BlockTypes::EmptyBlock:
-        case BlockTypes::FoodBlock:
-        case BlockTypes::WallBlock:
-            break;
-    }
-
-    for (int i = 0; i < _organism_blocks.size(); i ++) {
-        organism_blocks[_organism_blocks[i].relative_x][_organism_blocks[i].relative_y].type      = _organism_blocks[i].type;
-        organism_blocks[_organism_blocks[i].relative_x][_organism_blocks[i].relative_y].rotation  = _organism_blocks[i].rotation;
+    for (int i = 0; i < organism_blocks.size(); i ++) {
+        _organism_blocks[organism_blocks[i].relative_x][organism_blocks[i].relative_y].type      = organism_blocks[i].type;
+        _organism_blocks[organism_blocks[i].relative_x][organism_blocks[i].relative_y].rotation  = organism_blocks[i].rotation;
         if (i == block_choice) {
-            organism_blocks[_organism_blocks[i].relative_x][_organism_blocks[i].relative_y].type = type;
+            _organism_blocks[organism_blocks[i].relative_x][organism_blocks[i].relative_y].type = type;
             if (type == BlockTypes::EyeBlock) {
-                organism_blocks[_organism_blocks[i].relative_x][_organism_blocks[i].relative_y].rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
+                _organism_blocks[organism_blocks[i].relative_x][organism_blocks[i].relative_y].rotation = static_cast<Rotation>(std::uniform_int_distribution<int>(0, 3)(*mt));
             }
         }
     }
 
-    LegacyAnatomyMutationLogic::create_single_adjacent_space(organism_blocks, single_adjacent_space);
-    LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+    SimpleAnatomyMutationLogic::create_single_adjacent_space(_organism_blocks, single_adjacent_space);
+//    SimpleAnatomyMutationLogic::create_single_diagonal_adjacent_space(_organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
 
-    LegacyAnatomyMutationLogic::create_producing_space(organism_blocks, producing_space, single_adjacent_space, num_producing_space, producer_blocks);
-    LegacyAnatomyMutationLogic::create_eating_space(organism_blocks, eating_space, single_adjacent_space, mouth_blocks);
-    LegacyAnatomyMutationLogic::create_killing_space(organism_blocks, killing_space, single_adjacent_space, killer_blocks);
-
-    return LegacyAnatomyMutationLogic::serialize(organism_blocks,
-                                                 producing_space,
-                                                 eating_space,
-                                                 killing_space,
-                                                 num_producing_space,
-
-                                                 mouth_blocks,
-                                                 producer_blocks,
-                                                 mover_blocks,
-                                                 killer_blocks,
-                                                 armor_blocks,
-                                                 eye_blocks);
+    return make_container(_organism_blocks, single_adjacent_space, _c);
 }
 
-SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& block_parameters, lehmer64 &gen) {
-    float total_chance = 0;
-    total_chance += block_parameters.MouthBlock   .chance_weight;
-    total_chance += block_parameters.ProducerBlock.chance_weight;
-    total_chance += block_parameters.MoverBlock   .chance_weight;
-    total_chance += block_parameters.KillerBlock  .chance_weight;
-    total_chance += block_parameters.ArmorBlock   .chance_weight;
-    total_chance += block_parameters.EyeBlock     .chance_weight;
+SerializedOrganismStructureContainer * Anatomy::change_random_block(OrganismBlockParameters& bp, lehmer64 &gen) {
+    float total_chance = [&](){float summ=0;for(auto&item:bp.pa){summ+=item.chance_weight;}return summ;}();
 
     float type_choice  = std::uniform_real_distribution<float>{0, total_chance}(gen);
-    int   block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(gen);
+    int   block_choice = std::uniform_int_distribution<int>{0, int(organism_blocks.size()) - 1}(gen);
 
-    if (type_choice < block_parameters.MouthBlock.chance_weight)    {return change_block(BlockTypes::MouthBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.MouthBlock.chance_weight;
-    if (type_choice < block_parameters.ProducerBlock.chance_weight) {return change_block(BlockTypes::ProducerBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.ProducerBlock.chance_weight;
-    if (type_choice < block_parameters.MoverBlock.chance_weight)    {return change_block(BlockTypes::MoverBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.MoverBlock.chance_weight;
-    if (type_choice < block_parameters.KillerBlock.chance_weight)   {return change_block(BlockTypes::KillerBlock,
-                                                                                         block_choice, &gen);}
-    type_choice -= block_parameters.KillerBlock.chance_weight;
-    if (type_choice < block_parameters.ArmorBlock.chance_weight)    {return change_block(BlockTypes::ArmorBlock,
-                                                                                         block_choice, &gen);}
+    for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
+        auto &item = bp.pa[i];
+        if (type_choice < item.chance_weight) {
+            return change_block((BlockTypes)(i+1), block_choice, &gen);
+        }
+        type_choice -= item.chance_weight;
+    }
 
-    return change_block(BlockTypes::EyeBlock, block_choice, &gen);
+    return change_block((BlockTypes)NUM_ORGANISM_BLOCKS, block_choice, &gen);
 }
 
 SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
-    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
-    boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> producing_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
+    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks;
 
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
+//    boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    std::vector<int> num_producing_space;
+    auto _c = get_map();
+    set_m(_c, c);
 
-    int32_t mouth_blocks    = _mouth_blocks;
-    int32_t producer_blocks = _producer_blocks;
-    int32_t mover_blocks    = _mover_blocks;
-    int32_t killer_blocks   = _killer_blocks;
-    int32_t armor_blocks    = _armor_blocks;
-    int32_t eye_blocks      = _eye_blocks;
+    get_mp(_c, organism_blocks[block_choice].type)--;
 
-    switch (_organism_blocks[block_choice].type) {
-        case BlockTypes::MouthBlock:    mouth_blocks--    ; break;
-        case BlockTypes::ProducerBlock: producer_blocks-- ; break;
-        case BlockTypes::MoverBlock:    mover_blocks--    ; break;
-        case BlockTypes::KillerBlock:   killer_blocks--   ; break;
-        case BlockTypes::ArmorBlock:    armor_blocks--    ; break;
-        case BlockTypes::EyeBlock:      eye_blocks--      ; break;
-        case BlockTypes::EmptyBlock:
-        case BlockTypes::FoodBlock:
-        case BlockTypes::WallBlock:
-            break;
+    int x = organism_blocks[block_choice].relative_x;
+    int y = organism_blocks[block_choice].relative_y;
+
+    for (auto &block: organism_blocks) {
+        _organism_blocks[block.relative_x][block.relative_y] = BaseGridBlock{block.type, block.rotation};
     }
 
-    int x = _organism_blocks[block_choice].relative_x;
-    int y = _organism_blocks[block_choice].relative_y;
+    _organism_blocks[x].erase(_organism_blocks[x].find(y));
 
-    for (auto &block: _organism_blocks) {
-        organism_blocks[block.relative_x][block.relative_y] = BaseGridBlock{block.type, block.rotation};
-    }
+    SimpleAnatomyMutationLogic::create_single_adjacent_space(_organism_blocks, single_adjacent_space);
+//    SimpleAnatomyMutationLogic::create_single_diagonal_adjacent_space(_organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
 
-    organism_blocks[x].erase(organism_blocks[x].find(y));
-
-    LegacyAnatomyMutationLogic::create_single_adjacent_space(organism_blocks, single_adjacent_space);
-    LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
-
-    LegacyAnatomyMutationLogic::create_producing_space(organism_blocks, producing_space, single_adjacent_space, num_producing_space, producer_blocks);
-    LegacyAnatomyMutationLogic::create_eating_space(organism_blocks, eating_space, single_adjacent_space, mouth_blocks);
-    LegacyAnatomyMutationLogic::create_killing_space(organism_blocks, killing_space, single_adjacent_space, killer_blocks);
-
-    return LegacyAnatomyMutationLogic::serialize(organism_blocks,
-                                                 producing_space,
-                                                 eating_space,
-                                                 killing_space,
-                                                 num_producing_space,
-
-                                                 mouth_blocks,
-                                                 producer_blocks,
-                                                 mover_blocks,
-                                                 killer_blocks,
-                                                 armor_blocks,
-                                                 eye_blocks);
+    return make_container(_organism_blocks, single_adjacent_space, _c);
 }
 
 SerializedOrganismStructureContainer * Anatomy::remove_random_block(lehmer64 &gen) {
-    int block_choice = std::uniform_int_distribution<int>{0, int(_organism_blocks.size())-1}(gen);
+    int block_choice = std::uniform_int_distribution<int>{0, int(organism_blocks.size()) - 1}(gen);
     return remove_block(block_choice);
 }
 
 void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
 //    if (type == BlockTypes::EmptyBlock) { return;}
     int num_block = 0;
-    for (auto & item: _organism_blocks) {
+    for (auto & item: organism_blocks) {
         if (item.relative_x == x && item.relative_y == y) {
             //If delete block, then the decrementing logic will be configured by remove_block
             if (type  != BlockTypes::EmptyBlock) {
-                switch (item.type) {
-                    case BlockTypes::MouthBlock:    _mouth_blocks--    ; break;
-                    case BlockTypes::ProducerBlock: _producer_blocks-- ; break;
-                    case BlockTypes::MoverBlock:    _mover_blocks--    ; break;
-                    case BlockTypes::KillerBlock:   _killer_blocks--   ; break;
-                    case BlockTypes::ArmorBlock:    _armor_blocks--    ; break;
-                    case BlockTypes::EyeBlock:      _eye_blocks--      ; break;
-                    case BlockTypes::EmptyBlock:
-                    case BlockTypes::FoodBlock:
-                    case BlockTypes::WallBlock:
-                        break;
-                }
+                get_mp(c, item.type)--;
             }
             break;
         }
@@ -380,25 +216,25 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     }
 
     //if tried to delete an empty space
-    if (type == BlockTypes::EmptyBlock && num_block == _organism_blocks.size()) { return;}
+    if (type == BlockTypes::EmptyBlock && num_block == organism_blocks.size()) { return;}
 
     SerializedOrganismStructureContainer *new_structure;
 
     if (type == BlockTypes::EmptyBlock) {
         new_structure = remove_block(num_block);
     } else {
-        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
+        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks;
 
-        for (auto& block: _organism_blocks) {
-            organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-            organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
+        for (auto& block: organism_blocks) {
+            _organism_blocks[block.relative_x][block.relative_y].type     = block.type;
+            _organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
         }
 
         boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
         boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-        LegacyAnatomyMutationLogic::create_single_adjacent_space(organism_blocks, single_adjacent_space);
-        LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+        SimpleAnatomyMutationLogic::create_single_adjacent_space(_organism_blocks, single_adjacent_space);
+        SimpleAnatomyMutationLogic::create_single_diagonal_adjacent_space(_organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
 
         std::vector<SerializedAdjacentSpaceContainer> _single_adjacent_space;
         std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;
@@ -415,111 +251,38 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
             }
         }
          new_structure = add_block(type, -1, rotation, x, y,
-                                        organism_blocks, _single_adjacent_space,
-                                        _single_diagonal_adjacent_space, single_adjacent_space);
+                                   _organism_blocks, _single_adjacent_space,
+                                   _single_diagonal_adjacent_space, single_adjacent_space);
     }
 
-    _organism_blocks = std::move(new_structure->organism_blocks);
-
-    _producing_space = std::move(new_structure->producing_space);
-    _killing_space   = std::move(new_structure->killing_space);
-    _eating_space    = std::move(new_structure->eating_space);
-    _eye_block_vec   = std::move(new_structure->eye_blocks_vec);
-
-    _mouth_blocks    = new_structure->mouth_blocks;
-    _producer_blocks = new_structure->producer_blocks;
-    _mover_blocks    = new_structure->mover_blocks;
-    _killer_blocks   = new_structure->killer_blocks;
-    _armor_blocks    = new_structure->armor_blocks;
-    _eye_blocks      = new_structure->eye_blocks;
-
+    move_s(new_structure);
     delete new_structure;
 }
 
-void Anatomy::set_many_blocks(std::vector<SerializedOrganismBlockContainer> &blocks) {
-    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> organism_blocks;
-    boost::unordered_map<int, boost::unordered_map<int, ProducerAdjacent>> producing_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> eating_space;
-    boost::unordered_map<int, boost::unordered_map<int, bool>> killing_space;
+void Anatomy::set_many_blocks(const std::vector<SerializedOrganismBlockContainer> &blocks) {
+    boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks;
 
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    std::vector<int> num_producing_space;
-
-    _mouth_blocks    = 0;
-    _producer_blocks = 0;
-    _mover_blocks    = 0;
-    _killer_blocks   = 0;
-    _armor_blocks    = 0;
-    _eye_blocks      = 0;
-
+    auto _c = get_map();
     for (auto & block: blocks) {
-        switch (block.type) {
-            case BlockTypes::MouthBlock:    _mouth_blocks++    ; break;
-            case BlockTypes::ProducerBlock: _producer_blocks++ ; break;
-            case BlockTypes::MoverBlock:    _mover_blocks++    ; break;
-            case BlockTypes::KillerBlock:   _killer_blocks++   ; break;
-            case BlockTypes::ArmorBlock:    _armor_blocks++    ; break;
-            case BlockTypes::EyeBlock:      _eye_blocks++      ; break;
-            default: break;
-        }
+        get_mp(_c, block.type)++;
 
-        organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-        organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
+        _organism_blocks[block.relative_x][block.relative_y].type     = block.type;
+        _organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
     }
 
-    LegacyAnatomyMutationLogic::create_single_adjacent_space(organism_blocks, single_adjacent_space);
-    LegacyAnatomyMutationLogic::create_single_diagonal_adjacent_space(organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+    SimpleAnatomyMutationLogic::create_single_adjacent_space(_organism_blocks, single_adjacent_space);
+//    SimpleAnatomyMutationLogic::create_single_diagonal_adjacent_space(_organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
 
-    LegacyAnatomyMutationLogic::create_producing_space(organism_blocks, producing_space, single_adjacent_space, num_producing_space, _producer_blocks);
-    LegacyAnatomyMutationLogic::create_eating_space(organism_blocks, eating_space, single_adjacent_space, _mouth_blocks);
-    LegacyAnatomyMutationLogic::create_killing_space(organism_blocks, killing_space, single_adjacent_space, _killer_blocks);
-
-    auto *new_structure = LegacyAnatomyMutationLogic::serialize(organism_blocks,
-                                                                producing_space,
-                                                                eating_space,
-                                                                killing_space,
-                                                                num_producing_space,
-
-                                                                _mouth_blocks,
-                                                                _producer_blocks,
-                                                                _mover_blocks,
-                                                                _killer_blocks,
-                                                                _armor_blocks,
-                                                                _eye_blocks);
-
-    _organism_blocks = std::move(new_structure->organism_blocks);
-
-    _producing_space = std::move(new_structure->producing_space);
-    _eating_space    = std::move(new_structure->eating_space);
-    _eye_block_vec   = std::move(new_structure->eye_blocks_vec);
-
-    _mouth_blocks    = new_structure->mouth_blocks;
-    _producer_blocks = new_structure->producer_blocks;
-    _mover_blocks    = new_structure->mover_blocks;
-    _killer_blocks   = new_structure->killer_blocks;
-    _armor_blocks    = new_structure->armor_blocks;
-    _eye_blocks      = new_structure->eye_blocks;
-
+    auto *new_structure = make_container(_organism_blocks, single_adjacent_space, _c);
+    move_s(new_structure);
     delete new_structure;
 }
 
-//Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {
-//    _mouth_blocks    = other_anatomy._mouth_blocks;
-//    _producer_blocks = other_anatomy._producer_blocks;
-//    _mover_blocks    = other_anatomy._mover_blocks;
-//    _killer_blocks   = other_anatomy._killer_blocks;
-//    _armor_blocks    = other_anatomy._armor_blocks;
-//    _eye_blocks      = other_anatomy._eye_blocks;
-//
-//    _organism_blocks = std::move(other_anatomy._organism_blocks);
-//    _producing_space = std::move(other_anatomy._producing_space);
-//    _eating_space    = std::move(other_anatomy._eating_space);
-//    _killing_space   = std::move(other_anatomy._killing_space);
-//
-//    return *this;
-//}
+Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {move_s(&other_anatomy);return *this;}
+Anatomy &Anatomy::operator=(const Anatomy &other_anatomy)     {copy_s(&other_anatomy);return *this;}
 
 Vector2<int> Anatomy::recenter_blocks(bool imaginary_center) {
     if (imaginary_center) {
@@ -530,43 +293,43 @@ Vector2<int> Anatomy::recenter_blocks(bool imaginary_center) {
 }
 
 void Anatomy::subtract_difference(int x, int y) {
-    for (auto & block: _organism_blocks) {
+    for (auto & block: organism_blocks) {
         block.relative_x -= x;
         block.relative_y -= y;
     }
 
-    for (auto & spe: _producing_space) {
+    for (auto & spe: producing_space) {
         for (auto & pc: spe) {
             pc.relative_x -= x;
             pc.relative_y -= y;
         }
     }
 
-    for (auto & block: _eating_space) {
+    for (auto & block: eating_space) {
         block.relative_x -= x;
         block.relative_y -= y;
     }
 
-    for (auto & block: _killing_space) {
+    for (auto & block: killing_space) {
         block.relative_x -= x;
         block.relative_y -= y;
     }
 
-    for (auto & block: _eye_block_vec) {
+    for (auto & block: eye_block_vec) {
         block.relative_x -= x;
         block.relative_y -= y;
     }
 }
 
 Vector2<int> Anatomy::recenter_to_existing() {
-    if (_organism_blocks.empty()) { return {0, 0};}
+    if (organism_blocks.empty()) { return {0, 0};}
     int block_pos_in_vec = 0;
     //the position of a block will definitely never be bigger than this.
     Vector2<int32_t> abs_pos{INT32_MAX/4, INT32_MAX/4};
 
     //will find the closest cell to the center
     int i = 0;
-    for (auto & block: _organism_blocks) {
+    for (auto & block: organism_blocks) {
         if (abs(block.relative_x) + abs(block.relative_y) < abs_pos.x + abs_pos.y) {
             abs_pos = {abs(block.relative_x), abs(block.relative_y)};
             block_pos_in_vec = i;
@@ -574,18 +337,18 @@ Vector2<int> Anatomy::recenter_to_existing() {
         i++;
     }
 
-    Vector2<int32_t> new_center_pos = {_organism_blocks[block_pos_in_vec].relative_x, _organism_blocks[block_pos_in_vec].relative_y};
+    Vector2<int32_t> new_center_pos = {organism_blocks[block_pos_in_vec].relative_x, organism_blocks[block_pos_in_vec].relative_y};
 
     subtract_difference(new_center_pos.x, new_center_pos.y);
     return {new_center_pos.x, new_center_pos.y};
 }
 
 Vector2<int> Anatomy::recenter_to_imaginary() {
-    if (_organism_blocks.empty()) { return {0, 0};}
+    if (organism_blocks.empty()) { return {0, 0};}
     Vector2 min{0, 0};
     Vector2 max{0, 0};
 
-    for (auto & block: _organism_blocks) {
+    for (auto & block: organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
         if (block.relative_y < min.y) {min.y = block.relative_y;}
         if (block.relative_x > max.x) {max.x = block.relative_x;}

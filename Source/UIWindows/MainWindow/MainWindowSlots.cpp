@@ -508,7 +508,9 @@ void MainWindow::le_continuous_movement_drag_slot() {
 }
 
 void MainWindow::le_food_threshold_slot() {
+    engine.pause();
     le_slot_lower_bound<float>(sp.food_threshold, sp.food_threshold, "float", ui.le_food_threshold, 0, "0");
+    engine.unpause();
 }
 
 void MainWindow::le_max_food_slot() {
@@ -780,6 +782,7 @@ void MainWindow::cb_use_continuous_movement_slot(bool state) {
     if (state && !sp.use_weighted_brain) { cb_use_weighted_brain_slot(true); ui.cb_use_weighted_brain->setChecked(true);}
     if (state) {ui.cb_use_weighted_brain->setEnabled(false);} else {ui.cb_use_weighted_brain->setEnabled(true);}
     sp.use_continuous_movement = state;
+    engine.reinit_organisms();
 }
 
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}
@@ -851,15 +854,7 @@ void MainWindow::table_cell_changed_slot(int row, int col) {
     } else {
         if (!disable_warnings) {display_message("Value should be float.");}
     }
-    BParameters * type;
-    switch (static_cast<BlocksNames>(row)) {
-        case BlocksNames::MouthBlock:    type = &bp.MouthBlock;    break;
-        case BlocksNames::ProducerBlock: type = &bp.ProducerBlock; break;
-        case BlocksNames::MoverBlock:    type = &bp.MoverBlock;    break;
-        case BlocksNames::KillerBlock:   type = &bp.KillerBlock;   break;
-        case BlocksNames::ArmorBlock:    type = &bp.ArmorBlock;    break;
-        case BlocksNames::EyeBlock:      type = &bp.EyeBlock;      break;
-    }
+    BParameters * type = &bp.pa[row];
 
     float * value;
     switch (static_cast<ParametersNames>(col)) {

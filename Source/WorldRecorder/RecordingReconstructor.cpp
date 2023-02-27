@@ -1,3 +1,7 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 //
 // Created by spaceeye on 02.10.22.
 //
@@ -45,14 +49,15 @@ void RecordingReconstructor::apply_reset(Transaction & transaction) {
 
 
 void RecordingReconstructor::apply_normal(Transaction &transaction) {
+    apply_user_actions(transaction);
     apply_recenter(transaction);
+    apply_food_threshold(transaction);
+
     apply_food_change(transaction);
     apply_dead_organisms(transaction);
     apply_move_change(transaction);
     apply_compressed_change(transaction);
     apply_organism_change(transaction);
-
-    apply_user_actions(transaction);
 }
 
 void RecordingReconstructor::apply_user_actions(Transaction &transaction) {
@@ -79,30 +84,33 @@ void RecordingReconstructor::apply_user_wall_change(Transaction &transaction, in
 void RecordingReconstructor::apply_user_kill_organism(Transaction &transaction, int pos) {
     auto dc = transaction.user_dead_change[pos];
     auto & o = rec_orgs[dc];
-    for (auto & b: o.anatomy._organism_blocks) {
-        auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
-        wb.type = BlockTypes::FoodBlock;
-        //TODO
-        food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] += 1;
+    for (auto & b: o.anatomy.organism_blocks) {
+        const auto bpos = b.get_pos(o.rotation);
+        const auto apos = o.x + bpos.x + (o.y + bpos.y) * width;
+
+        auto & wb = rec_grid[apos];
+        wb.type = food_grid[apos] >= food_threshold ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
     }
 }
 
 void RecordingReconstructor::apply_user_food_change(Transaction &transaction, int pos) {
-    auto & fc = transaction.user_food_change[pos];
-    auto & num = food_grid[fc.x + fc.y * width];
-    auto & type = rec_grid[fc.x + fc.y * width].type;
+    const auto & fc = transaction.user_food_change[pos];
+    const auto apos = fc.x + fc.y * width;
+
+    auto & num = food_grid[apos];
+    auto & type = rec_grid[apos].type;
     num += fc.num;
 
-    //TODO
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::FoodBlock) {
-        type = num > 0.99 ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
+        type = num > food_threshold ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
     }
 }
 
 void RecordingReconstructor::apply_user_add_organism(Transaction &transaction, int pos) {
     auto & o = transaction.user_organism_change[pos];
-    for (auto & b: o.anatomy._organism_blocks) {
-        auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
+    for (auto & b: o.anatomy.organism_blocks) {
+        const auto bpos = b.get_pos(o.rotation);
+        auto & wb = rec_grid[o.x + bpos.x + (o.y + bpos.y) * width];
         wb.type = b.type;
         wb.rotation = b.rotation;
     }
@@ -116,10 +124,12 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
     for (auto & mc: transaction.move_change) {
         auto & o = rec_orgs[mc.vector_index];
 
-        for (auto & b: o.anatomy._organism_blocks) {
-            auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
-            //TODO
-            if (food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] >= 0.99) {
+        for (auto & b: o.anatomy.organism_blocks) {
+            const auto bpos = b.get_pos(o.rotation);
+            const auto apos = o.x + bpos.x + (o.y + bpos.y) * width;
+
+            auto & wb = rec_grid[apos];
+            if (food_grid[apos] >= food_threshold) {
                 wb.type = BlockTypes::FoodBlock;
             } else {
                 wb.type = BlockTypes::EmptyBlock;
@@ -130,8 +140,9 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
         o.x = mc.x;
         o.y = mc.y;
 
-        for (auto & b: o.anatomy._organism_blocks) {
-            auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
+        for (auto & b: o.anatomy.organism_blocks) {
+            const auto bpos = b.get_pos(o.rotation);
+            auto & wb = rec_grid[o.x + bpos.x + (o.y + bpos.y) * width];
             wb.type = b.type;
             wb.rotation = b.rotation;
         }
@@ -141,11 +152,12 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
 void RecordingReconstructor::apply_dead_organisms(Transaction &transaction) {
     for (auto & dc: transaction.dead_organisms) {
         auto & o = rec_orgs[dc];
-        for (auto & b: o.anatomy._organism_blocks) {
-            auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
-            wb.type = BlockTypes::FoodBlock;
-            //TODO
-            food_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width] += 1;
+        for (auto & b: o.anatomy.organism_blocks) {
+            const auto bpos = b.get_pos(o.rotation);
+            const auto apos = o.x + bpos.x + (o.y + bpos.y) * width;
+
+            auto & wb = rec_grid[apos];
+            wb.type = food_grid[apos] >= food_threshold ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
         }
     }
 }
@@ -163,24 +175,29 @@ void RecordingReconstructor::apply_recenter(const Transaction &transaction) {
     }
 }
 
+void RecordingReconstructor::apply_food_threshold(Transaction &transaction) {
+    food_threshold = transaction.food_threshold;
+}
+
 void RecordingReconstructor::apply_food_change(Transaction &transaction) {
     for (auto & fc: transaction.food_change) {
-        auto & num = food_grid[fc.x + fc.y * width];
-        auto & type = rec_grid[fc.x + fc.y * width].type;
+        const auto apos = fc.x + fc.y * width;
+        auto & num = food_grid[apos];
+        auto & type = rec_grid[apos].type;
         num += fc.num;
 
         //TODO
         if (type == BlockTypes::EmptyBlock || type == BlockTypes::FoodBlock) {
-            type = num > 0.99 ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
+            type = num >= 1 ? BlockTypes::FoodBlock : BlockTypes::EmptyBlock;
         }
     }
 }
 
 void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
-    //TODO did it wrong
+    //TODO did resizing wrong
     rec_orgs.resize(rec_orgs.size() + transaction.organism_change.size());
     for (auto & o: transaction.organism_change) {
-        for (auto & b: o.anatomy._organism_blocks) {
+        for (auto & b: o.anatomy.organism_blocks) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             wb.type = b.type;
             wb.rotation = b.rotation;

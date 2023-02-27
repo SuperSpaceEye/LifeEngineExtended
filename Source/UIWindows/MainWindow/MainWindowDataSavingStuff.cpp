@@ -115,28 +115,7 @@ bool MainWindow::read_organisms(QDataStream &is) {
 void MainWindow::update_table_values() {
     for (int row = 0; row < 6; row++) {
         for (int col = 0; col < 4; col++) {
-            BParameters *type;
-            switch (static_cast<BlocksNames>(row)) {
-                case BlocksNames::MouthBlock:
-                    type = &bp.MouthBlock;
-                    break;
-                case BlocksNames::ProducerBlock:
-                    type = &bp.ProducerBlock;
-                    break;
-                case BlocksNames::MoverBlock:
-                    type = &bp.MoverBlock;
-                    break;
-                case BlocksNames::KillerBlock:
-                    type = &bp.KillerBlock;
-                    break;
-                case BlocksNames::ArmorBlock:
-                    type = &bp.ArmorBlock;
-                    break;
-                case BlocksNames::EyeBlock:
-                    type = &bp.EyeBlock;
-                    break;
-            }
-
+            BParameters *type = &bp.pa[row];
             float *value;
             switch (static_cast<ParametersNames>(col)) {
                 case ParametersNames::FoodCostModifier:

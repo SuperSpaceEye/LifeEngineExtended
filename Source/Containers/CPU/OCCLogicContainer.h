@@ -32,8 +32,7 @@ struct OCCLogicContainer {
     uint64_t spaces_counter = 0;
 
     std::vector<OCCBlock> occ_main_block_construction_space;
-    //for producing/eating/killing spaces
-    std::vector<OCCSpace> occ_producing_space;
+    //for spaces
     std::vector<OCCSpace> occ_eating_space;
     std::vector<OCCSpace> occ_killing_space;
 };

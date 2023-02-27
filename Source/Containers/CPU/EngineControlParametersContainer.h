@@ -11,6 +11,9 @@
 
 enum class SimulationModes {
     CPU_Single_Threaded,
+
+
+
     CPU_Partial_Multi_threaded,
     CPU_Multi_Threaded,
     GPU_CUDA_mode,
@@ -68,6 +71,8 @@ struct EngineControlParameters {
 
     volatile bool do_not_use_user_actions_ui = false;
     volatile bool do_not_use_user_actions_engine = false;
+
+    volatile bool make_images = true;
 };
 
 #endif //THELIFEENGINECPP_ENGINECONTROLCONTAINER_H
