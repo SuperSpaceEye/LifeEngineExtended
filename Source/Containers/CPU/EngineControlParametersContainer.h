@@ -71,6 +71,8 @@ struct EngineControlParameters {
 
     volatile bool do_not_use_user_actions_ui = false;
     volatile bool do_not_use_user_actions_engine = false;
+
+    volatile bool make_images = true;
 };
 
 #endif //THELIFEENGINECPP_ENGINECONTROLCONTAINER_H

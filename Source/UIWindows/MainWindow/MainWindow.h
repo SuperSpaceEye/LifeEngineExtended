@@ -243,7 +243,7 @@ private:
     void set_simulation_interval(int max_simulation_fps);
     void set_image_creator_interval(int max_window_fps);
     void update_fps_labels(int fps, int tps, int ups);
-    void resize_image();
+    void resize_image(int image_width, int image_height);
 
     // for fill_view
     void calculate_new_simulation_size();
@@ -284,8 +284,8 @@ private:
 
     void load_textures_from_disk();
 
-    void pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
-                                         std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+    void pre_parse_simulation_grid_stage(std::vector<int> &lin_width, std::vector<int> &lin_height,
+                                         std::vector<int> &truncated_lin_width,
                                          std::vector<int> &truncated_lin_height);
 
     void parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,

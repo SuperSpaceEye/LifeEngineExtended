@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     SimulationEngineSingleThread::place_organism(edc, *organism, sp);
 
-    resize_image();
+    resize_image(image_width, image_height);
     reset_scale_view();
 
     //Will execute on first QT show event
@@ -202,7 +202,7 @@ void MainWindow::ui_tick() {
 
     if (do_not_parse_image_data_ct) { return;}
     do_not_parse_image_data_mt.store(true);
-    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vectors[ready_buffer].data(), image_width, image_height, QImage::Format_RGB32)));
+    pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vectors[ready_buffer].data(), image_width, image_height, QImage::Format_RGB32).copy()));
     have_read_buffer = true;
     do_not_parse_image_data_mt.store(false);
 }
@@ -213,10 +213,10 @@ void MainWindow::update_fps_labels(int fps, int tps, int ups) {
     ui.lb_ups->setText(QString::fromStdString("ups: " + std::to_string(ups)));
 }
 
-void MainWindow::resize_image() {
-    if (image_vectors[0].size() == 4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height()) {return;}
-    image_vectors[0].resize(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
-    image_vectors[1].resize(4 * ui.simulation_graphicsView->viewport()->width() * ui.simulation_graphicsView->viewport()->height());
+void MainWindow::resize_image(int image_width, int image_height) {
+    if (image_vectors[0].size() == 4 * image_width * image_height) {return;}
+    image_vectors[0].resize(4 * image_width * image_height, 255);
+    image_vectors[1].resize(4 * image_width * image_height, 255);
 }
 
 void MainWindow::move_center(int delta_x, int delta_y) {
@@ -266,7 +266,7 @@ void MainWindow::create_image() {
     std::vector<int> truncated_lin_width;
     std::vector<int> truncated_lin_height;
 
-    pre_parse_simulation_grid_stage(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
+    pre_parse_simulation_grid_stage(lin_width, lin_height, truncated_lin_width, truncated_lin_height);
 
     parse_simulation_grid_stage(truncated_lin_width, truncated_lin_height);
 
@@ -294,12 +294,12 @@ void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_l
     }
 }
 
-void MainWindow::pre_parse_simulation_grid_stage(int &image_width, int &image_height, std::vector<int> &lin_width,
-                                                 std::vector<int> &lin_height, std::vector<int> &truncated_lin_width,
+void MainWindow::pre_parse_simulation_grid_stage(std::vector<int> &lin_width, std::vector<int> &lin_height,
+                                                 std::vector<int> &truncated_lin_width,
                                                  std::vector<int> &truncated_lin_height) {
     image_width  = ui.simulation_graphicsView->viewport()->width();
     image_height = ui.simulation_graphicsView->viewport()->height();
-    resize_image();
+    resize_image(image_width, image_height);
     int scaled_width  = image_width * scaling_zoom;
     int scaled_height = image_height * scaling_zoom;
 
@@ -918,7 +918,7 @@ void MainWindow::create_image_creation_thread() {
     image_creation_thread = std::thread{[&](){
         auto point1 = std::chrono::high_resolution_clock::now();
         auto point2 = point1;
-        while (true) {
+        while (ecp.make_images) {
             point1 = std::chrono::high_resolution_clock::now();
             if (!pause_grid_parsing || !really_stop_render) {
                 if (have_read_buffer) {
