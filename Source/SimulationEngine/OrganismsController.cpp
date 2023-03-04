@@ -82,6 +82,7 @@ int32_t OrganismsController::emplace_child_organisms_to_main_vector(Organism *ch
 
     free_child_organism(child_organism, edc);
     main_o_ptr->is_dead = false;
+    main_o_ptr->pre_init();
     main_o_ptr->init_values();
 
     return main_o_ptr->vector_index;

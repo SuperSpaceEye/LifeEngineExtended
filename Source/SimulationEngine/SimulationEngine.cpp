@@ -161,6 +161,7 @@ void SimulationEngine::process_user_action_pool() {
                 break;
             case ActionType::TryAddOrganism: {
                 bool continue_flag = false;
+                edc.chosen_organism.pre_init();
                 edc.chosen_organism.init_values();
 
                 continue_flag = action_check_if_space_for_organism_is_free(action, continue_flag);
@@ -219,17 +220,8 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
 
-    if (new_organism->anatomy.c["eye"] > 0 && new_organism->anatomy.c["mover"] > 0) {
-        if (sp.use_weighted_brain || sp.use_continuous_movement) {
-            new_organism->brain.brain_type = BrainTypes::WeightedBrain;
-        } else {
-            new_organism->brain.brain_type = BrainTypes::SimpleBrain;
-        }
-    }
-
-    if(sp.use_continuous_movement) {
-        new_organism->init_values();
-    }
+    new_organism->pre_init();
+    new_organism->init_values();
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {

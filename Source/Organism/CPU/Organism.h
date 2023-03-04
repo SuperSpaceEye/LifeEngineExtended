@@ -57,8 +57,12 @@ public:
     int max_decision_lifetime = 2;
     int max_do_nothing_lifetime = 3;
 
+    int size = 0;
+
     DecisionObservation last_decision_observation = DecisionObservation{};
     BrainDecision last_decision = BrainDecision::MoveUp;
+
+    ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = get_map();
 
     OrganismData()=default;
     OrganismData(int x, int y, Rotation rotation, int move_range, float anatomy_mutation_rate,
@@ -124,6 +128,9 @@ public:
     void calculate_discrete_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 
     void calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
+
+    //TODO make init_values include pre_init, but rename original init_values to something else to separate usages
+    void pre_init();
 };
 
 

@@ -55,11 +55,11 @@ private:
             info.total_size_producing_space += organism.anatomy.producing_space.size();
             info.total_size_eating_space    += organism.anatomy.eating_space.size();
 
-            if (organism.anatomy.c["mover"] > 0) {
+            if (organism.c["mover"] > 0) {
                 info.move_range += organism.move_range;
                 info.moving_organisms++;
 
-                if(organism.anatomy.c["eye"] > 0) {
+                if(organism.c["eye"] > 0) {
                     info.organisms_with_eyes++;
                 }
             }
@@ -67,8 +67,8 @@ private:
             for (int n = 0; n < 3; n++) {
                 if (
                   !(n == 0
-                || (n == 1 && organism.anatomy.c["mover"] == 0)
-                || (n == 2 && organism.anatomy.c["mover"] > 0))) {continue;}
+                || (n == 1 && organism.c["mover"] == 0)
+                || (n == 2 && organism.c["mover"] > 0))) {continue;}
 
                 auto & avg = info.avgs[n];
 
@@ -78,7 +78,7 @@ private:
                 avg._organism_age      += organism.lifetime;
                 avg._gathered_food     += organism.food_collected;
                 for (int i = 0; i < NUM_ORGANISM_BLOCKS; i++) {
-                    avg.block_avgs[i] += organism.anatomy.c.data[i];
+                    avg.block_avgs[i] += organism.c.data[i];
                 }
                 avg.total_occ_instructions_num += organism.occ.get_code_const_ref().size();
 

@@ -54,14 +54,13 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Orga
             num = 0;
         }
     }
-    if (sp.use_continuous_movement) {
-        organism.init_values();
-    }
+    organism.pre_init();
+    organism.init_values();
 }
 
 void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen) {
-    if (organism.anatomy.c.data[int(BlockTypes::ProducerBlock)-1] == 0) {return;}
-    if (organism.anatomy.c.data[int(BlockTypes::MoverBlock)-1] > 0 && !sp.movers_can_produce_food) {return;}
+    if (organism.c.data[int(BlockTypes::ProducerBlock)-1] == 0) {return;}
+    if (organism.c.data[int(BlockTypes::MoverBlock)-1] > 0 && !sp.movers_can_produce_food) {return;}
     if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp.simplified_food_production) {
@@ -182,8 +181,8 @@ void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<
         if (organism.is_dead) { observations.emplace_back(); continue;}
 
         //if organism has no eyes, movers or is moving, then do not observe.
-        if (organism.anatomy.c["eye"] > 0 && organism.anatomy.c["mover"] > 0 && organism.move_counter == 0) {
-            observations.emplace_back(std::vector<Observation>(organism.anatomy.c["eye"]));
+        if (organism.c["eye"] > 0 && organism.c["mover"] > 0 && organism.move_counter == 0) {
+            observations.emplace_back(organism.c["eye"]);
         } else {
             observations.emplace_back();
         }
@@ -194,10 +193,10 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, Si
                                                     Organism &organism,
                                                     std::vector<std::vector<Observation>> &organism_observations)
                                                     {
-    if (organism.anatomy.c["eye"] <= 0 || organism.anatomy.c["mover"] <= 0) {return;}
+    if (organism.c["eye"] <= 0 || organism.c["mover"] <= 0) {return;}
     if (organism.move_counter != 0) {return;}
 
-    for (int eye_i = 0; eye_i < organism.anatomy.c["eye"]; eye_i++) {
+    for (int eye_i = 0; eye_i < organism.c["eye"]; eye_i++) {
         auto & block = organism.anatomy.eye_block_vec[eye_i];
 
         auto pos_x = organism.x + block.get_pos(organism.rotation).x;
@@ -337,8 +336,8 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
                                                              int &new_y) {
     float mass = organism.food_needed; // + organism.food_collected
     auto & cd = organism.cdata;
-    cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.anatomy.c.data[int(BlockTypes::MoverBlock)];
-    cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.anatomy.c.data[int(BlockTypes::MoverBlock)];
+    cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.c.data[int(BlockTypes::MoverBlock)-1];
+    cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.c.data[int(BlockTypes::MoverBlock)-1];
 
     cd.p_x += cd.p_vx;
     cd.p_y += cd.p_vy;
@@ -417,22 +416,19 @@ bool SimulationEngineSingleThread::calculate_discrete_movement(EngineDataContain
 
 void SimulationEngineSingleThread::make_decision(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen) {
     bool moved = false;
+    if (organism.c.data[(int)BlockTypes::MoverBlock-1] <= 0) {return;}
 
     if (sp.use_continuous_movement) {
-        if (organism.anatomy.c["mover"] > 0) {
-            move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
-            organism.move_counter++;
-        }
+        move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
+        organism.move_counter++;
     } else {
         switch (organism.last_decision_observation.decision) {
             case BrainDecision::MoveUp:
             case BrainDecision::MoveDown:
             case BrainDecision::MoveLeft:
             case BrainDecision::MoveRight:
-                if (organism.anatomy.c["mover"] > 0) {
-                    move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
-                    organism.move_counter++;
-                }
+                move_organism(edc, organism, organism.last_decision_observation.decision, sp, moved);
+                organism.move_counter++;
                 break;
             default:
                 break;
@@ -442,7 +438,7 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer &edc, Simul
     if ((!sp.set_fixed_move_range && organism.move_counter >= organism.move_range) || (sp.set_fixed_move_range && sp.min_move_range <= organism.move_counter)) {
         organism.move_counter = 0;
     }
-    if ((organism.move_counter == 0 || sp.rotate_every_move_tick) && organism.anatomy.c["mover"] > 0 && sp.runtime_rotation_enabled) {
+    if ((organism.move_counter == 0 || sp.rotate_every_move_tick) && sp.runtime_rotation_enabled) {
         if (organism.last_decision_observation.decision != organism.last_decision || sp.no_random_decisions || sp.use_continuous_movement) {
             organism.last_decision = organism.last_decision_observation.decision;
             rotate_organism(edc, organism, static_cast<BrainDecision>(std::uniform_int_distribution<int>(4, 6)(gen)),

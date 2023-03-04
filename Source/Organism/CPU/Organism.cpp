@@ -37,6 +37,17 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
     init_values();
 }
 
+void Organism::pre_init() {
+    if (!sp->growth_of_organisms) {
+        set_m(c, anatomy.c);
+        size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size()) - 1;
+    } else {
+        for (int i = 0; i < sp->starting_organism_size; i++){
+            c.data[(int) anatomy.organism_blocks[i].type]++;
+        }
+    }
+}
+
 void Organism::init_values() {
     calculate_max_life();
     calculate_organism_lifetime();
@@ -52,10 +63,18 @@ void Organism::init_values() {
     multiplier = 1;
 
     if (sp->multiply_food_production_prob) {
-        multiplier *= anatomy.c["producer"];
+        multiplier *= c["producer"];
     }
 
-    if (anatomy.c["eye"] == 0) { brain.brain_type = BrainTypes::RandomActions;}
+    if (c["eye"] == 0) { brain.brain_type = BrainTypes::RandomActions;} else {
+        if (c["eye"] > 0 && c["mover"] > 0) {
+            if (!sp->use_weighted_brain) {
+                brain.brain_type = BrainTypes::SimpleBrain;
+            } else {
+                brain.brain_type = BrainTypes::WeightedBrain;
+            }
+        }
+    }
 
     if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
         brain.convert_simple_to_weighted();
@@ -68,20 +87,33 @@ void Organism::init_values() {
 
 float Organism::calculate_max_life() {
     life_points = 0;
-    for (auto& item: anatomy.organism_blocks) { life_points += bp->pa[int(item.type) - 1].life_point_amount;}
+    if (!sp->growth_of_organisms) {
+        for (auto &item: anatomy.organism_blocks) { life_points += bp->pa[int(item.type) - 1].life_point_amount; }
+    } else {
+        for (int i = 0; i <= size; i++) { life_points += bp->pa[int(anatomy.organism_blocks[i].type) - 1].life_point_amount;}
+    }
     return life_points;
 }
 
 int Organism::calculate_organism_lifetime() {
     float lifetime_weights = 0;
-    for (auto & block: anatomy.organism_blocks) { lifetime_weights += bp->pa[(int)block.type - 1].lifetime_weight;}
+    if (!sp->growth_of_organisms) {
+        for (auto &block: anatomy.organism_blocks) { lifetime_weights += bp->pa[(int) block.type - 1].lifetime_weight; }
+    } else {
+        for (int i = 0; i <= size; i++) { lifetime_weights += bp->pa[int(anatomy.organism_blocks[i].type) - 1].lifetime_weight;}
+    }
+
     max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
 }
 
 float Organism::calculate_food_needed() {
     food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy.c["mover"] > 0);
-    for (auto & block: anatomy.organism_blocks) { food_needed += bp->pa[(int)block.type - 1].food_cost;}
+    if (!sp->growth_of_organisms) {
+        for (auto &block: anatomy.organism_blocks) { food_needed += bp->pa[(int) block.type - 1].food_cost; }
+    } else {
+        for (int i = 0; i < sp->starting_organism_size; i++) {food_needed += bp->pa[int(anatomy.organism_blocks[i].type) - 1].food_cost;}
+    }
     return food_needed;
 }
 
@@ -196,14 +228,14 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
     mutate_brain(new_anatomy, new_brain, _brain_mutation_rate, gen);
     auto child_move_range = mutate_move_range(sp, gen, move_range);
 
-    if (new_anatomy.c["eye"] > 0 && new_anatomy.c["mover"] > 0) {
-        if (!sp->use_weighted_brain) {
-            new_brain.brain_type = BrainTypes::SimpleBrain;
-        } else {
-            new_brain.brain_type = BrainTypes::WeightedBrain;
-        }
-    }
-    else {new_brain.brain_type = BrainTypes::RandomActions;}
+//    if (new_anatomy.c["eye"] > 0 && new_anatomy.c["mover"] > 0) {
+//        if (!sp->use_weighted_brain) {
+//            new_brain.brain_type = BrainTypes::SimpleBrain;
+//        } else {
+//            new_brain.brain_type = BrainTypes::WeightedBrain;
+//        }
+//    }
+//    else {new_brain.brain_type = BrainTypes::RandomActions;}
 
     auto * child_ptr = OrganismsController::get_new_child_organism(edc);
     child_ptr->rotation = rotation;
@@ -217,6 +249,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
     child_ptr->move_range = child_move_range;
     child_ptr->anatomy_mutation_rate = _anatomy_mutation_rate;
     child_ptr->brain_mutation_rate = _brain_mutation_rate;
+    child_ptr->pre_init();
     child_ptr->init_values();
 
     return child_ptr->vector_index;
@@ -280,6 +313,7 @@ void Organism::move_organism(Organism &organism) {
     brain = organism.brain;
     anatomy = std::move(organism.anatomy);
     occ = std::move(organism.occ);
+    c = std::move(organism.c);
 
     sp = organism.sp;
     bp = organism.bp;
@@ -309,12 +343,14 @@ void Organism::copy_organism(const Organism &organism) {
     brain = organism.brain;
     anatomy = organism.anatomy;
     occ = organism.occ;
+    set_m(c, organism.c);
 
     sp = organism.sp;
     bp = organism.bp;
     occp = organism.occp;
     occl = organism.occl;
 
+    pre_init();
     init_values();
 }
 
