@@ -1,6 +1,8 @@
 # LifeEngine Extended
 Web Version: https://lifeengineextended.github.io/
 
+Warning! The web version is made using qt6 webassembly compiler which autogenerates a lot of stuff i don't know how to debug or fix. So if you have any bugs, glitches or errors (in the web version), i will probably be unable to fix them
+
 Idea for this project is based on https://github.com/MaxRobinsonTheGreat/LifeEngine.
 
 **The program needs to be placed in path with only english letters.**
@@ -43,4 +45,3 @@ Idea for this project is based on https://github.com/MaxRobinsonTheGreat/LifeEng
 - Saving and loading will not work correctly unless your path contains only english letters.
 - Mouse movement tracking is imprecise.
 - Renderer imprecisely calculates textures for small num of pixels per block. So if you want to have nice, correct images/videos when using recorder, set "Number of pixels per world block" > 10
-- The program will crash sometimes.
