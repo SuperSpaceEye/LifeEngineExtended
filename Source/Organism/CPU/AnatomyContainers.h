@@ -16,7 +16,8 @@
 #include "../../Stuff/BlockTypes.hpp"
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
-#include "../../Stuff/ConstMap.h"
+
+#include "AnatomyCountersMap.h"
 
 struct BaseSerializedContainer {
 public:
@@ -72,7 +73,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
     std::vector<SerializedOrganismBlockContainer> eye_block_vec;
 
-    ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = get_map();
+    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_map();
 
     SerializedOrganismStructureContainer()=default;
     SerializedOrganismStructureContainer(
@@ -82,7 +83,7 @@ struct SerializedOrganismStructureContainer {
             std::vector<SerializedAdjacentSpaceContainer> killing_space,
             std::vector<SerializedOrganismBlockContainer> eye_block_vector,
 
-            ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c
+            AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c
             ):
             organism_blocks                (std::move(organism_blocks)),
             producing_space                (std::move(producing_space)),
@@ -100,7 +101,7 @@ struct SerializedOrganismStructureContainer {
         killing_space   = std::move(structure->killing_space);
         eye_block_vec   = std::move(structure->eye_block_vec);
 
-        set_m(c, structure->c);
+        c = structure->c;
     }
     void copy_s(const SerializedOrganismStructureContainer * structure) {
         organism_blocks = std::vector(structure->organism_blocks);
@@ -110,7 +111,7 @@ struct SerializedOrganismStructureContainer {
         killing_space   = std::vector(structure->killing_space);
         eye_block_vec   = std::vector(structure->eye_block_vec);
 
-        set_m(c, structure->c);
+        c = structure->c;
     }
 };
 

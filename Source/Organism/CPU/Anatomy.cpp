@@ -9,6 +9,8 @@
 #include "Anatomy.h"
 #include "SimpleAnatomyMutationLogic.h"
 
+using BT = BlockTypes;
+
 Anatomy::Anatomy(SerializedOrganismStructureContainer *structure) {
     move_s(structure);
     delete structure;
@@ -21,16 +23,16 @@ Anatomy::Anatomy(const Anatomy & anatomy) {
 SerializedOrganismStructureContainer *
 Anatomy::make_container(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
                         boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
-                        ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const {
+                        AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const {
     std::vector<int> num_producing_space;
 
     boost::unordered_map<int, boost::unordered_map<int, std::vector<int>>> _producing_space;
     boost::unordered_map<int, boost::unordered_map<int, int>> _eating_space;
     boost::unordered_map<int, boost::unordered_map<int, int>> _killing_space;
 
-    SimpleAnatomyMutationLogic::create_producing_space(_organism_blocks, _producing_space, single_adjacent_space, num_producing_space, _c["producer"]);
-    SimpleAnatomyMutationLogic::create_eating_space(_organism_blocks, _eating_space, single_adjacent_space, _c["mouth"]);
-    SimpleAnatomyMutationLogic::create_killing_space(_organism_blocks, _killing_space, single_adjacent_space, _c["killer"]);
+    SimpleAnatomyMutationLogic::create_producing_space(_organism_blocks, _producing_space, single_adjacent_space, num_producing_space, _c[BT::ProducerBlock]);
+    SimpleAnatomyMutationLogic::create_eating_space(_organism_blocks, _eating_space, single_adjacent_space, _c[BT::MouthBlock]);
+    SimpleAnatomyMutationLogic::create_killing_space(_organism_blocks, _killing_space, single_adjacent_space, _c[BT::KillerBlock]);
 
     return SimpleAnatomyMutationLogic::serialize(_organism_blocks,
                                                  _producing_space,
@@ -66,9 +68,9 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
     block.rotation = rotation;
     _organism_blocks[x][y] = block;
 
-    auto _c = get_map();
-    set_m(_c, c);
-    get_mp(_c, type)++;
+    auto _c = make_map();
+    _c = c;
+    _c[type]++;
 
     return make_container(_organism_blocks, single_adjacent_space, _c);
 }
@@ -130,11 +132,11 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    auto _c = get_map();
-    set_m(_c, c);
+    auto _c = make_map();
+    _c = c;
 
-    get_mp(_c, organism_blocks[block_choice].type)--;
-    get_mp(_c, type)++;
+    _c[organism_blocks[block_choice].type]--;
+    _c[type]++;
 
     for (int i = 0; i < organism_blocks.size(); i ++) {
         _organism_blocks[organism_blocks[i].relative_x][organism_blocks[i].relative_y].type      = organism_blocks[i].type;
@@ -176,10 +178,9 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
 //    boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    auto _c = get_map();
-    set_m(_c, c);
-
-    get_mp(_c, organism_blocks[block_choice].type)--;
+    auto _c = make_map();
+    _c = c;
+    _c[organism_blocks[block_choice].type]--;
 
     int x = organism_blocks[block_choice].relative_x;
     int y = organism_blocks[block_choice].relative_y;
@@ -208,7 +209,7 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
         if (item.relative_x == x && item.relative_y == y) {
             //If delete block, then the decrementing logic will be configured by remove_block
             if (type  != BlockTypes::EmptyBlock) {
-                get_mp(c, item.type)--;
+                c[item.type]--;
             }
             break;
         }
@@ -265,9 +266,9 @@ void Anatomy::set_many_blocks(const std::vector<SerializedOrganismBlockContainer
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    auto _c = get_map();
+    auto _c = make_map();
     for (auto & block: blocks) {
-        get_mp(_c, block.type)++;
+        _c[block.type]++;
 
         _organism_blocks[block.relative_x][block.relative_y].type     = block.type;
         _organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;

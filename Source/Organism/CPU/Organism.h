@@ -62,7 +62,7 @@ public:
     DecisionObservation last_decision_observation = DecisionObservation{};
     BrainDecision last_decision = BrainDecision::MoveUp;
 
-    ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = get_map();
+    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_map();
 
     OrganismData()=default;
     OrganismData(int x, int y, Rotation rotation, int move_range, float anatomy_mutation_rate,

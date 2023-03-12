@@ -16,7 +16,8 @@
 #include "../../Containers/CPU/OrganismBlockParameters.h"
 #include "Rotation.h"
 #include "AnatomyContainers.h"
-#include "../../Stuff/ConstMap.h"
+
+#include "AnatomyCountersMap.h"
 
 #include <boost/unordered_map.hpp>
 #include <string_view>
@@ -248,7 +249,7 @@ public:
             const boost::unordered_map<int, boost::unordered_map<int, int>> &eating_space,
             const boost::unordered_map<int, boost::unordered_map<int, int>> &killing_space,
             const std::vector<int> &num_producing_space,
-            const ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &c) {
+            const AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &c) {
         std::vector<SerializedOrganismBlockContainer> _organism_blocks;
 
         std::vector<std::vector<SerializedAdjacentSpaceContainer>> _producing_space;

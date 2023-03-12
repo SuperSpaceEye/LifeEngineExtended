@@ -54,37 +54,6 @@ void SimulationEngine::threaded_mainloop() {
     }
 }
 
-//void SimulationEngine::change_mode() {
-//    if (ecp.change_to_mode == ecp.simulation_mode) {
-//        return;
-//    }
-//
-//    //switches from
-//    switch (ecp.simulation_mode) {
-//        case SimulationModes::CPU_Single_Threaded:
-//            break;
-//        case SimulationModes::CPU_Partial_Multi_threaded:
-//            break;
-//        case SimulationModes::CPU_Multi_Threaded:
-//            break;
-//        case SimulationModes::GPU_CUDA_mode:
-//            break;
-//    }
-//
-//    //switches to
-//    switch (ecp.change_to_mode) {
-//        case SimulationModes::CPU_Single_Threaded:
-//            break;
-//        case SimulationModes::CPU_Partial_Multi_threaded:
-//            break;
-//        case SimulationModes::CPU_Multi_Threaded:
-//            break;
-//        case SimulationModes::GPU_CUDA_mode:
-//            break;
-//    }
-//    ecp.simulation_mode = ecp.change_to_mode;
-//}
-
 void SimulationEngine::simulation_tick() {
     edc.engine_ticks_between_updates++;
     edc.total_engine_ticks++;
@@ -107,17 +76,7 @@ void SimulationEngine::simulation_tick() {
         return;
     }
 
-//    switch (ecp.simulation_mode){
-//        case SimulationModes::CPU_Single_Threaded:
     SimulationEngineSingleThread::single_threaded_tick(edc, sp, gen);
-//            break;
-//        case SimulationModes::CPU_Partial_Multi_threaded:
-//            break;
-//        case SimulationModes::CPU_Multi_Threaded:
-//            break;
-//        case SimulationModes::GPU_CUDA_mode:
-//            break;
-//    }
 }
 
 void SimulationEngine::process_user_action_pool() {

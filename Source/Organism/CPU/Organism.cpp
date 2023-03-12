@@ -13,6 +13,8 @@
 #include "../../SimulationEngine/OrganismsController.h"
 #include "AnatomyContainers.h"
 
+using BT = BlockTypes;
+
 Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
                    SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
                    OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate, float brain_mutation_rate) :
@@ -39,11 +41,11 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
 
 void Organism::pre_init() {
     if (!sp->growth_of_organisms) {
-        set_m(c, anatomy.c);
+        c = anatomy.c;
         size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size()) - 1;
     } else {
         for (int i = 0; i < sp->starting_organism_size; i++){
-            c.data[(int) anatomy.organism_blocks[i].type]++;
+            c[anatomy.organism_blocks[i].type]++;
         }
     }
 }
@@ -63,11 +65,11 @@ void Organism::init_values() {
     multiplier = 1;
 
     if (sp->multiply_food_production_prob) {
-        multiplier *= c["producer"];
+        multiplier *= c[BT::ProducerBlock];
     }
 
-    if (c["eye"] == 0) { brain.brain_type = BrainTypes::RandomActions;} else {
-        if (c["eye"] > 0 && c["mover"] > 0) {
+    if (c[BT::EyeBlock] == 0) { brain.brain_type = BrainTypes::RandomActions;} else {
+        if (c[BT::EyeBlock] > 0 && c[BT::MoverBlock] > 0) {
             if (!sp->use_weighted_brain) {
                 brain.brain_type = BrainTypes::SimpleBrain;
             } else {
@@ -108,7 +110,7 @@ int Organism::calculate_organism_lifetime() {
 }
 
 float Organism::calculate_food_needed() {
-    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy.c["mover"] > 0);
+    food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy.c[BT::MoverBlock] > 0);
     if (!sp->growth_of_organisms) {
         for (auto &block: anatomy.organism_blocks) { food_needed += bp->pa[(int) block.type - 1].food_cost; }
     } else {
@@ -170,7 +172,7 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
 void Organism::mutate_brain(const Anatomy &new_anatomy, Brain &new_brain,
                             float &_brain_mutation_rate, lehmer64 &gen) {
     // movers without eyes as well.
-    if (sp->do_not_mutate_brains_of_plants && (new_anatomy.c["mover"] == 0 || new_anatomy.c["eye"] == 0)) {
+    if (sp->do_not_mutate_brains_of_plants && (new_anatomy.c[BT::MoverBlock] == 0 || new_anatomy.c[BT::EyeBlock] == 0)) {
         return;
     }
 
@@ -256,7 +258,7 @@ int32_t Organism::create_child(lehmer64 &gen, EngineDataContainer &edc) {
 }
 
 void Organism::think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
-    if (anatomy.c.data[int(BlockTypes::MoverBlock)-1] == 0) { return;}
+    if (anatomy.c[BT::MoverBlock] == 0) { return;}
     if (move_counter == 0) { //if organism can make new move
         if (sp->use_continuous_movement) {
             calculate_continuous_decision(organism_observations, gen);
@@ -313,7 +315,7 @@ void Organism::move_organism(Organism &organism) {
     brain = organism.brain;
     anatomy = std::move(organism.anatomy);
     occ = std::move(organism.occ);
-    c = std::move(organism.c);
+    c = organism.c;
 
     sp = organism.sp;
     bp = organism.bp;
@@ -343,7 +345,7 @@ void Organism::copy_organism(const Organism &organism) {
     brain = organism.brain;
     anatomy = organism.anatomy;
     occ = organism.occ;
-    set_m(c, organism.c);
+    c = organism.c;
 
     sp = organism.sp;
     bp = organism.bp;

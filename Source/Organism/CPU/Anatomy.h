@@ -37,7 +37,7 @@ private:
     SerializedOrganismStructureContainer *
     make_container(boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &_organism_blocks,
                    boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
-                   ConstMap<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const;
+                   AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view *) SW_ORGANISM_BLOCK_NAMES> &_c) const;
 
 
     void subtract_difference(int x, int y);

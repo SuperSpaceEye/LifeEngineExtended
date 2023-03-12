@@ -57,9 +57,6 @@ struct EngineControlParameters {
 
     volatile bool update_editor_organism = false;
 
-    //TODO move to recorder?
-    volatile int  parse_full_grid_every_n = 1;
-
     //TODO move?
     volatile bool lock_resizing = false;
 

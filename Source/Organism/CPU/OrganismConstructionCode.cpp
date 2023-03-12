@@ -132,13 +132,13 @@ void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContain
         block.parent_block_pos = temp_blocks.size()-1;
         block.type = type;
     } else {
-        get_mp(structure_container->c, block.type)--;
+        structure_container->c[block.type]--;
         temp_blocks[block.parent_block_pos].type = type;
         temp_blocks[block.parent_block_pos].rotation = rotation;
         block.type = type;
     }
 
-    get_mp(structure_container->c, type)++;
+    structure_container->c[type]++;
 }
 
 void set_rotation(int x, int y, Rotation rotation, OCCLogicContainer &occ_c,
