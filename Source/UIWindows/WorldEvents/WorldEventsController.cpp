@@ -3,7 +3,7 @@
 //
 
 #include "WorldEventsController.h"
-#include "WorldEventsEnums.h"
+#include "UIWindows/WorldEvents/Misc/WorldEventsEnums.h"
 
 void WorldEventsController::delete_all_nodes() {
     for (auto & node: node_storage) {

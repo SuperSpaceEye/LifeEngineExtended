@@ -9,8 +9,8 @@
 #ifndef THELIFEENGINECPP_BASEGRIDBLOCK_H
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
-#include "../Stuff/BlockTypes.hpp"
-#include "../Organism/CPU/Rotation.h"
+#include "Stuff/enums/BlockTypes.hpp"
+#include "Stuff/enums/Rotation.h"
 
 class Organism;
 

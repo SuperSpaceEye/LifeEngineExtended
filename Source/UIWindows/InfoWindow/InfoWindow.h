@@ -5,8 +5,9 @@
 #ifndef LIFEENGINEEXTENDED_INFOWINDOW_H
 #define LIFEENGINEEXTENDED_INFOWINDOW_H
 
+#include "UIWindows//MainWindow/WindowUI.h"
+
 #include "InfoWindowUI.h"
-#include "../MainWindow/WindowUI.h"
 
 class InfoWindow: public QWidget {
 Q_OBJECT

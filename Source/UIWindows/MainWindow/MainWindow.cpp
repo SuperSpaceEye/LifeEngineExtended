@@ -422,9 +422,9 @@ void MainWindow::resize_simulation_grid() {
     if (!disable_warnings) {
         if (!use_cuda) {
             auto msg = DescisionMessageBox("Warning",
-                                       QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
+                                                   QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
                                        "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t) * 2) * new_simulation_height * new_simulation_width)),
-                                       "OK", "Cancel", this);
+                                                   "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
                 return;
@@ -432,10 +432,10 @@ void MainWindow::resize_simulation_grid() {
         } else {
             auto msg = DescisionMessageBox("Warning",
                                            QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t)*2) * new_simulation_height * new_simulation_width)
-                                                                  + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock)*new_simulation_height*new_simulation_width))
+                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t) * 2) * new_simulation_height * new_simulation_width)
+                                                                  + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock) * new_simulation_height * new_simulation_width))
                                                                   + " GPU's VRAM",
-                                           "OK", "Cancel", this);
+                                                   "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
                 return;
@@ -481,20 +481,32 @@ void MainWindow::initialize_gui() {
     ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
     ui.cb_fill_window               ->setChecked(fill_window);
     //Evolution settings
-    ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability, 4)));
-    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate, 2)));
-    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate, 2)));
-    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
-    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter, 2)));
+    ui.le_food_production_probability       ->setText(QString::fromStdString(
+            to_str(sp.food_production_probability, 4)));
+    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(
+            to_str(sp.global_anatomy_mutation_rate, 2)));
+    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(
+            to_str(sp.global_brain_mutation_rate, 2)));
+    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(
+            to_str(sp.anatomy_mutation_rate_delimiter, 2)));
+    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(
+            to_str(sp.brain_mutation_rate_delimiter, 2)));
     ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter, 2)));
     ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier, 3)));
-    ui.le_brain_min_possible_mutation_rate  ->setText(QString::fromStdString(to_str(sp.brain_min_possible_mutation_rate, 3)));
-    ui.le_anatomy_min_possible_mutation_rate->setText(QString::fromStdString(to_str(sp.anatomy_min_possible_mutation_rate, 3)));
-    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost, 0)));
-    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost, 0)));
-    ui.le_anatomy_mutation_rate_step        ->setText(QString::fromStdString(to_str(sp.anatomy_mutations_rate_mutation_step, 2)));
-    ui.le_brain_mutation_rate_step          ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_mutation_step, 2)));
-    ui.le_continuous_movement_drag          ->setText(QString::fromStdString(to_str(sp.continuous_movement_drag, 2)));
+    ui.le_brain_min_possible_mutation_rate  ->setText(QString::fromStdString(
+            to_str(sp.brain_min_possible_mutation_rate, 3)));
+    ui.le_anatomy_min_possible_mutation_rate->setText(QString::fromStdString(
+            to_str(sp.anatomy_min_possible_mutation_rate, 3)));
+    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(
+            to_str(sp.extra_mover_reproductive_cost, 0)));
+    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(
+            to_str(sp.extra_reproduction_cost, 0)));
+    ui.le_anatomy_mutation_rate_step        ->setText(QString::fromStdString(
+            to_str(sp.anatomy_mutations_rate_mutation_step, 2)));
+    ui.le_brain_mutation_rate_step          ->setText(QString::fromStdString(
+            to_str(sp.brain_mutation_rate_mutation_step, 2)));
+    ui.le_continuous_movement_drag          ->setText(QString::fromStdString(
+            to_str(sp.continuous_movement_drag, 2)));
     ui.le_food_threshold                    ->setText(QString::fromStdString(to_str(sp.food_threshold, 2)));
     ui.le_max_food                          ->setText(QString::fromStdString(to_str(sp.max_food)));
     ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
@@ -544,7 +556,8 @@ void MainWindow::initialize_gui() {
     ui.le_perlin_y_modifier ->setText(QString::fromStdString(to_str(sp.perlin_y_modifier, 3)));
     ui.le_keyboard_movement_amount->setText(QString::fromStdString(to_str(keyboard_movement_amount, 1)));
     ui.le_scaling_coefficient->setText(QString::fromStdString(to_str(scaling_coefficient, 1)));
-    ui.le_memory_allocation_strategy_modifier->setText(QString::fromStdString(to_str(edc.stc.memory_allocation_strategy_modifier, 0)));
+    ui.le_memory_allocation_strategy_modifier->setText(QString::fromStdString(
+            to_str(edc.stc.memory_allocation_strategy_modifier, 0)));
 
     ui.le_num_threads->setText(QString::fromStdString(std::to_string(ecp.num_threads)));
     ui.le_float_number_precision->setText(QString::fromStdString(std::to_string(float_precision)));
@@ -607,14 +620,21 @@ void MainWindow::get_current_font_size() {
 }
 
 void MainWindow::update_world_event_values_ui() {
-    ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability, 4)));
-    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate, 2)));
-    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate, 2)));
-    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
-    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter, 2)));
+    ui.le_food_production_probability       ->setText(QString::fromStdString(
+            to_str(sp.food_production_probability, 4)));
+    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(
+            to_str(sp.global_anatomy_mutation_rate, 2)));
+    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(
+            to_str(sp.global_brain_mutation_rate, 2)));
+    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(
+            to_str(sp.anatomy_mutation_rate_delimiter, 2)));
+    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(
+            to_str(sp.brain_mutation_rate_delimiter, 2)));
     ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier, 3)));
-    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost, 0)));
-    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost, 0)));
+    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(
+            to_str(sp.extra_mover_reproductive_cost, 0)));
+    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(
+            to_str(sp.extra_reproduction_cost, 0)));
     ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
     ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));
@@ -809,7 +829,7 @@ void MainWindow::load_textures_from_disk() {
                 }
             }
         } else {
-            textures.textures[i] = default_holders[i];
+            textures.textures[i] = Textures::default_holders[i];
         }
     }
 

@@ -9,10 +9,13 @@
 #ifndef THELIFEENGINECPP_STATISTICSCORE_H
 #define THELIFEENGINECPP_STATISTICSCORE_H
 
+#include "UIWindows/MainWindow/WindowUI.h"
+
+#include "Stuff/enums/BlockTypes.hpp"
+#include "Stuff/UIMisc.h"
+#include "Containers/OrganismInfoContainer.h"
+
 #include "StatisticsUI.h"
-#include "../MainWindow/WindowUI.h"
-#include "../../Stuff/BlockTypes.hpp"
-#include "../../Containers/CPU/OrganismInfoContainer.h"
 
 class Statistics: public QWidget {
     Q_OBJECT

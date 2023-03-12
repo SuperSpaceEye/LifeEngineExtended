@@ -5,8 +5,9 @@
 #ifndef LIFEENGINEEXTENDED_EVENTNODES_H
 #define LIFEENGINEEXTENDED_EVENTNODES_H
 
-#include "WorldEventsEnums.h"
+#include <cstdint>
 
+#include "UIWindows/WorldEvents/Misc/WorldEventsEnums.h"
 
 struct BaseEventNode {
     NodeType type;

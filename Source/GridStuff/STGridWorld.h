@@ -14,8 +14,8 @@
 #include <stdexcept>
 #endif
 
-#include "../Stuff/BlockTypes.hpp"
-#include "../Organism/CPU/Rotation.h"
+#include "Stuff/enums/BlockTypes.hpp"
+#include "Stuff/enums/Rotation.h"
 
 //Singe Thread
 struct STGridWorld {

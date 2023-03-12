@@ -8,15 +8,17 @@
 #include <QDialogButtonBox>
 #include <QSpacerItem>
 
-#include "WorldEventsUI.h"
-#include "../MainWindow/WindowUI.h"
-#include "EventNodes.h"
-#include "ParametersList.h"
-#include "../../SimulationEngine/SimulationEngine.h"
+#include "UIWindows/WorldEvents/EventNodesWidgets/ConditionalEventNodeWidget.h"
+#include "UIWindows/WorldEvents/EventNodesWidgets/ChangeValueEventNodeWidget.h"
+#include "UIWindows/MainWindow/WindowUI.h"
+#include "UIWindows/WorldEvents/Misc/WorldEventsEnums.h"
+#include "UIWindows/WorldEvents/Misc/ParametersList.h"
 
-#include "ConditionalEventNodeWidget.h"
-#include "ChangeValueEventNodeWidget.h"
-#include "../../Stuff/MiscFuncs.h"
+#include "SimulationEngine/SimulationEngine.h"
+#include "Stuff/UIMisc.h"
+
+#include "WorldEventsUI.h"
+#include "EventNodes.h"
 
 class WorldEvents: public QWidget {
     Q_OBJECT

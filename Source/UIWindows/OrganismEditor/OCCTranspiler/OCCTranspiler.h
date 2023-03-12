@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 
-#include "../../../Organism/CPU/OrganismConstructionCodeInstruction.h"
+#include "Organism/OCC/OrganismConstructionCodeInstruction.h"
 
 enum class OCCTranspilingErrorCodes {
     NoError,

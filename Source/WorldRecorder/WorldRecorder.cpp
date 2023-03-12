@@ -6,10 +6,11 @@
 // Created by spaceeye on 02.10.22.
 //
 
-#include "WorldRecorder.h"
-#include "../Stuff/DataSavingFunctions.h"
-
 #include <utility>
+
+#include "Stuff/DataSavingFunctions.h"
+
+#include "WorldRecorder.h"
 
 const int BUFFER_VERSION = 1;
 

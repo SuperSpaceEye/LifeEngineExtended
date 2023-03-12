@@ -20,6 +20,10 @@
 #include <fstream>
 #include <filesystem>
 
+#if defined(__WIN32)
+#include <windows.h>
+#endif
+
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 #include <boost/nondet_random.hpp>
@@ -40,46 +44,43 @@
 #include <QWheelEvent>
 //#include <QtCharts>
 
-#include "WindowUI.h"
-#include "../../SimulationEngine/SimulationEngine.h"
-#include "../../Containers/CPU/ColorContainer.h"
-#include "../../Containers/CPU/SimulationParameters.h"
-#include "../../Containers/CPU/EngineControlParametersContainer.h"
-#include "../../Containers/CPU/EngineDataContainer.h"
-#include "../../Containers/CPU/OrganismBlockParameters.h"
-#include "../../PRNGS/lehmer64.h"
-#include "../../Stuff/textures.h"
-#include "../../Stuff/MiscFuncs.h"
-#include "../../Stuff/CursorMode.h"
-#include "../../Stuff/Vector2.h"
-#include "../../Stuff/ImageCreation.h"
-#include "../../Stuff/DataSavingFunctions.h"
-#include "../../Containers/CPU/OrganismInfoContainer.h"
-#include "../../SimulationEngine/OrganismsController.h"
+#include "Stuff/external/rapidjson/document.h"
+#include "Stuff/external/rapidjson/writer.h"
+#include "Stuff/external/rapidjson/stringbuffer.h"
 
-#include "../../Stuff/rapidjson/document.h"
-#include "../../Stuff/rapidjson/writer.h"
-#include "../../Stuff/rapidjson/stringbuffer.h"
+#include "UIWindows/Statistics/Statistics.h"
+#include "UIWindows/OrganismEditor/OrganismEditor.h"
+#include "UIWindows/InfoWindow/InfoWindow.h"
+#include "UIWindows/WorldEvents/WorldEvents.h"
+#include "UIWindows/Benchmark/Benchmarks.h"
+#include "UIWindows/OCCParameters/OCCParameters.h"
 
-#include "../Statistics/Statistics.h"
-#include "../OrganismEditor/OrganismEditor.h"
-#include "../InfoWindow/InfoWindow.h"
+#include "Stuff/ImageStuff/textures.h"
+#include "Stuff/UIMisc.h"
+#include "Stuff/enums/CursorMode.h"
+#include "Stuff/structs/Vector2.h"
+#include "Stuff/ImageStuff/ImageCreation.h"
+#include "Stuff/DataSavingFunctions.h"
+#include "Containers/ColorContainer.h"
+#include "Containers/SimulationParameters.h"
+#include "Containers/EngineControlParametersContainer.h"
+#include "Containers/EngineDataContainer.h"
+#include "Containers/OrganismBlockParameters.h"
+#include "Containers/OrganismInfoContainer.h"
+#include "SimulationEngine/OrganismsController.h"
+#include "PRNGS/lehmer64.h"
+#include "SimulationEngine/SimulationEngine.h"
+
 #ifndef __NO_RECORDER__
-#include "../Recorder/Recorder.h"
+#include "UIWindows/Recorder/Recorder.h"
 #endif
-#include "../../UIWindows/WorldEvents/WorldEvents.h"
-#include "../Benchmark/Benchmarks.h"
-#include "../OCCParameters/OCCParameters.h"
-
 
 #ifdef __CUDA_USED__
-#include "../../Stuff/cuda_image_creator.cuh"
-#include "../../Stuff/get_device_count.cuh"
+#include "Stuff/cuda_image_creator.cuh"
+#include "Stuff/get_device_count.cuh"
 #endif
 
-#if defined(__WIN32)
-#include <windows.h>
-#endif
+#include "WindowUI.h"
 
 class MainWindow: public QWidget {
         Q_OBJECT
@@ -93,7 +94,7 @@ private:
     std::thread engine_thread;
     std::thread image_creation_thread;
 
-    TexturesContainer textures{};
+    Textures::TexturesContainer textures{};
 
     //double buffering to eliminate tearing
     std::array<std::vector<unsigned char>, 2> image_vectors{std::vector<unsigned char>{}, std::vector<unsigned char>{}};

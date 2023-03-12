@@ -3,7 +3,6 @@
 //
 
 #include "Statistics.h"
-#include "../../Stuff/MiscFuncs.h"
 
 void Statistics::make_organism_blocks_labels() {
     std::array<QVBoxLayout*, 3> layouts{ui.both_vl, ui.stationary_vl, ui.moving_vl};

@@ -6,8 +6,9 @@
 // Created by spaceeye on 16.05.2022.
 //
 
+#include "SimulationEngine//OrganismsController.h"
+
 #include "SimulationEngineSingleThread.h"
-#include "../OrganismsController.h"
 
 using BT = BlockTypes;
 

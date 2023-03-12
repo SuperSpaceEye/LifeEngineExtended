@@ -7,8 +7,8 @@
 
 #include <algorithm>
 
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Organism/CPU/Organism.h"
+#include "Containers/EngineDataContainer.h"
+#include "Organism/Organism.h"
 
 class OrganismsController {
 public:

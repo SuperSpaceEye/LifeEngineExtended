@@ -3,7 +3,6 @@
 //
 
 #include "WorldEvents.h"
-#include "WorldEventsEnums.h"
 
 WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
                          SimulationParameters * sp,

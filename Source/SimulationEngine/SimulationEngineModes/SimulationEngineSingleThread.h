@@ -13,14 +13,14 @@
 #include <iostream>
 #include <vector>
 
-#include "../../GridStuff/BaseGridBlock.h"
-#include "../../Organism/CPU/Organism.h"
-#include "../../Stuff/BlockTypes.hpp"
-#include "../../Containers/CPU/EngineControlParametersContainer.h"
-#include "../../Containers/CPU/EngineDataContainer.h"
-#include "../../Containers/CPU/OrganismBlockParameters.h"
-#include "../../Stuff/Linspace.h"
-#include "../../Organism/CPU/ObservationStuff.h"
+#include "Containers/EngineControlParametersContainer.h"
+#include "Containers/EngineDataContainer.h"
+#include "Containers/OrganismBlockParameters.h"
+#include "Organism/Organism.h"
+#include "Organism/Brain/Observation.h"
+#include "GridStuff/BaseGridBlock.h"
+#include "Stuff/enums/BlockTypes.hpp"
+#include "Stuff/Linspace.h"
 
 inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
     uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(rotation1) + static_cast<uint_fast8_t>(rotation2);

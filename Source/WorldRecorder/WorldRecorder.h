@@ -13,7 +13,7 @@
 #include <cctype>
 #include <fstream>
 
-#include "../Organism/CPU/Organism.h"
+#include "Organism/Organism.h"
 
 struct FoodChange {
     int x;

@@ -10,7 +10,7 @@
 
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                               Organism *chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                               Organism *chosen_organism, Textures::TexturesContainer &textures, OCCLogicContainer *occl,
                                OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda)
         : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
