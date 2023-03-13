@@ -203,10 +203,12 @@ private:
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
     int font_size;
-    int image_width;
-    int image_height;
+    int image_width = 0;
+    int image_height = 0;
     int last_last_cursor_x_pos = 0;
     int last_last_cursor_y_pos = 0;
+
+    bool engine_error = false;
 
     static auto clock_now() {return std::chrono::high_resolution_clock::now();}
 

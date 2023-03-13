@@ -23,31 +23,31 @@ private:
     std::vector<float> food_grid;
     std::vector<Organism> rec_orgs;
 
-    void apply_organism_change(Transaction &transaction);
-    void apply_food_change(Transaction &transaction);
-    void apply_recenter(const Transaction &transaction);
-    void apply_food_threshold(Transaction & transaction);
-    void apply_dead_organisms(Transaction &transaction);
-    void apply_move_change(Transaction &transaction);
-    void apply_compressed_change(Transaction &transaction);
+    void apply_organism_change(WorldRecorder::Transaction &transaction);
+    void apply_food_change(WorldRecorder::Transaction &transaction);
+    void apply_recenter(const WorldRecorder::Transaction &transaction);
+    void apply_food_threshold(WorldRecorder::Transaction & transaction);
+    void apply_dead_organisms(WorldRecorder::Transaction &transaction);
+    void apply_move_change(WorldRecorder::Transaction &transaction);
+    void apply_compressed_change(WorldRecorder::Transaction &transaction);
 
-    void apply_user_wall_change(Transaction &transaction, int pos);
-    void apply_user_food_change(Transaction &transaction, int pos);
-    void apply_user_add_organism(Transaction &transaction, int pos);
-    void apply_user_kill_organism(Transaction &transaction, int pos);
+    void apply_user_wall_change(WorldRecorder::Transaction &transaction, int pos);
+    void apply_user_food_change(WorldRecorder::Transaction &transaction, int pos);
+    void apply_user_add_organism(WorldRecorder::Transaction &transaction, int pos);
+    void apply_user_kill_organism(WorldRecorder::Transaction &transaction, int pos);
 
-    void apply_user_actions(Transaction &transaction);
+    void apply_user_actions(WorldRecorder::Transaction &transaction);
 
-    void apply_starting_point(Transaction & transaction);
-    void apply_reset(Transaction & transaction);
-    void apply_normal(Transaction & transaction);
+    void apply_starting_point(WorldRecorder::Transaction & transaction);
+    void apply_reset(WorldRecorder::Transaction & transaction);
+    void apply_normal(WorldRecorder::Transaction & transaction);
     //TODO void_apply_user_food_change
 public:
     RecordingReconstructor()=default;
 
     void start_reconstruction(int width, int height);
 
-    void apply_transaction(Transaction & transaction);
+    void apply_transaction(WorldRecorder::Transaction & transaction);
 
     const std::vector<BaseGridBlock> & get_state();
 

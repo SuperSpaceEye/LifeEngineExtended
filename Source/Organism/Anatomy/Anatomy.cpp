@@ -7,7 +7,6 @@
 //
 
 #include "Anatomy.h"
-#include "SimpleAnatomyMutationLogic.h"
 
 using BT = BlockTypes;
 

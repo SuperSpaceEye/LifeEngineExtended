@@ -9,13 +9,13 @@
 // ==================== Line Edits ====================
 
 void ChangeValueEventNodeWidget::le_time_horizon_slot() {
-    auto _node = reinterpret_cast<ChangeValueEventNode<int32_t>*>(node);
+    auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t>*>(node);
     le_slot_lower_bound<uint32_t>(_node->time_horizon, _node->time_horizon, "int", ui.le_time_horizon, 1, "1");
 }
 
 //TODO no checks if value can be target value.
 void ChangeValueEventNodeWidget::le_target_value_slot() {
-    auto _node = reinterpret_cast<ChangeValueEventNode<int32_t>*>(node);
+    auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t>*>(node);
     switch (_node->value_type) {
         case ChangeTypes::INT32: {
             switch (_node->change_mode) {
@@ -41,7 +41,7 @@ void ChangeValueEventNodeWidget::le_target_value_slot() {
         }
             break;
         case ChangeTypes::FLOAT: {
-            auto _node = reinterpret_cast<ChangeValueEventNode<float>*>(node);
+            auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<float>*>(node);
             switch (_node->change_mode) {
                 case ChangeValueMode::Step:
                 case ChangeValueMode::Linear:
@@ -82,10 +82,10 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
 
     switch (value.type) {
         case ValueType::NONE:
-            reinterpret_cast<ChangeValueEventNode<int32_t> *>(node)->value_type = ChangeTypes::NONE;
+            reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t> *>(node)->value_type = ChangeTypes::NONE;
             break;
         case ValueType::INT: {
-            auto _node = reinterpret_cast<ChangeValueEventNode<int32_t> *>(node);
+            auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t> *>(node);
 
             if (_node->value_type == ChangeTypes::INT32) {
                 _node->change_value    = value.int_val;
@@ -93,17 +93,17 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
                 _node->min_clamp_value = value.min_int_clamp;
                 _node->max_clamp_value = value.max_int_clamp;
             } else {
-                auto * new_node = new ChangeValueEventNode<int32_t>(node->next_node,
-                                                                    node->previous_node,
-                                                                    value.int_val,
-                                                                    static_cast<int32_t>(_node->target_value),
-                                                                    _node->time_horizon,
-                                                                    node->execute_every_n_tick,
-                                                                    _node->change_mode,
-                                                                    ChangeTypes::INT32,
-                                                                    value.clamp_mode,
-                                                                    value.min_int_clamp,
-                                                                    value.max_int_clamp);
+                auto * new_node = new WorldEventNodes::ChangeValueEventNode<int32_t>(node->next_node,
+                                                                                     node->previous_node,
+                                                                                     value.int_val,
+                                                                                     static_cast<int32_t>(_node->target_value),
+                                                                                     _node->time_horizon,
+                                                                                     node->execute_every_n_tick,
+                                                                                     _node->change_mode,
+                                                                                     ChangeTypes::INT32,
+                                                                                     value.clamp_mode,
+                                                                                     value.min_int_clamp,
+                                                                                     value.max_int_clamp);
 
                 int index_of_node = 0;
                 for (; index_of_node < starting_nodes.size(); index_of_node++) {
@@ -121,7 +121,7 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
         }
             break;
         case ValueType::FLOAT:
-            auto _node = reinterpret_cast<ChangeValueEventNode<float> *>(node);
+            auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<float> *>(node);
 
             if (_node->value_type == ChangeTypes::FLOAT) {
                 _node->change_value    = value.float_val;
@@ -129,17 +129,17 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
                 _node->min_clamp_value = value.min_float_clamp;
                 _node->max_clamp_value = value.min_float_clamp;
             } else {
-                auto * new_node = new ChangeValueEventNode<float>(node->next_node,
-                                                                  node->previous_node,
-                                                                  value.float_val,
-                                                                  static_cast<float>(_node->target_value),
-                                                                  _node->time_horizon,
-                                                                  node->execute_every_n_tick,
-                                                                  _node->change_mode,
-                                                                  ChangeTypes::FLOAT,
-                                                                  value.clamp_mode,
-                                                                  value.min_float_clamp,
-                                                                  value.max_float_clamp);
+                auto * new_node = new WorldEventNodes::ChangeValueEventNode<float>(node->next_node,
+                                                                                   node->previous_node,
+                                                                                   value.float_val,
+                                                                                   static_cast<float>(_node->target_value),
+                                                                                   _node->time_horizon,
+                                                                                   node->execute_every_n_tick,
+                                                                                   _node->change_mode,
+                                                                                   ChangeTypes::FLOAT,
+                                                                                   value.clamp_mode,
+                                                                                   value.min_float_clamp,
+                                                                                   value.max_float_clamp);
 
                 int index_of_node = 0;
                 for (; index_of_node < starting_nodes.size(); index_of_node++) {
@@ -159,7 +159,7 @@ void ChangeValueEventNodeWidget::cmb_change_value_slot(QString str) {
 }
 
 void ChangeValueEventNodeWidget::cmb_change_mode_slot(QString str) {
-    auto _node = reinterpret_cast<ChangeValueEventNode<int32_t>*>(node);
+    auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t>*>(node);
     if (str == "Linear") {
         _node->change_mode = ChangeValueMode::Linear;
         ui.le_time_horizon->show();
@@ -187,7 +187,7 @@ void ChangeValueEventNodeWidget::b_new_event_left_slot() {
     NodeType new_node_type;
     if (!choose_node_window(new_node_type)) { return;}
 
-    BaseEventNode * new_node;
+    WorldEventNodes::BaseEventNode * new_node;
 
     QWidget * new_widget;
 
@@ -237,7 +237,7 @@ void ChangeValueEventNodeWidget::b_new_event_right_slot() {
     NodeType new_node_type;
     if (!choose_node_window(new_node_type)) { return;}
 
-    BaseEventNode * new_node;
+    WorldEventNodes::BaseEventNode * new_node;
 
     QWidget * new_widget;
 

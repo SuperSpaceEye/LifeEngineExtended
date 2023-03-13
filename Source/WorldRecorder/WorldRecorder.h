@@ -15,6 +15,7 @@
 
 #include "Organism/Organism.h"
 
+namespace WorldRecorder {
 struct FoodChange {
     int x;
     int y;
@@ -50,7 +51,6 @@ enum class RecActionType {
     OrganismChange,
     OrganismKill
 };
-
 struct Transaction {
     std::vector<Organism> organism_change;
     std::vector<FoodChange> food_change;
@@ -103,6 +103,7 @@ struct TransactionBuffer {
     void record_transaction();
     void finish_recording();
 };
+}
 
 
 #endif //LIFEENGINEEXTENDED_WORLDRECORDER_H

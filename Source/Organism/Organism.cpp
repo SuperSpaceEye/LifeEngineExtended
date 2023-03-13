@@ -17,15 +17,15 @@ using BT = BlockTypes;
 
 Organism::Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
                    SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
-                   OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate, float brain_mutation_rate) :
+                   OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate, float brain_mutation_rate, bool no_init_views) :
         anatomy(anatomy), sp(sp), bp(block_parameters), brain(brain), occ(occ), occp(occp), occl(occl),
         OrganismData(x,
-                                y,
-                                rotation,
-                                move_range,
-                                anatomy_mutation_rate,
-                                brain_mutation_rate) {
-    init_values();
+                     y,
+                     rotation,
+                     move_range,
+                     anatomy_mutation_rate,
+                     brain_mutation_rate) {
+    init_values(no_init_views);
 }
 
 Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism->sp), occp(organism->occp), occl(organism->occl),
@@ -39,21 +39,35 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
     init_values();
 }
 
-void Organism::pre_init() {
+void Organism::pre_init(bool no_init_views) {
     if (!sp->growth_of_organisms) {
         c = anatomy.c;
-        size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size()) - 1;
+        size = -1;
+        is_adult = true;
     } else {
-        for (int i = 0; i < sp->starting_organism_size; i++){
+        c = make_map();
+        for (int i = 0; i < std::min<int64_t>(
+                sp->starting_organism_size, anatomy.organism_blocks.size()); i++){
             c[anatomy.organism_blocks[i].type]++;
         }
+        size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size());
+        if (size == anatomy.organism_blocks.size()) {is_adult = true;}
     }
-}
 
-void Organism::init_values() {
+//    for (int i = 0; i < 6; i++) {
+//        assert(anatomy.c.data[i] == c.data[i]);
+//    }
+
     calculate_max_life();
     calculate_organism_lifetime();
     calculate_food_needed();
+}
+
+void Organism::init_values(bool no_init_views) {
+    pre_init(no_init_views);
+//    calculate_max_life();
+//    calculate_organism_lifetime();
+//    calculate_food_needed();
     auto vec = anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
     //just to reuse rotation of positions logic
@@ -92,7 +106,8 @@ float Organism::calculate_max_life() {
     if (!sp->growth_of_organisms) {
         for (auto &item: anatomy.organism_blocks) { life_points += bp->pa[int(item.type) - 1].life_point_amount; }
     } else {
-        for (int i = 0; i <= size; i++) { life_points += bp->pa[int(anatomy.organism_blocks[i].type) - 1].life_point_amount;}
+        for (int i = 0; i < size; i++) {
+            life_points += bp->pa[int(anatomy.organism_blocks[i].type) - 1].life_point_amount;}
     }
     return life_points;
 }
@@ -102,7 +117,7 @@ int Organism::calculate_organism_lifetime() {
     if (!sp->growth_of_organisms) {
         for (auto &block: anatomy.organism_blocks) { lifetime_weights += bp->pa[(int) block.type - 1].lifetime_weight; }
     } else {
-        for (int i = 0; i <= size; i++) { lifetime_weights += bp->pa[int(anatomy.organism_blocks[i].type) - 1].lifetime_weight;}
+        for (int i = 0; i < size; i++) { lifetime_weights += bp->pa[int(anatomy.organism_blocks[i].type) - 1].lifetime_weight;}
     }
 
     max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
@@ -114,7 +129,7 @@ float Organism::calculate_food_needed() {
     if (!sp->growth_of_organisms) {
         for (auto &block: anatomy.organism_blocks) { food_needed += bp->pa[(int) block.type - 1].food_cost; }
     } else {
-        for (int i = 0; i < sp->starting_organism_size; i++) {food_needed += bp->pa[int(anatomy.organism_blocks[i].type) - 1].food_cost;}
+        for (int i = 0; i < size; i++) {food_needed += bp->pa[int(anatomy.organism_blocks[i].type) - 1].food_cost;}
     }
     return food_needed;
 }
@@ -155,7 +170,7 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
             if (choice < sp->remove_cell && anatomy.organism_blocks.size() > sp->min_organism_size) { new_anatomy = Anatomy(anatomy.remove_random_block(gen));return;}
         } else {
             new_occ = occ.mutate(*occp, gen);
-            new_anatomy = Anatomy(new_occ.compile_code(*occl));
+            new_anatomy = Anatomy(new_occ.compile_code(*occl, sp->growth_of_organisms));
 
             if (new_anatomy.organism_blocks.empty()) {
                 new_anatomy = std::move(Anatomy(anatomy));
@@ -352,8 +367,7 @@ void Organism::copy_organism(const Organism &organism) {
     occp = organism.occp;
     occl = organism.occl;
 
-    pre_init();
-    init_values();
+    init_values(true);
 }
 
 void Organism::kill_organism(EngineDataContainer &edc) {

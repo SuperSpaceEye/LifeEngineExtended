@@ -7,6 +7,7 @@
 //
 
 #include "RecordingReconstructor.h"
+#include "WorldRecorder.h"
 
 void RecordingReconstructor::start_reconstruction(int width, int height) {
     this->width = width;
@@ -15,7 +16,7 @@ void RecordingReconstructor::start_reconstruction(int width, int height) {
     rec_grid.resize(width * height);
 }
 
-void RecordingReconstructor::apply_transaction(Transaction &transaction) {
+void RecordingReconstructor::apply_transaction(WorldRecorder::Transaction &transaction) {
     if (transaction.reset) {
         apply_reset(transaction);
     } else if (transaction.starting_point) {
@@ -25,7 +26,7 @@ void RecordingReconstructor::apply_transaction(Transaction &transaction) {
     }
 }
 
-void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
+void RecordingReconstructor::apply_starting_point(WorldRecorder::Transaction &transaction) {
     rec_grid = std::vector<BaseGridBlock>(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
     food_grid = std::vector<float>(width*height, 0);
     rec_orgs = std::vector<Organism>();
@@ -37,7 +38,7 @@ void RecordingReconstructor::apply_starting_point(Transaction &transaction) {
     apply_normal(transaction);
 }
 
-void RecordingReconstructor::apply_reset(Transaction & transaction) {
+void RecordingReconstructor::apply_reset(WorldRecorder::Transaction & transaction) {
     rec_grid = std::vector<BaseGridBlock>(width*height, BaseGridBlock{BlockTypes::EmptyBlock});
     food_grid = std::vector<float>(width*height, 0);
     rec_orgs = std::vector<Organism>();
@@ -48,7 +49,7 @@ void RecordingReconstructor::apply_reset(Transaction & transaction) {
 }
 
 
-void RecordingReconstructor::apply_normal(Transaction &transaction) {
+void RecordingReconstructor::apply_normal(WorldRecorder::Transaction &transaction) {
     apply_user_actions(transaction);
     apply_recenter(transaction);
     apply_food_threshold(transaction);
@@ -60,7 +61,7 @@ void RecordingReconstructor::apply_normal(Transaction &transaction) {
     apply_organism_change(transaction);
 }
 
-void RecordingReconstructor::apply_user_actions(Transaction &transaction) {
+void RecordingReconstructor::apply_user_actions(WorldRecorder::Transaction &transaction) {
     int wall_change_pos = 0;
     int food_change_pos = 0;
     int organism_change_pos = 0;
@@ -68,20 +69,20 @@ void RecordingReconstructor::apply_user_actions(Transaction &transaction) {
 
     for (auto type: transaction.user_action_execution_order) {
         switch (type) {
-            case RecActionType::WallChange:     apply_user_wall_change(transaction, wall_change_pos++); break;
-            case RecActionType::FoodChange:     apply_user_food_change(transaction, food_change_pos++);break;
-            case RecActionType::OrganismChange: apply_user_add_organism(transaction, organism_change_pos++); break;
-            case RecActionType::OrganismKill:   apply_user_kill_organism(transaction, organism_kill_pos++); break;
+            case WorldRecorder::RecActionType::WallChange:     apply_user_wall_change(transaction, wall_change_pos++); break;
+            case WorldRecorder::RecActionType::FoodChange:     apply_user_food_change(transaction, food_change_pos++);break;
+            case WorldRecorder::RecActionType::OrganismChange: apply_user_add_organism(transaction, organism_change_pos++); break;
+            case WorldRecorder::RecActionType::OrganismKill:   apply_user_kill_organism(transaction, organism_kill_pos++); break;
         }
     }
 }
 
-void RecordingReconstructor::apply_user_wall_change(Transaction &transaction, int pos) {
+void RecordingReconstructor::apply_user_wall_change(WorldRecorder::Transaction &transaction, int pos) {
     auto & wc = transaction.user_wall_change[pos];
     rec_grid[wc.x + wc.y * width].type = wc.added ? BlockTypes::WallBlock : BlockTypes::EmptyBlock;
 }
 
-void RecordingReconstructor::apply_user_kill_organism(Transaction &transaction, int pos) {
+void RecordingReconstructor::apply_user_kill_organism(WorldRecorder::Transaction &transaction, int pos) {
     auto dc = transaction.user_dead_change[pos];
     auto & o = rec_orgs[dc];
     for (auto & b: o.anatomy.organism_blocks) {
@@ -93,7 +94,7 @@ void RecordingReconstructor::apply_user_kill_organism(Transaction &transaction, 
     }
 }
 
-void RecordingReconstructor::apply_user_food_change(Transaction &transaction, int pos) {
+void RecordingReconstructor::apply_user_food_change(WorldRecorder::Transaction &transaction, int pos) {
     const auto & fc = transaction.user_food_change[pos];
     const auto apos = fc.x + fc.y * width;
 
@@ -106,7 +107,7 @@ void RecordingReconstructor::apply_user_food_change(Transaction &transaction, in
     }
 }
 
-void RecordingReconstructor::apply_user_add_organism(Transaction &transaction, int pos) {
+void RecordingReconstructor::apply_user_add_organism(WorldRecorder::Transaction &transaction, int pos) {
     auto & o = transaction.user_organism_change[pos];
     for (auto & b: o.anatomy.organism_blocks) {
         const auto bpos = b.get_pos(o.rotation);
@@ -120,7 +121,7 @@ void RecordingReconstructor::apply_user_add_organism(Transaction &transaction, i
     rec_orgs[temp].vector_index = temp;
 }
 
-void RecordingReconstructor::apply_move_change(Transaction &transaction) {
+void RecordingReconstructor::apply_move_change(WorldRecorder::Transaction &transaction) {
     for (auto & mc: transaction.move_change) {
         auto & o = rec_orgs[mc.vector_index];
 
@@ -149,7 +150,7 @@ void RecordingReconstructor::apply_move_change(Transaction &transaction) {
     }
 }
 
-void RecordingReconstructor::apply_dead_organisms(Transaction &transaction) {
+void RecordingReconstructor::apply_dead_organisms(WorldRecorder::Transaction &transaction) {
     for (auto & dc: transaction.dead_organisms) {
         auto & o = rec_orgs[dc];
         for (auto & b: o.anatomy.organism_blocks) {
@@ -162,7 +163,7 @@ void RecordingReconstructor::apply_dead_organisms(Transaction &transaction) {
     }
 }
 
-void RecordingReconstructor::apply_recenter(const Transaction &transaction) {
+void RecordingReconstructor::apply_recenter(const WorldRecorder::Transaction &transaction) {
     if (recenter_to_imaginary_pos != transaction.recenter_to_imaginary_pos) {
         for (auto & organism: rec_orgs) {
             auto vec = organism.anatomy.recenter_blocks(transaction.recenter_to_imaginary_pos);
@@ -175,11 +176,11 @@ void RecordingReconstructor::apply_recenter(const Transaction &transaction) {
     }
 }
 
-void RecordingReconstructor::apply_food_threshold(Transaction &transaction) {
+void RecordingReconstructor::apply_food_threshold(WorldRecorder::Transaction &transaction) {
     food_threshold = transaction.food_threshold;
 }
 
-void RecordingReconstructor::apply_food_change(Transaction &transaction) {
+void RecordingReconstructor::apply_food_change(WorldRecorder::Transaction &transaction) {
     for (auto & fc: transaction.food_change) {
         const auto apos = fc.x + fc.y * width;
         auto & num = food_grid[apos];
@@ -193,7 +194,7 @@ void RecordingReconstructor::apply_food_change(Transaction &transaction) {
     }
 }
 
-void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
+void RecordingReconstructor::apply_organism_change(WorldRecorder::Transaction &transaction) {
     //TODO did resizing wrong
     rec_orgs.resize(rec_orgs.size() + transaction.organism_change.size());
     for (auto & o: transaction.organism_change) {
@@ -209,7 +210,7 @@ void RecordingReconstructor::apply_organism_change(Transaction &transaction) {
     }
 }
 
-void RecordingReconstructor::apply_compressed_change(Transaction &transaction) {
+void RecordingReconstructor::apply_compressed_change(WorldRecorder::Transaction &transaction) {
     for (auto & pair: transaction.compressed_change) {
         auto & left_organism  = rec_orgs[pair.first];
         auto & right_organism = rec_orgs[pair.second];

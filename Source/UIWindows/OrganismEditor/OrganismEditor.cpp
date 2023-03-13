@@ -26,6 +26,8 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     auto anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    anatomy.killer_mask.emplace_back(0);
+    anatomy.eating_mask.emplace_back(1);
 
     auto brain = Brain();
     brain.brain_type = BrainTypes::SimpleBrain;
@@ -40,7 +42,7 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
                                    brain, occ,
                                    sp,
                                    bp, occp, occl,
-                                   1);
+                                   1, 0.05, 0.1, true);
 
     resize_editing_grid(width, height);
     resize_image();
@@ -221,7 +223,7 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
 
 void OrganismEditor::resize_image() {
     edit_image.clear();
-    edit_image.reserve(4 * ui.editor_graphicsView->viewport()->width() * ui.editor_graphicsView->viewport()->height());
+    edit_image.resize(4 * ui.editor_graphicsView->viewport()->width() * ui.editor_graphicsView->viewport()->height(), 255);
 }
 
 void OrganismEditor::create_image() {

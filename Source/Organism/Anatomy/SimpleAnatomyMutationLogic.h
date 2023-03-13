@@ -258,7 +258,7 @@ public:
 
         _organism_blocks.reserve(get_map_size(organism_blocks));
 
-        _producing_space.reserve(c["producer"]);
+        _producing_space.reserve(c[BlockTypes::ProducerBlock]);
         _eating_space.reserve( get_map_size(eating_space));
         _killing_space.reserve(get_map_size(killing_space));
 
@@ -266,7 +266,7 @@ public:
         serialize_producing_space(producing_space, num_producing_space, _producing_space);
         serialize_eating_space(eating_space, _eating_space);
         serialize_killing_space(killing_space, _killing_space);
-        serialize_eye_blocks(_organism_blocks, _eye_blocks_vector, c["eye"]);
+        serialize_eye_blocks(_organism_blocks, _eye_blocks_vector, c[BlockTypes::EyeBlock]);
 
         return new SerializedOrganismStructureContainer{_organism_blocks,
 
@@ -274,6 +274,9 @@ public:
                                                         _eating_space,
                                                         _killing_space,
                                                         _eye_blocks_vector,
+
+                                                        std::vector<uint32_t>{},
+                                                        std::vector<uint32_t>{},
 
                                                         c};
     }

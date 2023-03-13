@@ -9,6 +9,7 @@
 
 #include "UIWindows/WorldEvents/Misc/WorldEventsEnums.h"
 
+namespace WorldEventNodes {
 struct BaseEventNode {
     NodeType type;
     BaseEventNode * next_node = nullptr;
@@ -221,5 +222,5 @@ struct ConditionalEventNode: public BaseEventNode {
 
     ~ConditionalEventNode() override =default;
 };
-
+}
 #endif //LIFEENGINEEXTENDED_EVENTNODES_H

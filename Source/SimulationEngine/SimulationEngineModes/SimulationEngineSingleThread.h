@@ -79,6 +79,8 @@ public:
 
     static void child_pos_calculator(Organism &organism, const Rotation to_place, int distance, EngineDataContainer &edc);
 
+    static void grow_organism(EngineDataContainer & edc, SimulationParameters & sp, Organism & organism);
+
     //min x, min y, max x, max y
     static std::array<int, 4> get_organism_dimensions(Organism &organism);
 

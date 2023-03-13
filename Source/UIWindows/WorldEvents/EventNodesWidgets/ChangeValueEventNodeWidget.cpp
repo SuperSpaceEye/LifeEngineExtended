@@ -7,10 +7,10 @@
 #include "ChangeValueEventNodeWidget.h"
 
 ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent,
-                                                       BaseEventNode * previous_node,
+                                                       WorldEventNodes::BaseEventNode * previous_node,
                                                        ParametersList & parameter_list,
                                                        QHBoxLayout * layout,
-                                                       std::vector<BaseEventNode*> & starting_nodes,
+                                                       std::vector<WorldEventNodes::BaseEventNode*> & starting_nodes,
                                                        std::vector<char*> & repeating_branch):
     pl(parameter_list), layout(layout), starting_nodes(starting_nodes), repeating_branch(repeating_branch) {
     ui.setupUi(this);
@@ -18,13 +18,13 @@ ChangeValueEventNodeWidget::ChangeValueEventNodeWidget(QWidget * parent,
     this->setMinimumSize(400, 200);
     this->setMaximumSize(400, 200);
 
-    node = new ChangeValueEventNode<int32_t>(nullptr, previous_node, nullptr, 0, 20, 1, ChangeValueMode::Linear,
-                                             ChangeTypes::INT32, ClampModes::NoClamp, 0, 0);
+    node = new WorldEventNodes::ChangeValueEventNode<int32_t>(nullptr, previous_node, nullptr, 0, 20, 1, ChangeValueMode::Linear,
+                                                              ChangeTypes::INT32, ClampModes::NoClamp, 0, 0);
     init_gui();
 }
 
 void ChangeValueEventNodeWidget::init_gui() {
-    auto _node = reinterpret_cast<ChangeValueEventNode<int32_t>*>(node);
+    auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t>*>(node);
     auto parameters_list = pl.get_changeable_parameters_list();
     for (auto & name: parameters_list) {
         ui.cmb_change_value->addItem(QString::fromStdString(name));
@@ -39,7 +39,7 @@ void ChangeValueEventNodeWidget::init_gui() {
     if (_node->value_type == ChangeTypes::INT32) {
         ui.le_target_value->setText(QString::fromStdString(std::to_string(_node->target_value)));
     } else if (_node->value_type == ChangeTypes::FLOAT) {
-        auto _node = reinterpret_cast<ChangeValueEventNode<float>*>(node);
+        auto _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<float>*>(node);
         ui.le_target_value->setText(QString::fromStdString(std::to_string(_node->target_value)));
     }
 }

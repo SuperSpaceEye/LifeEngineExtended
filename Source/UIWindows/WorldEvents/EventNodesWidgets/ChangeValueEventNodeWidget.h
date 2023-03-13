@@ -17,16 +17,16 @@ class ChangeValueEventNodeWidget: public QWidget {
     Q_OBJECT
 public:
     ChangeValueEventNodeWidget(QWidget * parent,
-                               BaseEventNode * previous_node,
+                               WorldEventNodes::BaseEventNode * previous_node,
                                ParametersList & pl, QHBoxLayout * layout,
-                               std::vector<BaseEventNode*> & starting_nodes,
+                               std::vector<WorldEventNodes::BaseEventNode*> & starting_nodes,
                                std::vector<char*> & repeating_branch);
-    BaseEventNode * node = nullptr;
+    WorldEventNodes::BaseEventNode * node = nullptr;
 private:
     Ui::ChangeValueEventNodeWidget ui{};
     ParametersList & pl;
     QHBoxLayout * layout;
-    std::vector<BaseEventNode*> & starting_nodes;
+    std::vector<WorldEventNodes::BaseEventNode*> & starting_nodes;
     std::vector<char*> & repeating_branch;
 
     void init_gui();

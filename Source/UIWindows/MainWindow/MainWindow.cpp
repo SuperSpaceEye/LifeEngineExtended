@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent):
                                              OCCInstruction::ShiftDownRight, OCCInstruction::SetBlockProducer});
 
     if (sp.use_occ) {
-        anatomy = Anatomy(occ.compile_code(edc.stc.occl));
+        anatomy = Anatomy(occ.compile_code(edc.stc.occl, sp.growth_of_organisms));
     } else {
         anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
         anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
@@ -67,10 +67,10 @@ MainWindow::MainWindow(QWidget *parent):
 
     edc.base_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                      Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
-                                     &edc.stc.occl, 1);
+                                     &edc.stc.occl, 1, 0.05, 0.1);
     edc.chosen_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                        Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp, &occp,
-                                       &edc.stc.occl, 1);
+                                       &edc.stc.occl, 1, 0.05, 0.1);
 
     edc.base_organism.last_decision_observation = DecisionObservation{};
     edc.chosen_organism.last_decision_observation = DecisionObservation{};
@@ -175,6 +175,11 @@ void MainWindow::mainloop_tick() {
 }
 
 void MainWindow::ui_tick() {
+    if (!ecp.engine_working && !engine_error) {
+        display_message("Simulation Engine has stopped unexpectedly.");
+        engine_error = true;
+    }
+
     if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
