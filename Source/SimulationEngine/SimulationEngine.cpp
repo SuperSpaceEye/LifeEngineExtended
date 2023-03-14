@@ -144,6 +144,22 @@ void SimulationEngine::process_user_action_pool() {
                 edc.selected_organism = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(action.x, action.y), edc);
                 goto endfor;
                 }
+                break;
+            case ActionType::DebugDisplayInfo: {
+                auto idx = edc.st_grid.get_organism_index(action.x, action.y);
+                auto o = OrganismsController::get_organism_by_index(idx, edc);
+                if (o == nullptr) { continue;}
+                std::cout << "Food collected: " << o->food_collected << "\n";
+                std::cout << "Max age: " << o->max_lifetime << "\n";
+                std::cout << "Age: " << o->lifetime << "\n";
+                std::cout << "Max size: " << o->anatomy.organism_blocks.size() << "\n";
+                std::cout << "Size: " << o->size << "\n";
+                std::cout << "Is adult: " << o->is_adult << "\n";
+                std::cout << "\n";
+
+                goto endfor;
+                }
+                break;
         }
     }
     endfor:
@@ -254,6 +270,8 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     auto & type = edc.st_grid.get_type(x, y);
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
+    //TODO why this happens.
+    if (organism_ptr == nullptr) {;return;}
     for (auto & block: organism_ptr->get_organism_blocks_view()) {
         const auto pos = block.get_pos(organism_ptr->rotation);
         const auto ox = organism_ptr->x + pos.x;

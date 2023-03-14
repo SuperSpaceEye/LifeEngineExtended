@@ -700,10 +700,13 @@ void MainWindow::change_main_grid_left_click() {
                         break;
                     case CursorMode::ChooseOrganism:
                         edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, pt.x + x, pt.y + y);
-                        goto endfor;
+//                        goto endfor;
+                        break;
                     case CursorMode::PlaceOrganism:
                         edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, pt.x, pt.y);
                         goto endfor;
+                    case CursorMode::DebugDisplayInfo:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::DebugDisplayInfo, pt.x, pt.y);
                     default:
                         break;
                 }

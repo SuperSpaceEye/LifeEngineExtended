@@ -51,12 +51,8 @@ void Organism::pre_init(bool no_init_views) {
             c[anatomy.organism_blocks[i].type]++;
         }
         size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size());
-        if (size == anatomy.organism_blocks.size()) {is_adult = true;}
+        is_adult = size == anatomy.organism_blocks.size();
     }
-
-//    for (int i = 0; i < 6; i++) {
-//        assert(anatomy.c.data[i] == c.data[i]);
-//    }
 
     calculate_max_life();
     calculate_organism_lifetime();
@@ -64,10 +60,6 @@ void Organism::pre_init(bool no_init_views) {
 }
 
 void Organism::init_values(bool no_init_views) {
-    pre_init(no_init_views);
-//    calculate_max_life();
-//    calculate_organism_lifetime();
-//    calculate_food_needed();
     auto vec = anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
     //just to reuse rotation of positions logic

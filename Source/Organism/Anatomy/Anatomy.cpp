@@ -284,6 +284,7 @@ void Anatomy::set_many_blocks(const std::vector<SerializedOrganismBlockContainer
 Anatomy &Anatomy::operator=(Anatomy &&other_anatomy) noexcept {move_s(&other_anatomy);return *this;}
 Anatomy &Anatomy::operator=(const Anatomy &other_anatomy)     {copy_s(&other_anatomy);return *this;}
 
+//TODO
 Vector2<int> Anatomy::recenter_blocks(bool imaginary_center) {
     if (imaginary_center) {
         return recenter_to_imaginary();
