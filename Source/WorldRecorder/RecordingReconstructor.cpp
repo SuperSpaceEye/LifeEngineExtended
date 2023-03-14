@@ -86,7 +86,7 @@ void RecordingReconstructor::apply_user_wall_change(WorldRecorder::Transaction &
 void RecordingReconstructor::apply_user_kill_organism(WorldRecorder::Transaction &transaction, int pos) {
     auto dc = transaction.user_dead_change[pos];
     auto & o = rec_orgs[dc];
-    for (auto & b: o.anatomy.organism_blocks) {
+    for (auto & b: o.get_organism_blocks_view()) {
         const auto bpos = b.get_pos(o.rotation);
         const auto apos = o.x + bpos.x + (o.y + bpos.y) * width;
 
@@ -110,7 +110,7 @@ void RecordingReconstructor::apply_user_food_change(WorldRecorder::Transaction &
 
 void RecordingReconstructor::apply_user_add_organism(WorldRecorder::Transaction &transaction, int pos) {
     auto & o = transaction.user_organism_change[pos];
-    for (auto & b: o.anatomy.organism_blocks) {
+    for (auto & b: o.get_organism_blocks_view()) {
         const auto bpos = b.get_pos(o.rotation);
         auto & wb = rec_grid[o.x + bpos.x + (o.y + bpos.y) * width];
         wb.type = b.type;
