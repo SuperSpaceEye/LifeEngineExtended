@@ -53,6 +53,8 @@ void Organism::pre_init(bool no_init_views) {
         size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size());
         is_adult = size == anatomy.organism_blocks.size();
     }
+    lifetime = 0;
+    damage = 0;
 
     calculate_max_life();
     calculate_organism_lifetime();

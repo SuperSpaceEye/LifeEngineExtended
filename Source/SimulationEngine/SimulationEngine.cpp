@@ -190,6 +190,13 @@ void SimulationEngine::action_place_organism(const Action &action) {
 
     if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
 
+    new_organism->pre_init();
+    new_organism->init_values();
+
+    new_organism->size = new_organism->anatomy.organism_blocks.size();
+    new_organism->is_adult = true;
+    new_organism->c = new_organism->anatomy.c;
+
     for (auto &block: new_organism->get_organism_blocks_view()) {
         int x = block.get_pos(edc.chosen_organism.rotation).x + new_organism->x;
         int y = block.get_pos(edc.chosen_organism.rotation).y + new_organism->y;
@@ -198,13 +205,10 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_organism_index(x, y) = new_organism->vector_index;
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
-
-    new_organism->pre_init();
-    new_organism->init_values();
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
-    for (auto &block: edc.chosen_organism.get_organism_blocks_view()) {
+    for (auto &block: edc.chosen_organism.anatomy.organism_blocks) {
         const auto pos = block.get_pos(edc.chosen_organism.rotation);
         const auto x = pos.x + action.x;
         const auto y = pos.y + action.y;

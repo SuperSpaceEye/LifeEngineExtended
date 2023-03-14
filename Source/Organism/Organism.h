@@ -142,12 +142,12 @@ public:
 //    using SerializedAdjacentSpaceContainer = SerializedAdjacentSpaceContainer;
 //    using SerializedOrganismBlockContainer = SerializedOrganismBlockContainer;
 
-    array_view1d<SerializedOrganismBlockContainer> organism_blocks_view;
-    array_view1d<SerializedOrganismBlockContainer> eye_blocks_view;
-    array_view1d<std::vector<SerializedAdjacentSpaceContainer>> producing_space_view;
-
-    array_view1d<SerializedAdjacentSpaceContainer> eating_view;
-    array_view1d<SerializedAdjacentSpaceContainer> killing_view;
+//    array_view1d<SerializedOrganismBlockContainer> organism_blocks_view;
+//    array_view1d<SerializedOrganismBlockContainer> eye_blocks_view;
+//    array_view1d<std::vector<SerializedAdjacentSpaceContainer>> producing_space_view;
+//
+//    array_view1d<SerializedAdjacentSpaceContainer> eating_view;
+//    array_view1d<SerializedAdjacentSpaceContainer> killing_view;
 
 //    void make_views() {
 ////        organism_blocks_view = array_view1d<SerializedOrganismBlockContainer>{(SerializedOrganismBlockContainer*)anatomy.organism_blocks.data(), std::min<uint64_t>(size, anatomy.organism_blocks.size())};
