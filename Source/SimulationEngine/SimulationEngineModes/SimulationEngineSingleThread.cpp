@@ -565,6 +565,7 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
     organism.c[next_block.type]++;
     if (organism.size == organism.anatomy.organism_blocks.size()) {organism.is_adult = true;}
 
+    if (edc.record_data) {edc.stc.tbuffer.record_organism_size_change(organism);}
 #ifdef __DEBUG__
     assert(organism.size <= organism.anatomy.organism_blocks.size());
 #endif

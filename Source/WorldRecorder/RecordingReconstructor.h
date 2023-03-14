@@ -23,6 +23,7 @@ private:
     std::vector<float> food_grid;
     std::vector<Organism> rec_orgs;
 
+    void apply_organism_size_change(WorldRecorder::Transaction &transaction);
     void apply_organism_change(WorldRecorder::Transaction &transaction);
     void apply_food_change(WorldRecorder::Transaction &transaction);
     void apply_recenter(const WorldRecorder::Transaction &transaction);

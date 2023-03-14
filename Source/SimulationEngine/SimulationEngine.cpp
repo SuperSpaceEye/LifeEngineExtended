@@ -188,8 +188,6 @@ void SimulationEngine::action_place_organism(const Action &action) {
     new_organism->x = action.x;
     new_organism->y = action.y;
 
-    if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
-
     new_organism->pre_init();
     new_organism->init_values();
 
@@ -205,6 +203,8 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_organism_index(x, y) = new_organism->vector_index;
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
+
+    if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {

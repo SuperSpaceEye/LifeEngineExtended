@@ -62,6 +62,10 @@ void WorldRecorder::TransactionBuffer::record_compressed(int pos1, int pos2) {
     transactions[buffer_pos].compressed_change.emplace_back(std::pair<int, int>{pos1, pos2});
 }
 
+void WorldRecorder::TransactionBuffer::record_organism_size_change(const Organism &organism) {
+    transactions[buffer_pos].organism_size_change.emplace_back(organism.size, organism.vector_index);
+}
+
 void WorldRecorder::TransactionBuffer::record_user_wall_change(int x, int y, bool added) {
     transactions[buffer_pos].user_wall_change.emplace_back(x, y, added);
     transactions[buffer_pos].user_action_execution_order.emplace_back(WorldRecorder::RecActionType::WallChange);
@@ -136,6 +140,9 @@ void WorldRecorder::TransactionBuffer::flush_transactions() {
         out.write((char*)&size, sizeof(int));
         out.write((char*)transaction.compressed_change.data(), sizeof(std::pair<int, int>)*size);
 
+        size = transaction.organism_size_change.size();
+        out.write((char*)&size, sizeof(int));
+        out.write((char*)transaction.organism_size_change.data(), sizeof(OSizeChange)*size);
 
         size = transaction.user_action_execution_order.size();
         out.write((char*)&size, sizeof(int));
@@ -258,6 +265,10 @@ bool WorldRecorder::TransactionBuffer::load_buffer(std::string & path_to_buffer)
         in.read((char*)&size, sizeof(int));
         transaction.compressed_change.resize(size);
         in.read((char*)transaction.compressed_change.data(), sizeof(std::pair<int, int>)*size);
+
+        in.read((char*)&size, sizeof(int));
+        transaction.organism_size_change.resize(size);
+        in.read((char*)transaction.organism_size_change.data(), sizeof(OSizeChange)*size);
 
 
         in.read((char*)&size, sizeof(int));

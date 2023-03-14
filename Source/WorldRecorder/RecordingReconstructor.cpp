@@ -54,6 +54,7 @@ void RecordingReconstructor::apply_normal(WorldRecorder::Transaction &transactio
     apply_recenter(transaction);
     apply_food_threshold(transaction);
 
+    apply_organism_size_change(transaction);
     apply_food_change(transaction);
     apply_dead_organisms(transaction);
     apply_move_change(transaction);
@@ -121,11 +122,17 @@ void RecordingReconstructor::apply_user_add_organism(WorldRecorder::Transaction 
     rec_orgs[temp].vector_index = temp;
 }
 
+void RecordingReconstructor::apply_organism_size_change(WorldRecorder::Transaction &transaction) {
+    for (auto & sc: transaction.organism_size_change) {
+        rec_orgs[sc.organism_idx].size = sc.new_size;
+    }
+}
+
 void RecordingReconstructor::apply_move_change(WorldRecorder::Transaction &transaction) {
     for (auto & mc: transaction.move_change) {
         auto & o = rec_orgs[mc.vector_index];
 
-        for (auto & b: o.anatomy.organism_blocks) {
+        for (auto & b: o.get_organism_blocks_view()) {
             const auto bpos = b.get_pos(o.rotation);
             const auto apos = o.x + bpos.x + (o.y + bpos.y) * width;
 
@@ -141,7 +148,7 @@ void RecordingReconstructor::apply_move_change(WorldRecorder::Transaction &trans
         o.x = mc.x;
         o.y = mc.y;
 
-        for (auto & b: o.anatomy.organism_blocks) {
+        for (auto & b: o.get_organism_blocks_view()) {
             const auto bpos = b.get_pos(o.rotation);
             auto & wb = rec_grid[o.x + bpos.x + (o.y + bpos.y) * width];
             wb.type = b.type;
@@ -153,7 +160,7 @@ void RecordingReconstructor::apply_move_change(WorldRecorder::Transaction &trans
 void RecordingReconstructor::apply_dead_organisms(WorldRecorder::Transaction &transaction) {
     for (auto & dc: transaction.dead_organisms) {
         auto & o = rec_orgs[dc];
-        for (auto & b: o.anatomy.organism_blocks) {
+        for (auto & b: o.get_organism_blocks_view()) {
             const auto bpos = b.get_pos(o.rotation);
             const auto apos = o.x + bpos.x + (o.y + bpos.y) * width;
 
@@ -198,7 +205,7 @@ void RecordingReconstructor::apply_organism_change(WorldRecorder::Transaction &t
     //TODO did resizing wrong
     rec_orgs.resize(rec_orgs.size() + transaction.organism_change.size());
     for (auto & o: transaction.organism_change) {
-        for (auto & b: o.anatomy.organism_blocks) {
+        for (auto & b: o.get_organism_blocks_view()) {
             auto & wb = rec_grid[o.x + b.get_pos(o.rotation).x + (o.y + b.get_pos(o.rotation).y) * width];
             wb.type = b.type;
             wb.rotation = b.rotation;
