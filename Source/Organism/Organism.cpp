@@ -46,9 +46,11 @@ void Organism::pre_init(bool no_init_views) {
         is_adult = true;
     } else {
         c = make_map();
+        food_needed = 0;
         for (int i = 0; i < std::min<int64_t>(
                 sp->starting_organism_size, anatomy.organism_blocks.size()); i++){
             c[anatomy.organism_blocks[i].type]++;
+            food_needed += bp->pa[(int)anatomy.organism_blocks[i].type-1].food_cost;
         }
         size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size());
         is_adult = size == anatomy.organism_blocks.size();
@@ -76,15 +78,7 @@ void Organism::init_values(bool no_init_views) {
         multiplier *= c[BT::ProducerBlock];
     }
 
-    if (c[BT::EyeBlock] == 0) { brain.brain_type = BrainTypes::RandomActions;} else {
-        if (c[BT::EyeBlock] > 0 && c[BT::MoverBlock] > 0) {
-            if (!sp->use_weighted_brain) {
-                brain.brain_type = BrainTypes::SimpleBrain;
-            } else {
-                brain.brain_type = BrainTypes::WeightedBrain;
-            }
-        }
-    }
+    init_brain();
 
     if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
         brain.convert_simple_to_weighted();
@@ -93,6 +87,20 @@ void Organism::init_values(bool no_init_views) {
     }
 
     if (sp->use_continuous_movement) {cdata = ContinuousData{float(x), float(y), 0, 0, 0, 0};}
+}
+
+void Organism::init_brain() {
+    if (c[BT::EyeBlock] == 0) { brain.brain_type = BrainTypes::RandomActions;} else {
+        if (c[BT::MoverBlock] > 0) {
+            if (!sp->use_weighted_brain) {
+                brain.brain_type = BrainTypes::SimpleBrain;
+            } else {
+                brain.brain_type = BrainTypes::WeightedBrain;
+            }
+        } else {
+            brain.brain_type = BrainTypes::RandomActions;
+        }
+    }
 }
 
 float Organism::calculate_max_life() {

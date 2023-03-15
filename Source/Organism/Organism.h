@@ -46,6 +46,7 @@ public:
     float brain_mutation_rate = 0.1;
 
     float food_collected = 0;
+    //if growth of organisms is enabled it will work as "mass"
     float food_needed = 0;
 
     float multiplier = 1;
@@ -169,6 +170,7 @@ public:
     inline auto get_eating_space_view   () {return array_view1d<SASC>{(SASC*)anatomy.eating_space.data(),  std::min<size_t>(anatomy.eating_mask[c[BT::MouthBlock]-1], anatomy.eating_space.size())};}
     inline auto get_killing_space_view  () {return array_view1d<SASC>{(SASC*)anatomy.killing_space.data(), std::min<size_t>(anatomy.killer_mask[c[BT::KillerBlock]-1], anatomy.killing_space.size())};}
 
+    void init_brain();
 };
 
 

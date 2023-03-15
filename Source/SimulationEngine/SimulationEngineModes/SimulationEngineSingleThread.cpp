@@ -343,8 +343,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer &edc, Organ
 bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer &edc, Organism &organism,
                                                              const SimulationParameters &sp, int &new_x,
                                                              int &new_y) {
-    //TODO
-    float mass = organism.food_needed; // + organism.food_collected
+    float mass = organism.food_needed + organism.food_collected;
     auto & cd = organism.cdata;
     cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.c[BT::MoverBlock];
     cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.c[BT::MoverBlock];
@@ -560,9 +559,15 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
     edc.st_grid.get_rotation(x, y) = next_block.rotation;
     organism.food_collected -= food_needed;
 
+    if(organism.c[BT::MoverBlock] == 0 && next_block.type == BT::MoverBlock ||
+       organism.c[BT::EyeBlock]   == 0 && next_block.type == BT::EyeBlock) {
+        organism.init_brain();
+    }
+
     organism.life_points += b_bp.life_point_amount;
     organism.max_lifetime += sp.lifespan_multiplier * b_bp.lifetime_weight;
     organism.c[next_block.type]++;
+    organism.food_needed += food_needed;
     if (organism.size == organism.anatomy.organism_blocks.size()) {organism.is_adult = true;}
 
     if (edc.record_data) {edc.stc.tbuffer.record_organism_size_change(organism);}
