@@ -6,7 +6,7 @@
 // Created by spaceeye on 16.05.2022.
 //
 
-#include "SimulationEngine//OrganismsController.h"
+#include "SimulationEngine/OrganismsController.h"
 
 #include "SimulationEngineSingleThread.h"
 
@@ -15,7 +15,7 @@ using BT = BlockTypes;
 void
 SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer &edc, SimulationParameters &sp, lehmer64 &gen) {
     if (sp.growth_of_organisms) {
-        for (int i = 0; i < edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {grow_organism(edc, sp, organism);}}
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {grow_organism(edc, sp, organism);}}
     }
 
     if (sp.eat_then_produce) {
@@ -111,6 +111,15 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
 
         auto x = organism.x + pc.get_pos(organism.rotation).x;
         auto y = organism.y + pc.get_pos(organism.rotation).y;
+
+        try {
+            auto & type = edc.st_grid.get_type(x, y);
+        } catch (std::runtime_error & e) {
+                std::cout << e.what() << std::endl;
+                std::cout << x << " " << y << " " << pc.relative_x << " " << pc.relative_y << " " << pc.num << " "
+                << organism.x << " " << organism.y << " " << organism.vector_index << "\n";
+                throw std::runtime_error("");
+        }
 
         auto & type = edc.st_grid.get_type(x, y);
 
@@ -661,9 +670,9 @@ void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, cons
 
 bool SimulationEngineSingleThread::check_if_out_of_bounds(EngineDataContainer &edc, int x, int y) {
     return (x < 0 ||
-            x > edc.simulation_width - 1 ||
+            x >= edc.simulation_width ||
             y < 0 ||
-            y > edc.simulation_height - 1);
+            y >= edc.simulation_height);
 }
 
 // if any is true, then check fails, else check succeeds

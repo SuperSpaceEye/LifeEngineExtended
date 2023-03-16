@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     cc = ColorContainer{};
     sp = SimulationParameters{};
+//    sp.growth_of_organisms = false;
 
     cuda_is_available_var = cuda_is_available();
 

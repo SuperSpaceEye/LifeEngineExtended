@@ -78,6 +78,15 @@ void SimulationEngine::simulation_tick() {
 
 //    try {
         SimulationEngineSingleThread::single_threaded_tick(edc, sp, gen);
+//    } catch (std::exception & e) {
+//        std::cout << e.what() << std::endl;
+//        ecp.stop_engine = true;
+//    } catch (std::logic_error & e) {
+//        std::cout << e.what() << std::endl;
+//        ecp.stop_engine = true;
+//    } catch (std::runtime_error & e){
+//        std::cout << e.what() << std::endl;
+//        ecp.stop_engine = true;
 //    } catch (...) {
 //        ecp.stop_engine = true;
 //    }
