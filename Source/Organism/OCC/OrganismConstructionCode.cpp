@@ -322,7 +322,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
 
                     //organism blocks can only affect area directly connected to them, so if the space is beyond computed
                     // edges, then no other block can affect the same area
-                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
+                    if (x_ == 0 || y_ == 0 || x_ >= occ_c.occ_width || y_ >= occ_c.occ_height) {
                         temp_producing_space.emplace_back(producer, x_-center_x, y_-center_y);
                         continue;
                     }
@@ -341,7 +341,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
 
                     //organism blocks can only affect area directly connected to them, so if the space is beyond computed
                     // edges, then no other block can affect the same area
-                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
+                    if (x_ == 0 || y_ == 0 || x_ >= occ_c.occ_width || y_ >= occ_c.occ_height) {
                         eating_space.emplace_back(x_-center_x, y_-center_y);
                         eating_c++;
                         continue;
@@ -370,7 +370,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
 
                     //organism blocks can only affect area directly connected to them, so if the space is beyond computed
                     // edges, then no other block can affect the same area
-                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
+                    if (x_ == 0 || y_ == 0 || x_ >= occ_c.occ_width || y_ >= occ_c.occ_height) {
                         killer_space.emplace_back(x_-center_x, y_-center_y);
                         killer_c++;
                         continue;

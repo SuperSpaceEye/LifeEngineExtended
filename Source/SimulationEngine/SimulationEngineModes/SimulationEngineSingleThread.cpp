@@ -112,14 +112,17 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
         auto x = organism.x + pc.get_pos(organism.rotation).x;
         auto y = organism.y + pc.get_pos(organism.rotation).y;
 
+#ifdef __DEBUG__
         try {
             auto & type = edc.st_grid.get_type(x, y);
         } catch (std::runtime_error & e) {
                 std::cout << e.what() << std::endl;
                 std::cout << x << " " << y << " " << pc.relative_x << " " << pc.relative_y << " " << pc.num << " "
                 << organism.x << " " << organism.y << " " << organism.vector_index << "\n";
+                edc.chosen_organism = organism;
                 throw std::runtime_error("");
         }
+#endif
 
         auto & type = edc.st_grid.get_type(x, y);
 
