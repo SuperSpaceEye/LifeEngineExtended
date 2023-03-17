@@ -324,8 +324,6 @@ bool OrganismEditor::check_edit_area() {
     Vector2 min{0, 0};
     Vector2 max{0, 0};
 
-    bool ret = false;
-
     for (auto & block: editor_organism.anatomy.organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
         if (block.relative_y < min.y) {min.y = block.relative_y;}
@@ -333,10 +331,10 @@ bool OrganismEditor::check_edit_area() {
         if (block.relative_y > max.y) {max.y = block.relative_y;}
     }
 
-    if (abs(min.x) + max.x >= new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;  ret=true;}
-    if (abs(min.y) + max.y >= new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1; ret=true;}
+    if (std::max(abs(min.x), max.x) * 2 + 1 > new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;  return true;}
+    if (std::max(abs(min.y), max.y) * 2 + 1 > new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1; return true;}
 
-    return ret;
+    return false;
 }
 
 void OrganismEditor::occ_mode(bool state) {
