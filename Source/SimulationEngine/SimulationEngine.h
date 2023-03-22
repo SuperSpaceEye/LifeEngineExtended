@@ -21,21 +21,23 @@
 #include <boost/random.hpp>
 #endif
 
-#include "../GridStuff/BaseGridBlock.h"
-#include "../Organism/CPU/Organism.h"
-#include "../Stuff/BlockTypes.hpp"
-#include "../Stuff/Vector2.h"
-#include "../Containers/CPU/EngineControlParametersContainer.h"
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Stuff/Linspace.h"
-#include "../Stuff/PerlinNoise.hpp"
-#include "../PRNGS/lehmer64.h"
-#include "../UIWindows/OrganismEditor/OrganismEditor.h"
-//#include "SimulationEngineModes/SimulationEnginePartialMultiThread.h"
+#include "Stuff/external/PerlinNoise.hpp"
+
+#include "UIWindows/OrganismEditor/OrganismEditor.h"
+#include "UIWindows/WorldEvents/WorldEventsController.h"
+
+#include "Containers/EngineControlParametersContainer.h"
+#include "Containers/EngineDataContainer.h"
+#include "Containers/OrganismBlockParameters.h"
+#include "Containers/OrganismInfoContainer.h"
+#include "Stuff/Linspace.h"
+#include "Stuff/enums/BlockTypes.hpp"
+#include "Stuff/structs/Vector2.h"
+#include "PRNGS/lehmer64.h"
+#include "GridStuff/BaseGridBlock.h"
+#include "Organism/Organism.h"
+
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
-#include "../Containers/CPU/OrganismInfoContainer.h"
-#include "../UIWindows/WorldEvents/WorldEventsController.h"
 #include "OrganismsController.h"
 
 //TODO move simulation grid translation to here
@@ -109,9 +111,9 @@ public:
     void stop_world_events(bool no_resume = true);
     void stop_world_events_no_setting_reset();
 
-    void reset_world_events(std::vector<BaseEventNode *> start_nodes,
+    void reset_world_events(std::vector<WorldEventNodes::BaseEventNode *> start_nodes,
                             std::vector<char> repeating_branch,
-                            std::vector<BaseEventNode *> node_storage);
+                            std::vector<WorldEventNodes::BaseEventNode *> node_storage);
 
     void set_seed(uint64_t new_seed);
 

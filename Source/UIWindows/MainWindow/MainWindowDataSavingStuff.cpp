@@ -103,7 +103,7 @@ bool MainWindow::read_organisms(QDataStream &is) {
 
     if (num_organisms > max_loaded_num_organisms) {
         if (!display_dialog_message("The loaded number of organisms is " + std::to_string(num_organisms) +
-                                    ". Continue?", false)) {
+                                            ". Continue?", false)) {
             return true;
         }
     }

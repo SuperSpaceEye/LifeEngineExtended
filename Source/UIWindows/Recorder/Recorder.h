@@ -12,19 +12,21 @@
 #include <QFileDialog>
 #include <QImage>
 
+#include "UIWindows/MainWindow/WindowUI.h"
+
+#include "Containers/EngineControlParametersContainer.h"
+#include "Containers/EngineDataContainer.h"
+#include "Containers/OrganismInfoContainer.h"
+#include "Organism/Organism.h"
+#include "Organism/Brain/Brain.h"
+#include "Organism/Anatomy/Anatomy.h"
+#include "Stuff/ImageStuff/textures.h"
+#include "Stuff/ImageStuff/ImageCreation.h"
+#include "Stuff/UIMisc.h"
+#include "WorldRecorder/RecordingReconstructor.h"
+#include "SimulationEngine/SimulationEngine.h"
+
 #include "RecorderWindowUI.h"
-#include "../MainWindow/WindowUI.h"
-#include "../../Containers/CPU/EngineDataContainer.h"
-#include "../../Stuff/MiscFuncs.h"
-#include "../../Containers/CPU/EngineControlParametersContainer.h"
-#include "../../Organism/CPU/Organism.h"
-#include "../../Organism/CPU/Brain.h"
-#include "../../Organism/CPU/Anatomy.h"
-#include "../../SimulationEngine/SimulationEngine.h"
-#include "../../Stuff/textures.h"
-#include "../../Stuff/ImageCreation.h"
-#include "../../Containers/CPU/OrganismInfoContainer.h"
-#include "../../WorldRecorder/RecordingReconstructor.h"
 
 #ifdef __CUDA_USED__
 #include "../../WorldRecorder/RecordingReconstructorCUDA.cuh"

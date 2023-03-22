@@ -11,7 +11,7 @@
 
 #include "../SimulationEngineSingleThread.h"
 #include "../../OrganismsController.h"
-#include "../../../Containers/CPU/OrganismBlockParameters.h"
+#include "../../../Containers/OrganismBlockParameters.h"
 
 enum class BenchmarkTypes {
     ProduceFood,

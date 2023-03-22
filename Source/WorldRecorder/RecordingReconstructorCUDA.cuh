@@ -5,7 +5,8 @@
 #ifndef LIFEENGINEEXTENDED_RECORDINGRECONSTRUCTORCUDA_CUH
 #define LIFEENGINEEXTENDED_RECORDINGRECONSTRUCTORCUDA_CUH
 
-#include "../Stuff/cuda_image_creator.cuh"
+#include "Stuff/cuda_image_creator.cuh"
+
 #include "WorldRecorder.h"
 
 class RecCudaOrganism {

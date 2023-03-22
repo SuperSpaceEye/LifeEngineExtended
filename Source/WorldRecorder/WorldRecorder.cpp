@@ -6,14 +6,15 @@
 // Created by spaceeye on 02.10.22.
 //
 
-#include "WorldRecorder.h"
-#include "../Stuff/DataSavingFunctions.h"
-
 #include <utility>
+
+#include "Stuff/DataSavingFunctions.h"
+
+#include "WorldRecorder.h"
 
 const int BUFFER_VERSION = 1;
 
-void TransactionBuffer::start_recording(std::string path_to_save_, int width_, int height_, int buffer_size_) {
+void WorldRecorder::TransactionBuffer::start_recording(std::string path_to_save_, int width_, int height_, int buffer_size_) {
     path_to_save = std::move(path_to_save_);
     buffer_size = buffer_size_;
     width = width_;
@@ -27,63 +28,67 @@ void TransactionBuffer::start_recording(std::string path_to_save_, int width_, i
     transactions[0].starting_point = true;
 }
 
-void TransactionBuffer::record_food_change(int x, int y, float num) {
+void WorldRecorder::TransactionBuffer::record_food_change(int x, int y, float num) {
     transactions[buffer_pos].food_change.emplace_back(x, y, num);
 }
 
-void TransactionBuffer::record_new_organism(const Organism &organism) {
+void WorldRecorder::TransactionBuffer::record_new_organism(const Organism &organism) {
     auto new_organism = Organism(); new_organism.copy_organism(organism);
     new_organism.vector_index = organism.vector_index;
     transactions[buffer_pos].organism_change.emplace_back(std::move(new_organism));
 }
 
-void TransactionBuffer::record_organism_dying(int organism_index) {
+void WorldRecorder::TransactionBuffer::record_organism_dying(int organism_index) {
     transactions[buffer_pos].dead_organisms.emplace_back(organism_index);
 }
 
-void TransactionBuffer::record_organism_move_change(int vector_index, int x, int y, Rotation rotation) {
+void WorldRecorder::TransactionBuffer::record_organism_move_change(int vector_index, int x, int y, Rotation rotation) {
     transactions[buffer_pos].move_change.emplace_back(vector_index, rotation, x, y);
 }
 
-void TransactionBuffer::record_recenter_to_imaginary_pos(bool state) {
+void WorldRecorder::TransactionBuffer::record_recenter_to_imaginary_pos(bool state) {
     transactions[buffer_pos].recenter_to_imaginary_pos = state;
 }
 
-void TransactionBuffer::record_food_threshold(float food_threshold) {
+void WorldRecorder::TransactionBuffer::record_food_threshold(float food_threshold) {
     transactions[buffer_pos].food_threshold = food_threshold;
 }
 
-void TransactionBuffer::record_reset() {
+void WorldRecorder::TransactionBuffer::record_reset() {
     transactions[buffer_pos].reset = true;
 }
 
-void TransactionBuffer::record_compressed(int pos1, int pos2) {
+void WorldRecorder::TransactionBuffer::record_compressed(int pos1, int pos2) {
     transactions[buffer_pos].compressed_change.emplace_back(std::pair<int, int>{pos1, pos2});
 }
 
-void TransactionBuffer::record_user_wall_change(int x, int y, bool added) {
+void WorldRecorder::TransactionBuffer::record_organism_size_change(const Organism &organism) {
+    transactions[buffer_pos].organism_size_change.emplace_back(organism.size, organism.vector_index);
+}
+
+void WorldRecorder::TransactionBuffer::record_user_wall_change(int x, int y, bool added) {
     transactions[buffer_pos].user_wall_change.emplace_back(x, y, added);
-    transactions[buffer_pos].user_action_execution_order.emplace_back(RecActionType::WallChange);
+    transactions[buffer_pos].user_action_execution_order.emplace_back(WorldRecorder::RecActionType::WallChange);
 }
 
-void TransactionBuffer::record_user_food_change(int x, int y, float num) {
+void WorldRecorder::TransactionBuffer::record_user_food_change(int x, int y, float num) {
     transactions[buffer_pos].user_food_change.emplace_back(x, y, num);
-    transactions[buffer_pos].user_action_execution_order.emplace_back(RecActionType::FoodChange);
+    transactions[buffer_pos].user_action_execution_order.emplace_back(WorldRecorder::RecActionType::FoodChange);
 }
 
-void TransactionBuffer::record_user_new_organism(const Organism &organism) {
+void WorldRecorder::TransactionBuffer::record_user_new_organism(const Organism &organism) {
     auto new_organism = Organism(); new_organism.copy_organism(organism);
     new_organism.vector_index = organism.vector_index;
     transactions[buffer_pos].user_organism_change.emplace_back(std::move(new_organism));
-    transactions[buffer_pos].user_action_execution_order.emplace_back(RecActionType::OrganismChange);
+    transactions[buffer_pos].user_action_execution_order.emplace_back(WorldRecorder::RecActionType::OrganismChange);
 }
 
-void TransactionBuffer::record_user_kill_organism(int organism_index) {
+void WorldRecorder::TransactionBuffer::record_user_kill_organism(int organism_index) {
     transactions[buffer_pos].user_dead_change.emplace_back(organism_index);
-    transactions[buffer_pos].user_action_execution_order.emplace_back(RecActionType::OrganismKill);
+    transactions[buffer_pos].user_action_execution_order.emplace_back(WorldRecorder::RecActionType::OrganismKill);
 }
 
-void TransactionBuffer::record_transaction() {
+void WorldRecorder::TransactionBuffer::record_transaction() {
     if (transactions.size() < buffer_size) {
         transactions.emplace_back();
         buffer_pos++;
@@ -95,7 +100,7 @@ void TransactionBuffer::record_transaction() {
     flush_transactions();
 }
 
-void TransactionBuffer::flush_transactions() {
+void WorldRecorder::TransactionBuffer::flush_transactions() {
 //    if (buffer_pos == 0) { return;}
 //
 //    auto path = path_to_save + "/" + std::to_string(saved_buffers);
@@ -135,6 +140,9 @@ void TransactionBuffer::flush_transactions() {
 //        out.write((char*)&size, sizeof(int));
 //        out.write((char*)transaction.compressed_change.data(), sizeof(std::pair<int, int>)*size);
 //
+//        size = transaction.organism_size_change.size();
+//        out.write((char*)&size, sizeof(int));
+//        out.write((char*)transaction.organism_size_change.data(), sizeof(OSizeChange)*size);
 //
 //        size = transaction.user_action_execution_order.size();
 //        out.write((char*)&size, sizeof(int));
@@ -168,7 +176,7 @@ void TransactionBuffer::flush_transactions() {
 //    buffer_pos = 0;
 }
 
-void TransactionBuffer::finish_recording() {
+void WorldRecorder::TransactionBuffer::finish_recording() {
     flush_transactions();
 
     width = 0;
@@ -181,7 +189,7 @@ void TransactionBuffer::finish_recording() {
     transactions = std::vector<Transaction>();
 }
 
-void TransactionBuffer::resize_buffer(int new_buffer_size) {
+void WorldRecorder::TransactionBuffer::resize_buffer(int new_buffer_size) {
     if (new_buffer_size == buffer_size) { return;}
     if (new_buffer_size > buffer_size) {
         transactions.reserve(new_buffer_size);
@@ -194,7 +202,7 @@ void TransactionBuffer::resize_buffer(int new_buffer_size) {
     buffer_size = new_buffer_size;
 }
 
-bool TransactionBuffer::load_buffer_metadata(std::string &path_to_buffer, int &width, int &height, int &piece_len) {
+bool WorldRecorder::TransactionBuffer::load_buffer_metadata(std::string &path_to_buffer, int &width, int &height, int &piece_len) {
 //    std::ifstream in(path_to_buffer, std::ios::in | std::ios::binary);
 //
 //    int version;
@@ -208,7 +216,7 @@ bool TransactionBuffer::load_buffer_metadata(std::string &path_to_buffer, int &w
 //    return true;
 }
 
-bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
+bool WorldRecorder::TransactionBuffer::load_buffer(std::string & path_to_buffer) {
 //    std::ifstream in(path_to_buffer, std::ios::in | std::ios::binary);
 //    int version;
 //    in.read((char*)&version, sizeof(int));
@@ -258,6 +266,10 @@ bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
 //        transaction.compressed_change.resize(size);
 //        in.read((char*)transaction.compressed_change.data(), sizeof(std::pair<int, int>)*size);
 //
+//        in.read((char*)&size, sizeof(int));
+//        transaction.organism_size_change.resize(size);
+//        in.read((char*)transaction.organism_size_change.data(), sizeof(OSizeChange)*size);
+//
 //
 //        in.read((char*)&size, sizeof(int));
 //        transaction.user_action_execution_order.resize(size);
@@ -283,6 +295,6 @@ bool TransactionBuffer::load_buffer(std::string & path_to_buffer) {
 //    }
 //
 //    in.close();
-
-    return true;
+//
+//    return true;
 }

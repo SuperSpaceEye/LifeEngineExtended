@@ -104,7 +104,7 @@ void OrganismEditor::b_compile_occ_slot() {
     OrganismConstructionCode temp_occ;
     Anatomy temp_anatomy;
     temp_occ.get_code_ref() = std::move(occt.get_transpiled_instructions());
-    temp_anatomy = Anatomy(temp_occ.compile_code(occl));
+    temp_anatomy = Anatomy(temp_occ.compile_code(occl, sp->growth_of_organisms));
     if (temp_anatomy.organism_blocks.empty()) {
         display_message("Instruction sequence produced empty anatomy");
         occt.get_transpiled_instructions();
@@ -127,27 +127,27 @@ void OrganismEditor::b_compile_occ_slot() {
 
 void OrganismEditor::le_anatomy_mutation_rate_slot() {
     le_slot_lower_upper_bound<float>(editor_organism.anatomy_mutation_rate, editor_organism.anatomy_mutation_rate, "float",
-                                     ui.le_anatomy_mutation_rate, 0, "0", 1, "1");
+                                             ui.le_anatomy_mutation_rate, 0, "0", 1, "1");
 }
 
 void OrganismEditor::le_brain_mutation_rate_slot() {
     le_slot_lower_upper_bound<float>(editor_organism.brain_mutation_rate, editor_organism.brain_mutation_rate, "float",
-                                     ui.le_brain_mutation_rate, 0, "0", 1, "1");
+                                             ui.le_brain_mutation_rate, 0, "0", 1, "1");
 }
 
 void OrganismEditor::le_grid_width_slot() {
     le_slot_lower_bound<int>(new_editor_width, new_editor_width, "int",
-                             ui.le_grid_width, 5, "5");
+                                     ui.le_grid_width, 5, "5");
 }
 
 void OrganismEditor::le_grid_height_slot() {
     le_slot_lower_bound<int>(new_editor_height, new_editor_height, "int",
-                             ui.le_grid_height, 5, "5");
+                                     ui.le_grid_height, 5, "5");
 }
 
 void OrganismEditor::le_move_range_slot() {
     le_slot_lower_bound<int>(editor_organism.move_range, editor_organism.move_range, "int",
-                             ui.le_move_range, 1, "1");
+                                     ui.le_move_range, 1, "1");
 }
 
 //==================== Radio buttons ====================

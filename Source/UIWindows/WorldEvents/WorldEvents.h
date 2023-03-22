@@ -8,15 +8,17 @@
 #include <QDialogButtonBox>
 #include <QSpacerItem>
 
-#include "WorldEventsUI.h"
-#include "../MainWindow/WindowUI.h"
-#include "EventNodes.h"
-#include "ParametersList.h"
-#include "../../SimulationEngine/SimulationEngine.h"
+#include "UIWindows/WorldEvents/EventNodesWidgets/ConditionalEventNodeWidget.h"
+#include "UIWindows/WorldEvents/EventNodesWidgets/ChangeValueEventNodeWidget.h"
+#include "UIWindows/MainWindow/WindowUI.h"
+#include "UIWindows/WorldEvents/Misc/WorldEventsEnums.h"
+#include "UIWindows/WorldEvents/Misc/ParametersList.h"
 
-#include "ConditionalEventNodeWidget.h"
-#include "ChangeValueEventNodeWidget.h"
-#include "../../Stuff/MiscFuncs.h"
+#include "SimulationEngine/SimulationEngine.h"
+#include "Stuff/UIMisc.h"
+
+#include "WorldEventsUI.h"
+#include "EventNodes.h"
 
 class WorldEvents: public QWidget {
     Q_OBJECT
@@ -37,7 +39,7 @@ private:
     EngineControlParameters * ecp = nullptr;
     SimulationEngine * engine = nullptr;
 
-    std::vector<BaseEventNode*> starting_nodes_container;
+    std::vector<WorldEventNodes::BaseEventNode*> starting_nodes_container;
     std::vector<char*> repeating_branch;
 
     void closeEvent(QCloseEvent * event) override;
@@ -51,10 +53,10 @@ private:
     QWidget * node_chooser(QHBoxLayout * widget_layout);
 
     VerifyNodesFailCodes verify_nodes();
-    static WorldEvents::VerifyNodesFailCodes check_conditional_node(BaseEventNode * node);
-    static VerifyNodesFailCodes check_change_value_node(BaseEventNode * node);
-    BaseEventNode *copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage);
-    void copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage);
+    static WorldEvents::VerifyNodesFailCodes check_conditional_node(WorldEventNodes::BaseEventNode * node);
+    static VerifyNodesFailCodes check_change_value_node(WorldEventNodes::BaseEventNode * node);
+    WorldEventNodes::BaseEventNode *copy_node(WorldEventNodes::BaseEventNode *node, std::vector<WorldEventNodes::BaseEventNode *> &node_storage);
+    void copy_nodes(std::vector<WorldEventNodes::BaseEventNode *> &start_nodes, std::vector<WorldEventNodes::BaseEventNode *> &node_storage);
 public:
     WorldEvents(Ui::MainWindow * parent_ui,
                 SimulationParameters * sp,

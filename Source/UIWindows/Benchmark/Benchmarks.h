@@ -11,7 +11,7 @@
 #include "BenchmarkUI.h"
 #include "../MainWindow/WindowUI.h"
 //#include "../../SimulationEngine/SimulationEngineModes/del/SimulationEngineSingleThreadBenchmark.h"
-#include "../../Stuff/MiscFuncs.h"
+#include "../../Stuff/UIMisc.h"
 
 class Benchmarks: public QWidget {
     Q_OBJECT

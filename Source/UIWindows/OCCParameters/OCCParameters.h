@@ -7,13 +7,15 @@
 
 #include <QKeyEvent>
 
+#include "UIWindows/MainWindow/WindowUI.h"
+
+#include "Organism/OCC/OrganismConstructionCodeInstruction.h"
+#include "Organism/OCC/OrganismConstructionCodeInstruction.h"
+#include "Containers/OrganismConstructionCodeParameters.h"
+#include "Stuff/UIMisc.h"
+#include "SimulationEngine/SimulationEngine.h"
+
 #include "OCCParametersUI.h"
-#include "../MainWindow/WindowUI.h"
-#include "../../Containers/CPU/OrganismConstructionCodeParameters.h"
-#include "../../Stuff/MiscFuncs.h"
-#include "../../Organism/CPU/OrganismConstructionCodeInstruction.h"
-#include "../../SimulationEngine/SimulationEngine.h"
-#include "../../Organism/CPU/OrganismConstructionCodeInstruction.h"
 
 class OCCParametersWindow: public QWidget {
     Q_OBJECT

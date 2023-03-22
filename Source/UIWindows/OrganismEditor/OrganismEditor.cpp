@@ -10,7 +10,7 @@
 
 OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                                SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                               Organism *chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                               Organism *chosen_organism, Textures::TexturesContainer &textures, OCCLogicContainer *occl,
                                OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda)
         : editor_width(width), editor_height(height),
                                 parent_ui(parent_ui), color_container(color_container), sp(sp), bp(bp), c_mode(cursor_mode),
@@ -26,6 +26,8 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
 
     auto anatomy = Anatomy();
     anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
+    anatomy.killer_mask.emplace_back(0);
+    anatomy.eating_mask.emplace_back(1);
 
     auto brain = Brain();
     brain.brain_type = BrainTypes::SimpleBrain;
@@ -40,7 +42,7 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
                                    brain, occ,
                                    sp,
                                    bp, occp, occl,
-                                   1);
+                                   1, 0.05, 0.1, true);
 
     resize_editing_grid(width, height);
     resize_image();
@@ -54,6 +56,10 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     actual_cursor.setGeometry(50, 50, 5, 5);
     actual_cursor.setStyleSheet("background-color:red;");
     actual_cursor.hide();
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void OrganismEditor::update_cell_count_label() {
@@ -221,7 +227,7 @@ void OrganismEditor::resize_editing_grid(int width, int height) {
 
 void OrganismEditor::resize_image() {
     edit_image.clear();
-    edit_image.reserve(4 * ui.editor_graphicsView->viewport()->width() * ui.editor_graphicsView->viewport()->height());
+    edit_image.resize(4 * ui.editor_graphicsView->viewport()->width() * ui.editor_graphicsView->viewport()->height(), 255);
 }
 
 void OrganismEditor::create_image() {
@@ -322,8 +328,6 @@ bool OrganismEditor::check_edit_area() {
     Vector2 min{0, 0};
     Vector2 max{0, 0};
 
-    bool ret = false;
-
     for (auto & block: editor_organism.anatomy.organism_blocks) {
         if (block.relative_x < min.x) {min.x = block.relative_x;}
         if (block.relative_y < min.y) {min.y = block.relative_y;}
@@ -331,10 +335,10 @@ bool OrganismEditor::check_edit_area() {
         if (block.relative_y > max.y) {max.y = block.relative_y;}
     }
 
-    if (abs(min.x) + max.x >= new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;  ret=true;}
-    if (abs(min.y) + max.y >= new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1; ret=true;}
+    if (std::max(abs(min.x), max.x) * 2 + 1 > new_editor_width)  { new_editor_width = std::max(abs(min.x), max.x) * 2 + 1;  return true;}
+    if (std::max(abs(min.y), max.y) * 2 + 1 > new_editor_height) { new_editor_height = std::max(abs(min.y), max.y) * 2 + 1; return true;}
 
-    return ret;
+    return false;
 }
 
 void OrganismEditor::occ_mode(bool state) {

@@ -22,30 +22,31 @@
 #include <QFileDialog>
 #include <QKeyEvent>
 
-#include "../../Stuff/rapidjson/document.h"
-#include "../../Stuff/rapidjson/writer.h"
-#include "../../Stuff/rapidjson/stringbuffer.h"
+#include "Stuff/external/rapidjson/document.h"
+#include "Stuff/external/rapidjson/writer.h"
+#include "Stuff/external/rapidjson/stringbuffer.h"
 
-#include "../../Stuff/Linspace.h"
-#include "../../Organism/CPU/Organism.h"
-#include "../../Organism/CPU/Anatomy.h"
-#include "../../Organism/CPU/Brain.h"
-#include "../../Organism/CPU/Rotation.h"
-#include "../../GridStuff/BaseGridBlock.h"
-#include "EditorUI.h"
-#include "../MainWindow/WindowUI.h"
-#include "../../Stuff/Vector2.h"
-#include "../../Containers/CPU/ColorContainer.h"
-#include "../../Stuff/textures.h"
-#include "../../Stuff/CursorMode.h"
-#include "../../Stuff/MiscFuncs.h"
-#include "../../Stuff/ImageCreation.h"
-#include "../../Stuff/DataSavingFunctions.h"
+#include "UIWindows/MainWindow/WindowUI.h"
+
+#include "Stuff/Linspace.h"
+#include "Stuff/enums/Rotation.h"
+#include "Stuff/structs/Vector2.h"
+#include "Stuff/ImageStuff/textures.h"
+#include "Stuff/enums/CursorMode.h"
+#include "Stuff/UIMisc.h"
+#include "Stuff/ImageStuff/ImageCreation.h"
+#include "Stuff/DataSavingFunctions.h"
+#include "Organism/Organism.h"
+#include "Organism/Anatomy/Anatomy.h"
+#include "Organism/Brain/Brain.h"
+#include "GridStuff/BaseGridBlock.h"
 #include "OCCTranspiler/OCCTranspiler.h"
-#include "../../Stuff/ImageCreation.h"
+#include "Containers/ColorContainer.h"
+
+#include "EditorUI.h"
 
 #ifdef __CUDA_USED__
-#include "../../Stuff/cuda_image_creator.cuh"
+#include "Stuff/cuda_image_creator.cuh"
 #endif
 
 class OrganismEditor: public QWidget {
@@ -65,7 +66,7 @@ public:
     std::vector<unsigned char> edit_image;
     CursorMode * c_mode = nullptr;
 
-    TexturesContainer & textures;
+    Textures::TexturesContainer & textures;
 
     SimulationParameters * sp;
     OrganismBlockParameters * bp;
@@ -140,7 +141,7 @@ public:
 
     OrganismEditor(int width, int height, Ui::MainWindow *parent_ui, ColorContainer *color_container,
                    SimulationParameters *sp, OrganismBlockParameters *bp, CursorMode *cursor_mode,
-                   Organism *chosen_organism, TexturesContainer &textures, OCCLogicContainer *occl,
+                   Organism *chosen_organism, Textures::TexturesContainer &textures, OCCLogicContainer *occl,
                    OCCParameters *occp, const bool &cuda_is_available, const bool &use_cuda);
 
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);

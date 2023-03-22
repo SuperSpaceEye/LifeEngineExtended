@@ -2,12 +2,12 @@
 // Created by spaceeye on 25.10.22.
 //
 
-#include "RecordingReconstructorCUDA.cuh"
-
 #include <cuda.h>
 #include <cuda_runtime.h>
 
 #include <utility>
+
+#include "RecordingReconstructorCUDA.cuh"
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)

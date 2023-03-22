@@ -9,10 +9,8 @@
 #ifndef THELIFEENGINECPP_BASEGRIDBLOCK_H
 #define THELIFEENGINECPP_BASEGRIDBLOCK_H
 
-#include "../Stuff/BlockTypes.hpp"
-#include "../Organism/CPU/Rotation.h"
-
-class Organism;
+#include "Stuff/enums/BlockTypes.hpp"
+#include "Stuff/enums/Rotation.h"
 
 struct BaseGridBlock{
 public:

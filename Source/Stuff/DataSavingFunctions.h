@@ -9,21 +9,22 @@
 #include <filesystem>
 #include <QDataStream>
 
-#include "../SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.h"
-#include "BlockTypes.hpp"
-#include "../Containers/CPU/SimulationParameters.h"
-#include "../Containers/CPU/EngineDataContainer.h"
-#include "../Containers/CPU/OrganismBlockParameters.h"
-#include "../Organism/CPU/Organism.h"
-#include "../Organism/CPU/Anatomy.h"
-#include "../Organism/CPU/Brain.h"
-#include "../SimulationEngine/OrganismsController.h"
-#include "MiscFuncs.h"
-#include "../Containers/CPU/OrganismConstructionCodeParameters.h"
+#include "Stuff/external/rapidjson/document.h"
+#include "Stuff/external/rapidjson/writer.h"
+#include "Stuff/external/rapidjson/stringbuffer.h"
 
-#include "../Stuff/rapidjson/document.h"
-#include "../Stuff/rapidjson/writer.h"
-#include "../Stuff/rapidjson/stringbuffer.h"
+#include "Containers/SimulationParameters.h"
+#include "Containers/EngineDataContainer.h"
+#include "Containers/OrganismBlockParameters.h"
+#include "Containers/OrganismConstructionCodeParameters.h"
+#include "Organism/Organism.h"
+#include "Organism/Anatomy/Anatomy.h"
+#include "Organism/Brain/Brain.h"
+#include "SimulationEngine/SimulationEngineModes/SimulationEngineSingleThread.h"
+#include "SimulationEngine/OrganismsController.h"
+
+#include "Stuff/enums/BlockTypes.hpp"
+#include "UIMisc.h"
 
 namespace DataSavingFunctions {
     struct WorldBlocks {

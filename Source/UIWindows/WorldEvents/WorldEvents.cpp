@@ -3,7 +3,7 @@
 //
 
 #include "WorldEvents.h"
-#include "WorldEventsEnums.h"
+#include "EventNodes.h"
 
 WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
                          SimulationParameters * sp,
@@ -24,6 +24,10 @@ WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
     //load/save world events
     ui.pushButton->hide();
     ui.pushButton_2->hide();
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void WorldEvents::closeEvent(QCloseEvent *event) {
@@ -99,7 +103,7 @@ QWidget * WorldEvents::node_chooser(QHBoxLayout * widget_layout) {
 WorldEvents::VerifyNodesFailCodes WorldEvents::verify_nodes() {
     if (starting_nodes_container.empty()) {return VerifyNodesFailCodes::EmptyStartingNode;}
     for (auto * starting_node: starting_nodes_container) {
-        std::vector<BaseEventNode*> branch_stack;
+        std::vector<WorldEventNodes::BaseEventNode*> branch_stack;
         branch_stack.push_back(starting_node);
         while (!branch_stack.empty()) {
             auto node = branch_stack.back();
@@ -128,84 +132,84 @@ WorldEvents::VerifyNodesFailCodes WorldEvents::verify_nodes() {
     return VerifyNodesFailCodes::NoProblems;
 }
 
-WorldEvents::VerifyNodesFailCodes WorldEvents::check_change_value_node(BaseEventNode *node) {
-    auto * _node = reinterpret_cast<ChangeValueEventNode<float>*>(node);
+WorldEvents::VerifyNodesFailCodes WorldEvents::check_change_value_node(WorldEventNodes::BaseEventNode *node) {
+    auto * _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<float>*>(node);
     if (_node->change_value == nullptr) {return VerifyNodesFailCodes::ChangeValueNodeNoChangeValue;}
     if (_node->value_type   == ChangeTypes::NONE) {return VerifyNodesFailCodes::ChangeValueIncorrectValue;}
     return VerifyNodesFailCodes::NoProblems;
 }
 
-WorldEvents::VerifyNodesFailCodes WorldEvents::check_conditional_node(BaseEventNode *node) {
-    auto * _node = reinterpret_cast<ConditionalEventNode<double>*>(node);
+WorldEvents::VerifyNodesFailCodes WorldEvents::check_conditional_node(WorldEventNodes::BaseEventNode *node) {
+    auto * _node = reinterpret_cast<WorldEventNodes::ConditionalEventNode<double>*>(node);
     if (_node->check_value == nullptr) {return VerifyNodesFailCodes::ConditionalNodeNoValueToCheck;}
     if (_node->value_type  == ConditionalTypes::NONE) {return VerifyNodesFailCodes::ConditionalNodeIncorrectValueToChange;}
     return VerifyNodesFailCodes::NoProblems;
 }
 
-BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEventNode *> &node_storage) {
+WorldEventNodes::BaseEventNode * WorldEvents::copy_node(WorldEventNodes::BaseEventNode *node, std::vector<WorldEventNodes::BaseEventNode *> &node_storage) {
     if (node == nullptr) {return nullptr;}
-    BaseEventNode * new_node;
+    WorldEventNodes::BaseEventNode * new_node;
 
     switch (node->type) {
         case NodeType::ChangeValue: {
-            switch (reinterpret_cast<ChangeValueEventNode<float> *>(node)->value_type) {
+            switch (reinterpret_cast<WorldEventNodes::ChangeValueEventNode<float> *>(node)->value_type) {
                 case ChangeTypes::INT32: {
-                    auto * _node = reinterpret_cast<ChangeValueEventNode<int32_t> *>(node);
-                    new_node = new ChangeValueEventNode<int32_t>(nullptr,
-                                                                 nullptr,
-                                                                 _node->change_value,
-                                                                 _node->target_value,
-                                                                 _node->time_horizon,
-                                                                 _node->execute_every_n_tick,
-                                                                 _node->change_mode,
-                                                                 _node->value_type,
-                                                                 _node->clamp_mode,
-                                                                 _node->min_clamp_value,
-                                                                 _node->max_clamp_value);
+                    auto * _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<int32_t> *>(node);
+                    new_node = new WorldEventNodes::ChangeValueEventNode<int32_t>(nullptr,
+                                                                                  nullptr,
+                                                                                  _node->change_value,
+                                                                                  _node->target_value,
+                                                                                  _node->time_horizon,
+                                                                                  _node->execute_every_n_tick,
+                                                                                  _node->change_mode,
+                                                                                  _node->value_type,
+                                                                                  _node->clamp_mode,
+                                                                                  _node->min_clamp_value,
+                                                                                  _node->max_clamp_value);
                 }
                     break;
                 case ChangeTypes::FLOAT: {
-                    auto * _node = reinterpret_cast<ChangeValueEventNode<float> *>(node);
-                    new_node = new ChangeValueEventNode<float>(nullptr,
-                                                               nullptr,
-                                                               _node->change_value,
-                                                               _node->target_value,
-                                                               _node->time_horizon,
-                                                               _node->execute_every_n_tick,
-                                                               _node->change_mode,
-                                                               _node->value_type,
-                                                               _node->clamp_mode,
-                                                               _node->min_clamp_value,
-                                                               _node->max_clamp_value);
+                    auto * _node = reinterpret_cast<WorldEventNodes::ChangeValueEventNode<float> *>(node);
+                    new_node = new WorldEventNodes::ChangeValueEventNode<float>(nullptr,
+                                                                                nullptr,
+                                                                                _node->change_value,
+                                                                                _node->target_value,
+                                                                                _node->time_horizon,
+                                                                                _node->execute_every_n_tick,
+                                                                                _node->change_mode,
+                                                                                _node->value_type,
+                                                                                _node->clamp_mode,
+                                                                                _node->min_clamp_value,
+                                                                                _node->max_clamp_value);
                 }
                     break;
             }
         }
             break;
         case NodeType::Conditional: {
-            switch (reinterpret_cast<ConditionalEventNode<double> *>(node)->value_type) {
+            switch (reinterpret_cast<WorldEventNodes::ConditionalEventNode<double> *>(node)->value_type) {
                 case ConditionalTypes::DOUBLE: {
-                    auto * _node = reinterpret_cast<ConditionalEventNode<double>*>(node);
-                    new_node = new ConditionalEventNode<double>(_node->check_value,
-                                                                _node->fixed_value,
-                                                                _node->mode,
-                                                                _node->value_type,
-                                                                nullptr,
-                                                                nullptr,
-                                                                nullptr,
-                                                                _node->execute_every_n_tick);
+                    auto * _node = reinterpret_cast<WorldEventNodes::ConditionalEventNode<double>*>(node);
+                    new_node = new WorldEventNodes::ConditionalEventNode<double>(_node->check_value,
+                                                                                 _node->fixed_value,
+                                                                                 _node->mode,
+                                                                                 _node->value_type,
+                                                                                 nullptr,
+                                                                                 nullptr,
+                                                                                 nullptr,
+                                                                                 _node->execute_every_n_tick);
                 }
                     break;
                 case ConditionalTypes::INT64: {
-                    auto * _node = reinterpret_cast<ConditionalEventNode<int64_t>*>(node);
-                    new_node = new ConditionalEventNode<int64_t>(_node->check_value,
-                                                                 _node->fixed_value,
-                                                                 _node->mode,
-                                                                 _node->value_type,
-                                                                 nullptr,
-                                                                 nullptr,
-                                                                 nullptr,
-                                                                 _node->execute_every_n_tick);
+                    auto * _node = reinterpret_cast<WorldEventNodes::ConditionalEventNode<int64_t>*>(node);
+                    new_node = new WorldEventNodes::ConditionalEventNode<int64_t>(_node->check_value,
+                                                                                  _node->fixed_value,
+                                                                                  _node->mode,
+                                                                                  _node->value_type,
+                                                                                  nullptr,
+                                                                                  nullptr,
+                                                                                  nullptr,
+                                                                                  _node->execute_every_n_tick);
                 }
                     break;
             }
@@ -221,7 +225,7 @@ BaseEventNode * WorldEvents::copy_node(BaseEventNode *node, std::vector<BaseEven
     return new_node;
 }
 
-void WorldEvents::copy_nodes(std::vector<BaseEventNode *> &start_nodes, std::vector<BaseEventNode *> &node_storage) {
+void WorldEvents::copy_nodes(std::vector<WorldEventNodes::BaseEventNode *> &start_nodes, std::vector<WorldEventNodes::BaseEventNode *> &node_storage) {
     for (auto * starting_node: starting_nodes_container) {
         auto * copied_root_node = copy_node(starting_node, node_storage);
         start_nodes.emplace_back(copied_root_node);
