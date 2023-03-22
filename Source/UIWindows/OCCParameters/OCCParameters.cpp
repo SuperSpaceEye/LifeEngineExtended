@@ -12,6 +12,10 @@ OCCParametersWindow::OCCParametersWindow(Ui::MainWindow *parent_ui, OCCParameter
     create_mutation_type_distribution();
     create_move_distance_distribution();
     create_group_size_distribution();
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void OCCParametersWindow::closeEvent(QCloseEvent *event) {

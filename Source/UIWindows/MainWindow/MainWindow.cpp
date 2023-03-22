@@ -86,6 +86,8 @@ MainWindow::MainWindow(QWidget *parent):
     resize_image(image_width, image_height);
     reset_scale_view();
 
+
+
     //Will execute on first QT show event
     QTimer::singleShot(0, [&]{
         engine_thread = std::thread{&SimulationEngine::threaded_mainloop, std::ref(engine)};

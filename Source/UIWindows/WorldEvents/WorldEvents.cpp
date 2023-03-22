@@ -24,6 +24,10 @@ WorldEvents::WorldEvents(Ui::MainWindow *parent_ui,
     //load/save world events
     ui.pushButton->hide();
     ui.pushButton_2->hide();
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void WorldEvents::closeEvent(QCloseEvent *event) {

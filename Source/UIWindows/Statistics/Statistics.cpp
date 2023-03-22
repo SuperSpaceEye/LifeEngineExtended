@@ -13,6 +13,10 @@ void Statistics::make_organism_blocks_labels() {
             layouts[n]->addWidget(lb);
         }
     }
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void Statistics::update_statistics(const OrganismInfoContainer &info, EngineDataContainer & edc, int float_precision, float scaling_zoom, float center_x, float center_y) {

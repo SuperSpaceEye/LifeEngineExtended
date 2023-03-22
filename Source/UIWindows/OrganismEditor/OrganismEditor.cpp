@@ -56,6 +56,10 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     actual_cursor.setGeometry(50, 50, 5, 5);
     actual_cursor.setStyleSheet("background-color:red;");
     actual_cursor.hide();
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void OrganismEditor::update_cell_count_label() {

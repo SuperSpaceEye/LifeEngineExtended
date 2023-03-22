@@ -12,6 +12,10 @@ Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer *edc, EngineC
     main_viewpoint_y(viewpoint_y), main_zoom(zoom), cuda_is_available(cuda_is_available){
     ui.setupUi(this);
     init_gui();
+
+    auto button = new QPushButton("Return", this);
+    QPushButton::connect(button, &QPushButton::clicked, [&](){ this->close();});
+    this->layout()->addWidget(button);
 }
 
 void Recorder::set_engine(SimulationEngine * engine) {
