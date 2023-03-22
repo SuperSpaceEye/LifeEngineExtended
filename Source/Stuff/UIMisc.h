@@ -15,9 +15,6 @@
 #include <csetjmp>
 #include <csignal>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/lexical_cast/try_lexical_convert.hpp>
-
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>

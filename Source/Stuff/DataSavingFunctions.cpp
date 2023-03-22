@@ -699,31 +699,31 @@ void DataSavingFunctions::read_organism_occ(QDataStream &is, OrganismConstructio
 
 
 
-void DataSavingFunctions::write_json_data(const std::string &path, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate) {
-    Document d;
-    d.SetObject();
-
-    d.AddMember("num_rows", Value(edc.simulation_height - 2), d.GetAllocator());
-    d.AddMember("num_cols", Value(edc.simulation_width - 2), d.GetAllocator());
-    d.AddMember("total_mutability", Value(int(total_total_mutation_rate*100)), d.GetAllocator());
-    d.AddMember("largest_cell_count", Value(0), d.GetAllocator());
-    d.AddMember("reset_count", Value(0), d.GetAllocator());
-    d.AddMember("total_ticks", Value(edc.total_engine_ticks), d.GetAllocator());
-    d.AddMember("data_update_rate", Value(100), d.GetAllocator());
-
-    json_write_grid(d, edc);
-    json_write_organisms(d, edc, sp);
-    json_write_fossil_record(d);
-    json_write_controls(d, sp);
-
-    StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    d.Accept(writer);
-
-    std::fstream file;
-    file.open(path, std::ios_base::out);
-    file << buffer.GetString();
-    file.close();
+void write_json_data(QDataStream &stream, EngineDataContainer &edc, SimulationParameters &sp, double total_total_mutation_rate) {
+//    Document d;
+//    d.SetObject();
+//
+//    d.AddMember("num_rows", Value(edc.simulation_height - 2), d.GetAllocator());
+//    d.AddMember("num_cols", Value(edc.simulation_width - 2), d.GetAllocator());
+//    d.AddMember("total_mutability", Value(int(total_total_mutation_rate*100)), d.GetAllocator());
+//    d.AddMember("largest_cell_count", Value(0), d.GetAllocator());
+//    d.AddMember("reset_count", Value(0), d.GetAllocator());
+//    d.AddMember("total_ticks", Value(edc.total_engine_ticks), d.GetAllocator());
+//    d.AddMember("data_update_rate", Value(100), d.GetAllocator());
+//
+//    json_write_grid(d, edc);
+//    json_write_organisms(d, edc, sp);
+//    json_write_fossil_record(d);
+//    json_write_controls(d, sp);
+//
+//    StringBuffer buffer;
+//    Writer<StringBuffer> writer(buffer);
+//    d.Accept(writer);
+//
+//    std::fstream file;
+//    file.open(path, std::ios_base::out);
+//    file << buffer.GetString();
+//    file.close();
 }
 
 void DataSavingFunctions::json_write_grid(Document & d, EngineDataContainer &edc) {
