@@ -6,7 +6,7 @@
 // Created by spaceeye on 16.05.2022.
 //
 
-#include "SimulationEngine//OrganismsController.h"
+#include "SimulationEngine/OrganismsController.h"
 
 #include "SimulationEngineSingleThread.h"
 
@@ -14,6 +14,10 @@ using BT = BlockTypes;
 
 void
 SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer &edc, SimulationParameters &sp, lehmer64 &gen) {
+    if (sp.growth_of_organisms) {
+        for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {grow_organism(edc, sp, organism);}}
+    }
+
     if (sp.eat_then_produce) {
         for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {eat_food(edc, sp, organism);}}
         for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {produce_food(edc, sp, organism, gen);}}
@@ -45,8 +49,10 @@ SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer &edc, Sim
 }
 
 void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp) {
+    organism.pre_init();
+    organism.init_values();
     if (edc.record_data) {edc.stc.tbuffer.record_new_organism(organism);}
-    for (auto &block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         auto pos = block.get_pos(organism.rotation);
         edc.st_grid.get_type(organism.x + pos.x, organism.y + pos.y) = block.type;
         edc.st_grid.get_rotation(organism.x + pos.x, organism.y + pos.y) = get_global_rotation(block.rotation, organism.rotation);
@@ -57,12 +63,10 @@ void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Orga
             num = 0;
         }
     }
-    organism.pre_init();
-    organism.init_values();
 }
 
 void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen) {
-    if (organism.c[BT::ProducerBlock] == 0) {return;}
+    if (organism.c[BT::ProducerBlock] <= 0) {return;}
     if (organism.c[BT::MoverBlock] > 0 && !sp.movers_can_produce_food) {return;}
     if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
 
@@ -76,14 +80,14 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, Simula
 //just iterate over all producing spaces and try to make food.
 void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer &edc, SimulationParameters &sp,
                                                            Organism &organism, lehmer64 &gen, float multiplier) {
-    for (auto & pr: organism.anatomy.producing_space) {
+    for (auto & pr: organism.get_producing_space_view()) {
         for (auto &pc: pr) {
             auto x = organism.x + pc.get_pos(organism.rotation).x;
             auto y = organism.y + pc.get_pos(organism.rotation).y;
 
             auto & type = edc.st_grid.get_type(x, y);
 
-            if (type != BT::EmptyBlock && type != BT::FoodBlock) {return;}
+            if (type != BT::EmptyBlock) {return;}
 
             if (std::uniform_real_distribution<float>(0, 1)(gen) < sp.food_production_probability * multiplier) {
                 //if couldn't add the food because there is already almost max amount.
@@ -98,7 +102,7 @@ void SimulationEngineSingleThread::produce_food_simplified(EngineDataContainer &
 
 void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc, SimulationParameters &sp,
                                                         Organism &organism, lehmer64 &gen, float multiplier) {
-    for (auto & pr: organism.anatomy.producing_space) {
+    for (auto & pr: organism.get_producing_space_view()) {
         //First checks if producer can produce
         if (std::uniform_real_distribution<float>(0, 1)(gen) > sp.food_production_probability * multiplier) { continue;}
 
@@ -108,9 +112,21 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
         auto x = organism.x + pc.get_pos(organism.rotation).x;
         auto y = organism.y + pc.get_pos(organism.rotation).y;
 
+#ifdef __DEBUG__
+        try {
+            auto & type = edc.st_grid.get_type(x, y);
+        } catch (std::runtime_error & e) {
+                std::cout << e.what() << std::endl;
+                std::cout << x << " " << y << " " << pc.relative_x << " " << pc.relative_y << " " << pc.num << " "
+                << organism.x << " " << organism.y << " " << organism.vector_index << "\n";
+                edc.chosen_organism = organism;
+                throw std::runtime_error("");
+        }
+#endif
+
         auto & type = edc.st_grid.get_type(x, y);
 
-        if (type != BT::EmptyBlock && type != BT::FoodBlock) {return;}
+        if (type != BT::EmptyBlock) {return;}
 
         if (!edc.st_grid.add_food_num(x, y, 1, sp.max_food)) { continue;}
         if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, 1);}
@@ -119,7 +135,8 @@ void SimulationEngineSingleThread::produce_food_complex(EngineDataContainer &edc
 }
 
 void SimulationEngineSingleThread::eat_food(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism) {
-    for (auto & pc: organism.anatomy.eating_space) {
+    if (organism.c[BT::MouthBlock] <= 0) {return;}
+    for (auto & pc: organism.get_eating_space_view()) {
         auto x = organism.x + pc.get_pos(organism.rotation).x;
         auto y = organism.y + pc.get_pos(organism.rotation).y;
 
@@ -142,7 +159,7 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer &edc, Organ
     if (organism.lifetime > organism.max_lifetime || organism.damage > organism.life_points) {
         organism.kill_organism(edc);
         if (edc.record_data) {edc.stc.tbuffer.record_organism_dying(organism.vector_index);}
-        for (auto & block: organism.anatomy.organism_blocks) {
+        for (auto & block: organism.get_organism_blocks_view()) {
             const auto x = organism.x + block.get_pos(organism.rotation).x;
             const auto y = organism.y + block.get_pos(organism.rotation).y;
             edc.st_grid.get_type(x, y) = BT::EmptyBlock;
@@ -156,7 +173,8 @@ void SimulationEngineSingleThread::tick_lifetime(EngineDataContainer &edc, Organ
 }
 
 void SimulationEngineSingleThread::apply_damage(EngineDataContainer & edc, SimulationParameters & sp, Organism &organism) {
-    for (auto &block: organism.anatomy.killing_space) {
+    if (organism.c[BT::KillerBlock] <= 0) {return;}
+    for (auto &block: organism.get_killing_space_view()) {
         const auto x = organism.x + block.get_pos(organism.rotation).x;
         const auto y = organism.y + block.get_pos(organism.rotation).y;
         switch (edc.st_grid.get_type(x, y)) {
@@ -269,7 +287,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer &edc, Org
     auto new_rotation = static_cast<Rotation>(new_int_rotation%4);
 
     //checks if space for organism is empty, or contains itself
-    for (auto & block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         if (check_if_block_out_of_bounds(edc, organism, block, new_rotation)) { return;}
         const auto x = organism.x + block.get_pos(new_rotation).x;
         const auto y = organism.y + block.get_pos(new_rotation).y;
@@ -285,7 +303,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer &edc, Org
         }
     }
 
-    for (auto & block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         const auto pos = block.get_pos(organism.rotation);
         const auto x = organism.x + pos.x; const auto y = organism.y + pos.y;
         edc.st_grid.get_type(x, y) = BT::EmptyBlock;
@@ -294,7 +312,7 @@ void SimulationEngineSingleThread::rotate_organism(EngineDataContainer &edc, Org
 
     //If there is a place for rotated organism, then rotation can happen
     organism.rotation = new_rotation;
-    for (auto & block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         const auto pos = block.get_pos(organism.rotation);
         const auto x = organism.x + pos.x; const auto y = organism.y + pos.y;
         edc.st_grid.get_type(x, y) = block.type;
@@ -315,13 +333,13 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer &edc, Organ
         if (!calculate_discrete_movement(edc, organism, decision, sp, new_x, new_y)) { return; }
     }
 
-    for (auto & block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         auto pos = block.get_pos(organism.rotation);
         edc.st_grid.get_type(organism.x + pos.x, organism.y + pos.y) = BT::EmptyBlock;
         edc.st_grid.get_organism_index(organism.x + pos.x, organism.y + pos.y) = -1;
     }
 
-    for (auto & block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         auto pos = block.get_pos(organism.rotation);
         edc.st_grid.get_type(new_x + pos.x, new_y + pos.y) = block.type;
         edc.st_grid.get_rotation(new_x + pos.x, new_y + pos.y) = get_global_rotation(block.rotation, organism.rotation);
@@ -337,7 +355,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer &edc, Organ
 bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer &edc, Organism &organism,
                                                              const SimulationParameters &sp, int &new_x,
                                                              int &new_y) {
-    float mass = organism.food_needed; // + organism.food_collected
+    float mass = organism.food_needed + organism.food_collected;
     auto & cd = organism.cdata;
     cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.c[BT::MoverBlock];
     cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.c[BT::MoverBlock];
@@ -354,7 +372,7 @@ bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer
     if (new_x != organism.x || new_y != organism.y) {
         bool is_clear = true;
 
-        for (auto & block: organism.anatomy.organism_blocks) {
+        for (auto & block: organism.get_organism_blocks_view()) {
             auto pos = block.get_pos(organism.rotation);
 
             auto new_pos = Vector2{new_x + pos.x, new_y + pos.y};
@@ -400,7 +418,7 @@ bool SimulationEngineSingleThread::calculate_discrete_movement(EngineDataContain
     }
 
     //Organism can move only by 1 block a simulation tick, so it will be stopped by a wall and doesn't need an out-of-bounds check.
-    for (auto & block: organism.anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         auto pos = block.get_pos(organism.rotation);
 
         auto type = edc.st_grid.get_type(new_x + pos.x, new_y + pos.y);
@@ -454,6 +472,7 @@ void SimulationEngineSingleThread::make_decision(EngineDataContainer &edc, Simul
 
 void SimulationEngineSingleThread::try_make_child(EngineDataContainer &edc, SimulationParameters &sp, Organism &organism,
                                                   lehmer64 &gen) {
+    if (sp.growth_of_organisms && !organism.is_adult) {return;}
     if (organism.child_pattern_index < 0) { organism.child_pattern_index = organism.create_child(gen, edc);}
     // if max_organisms < 0, then unlimited.
     if (edc.max_organisms >= 0 && edc.stc.num_alive_organisms >= edc.max_organisms) {return;}
@@ -488,7 +507,8 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer &edc, Simulat
     if (sp.check_if_path_is_clear) {
         int c_distance = std::abs(organism.x - child_pattern->x) + std::abs(organism.y - child_pattern->y);
 
-        for (auto & block: child_pattern->anatomy.organism_blocks) {
+          for (auto & block: child_pattern->get_organism_blocks_view()) {
+//            for (auto & block: child_pattern->anatomy.organism_blocks) {
             if (!path_is_clear(organism.x + block.get_pos(rotation).x,
                                organism.y + block.get_pos(rotation).y,
                                to_place,
@@ -499,7 +519,7 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer &edc, Simulat
     }
 
     //checking, if there is space for a child
-    for (auto & block: child_pattern->anatomy.organism_blocks) {
+    for (auto & block: child_pattern->get_organism_blocks_view()) {
         if (check_if_block_out_of_bounds(edc, *child_pattern, block, child_pattern->rotation)) {return;}
 
         auto type = edc.st_grid.get_type(child_pattern->x + block.get_pos(child_pattern->rotation).x,
@@ -526,6 +546,49 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer &edc, Simulat
     OrganismsController::get_organism_by_index(main_organism_index, edc)->child_pattern_index = -1;
 }
 
+void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, SimulationParameters &sp,
+                                                 Organism &organism) {
+    if (organism.is_adult) {return;}
+    if (organism.lifetime <= (organism.size+1)*sp.cell_growth_time) {return;}
+
+    auto & next_block = organism.anatomy.organism_blocks[organism.size];
+    if (check_if_block_out_of_bounds(edc, organism, next_block, organism.rotation)) {return;}
+    auto b_bp = organism.bp->pa[(int)next_block.type-1];
+    auto food_needed = b_bp.food_cost;
+
+    if (organism.food_collected < food_needed) {return;}
+
+    auto b_pos = next_block.get_pos(organism.rotation);
+    int x = b_pos.x + organism.x;
+    int y = b_pos.y + organism.y;
+
+    if (edc.st_grid.get_type(x, y) != BT::EmptyBlock) {return;}
+    if (sp.food_blocks_reproduction && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
+    if (sp.organisms_destroy_food) {edc.st_grid.get_food_num(x, y)=0;}
+
+    organism.size++;
+    edc.st_grid.get_type(x, y) = next_block.type;
+    edc.st_grid.get_rotation(x, y) = next_block.rotation;
+    edc.st_grid.get_organism_index(x, y) = organism.vector_index;
+    organism.food_collected -= food_needed;
+
+    if(organism.c[BT::MoverBlock] == 0 && next_block.type == BT::MoverBlock ||
+       organism.c[BT::EyeBlock]   == 0 && next_block.type == BT::EyeBlock) {
+        organism.init_brain();
+    }
+
+    organism.life_points += b_bp.life_point_amount;
+    organism.max_lifetime += sp.lifespan_multiplier * b_bp.lifetime_weight;
+    organism.c[next_block.type]++;
+    organism.food_needed += food_needed;
+    if (organism.size == organism.anatomy.organism_blocks.size()) {organism.is_adult = true;}
+
+    if (edc.record_data) {edc.stc.tbuffer.record_organism_size_change(organism);}
+#ifdef __DEBUG__
+    assert(organism.size <= organism.anatomy.organism_blocks.size());
+#endif
+}
+
 void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, const Rotation to_place, int distance,
                                                         EngineDataContainer &edc) {
     auto o_min_y = 0;
@@ -550,11 +613,11 @@ void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, cons
         case Rotation::UP:
             o_min_y = INT32_MAX;
             c_max_y = INT32_MIN;
-            for (auto & block: organism.anatomy.organism_blocks) {
+            for (auto & block: organism.get_organism_blocks_view()) {
                 auto pos = block.get_pos(organism.rotation);
                 if (pos.y < o_min_y) { o_min_y = pos.y;}
             }
-            for (auto & block: child_pattern->anatomy.organism_blocks) {
+            for (auto & block: child_pattern->get_organism_blocks_view()) {
                 auto pos = block.get_pos(child_pattern->rotation);
                 if (pos.y > c_max_y) { c_max_y = pos.y;}
             }
@@ -564,11 +627,11 @@ void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, cons
         case Rotation::LEFT:
             o_min_x = INT32_MAX;
             c_max_x = INT32_MIN;
-            for (auto & block: organism.anatomy.organism_blocks) {
+            for (auto & block: organism.get_organism_blocks_view()) {
                 auto pos = block.get_pos(organism.rotation);
                 if (pos.x < o_min_x) { o_min_x = pos.x;}
             }
-            for (auto & block: child_pattern->anatomy.organism_blocks) {
+            for (auto & block: child_pattern->get_organism_blocks_view()) {
                 auto pos = block.get_pos(child_pattern->rotation);
                 if (pos.x > c_max_x) { c_max_x = pos.x;}
             }
@@ -578,11 +641,11 @@ void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, cons
         case Rotation::DOWN:
             o_max_y = INT32_MIN;
             c_min_y = INT32_MAX;
-            for (auto & block: organism.anatomy.organism_blocks) {
+            for (auto & block: organism.get_organism_blocks_view()) {
                 auto pos = block.get_pos(organism.rotation);
                 if (pos.y > o_max_y) { o_max_y = pos.y;}
             }
-            for (auto & block: child_pattern->anatomy.organism_blocks) {
+            for (auto & block: child_pattern->get_organism_blocks_view()) {
                 auto pos = block.get_pos(child_pattern->rotation);
                 if (pos.y < c_min_y) { c_min_y = pos.y;}
             }
@@ -592,11 +655,11 @@ void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, cons
         case Rotation::RIGHT:
             o_max_x = INT32_MIN;
             c_min_x = INT32_MAX;
-            for (auto & block: organism.anatomy.organism_blocks){
+            for (auto & block: organism.get_organism_blocks_view()){
                 auto pos = block.get_pos(organism.rotation);
                 if (pos.x > o_max_x) { o_max_x = pos.x;}
             }
-            for (auto & block: child_pattern->anatomy.organism_blocks) {
+            for (auto & block: child_pattern->get_organism_blocks_view()) {
                 auto pos = block.get_pos(child_pattern->rotation);
                 if (pos.x < c_min_x) { c_min_x = pos.x;}
             }
@@ -611,9 +674,9 @@ void SimulationEngineSingleThread::child_pos_calculator(Organism &organism, cons
 
 bool SimulationEngineSingleThread::check_if_out_of_bounds(EngineDataContainer &edc, int x, int y) {
     return (x < 0 ||
-            x > edc.simulation_width - 1 ||
+            x >= edc.simulation_width ||
             y < 0 ||
-            y > edc.simulation_height - 1);
+            y >= edc.simulation_height);
 }
 
 // if any is true, then check fails, else check succeeds
@@ -655,9 +718,8 @@ bool SimulationEngineSingleThread::path_is_clear(int x, int y, Rotation directio
 
 std::array<int, 4> SimulationEngineSingleThread::get_organism_dimensions(Organism &organism) {
     std::array<int, 4> output{INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN};
-    auto & anatomy = organism.anatomy;
 
-    for (auto & block: anatomy.organism_blocks) {
+    for (auto & block: organism.get_organism_blocks_view()) {
         if (block.relative_x < output[0]) {output[0] = block.relative_x;}
         if (block.relative_y < output[1]) {output[1] = block.relative_y;}
         if (block.relative_x > output[2]) {output[2] = block.relative_x;}

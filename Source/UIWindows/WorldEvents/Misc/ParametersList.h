@@ -57,8 +57,6 @@ public:
 
     ChangeableReturn get_changeable_value_address_from_name(std::string & name);
     ChangingReturn get_changing_value_address_from_name(std::string & name);
-
-
 };
 
 #endif //LIFEENGINEEXTENDED_PARAMETERSLIST_H

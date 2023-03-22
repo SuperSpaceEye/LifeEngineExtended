@@ -12,8 +12,6 @@
 #include "Stuff/enums/BlockTypes.hpp"
 #include "Stuff/enums/Rotation.h"
 
-class Organism;
-
 struct BaseGridBlock{
 public:
     BlockTypes type = BlockTypes::EmptyBlock;

@@ -10,6 +10,8 @@
 
 #include "OrganismConstructionCode.h"
 
+using BT = BlockTypes;
+
 //Will simulate changes in cursor position and find max/min positions that occ will need to actually construct anatomy
 std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
     // min x, max x, min y, max y
@@ -87,7 +89,8 @@ std::array<int, 4> OrganismConstructionCode::calculate_construction_edges() {
     return edges;
 }
 
-SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCCLogicContainer & occ_c) {
+SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCCLogicContainer &occ_c,
+                                                                             bool organisms_grow) {
     auto * container = new SerializedOrganismStructureContainer();
 
     auto edges = calculate_construction_edges();
@@ -105,7 +108,7 @@ SerializedOrganismStructureContainer *OrganismConstructionCode::compile_code(OCC
     container->organism_blocks = compile_base_structure(container, occ_c, edges);
     edges[0]--;edges[1]++;edges[2]--;edges[3]++;
 
-    return compile_spaces(occ_c, edges, container->organism_blocks, container);
+    return compile_spaces(occ_c, edges, container->organism_blocks, container, organisms_grow);
 }
 
 void set_block(int x, int y, BlockTypes type, Rotation rotation, OCCLogicContainer &occ_c,
@@ -272,7 +275,7 @@ void OrganismConstructionCode::shift_instruction_part(SerializedOrganismStructur
 SerializedOrganismStructureContainer *
 OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::array<int, 4> &edges,
                                          std::vector<SerializedOrganismBlockContainer> &organism_blocks,
-                                         SerializedOrganismStructureContainer *container) {
+                                         SerializedOrganismStructureContainer *container, bool organisms_grow) {
     constexpr auto shifting_positions = std::array<std::array<int, 2>, 4> {
         std::array<int, 2>{ 0,-1},
         std::array<int, 2>{-1, 0},
@@ -287,14 +290,19 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
     auto &killer_space    = container->killing_space;
     auto &eye_blocks_vec  = container->eye_block_vec;
 
-    eye_blocks_vec.reserve(container->c["eye"]);
+    auto & killer_mask = container->killer_mask; killer_mask.reserve(container->c[BT::MouthBlock]);
+    auto & eating_mask = container->eating_mask; eating_mask.reserve(container->c[BT::KillerBlock]);
+
+    eye_blocks_vec.reserve(container->c[BT::EyeBlock]);
 
     auto temp_producing_space = std::vector<OCCSerializedProducingSpace>();
 
-    producing_space.resize(container->c["producer"]);
+    producing_space.resize(container->c[BT::ProducerBlock]);
     //TODO probably not very space efficient
-    eating_space.reserve(container->c["mouth"]*4);
-    killer_space.reserve(container->c["killer"]*4);
+    eating_space.reserve(container->c[BT::MouthBlock]*4);
+    killer_space.reserve(container->c[BT::KillerBlock]*4);
+    uint32_t eating_c = 0;
+    uint32_t killer_c = 0;
 
     int producer = -1;
 
@@ -314,7 +322,7 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
 
                     //organism blocks can only affect area directly connected to them, so if the space is beyond computed
                     // edges, then no other block can affect the same area
-                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
+                    if (x_ == 0 || y_ == 0 || x_ >= occ_c.occ_width || y_ >= occ_c.occ_height) {
                         temp_producing_space.emplace_back(producer, x_-center_x, y_-center_y);
                         continue;
                     }
@@ -333,8 +341,9 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
 
                     //organism blocks can only affect area directly connected to them, so if the space is beyond computed
                     // edges, then no other block can affect the same area
-                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
+                    if (x_ == 0 || y_ == 0 || x_ >= occ_c.occ_width || y_ >= occ_c.occ_height) {
                         eating_space.emplace_back(x_-center_x, y_-center_y);
+                        eating_c++;
                         continue;
                     }
                     //if space position is inside an organism block
@@ -342,15 +351,17 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
                         continue;
                     }
                     // if the space was not initialized before
-                    if (occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)].counter != occ_c.spaces_counter) {
+                    if (occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)].counter != occ_c.spaces_counter || organisms_grow) {
                         eating_space.emplace_back(x_-center_x, y_-center_y, 1);
                         auto & block = occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)];
                         block.parent_block_pos = eating_space.size() - 1;
                         block.counter = occ_c.spaces_counter;
+                        eating_c++;
                     } else {
                         eating_space[occ_c.occ_eating_space[x_ + y_ * (occ_c.occ_width+2)].parent_block_pos].num++;
                     }
                 }
+                eating_mask.emplace_back(eating_c);
                 break;
             case BlockTypes::KillerBlock:
                 for (auto & shift: shifting_positions) {
@@ -359,8 +370,9 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
 
                     //organism blocks can only affect area directly connected to them, so if the space is beyond computed
                     // edges, then no other block can affect the same area
-                    if (x_ == 0 || y_ == 0 || x_ > occ_c.occ_width || y_ > occ_c.occ_height) {
+                    if (x_ == 0 || y_ == 0 || x_ >= occ_c.occ_width || y_ >= occ_c.occ_height) {
                         killer_space.emplace_back(x_-center_x, y_-center_y);
+                        killer_c++;
                         continue;
                     }
                     //if space position is inside an organism block
@@ -368,15 +380,17 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
                         continue;
                     }
                     // if the space was not initialized before
-                    if (occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)].counter != occ_c.spaces_counter) {
+                    if (occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)].counter != occ_c.spaces_counter || organisms_grow) {
                         killer_space.emplace_back(x_-center_x, y_-center_y, 1);
                         auto & block = occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)];
                         block.parent_block_pos = killer_space.size() - 1;
                         block.counter = occ_c.spaces_counter;
+                        killer_c++;
                     } else {
                         killer_space[occ_c.occ_killing_space[x_ + y_ * (occ_c.occ_width+2)].parent_block_pos].num++;
                     }
                 }
+                killer_mask.emplace_back(killer_c);
                 break;
             case BlockTypes::EyeBlock:
 #ifdef __DEBUG__
@@ -387,7 +401,6 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
             default: break;
         }
     }
-
 
     for (auto & producing: temp_producing_space) {
         producing_space[producing.producer].emplace_back(producing.x, producing.y);
@@ -403,6 +416,20 @@ OrganismConstructionCode::compile_spaces(OCCLogicContainer &occ_c, const std::ar
         }
     }
 
+#ifdef __DEBUG__
+    if (organisms_grow) {
+        if (!killer_mask.empty()) {
+            assert(killer_mask.back() == killer_space.size());
+        } else {assert(killer_space.empty());}
+
+        if (!eating_mask.empty()) {
+        assert(eating_mask.back() == eating_space.size());
+        } else {assert(eating_space.empty());}
+
+        assert(eating_mask.size() == container->c[BT::MouthBlock]);
+        assert(killer_mask.size() == container->c[BT::KillerBlock]);
+    }
+#endif
     return container;
 }
 

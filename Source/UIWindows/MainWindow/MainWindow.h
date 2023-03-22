@@ -203,10 +203,12 @@ private:
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
     int font_size;
-    int image_width;
-    int image_height;
+    int image_width = 0;
+    int image_height = 0;
     int last_last_cursor_x_pos = 0;
     int last_last_cursor_y_pos = 0;
+
+    bool engine_error = false;
 
     static auto clock_now() {return std::chrono::high_resolution_clock::now();}
 
@@ -367,6 +369,9 @@ private slots:
     void le_continuous_movement_drag_slot();
     void le_food_threshold_slot();
     void le_max_food_slot();
+    void le_starting_organism_size_slot();
+    void le_cell_growth_modifier_slot();
+
     //Settings
     void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
@@ -414,6 +419,7 @@ private slots:
     void cb_eat_then_produce_slot(bool state);
     void cb_food_blocks_movement_slot(bool state);
     void cb_organisms_destroy_food_slot(bool state);
+    void cb_enable_organism_growth_slot(bool state);
 
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);

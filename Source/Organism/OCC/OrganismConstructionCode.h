@@ -33,7 +33,7 @@ public:
     OrganismConstructionCode & operator=(OrganismConstructionCode && code)  noexcept {occ_vector = std::move(code.occ_vector); return *this;}
 
     OrganismConstructionCode mutate(OCCParameters & occp, lehmer64 & gen);
-    SerializedOrganismStructureContainer * compile_code(OCCLogicContainer & occ_container);
+    SerializedOrganismStructureContainer *compile_code(OCCLogicContainer &occ_container, bool organisms_grow);
 
     void set_code(std::vector<OCCInstruction> && code) {occ_vector = std::move(code);}
     const std::vector<OCCInstruction> & get_code_const_ref() {return occ_vector;}
@@ -49,7 +49,7 @@ private:
     static SerializedOrganismStructureContainer *
     compile_spaces(OCCLogicContainer &occ_c, const std::array<int, 4> &edges,
                    std::vector<SerializedOrganismBlockContainer> &organism_blocks,
-                   SerializedOrganismStructureContainer *container);
+                   SerializedOrganismStructureContainer *container, bool organisms_grow);
 
     static void shift_instruction_part(SerializedOrganismStructureContainer *container, OCCLogicContainer &occ_c,
                                        const std::array<std::array<int, 2>, 8> &shift_values, std::array<int, 2> &shift,

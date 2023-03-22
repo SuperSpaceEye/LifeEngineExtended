@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     cc = ColorContainer{};
     sp = SimulationParameters{};
+//    sp.growth_of_organisms = false;
 
     cuda_is_available_var = cuda_is_available();
 
@@ -56,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent):
                                              OCCInstruction::ShiftDownRight, OCCInstruction::SetBlockProducer});
 
     if (sp.use_occ) {
-        anatomy = Anatomy(occ.compile_code(edc.stc.occl));
+        anatomy = Anatomy(occ.compile_code(edc.stc.occl, sp.growth_of_organisms));
     } else {
         anatomy.set_block(BlockTypes::MouthBlock, Rotation::UP, 0, 0);
         anatomy.set_block(BlockTypes::ProducerBlock, Rotation::UP, -1, -1);
@@ -67,10 +68,10 @@ MainWindow::MainWindow(QWidget *parent):
 
     edc.base_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                      Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
-                                     &edc.stc.occl, 1);
+                                     &edc.stc.occl, 1, 0.05, 0.1);
     edc.chosen_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
                                        Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp, &occp,
-                                       &edc.stc.occl, 1);
+                                       &edc.stc.occl, 1, 0.05, 0.1);
 
     edc.base_organism.last_decision_observation = DecisionObservation{};
     edc.chosen_organism.last_decision_observation = DecisionObservation{};
@@ -175,6 +176,11 @@ void MainWindow::mainloop_tick() {
 }
 
 void MainWindow::ui_tick() {
+    if (!ecp.engine_working && !engine_error) {
+        display_message("Simulation Engine has stopped unexpectedly.");
+        engine_error = true;
+    }
+
     if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
@@ -471,6 +477,9 @@ void MainWindow::update_statistics_info(const OrganismInfoContainer &info) {
 
 // So that changes in code values would be set by default in gui.
 void MainWindow::initialize_gui() {
+    auto temp = disable_warnings;
+    disable_warnings = true;
+
     //World settings
     ui.le_cell_size         ->setText(QString::fromStdString(std::to_string(starting_cell_size_on_resize)));
     ui.le_simulation_width  ->setText(QString::fromStdString(std::to_string(edc.simulation_width)));
@@ -481,34 +490,23 @@ void MainWindow::initialize_gui() {
     ui.cb_pause_on_total_extinction ->setChecked(sp.pause_on_total_extinction);
     ui.cb_fill_window               ->setChecked(fill_window);
     //Evolution settings
-    ui.le_food_production_probability       ->setText(QString::fromStdString(
-            to_str(sp.food_production_probability, 4)));
-    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(
-            to_str(sp.global_anatomy_mutation_rate, 2)));
-    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(
-            to_str(sp.global_brain_mutation_rate, 2)));
-    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(
-            to_str(sp.anatomy_mutation_rate_delimiter, 2)));
-    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(
-            to_str(sp.brain_mutation_rate_delimiter, 2)));
+    ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability, 4)));
+    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate, 2)));
+    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate, 2)));
+    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
+    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter, 2)));
     ui.le_move_range_delimiter              ->setText(QString::fromStdString(to_str(sp.move_range_delimiter, 2)));
     ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier, 3)));
-    ui.le_brain_min_possible_mutation_rate  ->setText(QString::fromStdString(
-            to_str(sp.brain_min_possible_mutation_rate, 3)));
-    ui.le_anatomy_min_possible_mutation_rate->setText(QString::fromStdString(
-            to_str(sp.anatomy_min_possible_mutation_rate, 3)));
-    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(
-            to_str(sp.extra_mover_reproductive_cost, 0)));
-    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(
-            to_str(sp.extra_reproduction_cost, 0)));
-    ui.le_anatomy_mutation_rate_step        ->setText(QString::fromStdString(
-            to_str(sp.anatomy_mutations_rate_mutation_step, 2)));
-    ui.le_brain_mutation_rate_step          ->setText(QString::fromStdString(
-            to_str(sp.brain_mutation_rate_mutation_step, 2)));
-    ui.le_continuous_movement_drag          ->setText(QString::fromStdString(
-            to_str(sp.continuous_movement_drag, 2)));
+    ui.le_brain_min_possible_mutation_rate  ->setText(QString::fromStdString(to_str(sp.brain_min_possible_mutation_rate, 3)));
+    ui.le_anatomy_min_possible_mutation_rate->setText(QString::fromStdString(to_str(sp.anatomy_min_possible_mutation_rate, 3)));
+    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost, 0)));
+    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost, 0)));
+    ui.le_anatomy_mutation_rate_step        ->setText(QString::fromStdString(to_str(sp.anatomy_mutations_rate_mutation_step, 2)));
+    ui.le_brain_mutation_rate_step          ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_mutation_step, 2)));
+    ui.le_continuous_movement_drag          ->setText(QString::fromStdString(to_str(sp.continuous_movement_drag, 2)));
     ui.le_food_threshold                    ->setText(QString::fromStdString(to_str(sp.food_threshold, 2)));
     ui.le_max_food                          ->setText(QString::fromStdString(to_str(sp.max_food)));
+    ui.le_cell_growth_modifier              ->setText(QString::fromStdString(to_str(sp.cell_growth_modifier)));
     ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     ui.le_look_range                        ->setText(QString::fromStdString(std::to_string(sp.look_range)));
     ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
@@ -520,6 +518,7 @@ void MainWindow::initialize_gui() {
     ui.le_max_reproduction_distance         ->setText(QString::fromStdString(std::to_string(sp.max_reproducing_distance)));
     ui.le_min_move_range                    ->setText(QString::fromStdString(std::to_string(sp.min_move_range)));
     ui.le_max_move_range                    ->setText(QString::fromStdString(std::to_string(sp.max_move_range)));
+    ui.le_starting_organism_size            ->setText(QString::fromStdString(std::to_string(sp.starting_organism_size)));
 
     ui.cb_reproducing_rotation_enabled      ->setChecked(sp.reproduction_rotation_enabled);
     ui.cb_runtime_rotation_enabled          ->setChecked(sp.runtime_rotation_enabled);
@@ -547,6 +546,7 @@ void MainWindow::initialize_gui() {
     ui.cb_use_weighted_brain                ->setChecked(sp.use_weighted_brain);
     ui.cb_organisms_destroy_food            ->setChecked(sp.organisms_destroy_food);
     ui.cb_use_continuous_movement           ->setChecked(sp.use_continuous_movement);
+    ui.cb_enable_organism_growth            ->setChecked(sp.growth_of_organisms);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
@@ -606,6 +606,8 @@ void MainWindow::initialize_gui() {
     #endif
 
     ee.update_brain_edit_visibility(sp.use_weighted_brain);
+
+    disable_warnings = temp;
 }
 
 void MainWindow::get_current_font_size() {
@@ -695,10 +697,13 @@ void MainWindow::change_main_grid_left_click() {
                         break;
                     case CursorMode::ChooseOrganism:
                         edc.ui_user_actions_pool.emplace_back(ActionType::TrySelectOrganism, pt.x + x, pt.y + y);
-                        goto endfor;
+//                        goto endfor;
+                        break;
                     case CursorMode::PlaceOrganism:
                         edc.ui_user_actions_pool.emplace_back(ActionType::TryAddOrganism, pt.x, pt.y);
                         goto endfor;
+                    case CursorMode::DebugDisplayInfo:
+                        edc.ui_user_actions_pool.emplace_back(ActionType::DebugDisplayInfo, pt.x, pt.y);
                     default:
                         break;
                 }

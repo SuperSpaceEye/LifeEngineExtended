@@ -1071,9 +1071,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-1317</y>
+                  <y>0</y>
                   <width>606</width>
-                  <height>1806</height>
+                  <height>1901</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1101,9 +1101,9 @@
                  <item>
                   <widget class="QWidget" name="widget" native="true">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                     <horstretch>10</horstretch>
-                     <verstretch>100</verstretch>
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
@@ -1112,7 +1112,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1722,6 +1722,34 @@
                      </layout>
                     </item>
                     <item>
+                     <layout class="QHBoxLayout" name="hb_starting_organism_size">
+                      <item>
+                       <widget class="QLabel" name="label_52">
+                        <property name="text">
+                         <string>Starting organism size</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_starting_organism_size"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="hb_cell_growth_modifier">
+                      <item>
+                       <widget class="QLabel" name="label_53">
+                        <property name="text">
+                         <string>Cell growth modifier</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="le_cell_growth_modifier"/>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
                      <widget class="QCheckBox" name="cb_failed_reproduction_eats_food">
                       <property name="text">
                        <string>Failed reproduction eats food</string>
@@ -1816,6 +1844,13 @@
                      <widget class="QCheckBox" name="cb_use_continuous_movement">
                       <property name="text">
                        <string>Use continuous movement</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_enable_organism_growth">
+                      <property name="text">
+                       <string>Enable organism growth</string>
                       </property>
                      </widget>
                     </item>
@@ -4567,6 +4602,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_enable_organism_growth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_enable_organism_growth_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>804</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_starting_organism_size</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_starting_organism_size_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>759</x>
+     <y>804</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>le_cell_growth_modifier</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>le_cell_growth_modifier_slot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>753</x>
+     <y>847</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4697,13 +4780,16 @@
   <slot>cb_use_continuous_movement_slot(bool)</slot>
   <slot>le_food_threshold_slot()</slot>
   <slot>le_max_food_slot()</slot>
+  <slot>cb_enable_organism_growth_slot(bool)</slot>
+  <slot>le_starting_organism_size_slot()</slot>
+  <slot>le_cell_growth_modifier_slot()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="simulation_modes"/>
   <buttongroup name="cursor_modes">
    <property name="exclusive">
     <bool>true</bool>
    </property>
   </buttongroup>
+  <buttongroup name="simulation_modes"/>
  </buttongroups>
 </ui>

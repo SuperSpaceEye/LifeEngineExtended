@@ -3,11 +3,12 @@
 //
 
 #include "WorldEvents.h"
+#include "EventNodes.h"
 
 void WorldEvents::b_apply_events_slot() {
-    std::vector<BaseEventNode*> start_nodes;
+    std::vector<WorldEventNodes::BaseEventNode*> start_nodes;
     std::vector<char> _repeating_branch;
-    std::vector<BaseEventNode*> node_storage;
+    std::vector<WorldEventNodes::BaseEventNode*> node_storage;
 
     _repeating_branch.reserve(repeating_branch.size());
 

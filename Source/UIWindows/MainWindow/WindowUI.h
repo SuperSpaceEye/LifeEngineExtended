@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.4.0
+** Created by: Qt User Interface Compiler version 6.4.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -240,6 +240,12 @@ public:
     QHBoxLayout *horizontalLayout_60;
     QLabel *label_49;
     QLineEdit *le_continuous_movement_drag;
+    QHBoxLayout *hb_starting_organism_size;
+    QLabel *label_52;
+    QLineEdit *le_starting_organism_size;
+    QHBoxLayout *hb_cell_growth_modifier;
+    QLabel *label_53;
+    QLineEdit *le_cell_growth_modifier;
     QCheckBox *cb_failed_reproduction_eats_food;
     QCheckBox *cb_rotate_every_move_tick;
     QCheckBox *cb_multiply_food_production_prob;
@@ -254,6 +260,7 @@ public:
     QCheckBox *cb_use_weighted_brain;
     QCheckBox *cb_organisms_destroy_food;
     QCheckBox *cb_use_continuous_movement;
+    QCheckBox *cb_enable_organism_growth;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -326,8 +333,8 @@ public:
     QHBoxLayout *horizontalLayout_17;
     QLabel *label_31;
     QLineEdit *le_perlin_y_modifier;
-    QButtonGroup *simulation_modes;
     QButtonGroup *cursor_modes;
+    QButtonGroup *simulation_modes;
 
     void setupUi(QWidget *MainWindow)
     {
@@ -940,7 +947,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1317, 606, 1806));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1901));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -952,11 +959,8 @@ public:
         verticalLayout_9->setContentsMargins(9, 9, 9, 9);
         widget = new QWidget(scrollAreaWidgetContents_2);
         widget->setObjectName("widget");
-        QSizePolicy sizePolicy7(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy7.setHorizontalStretch(10);
-        sizePolicy7.setVerticalStretch(100);
-        sizePolicy7.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
-        widget->setSizePolicy(sizePolicy7);
+        sizePolicy4.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
+        widget->setSizePolicy(sizePolicy4);
         widget->setMinimumSize(QSize(0, 0));
         verticalLayout_20 = new QVBoxLayout(widget);
         verticalLayout_20->setSpacing(6);
@@ -1471,6 +1475,36 @@ public:
 
         verticalLayout_20->addLayout(horizontalLayout_60);
 
+        hb_starting_organism_size = new QHBoxLayout();
+        hb_starting_organism_size->setObjectName("hb_starting_organism_size");
+        label_52 = new QLabel(widget);
+        label_52->setObjectName("label_52");
+
+        hb_starting_organism_size->addWidget(label_52);
+
+        le_starting_organism_size = new QLineEdit(widget);
+        le_starting_organism_size->setObjectName("le_starting_organism_size");
+
+        hb_starting_organism_size->addWidget(le_starting_organism_size);
+
+
+        verticalLayout_20->addLayout(hb_starting_organism_size);
+
+        hb_cell_growth_modifier = new QHBoxLayout();
+        hb_cell_growth_modifier->setObjectName("hb_cell_growth_modifier");
+        label_53 = new QLabel(widget);
+        label_53->setObjectName("label_53");
+
+        hb_cell_growth_modifier->addWidget(label_53);
+
+        le_cell_growth_modifier = new QLineEdit(widget);
+        le_cell_growth_modifier->setObjectName("le_cell_growth_modifier");
+
+        hb_cell_growth_modifier->addWidget(le_cell_growth_modifier);
+
+
+        verticalLayout_20->addLayout(hb_cell_growth_modifier);
+
         cb_failed_reproduction_eats_food = new QCheckBox(widget);
         cb_failed_reproduction_eats_food->setObjectName("cb_failed_reproduction_eats_food");
 
@@ -1541,6 +1575,11 @@ public:
 
         verticalLayout_20->addWidget(cb_use_continuous_movement);
 
+        cb_enable_organism_growth = new QCheckBox(widget);
+        cb_enable_organism_growth->setObjectName("cb_enable_organism_growth");
+
+        verticalLayout_20->addWidget(cb_enable_organism_growth);
+
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
         verticalLayout_20->addItem(verticalSpacer);
@@ -1584,7 +1623,7 @@ public:
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
         table_organism_block_parameters->setVerticalHeaderItem(5, __qtablewidgetitem9);
         QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
-        __qtablewidgetitem10->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        __qtablewidgetitem10->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled|Qt::ItemIsUserTristate);
         table_organism_block_parameters->setItem(0, 0, __qtablewidgetitem10);
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
         table_organism_block_parameters->setItem(0, 1, __qtablewidgetitem11);
@@ -1677,11 +1716,11 @@ public:
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 606, 807));
-        QSizePolicy sizePolicy8(QSizePolicy::Ignored, QSizePolicy::Preferred);
-        sizePolicy8.setHorizontalStretch(0);
-        sizePolicy8.setVerticalStretch(0);
-        sizePolicy8.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
-        scrollAreaWidgetContents->setSizePolicy(sizePolicy8);
+        QSizePolicy sizePolicy7(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        sizePolicy7.setHorizontalStretch(0);
+        sizePolicy7.setVerticalStretch(0);
+        sizePolicy7.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
+        scrollAreaWidgetContents->setSizePolicy(sizePolicy7);
         verticalLayout_5 = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_5->setSpacing(0);
         verticalLayout_5->setObjectName("verticalLayout_5");
@@ -2168,6 +2207,9 @@ public:
         QObject::connect(cb_use_continuous_movement, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_use_continuous_movement_slot(bool)));
         QObject::connect(le_food_threshold, SIGNAL(returnPressed()), MainWindow, SLOT(le_food_threshold_slot()));
         QObject::connect(le_max_food, SIGNAL(returnPressed()), MainWindow, SLOT(le_max_food_slot()));
+        QObject::connect(cb_enable_organism_growth, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_enable_organism_growth_slot(bool)));
+        QObject::connect(le_starting_organism_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_starting_organism_size_slot()));
+        QObject::connect(le_cell_growth_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_cell_growth_modifier_slot()));
 
         Tabs->setCurrentIndex(0);
 
@@ -2288,6 +2330,8 @@ public:
         label_50->setText(QCoreApplication::translate("MainWindow", "Food threshold", nullptr));
         label_51->setText(QCoreApplication::translate("MainWindow", "Max food", nullptr));
         label_49->setText(QCoreApplication::translate("MainWindow", "Continuous movement drag ", nullptr));
+        label_52->setText(QCoreApplication::translate("MainWindow", "Starting organism size", nullptr));
+        label_53->setText(QCoreApplication::translate("MainWindow", "Cell growth modifier", nullptr));
         cb_failed_reproduction_eats_food->setText(QCoreApplication::translate("MainWindow", "Failed reproduction eats food", nullptr));
         cb_rotate_every_move_tick->setText(QCoreApplication::translate("MainWindow", "Rotate every move tick", nullptr));
         cb_multiply_food_production_prob->setText(QCoreApplication::translate("MainWindow", "Multiply food production probability by number of producers", nullptr));
@@ -2302,6 +2346,7 @@ public:
         cb_use_weighted_brain->setText(QCoreApplication::translate("MainWindow", "Use weighted brain", nullptr));
         cb_organisms_destroy_food->setText(QCoreApplication::translate("MainWindow", "Organisms destroy food", nullptr));
         cb_use_continuous_movement->setText(QCoreApplication::translate("MainWindow", "Use continuous movement", nullptr));
+        cb_enable_organism_growth->setText(QCoreApplication::translate("MainWindow", "Enable organism growth", nullptr));
         label_45->setText(QCoreApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "Food Cost", nullptr));

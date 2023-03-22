@@ -49,7 +49,8 @@ struct SimulationParameters {
     int   min_organism_size = 1;
 
     int   starting_organism_size = 3;
-    float cell_growth_modifier = 0.3;
+    float cell_growth_modifier = 0.2;
+    int   cell_growth_time = 20;
 
     //Probabilities of creating child with doing:
         int add_cell = 33;
@@ -92,7 +93,7 @@ struct SimulationParameters {
     bool use_weighted_brain = true;
     bool organisms_destroy_food = true;
     bool use_continuous_movement = true;
-    bool growth_of_organisms = false;
+    bool growth_of_organisms = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

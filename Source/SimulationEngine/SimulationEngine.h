@@ -109,9 +109,9 @@ public:
     void stop_world_events(bool no_resume = true);
     void stop_world_events_no_setting_reset();
 
-    void reset_world_events(std::vector<BaseEventNode *> start_nodes,
+    void reset_world_events(std::vector<WorldEventNodes::BaseEventNode *> start_nodes,
                             std::vector<char> repeating_branch,
-                            std::vector<BaseEventNode *> node_storage);
+                            std::vector<WorldEventNodes::BaseEventNode *> node_storage);
 
     void set_seed(uint64_t new_seed);
 

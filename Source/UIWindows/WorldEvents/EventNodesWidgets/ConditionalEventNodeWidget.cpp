@@ -7,10 +7,10 @@
 #include "ConditionalEventNodeWidget.h"
 
 ConditionalEventNodeWidget::ConditionalEventNodeWidget(QWidget *parent,
-                                                       BaseEventNode * previous_node,
+                                                       WorldEventNodes::BaseEventNode * previous_node,
                                                        ParametersList & parameters_list,
                                                        QHBoxLayout * layout,
-                                                       std::vector<BaseEventNode*> & starting_nodes,
+                                                       std::vector<WorldEventNodes::BaseEventNode*> & starting_nodes,
                                                        std::vector<char*> & repeating_branch):
     pl(parameters_list), layout(layout), starting_nodes(starting_nodes), repeating_branch(repeating_branch) {
     ui.setupUi(this);
@@ -18,8 +18,8 @@ ConditionalEventNodeWidget::ConditionalEventNodeWidget(QWidget *parent,
     this->setMinimumSize(400, 200);
     this->setMaximumSize(400, 200);
 
-    node = new ConditionalEventNode<int64_t>(nullptr, 0, ConditionalMode::MoreOrEqual, ConditionalTypes::INT64, nullptr, previous_node,
-                                             nullptr, 10);
+    node = new WorldEventNodes::ConditionalEventNode<int64_t>(nullptr, 0, ConditionalMode::MoreOrEqual, ConditionalTypes::INT64, nullptr, previous_node,
+                                                              nullptr, 10);
 
     init_gui();
 }

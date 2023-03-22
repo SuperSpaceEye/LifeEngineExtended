@@ -16,6 +16,8 @@ enum class CursorMode {
     KillOrganism,
     ChooseOrganism,
     PlaceOrganism,
+
+    DebugDisplayInfo,
 };
 
 #endif //THELIFEENGINECPP_CURSORMODE_H

@@ -13,5 +13,7 @@ enum class ActionType {
     TryAddOrganism,
     TryKillOrganism,
     TrySelectOrganism,
+
+    DebugDisplayInfo,
 };
 #endif //LIFEENGINEEXTENDED_ACTIONTYPE_H

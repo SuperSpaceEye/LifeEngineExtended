@@ -52,7 +52,7 @@ private:
         for (auto & organism: edc->stc.organisms) {
             if (organism.is_dead) { continue;}
 
-            info.total_size_organism_blocks += organism.anatomy.organism_blocks.size();
+            info.total_size_organism_blocks += organism.get_organism_blocks_view().size();
             info.total_size_producing_space += organism.anatomy.producing_space.size();
             info.total_size_eating_space    += organism.anatomy.eating_space.size();
 
@@ -73,7 +73,7 @@ private:
 
                 auto & avg = info.avgs[n];
 
-                avg.size += organism.anatomy.organism_blocks.size();
+                avg.size += organism.get_organism_blocks_view().size();
 
                 avg._organism_lifetime += organism.max_lifetime;
                 avg._organism_age      += organism.lifetime;

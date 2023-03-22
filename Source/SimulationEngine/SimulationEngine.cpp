@@ -76,7 +76,20 @@ void SimulationEngine::simulation_tick() {
         return;
     }
 
-    SimulationEngineSingleThread::single_threaded_tick(edc, sp, gen);
+//    try {
+        SimulationEngineSingleThread::single_threaded_tick(edc, sp, gen);
+//    } catch (std::exception & e) {
+//        std::cout << e.what() << std::endl;
+//        ecp.stop_engine = true;
+//    } catch (std::logic_error & e) {
+//        std::cout << e.what() << std::endl;
+//        ecp.stop_engine = true;
+//    } catch (std::runtime_error & e){
+//        std::cout << e.what() << std::endl;
+//        ecp.stop_engine = true;
+//    } catch (...) {
+//        ecp.stop_engine = true;
+//    }
 }
 
 void SimulationEngine::process_user_action_pool() {
@@ -140,6 +153,22 @@ void SimulationEngine::process_user_action_pool() {
                 edc.selected_organism = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(action.x, action.y), edc);
                 goto endfor;
                 }
+                break;
+            case ActionType::DebugDisplayInfo: {
+                auto idx = edc.st_grid.get_organism_index(action.x, action.y);
+                auto o = OrganismsController::get_organism_by_index(idx, edc);
+                if (o == nullptr) { continue;}
+                std::cout << "Food collected: " << o->food_collected << "\n";
+                std::cout << "Max age: " << o->max_lifetime << "\n";
+                std::cout << "Age: " << o->lifetime << "\n";
+                std::cout << "Max size: " << o->anatomy.organism_blocks.size() << "\n";
+                std::cout << "Size: " << o->size << "\n";
+                std::cout << "Is adult: " << o->is_adult << "\n";
+                std::cout << "\n";
+
+                goto endfor;
+                }
+                break;
         }
     }
     endfor:
@@ -168,9 +197,14 @@ void SimulationEngine::action_place_organism(const Action &action) {
     new_organism->x = action.x;
     new_organism->y = action.y;
 
-    if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
+    new_organism->pre_init();
+    new_organism->init_values();
 
-    for (auto &block: new_organism->anatomy.organism_blocks) {
+    new_organism->size = new_organism->anatomy.organism_blocks.size();
+    new_organism->is_adult = true;
+    new_organism->c = new_organism->anatomy.c;
+
+    for (auto &block: new_organism->get_organism_blocks_view()) {
         int x = block.get_pos(edc.chosen_organism.rotation).x + new_organism->x;
         int y = block.get_pos(edc.chosen_organism.rotation).y + new_organism->y;
 
@@ -179,8 +213,7 @@ void SimulationEngine::action_place_organism(const Action &action) {
         edc.st_grid.get_rotation(x, y)       = get_global_rotation(block.rotation, edc.chosen_organism.rotation);
     }
 
-    new_organism->pre_init();
-    new_organism->init_values();
+    if (edc.record_data) { edc.stc.tbuffer.record_user_new_organism(*new_organism);}
 }
 
 bool SimulationEngine::action_check_if_space_for_organism_is_free(const Action &action, bool continue_flag) {
@@ -250,7 +283,9 @@ void SimulationEngine::try_kill_organism(int x, int y) {
     auto & type = edc.st_grid.get_type(x, y);
     if (type == BlockTypes::EmptyBlock || type == BlockTypes::WallBlock) { return; }
     Organism * organism_ptr = OrganismsController::get_organism_by_index(edc.st_grid.get_organism_index(x, y), edc);
-    for (auto & block: organism_ptr->anatomy.organism_blocks) {
+    //TODO why this happens.
+    if (organism_ptr == nullptr) {;return;}
+    for (auto & block: organism_ptr->get_organism_blocks_view()) {
         const auto pos = block.get_pos(organism_ptr->rotation);
         const auto ox = organism_ptr->x + pos.x;
         const auto oy = organism_ptr->y + pos.y;
@@ -453,9 +488,9 @@ const OrganismInfoContainer & SimulationEngine::get_info() {
     return info.get_info();
 }
 
-void SimulationEngine::reset_world_events(std::vector<BaseEventNode *> start_nodes,
+void SimulationEngine::reset_world_events(std::vector<WorldEventNodes::BaseEventNode *> start_nodes,
                                           std::vector<char> repeating_branch,
-                                          std::vector<BaseEventNode *> node_storage) {
+                                          std::vector<WorldEventNodes::BaseEventNode *> node_storage) {
     stop_world_events_no_setting_reset();
     world_events_controller.reset_events(std::move(start_nodes), std::move(repeating_branch), std::move(node_storage));
     unpause();

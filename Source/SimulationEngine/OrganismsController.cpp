@@ -60,7 +60,6 @@ void OrganismsController::free_main_organism(Organism *organism, EngineDataConta
     organism->child_pattern_index = -1;
 
     organism->is_dead = true;
-
     edc.stc.dead_organisms_positions.emplace_back(organism->vector_index);
 
     if (organism->vector_index < edc.stc.last_alive_position) {
@@ -128,7 +127,7 @@ void OrganismsController::try_compress_organisms(EngineDataContainer &edc) {
 
         //update indexes of swapped organisms the cells on a grid
         for (auto * organism: std::array<Organism*, 2>{left_organism, right_organism}) {
-            for (auto & block: organism->anatomy.organism_blocks) {
+            for (auto & block: organism->get_organism_blocks_view()) {
                 auto & organism_index = edc.st_grid.get_organism_index(organism->x + block.get_pos(organism->rotation).x,
                                                                        organism->y + block.get_pos(organism->rotation).y);
                 organism_index = organism->vector_index;

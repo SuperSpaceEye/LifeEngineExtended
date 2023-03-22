@@ -164,6 +164,7 @@ void MainWindow::keyPressEvent(QKeyEvent * event) {
         case Qt::Key_4: ee.rb_place_organism_slot();ee.ui.rb_place_organism->setChecked(true);break;
         case Qt::Key_5: ee.rb_choose_organism_slot();ee.ui.rb_chose_organism->setChecked(true);break;
         case Qt::Key_0: ui.rb_null_button->setChecked(true);cursor_mode = CursorMode::NoAction;break;
+        case Qt::Key_9: ui.rb_null_button->setChecked(true);cursor_mode = CursorMode::DebugDisplayInfo;break;
 
         case Qt::Key_F11: flip_fullscreen();break;
     }

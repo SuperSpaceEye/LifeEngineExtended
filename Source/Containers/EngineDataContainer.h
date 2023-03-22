@@ -60,7 +60,7 @@ struct EngineDataContainer {
 
         OCCLogicContainer occl{};
 
-        TransactionBuffer tbuffer{};
+        WorldRecorder::TransactionBuffer tbuffer{};
     };
     SingleThreadContainer stc{};
 

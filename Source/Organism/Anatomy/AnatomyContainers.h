@@ -9,8 +9,11 @@
 #ifndef LIFEENGINEEXTENDED_ANATOMYCONTAINERS_H
 #define LIFEENGINEEXTENDED_ANATOMYCONTAINERS_H
 
+#include <utility>
 #include <vector>
 #include <string_view>
+
+#include "Stuff/external/ArrayView.h"
 
 #include "Stuff/structs/Vector2.h"
 #include "Stuff/enums/BlockTypes.hpp"
@@ -73,6 +76,9 @@ struct SerializedOrganismStructureContainer {
     std::vector<SerializedAdjacentSpaceContainer> killing_space;
     std::vector<SerializedOrganismBlockContainer> eye_block_vec;
 
+    std::vector<uint32_t> eating_mask;
+    std::vector<uint32_t> killer_mask;
+
     AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_map();
 
     SerializedOrganismStructureContainer()=default;
@@ -82,6 +88,8 @@ struct SerializedOrganismStructureContainer {
             std::vector<SerializedAdjacentSpaceContainer> eating_space,
             std::vector<SerializedAdjacentSpaceContainer> killing_space,
             std::vector<SerializedOrganismBlockContainer> eye_block_vector,
+            std::vector<uint32_t> eating_mask,
+            std::vector<uint32_t> killer_mask,
 
             AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c
             ):
@@ -91,7 +99,10 @@ struct SerializedOrganismStructureContainer {
             killing_space                  (std::move(killing_space)),
             eye_block_vec                  (std::move(eye_block_vector)),
 
-            c(c)
+            eating_mask(std::move(eating_mask)),
+            killer_mask(std::move(killer_mask)),
+
+            c(std::move(c))
             {}
     void move_s(SerializedOrganismStructureContainer *structure) {
         organism_blocks = std::move(structure->organism_blocks);
@@ -100,6 +111,9 @@ struct SerializedOrganismStructureContainer {
         eating_space    = std::move(structure->eating_space);
         killing_space   = std::move(structure->killing_space);
         eye_block_vec   = std::move(structure->eye_block_vec);
+
+        eating_mask = std::move(structure->eating_mask);
+        killer_mask = std::move(structure->killer_mask);
 
         c = structure->c;
     }
@@ -110,6 +124,9 @@ struct SerializedOrganismStructureContainer {
         eating_space    = std::vector(structure->eating_space);
         killing_space   = std::vector(structure->killing_space);
         eye_block_vec   = std::vector(structure->eye_block_vec);
+
+        eating_mask = std::vector(structure->eating_mask);
+        killer_mask = std::vector(structure->killer_mask);
 
         c = structure->c;
     }

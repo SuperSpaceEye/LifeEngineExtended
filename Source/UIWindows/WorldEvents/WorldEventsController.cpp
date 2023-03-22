@@ -4,6 +4,7 @@
 
 #include "WorldEventsController.h"
 #include "UIWindows/WorldEvents/Misc/WorldEventsEnums.h"
+#include "EventNodes.h"
 
 void WorldEventsController::delete_all_nodes() {
     for (auto & node: node_storage) {
@@ -16,9 +17,9 @@ void WorldEventsController::delete_all_nodes() {
     node_storage.clear();
 }
 
-void WorldEventsController::reset_events(std::vector<BaseEventNode *> _start_nodes,
+void WorldEventsController::reset_events(std::vector<WorldEventNodes::BaseEventNode *> _start_nodes,
                                          std::vector<char> _repeating_branch,
-                                         std::vector<BaseEventNode *> _node_storage) {
+                                         std::vector<WorldEventNodes::BaseEventNode *> _node_storage) {
     delete_all_nodes();
 
     start_nodes = std::move(_start_nodes);
@@ -45,7 +46,7 @@ void WorldEventsController::reset() {
     for (auto & node: node_cursors) {
         //If execution of event stopped abruptly.
         if (node != nullptr && node->type == NodeType::ChangeValue) {
-            dynamic_cast<ChangeValueEventNode<float>*>(node)->reset_node();
+            dynamic_cast<WorldEventNodes::ChangeValueEventNode<float>*>(node)->reset_node();
         }
     }
 
