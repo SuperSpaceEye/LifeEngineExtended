@@ -17,13 +17,12 @@ option(BOOST_LIBRARYDIR "If on windows, set path to compiled libraries, like 'bo
 
 set(NO_RECORDER ON)
 
-set(DEBUG 1)
-set(INLINE 1)
-set(SANITIZE 1)
-
-#set(DEBUG 0)
-#set(INLINE 0)
-#set(SANITIZE 0)
+#set(DEBUG 1)
+#set(INLINE 1)
+#set(SANITIZE 1)
+set(DEBUG 0)
+set(INLINE 0)
+set(SANITIZE 0)
 
 # -ffast-math -funroll-loops -ftree-parallelize-loops=4
 

@@ -569,6 +569,7 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
     organism.size++;
     edc.st_grid.get_type(x, y) = next_block.type;
     edc.st_grid.get_rotation(x, y) = next_block.rotation;
+    edc.st_grid.get_organism_index(x, y) = organism.vector_index;
     organism.food_collected -= food_needed;
 
     if(organism.c[BT::MoverBlock] == 0 && next_block.type == BT::MoverBlock ||
