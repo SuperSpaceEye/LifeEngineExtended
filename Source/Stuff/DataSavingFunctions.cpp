@@ -309,6 +309,10 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("set_fixed_move_range", Value(sp.set_fixed_move_range), d.GetAllocator());
     d.AddMember("min_organism_size",    Value(sp.min_organism_size), d.GetAllocator());
 
+    d.AddMember("starting_organism_size", Value(sp.starting_organism_size), d.GetAllocator());
+    d.AddMember("cell_growth_modifier",   Value(sp.cell_growth_modifier), d.GetAllocator());
+    d.AddMember("cell_growth_time",       Value(sp.cell_growth_time), d.GetAllocator());
+
     d.AddMember("add_cell",    Value(sp.add_cell), d.GetAllocator());
     d.AddMember("change_cell", Value(sp.change_cell), d.GetAllocator());
     d.AddMember("remove_cell", Value(sp.remove_cell), d.GetAllocator());
@@ -349,6 +353,7 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("use_weighted_brain",               Value(sp.use_weighted_brain), d.GetAllocator());
     d.AddMember("organisms_destroy_food",           Value(sp.organisms_destroy_food), d.GetAllocator());
     d.AddMember("use_continuous_movement",          Value(sp.use_continuous_movement), d.GetAllocator());
+    d.AddMember("growth_of_organisms",              Value(sp.growth_of_organisms), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -386,6 +391,10 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.move_range_delimiter = d["move_range_delimiter"].GetFloat();
     sp.set_fixed_move_range = d["set_fixed_move_range"].GetBool();
     sp.min_organism_size    = d["min_organism_size"].GetInt();
+
+    sp.starting_organism_size = d["starting_organism_size"].GetInt();
+    sp.cell_growth_modifier   = d["cell_growth_modifier"].GetFloat();
+    sp.cell_growth_time       = d["cell_growth_time"].GetInt();
 
     sp.add_cell    = d["add_cell"].GetInt();
     sp.change_cell = d["change_cell"].GetInt();
@@ -427,6 +436,7 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.use_weighted_brain               = d["use_weighted_brain"].GetBool();
     sp.organisms_destroy_food           = d["organisms_destroy_food"].GetBool();
     sp.use_continuous_movement          = d["use_continuous_movement"].GetBool();
+    sp.growth_of_organisms              = d["growth_of_organisms"].GetBool();
 }
 
 

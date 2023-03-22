@@ -538,6 +538,15 @@ void MainWindow::le_set_ups_slot() {
     set_image_creator_interval(1./image_creation_interval+1);
 }
 
+void MainWindow::le_starting_organism_size_slot() {
+    le_slot_lower_bound(sp.starting_organism_size, sp.starting_organism_size, "int", ui.le_starting_organism_size, 0, "0");
+}
+
+void MainWindow::le_cell_growth_modifier_slot() {
+    le_slot_lower_upper_bound<float>(sp.cell_growth_modifier, sp.cell_growth_modifier, "float", ui.le_cell_growth_modifier, 0, "0", 1, "1");
+    sp.cell_growth_time = sp.lifespan_multiplier * sp.cell_growth_modifier;
+}
+
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
@@ -799,6 +808,21 @@ void MainWindow::cb_use_continuous_movement_slot(bool state) {
     if (state) {ui.cb_use_weighted_brain->setEnabled(false);} else {ui.cb_use_weighted_brain->setEnabled(true);}
     sp.use_continuous_movement = state;
     engine.reinit_organisms();
+}
+
+void MainWindow::cb_enable_organism_growth_slot(bool state) {
+    if (!display_dialog_message("Changing organism growth requires resetting of the simulation.", disable_warnings)) {
+        ui.cb_enable_organism_growth->setEnabled(sp.growth_of_organisms);
+        return;
+    }
+
+    ui.le_starting_organism_size->setEnabled(state);
+    ui.le_cell_growth_modifier->setEnabled(state);
+
+    engine.pause();
+    sp.growth_of_organisms = state;
+    engine.reset_world();
+    engine.unpause();
 }
 
 void MainWindow::cb_reproduction_rotation_enabled_slot   (bool state) { sp.reproduction_rotation_enabled = state;}

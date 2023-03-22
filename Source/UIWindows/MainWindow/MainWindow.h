@@ -369,6 +369,9 @@ private slots:
     void le_continuous_movement_drag_slot();
     void le_food_threshold_slot();
     void le_max_food_slot();
+    void le_starting_organism_size_slot();
+    void le_cell_growth_modifier_slot();
+
     //Settings
     void le_num_threads_slot();
     void le_update_info_every_n_milliseconds_slot();
@@ -416,6 +419,7 @@ private slots:
     void cb_eat_then_produce_slot(bool state);
     void cb_food_blocks_movement_slot(bool state);
     void cb_organisms_destroy_food_slot(bool state);
+    void cb_enable_organism_growth_slot(bool state);
 
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);
