@@ -4,6 +4,9 @@
 
 #include "Recorder.h"
 
+using namespace Textures;
+using namespace WorldRecorder;
+
 Recorder::Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer *edc, EngineControlParameters *ecp,
                    ColorContainer *cc,
                    TexturesContainer *textures, TransactionBuffer *tbuffer, float *viewpoint_x, float *viewpoint_y,

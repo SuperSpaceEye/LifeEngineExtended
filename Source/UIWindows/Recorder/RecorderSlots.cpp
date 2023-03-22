@@ -4,6 +4,8 @@
 
 #include "Recorder.h"
 
+using namespace WorldRecorder;
+
 //==================== Line edits ====================
 
 void Recorder::le_number_of_pixels_per_block_slot() {
