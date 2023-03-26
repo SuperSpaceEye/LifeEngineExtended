@@ -37,7 +37,7 @@ struct AnatomyCounters: public ConstMap<T, len, allowed> {
     }
 };
 
-constexpr auto make_map(){
+constexpr auto make_anatomy_counters(){
     return AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>{};
 };
 

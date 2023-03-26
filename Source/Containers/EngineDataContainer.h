@@ -21,6 +21,9 @@
 #include "Stuff/structs/Actions.h"
 
 struct EngineDataContainer {
+    EngineDataContainer() : chosen_organism(0, 0, Rotation::RIGHT, Anatomy(), Brain(), OrganismConstructionCode(),
+                                            nullptr, nullptr, nullptr, nullptr, 0, 0, 0, true) {}
+
     uint64_t delta_time = 0;
     // for calculating ticks/second
     uint32_t engine_ticks_between_updates = 0;

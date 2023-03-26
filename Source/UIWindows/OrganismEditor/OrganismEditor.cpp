@@ -36,13 +36,13 @@ OrganismEditor::OrganismEditor(int width, int height, Ui::MainWindow *parent_ui,
     occ.set_code(std::vector<OCCInstruction>{OCCInstruction::SetBlockMouth});
 
     editor_organism = Organism(editor_width / 2,
-                                   editor_height / 2,
-                                   Rotation::UP,
-                                   anatomy,
-                                   brain, occ,
-                                   sp,
-                                   bp, occp, occl,
-                                   1, 0.05, 0.1, true);
+                               editor_height / 2,
+                               Rotation::UP,
+                               anatomy,
+                               brain, occ,
+                               sp,
+                               bp, occp, occl,
+                               1, 0.05, 0.1, false);
 
     resize_editing_grid(width, height);
     resize_image();

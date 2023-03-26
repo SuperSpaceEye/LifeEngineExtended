@@ -67,11 +67,11 @@ MainWindow::MainWindow(QWidget *parent):
     ee.occ_mode(sp.use_occ);
 
     edc.base_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
-                                     Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
-                                     &edc.stc.occl, 1, 0.05, 0.1);
+                                 Rotation::UP, anatomy, brain, occ, &sp, &bp, &occp,
+                                 &edc.stc.occl, 1, 0.05, 0.1, false);
     edc.chosen_organism = Organism(edc.simulation_width / 2, edc.simulation_height / 2,
-                                       Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp, &occp,
-                                       &edc.stc.occl, 1, 0.05, 0.1);
+                                   Rotation::UP, Anatomy(anatomy), Brain(), OrganismConstructionCode(occ), &sp, &bp,
+                                   &occp, &edc.stc.occl, 1, 0.05, 0.1, false);
 
     edc.base_organism.last_decision_observation = DecisionObservation{};
     edc.chosen_organism.last_decision_observation = DecisionObservation{};

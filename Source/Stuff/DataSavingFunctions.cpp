@@ -182,7 +182,7 @@ void DataSavingFunctions::read_organism(std::ifstream &is, SimulationParameters 
                          &sp,
                          &bp,
                          &occp,
-                         &occl, 0, 0, 0);
+                         &occl, 0, 0, 0, false);
     read_organism_data(is, *static_cast<OrganismData*>(organism));
 }
 
@@ -1019,7 +1019,7 @@ void DataSavingFunctions::json_read_organism(rapidjson::GenericValue<rapidjson::
                              &sp,
                              &bp, nullptr, nullptr,
                              move_range,
-                             mutability);
+                             mutability, 0, false);
     new_organism->lifetime = lifetime;
     new_organism->food_collected = food_collected;
     new_organism->damage = damage;

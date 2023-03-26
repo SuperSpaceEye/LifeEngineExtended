@@ -67,7 +67,7 @@ public:
     DecisionObservation last_decision_observation = DecisionObservation{};
     BrainDecision last_decision = BrainDecision::MoveUp;
 
-    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_map();
+    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_anatomy_counters();
 
     OrganismData()=default;
     OrganismData(int x, int y, Rotation rotation, int move_range, float anatomy_mutation_rate,
@@ -85,6 +85,7 @@ struct ContinuousData {
     //force
     float p_fx = 0;
     float p_fy = 0;
+    bool initialized = false;
 };
 
 class Organism: public OrganismData {
@@ -115,7 +116,7 @@ public:
 
     void think_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 
-    void init_values(bool no_init_views=false);
+    void init_values();
 
     void kill_organism(EngineDataContainer & edc);
 
@@ -127,8 +128,8 @@ public:
     Organism(Organism&&)=default;
     Organism(int x, int y, Rotation rotation, Anatomy anatomy, Brain brain, OrganismConstructionCode occ,
              SimulationParameters *sp, OrganismBlockParameters *block_parameters, OCCParameters *occp,
-             OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate = 0.05,
-             float brain_mutation_rate = 0.1, bool no_init_views=false);
+             OCCLogicContainer *occl, int move_range, float anatomy_mutation_rate, float brain_mutation_rate,
+             bool no_init=false);
     explicit Organism(Organism *organism);
     int32_t create_child(lehmer64 &gen, EngineDataContainer &edc);
 
@@ -170,7 +171,11 @@ public:
     inline auto get_eating_space_view   () {return array_view1d<SASC>{(SASC*)anatomy.eating_space.data(),  std::min<size_t>(anatomy.eating_mask[c[BT::MouthBlock]-1], anatomy.eating_space.size())};}
     inline auto get_killing_space_view  () {return array_view1d<SASC>{(SASC*)anatomy.killing_space.data(), std::min<size_t>(anatomy.killer_mask[c[BT::KillerBlock]-1], anatomy.killing_space.size())};}
 
-    void init_brain();
+    void init_brain_type();
+
+    void mutate_legacy(Anatomy &new_anatomy, lehmer64 &gen);
+    void mutate_occ(Anatomy &new_anatomy, lehmer64 &gen, OrganismConstructionCode &new_occ);
+    void mutate_mutation_rate(float &_anatomy_mutation_rate, lehmer64 &gen) const;
 };
 
 

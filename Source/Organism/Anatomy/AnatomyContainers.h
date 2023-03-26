@@ -79,7 +79,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<uint32_t> eating_mask;
     std::vector<uint32_t> killer_mask;
 
-    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_map();
+    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_anatomy_counters();
 
     SerializedOrganismStructureContainer()=default;
     SerializedOrganismStructureContainer(

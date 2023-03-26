@@ -67,7 +67,7 @@ SerializedOrganismStructureContainer * Anatomy::add_block(BlockTypes type, int b
     block.rotation = rotation;
     _organism_blocks[x][y] = block;
 
-    auto _c = make_map();
+    auto _c = make_anatomy_counters();
     _c = c;
     _c[type]++;
 
@@ -131,7 +131,7 @@ SerializedOrganismStructureContainer * Anatomy::change_block(BlockTypes type, in
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    auto _c = make_map();
+    auto _c = make_anatomy_counters();
     _c = c;
 
     _c[organism_blocks[block_choice].type]--;
@@ -177,7 +177,7 @@ SerializedOrganismStructureContainer * Anatomy::remove_block(int block_choice) {
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
 //    boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    auto _c = make_map();
+    auto _c = make_anatomy_counters();
     _c = c;
     _c[organism_blocks[block_choice].type]--;
 
@@ -265,7 +265,7 @@ void Anatomy::set_many_blocks(const std::vector<SerializedOrganismBlockContainer
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
     boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-    auto _c = make_map();
+    auto _c = make_anatomy_counters();
     for (auto & block: blocks) {
         _c[block.type]++;
 
@@ -340,6 +340,8 @@ Vector2<int> Anatomy::recenter_to_existing() {
 
     Vector2<int32_t> new_center_pos = {organism_blocks[block_pos_in_vec].relative_x, organism_blocks[block_pos_in_vec].relative_y};
 
+    if (new_center_pos.x == 0 && new_center_pos.y == 0) {return {0, 0};}
+
     subtract_difference(new_center_pos.x, new_center_pos.y);
     return {new_center_pos.x, new_center_pos.y};
 }
@@ -358,6 +360,8 @@ Vector2<int> Anatomy::recenter_to_imaginary() {
 
     auto diff_x = (max.x - min.x) / 2 + min.x;
     auto diff_y = (max.y - min.y) / 2 + min.y;
+
+    if (diff_x == 0 && diff_y == 0) {return {0, 0};}
 
     subtract_difference(diff_x, diff_y);
 

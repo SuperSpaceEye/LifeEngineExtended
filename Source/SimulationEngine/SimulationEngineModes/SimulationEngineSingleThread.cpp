@@ -563,6 +563,7 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
     int y = b_pos.y + organism.y;
 
     if (edc.st_grid.get_type(x, y) != BT::EmptyBlock) {return;}
+    //TODO instead of food_blocks_reproduction make new parameter food_blocks_growth
     if (sp.food_blocks_reproduction && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
     if (sp.organisms_destroy_food) {
         auto & num = edc.st_grid.get_food_num(x, y);
@@ -578,7 +579,7 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
 
     if(organism.c[BT::MoverBlock] == 0 && next_block.type == BT::MoverBlock ||
        organism.c[BT::EyeBlock]   == 0 && next_block.type == BT::EyeBlock) {
-        organism.init_brain();
+        organism.init_brain_type();
     }
 
     organism.life_points += b_bp.life_point_amount;
