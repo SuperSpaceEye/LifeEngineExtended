@@ -137,7 +137,7 @@ public:
     void calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen);
 
     //TODO make init_values include pre_init, but rename original init_values to something else to separate usages
-    void pre_init(bool no_init_views=false);
+    void pre_init();
     
 //    using BlockTypes   = BlockTypes;
 //    using SerializedAdjacentSpaceContainer = SerializedAdjacentSpaceContainer;

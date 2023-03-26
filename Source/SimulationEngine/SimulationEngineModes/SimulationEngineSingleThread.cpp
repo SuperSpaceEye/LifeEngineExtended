@@ -564,7 +564,11 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
 
     if (edc.st_grid.get_type(x, y) != BT::EmptyBlock) {return;}
     if (sp.food_blocks_reproduction && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
-    if (sp.organisms_destroy_food) {edc.st_grid.get_food_num(x, y)=0;}
+    if (sp.organisms_destroy_food) {
+        auto & num = edc.st_grid.get_food_num(x, y);
+        if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, -num);}
+        num=0;
+    }
 
     organism.size++;
     edc.st_grid.get_type(x, y) = next_block.type;

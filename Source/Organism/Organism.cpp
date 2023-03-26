@@ -39,7 +39,7 @@ Organism::Organism(Organism *organism): anatomy(organism->anatomy), sp(organism-
     init_values();
 }
 
-void Organism::pre_init(bool no_init_views) {
+void Organism::pre_init() {
     if (!sp->growth_of_organisms) {
         c = anatomy.c;
         size = -1;
@@ -90,37 +90,30 @@ void Organism::init_values(bool no_init_views) {
 }
 
 void Organism::init_brain() {
-    if (c[BT::EyeBlock] == 0) { brain.brain_type = BrainTypes::RandomActions;} else {
-        if (c[BT::MoverBlock] > 0) {
-            if (!sp->use_weighted_brain) {
-                brain.brain_type = BrainTypes::SimpleBrain;
-            } else {
-                brain.brain_type = BrainTypes::WeightedBrain;
-            }
-        } else {
-            brain.brain_type = BrainTypes::RandomActions;
-        }
+    if (c[BT::EyeBlock] == 0)   {brain.brain_type = BrainTypes::RandomActions; return;}
+    if (c[BT::MoverBlock] <= 0) {brain.brain_type = BrainTypes::RandomActions; return;}
+
+    if (!sp->use_weighted_brain) {
+        brain.brain_type = BrainTypes::SimpleBrain;
+    } else {
+        brain.brain_type = BrainTypes::WeightedBrain;
     }
 }
 
 float Organism::calculate_max_life() {
-    life_points = 0;
-    if (!sp->growth_of_organisms) {
-        for (auto &item: anatomy.organism_blocks) { life_points += bp->pa[int(item.type) - 1].life_point_amount; }
-    } else {
-        for (int i = 0; i < size; i++) {
-            life_points += bp->pa[int(anatomy.organism_blocks[i].type) - 1].life_point_amount;}
-    }
+    int max_point = anatomy.organism_blocks.size();
+    if (sp->growth_of_organisms) {max_point = size;}
+    life_points = std::accumulate(anatomy.organism_blocks.begin(), anatomy.organism_blocks.begin()+max_point,0,
+    [&](auto sum, auto & item){return sum + bp->pa[int(item.type)-1].life_point_amount;});
+
     return life_points;
 }
 
 int Organism::calculate_organism_lifetime() {
-    float lifetime_weights = 0;
-    if (!sp->growth_of_organisms) {
-        for (auto &block: anatomy.organism_blocks) { lifetime_weights += bp->pa[(int) block.type - 1].lifetime_weight; }
-    } else {
-        for (int i = 0; i < size; i++) { lifetime_weights += bp->pa[int(anatomy.organism_blocks[i].type) - 1].lifetime_weight;}
-    }
+    int max_point = anatomy.organism_blocks.size();
+    if (sp->growth_of_organisms) {max_point = size;}
+    float lifetime_weights = std::accumulate(anatomy.organism_blocks.begin(), anatomy.organism_blocks.begin()+max_point, 0,
+       [&](auto sum, auto & item){return sum + bp->pa[int(item.type)-1].lifetime_weight;});
 
     max_lifetime = static_cast<int>(lifetime_weights * sp->lifespan_multiplier);
     return max_lifetime;
@@ -128,11 +121,12 @@ int Organism::calculate_organism_lifetime() {
 
 float Organism::calculate_food_needed() {
     food_needed = sp->extra_reproduction_cost + sp->extra_mover_reproductive_cost * (anatomy.c[BT::MoverBlock] > 0);
-    if (!sp->growth_of_organisms) {
-        for (auto &block: anatomy.organism_blocks) { food_needed += bp->pa[(int) block.type - 1].food_cost; }
-    } else {
-        for (int i = 0; i < size; i++) {food_needed += bp->pa[int(anatomy.organism_blocks[i].type) - 1].food_cost;}
-    }
+
+    int max_point = anatomy.organism_blocks.size();
+    if (sp->growth_of_organisms) {max_point = size;}
+    food_needed = std::accumulate(anatomy.organism_blocks.begin(), anatomy.organism_blocks.begin()+max_point, food_needed,
+  [&](auto sum, auto & item){return sum + bp->pa[int(item.type)-1].food_cost;});
+
     return food_needed;
 }
 

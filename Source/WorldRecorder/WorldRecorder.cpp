@@ -144,6 +144,7 @@ void WorldRecorder::TransactionBuffer::flush_transactions() {
         out.write((char*)&size, sizeof(int));
         out.write((char*)transaction.organism_size_change.data(), sizeof(OSizeChange)*size);
 
+
         size = transaction.user_action_execution_order.size();
         out.write((char*)&size, sizeof(int));
         out.write((char*)transaction.user_action_execution_order.data(), sizeof(RecActionType)*size);
