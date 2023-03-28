@@ -16,8 +16,6 @@
 
 #include "Brain/Brain.h"
 #include "Brain/Observation.h"
-#include "Brain/Observation.h"
-#include "Stuff/enums/Rotation.h"
 #include "Stuff/enums/Rotation.h"
 #include "Containers/SimulationParameters.h"
 #include "Containers/OrganismBlockParameters.h"
@@ -26,6 +24,19 @@
 #include "Anatomy/Anatomy.h"
 
 struct EngineDataContainer;
+
+struct ContinuousData {
+    // physics
+    float p_x = 0;
+    float p_y = 0;
+    //velocity
+    float p_vx = 0;
+    float p_vy = 0;
+    //force
+    float p_fx = 0;
+    float p_fy = 0;
+    bool initialized = false;
+};
 
 struct OrganismData {
 public:
@@ -46,8 +57,8 @@ public:
     float brain_mutation_rate = 0.1;
 
     float food_collected = 0;
-    //if growth of organisms is enabled it will work as "mass"
     float food_needed = 0;
+    float mass = 0;
 
     float multiplier = 1;
 
@@ -56,13 +67,11 @@ public:
 
     int move_counter = 0;
 
-    //TODO make evolvable
-    int max_decision_lifetime = 2;
-    int max_do_nothing_lifetime = 3;
-
     uint32_t size = -1;
 
     bool is_adult = false;
+
+    ContinuousData cdata;
 
     DecisionObservation last_decision_observation = DecisionObservation{};
     BrainDecision last_decision = BrainDecision::MoveUp;
@@ -75,22 +84,8 @@ public:
                                              brain_mutation_rate(brain_mutation_rate), move_range(move_range) {};
 };
 
-struct ContinuousData {
-    // physics
-    float p_x = 0;
-    float p_y = 0;
-    //velocity
-    float p_vx = 0;
-    float p_vy = 0;
-    //force
-    float p_fx = 0;
-    float p_fy = 0;
-    bool initialized = false;
-};
-
 class Organism: public OrganismData {
 public:
-    ContinuousData cdata;
     Anatomy anatomy;
     Brain brain;
     OrganismConstructionCode occ;
@@ -100,8 +95,6 @@ public:
     OCCLogicContainer * occl = nullptr;
     int32_t child_pattern_index = -1;
     int32_t vector_index = -1;
-
-
 
     bool is_dead = false;
 

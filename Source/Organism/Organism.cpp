@@ -49,17 +49,22 @@ void Organism::pre_init() {
         is_adult = true;
     } else {
         c = make_anatomy_counters();
-        food_needed = 0;
         for (int i = 0; i < std::min<int64_t>(
                 sp->starting_organism_size, anatomy.organism_blocks.size()); i++){
             c[anatomy.organism_blocks[i].type]++;
-            food_needed += bp->pa[(int)anatomy.organism_blocks[i].type-1].food_cost;
         }
         size = std::min<int>(sp->starting_organism_size, anatomy.organism_blocks.size());
         is_adult = size == anatomy.organism_blocks.size();
     }
+
+    int max_point = sp->growth_of_organisms ? size : anatomy.organism_blocks.size();
+    mass = std::accumulate(anatomy.organism_blocks.begin(), anatomy.organism_blocks.begin()+max_point, 0,
+    [&](auto sum, auto & item){return sum + bp->pa[int(item.type)-1].food_cost;});
+
     lifetime = 0;
     damage = 0;
+
+    cdata = ContinuousData{};
 }
 
 void Organism::init_values() {
@@ -129,7 +134,7 @@ float Organism::calculate_food_needed() {
     int max_point = anatomy.organism_blocks.size();
     if (sp->growth_of_organisms) {max_point = size;}
     food_needed = std::accumulate(anatomy.organism_blocks.begin(), anatomy.organism_blocks.begin()+max_point, food_needed,
-  [&](auto sum, auto & item){return sum + bp->pa[int(item.type)-1].food_cost;});
+    [&](auto sum, auto & item){return sum + bp->pa[int(item.type)-1].food_cost;});
 
     return food_needed;
 }
@@ -308,24 +313,8 @@ void Organism::calculate_discrete_decision(std::vector<Observation> &organism_ob
 }
 
 void Organism::move_organism(Organism &organism) {
-    x = organism.x;
-    y = organism.y;
-    life_points = organism.life_points;
-    damage = organism.damage;
-    max_lifetime = organism.max_lifetime;
-    lifetime = organism.lifetime;
-    anatomy_mutation_rate = organism.anatomy_mutation_rate;
-    brain_mutation_rate = organism.brain_mutation_rate;
-    food_collected = organism.food_collected;
-    food_needed = organism.food_needed;
-    multiplier = organism.multiplier;
-    move_range = organism.move_range;
-    rotation = organism.rotation;
-    move_counter = organism.move_counter;
-    max_decision_lifetime = organism.max_decision_lifetime;
-    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
+    *(OrganismData*)this = *(OrganismData*)&organism;
 
-    cdata = organism.cdata;
     brain = organism.brain;
     anatomy = std::move(organism.anatomy);
     occ = std::move(organism.occ);
@@ -338,24 +327,8 @@ void Organism::move_organism(Organism &organism) {
 }
 
 void Organism::copy_organism(const Organism &organism) {
-    x = organism.x;
-    y = organism.y;
-    life_points = organism.life_points;
-    damage = organism.damage;
-    max_lifetime = organism.max_lifetime;
-    lifetime = organism.lifetime;
-    anatomy_mutation_rate = organism.anatomy_mutation_rate;
-    brain_mutation_rate = organism.brain_mutation_rate;
-    food_collected = organism.food_collected;
-    food_needed = organism.food_needed;
-    multiplier = organism.multiplier;
-    move_range = organism.move_range;
-    rotation = organism.rotation;
-    move_counter = organism.move_counter;
-    max_decision_lifetime = organism.max_decision_lifetime;
-    max_do_nothing_lifetime = organism.max_do_nothing_lifetime;
+    *(OrganismData*)this = *(OrganismData*)&organism;
 
-    cdata = organism.cdata;
     brain = organism.brain;
     anatomy = organism.anatomy;
     occ = organism.occ;
