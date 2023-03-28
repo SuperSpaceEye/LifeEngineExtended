@@ -427,9 +427,6 @@ void SimulationEngine::reinit_organisms() {
             organism.init_values();
         }
     }
-    for (auto & organism: edc.stc.child_organisms) {
-        organism.init_values();
-    }
 
     unpause();
 }
