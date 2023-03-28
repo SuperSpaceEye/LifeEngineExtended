@@ -508,7 +508,6 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer &edc, Simulat
         int c_distance = std::abs(organism.x - child_pattern->x) + std::abs(organism.y - child_pattern->y);
 
           for (auto & block: child_pattern->get_organism_blocks_view()) {
-//            for (auto & block: child_pattern->anatomy.organism_blocks) {
             if (!path_is_clear(organism.x + block.get_pos(rotation).x,
                                organism.y + block.get_pos(rotation).y,
                                to_place,
@@ -563,8 +562,7 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
     int y = b_pos.y + organism.y;
 
     if (edc.st_grid.get_type(x, y) != BT::EmptyBlock) {return;}
-    //TODO instead of food_blocks_reproduction make new parameter food_blocks_growth
-    if (sp.food_blocks_reproduction && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
+    if (sp.food_blocks_growth && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
     if (sp.organisms_destroy_food) {
         auto & num = edc.st_grid.get_food_num(x, y);
         if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, -num);}

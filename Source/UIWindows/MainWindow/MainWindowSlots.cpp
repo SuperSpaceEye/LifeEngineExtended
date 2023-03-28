@@ -818,6 +818,7 @@ void MainWindow::cb_enable_organism_growth_slot(bool state) {
 
     ui.le_starting_organism_size->setEnabled(state);
     ui.le_cell_growth_modifier->setEnabled(state);
+    ui.cb_food_blocks_growth->setEnabled(state);
 
     engine.pause();
     sp.growth_of_organisms = state;
@@ -877,6 +878,8 @@ void MainWindow::cb_do_not_mutate_brain_of_plants_slot   (bool state) { sp.do_no
 
 //TODO destroy food under organisms on enable?
 void MainWindow::cb_organisms_destroy_food_slot          (bool state) { sp.organisms_destroy_food = state;}
+
+void MainWindow::cb_food_blocks_growth_slot              (bool state) { sp.food_blocks_growth = state;}
 
 void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 

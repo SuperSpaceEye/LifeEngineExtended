@@ -420,6 +420,7 @@ private slots:
     void cb_food_blocks_movement_slot(bool state);
     void cb_organisms_destroy_food_slot(bool state);
     void cb_enable_organism_growth_slot(bool state);
+    void cb_food_blocks_growth_slot(bool state);
 
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);

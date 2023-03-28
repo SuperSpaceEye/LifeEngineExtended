@@ -1071,9 +1071,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>0</y>
+                  <y>-1597</y>
                   <width>606</width>
-                  <height>1901</height>
+                  <height>1930</height>
                  </rect>
                 </property>
                 <property name="sizePolicy">
@@ -1112,7 +1112,7 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                   <layout class="QVBoxLayout" name="verticalLayout_20" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                     <property name="spacing">
                      <number>6</number>
                     </property>
@@ -1851,6 +1851,13 @@
                      <widget class="QCheckBox" name="cb_enable_organism_growth">
                       <property name="text">
                        <string>Enable organism growth</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cb_food_blocks_growth">
+                      <property name="text">
+                       <string>Food blocks growth</string>
                       </property>
                      </widget>
                     </item>
@@ -4650,6 +4657,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>cb_food_blocks_growth</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cb_food_blocks_growth_slot(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>794</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>449</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>tb_pause_slot(bool)</slot>
@@ -4783,6 +4806,7 @@
   <slot>cb_enable_organism_growth_slot(bool)</slot>
   <slot>le_starting_organism_size_slot()</slot>
   <slot>le_cell_growth_modifier_slot()</slot>
+  <slot>cb_food_blocks_growth_slot(bool)</slot>
  </slots>
  <buttongroups>
   <buttongroup name="cursor_modes">

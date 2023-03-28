@@ -261,6 +261,7 @@ public:
     QCheckBox *cb_organisms_destroy_food;
     QCheckBox *cb_use_continuous_movement;
     QCheckBox *cb_enable_organism_growth;
+    QCheckBox *cb_food_blocks_growth;
     QSpacerItem *verticalSpacer;
     QLabel *label_45;
     QTableWidget *table_organism_block_parameters;
@@ -947,7 +948,7 @@ public:
         scrollArea_2->setAlignment(Qt::AlignCenter);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName("scrollAreaWidgetContents_2");
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 606, 1901));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, -1597, 606, 1930));
         QSizePolicy sizePolicy6(QSizePolicy::Ignored, QSizePolicy::Expanding);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1580,6 +1581,11 @@ public:
 
         verticalLayout_20->addWidget(cb_enable_organism_growth);
 
+        cb_food_blocks_growth = new QCheckBox(widget);
+        cb_food_blocks_growth->setObjectName("cb_food_blocks_growth");
+
+        verticalLayout_20->addWidget(cb_food_blocks_growth);
+
         verticalSpacer = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Minimum);
 
         verticalLayout_20->addItem(verticalSpacer);
@@ -2210,6 +2216,7 @@ public:
         QObject::connect(cb_enable_organism_growth, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_enable_organism_growth_slot(bool)));
         QObject::connect(le_starting_organism_size, SIGNAL(returnPressed()), MainWindow, SLOT(le_starting_organism_size_slot()));
         QObject::connect(le_cell_growth_modifier, SIGNAL(returnPressed()), MainWindow, SLOT(le_cell_growth_modifier_slot()));
+        QObject::connect(cb_food_blocks_growth, SIGNAL(toggled(bool)), MainWindow, SLOT(cb_food_blocks_growth_slot(bool)));
 
         Tabs->setCurrentIndex(0);
 
@@ -2347,6 +2354,7 @@ public:
         cb_organisms_destroy_food->setText(QCoreApplication::translate("MainWindow", "Organisms destroy food", nullptr));
         cb_use_continuous_movement->setText(QCoreApplication::translate("MainWindow", "Use continuous movement", nullptr));
         cb_enable_organism_growth->setText(QCoreApplication::translate("MainWindow", "Enable organism growth", nullptr));
+        cb_food_blocks_growth->setText(QCoreApplication::translate("MainWindow", "Food blocks growth", nullptr));
         label_45->setText(QCoreApplication::translate("MainWindow", "Organism blocks parameters modifiers", nullptr));
         QTableWidgetItem *___qtablewidgetitem = table_organism_block_parameters->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "Food Cost", nullptr));

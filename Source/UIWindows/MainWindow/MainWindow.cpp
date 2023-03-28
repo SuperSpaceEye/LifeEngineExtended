@@ -547,6 +547,7 @@ void MainWindow::initialize_gui() {
     ui.cb_organisms_destroy_food            ->setChecked(sp.organisms_destroy_food);
     ui.cb_use_continuous_movement           ->setChecked(sp.use_continuous_movement);
     ui.cb_enable_organism_growth            ->setChecked(sp.growth_of_organisms);
+    ui.cb_food_blocks_growth                ->setChecked(sp.food_blocks_growth);
 
     //Settings
     ui.le_perlin_persistence->setText(QString::fromStdString(to_str(sp.perlin_persistence, 3)));
@@ -622,21 +623,14 @@ void MainWindow::get_current_font_size() {
 }
 
 void MainWindow::update_world_event_values_ui() {
-    ui.le_food_production_probability       ->setText(QString::fromStdString(
-            to_str(sp.food_production_probability, 4)));
-    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(
-            to_str(sp.global_anatomy_mutation_rate, 2)));
-    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(
-            to_str(sp.global_brain_mutation_rate, 2)));
-    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(
-            to_str(sp.anatomy_mutation_rate_delimiter, 2)));
-    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(
-            to_str(sp.brain_mutation_rate_delimiter, 2)));
+    ui.le_food_production_probability       ->setText(QString::fromStdString(to_str(sp.food_production_probability, 4)));
+    ui.le_global_anatomy_mutation_rate      ->setText(QString::fromStdString(to_str(sp.global_anatomy_mutation_rate, 2)));
+    ui.le_global_brain_mutation_rate        ->setText(QString::fromStdString(to_str(sp.global_brain_mutation_rate, 2)));
+    ui.le_anatomy_mutation_rate_delimiter   ->setText(QString::fromStdString(to_str(sp.anatomy_mutation_rate_delimiter, 2)));
+    ui.le_brain_mutation_rate_delimiter     ->setText(QString::fromStdString(to_str(sp.brain_mutation_rate_delimiter, 2)));
     ui.le_lifespan_multiplier               ->setText(QString::fromStdString(to_str(sp.lifespan_multiplier, 3)));
-    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(
-            to_str(sp.extra_mover_reproductive_cost, 0)));
-    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(
-            to_str(sp.extra_reproduction_cost, 0)));
+    ui.le_extra_mover_reproduction_cost     ->setText(QString::fromStdString(to_str(sp.extra_mover_reproductive_cost, 0)));
+    ui.le_extra_reproduction_cost           ->setText(QString::fromStdString(to_str(sp.extra_reproduction_cost, 0)));
     ui.le_produce_food_every_n_tick         ->setText(QString::fromStdString(std::to_string(sp.produce_food_every_n_life_ticks)));
     ui.le_auto_produce_n_food               ->setText(QString::fromStdString(std::to_string(sp.auto_produce_n_food)));
     ui.le_auto_produce_food_every_n_tick    ->setText(QString::fromStdString(std::to_string(sp.auto_produce_food_every_n_ticks)));
