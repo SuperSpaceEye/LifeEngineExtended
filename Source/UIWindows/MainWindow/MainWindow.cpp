@@ -147,10 +147,13 @@ MainWindow::MainWindow(QWidget *parent):
 
 void MainWindow::mainloop_tick() {
     ui_tick();
+    statistics_tick();
+}
 
+void MainWindow::statistics_tick() {
     auto info_update = std::chrono::duration_cast<std::chrono::microseconds>(clock_now() - fps_timer).count();
 
-    if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds*1000) {
+    if (synchronise_info_update_with_window_update || info_update >= update_info_every_n_milliseconds * 1000) {
         uint32_t simulation_frames = edc.engine_ticks_between_updates;
         edc.engine_ticks_between_updates = 0;
 
@@ -176,11 +179,12 @@ void MainWindow::mainloop_tick() {
 }
 
 void MainWindow::ui_tick() {
+#ifdef __DEBUG__
     if (!ecp.engine_working && !engine_error) {
         display_message("Simulation Engine has stopped unexpectedly.");
         engine_error = true;
     }
-
+#endif
     if (ecp.update_editor_organism) { ee.load_chosen_organism(); ecp.update_editor_organism = false;}
 
     if (resize_simulation_grid_flag) { resize_simulation_grid(); resize_simulation_grid_flag=false;}
@@ -204,8 +208,12 @@ void MainWindow::ui_tick() {
 
     window_frames++;
 
-    if (pause_grid_parsing && really_stop_render) { return;}
+    load_grid_image();
+}
 
+//loads constructed image of simulation from image creation thread with minimal main thread blocking
+void MainWindow::load_grid_image() {
+    if (pause_grid_parsing && really_stop_render) { return;}
     if (do_not_parse_image_data_ct) { return;}
     do_not_parse_image_data_mt.store(true);
     pixmap_item.setPixmap(QPixmap::fromImage(QImage(image_vectors[ready_buffer].data(), image_width, image_height, QImage::Format_RGB32).copy()));
@@ -263,66 +271,6 @@ void MainWindow::reset_scale_view() {
 }
 
 
-void MainWindow::create_image() {
-    while (do_not_parse_image_data_mt) {}
-    do_not_parse_image_data_ct.store(true);
-
-    std::vector<int> lin_width;
-    std::vector<int> lin_height;
-    std::vector<int> truncated_lin_width;
-    std::vector<int> truncated_lin_height;
-
-    pre_parse_simulation_grid_stage(lin_width, lin_height, truncated_lin_width, truncated_lin_height);
-
-    parse_simulation_grid_stage(truncated_lin_width, truncated_lin_height);
-
-    int new_buffer = !bool(ready_buffer);
-
-#ifdef __CUDA_USED__
-    void * cuda_creator_ptr = &cuda_creator;
-#else
-    void * cuda_creator_ptr = nullptr;
-#endif
-
-    ImageCreation::create_image(lin_width, lin_height, edc.simulation_width, edc.simulation_height, cc, textures,
-                                image_width, image_height, image_vectors[new_buffer], edc.simple_state_grid,
-                                use_cuda, cuda_is_available_var, cuda_creator_ptr, truncated_lin_width,
-                                truncated_lin_height, false, 1);
-
-    ready_buffer = new_buffer;
-    do_not_parse_image_data_ct.store(false);
-}
-
-void MainWindow::parse_simulation_grid_stage(const std::vector<int> &truncated_lin_width,
-                                             const std::vector<int> &truncated_lin_height) {
-    if (!pause_grid_parsing && !ecp.engine_global_pause) {
-        parse_simulation_grid(truncated_lin_width, truncated_lin_height);
-    }
-}
-
-void MainWindow::pre_parse_simulation_grid_stage(std::vector<int> &lin_width, std::vector<int> &lin_height,
-                                                 std::vector<int> &truncated_lin_width,
-                                                 std::vector<int> &truncated_lin_height) {
-    image_width  = ui.simulation_graphicsView->viewport()->width();
-    image_height = ui.simulation_graphicsView->viewport()->height();
-    resize_image(image_width, image_height);
-    int scaled_width  = image_width * scaling_zoom;
-    int scaled_height = image_height * scaling_zoom;
-
-    // start and y coordinates on simulation grid
-    auto start_x = int(center_x - (scaled_width / 2));
-    auto end_x   = int(center_x + (scaled_width / 2));
-
-    auto start_y = int(center_y - (scaled_height / 2));
-    auto end_y   = int(center_y + (scaled_height / 2));
-    ImageCreation::calculate_linspace(lin_width, lin_height, start_x, end_x, start_y, end_y, image_width, image_height);
-
-    truncated_lin_width .reserve(std::abs(lin_width [lin_width.size() -1])+1);
-    truncated_lin_height.reserve(std::abs(lin_height[lin_height.size()-1])+1);
-
-    ImageCreation::calculate_truncated_linspace(image_width, image_height, lin_width, lin_height, truncated_lin_width, truncated_lin_height);
-}
-
 void MainWindow::set_image_creator_interval(int max_window_fps) {
     if (max_window_fps <= 0) {
         image_creation_interval = 0.;
@@ -348,22 +296,6 @@ void MainWindow::set_simulation_interval(int max_simulation_fps) {
 }
 
 
-void MainWindow::parse_simulation_grid(const std::vector<int> &lin_width, const std::vector<int> &lin_height) {
-    for (int x: lin_width) {
-        if (x < 0 || x >= edc.simulation_width) { continue; }
-        for (int y: lin_height) {
-            if (y < 0 || y >= edc.simulation_height) { continue; }
-            auto type = edc.st_grid.get_type(x, y);
-            auto & simple_block = edc.simple_state_grid[x + y * edc.simulation_width];
-            simple_block.type = type;
-            simple_block.rotation = edc.st_grid.get_rotation(x, y);
-
-            if (type == BlockTypes::EmptyBlock && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {
-                simple_block.type = BlockTypes::FoodBlock;}
-        }
-    }
-}
-
 void MainWindow::parse_full_simulation_grid(bool parse) {
     if (!parse) {return;}
     engine.pause();
@@ -372,18 +304,14 @@ void MainWindow::parse_full_simulation_grid(bool parse) {
 }
 
 void MainWindow::set_simulation_num_threads(uint8_t num_threads) {
-    engine.pause();
-
-    ecp.num_threads = num_threads;
-    if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        ecp.build_threads = true;
-    }
-
-    engine.unpause();
-}
-
-void MainWindow::set_cursor_mode(CursorMode mode) {
-    cursor_mode = mode;
+//    engine.pause();
+//
+//    ecp.num_threads = num_threads;
+//    if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+//        ecp.build_threads = true;
+//    }
+//
+//    engine.unpause();
 }
 
 void MainWindow::set_simulation_mode(SimulationModes mode) {
@@ -391,7 +319,7 @@ void MainWindow::set_simulation_mode(SimulationModes mode) {
     ecp.change_simulation_mode = true;
 }
 
-void MainWindow::calculate_new_simulation_size() {
+void MainWindow::calculate_fill_window_simulation_size() {
     auto window_size = ui.simulation_graphicsView->viewport()->size();
 
     new_simulation_width  = window_size.width() / starting_cell_size_on_resize;
@@ -423,25 +351,21 @@ void MainWindow::resize_simulation_grid() {
         display_message("Grid cannot be resized until recording is stopped.");
         return;
     }
-    if (fill_window) {calculate_new_simulation_size();}
+    if (fill_window) { calculate_fill_window_simulation_size();}
 
     if (!disable_warnings) {
         if (!use_cuda) {
             auto msg = DescisionMessageBox("Warning",
-                                                   QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                       "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t) * 2) * new_simulation_height * new_simulation_width)),
-                                                   "OK", "Cancel", this);
+                                           QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"),
+                                           "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
                 return;
             }
         } else {
             auto msg = DescisionMessageBox("Warning",
-                                           QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"
-                                                                  "New grid will need " + convert_num_bytes((sizeof(BaseGridBlock) * 2 + sizeof(int32_t) * 2) * new_simulation_height * new_simulation_width)
-                                                                  + " of RAM and " + convert_num_bytes(sizeof(BaseGridBlock) * new_simulation_height * new_simulation_width))
-                                                                  + " GPU's VRAM",
-                                                   "OK", "Cancel", this);
+                                           QString::fromStdString("Simulation space will be rebuilt and all organisms cleared.\n"),
+                                           "OK", "Cancel", this);
             auto result = msg.exec();
             if (!result) {
                 return;
@@ -453,9 +377,9 @@ void MainWindow::resize_simulation_grid() {
 
     just_resize_simulation_grid();
 
-    if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
-        ecp.build_threads = true;
-    }
+//    if (ecp.simulation_mode == SimulationModes::CPU_Partial_Multi_threaded) {
+//        ecp.build_threads = true;
+//    }
 
     engine.reset_world();
     engine.unpause();
@@ -931,70 +855,4 @@ void MainWindow::apply_font_size() {
     }
 
     apply_font_to_windows(_font);
-}
-
-void MainWindow::create_image_creation_thread() {
-    image_creation_thread = std::thread{[&](){
-        auto point1 = std::chrono::high_resolution_clock::now();
-        auto point2 = point1;
-        while (ecp.make_images) {
-            point1 = std::chrono::high_resolution_clock::now();
-            if (!pause_grid_parsing || !really_stop_render) {
-                if (have_read_buffer) {
-                    have_read_buffer = false;
-                    create_image();
-                    image_frames++;
-                }
-            }
-            point2 = std::chrono::high_resolution_clock::now();
-            std::this_thread::sleep_for(std::chrono::microseconds(
-                    std::max<int64_t>(
-                            int(image_creation_interval * 1000000) -
-                            std::chrono::duration_cast<std::chrono::microseconds>(point2 - point1).count()
-            , 0)));
-        }
-    }};
-
-    image_creation_thread.detach();
-}
-
-//https://gist.github.com/DavidMcLaughlin208/60e69e698e3858617c322d80a8f174e2
-std::vector<Vector2<int>> MainWindow::iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2) {
-    if (pos1.x == pos2.x && pos1.y == pos2.y) {return {pos1};}
-
-    std::vector<Vector2<int>> points;
-    int matrixX1 = pos1.x;
-    int matrixY1 = pos1.y;
-    int matrixX2 = pos2.x;
-    int matrixY2 = pos2.y;
-
-    int x_diff = matrixX1 - matrixX2;
-    int y_diff = matrixY1 - matrixY2;
-    bool x_diff_is_larger = std::abs(x_diff) > std::abs(y_diff);
-
-    int x_modifier = x_diff < 0 ? 1 : -1;
-    int y_modifier = y_diff < 0 ? 1 : -1;
-
-    int longer_side_length  = std::max(std::abs(x_diff), std::abs(y_diff));
-    int shorter_side_length = std::min(std::abs(x_diff), std::abs(y_diff));
-
-    float slope = (shorter_side_length == 0 || longer_side_length == 0) ? 0 : ((float) (shorter_side_length) / (longer_side_length));
-
-    int shorter_side_increase;
-    for (int i = 1; i <= longer_side_length; i++) {
-        shorter_side_increase = std::round(i * slope);
-        int yIncrease, xIncrease;
-        if (x_diff_is_larger) {
-            xIncrease = i;
-            yIncrease = shorter_side_increase;
-        } else {
-            yIncrease = i;
-            xIncrease = shorter_side_increase;
-        }
-        int currentY = matrixY1 + (yIncrease * y_modifier);
-        int currentX = matrixX1 + (xIncrease * x_modifier);
-        points.emplace_back(currentX, currentY);
-    }
-
-    return points;
 }

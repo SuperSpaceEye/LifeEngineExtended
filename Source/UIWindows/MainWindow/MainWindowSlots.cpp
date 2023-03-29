@@ -550,17 +550,17 @@ void MainWindow::le_cell_growth_modifier_slot() {
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
-    set_cursor_mode(CursorMode::ModifyFood);
+    cursor_mode = CursorMode::ModifyFood;
     ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_wall_slot() {
-    set_cursor_mode(CursorMode::ModifyWall);
+    cursor_mode =CursorMode::ModifyWall;
     ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_kill_slot() {
-    set_cursor_mode(CursorMode::KillOrganism);
+    cursor_mode = CursorMode::KillOrganism;
     ee.ui.rb_null_button->setChecked(true);
 }
 

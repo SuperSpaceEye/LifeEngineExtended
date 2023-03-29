@@ -61,6 +61,7 @@
 #include "Stuff/structs/Vector2.h"
 #include "Stuff/ImageStuff/ImageCreation.h"
 #include "Stuff/DataSavingFunctions.h"
+#include "Stuff/iterate_between_two_points.h"
 #include "Containers/ColorContainer.h"
 #include "Containers/SimulationParameters.h"
 #include "Containers/EngineControlParametersContainer.h"
@@ -238,8 +239,6 @@ private:
 
     void update_table_values();
 
-    static std::vector<Vector2<int>> iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2);
-
     //is invoked by qt timer
     void mainloop_tick();
     void ui_tick();
@@ -249,7 +248,7 @@ private:
     void resize_image(int image_width, int image_height);
 
     // for fill_view
-    void calculate_new_simulation_size();
+    void calculate_fill_window_simulation_size();
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void create_image();
@@ -267,7 +266,6 @@ private:
     //TODO
     void set_simulation_num_threads(uint8_t num_threads);
 
-    void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
     void update_statistics_info(const OrganismInfoContainer &info);
@@ -458,6 +456,10 @@ public:
     void apply_font_size();
 
     void get_current_font_size();
+
+    void statistics_tick();
+
+    void load_grid_image();
 };
 
 
