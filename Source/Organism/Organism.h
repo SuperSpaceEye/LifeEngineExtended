@@ -36,6 +36,8 @@ struct ContinuousData {
     float p_fx = 0;
     float p_fy = 0;
     bool initialized = false;
+
+    bool operator==(const ContinuousData &) const=default;
 };
 
 struct OrganismData {

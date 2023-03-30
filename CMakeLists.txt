@@ -35,6 +35,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+include_directories("Source")
+
 if(USE_MARCH_NATIVE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 endif()
@@ -129,9 +131,6 @@ if (NOT NO_RECORDER)
     set(ADDITIONAL_PROJECT_FILES Source/Stuff/external/moviemaker/include/movie.h Source/Stuff/external/moviemaker/src/reader.cpp Source/Stuff/external/moviemaker/src/writer.cpp Source/UIWindows/Recorder/RecorderWindowUI.h Source/UIWindows/Recorder/Recorder.cpp Source/UIWindows/Recorder/Recorder.h Source/UIWindows/Recorder/RecorderSlots.cpp)
 endif()
 
-#include_directories("Source/Stuff")
-include_directories("Source")
-
 if(CUDAToolkit_FOUND)
     enable_language(CUDA)
     set(CUDA_FILES ${CUDA_SOURCES} ${CUDA_HEADERS} Source/WorldRecorder/RecordingReconstructorCUDA.cu Source/WorldRecorder/RecordingReconstructorCUDA.cuh)
@@ -191,7 +190,6 @@ if (NOT NO_RECORDER)
     endif()
 endif()
 
-
 if (TESTING)
     find_package(Catch2 3 REQUIRED)
 
@@ -201,13 +199,34 @@ if (TESTING)
     set(TESTS Tests/Organism/Organism.cpp)
 
     foreach(item ${TESTS})
-#       regex is a devil's toy
-#       extracting file name without fluff
+        #       regex is a devil's toy
+        #       extracting file name without fluff
         string(REGEX MATCH "([^\\/]*$)" name_item "${item}")
         string(REPLACE ".cpp" "" name_item "${name_item}")
 
-        add_executable("${name_item}" "${item}")
-        target_link_libraries("${name_item}" PRIVATE Catch2::Catch2WithMain)
-        catch_discover_tests("${name_item}")
+        add_executable(${name_item} ${item} ${PROJECT_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES})
+        target_link_libraries(${name_item} Catch2::Catch2WithMain)
+        catch_discover_tests(${name_item})
+
+        if (CUDAToolkit_FOUND)
+            set_target_properties(${name_item} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+        endif()
+        target_link_libraries(${name_item}
+            Qt6::Core
+            Qt6::Gui
+            Qt6::Widgets
+#           Qt6::Charts
+            )
+        if (Boost_FOUND)
+            target_link_libraries(${name_item} ${Boost_LIBRARIES})
+        endif()
+
+        if (NOT NO_RECORDER)
+            if (WIN_COMPILATION)
+                target_link_libraries(${name_item} ${FFMPEG_LIBRARIES} ${GTK3_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY} ZLIB::ZLIB)
+            else()
+                target_link_libraries(${name_item} ${FFMPEG_LIBRARIES} ${GTK3_LIBRARIES} ${X264_LIBRARIES} ${SWSCALE_LIBRARIES} ${RSVG_LIBRARY} ${NUMA_LIBRARY} ZLIB::ZLIB)
+            endif()
+        endif()
     endforeach()
 endif()

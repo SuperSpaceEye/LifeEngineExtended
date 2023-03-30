@@ -78,6 +78,15 @@ struct ConstMap {
         }
         return *this;
     }
+
+    bool operator==(const ConstMap & other) {
+        for (int i = 0; i < len; i++) {
+            if ((*this).data[i] != other.data[i]) {return false;}
+        }
+
+        return true;
+    }
+
     inline ConstMap & operator=(ConstMap && other) noexcept =default;
     ConstMap()=default;
     ConstMap(const ConstMap & o)=default;

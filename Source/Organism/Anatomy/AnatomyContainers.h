@@ -58,6 +58,14 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     inline float get_food_cost(const OrganismBlockParameters &bp) const {
         return bp.pa[(int)type-1].food_cost;
     }
+
+    inline bool operator==(const SerializedOrganismBlockContainer & other) {
+        return
+           type==other.type
+        && rotation==other.rotation
+        && relative_x==other.relative_x
+        && relative_y==other.relative_y;
+    }
 };
 
 struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
