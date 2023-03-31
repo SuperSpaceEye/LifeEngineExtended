@@ -62,7 +62,7 @@ public:
     float food_needed = 0;
     float mass = 0;
 
-    float multiplier = 1;
+    float food_multiplier = 1;
 
     int move_range = 1;
     Rotation rotation = Rotation::UP;
@@ -163,14 +163,19 @@ public:
     inline auto get_eye_block_vec_view  () {return array_view1d<SOBC>{(SOBC*)anatomy.eye_block_vec.data(),   std::min<uint32_t>(c[BT::EyeBlock], anatomy.eye_block_vec.size())};}
     inline auto get_producing_space_view() {return array_view1d<std::vector<SASC>>{(std::vector<SASC>*)anatomy.producing_space.data(), std::min<uint32_t>(c[BT::ProducerBlock], anatomy.producing_space.size())};}
 
-    inline auto get_eating_space_view   () {return array_view1d<SASC>{(SASC*)anatomy.eating_space.data(),  std::min<size_t>(anatomy.eating_mask[c[BT::MouthBlock]-1], anatomy.eating_space.size())};}
-    inline auto get_killing_space_view  () {return array_view1d<SASC>{(SASC*)anatomy.killing_space.data(), std::min<size_t>(anatomy.killer_mask[c[BT::KillerBlock]-1], anatomy.killing_space.size())};}
+    inline auto get_eating_space_view   () {return array_view1d<SASC>{(SASC*)anatomy.eating_space.data(),  std::min<size_t>(!sp->growth_of_organisms ? -1 : anatomy.eating_mask[c[BT::MouthBlock]-1], anatomy.eating_space.size())};}
+    inline auto get_killing_space_view  () {return array_view1d<SASC>{(SASC*)anatomy.killing_space.data(), std::min<size_t>(!sp->growth_of_organisms ? -1 : anatomy.killer_mask[c[BT::KillerBlock]-1], anatomy.killing_space.size())};}
 
     void init_brain_type();
 
     void mutate_legacy(Anatomy &new_anatomy, lehmer64 &gen);
     void mutate_occ(Anatomy &new_anatomy, lehmer64 &gen, OrganismConstructionCode &new_occ);
     void mutate_mutation_rate(float &_anatomy_mutation_rate, lehmer64 &gen) const;
+
+    void calc_pos_shift();
+    void calc_food_multiplier();
+    void try_convert_brain();
+    void try_init_cdata();
 };
 
 

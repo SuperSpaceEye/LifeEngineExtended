@@ -780,6 +780,14 @@ void MainWindow::cb_use_occ_slot(bool state) {
         st.ui.lb_total_occ_length_4->hide();
     }
 
+    auto temp = disable_warnings;
+    disable_warnings = true;
+
+    cb_enable_organism_growth_slot(state);
+    ui.cb_enable_organism_growth->setEnabled(state);
+
+    disable_warnings = temp;
+
     engine.pause();
     sp.use_occ = state;
     engine.reset_world();

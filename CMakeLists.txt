@@ -17,7 +17,7 @@ option(BOOST_LIBRARYDIR "If on windows, set path to compiled libraries, like 'bo
 
 set(NO_RECORDER ON)
 
-set(TESTING 1)
+set(TESTING 0)
 
 #set(DEBUG 1)
 #set(INLINE 1)

@@ -72,6 +72,35 @@ void Organism::init_values() {
     calculate_organism_lifetime();
     calculate_food_needed();
 
+    calc_pos_shift();
+    calc_food_multiplier();
+    init_brain_type();
+    try_convert_brain();
+    try_init_cdata();
+}
+
+void Organism::try_init_cdata() {
+    if (sp->use_continuous_movement && !cdata.initialized) {
+        cdata = ContinuousData{float(x), float(y), 0, 0, 0, 0, true};
+    } else {
+        cdata.initialized = false;
+    }
+}
+
+void Organism::try_convert_brain() {
+    if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
+        brain.convert_simple_to_weighted();
+    } else if (!sp->use_weighted_brain && brain.brain_type == BrainTypes::WeightedBrain) {
+        brain.convert_weighted_to_simple(sp->threshold_move);
+    }
+}
+
+void Organism::calc_food_multiplier() {
+    food_multiplier = 1;
+    if (sp->multiply_food_production_prob) { food_multiplier *= c[BT::ProducerBlock];}
+}
+
+void Organism::calc_pos_shift() {
     auto vec = anatomy.recenter_blocks(sp->recenter_to_imaginary_pos);
 
     //just to reuse rotation of positions logic
@@ -79,23 +108,6 @@ void Organism::init_values() {
     //because organism can be rotated, the shift positions on grid also need to be rotated.
     x += temp.get_pos(rotation).x;
     y += temp.get_pos(rotation).y;
-
-    multiplier = 1;
-    if (sp->multiply_food_production_prob) {multiplier *= c[BT::ProducerBlock];}
-
-    init_brain_type();
-
-    if (sp->use_weighted_brain && brain.brain_type == BrainTypes::SimpleBrain) {
-        brain.convert_simple_to_weighted();
-    } else if (!sp->use_weighted_brain && brain.brain_type == BrainTypes::WeightedBrain) {
-        brain.convert_weighted_to_simple(sp->threshold_move);
-    }
-
-    if (sp->use_continuous_movement && !cdata.initialized) {
-        cdata = ContinuousData{float(x), float(y), 0, 0, 0, 0, true};
-    } else {
-        cdata.initialized = false;
-    }
 }
 
 void Organism::init_brain_type() {
@@ -160,7 +172,13 @@ void Organism::mutate_anatomy(Anatomy &new_anatomy, float &_anatomy_mutation_rat
     if (sp->use_occ) {
         mutate_occ(new_anatomy, gen, new_occ);return;
     } else {
-        mutate_legacy(new_anatomy, gen);return;
+        mutate_legacy(new_anatomy, gen);
+#ifdef __DEBUG__
+        if(new_anatomy.organism_blocks.empty()) {
+           throw std::logic_error("how");
+        }
+#endif
+        return;
     }
 }
 
@@ -196,7 +214,8 @@ void Organism::mutate_legacy(Anatomy &new_anatomy, lehmer64 &gen) {
     choice -= sp->add_cell;
     if (choice < sp->change_cell) { new_anatomy = Anatomy(anatomy.change_random_block(*bp, gen));return;}
     choice -= sp->change_cell;
-    if (choice < sp->remove_cell && anatomy.organism_blocks.size() > sp->min_organism_size) { new_anatomy = Anatomy(anatomy.remove_random_block(gen));return;}
+    if ((anatomy.organism_blocks.size() > sp->min_organism_size) && choice < sp->remove_cell) {new_anatomy = Anatomy(anatomy.remove_random_block(gen));return;}
+    new_anatomy = Anatomy(anatomy);
 }
 
 void Organism::mutate_brain(const Anatomy &new_anatomy, Brain &new_brain,

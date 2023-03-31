@@ -71,9 +71,9 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, Simula
     if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp.simplified_food_production) {
-        produce_food_simplified(edc, sp, organism, gen, organism.multiplier);
+        produce_food_simplified(edc, sp, organism, gen, organism.food_multiplier);
     } else {
-        produce_food_complex(edc, sp, organism, gen, organism.multiplier);
+        produce_food_complex(edc, sp, organism, gen, organism.food_multiplier);
     }
 }
 
