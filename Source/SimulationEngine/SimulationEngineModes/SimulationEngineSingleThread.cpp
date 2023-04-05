@@ -7,7 +7,6 @@
 //
 
 #include "SimulationEngine/OrganismsController.h"
-
 #include "SimulationEngineSingleThread.h"
 
 using BT = BlockTypes;
@@ -48,8 +47,8 @@ SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer &edc, Sim
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {try_make_child(edc, sp, organism, gen);}}
 }
 
-void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp) {
-    organism.pre_init();
+void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp, bool pre_init) {
+    if (pre_init) {organism.pre_init();}
     organism.init_values();
     if (edc.record_data) {edc.stc.tbuffer.record_new_organism(organism);}
     for (auto & block: organism.get_organism_blocks_view()) {

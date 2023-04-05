@@ -196,7 +196,7 @@ bool DataSavingFunctions::read_organisms(std::ifstream &is, EngineDataContainer 
         auto array_place = organism->vector_index;
         read_organism(is, sp, bp, organism, occp, occl);
         organism->vector_index = array_place;
-        SimulationEngineSingleThread::place_organism(edc, *organism, sp);
+        SimulationEngineSingleThread::place_organism(edc, *organism, sp, false);
     }
 
     return false;
