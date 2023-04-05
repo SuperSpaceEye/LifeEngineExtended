@@ -3,6 +3,8 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
 
+#include <iostream>
+
 #include <boost/range/combine.hpp>
 
 #include "Organism/Organism.h"

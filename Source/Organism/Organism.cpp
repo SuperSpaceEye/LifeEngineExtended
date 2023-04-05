@@ -308,7 +308,7 @@ void Organism::think_decision(std::vector<Observation> &organism_observations, l
 }
 
 void Organism::calculate_continuous_decision(std::vector<Observation> &organism_observations, lehmer64 &gen) {
-    auto [wdir, had_observation] = brain.get_global_weighted_direction(organism_observations, sp->look_range, rotation);
+    auto [wdir, had_observation] = brain.get_complex_weighted_direction(organism_observations, sp->look_range, rotation);
 
     if (brain.brain_type == BrainTypes::RandomActions || (!had_observation && !sp->no_random_decisions)) {
         wdir[0] = std::uniform_real_distribution<float>(-1., 1.)(gen);

@@ -16,6 +16,7 @@
 
 #include "Stuff/enums/BlockTypes.hpp"
 #include "Stuff/enums/Rotation.h"
+#include "Stuff/CoordinateCalculation/AngleRotationConversion.h"
 #include "Containers/SimulationParameters.h"
 #include "PRNGS/lehmer64.h"
 
@@ -121,6 +122,7 @@ private:
 
     BrainDecision calculate_simple_action(const Observation &observation) const;
     BrainWeightedDecision calculate_weighted_action(const Observation &observation, int look_range) const;
+    std::pair<BrainWeightedDecision, BrainWeightedDecision> calculate_complex_weighted_action(const Observation& observation, int look_range) const;
 public:
     Brain()=default;
     Brain(Brain & brain);
@@ -146,11 +148,11 @@ public:
 
     void set_brain(const Brain& brain);
 
-    std::array<float, 4> get_weighted_direction(std::vector<Observation> &observations_vector, int look_range) const;
+    std::array<float, 4> get_simple_weighted_direction(std::vector<Observation> &observations_vector, int look_range) const;
 
     std::pair<std::array<float, 4>, bool>
-    get_global_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
-                                  Rotation organism_rotation) const;
+    get_complex_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
+                                   Rotation organism_rotation) const;
 };
 
 

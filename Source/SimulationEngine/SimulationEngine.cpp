@@ -19,6 +19,9 @@ SimulationEngine::SimulationEngine(EngineDataContainer &engine_data_container,
     gen = lehmer64(rd());
     //TODO only do if enabled?
     init_auto_food_drop(edc.simulation_width, edc.simulation_height);
+
+    sp.eye_rays = 11;
+    sp.radian_spread = 90 * 3.14159265358979323846/180;
 }
 
 void SimulationEngine::threaded_mainloop() {

@@ -21,6 +21,9 @@
 #include "GridStuff/BaseGridBlock.h"
 #include "Stuff/enums/BlockTypes.hpp"
 #include "Stuff/Linspace.h"
+#include "Stuff/CoordinateCalculation/AngleConversion.h"
+#include "Stuff/CoordinateCalculation/get_max_coordinate.h"
+#include "Stuff/CoordinateCalculation/iterate_between_two_points.h"
 
 inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
     uint_fast8_t new_int_rotation = static_cast<uint_fast8_t>(rotation1) + static_cast<uint_fast8_t>(rotation2);

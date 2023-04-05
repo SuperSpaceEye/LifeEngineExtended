@@ -9,6 +9,8 @@
 #ifndef THELIFEENGINECPP_SIMULATIONPARAMETERS_H
 #define THELIFEENGINECPP_SIMULATIONPARAMETERS_H
 
+#define M_PI 3.14159265358979323846
+
 struct SimulationParameters {
     //evolution controls
     float food_production_probability = 0.025;
@@ -51,6 +53,10 @@ struct SimulationParameters {
     int   starting_organism_size = 3;
     float cell_growth_modifier = 0.2;
     int   cell_growth_time = 20;
+
+    //should be an odd number
+    int eye_rays = 5;
+    float radian_spread = 30 * M_PI/180;
 
     //Probabilities of creating child with doing:
         int add_cell = 33;

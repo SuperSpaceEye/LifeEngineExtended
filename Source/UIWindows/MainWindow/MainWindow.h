@@ -61,7 +61,7 @@
 #include "Stuff/structs/Vector2.h"
 #include "Stuff/ImageStuff/ImageCreation.h"
 #include "Stuff/DataSavingFunctions.h"
-#include "Stuff/iterate_between_two_points.h"
+#include "Stuff/CoordinateCalculation/iterate_between_two_points.h"
 #include "Containers/ColorContainer.h"
 #include "Containers/SimulationParameters.h"
 #include "Containers/EngineControlParametersContainer.h"

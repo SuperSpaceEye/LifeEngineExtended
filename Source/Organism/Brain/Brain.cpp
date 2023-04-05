@@ -100,11 +100,11 @@ BrainDecision Brain::calculate_simple_action(const Observation &observation) con
             BrainDecision::MoveDown,
             BrainDecision::MoveRight
         }
-    }[int(action)-1][int(observation.eye_rotation)];
+    }[int(action)-1][int(snap_to_closest_rotation(observation.eye_angle_r))];
 }
 
-std::array<float, 4> Brain::get_weighted_direction(std::vector<Observation> &observations_vector,
-                                                   int look_range) const {
+std::array<float, 4> Brain::get_simple_weighted_direction(std::vector<Observation> &observations_vector,
+                                                          int look_range) const {
     //up, left, down, right
     std::array<float, 4> weighted_directions{0, 0, 0, 0};
 
@@ -123,8 +123,8 @@ inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
 }
 
 std::pair<std::array<float, 4>, bool>
-Brain::get_global_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
-                                     Rotation organism_rotation) const {
+Brain::get_complex_weighted_direction(std::vector<Observation> &observations_vector, int look_range,
+                                      Rotation organism_rotation) const {
     //up, left, down, right
     std::array<float, 4> weighted_directions{0, 0, 0, 0};
     bool had_observation = false;
@@ -132,16 +132,17 @@ Brain::get_global_weighted_direction(std::vector<Observation> &observations_vect
     for (auto & observation: observations_vector) {
         if (observation.distance == 0) {continue;}
 
-        auto wd = calculate_weighted_action(observation, look_range);
+        auto [wd1, wd2] = calculate_complex_weighted_action(observation, look_range);
 
-        weighted_directions[static_cast<int>(get_global_rotation((Rotation)wd.decision, organism_rotation))] += wd.weight;
-        if (wd.weight > 0) had_observation = true;
+        weighted_directions[static_cast<int>(get_global_rotation((Rotation)wd1.decision, organism_rotation))] += wd1.weight;
+        weighted_directions[static_cast<int>(get_global_rotation((Rotation)wd2.decision, organism_rotation))] += wd2.weight;
+        if (wd1.weight > 0 || wd2.weight > 0) {had_observation = true;}
     }
     return {weighted_directions, had_observation};
 }
 
 DecisionObservation Brain::get_weighted_action_discrete(std::vector<Observation> &observations_vector, int look_range, float threshold_move) {
-    std::array<float, 4> weighted_directions = get_weighted_direction(observations_vector, look_range);
+    std::array<float, 4> weighted_directions = get_simple_weighted_direction(observations_vector, look_range);
 
     float max_weight = 0;
     int direction = 0;
@@ -172,6 +173,8 @@ BrainWeightedDecision Brain::calculate_weighted_action(const Observation &observ
     }
 #endif
 
+    auto rotation = snap_to_closest_rotation(observation.eye_angle_r);
+
     auto decision = std::array<std::array<BrainDecision, 4>, 2> {
             std::array<BrainDecision, 4>{
                     BrainDecision::MoveDown,
@@ -183,11 +186,46 @@ BrainWeightedDecision Brain::calculate_weighted_action(const Observation &observ
                     BrainDecision::MoveLeft,
                     BrainDecision::MoveDown,
                     BrainDecision::MoveRight
-            }}[(int)action-1][(int)observation.eye_rotation];
+            }}[(int)action-1][(int)rotation];
 
     return BrainWeightedDecision{decision, weight};
 }
 
+std::pair<BrainWeightedDecision, BrainWeightedDecision> Brain::calculate_complex_weighted_action(const Observation &observation, int look_range) const {
+    float distance_modifier = (float)std::abs(observation.distance - look_range - 1) / look_range;
+    float weight = weighted_action_table.da[int(observation.type)];
+
+    weight *= distance_modifier;
+
+    SimpleDecision action = weight > 0 ? SimpleDecision::GoTowards : SimpleDecision::GoAway;
+
+#ifdef __DEBUG__
+    if ((int)observation.eye_rotation < 0 || (int)observation.eye_rotation >= 4) {
+        throw std::runtime_error("");
+    }
+#endif
+
+    const auto decision_array = std::array<std::array<BrainDecision, 4>, 2> {
+            std::array<BrainDecision, 4>{
+                    BrainDecision::MoveDown,
+                    BrainDecision::MoveRight,
+                    BrainDecision::MoveUp,
+                    BrainDecision::MoveLeft
+            }, std::array<BrainDecision, 4>{
+                    BrainDecision::MoveUp,
+                    BrainDecision::MoveLeft,
+                    BrainDecision::MoveDown,
+                    BrainDecision::MoveRight
+            }};
+
+    auto [rotation1, r_weight] = snap_to_closest_rotation_with_percentage(observation.eye_angle_r);
+    auto rotation2 = snap_to_second_closest_rotation(observation.eye_angle_r);
+
+    auto decision1 = decision_array[(int)action-1][(int)rotation1];
+    auto decision2 = decision_array[(int)action-1][(int)rotation2];
+
+    return {BrainWeightedDecision{decision1, weight*r_weight}, BrainWeightedDecision{decision2, weight*(1-r_weight)}};
+}
 
 DecisionObservation
 Brain::get_decision(std::vector<Observation> &observation_vector, Rotation organism_rotation, lehmer64 &mt,

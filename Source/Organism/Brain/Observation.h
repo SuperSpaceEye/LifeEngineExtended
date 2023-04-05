@@ -19,6 +19,7 @@ struct Observation {
     int32_t distance = 0;
     //local rotation
     Rotation eye_rotation = Rotation::UP;
+    float eye_angle_r = 0;
 };
 
 #endif //THELIFEENGINECPP_OBSERVATIONSTUFF_H
