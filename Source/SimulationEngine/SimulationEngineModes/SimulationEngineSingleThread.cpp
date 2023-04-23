@@ -209,64 +209,6 @@ void SimulationEngineSingleThread::reserve_observations(std::vector<std::vector<
     }
 }
 
-//void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, SimulationParameters &sp,
-//                                                    Organism &organism,
-//                                                    std::vector<std::vector<Observation>> &organism_observations)
-//                                                    {
-//    if (organism.c[BT::EyeBlock] <= 0 || organism.c[BT::MoverBlock] <= 0) {return;}
-//    if (organism.move_counter != 0) {return;}
-//
-//    for (int eye_i = 0; eye_i < organism.c[BT::EyeBlock]; eye_i++) {
-//        auto & block = organism.anatomy.eye_block_vec[eye_i];
-//
-//        auto pos_x = organism.x + block.get_pos(organism.rotation).x;
-//        auto pos_y = organism.y + block.get_pos(organism.rotation).y;
-//        // getting global rotation on a simulation grid
-//        auto block_rotation = block.get_block_rotation_on_grid(organism.rotation);
-//
-//        auto offset_x = 0;
-//        auto offset_y = 0;
-//
-//        switch (block_rotation) {
-//            case Rotation::UP:    offset_y = -1; break;
-//            case Rotation::LEFT:  offset_x = -1; break;
-//            case Rotation::DOWN:  offset_y =  1; break;
-//            case Rotation::RIGHT: offset_x =  1; break;
-//        }
-//
-//#ifdef __DEBUG__
-//    if ((int)block.rotation < 0 || (int)block.rotation >= 4) {throw std::runtime_error("");}
-//#endif
-//
-//        auto last_observation = Observation{BT::EmptyBlock, 0, block.rotation};
-//
-//        for (int i = 1; i <= sp.look_range; i++) {
-//            pos_x += offset_x;
-//            pos_y += offset_y;
-//
-//            last_observation.type = edc.st_grid.get_type(pos_x, pos_y);
-//            last_observation.distance = i;
-//
-//            if (last_observation.type == BT::EmptyBlock && edc.st_grid.get_food_num(pos_x, pos_y) >= sp.food_threshold) {
-//                last_observation.type = BT::FoodBlock;
-//            }
-//
-//            switch (last_observation.type) {
-//                case BT::EmptyBlock: continue;
-//                case BT::FoodBlock:
-//                case BT::WallBlock: goto endfor;
-//                default:
-//                    if (!sp.organism_self_blocks_block_sight && edc.st_grid.get_organism_index(pos_x, pos_y) == organism.vector_index) {
-//                        continue;
-//                    }
-//                    goto endfor;
-//            }
-//        }
-//        endfor:
-//        organism_observations[organism.vector_index][eye_i] = last_observation;
-//    }
-//}
-
 void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, SimulationParameters &sp,
                                                     Organism &organism,
                                                     std::vector<std::vector<Observation>> &organism_observations)
@@ -293,7 +235,6 @@ void SimulationEngineSingleThread::get_observations(EngineDataContainer &edc, Si
             auto last_observation = Observation{
                 BT::EmptyBlock,
                 0,
-                block.rotation,
                 static_cast<float>(left_boundary + angle_step*step)};
 
             auto d_pos = get_max_coordinate<int>({c_pos.x, c_pos.y},

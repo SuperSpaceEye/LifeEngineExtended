@@ -17,8 +17,6 @@
 struct Observation {
     BlockTypes type = BlockTypes::EmptyBlock;
     int32_t distance = 0;
-    //local rotation
-    Rotation eye_rotation = Rotation::UP;
     float eye_angle_r = 0;
 };
 
