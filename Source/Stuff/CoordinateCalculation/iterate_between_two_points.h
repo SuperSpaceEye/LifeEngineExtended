@@ -22,7 +22,7 @@ inline std::vector<Vector2<T>> iterate_between_two_points(Vector2<T> pos1, Vecto
     std::vector<Vector2<T>> points;
 
     T x_diff = pos1.x - pos2.x;
-    T y_diff = pos1.x - pos2.y;
+    T y_diff = pos1.y - pos2.y;
     bool x_diff_is_larger = std::abs(x_diff) > std::abs(y_diff);
 
     T x_modifier = x_diff < 0 ? 1 : -1;
@@ -56,8 +56,8 @@ Vector2<T> calculate_pos(const Vector2<T> &pos1, bool x_diff_is_larger, T x_modi
         xIncrease = shorter_side_increase;
     }
     Vector2<T> curr = {
-            pos1.y + (yIncrease * y_modifier),
-            pos1.x + (xIncrease * x_modifier)
+            pos1.x + (xIncrease * x_modifier),
+            pos1.y + (yIncrease * y_modifier)
     };
     return curr;
 }

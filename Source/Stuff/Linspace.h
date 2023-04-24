@@ -34,6 +34,7 @@ std::vector<T> linspace(double start, double end, int num) {
     {
         linspaced.template emplace_back(T(start + delta * i) - displacement);
     }
+    end -= displacement;
     linspaced.template emplace_back(end);
 
     return linspaced;

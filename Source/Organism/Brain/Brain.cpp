@@ -82,12 +82,6 @@ BrainDecision Brain::calculate_simple_action(const Observation &observation) con
 
     if (action == SimpleDecision::DoNothing) {return BrainDecision::DoNothing;}
 
-#ifdef __DEBUG__
-    if ((int)observation.eye_rotation < 0 || (int)observation.eye_rotation >= 4) {
-        throw std::runtime_error("");
-    }
-#endif
-
     return std::array<std::array<BrainDecision, 4>, 2> {
             std::array<BrainDecision, 4>{
             BrainDecision::MoveDown,
@@ -167,12 +161,6 @@ BrainWeightedDecision Brain::calculate_weighted_action(const Observation &observ
 
     SimpleDecision action = weight > 0 ? SimpleDecision::GoTowards : SimpleDecision::GoAway;
 
-#ifdef __DEBUG__
-    if ((int)observation.eye_rotation < 0 || (int)observation.eye_rotation >= 4) {
-        throw std::runtime_error("");
-    }
-#endif
-
     auto rotation = snap_to_closest_rotation(observation.eye_angle_r);
 
     auto decision = std::array<std::array<BrainDecision, 4>, 2> {
@@ -198,12 +186,6 @@ std::pair<BrainWeightedDecision, BrainWeightedDecision> Brain::calculate_complex
     weight *= distance_modifier;
 
     SimpleDecision action = weight > 0 ? SimpleDecision::GoTowards : SimpleDecision::GoAway;
-
-#ifdef __DEBUG__
-    if ((int)observation.eye_rotation < 0 || (int)observation.eye_rotation >= 4) {
-        throw std::runtime_error("");
-    }
-#endif
 
     const auto decision_array = std::array<std::array<BrainDecision, 4>, 2> {
             std::array<BrainDecision, 4>{
