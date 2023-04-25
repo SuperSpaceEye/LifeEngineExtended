@@ -235,6 +235,11 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
         for (auto & block: organism_blocks) {
             for (auto & p: spos) {
                 SimpleAnatomyMutationLogic::set_single_adjacent(block.relative_x, block.relative_y, p.x, p.y, _organism_blocks, single_adjacent_space, BaseGridBlock{block.type, block.rotation});
+            }
+        }
+
+        for (auto & block: organism_blocks) {
+            for (auto & p: spos) {
                 SimpleAnatomyMutationLogic::set_single_diagonal_adjacent(block.relative_x, block.relative_y, p.x, p.y, _organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
             }
         }
