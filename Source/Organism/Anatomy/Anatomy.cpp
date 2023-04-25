@@ -223,18 +223,21 @@ void Anatomy::set_block(BlockTypes type, Rotation rotation, int x, int y) {
     if (type == BlockTypes::EmptyBlock) {
         new_structure = remove_block(num_block);
     } else {
-        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks;
+        boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> _organism_blocks{};
 
         for (auto& block: organism_blocks) {
-            _organism_blocks[block.relative_x][block.relative_y].type     = block.type;
-            _organism_blocks[block.relative_x][block.relative_y].rotation = block.rotation;
+            _organism_blocks[block.relative_x][block.relative_y] = BaseGridBlock{block.type, block.rotation};
         }
 
         boost::unordered_map<int, boost::unordered_map<int, bool>> single_adjacent_space;
         boost::unordered_map<int, boost::unordered_map<int, bool>> single_diagonal_adjacent_space;
 
-        SimpleAnatomyMutationLogic::create_single_adjacent_space(_organism_blocks, single_adjacent_space);
-        SimpleAnatomyMutationLogic::create_single_diagonal_adjacent_space(_organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+        for (auto & block: organism_blocks) {
+            for (auto & p: spos) {
+                SimpleAnatomyMutationLogic::set_single_adjacent(block.relative_x, block.relative_y, p.x, p.y, _organism_blocks, single_adjacent_space, BaseGridBlock{block.type, block.rotation});
+                SimpleAnatomyMutationLogic::set_single_diagonal_adjacent(block.relative_x, block.relative_y, p.x, p.y, _organism_blocks, single_adjacent_space, single_diagonal_adjacent_space);
+            }
+        }
 
         std::vector<SerializedAdjacentSpaceContainer> _single_adjacent_space;
         std::vector<SerializedAdjacentSpaceContainer> _single_diagonal_adjacent_space;

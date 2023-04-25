@@ -36,7 +36,7 @@ constexpr std::array<Vector2<int>, 4> dpos {
 };
 
 class SimpleAnatomyMutationLogic {
-
+public:
     static void set_single_adjacent(int x, int y, int x_offset, int y_offset,
                                     boost::unordered_map<int, boost::unordered_map<int, BaseGridBlock>> &organism_blocks,
                                     boost::unordered_map<int, boost::unordered_map<int, bool>> &single_adjacent_space,
