@@ -58,6 +58,14 @@ struct SerializedOrganismBlockContainer: BaseSerializedContainer {
     inline float get_food_cost(const OrganismBlockParameters &bp) const {
         return bp.pa[(int)type-1].food_cost;
     }
+
+    inline bool operator==(const SerializedOrganismBlockContainer & other) {
+        return
+           type==other.type
+        && rotation==other.rotation
+        && relative_x==other.relative_x
+        && relative_y==other.relative_y;
+    }
 };
 
 struct SerializedAdjacentSpaceContainer: BaseSerializedContainer {
@@ -79,7 +87,7 @@ struct SerializedOrganismStructureContainer {
     std::vector<uint32_t> eating_mask;
     std::vector<uint32_t> killer_mask;
 
-    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_map();
+    AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES> c = make_anatomy_counters();
 
     SerializedOrganismStructureContainer()=default;
     SerializedOrganismStructureContainer(

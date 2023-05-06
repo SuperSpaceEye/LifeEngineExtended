@@ -35,13 +35,13 @@ void ImageCreation::create_image(const std::vector<int> &lin_width, const std::v
     if (!use_cuda || !cuda_is_available) {
 #endif
         if (kernel_size == 1) {
-            ImageCreation::ImageCreationTools::cpu_image_creation(lin_width, lin_height, simulation_width,
-                                                                  simulation_height, cc, textures, image_width,
-                                                                  image_vector, second_grid);
+            ImageCreation::ImageCreationTools::image_creation<ImageCreationTools::get_texture_color>(lin_width, lin_height, simulation_width,
+                                                              simulation_height, cc, textures, image_width,
+                                                              image_vector, second_grid);
         } else {
-            ImageCreation::ImageCreationTools::cpu_kernel_image_creation(lin_width, lin_height, simulation_width,
-                                                                         simulation_height, cc, textures, image_width,
-                                                                         image_vector, second_grid, kernel_size);
+            ImageCreation::ImageCreationTools::image_creation<ImageCreationTools::get_kernel_texture_color>(lin_width, lin_height, simulation_width,
+                                                                                                     simulation_height, cc, textures, image_width,
+                                                                                                     image_vector, second_grid);
         }
 #ifdef __CUDA_USED__
     } else {
@@ -60,8 +60,13 @@ void ImageCreation::create_image(const std::vector<int> &lin_width, const std::v
 }
 
 Textures::color ImageCreation::ImageCreationTools::get_texture_color(BlockTypes type, Rotation rotation,
-                                                                     double rxs, double rys,
+                                                                     double texture_x, double texture_y,
+                                                                     double texture_width,double texture_height,
+                                                                     int _,
                                                                      const Textures::TexturesContainer &textures) {
+    auto rxs = texture_x / texture_width;
+    auto rys = texture_y / texture_height;
+
     auto & holder = textures.textures[static_cast<int>(type)];
 
     if (holder.width == 1 && holder.height == 1) {return holder.texture[0];}
@@ -110,7 +115,7 @@ Textures::color ImageCreation::ImageCreationTools::get_texture_color(BlockTypes 
     return holder.texture[x + y * holder.width];
 }
 
-//TODO make a proper description
+//I wrote this code at like 1 am or smth so
 
 // If the number of pixels per texture is small, then the textures will be incorrect for some reason.
 // That's why, this function for x,y pos will actually get x_1,y_1 to x_kernel_size,y_kernel_size positions with
@@ -118,10 +123,8 @@ Textures::color ImageCreation::ImageCreationTools::get_texture_color(BlockTypes 
 //Will do kernel_size^2
 Textures::color ImageCreation::ImageCreationTools::get_kernel_texture_color(BlockTypes type,
                                                                             Rotation rotation,
-                                                                            int texture_x,
-                                                                            int texture_y,
-                                                                            int texture_width,
-                                                                            int texture_height,
+                                                                            int texture_x, int texture_y,
+                                                                            int texture_width, int texture_height,
                                                                             int kernel_size,
                                                                             const Textures::TexturesContainer &textures) {
     auto & holder = textures.textures[static_cast<int>(type)];
@@ -136,8 +139,9 @@ Textures::color ImageCreation::ImageCreationTools::get_kernel_texture_color(Bloc
         for (int _y = texture_y * kernel_size; _y < texture_y * kernel_size + kernel_size; _y++) {
             auto _color = get_texture_color(type,
                                            rotation,
-                                           double(_x)/(texture_width*kernel_size),
-                                           double(_y)/(texture_height*kernel_size),
+                                           double(_x), double(texture_width*kernel_size),
+                                           double(_y), double(texture_height*kernel_size),
+                                           0,
                                            textures);
             bool is_in = false;
             for (auto & [lcol, num]: used_colors) {
@@ -184,38 +188,18 @@ void ImageCreation::ImageCreationTools::set_image_pixel(int x,
     image_vector[index  ] = color.b;
 }
 
-void ImageCreation::ImageCreationTools::cpu_image_creation(const std::vector<int> &lin_width,
-                                                           const std::vector<int> &lin_height,
-                                                           uint32_t simulation_width,
-                                                           uint32_t simulation_height,
-                                                           const ColorContainer &cc, const Textures::TexturesContainer &textures,
-                                                           int image_width, std::vector<unsigned char> &image_vector,
-                                                           const std::vector<BaseGridBlock> &second_grid) {
+template<auto texture_fn>
+void ImageCreation::ImageCreationTools::image_creation(const std::vector<int> &lin_width,
+                                                       const std::vector<int> &lin_height,
+                                                       uint32_t simulation_width,
+                                                       uint32_t simulation_height,
+                                                       const ColorContainer &cc, const Textures::TexturesContainer &textures,
+                                                       int image_width, std::vector<unsigned char> &image_vector,
+                                                       const std::vector<BaseGridBlock> &second_grid, int kernel_size) {
     std::vector<int> width_img_boundaries;
     std::vector<int> height_img_boundaries;
 
-    auto last = lin_width[0];
-    auto count = 0;
-    for (int x = 0; x < lin_width.size(); x++) {
-        if (last < lin_width[x]) {
-            width_img_boundaries.emplace_back(x - count);
-            last = lin_width[x];
-            count = x;
-        }
-    }
-    //TODO here is a blunt method to fix error
-    width_img_boundaries.emplace_back(INT32_MAX);
-
-    last = lin_height[0];
-    count = 0;
-    for (int y = 0; y < lin_height.size(); y++) {
-        if (last < lin_height[y]) {
-            height_img_boundaries.emplace_back(y - count);
-            last = lin_height[y];
-            count = y;
-        }
-    }
-    height_img_boundaries.emplace_back(INT32_MAX);
+    prepare_data(width_img_boundaries, height_img_boundaries, lin_width, lin_height);
 
     Textures::color pixel_color;
     //width of boundaries of an organisms
@@ -242,11 +226,12 @@ void ImageCreation::ImageCreationTools::cpu_image_creation(const std::vector<int
                 // first,  calculate relative position of a pixel inside a texture block.
                 // second, calculate a dimension of a pixel that is going to be displayed.
                 // third,  normalize relative position between 0 and 1 by dividing result of first stage by second one.
-                pixel_color = get_texture_color(block.type,
-                                                block.rotation,
-                                                double(texture_x) / (texture_width),
-                                                double(texture_y) / (texture_height),
-                                                textures);
+                pixel_color = texture_fn(block.type,
+                                         block.rotation,
+                                         double(texture_x), double(texture_width),
+                                         double(texture_y), double(texture_height),
+                                         kernel_size,
+                                         textures);
             }
             set_image_pixel(x, y, image_width, pixel_color, image_vector);
 
@@ -259,17 +244,10 @@ void ImageCreation::ImageCreationTools::cpu_image_creation(const std::vector<int
     }
 }
 
-void ImageCreation::ImageCreationTools::cpu_kernel_image_creation(const std::vector<int> &lin_width,
-                                                                  const std::vector<int> &lin_height,
-                                                                  uint32_t simulation_width,
-                                                                  uint32_t simulation_height,
-                                                                  const ColorContainer &cc, const Textures::TexturesContainer &textures,
-                                                                  int image_width, std::vector<unsigned char> &image_vector,
-                                                                  const std::vector<BaseGridBlock> &second_grid,
-                                                                  int kernel_size) {
-    std::vector<int> width_img_boundaries;
-    std::vector<int> height_img_boundaries;
-
+void ImageCreation::ImageCreationTools::prepare_data(std::vector<int> &width_img_boundaries,
+                                                     std::vector<int> &height_img_boundaries,
+                                                     const std::vector<int> &lin_width,
+                                                     const std::vector<int> &lin_height) {
     auto last = lin_width[0];
     auto count = 0;
     for (int x = 0; x < lin_width.size(); x++) {
@@ -279,7 +257,7 @@ void ImageCreation::ImageCreationTools::cpu_kernel_image_creation(const std::vec
             count = x;
         }
     }
-    //TODO here is a blunt method to fix error
+    //i don't remember why this is necessary, but it is.
     width_img_boundaries.emplace_back(INT32_MAX);
 
     last = lin_height[0];
@@ -292,45 +270,4 @@ void ImageCreation::ImageCreationTools::cpu_kernel_image_creation(const std::vec
         }
     }
     height_img_boundaries.emplace_back(INT32_MAX);
-
-    Textures::color pixel_color;
-    //width of boundaries of an organisms
-
-    int texture_x_i = 0;
-    int texture_y_i = 0;
-
-    int texture_x = 0;
-    int texture_y = 0;
-
-    int texture_width  = width_img_boundaries[0];
-    int texture_height = height_img_boundaries[0];
-
-    for (int y = 0; y < lin_height.size(); y++) {
-        for (int x = 0; x < lin_width.size(); x++) {
-            if (lin_width[x] < 0 ||
-                lin_width[x] >= simulation_width ||
-                lin_height[y] < 0 ||
-                lin_height[y] >= simulation_height) {
-                pixel_color = cc.simulation_background_color;
-            } else {
-                auto &block = second_grid[lin_width[x] + lin_height[y] * simulation_width];
-                //double({pos} - {dim}_b.x) / ({dim}_b.y - {dim}_b.x)
-                // first,  calculate relative position of a pixel inside a texture block.
-                // second, calculate a dimension of a pixel that is going to be displayed.
-                // third,  normalize relative position between 0 and 1 by dividing result of first stage by second one.
-                pixel_color = get_kernel_texture_color(block.type,
-                                                       block.rotation,
-                                                       texture_x, texture_y,
-                                                       texture_width, texture_height,
-                                                       kernel_size, textures);
-            }
-            set_image_pixel(x, y, image_width, pixel_color, image_vector);
-
-            texture_x++;
-            if (texture_x+1  > texture_width) {texture_x=0; texture_width = width_img_boundaries[++texture_x_i];}
-        }
-        texture_x=0; texture_x_i = 0; texture_width = width_img_boundaries[0];
-        texture_y++;
-        if (texture_y+1> texture_height) {texture_y=0; texture_height = height_img_boundaries[++texture_y_i];}
-    }
 }

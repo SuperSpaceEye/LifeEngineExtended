@@ -94,6 +94,7 @@ struct SimulationParameters {
     bool organisms_destroy_food = true;
     bool use_continuous_movement = true;
     bool growth_of_organisms = true;
+    bool food_blocks_growth = true;
 };
 
 #endif //THELIFEENGINECPP_SIMULATIONPARAMETERS_H

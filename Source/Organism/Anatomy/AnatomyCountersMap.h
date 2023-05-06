@@ -35,9 +35,17 @@ struct AnatomyCounters: public ConstMap<T, len, allowed> {
     __attribute__((optimize("-O3"))) inline constexpr const T & operator[](const BlockTypes & type) const {
         return this->data[(int)type-1];
     }
+
+    bool operator==(const AnatomyCounters & other) {
+        for (int i = 0; i < len; i++) {
+            if ((*this).data[i] != other.data[i]) {return false;}
+        }
+
+        return true;
+    }
 };
 
-constexpr auto make_map(){
+constexpr auto make_anatomy_counters(){
     return AnatomyCounters<int, NUM_ORGANISM_BLOCKS, (std::string_view*)SW_ORGANISM_BLOCK_NAMES>{};
 };
 

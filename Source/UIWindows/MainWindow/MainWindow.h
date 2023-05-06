@@ -52,6 +52,7 @@
 #include "Stuff/structs/Vector2.h"
 #include "Stuff/ImageStuff/ImageCreation.h"
 #include "Stuff/DataSavingFunctions.h"
+#include "Stuff/iterate_between_two_points.h"
 #include "Containers/ColorContainer.h"
 #include "Containers/SimulationParameters.h"
 #include "Containers/EngineControlParametersContainer.h"
@@ -190,7 +191,6 @@ private:
     int brush_size = 2;
     int update_info_every_n_milliseconds = 100;
     //Will give a warning if num is higher than this.
-    //TODO delete
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
     int font_size;
@@ -231,8 +231,6 @@ private:
 
     void update_table_values();
 
-    static std::vector<Vector2<int>> iterate_between_two_points(Vector2<int> pos1, Vector2<int> pos2);
-
     //is invoked by qt timer
     void mainloop_tick();
     void ui_tick();
@@ -242,7 +240,7 @@ private:
     void resize_image(int image_width, int image_height);
 
     // for fill_view
-    void calculate_new_simulation_size();
+    void calculate_fill_window_simulation_size();
     Vector2<int> calculate_cursor_pos_on_grid(int x, int y);
 
     void create_image();
@@ -260,7 +258,6 @@ private:
     //TODO
     void set_simulation_num_threads(uint8_t num_threads);
 
-    void set_cursor_mode(CursorMode mode);
     void set_simulation_mode(SimulationModes mode);
 
     void update_statistics_info(const OrganismInfoContainer &info);
@@ -413,6 +410,7 @@ private slots:
     void cb_food_blocks_movement_slot(bool state);
     void cb_organisms_destroy_food_slot(bool state);
     void cb_enable_organism_growth_slot(bool state);
+    void cb_food_blocks_growth_slot(bool state);
 
     void cb_check_if_path_is_clear_slot(bool state);
     void cb_no_random_decisions_slot(bool state);
@@ -450,6 +448,10 @@ public:
     void apply_font_size();
 
     void get_current_font_size();
+
+    void statistics_tick();
+
+    void load_grid_image();
 };
 
 

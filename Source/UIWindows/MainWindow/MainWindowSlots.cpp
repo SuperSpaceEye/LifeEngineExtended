@@ -534,17 +534,17 @@ void MainWindow::le_cell_growth_modifier_slot() {
 //==================== Radio button ====================
 
 void MainWindow::rb_food_slot() {
-    set_cursor_mode(CursorMode::ModifyFood);
+    cursor_mode = CursorMode::ModifyFood;
     ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_wall_slot() {
-    set_cursor_mode(CursorMode::ModifyWall);
+    cursor_mode =CursorMode::ModifyWall;
     ee.ui.rb_null_button->setChecked(true);
 }
 
 void MainWindow::rb_kill_slot() {
-    set_cursor_mode(CursorMode::KillOrganism);
+    cursor_mode = CursorMode::KillOrganism;
     ee.ui.rb_null_button->setChecked(true);
 }
 
@@ -764,6 +764,14 @@ void MainWindow::cb_use_occ_slot(bool state) {
         st.ui.lb_total_occ_length_4->hide();
     }
 
+    auto temp = disable_warnings;
+    disable_warnings = true;
+
+    cb_enable_organism_growth_slot(state);
+    ui.cb_enable_organism_growth->setEnabled(state);
+
+    disable_warnings = temp;
+
     engine.pause();
     sp.use_occ = state;
     engine.reset_world();
@@ -802,6 +810,7 @@ void MainWindow::cb_enable_organism_growth_slot(bool state) {
 
     ui.le_starting_organism_size->setEnabled(state);
     ui.le_cell_growth_modifier->setEnabled(state);
+    ui.cb_food_blocks_growth->setEnabled(state);
 
     engine.pause();
     sp.growth_of_organisms = state;
@@ -859,8 +868,9 @@ void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_ra
 
 void MainWindow::cb_do_not_mutate_brain_of_plants_slot   (bool state) { sp.do_not_mutate_brains_of_plants = state;}
 
-//TODO destroy food under organisms on enable?
 void MainWindow::cb_organisms_destroy_food_slot          (bool state) { sp.organisms_destroy_food = state;}
+
+void MainWindow::cb_food_blocks_growth_slot              (bool state) { sp.food_blocks_growth = state;}
 
 void MainWindow::cb_load_evolution_controls_from_state_slot(bool state) { save_simulation_settings = state;}
 

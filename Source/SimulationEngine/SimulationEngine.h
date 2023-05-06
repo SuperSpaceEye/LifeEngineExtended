@@ -40,7 +40,6 @@
 #include "SimulationEngineModes/SimulationEngineSingleThread.h"
 #include "OrganismsController.h"
 
-//TODO move simulation grid translation to here
 class SimulationEngine {
     EngineControlParameters& ecp;
     EngineDataContainer& edc;
@@ -65,7 +64,6 @@ class SimulationEngine {
 
     void simulation_tick();
 
-    void change_mode();
     static bool check_if_out_of_bounds(EngineDataContainer *dc, int x, int y);
 
     void random_food_drop();

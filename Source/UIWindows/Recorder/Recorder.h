@@ -32,7 +32,7 @@
 #include "../../WorldRecorder/RecordingReconstructorCUDA.cuh"
 #endif
 
-#include "../../Stuff/moviemaker/include/movie.h"
+#include "Stuff/external/moviemaker/include/movie.h"
 
 #if defined(__WIN32)
 #include <windows.h>
@@ -48,8 +48,8 @@ private:
     EngineControlParameters * ecp = nullptr;
     SimulationEngine * engine = nullptr;
     ColorContainer * cc = nullptr;
-    TexturesContainer * textures = nullptr;
-    TransactionBuffer * tbuffer = nullptr;
+    Textures::TexturesContainer * textures = nullptr;
+    WorldRecorder::TransactionBuffer * tbuffer = nullptr;
 
     RecordingReconstructor reconstructor;
 
@@ -110,7 +110,7 @@ private:
 
 public:
     Recorder(Ui::MainWindow *_parent_ui, EngineDataContainer *edc, EngineControlParameters *ecp, ColorContainer *cc,
-             TexturesContainer *textures, TransactionBuffer *tbuffer, float *viewpoint_x, float *viewpoint_y,
+             Textures::TexturesContainer *textures, WorldRecorder::TransactionBuffer *tbuffer, float *viewpoint_x, float *viewpoint_y,
              float *zoom, bool &cuda_is_available);
 
     void set_engine(SimulationEngine * engine);

@@ -7,7 +7,6 @@
 //
 
 #include "SimulationEngine/OrganismsController.h"
-
 #include "SimulationEngineSingleThread.h"
 
 using BT = BlockTypes;
@@ -48,8 +47,8 @@ SimulationEngineSingleThread::single_threaded_tick(EngineDataContainer &edc, Sim
     for (int i = 0; i <= edc.stc.last_alive_position; i++) {auto & organism = edc.stc.organisms[i]; if (!organism.is_dead) {try_make_child(edc, sp, organism, gen);}}
 }
 
-void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp) {
-    organism.pre_init();
+void SimulationEngineSingleThread::place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp, bool pre_init) {
+    if (pre_init) {organism.pre_init();}
     organism.init_values();
     if (edc.record_data) {edc.stc.tbuffer.record_new_organism(organism);}
     for (auto & block: organism.get_organism_blocks_view()) {
@@ -71,9 +70,9 @@ void SimulationEngineSingleThread::produce_food(EngineDataContainer &edc, Simula
     if (organism.lifetime % sp.produce_food_every_n_life_ticks != 0) {return;}
 
     if (sp.simplified_food_production) {
-        produce_food_simplified(edc, sp, organism, gen, organism.multiplier);
+        produce_food_simplified(edc, sp, organism, gen, organism.food_multiplier);
     } else {
-        produce_food_complex(edc, sp, organism, gen, organism.multiplier);
+        produce_food_complex(edc, sp, organism, gen, organism.food_multiplier);
     }
 }
 
@@ -355,7 +354,7 @@ void SimulationEngineSingleThread::move_organism(EngineDataContainer &edc, Organ
 bool SimulationEngineSingleThread::calculate_continuous_move(EngineDataContainer &edc, Organism &organism,
                                                              const SimulationParameters &sp, int &new_x,
                                                              int &new_y) {
-    float mass = organism.food_needed + organism.food_collected;
+    float mass = organism.mass + organism.food_collected;
     auto & cd = organism.cdata;
     cd.p_vx += (cd.p_fx - cd.p_vx * sp.continuous_movement_drag) / mass * organism.c[BT::MoverBlock];
     cd.p_vy += (cd.p_fy - cd.p_vy * sp.continuous_movement_drag) / mass * organism.c[BT::MoverBlock];
@@ -508,7 +507,6 @@ void SimulationEngineSingleThread::place_child(EngineDataContainer &edc, Simulat
         int c_distance = std::abs(organism.x - child_pattern->x) + std::abs(organism.y - child_pattern->y);
 
           for (auto & block: child_pattern->get_organism_blocks_view()) {
-//            for (auto & block: child_pattern->anatomy.organism_blocks) {
             if (!path_is_clear(organism.x + block.get_pos(rotation).x,
                                organism.y + block.get_pos(rotation).y,
                                to_place,
@@ -563,8 +561,12 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
     int y = b_pos.y + organism.y;
 
     if (edc.st_grid.get_type(x, y) != BT::EmptyBlock) {return;}
-    if (sp.food_blocks_reproduction && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
-    if (sp.organisms_destroy_food) {edc.st_grid.get_food_num(x, y)=0;}
+    if (sp.food_blocks_growth && edc.st_grid.get_food_num(x, y) >= sp.food_threshold) {return;}
+    if (sp.organisms_destroy_food) {
+        auto & num = edc.st_grid.get_food_num(x, y);
+        if (edc.record_data) {edc.stc.tbuffer.record_food_change(x, y, -num);}
+        num=0;
+    }
 
     organism.size++;
     edc.st_grid.get_type(x, y) = next_block.type;
@@ -574,13 +576,13 @@ void SimulationEngineSingleThread::grow_organism(EngineDataContainer &edc, Simul
 
     if(organism.c[BT::MoverBlock] == 0 && next_block.type == BT::MoverBlock ||
        organism.c[BT::EyeBlock]   == 0 && next_block.type == BT::EyeBlock) {
-        organism.init_brain();
+        organism.init_brain_type();
     }
 
     organism.life_points += b_bp.life_point_amount;
     organism.max_lifetime += sp.lifespan_multiplier * b_bp.lifetime_weight;
     organism.c[next_block.type]++;
-    organism.food_needed += food_needed;
+    organism.mass += food_needed;
     if (organism.size == organism.anatomy.organism_blocks.size()) {organism.is_adult = true;}
 
     if (edc.record_data) {edc.stc.tbuffer.record_organism_size_change(organism);}

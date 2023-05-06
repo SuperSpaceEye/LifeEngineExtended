@@ -157,6 +157,7 @@ void RecordingReconstructor::apply_move_change(WorldRecorder::Transaction &trans
     }
 }
 
+//TODO something here is wrong. I feel it
 void RecordingReconstructor::apply_dead_organisms(WorldRecorder::Transaction &transaction) {
     for (auto & dc: transaction.dead_organisms) {
         auto & o = rec_orgs[dc];

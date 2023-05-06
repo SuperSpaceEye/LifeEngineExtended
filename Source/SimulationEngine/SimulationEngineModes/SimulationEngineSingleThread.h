@@ -29,7 +29,7 @@ inline Rotation get_global_rotation(Rotation rotation1, Rotation rotation2) {
 
 class SimulationEngineSingleThread {
 public:
-    static void place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp);
+    static void place_organism(EngineDataContainer &edc, Organism &organism, SimulationParameters &sp, bool pre_init=true);
 
     static void produce_food    (EngineDataContainer &edc, SimulationParameters &sp, Organism &organism, lehmer64 &gen);
 

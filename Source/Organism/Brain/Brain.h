@@ -43,7 +43,7 @@ enum class BrainTypes {
     // If no meaningful action, then returns random action.
     SimpleBrain,
     WeightedBrain,
-    //TODO will try to implement in the future
+    //TODO maybe some day implement in the future
     //https://gamedev.stackexchange.com/questions/51693/difference-between-decision-trees-behavior-trees-for-game-ai
     //https://www.behaviortree.dev/
     //https://github.com/BehaviorTree/BehaviorTree.CPP
