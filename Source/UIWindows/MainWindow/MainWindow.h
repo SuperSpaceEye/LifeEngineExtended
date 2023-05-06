@@ -200,7 +200,6 @@ private:
     int brush_size = 2;
     int update_info_every_n_milliseconds = 100;
     //Will give a warning if num is higher than this.
-    //TODO delete
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
     int font_size;

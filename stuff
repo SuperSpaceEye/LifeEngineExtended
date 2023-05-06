@@ -1,0 +1,10 @@
+https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html
+https://docs.nvidia.com/cuda/cuda-occupancy-calculator/index.html#abstract
+https://stackoverflow.com/questions/9985912/how-do-i-choose-grid-and-block-dimensions-for-cuda-kernels
+https://docs.nvidia.com/cuda/thrust/index.html
+https://developer.nvidia.com/blog/even-easier-introduction-cuda/
+https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+https://cuda-tutorial.readthedocs.io/en/latest/tutorials/tutorial02/
+https://stackoverflow.com/questions/44223306/in-an-elementwise-add-cuda-kernel-why-is-the-stride-blockdim-x-griddim-x
+https://oneflow2020.medium.com/how-to-choose-the-grid-size-and-block-size-for-a-cuda-kernel-d1ff1f0a7f92
+https://stackoverflow.com/questions/2392250/understanding-cuda-grid-dimensions-block-dimensions-and-threads-organization-s

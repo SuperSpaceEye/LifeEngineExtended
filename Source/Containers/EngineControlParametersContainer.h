@@ -35,7 +35,6 @@ struct EngineControlParameters {
     volatile bool engine_pass_tick = false;
     // getting time is expensive, so if simulation time set to unlimited, do not get time.
     volatile bool calculate_simulation_tick_delta_time = true;
-    //TODO move into sim engine?
     volatile bool organisms_extinct = false;
 
     // pauses the engine when ui pause button is pressed
@@ -56,12 +55,7 @@ struct EngineControlParameters {
     volatile bool pause_button_pause = false;
 
     volatile bool update_editor_organism = false;
-
-    volatile bool parse_full_grid_every_n = 1;
-
-    //TODO move?
-    volatile bool lock_resizing = false;
-
+    
     volatile int  update_info_every_n_tick = 100;
     volatile int  update_world_events_every_n_tick = 1;
     volatile bool execute_world_events = false;

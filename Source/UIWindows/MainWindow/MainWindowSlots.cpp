@@ -884,7 +884,6 @@ void MainWindow::cb_no_random_decisions_slot             (bool state) { sp.no_ra
 
 void MainWindow::cb_do_not_mutate_brain_of_plants_slot   (bool state) { sp.do_not_mutate_brains_of_plants = state;}
 
-//TODO destroy food under organisms on enable?
 void MainWindow::cb_organisms_destroy_food_slot          (bool state) { sp.organisms_destroy_food = state;}
 
 void MainWindow::cb_food_blocks_growth_slot              (bool state) { sp.food_blocks_growth = state;}

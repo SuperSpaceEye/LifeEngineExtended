@@ -347,10 +347,6 @@ void MainWindow::just_resize_simulation_grid() {
 }
 
 void MainWindow::resize_simulation_grid() {
-    if (ecp.lock_resizing) {
-        display_message("Grid cannot be resized until recording is stopped.");
-        return;
-    }
     if (fill_window) { calculate_fill_window_simulation_size();}
 
     if (!disable_warnings) {
@@ -837,7 +833,7 @@ void MainWindow::load_state() {
     auto temp = disable_warnings;
     disable_warnings = true;
     initialize_gui();
-    //TODO this is kinda stupid fix
+    //This is kinda stupid fix
     cb_use_occ_slot(!sp.use_occ);
     cb_use_occ_slot(!sp.use_occ);
     disable_warnings = temp;
