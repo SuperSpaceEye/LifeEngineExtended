@@ -9,6 +9,8 @@
 
 #include "RecordingReconstructorCUDA.cuh"
 
+using namespace WorldRecorder;
+
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
@@ -510,7 +512,7 @@ void RecordingReconstructorCUDA::prepare_image_creation(int image_width, int ima
                                                         std::vector<int> lin_height,
                                                         std::vector<Vector2<int>> width_img_boundaries,
                                                         std::vector<Vector2<int>> height_img_boundaries,
-                                                        TexturesContainer &container,
+                                                        Textures::TexturesContainer &container,
                                                         ColorContainer *color_container) {
     this->image_width = image_width;
     this->image_height = image_height;

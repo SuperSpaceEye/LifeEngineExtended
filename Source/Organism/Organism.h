@@ -37,7 +37,9 @@ struct ContinuousData {
     float p_fy = 0;
     bool initialized = false;
 
-    bool operator==(const ContinuousData &) const=default;
+    bool operator==(const ContinuousData & d) const {
+        return std::memcmp(this, &d, sizeof(ContinuousData));
+    }
 };
 
 struct OrganismData {

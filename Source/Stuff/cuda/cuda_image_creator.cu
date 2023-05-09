@@ -30,7 +30,7 @@ void CUDAImageCreator::load_symbols(const ColorContainer *colorContainer) {
     gpuErrchk(cudaMemcpyToSymbol(const_color_container, colorContainer, sizeof(ColorContainer)));
 }
 
-__device__ void set_image_pixel(int x, int y, int width, color color, unsigned char * image_vector) {
+__device__ void set_image_pixel(int x, int y, int width, Textures::color color, unsigned char * image_vector) {
     auto index = 4 * (y * width + x);
     image_vector[index+2] = color.r;
     image_vector[index+1] = color.g;
@@ -45,7 +45,7 @@ __device__ void set_image_pixel(int x, int y, int width, color color, unsigned c
 #define RGB2U(R, G, B) CLIP(( ( -38 * (R) -  74 * (G) + 112 * (B) + 128) >> 8) + 128)
 #define RGB2V(R, G, B) CLIP(( ( 112 * (R) -  94 * (G) -  18 * (B) + 128) >> 8) + 128)
 //https://stackoverflow.com/questions/27822017/planar-yuv420-data-layout
-__device__ void set_yuv_image_pixel(int x, int y, int width, int height, color color, unsigned char *image_vector) {
+__device__ void set_yuv_image_pixel(int x, int y, int width, int height, Textures::color color, unsigned char *image_vector) {
     //y
     image_vector[y * width + x] = RGB2Y(color.r, color.g, color.b);
     //u
@@ -54,7 +54,7 @@ __device__ void set_yuv_image_pixel(int x, int y, int width, int height, color c
     image_vector[(y / 2) * (width / 2) + (x / 2) + width*height + width*height / 4] = RGB2V(color.r, color.g, color.b);
 }
 
-__device__ color get_texture_color(BlockTypes type, Rotation rotation, float rxs, float rys, CudaTextureHolder * textures) {
+__device__ Textures::color get_texture_color(BlockTypes type, Rotation rotation, float rxs, float rys, CudaTextureHolder * textures) {
     auto & holder = textures[static_cast<int>(type)];
 
     if (holder.width == 1 && holder.height == 1) {return holder.texture[0];}
@@ -119,7 +119,7 @@ __global__ void create_image_kernel(int image_width, int simulation_width, int s
 
     if (x_pos >= width_img_size || y_pos >= height_img_size) {return;}
 
-    color pixel_color;
+    Textures::color pixel_color;
 
     //x - start, y - stop
 
@@ -159,7 +159,7 @@ create_yuv_image_kernel(int image_width, int image_height, int simulation_width,
 
     if (x_pos >= width_img_size || y_pos >= height_img_size) {return;}
 
-    color pixel_color;
+    Textures::color pixel_color;
 
     //x - start, y - stop
 
@@ -374,7 +374,7 @@ void CUDAImageCreator::copy_result_image(std::vector<unsigned char> &image_vecto
                          cudaMemcpyDeviceToHost));
 }
 
-void CUDAImageCreator::copy_textures(TexturesContainer &container) {
+void CUDAImageCreator::copy_textures(Textures::TexturesContainer &container) {
     free_textures();
 
     std::vector<CudaTextureHolder> temp_container;
@@ -382,13 +382,13 @@ void CUDAImageCreator::copy_textures(TexturesContainer &container) {
     for (auto & texture: container.textures) {
         auto temp_holder = CudaTextureHolder{texture.width, texture.height};
 
-        color * temp_d_texture_pointer = nullptr;
+        Textures::color * temp_d_texture_pointer = nullptr;
 
-        gpuErrchk(cudaMalloc((color**)&temp_d_texture_pointer, sizeof(color) * texture.width * texture.height));
+        gpuErrchk(cudaMalloc((Textures::color**)&temp_d_texture_pointer, sizeof(Textures::color) * texture.width * texture.height));
 
         gpuErrchk(cudaMemcpy(temp_d_texture_pointer,
                              texture.texture.data(),
-                             sizeof(color) * texture.width * texture.height,
+                             sizeof(Textures::color) * texture.width * texture.height,
                              cudaMemcpyHostToDevice));
 
         d_textures_pointers.emplace_back(temp_d_texture_pointer);

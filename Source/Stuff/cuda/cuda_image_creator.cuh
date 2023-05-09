@@ -18,10 +18,10 @@
 #endif
 
 #include <vector>
-#include "../ImageStuff/textures.h"
+#include "Stuff/ImageStuff/textures.h"
 #include "Containers/ColorContainer.h"
 #include "Containers/EngineDataContainer.h"
-#include "Stuff/Vector2.h"
+#include "Stuff/structs/Vector2.h"
 
 struct Differences {
     uint32_t x;
@@ -33,7 +33,7 @@ struct Differences {
 struct CudaTextureHolder {
     int width;
     int height;
-    color* texture;
+    Textures::color * texture;
 };
 
 class CUDAImageCreator {
@@ -48,7 +48,7 @@ public:
     Differences * d_differences = nullptr;
     CudaTextureHolder * d_textures = nullptr;
 
-    std::vector<color*> d_textures_pointers;
+    std::vector<Textures::color*> d_textures_pointers;
 
     std::vector<BaseGridBlock> device_state_grid{};
 
@@ -106,7 +106,7 @@ public:
 
     void load_symbols(const ColorContainer *colorContainer);
 
-    void copy_textures(TexturesContainer & container);
+    void copy_textures(Textures::TexturesContainer & container);
 
     static void
     cuda_call_create_image(int image_width, int image_height, std::vector<unsigned char> &image_vector,

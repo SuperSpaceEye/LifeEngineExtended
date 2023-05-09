@@ -77,8 +77,8 @@
 #endif
 
 #ifdef __CUDA_USED__
-#include "Stuff/cuda_image_creator.cuh"
-#include "Stuff/get_device_count.cuh"
+#include "Stuff/cuda/cuda_image_creator.cuh"
+#include "Stuff/cuda/get_device_count.cuh"
 #endif
 
 #include "WindowUI.h"

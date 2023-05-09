@@ -64,8 +64,8 @@ if(SANITIZE OR DEBUG)
     set(CMAKE_LINK_DEF_FILE_FLAG "${CMAKE_LINK_DEF_FILE_FLAG} -fsanitize=address")
 endif()
 
-set(CUDA_HEADERS Source/SimulationEngine/SimulationEngineModes/del/SimulationEngineCuda.cuh Source/Stuff/cuda/cuda_image_creator.cuh Source/Stuff/cuda/get_device_count.cuh)
-set(CUDA_SOURCES Source/SimulationEngine/SimulationEngineModes/del/SimulationEngineCuda.cu Source/Stuff/cuda/cuda_image_creator.cu Source/Stuff/cuda/get_device_count.cu)
+set(CUDA_HEADERS Source/Stuff/cuda/cuda_image_creator.cuh Source/Stuff/cuda/get_device_count.cuh)
+set(CUDA_SOURCES Source/Stuff/cuda/cuda_image_creator.cu Source/Stuff/cuda/get_device_count.cu)
 
 if(NOT WIN_COMPILATION)
     set(CMAKE_CUDA_COMPILER "/usr/local/cuda-11.8/bin/nvcc")
