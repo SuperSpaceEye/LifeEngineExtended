@@ -1,0 +1,14 @@
+if .ui files are changed, run before building. Also change the uic path.
+
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/mainwindow.ui -o Source/UIWindows/MainWindow/WindowUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/statistics.ui -o Source/UIWindows/Statistics/StatisticsUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/editor.ui -o Source/UIWindows/OrganismEditor/EditorUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/info.ui -o Source/UIWindows/InfoWindow/InfoWindowUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/recorder.ui -o Source/UIWindows/Recorder/RecorderWindowUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/worldevents.ui -o Source/UIWindows/WorldEvents/WorldEventsUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/ChangeValueEventNodeWidget.ui -o Source/UIWindows/WorldEvents/ChangeValueEventNodeWidgetUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/ConditionalEventNodeWidget.ui -o Source/UIWindows/WorldEvents/ConditionalEventNodeWidgetUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/benchmark.ui -o Source/UIWindows/Benchmark/BenchmarkUI.h
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/OCCParameters.ui -o Source/UIWindows/OCCParameters/OCCParametersUI.h
+
+ /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/mainwindow.ui -o Source/UIWindows/MainWindow/WindowUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/statistics.ui -o Source/UIWindows/Statistics/StatisticsUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/editor.ui -o Source/UIWindows/OrganismEditor/EditorUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/info.ui -o Source/UIWindows/InfoWindow/InfoWindowUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/recorder.ui -o Source/UIWindows/Recorder/RecorderWindowUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/worldevents.ui -o Source/UIWindows/WorldEvents/WorldEventsUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/ChangeValueEventNodeWidget.ui -o Source/UIWindows/WorldEvents/ChangeValueEventNodeWidgetUI.h;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/ConditionalEventNodeWidget.ui -o Source/UIWindows/WorldEvents/ConditionalEventNodeWidgetUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/benchmark.ui -o Source/UIWindows/Benchmark/BenchmarkUI.h ;  /home/spaceeye/qt6-build/qtbase/libexec/uic  -g cpp Source/UiFiles/OCCParameters.ui -o Source/UIWindows/OCCParameters/OCCParametersUI.h
