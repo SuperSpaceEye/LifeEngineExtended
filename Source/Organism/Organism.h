@@ -37,7 +37,9 @@ struct ContinuousData {
     float p_fy = 0;
     bool initialized = false;
 
-    bool operator==(const ContinuousData &) const=default;
+    bool operator==(const ContinuousData & d) const {
+        return std::memcmp(this, &d, sizeof(ContinuousData));
+    }
 };
 
 struct OrganismData {
@@ -134,26 +136,6 @@ public:
 
     //TODO make init_values include pre_init, but rename original init_values to something else to separate usages
     void pre_init();
-    
-//    using BlockTypes   = BlockTypes;
-//    using SerializedAdjacentSpaceContainer = SerializedAdjacentSpaceContainer;
-//    using SerializedOrganismBlockContainer = SerializedOrganismBlockContainer;
-
-//    array_view1d<SerializedOrganismBlockContainer> organism_blocks_view;
-//    array_view1d<SerializedOrganismBlockContainer> eye_blocks_view;
-//    array_view1d<std::vector<SerializedAdjacentSpaceContainer>> producing_space_view;
-//
-//    array_view1d<SerializedAdjacentSpaceContainer> eating_view;
-//    array_view1d<SerializedAdjacentSpaceContainer> killing_view;
-
-//    void make_views() {
-////        organism_blocks_view = array_view1d<SerializedOrganismBlockContainer>{(SerializedOrganismBlockContainer*)anatomy.organism_blocks.data(), std::min<uint64_t>(size, anatomy.organism_blocks.size())};
-////        if (!anatomy.eye_block_vec.empty())   {eye_blocks_view      = array_view1d<SerializedOrganismBlockContainer>{(SerializedOrganismBlockContainer*)anatomy.eye_block_vec.data(),   std::min<uint64_t>(c[BlockTypes::EyeBlock], anatomy.eye_block_vec.size())};}
-////        if (!anatomy.producing_space.empty()) {producing_space_view = array_view1d<std::vector<SerializedAdjacentSpaceContainer>>{(std::vector<SerializedAdjacentSpaceContainer>*)anatomy.producing_space.data(), std::min<uint64_t>(c[BlockTypes::ProducerBlock], anatomy.producing_space.size())};}
-////
-////        if (!anatomy.eating_space.empty())  {eating_view   = array_view1d<SerializedAdjacentSpaceContainer>{(SerializedAdjacentSpaceContainer*)anatomy.eating_space.data(),   std::min<size_t>(anatomy.eating_mask[c[BlockTypes::MouthBlock]-1], anatomy.eating_space.size())};}
-////        if (!anatomy.killing_space.empty()) {killing_view  = array_view1d<SerializedAdjacentSpaceContainer>{(SerializedAdjacentSpaceContainer*)anatomy.killing_space.data(),  std::min<size_t>(anatomy.killer_mask[c[BlockTypes::KillerBlock]-1], anatomy.killing_space.size())};}
-//    }
 
     using BT = BlockTypes;
     using SOBC = SerializedOrganismBlockContainer;

@@ -5,7 +5,7 @@
 #ifndef LIFEENGINEEXTENDED_RECORDINGRECONSTRUCTORCUDA_CUH
 #define LIFEENGINEEXTENDED_RECORDINGRECONSTRUCTORCUDA_CUH
 
-#include "Stuff/cuda_image_creator.cuh"
+#include "Stuff/cuda/cuda_image_creator.cuh"
 
 #include "WorldRecorder.h"
 
@@ -24,14 +24,14 @@ public:
 
 struct CudaTransaction {
     RecCudaOrganism * organism_change = nullptr;
-    FoodChange * food_change = nullptr;
+    WorldRecorder::FoodChange * food_change = nullptr;
     int * dead_organisms = nullptr;
-    MoveChange * move_change = nullptr;
+    WorldRecorder::MoveChange * move_change = nullptr;
     std::pair<int, int> * compressed_change = nullptr;
 
-    RecActionType * user_action_execution_order = nullptr;
-    WallChange * user_wall_change = nullptr;
-    FoodChange * user_food_change = nullptr;
+    WorldRecorder::RecActionType * user_action_execution_order = nullptr;
+    WorldRecorder::WallChange * user_wall_change = nullptr;
+    WorldRecorder::FoodChange * user_food_change = nullptr;
     RecCudaOrganism * user_organism_change = nullptr;
     int * user_dead_change = nullptr;
 
@@ -88,11 +88,11 @@ class RecordingReconstructorCUDA {
     int grid_height;
     bool recenter_to_imaginary_position;
 
-    void apply_starting_point(Transaction & transaction);
-    void apply_reset(Transaction & transaction);
-    void apply_normal(Transaction & transaction);
+    void apply_starting_point(WorldRecorder::Transaction & transaction);
+    void apply_reset(WorldRecorder::Transaction & transaction);
+    void apply_normal(WorldRecorder::Transaction & transaction);
 
-    void prepare_transaction(Transaction & transaction);
+    void prepare_transaction(WorldRecorder::Transaction & transaction);
 public:
     RecordingReconstructorCUDA()=default;
 
@@ -101,9 +101,9 @@ public:
                                 std::vector<int> lin_height,
                                 std::vector<Vector2<int>> width_img_boundaries,
                                 std::vector<Vector2<int>> height_img_boundaries,
-                                TexturesContainer &container,
+                                Textures::TexturesContainer &container,
                                 ColorContainer *color_container);
-    void apply_transaction(Transaction & transaction);
+    void apply_transaction(WorldRecorder::Transaction & transaction);
     void make_image(std::vector<unsigned char> & image_vector);
     void finish_reconstruction();
     void finish_image_creation();

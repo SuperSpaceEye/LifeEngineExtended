@@ -77,8 +77,8 @@
 #endif
 
 #ifdef __CUDA_USED__
-#include "Stuff/cuda_image_creator.cuh"
-#include "Stuff/get_device_count.cuh"
+#include "Stuff/cuda/cuda_image_creator.cuh"
+#include "Stuff/cuda/get_device_count.cuh"
 #endif
 
 #include "WindowUI.h"
@@ -200,7 +200,6 @@ private:
     int brush_size = 2;
     int update_info_every_n_milliseconds = 100;
     //Will give a warning if num is higher than this.
-    //TODO delete
     int max_loaded_num_organisms = 1'000'000;
     int max_loaded_world_side = 10'000;
     int font_size;

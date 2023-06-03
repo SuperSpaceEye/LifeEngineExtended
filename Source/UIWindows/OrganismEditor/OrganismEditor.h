@@ -45,7 +45,7 @@
 #include "EditorUI.h"
 
 #ifdef __CUDA_USED__
-#include "Stuff/cuda_image_creator.cuh"
+#include "Stuff/cuda/cuda_image_creator.cuh"
 #endif
 
 class OrganismEditor: public QWidget {

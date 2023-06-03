@@ -110,7 +110,7 @@ Textures::color ImageCreation::ImageCreationTools::get_texture_color(BlockTypes 
     return holder.texture[x + y * holder.width];
 }
 
-//TODO make a proper description
+//I wrote this code at like 1 am or smth so
 
 // If the number of pixels per texture is small, then the textures will be incorrect for some reason.
 // That's why, this function for x,y pos will actually get x_1,y_1 to x_kernel_size,y_kernel_size positions with
@@ -118,10 +118,8 @@ Textures::color ImageCreation::ImageCreationTools::get_texture_color(BlockTypes 
 //Will do kernel_size^2
 Textures::color ImageCreation::ImageCreationTools::get_kernel_texture_color(BlockTypes type,
                                                                             Rotation rotation,
-                                                                            int texture_x,
-                                                                            int texture_y,
-                                                                            int texture_width,
-                                                                            int texture_height,
+                                                                            int texture_x, int texture_y,
+                                                                            int texture_width, int texture_height,
                                                                             int kernel_size,
                                                                             const Textures::TexturesContainer &textures) {
     auto & holder = textures.textures[static_cast<int>(type)];
@@ -136,8 +134,8 @@ Textures::color ImageCreation::ImageCreationTools::get_kernel_texture_color(Bloc
         for (int _y = texture_y * kernel_size; _y < texture_y * kernel_size + kernel_size; _y++) {
             auto _color = get_texture_color(type,
                                            rotation,
-                                           double(_x)/(texture_width*kernel_size),
-                                           double(_y)/(texture_height*kernel_size),
+                                            double(_x)/(texture_width*kernel_size),
+                                            double(_y)/(texture_height*kernel_size),
                                            textures);
             bool is_in = false;
             for (auto & [lcol, num]: used_colors) {

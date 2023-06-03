@@ -16,7 +16,7 @@
 #include "textures.h"
 
 #ifdef __CUDA_USED__
-#include "cuda_image_creator.cuh"
+#include "Stuff/cuda/cuda_image_creator.cuh"
 #endif
 
 namespace ImageCreation {

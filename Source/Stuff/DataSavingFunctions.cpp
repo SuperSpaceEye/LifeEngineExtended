@@ -300,6 +300,8 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("weighted_brain_mutation_step", Value(sp.weighted_brain_mutation_step), d.GetAllocator());
     d.AddMember("threshold_move",               Value(sp.threshold_move), d.GetAllocator());
 
+    d.AddMember("continuous_movement_drag", Value(sp.continuous_movement_drag), d.GetAllocator());
+
     d.AddMember("food_threshold", Value(sp.food_threshold), d.GetAllocator());
     d.AddMember("max_food",       Value(sp.max_food), d.GetAllocator());
 
@@ -354,6 +356,7 @@ void DataSavingFunctions::write_json_extended_simulation_parameters(rapidjson::D
     d.AddMember("organisms_destroy_food",           Value(sp.organisms_destroy_food), d.GetAllocator());
     d.AddMember("use_continuous_movement",          Value(sp.use_continuous_movement), d.GetAllocator());
     d.AddMember("growth_of_organisms",              Value(sp.growth_of_organisms), d.GetAllocator());
+    d.AddMember("food_blocks_movement",             Value(sp.food_blocks_movement), d.GetAllocator());
 }
 
 void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Document &d, SimulationParameters &sp) {
@@ -385,6 +388,8 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
 
     sp.food_threshold = d["food_threshold"].GetFloat();
     sp.max_food       = d["max_food"].GetFloat();
+
+    sp.continuous_movement_drag = d["continuous_movement_drag"].GetFloat();
 
     sp.min_move_range       = d["min_move_range"].GetInt();
     sp.max_move_range       = d["max_move_range"].GetInt();
@@ -437,6 +442,7 @@ void DataSavingFunctions::read_json_extended_simulation_parameters(rapidjson::Do
     sp.organisms_destroy_food           = d["organisms_destroy_food"].GetBool();
     sp.use_continuous_movement          = d["use_continuous_movement"].GetBool();
     sp.growth_of_organisms              = d["growth_of_organisms"].GetBool();
+    sp.food_blocks_movement             = d["food_blocks_movement"].GetBool();
 }
 
 

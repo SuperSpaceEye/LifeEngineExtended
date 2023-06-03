@@ -109,10 +109,6 @@ public:
                 deleted++;
             }
         }
-
-        //TODO downsizing vector?
-//    std::vector<std::vector<SerializedAdjacentSpaceContainer>>(_producing_space).swap(_producing_space);
-
     }
 
     template<typename T>
