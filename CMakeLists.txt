@@ -140,7 +140,7 @@ add_compile_definitions(__FRONTEND_IMPL_RELATIVE_PATH__="qt/all_frontend_include
 
 set(FRONTEND_IMPL_FILES Source/Frontend/qt/all_frontend_includes.h Source/Frontend/qt/impl/QtWindow.h)
 
-set(PROJECT_FILES Source/Frontend/frontend_interface.h Source/Frontend/base_frontend.h Source/common/common_concepts.h Source/common/includes/qt.h Source/common/external/PerlinNoise.hpp Source/common/external/ArrayView.h Source/common/external/PRNGS/lehmer64.h Source/common/external/PRNGS/splitmix64.h)
+set(PROJECT_FILES Source/Frontend/frontend_interface.h Source/Frontend/base_frontend.h Source/common/common_concepts.h Source/common/includes/qt.h Source/common/external/PerlinNoise.hpp Source/common/external/ArrayView.h Source/common/external/PRNGS/lehmer64.h Source/common/external/PRNGS/splitmix64.h Source/MainWindow/MainWindow.cpp Source/MainWindow/MainWindow.h)
 add_executable(${PROJECT_NAME} main.cpp ${PROJECT_FILES} ${FRONTEND_IMPL_FILES} ${CUDA_FILES} ${ADDITIONAL_PROJECT_FILES})
 
 if(CUDAToolkit_FOUND)

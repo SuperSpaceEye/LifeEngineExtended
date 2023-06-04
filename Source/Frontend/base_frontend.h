@@ -15,8 +15,8 @@ namespace {
 namespace BaseAbstractFrontend {
     class Widget {
     public:
-        virtual void show() {n("show");}
-        virtual void hide() {n("hide");}
+        virtual void show_it() {n("show_it");}
+        virtual void hide_it() {n("hide_it");}
     };
 
     class Label: public Widget {
@@ -25,17 +25,18 @@ namespace BaseAbstractFrontend {
         requires Concepts::StringLike<T>
         void set_text(const T & item){n("set_text");}
 
-        virtual std::string_view get_text() {n("get_text");}
+        virtual std::string get_text() const {n("get_text");}
     };
 
     class Window: public Widget {
     public:
         Window()=default;
-        Window(const std::string_view & window_name,
-               std::pair<int, int> starting_size,
-               std::pair<int, int> starting_position){}; // Constructor should be this
+        Window(const std::string & window_name,
+               const std::pair<int, int> & starting_size,
+               const std::pair<int, int> & starting_position){}; // Constructor should be this
 
-        virtual void start() {n("start");};
+        virtual void set_window_name(const std::string & name){n("set_window_name");};
+        virtual std::string get_window_name() const {n("get_window_name");}
     };
 }
 
