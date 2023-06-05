@@ -8,8 +8,8 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QApplication::setStyle(QStyleFactory::create("WindowsVista"));
 
-    auto window = MainWindow("LifeEngineExtended", {800, 600}, {200, 200});
-    window.show_it();
+    auto window = MainWindow("LifeEngineExtended", {800, 800}, {1000, 200});
+    window.show();
 
     return QApplication::exec();
 }

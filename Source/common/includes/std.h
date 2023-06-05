@@ -10,5 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <exception>
+#include <utility>
+#include <tuple>
 
 #endif //LIFEENGINEEXTENDED_STD_H

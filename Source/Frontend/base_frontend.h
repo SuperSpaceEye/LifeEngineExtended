@@ -15,11 +15,11 @@ namespace {
 namespace BaseAbstractFrontend {
     class Widget {
     public:
-        virtual void show_it() {n("show_it");}
-        virtual void hide_it() {n("hide_it");}
+        virtual void show() {n("show");}
+        virtual void hide() {n("hide");}
     };
 
-    class Label: public Widget {
+    class Label {
     public:
         template<typename T>
         requires Concepts::StringLike<T>
@@ -28,7 +28,7 @@ namespace BaseAbstractFrontend {
         virtual std::string get_text() const {n("get_text");}
     };
 
-    class Window: public Widget {
+    class Window {
     public:
         Window()=default;
         Window(const std::string & window_name,
@@ -37,6 +37,11 @@ namespace BaseAbstractFrontend {
 
         virtual void set_window_name(const std::string & name){n("set_window_name");};
         virtual std::string get_window_name() const {n("get_window_name");}
+        virtual void set_focus() {n("set_focus");}
+        virtual void set_size(const std::pair<int, int> & size) {n("set_size");}
+        virtual std::pair<int, int> get_size() const {n("get_size");}
+        virtual void set_pos(const std::pair<int, int> & pos) {n("set_pos");}
+        virtual std::pair<int, int> get_pos() const {n("get_pos");}
     };
 }
 
