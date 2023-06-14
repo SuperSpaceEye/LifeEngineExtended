@@ -68,6 +68,9 @@ struct EngineControlParameters {
     volatile bool do_not_use_user_actions_ui = false;
     volatile bool do_not_use_user_actions_engine = false;
 
+    volatile double max_zoom = 100;
+    volatile double min_zoom = 0.001;
+
     volatile bool make_images = true;
 };
 

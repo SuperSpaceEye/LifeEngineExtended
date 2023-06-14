@@ -164,8 +164,10 @@ void OrganismEditor::wheelEvent(QWheelEvent *event) {
     if (ui.editor_graphicsView->underMouse()) {
         if ((event->angleDelta().x() + event->angleDelta().y()) > 0) {
             scaling_zoom /= scaling_coefficient;
+            if (scaling_zoom <= 0.001) {scaling_zoom *= scaling_coefficient;}
         } else {
             scaling_zoom *= scaling_coefficient;
+            if (scaling_zoom >= 10) {scaling_zoom /= scaling_coefficient;}
         }
         create_image();
     }

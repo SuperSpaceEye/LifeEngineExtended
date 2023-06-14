@@ -116,8 +116,10 @@ void MainWindow::wheelEvent(QWheelEvent *event) {
     if (ui.simulation_graphicsView->underMouse()) {
         if ((event->angleDelta().x() + event->angleDelta().y()) > 0) {
             scaling_zoom /= scaling_coefficient;
+            if (scaling_zoom <= ecp.min_zoom) {scaling_zoom *= scaling_coefficient;}
         } else {
             scaling_zoom *= scaling_coefficient;
+            if (scaling_zoom >= ecp.max_zoom) {scaling_zoom /= scaling_coefficient;}
         }
     }
 }
